@@ -1,0 +1,25 @@
+{
+  "name" : "metal-engine",
+  "version-string" : "0.0.1",
+  "builtin-baseline" : "78ba9711d30c64a6b40462c72f356c681e2255f3",
+  "dependencies" : [ {
+    "name" : "glfw3",
+    "version>=" : "3.3.8#2"
+  }, {
+    "name" : "imguizmo",
+    "version>=" : "1.83#1"
+  }, {
+    "name" : "glm",
+    "version>=" : "2023-06-08"
+  },{
+    "name" : "spdlog",
+    "version>=" : "1.12.0"
+  }, {
+    "name" : "imgui",
+    "version>=" : "1.89.9",
+    "features" : [ "docking-experimental", "glfw-binding", "opengl3-binding" ]
+  }, {
+    "name" : "nlohmann-json",
+    "version>=" : "3.11.3"
+  } ]
+}

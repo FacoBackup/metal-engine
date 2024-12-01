@@ -1,20 +1,53 @@
 #include <iostream>
+#include <iostream>
+#include <nlohmann/json.hpp>
 
-// TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+
+using json = nlohmann::json;
 int main() {
-    // TIP Press <shortcut actionId="RenameElement"/> when your caret is at the
-    // <b>lang</b> variable name to see how CLion can help you rename it.
-    auto lang = "C++";
-    std::cout << "Hello and welcome to " << lang << "!\n";
+    json person = {
+        {"name", "Alice"},
+        {"age", 30},
+        {"is_student", false},
+        {"skills", {"C++", "Python", "JSON"}}
+    };
 
-    for (int i = 1; i <= 5; i++) {
-        // TIP Press <shortcut actionId="Debug"/> to start debugging your code.
-        // We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/>
-        // breakpoint for you, but you can always add more by pressing
-        // <shortcut actionId="ToggleLineBreakpoint"/>.
-        std::cout << "i = " << i << std::endl;
-    }
+    // Output the JSON object
+    std::cout << "Original JSON:\n" << person.dump(4) << "\n\n";
+
+    // Access elements
+    std::string name = person["name"];
+    int age = person["age"];
+    bool isStudent = person["is_student"];
+
+    std::cout << "Name: " << name << "\n";
+    std::cout << "Age: " << age << "\n";
+    std::cout << "Is student: " << std::boolalpha << isStudent << "\n\n";
+
+    // Modify elements
+    person["age"] = 31;  // Increment age
+    person["is_student"] = true;  // Update student status
+    person["skills"].push_back("JavaScript");  // Add a new skill
+
+    // Add a new key-value pair
+    person["address"] = {
+        {"city", "New York"},
+        {"zip", "10001"}
+    };
+
+    // Output the modified JSON object
+    std::cout << "Modified JSON:\n" << person.dump(4) << "\n\n";
+
+    // Serialize to a string
+    std::string jsonString = person.dump();
+    std::cout << "Serialized JSON string:\n" << jsonString << "\n\n";
+
+    // Deserialize from a string
+    std::string inputJson = R"({"name":"Bob","age":25,"is_student":true})";
+    json newPerson = json::parse(inputJson);
+
+    // Output the deserialized object
+    std::cout << "Deserialized JSON:\n" << newPerson.dump(4) << "\n";
 
     return 0;
 }
