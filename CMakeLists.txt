@@ -3,13 +3,25 @@ project(metal_engine)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(metal_engine main.cpp)
+add_executable(
+        metal_engine
+        MACOSX_BUNDLE
+        src/main.mm
+        src/backends-impl/IUIRenderer.h
+        src/backends-impl/metal/MetalRenderer.h
+        src/backends-impl/metal/MetalRenderer.mm)
 
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 find_package(imgui REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
+find_library(METAL_FRAMEWORK Metal)
+find_library(METALKIT_FRAMEWORK MetalKit)
+find_library(COCOA Cocoa)
+find_library(IO_KIT IOKit)
+find_library(CORE_VIDEO CoreVideo)
+find_library(QUARTZ QuartzCore)
 
 set(COMMON_LIBRARIES
         glfw
@@ -17,6 +29,12 @@ set(COMMON_LIBRARIES
         imgui::imgui
         spdlog::spdlog
         nlohmann_json::nlohmann_json
+        ${METAL_FRAMEWORK}
+        ${METALKIT_FRAMEWORK}
+        ${COCOA}
+        ${IO_KIT}
+        ${CORE_VIDEO}
+        ${QUARTZ}
 )
 target_link_libraries(metal_engine PRIVATE ${COMMON_LIBRARIES})
 
