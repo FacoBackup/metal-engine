@@ -11,7 +11,7 @@ add_executable(
         src/main.cpp
         src/ui/EditorPanel.cpp
         src/ui/EditorPanel.h
-        src/ui/IPanel.h
+        src/ui/common/IPanel.h
         src/engine/Engine.cpp
         src/engine/Engine.h
         src/renderer/VulkanUtils.cpp
@@ -28,8 +28,9 @@ add_executable(
         src/ui/docks/AbstractDockSpacePanel.h
         src/context/ApplicationContext.cpp
         src/context/ApplicationContext.h
-        src/ui/AbstractPanel.h
-        src/ui/AbstractPanel.cpp)
+        src/ui/common/AbstractPanel.h
+        src/ui/common/AbstractPanel.cpp
+        src/common/Synchornizable.h)
 
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)

@@ -13,6 +13,10 @@ namespace Metal {
 
         GUIContext &getGuiContext();
 
+        void start();
+
+        bool isValidContext();
+
     private:
         Engine engine;
         IPanel *panel = nullptr;

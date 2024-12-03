@@ -1,7 +1,7 @@
 #include "EditorPanel.h"
 
 namespace Metal {
-    void EditorPanel::render() {
+    void EditorPanel::onSync() {
         // START
         static float f = 0.0f;
         static int counter = 0;

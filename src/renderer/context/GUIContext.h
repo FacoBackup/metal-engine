@@ -3,7 +3,7 @@
 
 #include "GLFWContext.h"
 #include "imgui_impl_glfw.h"
-#include "../../ui/IPanel.h"
+#include "../../ui/common/IPanel.h"
 
 namespace Metal {
 
@@ -20,18 +20,12 @@ namespace Metal {
 
         void setupContext();
 
-        void start();
-
-        void setRoot(IPanel *root);
-
-    private:
-
         bool beginFrame();
 
         void endFrame();
+    private:
 
         GLFWContext windowContext;
-        IPanel *root = nullptr;
     };
 
 }

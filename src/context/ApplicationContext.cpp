@@ -5,8 +5,8 @@ namespace Metal {
     ApplicationContext::ApplicationContext() {
         auto *editorPanel = new EditorPanel;
         panel = editorPanel;
-        guiContext.setRoot(panel);
         editorPanel->setContext(this);
+        guiContext.build(true);
     }
 
     Engine &ApplicationContext::getEngine() {
@@ -15,5 +15,23 @@ namespace Metal {
 
     GUIContext &ApplicationContext::getGuiContext() {
         return guiContext;
+    }
+
+    void ApplicationContext::start() {
+        if (panel != nullptr) {
+            GLFWwindow *window = guiContext.getWindowContext().getWindow();
+            while (!glfwWindowShouldClose(window)) {
+                if (guiContext.beginFrame()) {
+                    continue;
+                }
+                panel->onSync();
+                guiContext.endFrame();
+            }
+            guiContext.shutdown();
+        }
+    }
+
+    bool ApplicationContext::isValidContext() {
+        return guiContext.getWindowContext().isValidContext();
     }
 }

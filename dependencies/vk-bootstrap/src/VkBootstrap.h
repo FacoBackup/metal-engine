@@ -605,7 +605,7 @@ class PhysicalDeviceSelector {
     Result<std::vector<std::string>> select_device_names(
         DeviceSelectionMode selection = DeviceSelectionMode::partially_and_fully_suitable) const;
 
-    // Set the surface in which the physical device should render to.
+    // Set the surface in which the physical device should onSync to.
     // Be sure to set it if swapchain functionality is to be used.
     PhysicalDeviceSelector& set_surface(VkSurfaceKHR surface);
 

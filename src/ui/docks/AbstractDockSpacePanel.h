@@ -1,7 +1,7 @@
 #ifndef METAL_ENGINE_ABSTRACTDOCKSPACEPANEL_H
 #define METAL_ENGINE_ABSTRACTDOCKSPACEPANEL_H
 
-#include "../AbstractPanel.h"
+#include "../common/AbstractPanel.h"
 
 namespace Metal {
 
