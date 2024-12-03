@@ -4,6 +4,8 @@
 namespace Metal {
     class Syncronizable {
     public:
+        virtual ~Syncronizable() = default;
+
         virtual void onSync() {}
     };
 }

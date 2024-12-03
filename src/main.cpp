@@ -1,6 +1,4 @@
-#include "renderer/context/GUIContext.h"
-#include "ui/EditorPanel.h"
-#include <stdio.h>
+#include "context/ApplicationContext.h"
 
 int main(int, char **) {
     Metal::ApplicationContext context;

@@ -30,7 +30,15 @@ add_executable(
         src/context/ApplicationContext.h
         src/ui/common/AbstractPanel.h
         src/ui/common/AbstractPanel.cpp
-        src/common/Synchornizable.h)
+        src/common/Synchornizable.h
+        src/engine/system/camera/CameraSystem.cpp
+        src/engine/system/camera/CameraSystem.h
+        src/engine/system/camera/CameraRepository.h
+        src/engine/system/camera/Camera.h
+        src/engine/system/camera/Frustum.cpp
+        src/engine/system/camera/Frustum.h
+        src/common/Util.h
+        src/common/Identifiable.h)
 
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)

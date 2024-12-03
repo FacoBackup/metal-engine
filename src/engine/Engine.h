@@ -3,9 +3,12 @@
 
 #include "../common/Initializable.h"
 #include "../common/Synchornizable.h"
+#include "system/camera/CameraSystem.h"
 
 namespace Metal {
-    class Engine : public Syncronizable, Initializable {
+    class Engine final : public Syncronizable, Initializable {
+    private:
+        CameraSystem cameraSystem;
     public:
         void onInitialize() override;
 

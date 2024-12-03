@@ -2,10 +2,9 @@
 
 namespace Metal {
     void Engine::onInitialize() {
-
     }
 
     void Engine::onSync() {
-
+        cameraSystem.onSync();
     }
 }

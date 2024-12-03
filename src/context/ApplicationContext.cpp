@@ -19,11 +19,15 @@ namespace Metal {
 
     void ApplicationContext::start() {
         if (panel != nullptr) {
+            engine.onInitialize();
+            panel->onInitialize();
+
             GLFWwindow *window = guiContext.getWindowContext().getWindow();
             while (!glfwWindowShouldClose(window)) {
                 if (guiContext.beginFrame()) {
                     continue;
                 }
+                engine.onSync();
                 panel->onSync();
                 guiContext.endFrame();
             }
