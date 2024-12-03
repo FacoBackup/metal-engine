@@ -7,4 +7,8 @@ namespace Metal {
     void Engine::onSync() {
         cameraSystem.onSync();
     }
+
+    CameraSystem &Engine::getCameraSystem() {
+        return cameraSystem;
+    }
 }

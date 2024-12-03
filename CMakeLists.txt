@@ -38,7 +38,19 @@ add_executable(
         src/engine/system/camera/Frustum.cpp
         src/engine/system/camera/Frustum.h
         src/common/Util.h
-        src/common/Identifiable.h)
+        src/common/Identifiable.h
+        src/common/Inspectable.h
+        src/common/Inspectable.cpp
+        src/common/InspectedField.h
+        src/common/InspectionBundle.h
+        src/ui/views/inspector/InspectorPanel.cpp
+        src/ui/views/inspector/InspectorPanel.h
+        src/ui/common/form/FormPanel.cpp
+        src/ui/common/form/FormPanel.h
+        src/ui/common/form/AccordionPanel.cpp
+        src/ui/common/form/AccordionPanel.h
+        src/common/FieldType.h
+)
 
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)

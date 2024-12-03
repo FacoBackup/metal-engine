@@ -1,12 +1,24 @@
-
 #include "AbstractPanel.h"
 
 namespace Metal {
-
-    void Metal::AbstractPanel::appendChild(AbstractPanel *panel) {
+    void AbstractPanel::appendChild(AbstractPanel *panel) {
         panel->setContext(context);
         panel->onInitialize();
-        panels.push_back(panel);
+        children.push_back(panel);
+    }
+
+    void AbstractPanel::renderChildren() const {
+        for (const auto panel: children) {
+            panel->onSync();
+        }
+    }
+
+    void AbstractPanel::removeAllChildren() {
+        for (const auto panel: children) {
+            panel->removeAllChildren();
+            delete panel;
+        }
+        children.clear();
     }
 
     void AbstractPanel::setContext(ApplicationContext *context) {

@@ -7,12 +7,14 @@
 
 namespace Metal {
     class Engine final : public Syncronizable, Initializable {
-    private:
         CameraSystem cameraSystem;
+
     public:
         void onInitialize() override;
 
         void onSync() override;
+
+        CameraSystem &getCameraSystem();
     };
 }
 #endif

@@ -8,7 +8,11 @@
 namespace Metal {
     class IPanel : public Syncronizable, Initializable {
     public:
-       void onInitialize() override {}
+        void onInitialize() override {
+        }
+
+        virtual void removeAllChildren() {
+        }
     };
 }
 #endif

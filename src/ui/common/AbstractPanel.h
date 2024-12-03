@@ -4,14 +4,20 @@
 #include "IPanel.h"
 #include "../../context/ApplicationContext.h"
 
-namespace Metal{
-    class AbstractPanel : public IPanel{
+namespace Metal {
+    class AbstractPanel : public IPanel {
     protected:
         ApplicationContext *context = nullptr;
-        std::vector<IPanel *> panels;
+        std::vector<IPanel *> children;
+        const std::string id = "##" + Util::uuidV4();
 
-        void appendChild(AbstractPanel *panel);
+        void renderChildren() const;
+
     public:
+        void appendChild(AbstractPanel *panel);
+
+        void removeAllChildren() override;
+
         void setContext(ApplicationContext *context);
     };
 }
