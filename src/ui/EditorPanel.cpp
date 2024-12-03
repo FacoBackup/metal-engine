@@ -1,7 +1,7 @@
-#include "EditorUIRenderer.h"
+#include "EditorPanel.h"
 
-namespace metal::ui {
-    void EditorUIRenderer::render() {
+namespace Metal {
+    void EditorPanel::render() {
         // START
         static float f = 0.0f;
         static int counter = 0;

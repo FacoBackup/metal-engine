@@ -1,5 +1,6 @@
 #include <imgui_impl_glfw.h>
 #include "GLFWContext.h"
+#include "../VulkanUtils.h"
 
 namespace Metal {
     GLFWwindow *GLFWContext::getWindow() const {
@@ -49,14 +50,24 @@ namespace Metal {
     }
 
     void GLFWContext::build(bool debugMode) {
-        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-        window = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+Vulkan example", nullptr, nullptr);
-
-        if (!glfwVulkanSupported()) {
+        glfwSetErrorCallback(Metal::VulkanUtils::glfw_error_callback);
+        if (!glfwInit()) {
             validContext = false;
-        } else {
-            validContext = true;
-            context.build(debugMode);
+        }
+
+        if (validContext) {
+            glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+            window = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+Vulkan example", nullptr, nullptr);
+
+            if (!glfwVulkanSupported()) {
+                validContext = false;
+            } else {
+                validContext = true;
+                context.build(debugMode);
+
+                context.setupVulkan();
+                context.setupVulkanWindow(window);
+            }
         }
     }
 }

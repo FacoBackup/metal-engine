@@ -43,6 +43,9 @@ namespace Metal {
 
     void GUIContext::build(bool debugMode) {
         windowContext.build(debugMode);
+        if (windowContext.isValidContext()) {
+            setupContext();
+        }
     }
 
     void GUIContext::setupContext() {
@@ -90,5 +93,19 @@ namespace Metal {
 
         // Load Fonts
 
+    }
+
+    void GUIContext::start() {
+        while (!glfwWindowShouldClose(windowContext.getWindow())) {
+            if (beginFrame()) {
+                continue;
+            }
+            root->render();
+            endFrame();
+        }
+    }
+
+    void GUIContext::setRoot(IPanel *root) {
+        GUIContext::root = root;
     }
 }

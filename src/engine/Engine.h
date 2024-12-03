@@ -1,7 +1,7 @@
 #ifndef METAL_ENGINE_ENGINE_H
 #define METAL_ENGINE_ENGINE_H
 
-namespace metal::engine {
+namespace Metal {
     class Engine {
 
     };

@@ -1,4 +1,4 @@
 #include "Engine.h"
 
-namespace metal::engine {
+namespace Metal {
 }

@@ -9,24 +9,27 @@ add_subdirectory(dependencies/vk-bootstrap)
 add_executable(
         metal_engine
         src/main.cpp
-        src/renderer/IUIRenderer.h
-        src/ui/EditorUIRenderer.cpp
-        src/ui/EditorUIRenderer.h
-        src/ui/IUIRenderer.h
+        src/ui/EditorPanel.cpp
+        src/ui/EditorPanel.h
+        src/ui/IPanel.h
         src/engine/Engine.cpp
         src/engine/Engine.h
-        src/renderer/VulkanCoreData.h
-        src/renderer/RendererCoreData.h
         src/renderer/VulkanUtils.cpp
         src/renderer/VulkanUtils.h
-        src/renderer/RendererContext.cpp
-        src/renderer/RendererContext.h
         src/renderer/context/VulkanContext.cpp
         src/renderer/context/VulkanContext.h
         src/renderer/context/GLFWContext.cpp
         src/renderer/context/GLFWContext.h
         src/renderer/context/GUIContext.cpp
-        src/renderer/context/GUIContext.h)
+        src/renderer/context/GUIContext.h
+        src/ui/views/viewport/ViewportPanel.cpp
+        src/ui/views/viewport/ViewportPanel.h
+        src/ui/docks/AbstractDockSpacePanel.cpp
+        src/ui/docks/AbstractDockSpacePanel.h
+        src/context/ApplicationContext.cpp
+        src/context/ApplicationContext.h
+        src/ui/AbstractPanel.h
+        src/ui/AbstractPanel.cpp)
 
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)

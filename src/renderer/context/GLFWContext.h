@@ -1,9 +1,13 @@
 #ifndef METAL_ENGINE_GLFWCONTEXT_H
 #define METAL_ENGINE_GLFWCONTEXT_H
 
+#define GLFW_INCLUDE_NONE
+#define GLFW_INCLUDE_VULKAN
+
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include "VulkanContext.h"
+
 
 namespace Metal {
 
@@ -25,7 +29,7 @@ namespace Metal {
 
     private:
         GLFWwindow *window;
-        bool validContext;
+        bool validContext = true;
         VulkanContext context;
     };
 }

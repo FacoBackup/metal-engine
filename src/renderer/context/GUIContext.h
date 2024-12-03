@@ -3,11 +3,13 @@
 
 #include "GLFWContext.h"
 #include "imgui_impl_glfw.h"
+#include "../../ui/IPanel.h"
 
 namespace Metal {
 
     class GUIContext {
     public:
+
         void build(bool debugMode);
 
         VulkanContext &getVulkanContext();
@@ -16,14 +18,20 @@ namespace Metal {
 
         void shutdown();
 
+        void setupContext();
+
+        void start();
+
+        void setRoot(IPanel *root);
+
+    private:
+
         bool beginFrame();
 
         void endFrame();
 
-        void setupContext();
-
-    private:
         GLFWContext windowContext;
+        IPanel *root = nullptr;
     };
 
 }
