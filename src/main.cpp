@@ -1,68 +1,89 @@
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_vulkan.h"
+#include "renderer/VulkanUtils.h"
+#include "renderer/RendererCoreData.h"
+#include "renderer/context/GLFWContext.h"
+#include "renderer/context/GUIContext.h"
+#include <stdio.h>
+#include <stdlib.h>
+
 #define GLFW_INCLUDE_NONE
+#define GLFW_INCLUDE_VULKAN
+
 #include <GLFW/glfw3.h>
 
-#define NS_PRIVATE_IMPLEMENTATION
-#define CA_PRIVATE_IMPLEMENTATION
-#define MTL_PRIVATE_IMPLEMENTATION
-
-#include <Foundation/Foundation.hpp>
-#include <Metal/Metal.hpp>
-#include <QuartzCore/CAMetalLayer.hpp>
-#include <QuartzCore/QuartzCore.hpp>
-#include <AppKit/AppKit.hpp>
-
-#include "backend/glfw_adapter.h"
-
-int main() {
-
-    //glfw stuff
-    glfwInit();
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    GLFWwindow* glfwWindow = glfwCreateWindow(800, 600, "Heavy", NULL, NULL);
-
-    //Metal Device
-    MTL::Device* device = MTL::CreateSystemDefaultDevice();
-
-    //Metal Layer
-    CA::MetalLayer* metalLayer = CA::MetalLayer::layer()->retain();
-    metalLayer->setDevice(device);
-    metalLayer->setPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm);
-
-    //Adapt glfw window to NS Window, and give it a layer to draw to
-    NS::Window* window = get_ns_window(glfwWindow, metalLayer)->retain();
-
-    //Drawable Area
-    CA::MetalDrawable* metalDrawable;
-
-    //Command Queue
-    MTL::CommandQueue* commandQueue = device->newCommandQueue()->retain();
-
-    while (!glfwWindowShouldClose(glfwWindow)) {
-        glfwPollEvents();
-
-        NS::AutoreleasePool* pool = NS::AutoreleasePool::alloc()->init();
-        metalDrawable = metalLayer->nextDrawable();
-        MTL::CommandBuffer* commandBuffer = commandQueue->commandBuffer();
-        MTL::RenderPassDescriptor* renderPassDescriptor = MTL::RenderPassDescriptor::alloc()->init();
-        MTL::RenderPassColorAttachmentDescriptor* colorAttachment = renderPassDescriptor->colorAttachments()->object(0);
-        colorAttachment->setTexture(metalDrawable->texture());
-        colorAttachment->setLoadAction(MTL::LoadActionClear);
-        colorAttachment->setClearColor(MTL::ClearColor(0.75f, 0.25f, 0.125f, 1.0f));
-        colorAttachment->setStoreAction(MTL::StoreActionStore);
-
-        MTL::RenderCommandEncoder* renderCommandEncoder = commandBuffer->renderCommandEncoder(renderPassDescriptor);
-        renderCommandEncoder->endEncoding();
-
-        commandBuffer->presentDrawable(metalDrawable);
-        commandBuffer->commit();
-        commandBuffer->waitUntilCompleted();
-        pool->release();
+// Main code
+int main(int, char **) {
+    glfwSetErrorCallback(Metal::VulkanUtils::glfw_error_callback);
+    if (!glfwInit())
+        return 1;
+        
+    
+    Metal::GUIContext guiContext;
+    guiContext.build(true);
+    if (!guiContext.getWindowContext().isValidContext()) {
+        printf("GLFW: Vulkan Not Supported\n");
+        return 1;
     }
 
-    commandQueue->release();
-    window->release();
-    metalLayer->release();
-    glfwTerminate();
-    device->release();
+    guiContext.getVulkanContext().setupVulkan();
+    guiContext.getVulkanContext().setupVulkanWindow(guiContext.getWindowContext().getWindow());
+    guiContext.setupContext();
+
+    // Our state
+    bool show_demo_window = true;
+    bool show_another_window = false;
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+    // Main loop
+    while (!glfwWindowShouldClose(guiContext.getWindowContext().getWindow())) {
+        if(guiContext.beginFrame()){
+            continue;
+        }
+
+        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+        if (show_demo_window)
+            ImGui::ShowDemoWindow(&show_demo_window);
+
+        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to build a named window.
+        {
+            static float f = 0.0f;
+            static int counter = 0;
+
+            ImGui::Begin(
+                    "Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+            ImGui::Text(
+                    "This is some useful text.");               // Display some text (you can use a format strings too)
+            ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+            ImGui::Checkbox("Another Window", &show_another_window);
+
+            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+            ImGui::ColorEdit3("clear color", (float *) &clear_color); // Edit 3 floats representing a color
+
+            if (ImGui::Button(
+                    "Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+                counter++;
+            ImGui::SameLine();
+            ImGui::Text("counter = %d", counter);
+
+            ImGui::End();
+        }
+
+        // 3. Show another simple window.
+        if (show_another_window) {
+            ImGui::Begin("Another Window",
+                         &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+            ImGui::Text("Hello from another window!");
+            if (ImGui::Button("Close Me"))
+                show_another_window = false;
+            ImGui::End();
+        }
+
+        guiContext.endFrame();
+    }
+
+    guiContext.shutdown();
     return 0;
 }
