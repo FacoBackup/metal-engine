@@ -6,7 +6,7 @@
 #include <__random/random_device.h>
 
 namespace Metal::Util {
-    static float TO_RADIANS = (3.1415926535 / 180);
+    static float TO_RADIANS = (3.1415926535f / 180);
     static std::random_device rd;
     static std::mt19937 gen(rd());
     static std::uniform_int_distribution<> dis(0, 15);

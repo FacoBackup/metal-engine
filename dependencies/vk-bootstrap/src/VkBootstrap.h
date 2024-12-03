@@ -412,19 +412,19 @@ class InstanceBuilder {
     // Checks if the validation layers are available and loads them if they are.
     InstanceBuilder& request_validation_layers(bool enable_validation = true);
 
-    // Use a default debug callback that prints to standard out.
+    // Use a default debug setValue that prints to standard out.
     InstanceBuilder& use_default_debug_messenger();
-    // Provide a user defined debug callback.
+    // Provide a user defined debug setValue.
     InstanceBuilder& set_debug_callback(PFN_vkDebugUtilsMessengerCallbackEXT callback);
-    // Sets the void* to use in the debug messenger - only useful with a custom callback
+    // Sets the void* to use in the debug messenger - only useful with a custom setValue
     InstanceBuilder& set_debug_callback_user_data_pointer(void* user_data_pointer);
-    // Set what message severity is needed to trigger the callback.
+    // Set what message severity is needed to trigger the setValue.
     InstanceBuilder& set_debug_messenger_severity(VkDebugUtilsMessageSeverityFlagsEXT severity);
-    // Add a message severity to the list that triggers the callback.
+    // Add a message severity to the list that triggers the setValue.
     InstanceBuilder& add_debug_messenger_severity(VkDebugUtilsMessageSeverityFlagsEXT severity);
-    // Set what message type triggers the callback.
+    // Set what message type triggers the setValue.
     InstanceBuilder& set_debug_messenger_type(VkDebugUtilsMessageTypeFlagsEXT type);
-    // Add a message type to the list of that triggers the callback.
+    // Add a message type to the list of that triggers the setValue.
     InstanceBuilder& add_debug_messenger_type(VkDebugUtilsMessageTypeFlagsEXT type);
 
     // Disable some validation checks.
@@ -459,7 +459,7 @@ class InstanceBuilder {
         VkInstanceCreateFlags flags = static_cast<VkInstanceCreateFlags>(0);
         std::vector<VkBaseOutStructure*> pNext_elements;
 
-        // debug callback - use the default so it is not nullptr
+        // debug setValue - use the default so it is not nullptr
         PFN_vkDebugUtilsMessengerCallbackEXT debug_callback = default_debug_callback;
         VkDebugUtilsMessageSeverityFlagsEXT debug_message_severity =
             VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;

@@ -9,7 +9,7 @@ namespace Metal {
                                 g_Allocator);
 
         if (debugMode) {
-            // Remove the debug report callback
+            // Remove the debug report setValue
             auto f_vkDestroyDebugReportCallbackEXT = (PFN_vkDestroyDebugReportCallbackEXT) vkGetInstanceProcAddr(
                     g_Instance, "vkDestroyDebugReportCallbackEXT");
             f_vkDestroyDebugReportCallbackEXT(g_Instance, g_DebugReport, g_Allocator);
@@ -149,7 +149,7 @@ namespace Metal {
             Metal::VulkanUtils::check_vk_result(err);
 
 
-            // Setup the debug report callback
+            // Setup the debug report setValue
             if (debugMode) {
                 auto f_vkCreateDebugReportCallbackEXT = (PFN_vkCreateDebugReportCallbackEXT) vkGetInstanceProcAddr(
                         g_Instance, "vkCreateDebugReportCallbackEXT");

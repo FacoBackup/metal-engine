@@ -1,8 +1,9 @@
 #ifndef CAMERAREPOSITORY_H
 #define CAMERAREPOSITORY_H
+
 #include "Camera.h"
 #include "Frustum.h"
-#include "../../../common/Inspectable.h"
+#include "../../../common/inspection/Inspectable.h"
 #include "glm/mat4x4.hpp"
 
 namespace Metal {
@@ -49,78 +50,101 @@ namespace Metal {
         float deltaY = 0;
 
         void registerFields() override {
-            registerField([this](const std::any &value) {
-                rotationSensitivity = std::any_cast<float>(value);
-            }, "Controls", "Camera rotation sensitivity");
-            registerField([this](const std::any &value) {
-                movementSensitivity = std::any_cast<float>(value);
-            }, "Controls", "Camera Movement speed");
-            registerField([this](const std::any &value) {
-                zoomSensitivity = std::any_cast<float>(value);
-            }, "Controls", "Orbit camera zoom sensitivity");
-            registerField([this](const std::any &value) {
-                motionBlurEnabled = std::any_cast<bool>(value);
-            }, "Motion blur", "Motion Blur Enabled");
-            registerField([this](const std::any &value) {
-                motionBlurVelocityScale = std::any_cast<float>(value);
-            }, "Motion blur", "Motion Blur Velocity Scale");
-            registerField([this](const std::any &value) {
-                motionBlurMaxSamples = std::any_cast<int>(value);
-            }, "Motion blur", "Motion Blur Max Samples");
-            registerField([this](const std::any &value) {
-                cameraMotionBlur = std::any_cast<bool>(value);
-            }, "Motion blur", "Camera Motion Blur");
-            registerField([this](const std::any &value) {
-                bloomEnabled = std::any_cast<bool>(value);
-            }, "Post processing", "Bloom");
-            registerField([this](const std::any &value) {
-                filmGrain = std::any_cast<bool>(value);
-            }, "Post processing", "Film Grain");
-            registerField([this](const std::any &value) {
-                vignetteEnabled = std::any_cast<bool>(value);
-            }, "Post processing", "Vignette Enabled");
-            registerField([this](const std::any &value) {
-                chromaticAberrationEnabled = std::any_cast<bool>(value);
-            }, "Post processing", "Chromatic Aberration");
-            registerField([this](const std::any &value) {
-                distortionEnabled = std::any_cast<bool>(value);
-            }, "Post processing", "Distortion");
-            registerField([this](const std::any &value) {
-                DOF = std::any_cast<bool>(value);
-            }, "Depth of Field", "Enable DOF");
-            registerField([this](const std::any &value) {
-                focusDistanceDOF = std::any_cast<int>(value);
-            }, "Depth of Field", "Focus Distance (DOF)");
-            registerField([this](const std::any &value) {
-                apertureDOF = std::any_cast<float>(value);
-            }, "Depth of Field", "Aperture (DOF)");
-            registerField([this](const std::any &value) {
-                focalLengthDOF = std::any_cast<int>(value);
-            }, "Depth of Field", "Focal Length (DOF)");
-            registerField([this](const std::any &value) {
-                samplesDOF = std::any_cast<int>(value);
-            }, "Depth of Field", "DOF Samples");
-            registerField([this](const std::any &value) {
-                filmGrainStrength = std::any_cast<float>(value);
-            }, "Post processing", "Film Grain Strength");
-            registerField([this](const std::any &value) {
-                vignetteStrength = std::any_cast<float>(value);
-            }, "Post processing", "Vignette Strength");
-            registerField([this](const std::any &value) {
-                bloomThreshold = std::any_cast<float>(value);
-            }, "Post processing", "Bloom Threshold");
-            registerField([this](const std::any &value) {
-                bloomQuality = std::any_cast<int>(value);
-            }, "Post processing", "Bloom Quality");
-            registerField([this](const std::any &value) {
-                bloomOffset = std::any_cast<int>(value);
-            }, "Post processing", "Bloom Offset");
-            registerField([this](const std::any &value) {
-                chromaticAberrationIntensity = std::any_cast<float>(value);
-            }, "Post processing", "Chromatic Aberration Strength", 0, MAX_INT, false);
-            registerField([this](const std::any &value) {
-                distortionIntensity = std::any_cast<float>(value);
-            }, "Post processing", "Distortion Strength", 0, MAX_INT, false);
+            registerField(FLOAT,
+                          GETTER(rotationSensitivity),
+                          SETTER(rotationSensitivity, float),
+                          "Controls", "Camera rotation sensitivity");
+
+            registerField(FLOAT,
+                          GETTER(movementSensitivity),
+                          SETTER(movementSensitivity, float),
+                          "Controls", "Camera Movement speed");
+
+            registerField(FLOAT,
+                          GETTER(zoomSensitivity),
+                          SETTER(zoomSensitivity, float),
+                          "Controls", "Orbit camera zoom sensitivity");
+
+            registerField(BOOLEAN,
+                          GETTER(motionBlurEnabled),
+                          SETTER(motionBlurEnabled, bool),
+                          "Motion blur", "Motion Blur Enabled");
+
+            registerField(FLOAT,
+                          GETTER(motionBlurVelocityScale),
+                          SETTER(motionBlurVelocityScale, float),
+                          "Motion blur", "Motion Blur Velocity Scale");
+
+            registerField(INT,
+                          GETTER(motionBlurMaxSamples),
+                          SETTER(motionBlurMaxSamples, int),
+                          "Motion blur", "Motion Blur Max Samples");
+
+            registerField(BOOLEAN,
+                          GETTER(cameraMotionBlur),
+                          SETTER(cameraMotionBlur, bool),
+                          "Motion blur", "Camera Motion Blur");
+
+            registerField(BOOLEAN,
+                          GETTER(bloomEnabled),
+                          SETTER(bloomEnabled, bool),
+                          "Post processing", "Bloom");
+
+            registerField(BOOLEAN,
+                          GETTER(filmGrain),
+                          SETTER(filmGrain, bool),
+                          "Post processing", "Film Grain");
+
+            registerField(BOOLEAN,
+                          GETTER(vignetteEnabled),
+                          SETTER(vignetteEnabled, bool),
+                          "Post processing", "Vignette Enabled");
+
+            registerField(BOOLEAN,
+                          GETTER(chromaticAberrationEnabled),
+                          SETTER(chromaticAberrationEnabled, bool),
+                          "Post processing", "Chromatic Aberration");
+
+            registerField(BOOLEAN,
+                          GETTER(distortionEnabled),
+                          SETTER(distortionEnabled, bool),
+                          "Post processing", "Distortion");
+
+            registerField(FLOAT,
+                          GETTER(filmGrainStrength),
+                          SETTER(filmGrainStrength, float),
+                          "Post processing", "Film Grain Strength");
+
+            registerField(FLOAT,
+                          GETTER(vignetteStrength),
+                          SETTER(vignetteStrength, float),
+                          "Post processing", "Vignette Strength");
+
+            registerField(FLOAT,
+                          GETTER(bloomThreshold),
+                          SETTER(bloomThreshold, float),
+                          "Post processing", "Bloom Threshold");
+
+            registerField(INT,
+                          GETTER(bloomQuality),
+                          SETTER(bloomQuality, int),
+                          "Post processing", "Bloom Quality");
+
+            registerField(INT,
+                          GETTER(bloomOffset),
+                          SETTER(bloomOffset, int),
+                          "Post processing",
+                          "Bloom Offset");
+
+            registerField(FLOAT,
+                          GETTER(chromaticAberrationIntensity),
+                          SETTER(chromaticAberrationIntensity, float),
+                          "Post processing", "Chromatic Aberration Strength", 0, MAX_INT, false);
+
+            registerField(FLOAT,
+                          GETTER(distortionIntensity),
+                          SETTER(distortionIntensity, float),
+                          "Post processing", "Distortion Strength", 0, MAX_INT, false);
         }
     };
 }

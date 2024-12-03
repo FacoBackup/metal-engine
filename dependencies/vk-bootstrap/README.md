@@ -13,7 +13,7 @@ This library simplifies the tedious process of:
 It also adds several conveniences for:
 
 * Enabling validation layers
-* Adding a debug callback messenger
+* Adding a debug setValue messenger
 * Enabling extensions on a physical device
 * Select a gpu based on a set of criteria like features, extensions, memory, etc
 
