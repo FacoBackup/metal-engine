@@ -1,15 +1,20 @@
 #ifndef METAL_ENGINE_APPLICATIONCONTEXT_H
 #define METAL_ENGINE_APPLICATIONCONTEXT_H
 
-#include "../../engine/Engine.h"
+#include "../../engine/EngineContext.h"
 #include "../../renderer/context/GUIContext.h"
+#include "../../editor/common/IPanel.h"
+#include "../../editor/service/DockService.h"
+#include "../../editor/EditorContext.h"
 
 namespace Metal {
     class ApplicationContext {
     public:
         explicit ApplicationContext();
 
-        Engine &getEngine();
+        EngineContext &getEngineContext();
+
+        EditorContext &getEditorContext();
 
         GUIContext &getGuiContext();
 
@@ -18,9 +23,10 @@ namespace Metal {
         bool isValidContext();
 
     private:
-        Engine engine{*this};
-        IPanel *panel = nullptr;
+        EngineContext engineContext{*this};
+        EditorContext editorContext{*this};
         GUIContext guiContext;
+        IPanel *rootPanel = nullptr;
     };
 
 }

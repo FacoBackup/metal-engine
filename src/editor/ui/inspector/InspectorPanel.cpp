@@ -3,7 +3,7 @@
 
 namespace Metal {
     void InspectorPanel::onInitialize() {
-        cameraRepository = &context->getEngine().cameraRepository;
+        cameraRepository = &context->getEngineContext().cameraRepository;
         auto *form = new FormPanel();
         appendChild(form);
         form->setInspection(cameraRepository);

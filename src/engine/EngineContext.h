@@ -1,14 +1,14 @@
-#ifndef METAL_ENGINE_ENGINE_H
-#define METAL_ENGINE_ENGINE_H
+#ifndef METAL_ENGINE_ENGINECONTEXT_H
+#define METAL_ENGINE_ENGINECONTEXT_H
 
 #include "../common/Initializable.h"
 #include "../common/Synchornizable.h"
 #include "system/camera/CameraSystem.h"
 
 namespace Metal {
-    class Engine final : AbstractSystem, Initializable {
+    class EngineContext final : AbstractRuntimeComponent, Initializable {
     public:
-        explicit Engine(ApplicationContext &context);
+        explicit EngineContext(ApplicationContext &context);
 
         CameraSystem cameraSystem{context};
         CameraRepository cameraRepository{context};

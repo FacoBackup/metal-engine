@@ -51,7 +51,7 @@ Configuration can be chained together and done inline with building, like so.
 ```cpp
 auto inst_builder_ret = instance_builder
         .set_app_name ("Awesome Vulkan Application")
-        .set_engine_name("Excellent Game Engine")
+        .set_engine_name("Excellent Game EngineContext")
         .require_api_version(1,0,0)
         .build();
 ```

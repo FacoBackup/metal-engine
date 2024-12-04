@@ -361,7 +361,7 @@ class InstanceBuilder {
 
     // Sets the name of the application. Defaults to "" if none is provided.
     InstanceBuilder& set_app_name(const char* app_name);
-    // Sets the name of the engine. Defaults to "" if none is provided.
+    // Sets the name of the engineContext. Defaults to "" if none is provided.
     InstanceBuilder& set_engine_name(const char* engine_name);
 
     // Sets the version of the application.
@@ -370,10 +370,10 @@ class InstanceBuilder {
     // Sets the (major, minor, patch) version of the application.
     InstanceBuilder& set_app_version(uint32_t major, uint32_t minor, uint32_t patch = 0);
 
-    // Sets the version of the engine.
+    // Sets the version of the engineContext.
     // Should be constructed with VK_MAKE_VERSION or VK_MAKE_API_VERSION.
     InstanceBuilder& set_engine_version(uint32_t engine_version);
-    // Sets the (major, minor, patch) version of the engine.
+    // Sets the (major, minor, patch) version of the engineContext.
     InstanceBuilder& set_engine_version(uint32_t major, uint32_t minor, uint32_t patch = 0);
 
     // Require a vulkan API version. Will fail to build if this version isn't available.
@@ -830,7 +830,7 @@ struct Swapchain {
     VkColorSpaceKHR color_space = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR; // The color space actually used when creating the swapchain.
     VkImageUsageFlags image_usage_flags = 0;
     VkExtent2D extent = { 0, 0 };
-    // The value of minImageCount actually used when creating the swapchain; note that the presentation engine is always free to build more images than that.
+    // The value of minImageCount actually used when creating the swapchain; note that the presentation engineContext is always free to build more images than that.
     uint32_t requested_min_image_count = 0;
     VkPresentModeKHR present_mode = VK_PRESENT_MODE_IMMEDIATE_KHR; // The present mode actually used when creating the swapchain.
     uint32_t instance_version = VKB_VK_API_VERSION_1_0;
@@ -915,7 +915,7 @@ class SwapchainBuilder {
     // are provided. The default is VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
     SwapchainBuilder& use_default_image_usage_flags();
 
-    // Set the number of views in for multiview/stereo surface
+    // Set the number of ui in for multiview/stereo surface
     SwapchainBuilder& set_image_array_layer_count(uint32_t array_layer_count);
 
     // Convenient named constants for passing to set_desired_min_image_count().
@@ -928,9 +928,9 @@ class SwapchainBuilder {
     };
 
     // Sets the desired minimum image count for the swapchain.
-    // Note that the presentation engine is always free to build more images than requested.
+    // Note that the presentation engineContext is always free to build more images than requested.
     // You may pass one of the values specified in the BufferMode enum, or any integer value.
-    // For instance, if you pass DOUBLE_BUFFERING, the presentation engine is allowed to give you a double buffering setup, triple buffering, or more. This is up to the drivers.
+    // For instance, if you pass DOUBLE_BUFFERING, the presentation engineContext is allowed to give you a double buffering setup, triple buffering, or more. This is up to the drivers.
     SwapchainBuilder& set_desired_min_image_count(uint32_t min_image_count);
 
     // Sets a required minimum image count for the swapchain.

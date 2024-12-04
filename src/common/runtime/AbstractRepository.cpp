@@ -2,5 +2,5 @@
 
 namespace Metal {
 
-    Metal::AbstractRepository::AbstractRepository(ApplicationContext &context) : AbstractSystem(context) {}
+    Metal::AbstractRepository::AbstractRepository(ApplicationContext &context) : AbstractRuntimeComponent(context) {}
 }

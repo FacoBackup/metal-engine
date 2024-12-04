@@ -2,10 +2,10 @@
 #define CAMERASYSTEM_H
 #include "../../repository/camera/CameraRepository.h"
 #include "../../../common/Synchornizable.h"
-#include "../../../common/runtime/AbstractSystem.h"
+#include "../../../common/runtime/AbstractRuntimeComponent.h"
 
 namespace Metal {
-    class CameraSystem final : public AbstractSystem {
+    class CameraSystem final : public AbstractRuntimeComponent {
     public:
         explicit CameraSystem(ApplicationContext &context);
 

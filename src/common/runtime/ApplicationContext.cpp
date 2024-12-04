@@ -1,16 +1,16 @@
 #include "ApplicationContext.h"
-#include "../../ui/EditorPanel.h"
+#include "../../editor/EditorPanel.h"
 
 namespace Metal {
     ApplicationContext::ApplicationContext() {
         auto *editorPanel = new EditorPanel;
-        panel = editorPanel;
+        rootPanel = editorPanel;
         editorPanel->setContext(this);
         guiContext.build(true);
     }
 
-    Engine &ApplicationContext::getEngine() {
-        return engine;
+    EngineContext &ApplicationContext::getEngineContext() {
+        return engineContext;
     }
 
     GUIContext &ApplicationContext::getGuiContext() {
@@ -18,17 +18,17 @@ namespace Metal {
     }
 
     void ApplicationContext::start() {
-        if (panel != nullptr) {
-            engine.onInitialize();
-            panel->onInitialize();
+        if (rootPanel != nullptr) {
+            engineContext.onInitialize();
+            rootPanel->onInitialize();
 
             GLFWwindow *window = guiContext.getWindowContext().getWindow();
             while (!glfwWindowShouldClose(window)) {
                 if (guiContext.beginFrame()) {
                     continue;
                 }
-                engine.onSync();
-                panel->onSync();
+                engineContext.onSync();
+                rootPanel->onSync();
                 guiContext.endFrame();
             }
             guiContext.shutdown();
@@ -37,5 +37,9 @@ namespace Metal {
 
     bool ApplicationContext::isValidContext() {
         return guiContext.getWindowContext().isValidContext();
+    }
+
+    EditorContext &ApplicationContext::getEditorContext() {
+        return editorContext;
     }
 }

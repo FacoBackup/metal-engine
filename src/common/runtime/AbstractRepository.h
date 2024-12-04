@@ -2,11 +2,11 @@
 #define METAL_ENGINE_ABSTRACTREPOSITORY_H
 
 #include "../inspection/Inspectable.h"
-#include "AbstractSystem.h"
+#include "AbstractRuntimeComponent.h"
 
 namespace Metal {
 
-    class AbstractRepository : public AbstractSystem, public Inspectable {
+    class AbstractRepository : public AbstractRuntimeComponent, public Inspectable {
     public:
         explicit AbstractRepository(ApplicationContext &context);
     };

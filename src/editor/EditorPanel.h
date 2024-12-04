@@ -1,0 +1,35 @@
+#ifndef METAL_ENGINE_EDITORPANEL_H
+#define METAL_ENGINE_EDITORPANEL_H
+
+#include "imgui.h"
+#include "common/IPanel.h"
+#include "common/AbstractPanel.h"
+#include "ui/header/EditorHeaderPanel.h"
+
+
+namespace Metal {
+    class EditorPanel : public AbstractPanel {
+        static int FLAGS;
+        static const char *NAME;
+        static const char *NAME_HEADER;
+        static ImVec2 CENTER;
+        static float HEADER_HEIGHT;
+        ImGuiID windowId;
+        EditorHeaderPanel headerPanel;
+
+        static void SetWindowStyle();
+
+        void renderDockSpaces();
+
+        void renderHeader(ImGuiViewport *viewport);
+
+    public:
+        void onInitialize() override;
+
+        void onSync() override;
+    };
+
+}
+
+
+#endif
