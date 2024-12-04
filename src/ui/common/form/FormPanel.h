@@ -4,7 +4,7 @@
 #include "../AbstractPanel.h"
 
 namespace Metal {
-    class FormPanel final : AbstractPanel {
+    class FormPanel final : public AbstractPanel {
         Inspectable *inspection = nullptr;
 
     public:

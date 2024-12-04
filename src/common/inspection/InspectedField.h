@@ -4,20 +4,21 @@
 #include <any>
 #include <utility>
 #include "InspectableMember.h"
-#include "FieldType.h"
 
 namespace Metal {
+    template<typename T>
     struct InspectedField : InspectableMember {
-        std::function<void(std::any)> setValue;
-        std::function<std::any()> getValue;
-        FieldType type;
+        T &field;
 
         std::optional<int> max;
         std::optional<int> min;
-        bool disabled;
+        std::optional<float> maxF;
+        std::optional<float> minF;
+        bool disabled = false;
 
-        bool isField() override { return true; }
+        explicit InspectedField(T &field) : field(field) {}
 
+        ~InspectedField() override = default;
     };
 }
 #endif

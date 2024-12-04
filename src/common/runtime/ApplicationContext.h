@@ -1,8 +1,8 @@
 #ifndef METAL_ENGINE_APPLICATIONCONTEXT_H
 #define METAL_ENGINE_APPLICATIONCONTEXT_H
 
-#include "../engine/Engine.h"
-#include "../renderer/context/GUIContext.h"
+#include "../../engine/Engine.h"
+#include "../../renderer/context/GUIContext.h"
 
 namespace Metal {
     class ApplicationContext {
@@ -18,7 +18,7 @@ namespace Metal {
         bool isValidContext();
 
     private:
-        Engine engine;
+        Engine engine{*this};
         IPanel *panel = nullptr;
         GUIContext guiContext;
     };

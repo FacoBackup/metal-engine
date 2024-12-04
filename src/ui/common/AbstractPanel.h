@@ -2,7 +2,7 @@
 #define METAL_ENGINE_ABSTRACTPANEL_H
 
 #include "IPanel.h"
-#include "../../context/ApplicationContext.h"
+#include "../../common/runtime/ApplicationContext.h"
 
 namespace Metal {
     class AbstractPanel : public IPanel {
@@ -11,7 +11,7 @@ namespace Metal {
         std::vector<IPanel *> children;
         const std::string id = "##" + Util::uuidV4();
 
-        void renderChildren() const;
+        void onSyncChildren() const;
 
     public:
         void appendChild(AbstractPanel *panel);
