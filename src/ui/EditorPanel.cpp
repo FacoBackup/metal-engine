@@ -1,4 +1,5 @@
 #include "EditorPanel.h"
+#include "views/inspector/InspectorPanel.h"
 
 namespace Metal {
     void EditorPanel::onSync() {
@@ -17,7 +18,12 @@ namespace Metal {
             counter++;
         ImGui::SameLine();
         ImGui::Text("counter = %d", counter);
+        onSyncChildren();
 
         ImGui::End();
+    }
+
+    void EditorPanel::onInitialize() {
+        appendChild(new InspectorPanel);
     }
 }

@@ -12,10 +12,13 @@ namespace Metal {
 
         std::optional<int> max;
         std::optional<int> min;
+        std::optional<float> maxF;
+        std::optional<float> minF;
         bool disabled = false;
 
         explicit InspectedField(T &field) : field(field) {}
 
+        ~InspectedField() override = default;
     };
 }
 #endif

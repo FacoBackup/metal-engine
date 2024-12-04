@@ -7,8 +7,10 @@
 
 
 namespace Metal {
-    class EditorPanel: public AbstractPanel{
+    class EditorPanel : public AbstractPanel {
     public:
+        void onInitialize() override;
+
         void onSync() override;
     };
 

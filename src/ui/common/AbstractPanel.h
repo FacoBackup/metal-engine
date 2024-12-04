@@ -11,7 +11,7 @@ namespace Metal {
         std::vector<IPanel *> children;
         const std::string id = "##" + Util::uuidV4();
 
-        void renderChildren() const;
+        void onSyncChildren() const;
 
     public:
         void appendChild(AbstractPanel *panel);

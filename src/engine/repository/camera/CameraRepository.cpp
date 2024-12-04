@@ -38,13 +38,13 @@ namespace Metal {
                      "Post processing", "Distortion", false);
 
         registerFloat(filmGrainStrength,
-                      "Post processing", "Film Grain Strength", -MAX_INT, MAX_INT, false);
+                      "Post processing", "Film Grain Strength", -MAX_FLOAT, MAX_FLOAT, false);
 
         registerFloat(vignetteStrength,
-                      "Post processing", "Vignette Strength", 0, MAX_INT, false);
+                      "Post processing", "Vignette Strength", 0, MAX_FLOAT, false);
 
         registerFloat(bloomThreshold,
-                      "Post processing", "Bloom Threshold", 0, MAX_INT, false);
+                      "Post processing", "Bloom Threshold", 0, MAX_FLOAT, false);
 
         registerInt(bloomQuality,
                     "Post processing", "Bloom Quality", 0, MAX_INT, false);
@@ -54,9 +54,9 @@ namespace Metal {
                     "Bloom Offset", 0, MAX_INT, false);
 
         registerFloat(chromaticAberrationIntensity, "Post processing", "Chromatic Aberration Strength", 0,
-                      MAX_INT, false);
+                      MAX_FLOAT, false);
 
-        registerFloat(distortionIntensity, "Post processing", "Distortion Strength", 0, MAX_INT, false);
+        registerFloat(distortionIntensity, "Post processing", "Distortion Strength", 0, MAX_FLOAT, false);
 
     }
 

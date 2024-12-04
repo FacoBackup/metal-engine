@@ -8,16 +8,16 @@
 
 namespace Metal {
     void FormPanel::processFields(std::unordered_map<std::string, AccordionPanel *> &groups) {
-        for (InspectableMember &field: inspection->getFields()) {
-            if (!groups.contains(field.group)) {
+        for (const auto &field: inspection->getFields()) {
+
+            if (!groups.contains(field->group)) {
                 const auto panel = new AccordionPanel();
-                groups[field.group] = panel;
+                groups[field->group] = panel;
                 appendChild(panel);
             }
-
-            AccordionPanel *group = groups[field.group];
-            group->title = field.group;
-            switch (field.type) {
+            AccordionPanel *group = groups[field->group];
+            group->setTitle(field->group);
+            switch (field->type) {
 //                    case STRING:
 //                        // if (field.getField().isAnnotationPresent<ResourceTypeField>()) {
 //                        //     group->appendChild(new ResourceField(field, changeHandler));
@@ -28,16 +28,16 @@ namespace Metal {
 //                        // }
 //                        break;
                 case INT:
-                    group->appendChild(new IntField{dynamic_cast<InspectedField<int> &>(field)});
+                    group->appendChild(new IntField{dynamic_cast<InspectedField<int> &>(*field)});
                     break;
                 case FLOAT:
-                    group->appendChild(new FloatField{dynamic_cast<InspectedField<float> &>(field)});
+                    group->appendChild(new FloatField{dynamic_cast<InspectedField<float> &>(*field)});
                     break;
                 case BOOLEAN:
-                    group->appendChild(new BooleanField{dynamic_cast<InspectedField<bool> &>(field)});
+                    group->appendChild(new BooleanField{dynamic_cast<InspectedField<bool> &>(*field)});
                     break;
                 case METHOD:
-                    group->appendChild(new MethodField{dynamic_cast<InspectedMethod &>(field)});
+                    group->appendChild(new MethodField{dynamic_cast<InspectedMethod &>(*field)});
                 default:
                     break;
 //                    case VECTOR2:
@@ -82,5 +82,7 @@ namespace Metal {
 
     void FormPanel::onSync() {
         if (inspection == nullptr) return;
+
+        onSyncChildren();
     }
 }

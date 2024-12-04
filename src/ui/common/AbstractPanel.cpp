@@ -7,7 +7,7 @@ namespace Metal {
         children.push_back(panel);
     }
 
-    void AbstractPanel::renderChildren() const {
+    void AbstractPanel::onSyncChildren() const {
         for (const auto panel: children) {
             panel->onSync();
         }
@@ -22,7 +22,7 @@ namespace Metal {
     }
 
     void AbstractPanel::setContext(ApplicationContext *context) {
-        if (context == nullptr) {
+        if (this->context == nullptr) {
             this->context = context;
         }
     }

@@ -1,13 +1,14 @@
 #ifndef ACCORDION_H
 #define ACCORDION_H
+
 #include "../AbstractPanel.h"
 
 namespace Metal {
     class AccordionPanel final : public AbstractPanel {
-        const char *fixedId = id.c_str();
+        std::string fixedId = id;
+        std::string title;
 
     public:
-        std::string title;
 
         void setTitle(const std::string &title);
 
