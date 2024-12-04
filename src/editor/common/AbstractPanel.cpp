@@ -26,4 +26,8 @@ namespace Metal {
             this->context = context;
         }
     }
+
+    std::vector<IPanel *> &AbstractPanel::getChildren() {
+        return children;
+    }
 }

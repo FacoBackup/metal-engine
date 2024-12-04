@@ -2,11 +2,19 @@
 #define METAL_ENGINE_DOCKREPOSITORY_H
 
 #include "../../../common/runtime/AbstractRuntimeComponent.h"
+#include "DockDTO.h"
 
 namespace Metal {
+    class DockSpacePanel;
 
-    class DockRepository : public AbstractRuntimeComponent {
-    public:
+    struct DockRepository : public AbstractRuntimeComponent {
+        DockDTO center;
+        std::vector<DockDTO> bottom;
+        std::vector<DockDTO> left;
+        std::vector<DockDTO> right;
+        DockDTO *dockToRemove;
+        DockSpacePanel *dockPanelToRemove;
+
         explicit DockRepository(ApplicationContext &context);
     };
 

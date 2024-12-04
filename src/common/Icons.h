@@ -533,7 +533,7 @@ namespace Metal::Icons {
     static const std::string deblur = "\ueb77";
     static const std::string deck = "\uea42";
     static const std::string dehaze = "\ue3c7";
-    static const std::string delete = "\ue872";
+    static const std::string idelete = "\ue872";
     static const std::string delete_forever = "\ue92b";
     static const std::string delete_outline = "\ue92e";
     static const std::string delete_sweep = "\ue16c";
@@ -713,7 +713,7 @@ namespace Metal::Icons {
     static const std::string expand_circle_down = "\ue7cd";
     static const std::string expand_less = "\ue5ce";
     static const std::string expand_more = "\ue5cf";
-    static const std::string explicit = "\ue01e";
+    static const std::string iexplicit = "\ue01e";
     static const std::string explore = "\ue87a";
     static const std::string explore_off = "\ue9a8";
     static const std::string exposure = "\ue3ca";
@@ -1556,7 +1556,7 @@ namespace Metal::Icons {
     static const std::string propane_tank = "\uec13";
     static const std::string psychology = "\uea4a";
     static const std::string psychology_alt = "\uf8ea";
-    static const std::string i = "\ue80b";
+    static const std::string ipublic = "\ue80b";
     static const std::string public_off = "\uf1ca";
     static const std::string publish = "\ue255";
     static const std::string published_with_changes = "\uf232";

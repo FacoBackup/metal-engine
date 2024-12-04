@@ -24,8 +24,8 @@ add_executable(
         src/renderer/context/GUIContext.h
         src/editor/ui/viewport/ViewportPanel.cpp
         src/editor/ui/viewport/ViewportPanel.h
-        src/editor/ui/docks/AbstractDockSpacePanel.cpp
-        src/editor/ui/docks/AbstractDockSpacePanel.h
+        src/editor/ui/docks/AbstractDockPanel.cpp
+        src/editor/ui/docks/AbstractDockPanel.h
         src/common/runtime/ApplicationContext.cpp
         src/common/runtime/ApplicationContext.h
         src/editor/common/AbstractPanel.h
@@ -78,6 +78,11 @@ add_executable(
         src/editor/repository/dock/DockDTO.cpp
         src/editor/repository/dock/DockDTO.h
         src/common/MEnum.h
+        src/editor/repository/dock/DockSpace.h
+        src/editor/repository/dock/DockPosition.h
+        src/editor/ui/docks/DockSpacePanel.cpp
+        src/editor/ui/docks/DockSpacePanel.h
+        src/editor/repository/dock/DockSpace.cpp
 )
 
 find_package(glfw3 REQUIRED)

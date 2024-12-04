@@ -14,11 +14,15 @@ namespace Metal {
         void onSyncChildren() const;
 
     public:
+        std::vector<IPanel *>& getChildren();
+
         void appendChild(AbstractPanel *panel);
 
         void removeAllChildren() override;
 
         void setContext(ApplicationContext *context);
+
+        void onRemove(){}
     };
 }
 #endif

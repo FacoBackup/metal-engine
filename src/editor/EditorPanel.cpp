@@ -1,5 +1,4 @@
 #include "EditorPanel.h"
-#include "views/inspector/InspectorPanel.h"
 #include "common/UIUtil.h"
 
 namespace Metal {

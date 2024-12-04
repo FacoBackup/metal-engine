@@ -1,9 +1,10 @@
 #ifndef INSPECTOR_H
 #define INSPECTOR_H
-#include "../../docks/AbstractDockSpacePanel.h"
+
+#include "../docks/AbstractDockPanel.h"
 
 namespace Metal {
-    class InspectorPanel final : public AbstractDockSpacePanel {
+    class InspectorPanel final : public AbstractDockPanel {
         CameraRepository *cameraRepository = nullptr;
 
     public:
