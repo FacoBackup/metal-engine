@@ -8,7 +8,6 @@ namespace Metal {
         cameraSystem.onSync();
     }
 
-    CameraSystem &Engine::getCameraSystem() {
-        return cameraSystem;
-    }
+    Engine::Engine(ApplicationContext &context) : AbstractSystem(context) {}
+
 }

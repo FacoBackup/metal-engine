@@ -2,7 +2,7 @@
 
 namespace Metal {
     void InspectorPanel::onInitialize() {
-        cameraRepository = &context->getEngine().getCameraSystem().cameraRepository;
+        cameraRepository = &context->getEngine().cameraRepository;
     }
 
     void InspectorPanel::onSync() {

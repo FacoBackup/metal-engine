@@ -1,14 +1,15 @@
 #ifndef CAMERASYSTEM_H
 #define CAMERASYSTEM_H
-#include "CameraRepository.h"
+#include "../../repository/camera/CameraRepository.h"
 #include "../../../common/Synchornizable.h"
+#include "../../../common/runtime/AbstractSystem.h"
 
 namespace Metal {
-    class CameraSystem final : public Syncronizable {
+    class CameraSystem final : public AbstractSystem {
     public:
-        void onSync() override;
+        explicit CameraSystem(ApplicationContext &context);
 
-        CameraRepository cameraRepository;
+        void onSync() override;
     };
 }
 

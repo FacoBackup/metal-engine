@@ -15,7 +15,8 @@ namespace Metal {
         VECTOR2,
         VECTOR3,
         VECTOR4,
-        QUATERNION
+        QUATERNION,
+        METHOD
     };
 }
 #endif

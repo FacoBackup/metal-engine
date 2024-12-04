@@ -1,5 +1,5 @@
 #include "ApplicationContext.h"
-#include "../ui/EditorPanel.h"
+#include "../../ui/EditorPanel.h"
 
 namespace Metal {
     ApplicationContext::ApplicationContext() {

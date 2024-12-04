@@ -1,4 +1,4 @@
-#include "context/ApplicationContext.h"
+#include "common/runtime/ApplicationContext.h"
 
 int main(int, char **) {
     Metal::ApplicationContext context;

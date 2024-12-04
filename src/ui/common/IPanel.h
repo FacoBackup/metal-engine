@@ -6,11 +6,8 @@
 #include "../../common/Initializable.h"
 
 namespace Metal {
-    class IPanel : public Syncronizable, Initializable {
+    class IPanel : public Syncronizable, public Initializable {
     public:
-        void onInitialize() override {
-        }
-
         virtual void removeAllChildren() {
         }
     };

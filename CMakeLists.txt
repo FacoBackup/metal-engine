@@ -26,17 +26,17 @@ add_executable(
         src/ui/views/viewport/ViewportPanel.h
         src/ui/docks/AbstractDockSpacePanel.cpp
         src/ui/docks/AbstractDockSpacePanel.h
-        src/context/ApplicationContext.cpp
-        src/context/ApplicationContext.h
+        src/common/runtime/ApplicationContext.cpp
+        src/common/runtime/ApplicationContext.h
         src/ui/common/AbstractPanel.h
         src/ui/common/AbstractPanel.cpp
         src/common/Synchornizable.h
         src/engine/system/camera/CameraSystem.cpp
         src/engine/system/camera/CameraSystem.h
-        src/engine/system/camera/CameraRepository.h
-        src/engine/system/camera/Camera.h
-        src/engine/system/camera/Frustum.cpp
-        src/engine/system/camera/Frustum.h
+        src/engine/repository/camera/CameraRepository.h
+        src/engine/repository/camera/Camera.h
+        src/engine/repository/camera/Frustum.cpp
+        src/engine/repository/camera/Frustum.h
         src/common/Util.h
         src/common/Identifiable.h
         src/common/inspection/Inspectable.h
@@ -50,6 +50,19 @@ add_executable(
         src/ui/common/form/AccordionPanel.h
         src/common/inspection/FieldType.h
         src/common/inspection/InspectableMember.h
+        src/common/runtime/AbstractSystem.cpp
+        src/common/runtime/AbstractSystem.h
+        src/common/runtime/AbstractRepository.h
+        src/engine/repository/camera/CameraRepository.cpp
+        src/common/runtime/AbstractRepository.cpp
+        src/ui/common/form/types/BooleanField.cpp
+        src/ui/common/form/types/BooleanField.h
+        src/ui/common/form/types/IntField.cpp
+        src/ui/common/form/types/IntField.h
+        src/ui/common/form/types/FloatField.cpp
+        src/ui/common/form/types/FloatField.h
+        src/ui/common/form/types/MethodField.cpp
+        src/ui/common/form/types/MethodField.h
 )
 
 find_package(glfw3 REQUIRED)

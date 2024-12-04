@@ -9,7 +9,6 @@
 #include "InspectedField.h"
 
 #define GETTER(field) [this]() { return field; }
-#define SETTER(field, type) [this](const std::any &value) { field = std::any_cast<type>(value); }
 #define MAX_INT 2147483647
 
 namespace Metal {
@@ -21,16 +20,13 @@ namespace Metal {
         virtual void registerFields() {
         }
 
-        void registerField(FieldType type, const std::function<std::any()> &getValue,
-                           const std::function<void(std::any)> &updateCallback, std::string group, std::string name,
-                           int min, int max, bool disabled);
-
-        void registerField(FieldType type, const std::function<std::any()> &getValue,
-                           const std::function<void(std::any)> &updateCallback, std::string group, std::string name);
-
-        void registerField(FieldType type, const std::function<std::any()> &getValue,
-                           const std::function<void(std::any)> &updateCallback, std::string group, std::string name,
+        void registerFloat(float &field, std::string group, std::string name, int min, int max,
                            bool disabled);
+
+        void registerInt(int &field, std::string group, std::string name, int min, int max,
+                         bool disabled);
+
+        void registerBool(bool &field, std::string group, std::string name, bool disabled);
 
         void registerMethod(const std::function<void()> &updateCallback, std::string name, std::string group);
 

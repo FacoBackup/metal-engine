@@ -1,6 +1,10 @@
 #include "FormPanel.h"
 #include "AccordionPanel.h"
 #include "../../../common/inspection/FieldType.h"
+#include "types/IntField.h"
+#include "types/FloatField.h"
+#include "types/BooleanField.h"
+#include "types/MethodField.h"
 
 namespace Metal {
     void FormPanel::processFields(std::unordered_map<std::string, AccordionPanel *> &groups) {
@@ -13,9 +17,7 @@ namespace Metal {
 
             AccordionPanel *group = groups[field.group];
             group->title = field.group;
-            if (field.isField()) {
-                auto &fieldCasted = dynamic_cast<InspectedField &>(field);
-//                switch (fieldCasted.type) {
+            switch (field.type) {
 //                    case STRING:
 //                        // if (field.getField().isAnnotationPresent<ResourceTypeField>()) {
 //                        //     group->appendChild(new ResourceField(field, changeHandler));
@@ -25,15 +27,19 @@ namespace Metal {
 //                        group->appendChild(new StringField(field, changeHandler));
 //                        // }
 //                        break;
-//                    case INT:
-//                        group->appendChild(new IntField(field, changeHandler));
-//                        break;
-//                    case FLOAT:
-//                        group->appendChild(new FloatField(field, changeHandler));
-//                        break;
-//                    case BOOLEAN:
-//                        group->appendChild(new BooleanField(field, changeHandler));
-//                        break;
+                case INT:
+                    group->appendChild(new IntField{dynamic_cast<InspectedField<int> &>(field)});
+                    break;
+                case FLOAT:
+                    group->appendChild(new FloatField{dynamic_cast<InspectedField<float> &>(field)});
+                    break;
+                case BOOLEAN:
+                    group->appendChild(new BooleanField{dynamic_cast<InspectedField<bool> &>(field)});
+                    break;
+                case METHOD:
+                    group->appendChild(new MethodField{dynamic_cast<InspectedMethod &>(field)});
+                default:
+                    break;
 //                    case VECTOR2:
 //                        group->appendChild(new Vector2Field(field, changeHandler));
 //                        break;
@@ -58,10 +64,8 @@ namespace Metal {
 //                        break;
 //                    case CUSTOM:
 //                        break;
-//                }
-            } else {
-                // TODO - Method
             }
+
         }
     }
 

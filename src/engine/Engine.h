@@ -6,15 +6,16 @@
 #include "system/camera/CameraSystem.h"
 
 namespace Metal {
-    class Engine final : public Syncronizable, Initializable {
-        CameraSystem cameraSystem;
-
+    class Engine final : AbstractSystem, Initializable {
     public:
+        explicit Engine(ApplicationContext &context);
+
+        CameraSystem cameraSystem{context};
+        CameraRepository cameraRepository{context};
+
         void onInitialize() override;
 
         void onSync() override;
-
-        CameraSystem &getCameraSystem();
     };
 }
 #endif

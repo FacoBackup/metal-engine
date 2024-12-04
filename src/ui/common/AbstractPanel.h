@@ -2,7 +2,7 @@
 #define METAL_ENGINE_ABSTRACTPANEL_H
 
 #include "IPanel.h"
-#include "../../context/ApplicationContext.h"
+#include "../../common/runtime/ApplicationContext.h"
 
 namespace Metal {
     class AbstractPanel : public IPanel {
