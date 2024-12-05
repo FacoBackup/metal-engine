@@ -19,7 +19,7 @@ namespace Metal {
         VkInstance g_Instance = VK_NULL_HANDLE;
         VkPhysicalDevice g_PhysicalDevice = VK_NULL_HANDLE;
         VkDevice g_Device = VK_NULL_HANDLE;
-        uint32_t g_QueueFamily = (uint32_t) -1;
+        uint32_t g_QueueFamily{};
         VkQueue g_Queue = VK_NULL_HANDLE;
         VkDebugReportCallbackEXT g_DebugReport = VK_NULL_HANDLE;
         VkPipelineCache g_PipelineCache = VK_NULL_HANDLE;

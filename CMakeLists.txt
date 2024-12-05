@@ -101,6 +101,11 @@ add_executable(
         src/editor/ui/console/ConsolePanel.h
         src/editor/ui/hierarchy/HierarchyPanel.cpp
         src/editor/ui/hierarchy/HierarchyPanel.h
+        src/engine/service/resources/AbstractResourceService.cpp
+        src/engine/service/resources/AbstractResourceService.h
+        src/engine/service/resources/IGPUResource.h
+        src/engine/render-pass/FrameCompositionPass.cpp
+        src/engine/render-pass/FrameCompositionPass.h
 )
 
 find_package(glfw3 REQUIRED)
