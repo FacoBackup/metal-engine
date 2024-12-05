@@ -8,24 +8,24 @@
 #include "DockPosition.h"
 
 namespace Metal {
-
     struct DockDTO {
-        const std::string id = Metal::Util::uuidV4();
-        ImGuiID nodeId;
+        const std::string id = Util::uuidV4();
+        ImGuiID nodeId{};
         int selectedOption;
         const std::string internalId;
-        ImGuiDir splitDir;
-        float sizeX;
-        float sizeY;
-        float sizeRatioForNodeAtDir;
+        ImGuiDir splitDir = ImGuiDir_Down;
+        float sizeX{};
+        float sizeY{};
+        float sizeRatioForNodeAtDir{};
         DockDTO *outAtOppositeDir = nullptr;
         DockDTO *origin = nullptr;
-        DockSpace description;
-        DockPosition direction;
-        explicit DockDTO(DockSpace description) : selectedOption(description.index), internalId("##" + Util::uuidV4()), description(description){
+        DockSpace *description;
+        DockPosition direction = LEFT;
+
+        explicit DockDTO(DockSpace *description) : selectedOption(description->index), internalId("##" + Util::uuidV4()),
+                                                   description(description) {
         }
     };
-
 } // Metal
 
 #endif

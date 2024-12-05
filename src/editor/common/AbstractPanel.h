@@ -2,9 +2,12 @@
 #define METAL_ENGINE_ABSTRACTPANEL_H
 
 #include "IPanel.h"
-#include "../../common/runtime/ApplicationContext.h"
+#include "imgui.h"
+#include "../../common/Util.h"
 
 namespace Metal {
+    class ApplicationContext;
+
     class AbstractPanel : public IPanel {
     protected:
         ApplicationContext *context = nullptr;
@@ -14,7 +17,7 @@ namespace Metal {
         void onSyncChildren() const;
 
     public:
-        std::vector<IPanel *>& getChildren();
+        std::vector<IPanel *> &getChildren();
 
         void appendChild(AbstractPanel *panel);
 
@@ -22,7 +25,8 @@ namespace Metal {
 
         void setContext(ApplicationContext *context);
 
-        void onRemove(){}
+        virtual void onRemove() {
+        }
     };
 }
 #endif

@@ -4,6 +4,8 @@
 #include "../docks/AbstractDockPanel.h"
 
 namespace Metal {
+    class CameraRepository;
+
     class InspectorPanel final : public AbstractDockPanel {
         CameraRepository *cameraRepository = nullptr;
 

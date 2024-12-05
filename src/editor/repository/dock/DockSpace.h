@@ -5,32 +5,36 @@
 #include <string>
 
 namespace Metal {
-    class AbstractPanel;
+    class AbstractDockPanel;
 
     struct DockSpace {
-        static const DockSpace VIEWPORT;
-        static const DockSpace INSPECTOR;
-        static const DockSpace HIERARCHY;
-        static const DockSpace CONSOLE;
-        static const DockSpace FILES;
-        static const DockSpace RESOURCES;
-        static const DockSpace METRICS;
+        static DockSpace VIEWPORT;
+        static DockSpace INSPECTOR;
+        static DockSpace HIERARCHY;
+        static DockSpace CONSOLE;
+        static DockSpace FILES;
+        static DockSpace RESOURCES;
+        static DockSpace METRICS;
+        static const char *OPTIONS;
 
         const int index;
         const std::string name;
         const std::string icon;
         const int paddingX;
         const int paddingY;
-        const std::function<std::unique_ptr<AbstractPanel>()> getPanel;
+        const std::function<std::unique_ptr<AbstractDockPanel>()> getPanel;
 
-        explicit DockSpace(int index, std::string name, std::string icon,
-                           int paddingX, int paddingY,
-                           std::function<std::unique_ptr<AbstractPanel>()> getPanel) : index(index),
-                                                                                       name(std::move(name)),
-                                                                                       icon(std::move(icon)),
-                                                                                       paddingX(paddingX),
-                                                                                       paddingY(paddingY),
-                                                                                       getPanel(std::move(getPanel)) {}
+        explicit DockSpace(const int index, std::string name, std::string icon,
+                           const int paddingX, const int paddingY,
+                           std::function<std::unique_ptr<AbstractDockPanel>()> getPanel) : index(index),
+            name(std::move(name)),
+            icon(std::move(icon)),
+            paddingX(paddingX),
+            paddingY(paddingY),
+            getPanel(std::move(getPanel)) {
+        }
+
+        static DockSpace *GetOption(int selected);
     };
 }
 #endif

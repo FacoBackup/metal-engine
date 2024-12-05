@@ -6,11 +6,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <limits>
 #include "InspectedField.h"
-
-#define MAX_INT std::numeric_limits<int>::max()
-#define MAX_FLOAT std::numeric_limits<float>::max()
 
 namespace Metal {
     class Inspectable {

@@ -1,4 +1,9 @@
 #include "DockSpacePanel.h"
+
+#include "AbstractDockPanel.h"
+#include "../../../common/runtime/ApplicationContext.h"
+#include "../../../common/Icons.h"
+#include "../../repository/dock/DockDTO.h"
 #include "../../common/UIUtil.h"
 
 namespace Metal {
@@ -13,62 +18,95 @@ namespace Metal {
     }
 
     void DockSpacePanel::initializeView() {
-
+        removeAllChildren();
+        view = dock->description->getPanel().get();
+        view->size = &size;
+        view->dock = dock;
+        view->position = &position;
+        appendChild(view);
     }
 
     void DockSpacePanel::onSync() {
-        Syncronizable::onSync();
+        ImGui::SetNextWindowSizeConstraints(MIN_SIZE, MAX_SIZE);
+        if (padding.x != DEFAULT.x || padding.y != DEFAULT.y) {
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, padding);
+            stylePushCount++;
+        }
+
+        beforeWindow();
+        if (ImGui::Begin(dock->internalId.c_str(), &UIUtil::OPEN, FLAGS)) {
+            view->isWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+            sizeInternal = ImGui::GetWindowSize();
+            size.x = sizeInternal.x;
+            size.y = sizeInternal.y;
+
+            dock->sizeX = size.x;
+            dock->sizeY = size.y;
+
+            position = ImGui::GetWindowPos();
+            renderHeader();
+            view->onSync();
+        }
+        ImGui::End();
+
+        ImGui::PopStyleVar(stylePushCount);
+        stylePushCount = 0;
     }
 
-    AbstractDockPanel *DockSpacePanel::getView() {
-        return nullptr;
+    AbstractDockPanel *DockSpacePanel::getView() const {
+        return view;
     }
 
     void DockSpacePanel::renderHeader() {
+        DockRepository &dockRepository = context->getEditorContext().dockRepository;
+        DockService &dockService = context->getEditorContext().dockService;
+
         headerPadding.x = ImGui::GetStyle().FramePadding.x;
 
         if (ImGui::BeginMenuBar()) {
-            std::string[] options = dock->description.getOptions();
             int &selected = dock->selectedOption;
-            ImGui::SetNextItemWidth(ImGui::CalcTextSize(options[selected]).x + 30);
+            ImGui::SetNextItemWidth(ImGui::CalcTextSize(DockSpace::GetOption(selected)->name.c_str()).x + 30);
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, headerPadding);
-            if (ImGui::Combo(id.c_str(), selected, options)) {
-                dock->description = dock->description.getSelectedOption(selected);
+            if (ImGui::Combo(id.c_str(), &selected, DockSpace::OPTIONS)) {
+                dock->description = DockSpace::GetOption(selected);
                 initializeView();
             }
             ImGui::PopStyleVar();
 
             if (isNotCenter) {
                 UIUtil::DynamicSpacing(55);
-                if (ImGui::Button((isDownDirection ? Icons.horizontal_split : Icons.vertical_split) + "##splitView" + imguiId, ONLY_ICON_BUTTON_SIZE, ONLY_ICON_BUTTON_SIZE)) {
-                    try {
-                        DockDTO *dto = new DockDTO(dock->description.name );
-                        dto->origin = dock;
-                        dto->splitDir = isDownDirection ? ImGuiDir_Down : ImGuiDir_Right;
-                        dto->sizeRatioForNodeAtDir = .5f;
-                        dto->outAtOppositeDir = dock;
-                        switch (dock->direction) {
-                            case LEFT:
-                                dockRepository.left.add(dockRepository.left.indexOf(dock) + 1, dto);
-                                break;
-                            case RIGHT:
-                                dockRepository.right.add(dockRepository.right.indexOf(dock) + 1, dto);
-                                break;
-                            case BOTTOM:
-                                dockRepository.bottom.add(dockRepository.bottom.indexOf(dock) + 1, dto);
-                                break;
-                            default:
-                                break;
-                        }
-                        dockRepository.isInitialized = false;
-                        messageRepository.pushMessage("Dock space created", MessageSeverity.SUCCESS);
-                    } catch (Exception e) {
-                        getLogger().error(e.getMessage(), e);
-                        messageRepository.pushMessage("Error while creating dock space", MessageSeverity.ERROR);
+                if (UIUtil::ButtonSimple(
+                    (isDownDirection ? Icons::horizontal_split : Icons::vertical_split) + id + "splitView",
+                    UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
+                    auto *dto = new DockDTO(dock->description);
+                    dto->origin = dock;
+                    dto->splitDir = isDownDirection ? ImGuiDir_Down : ImGuiDir_Right;
+                    dto->sizeRatioForNodeAtDir = .5f;
+                    dto->outAtOppositeDir = dock;
+                    switch (dock->direction) {
+                        case LEFT:
+                            dockRepository.left.insert(
+                                dockRepository.left.begin() + Util::indexOf(dockRepository.left, dock) + 1, dto);
+
+                            break;
+                        case RIGHT:
+                            dockRepository.right.insert(
+                                dockRepository.right.begin() + Util::indexOf(dockRepository.right, dock) + 1, dto);
+                            break;
+                        case BOTTOM:
+                            dockRepository.bottom.insert(
+                                dockRepository.bottom.begin() + Util::indexOf(dockRepository.bottom, dock) + 1,
+                                dto);
+
+                            break;
+                        default:
+                            break;
                     }
+                    dockRepository.isInitialized = false;
                 }
 
-                if (ImGui::Button(Icons.close + "##removeView" + imguiId, ONLY_ICON_BUTTON_SIZE, ONLY_ICON_BUTTON_SIZE)) {
+                if (UIUtil::ButtonSimple(Icons::close + id + "removeView", UIUtil::ONLY_ICON_BUTTON_SIZE,
+                                         UIUtil::ONLY_ICON_BUTTON_SIZE)) {
                     dockService.prepareForRemoval(dock, this);
                 }
             }
@@ -76,10 +114,10 @@ namespace Metal {
         }
     }
 
-    void DockSpacePanel::beforeWindow() {
+    void DockSpacePanel::beforeWindow() const {
         if (mainWindow != nullptr && mainWindow != this) {
-            ImVec2 pos = mainWindow->getPosition();
-            ImVec2 sze = mainWindow->getSize();
+            const ImVec2 &pos = mainWindow->getPosition();
+            const ImVec2 &sze = mainWindow->getSize();
             UIUtil::AUX_VEC2.x = pos.x + sze.x * 0.5f;
             UIUtil::AUX_VEC2.y = pos.y + sze.y * 0.5f;
             ImGui::SetNextWindowPos(UIUtil::AUX_VEC2, ImGuiCond_FirstUseEver, PIVOT);

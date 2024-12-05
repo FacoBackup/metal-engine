@@ -10,19 +10,19 @@ namespace Metal {
     class AbstractPanel;
 
     class DockService : public AbstractRuntimeComponent {
-        static const int NO_TAB_BAR_FLAG = 1 << 12;
+        static constexpr int NO_TAB_BAR_FLAG = 1 << 12;
 
-        bool isInitialized;
+        bool isInitialized = false;
     public:
-        void buildViews(ImGuiID &windowId, AbstractPanel *panel);
+        void buildViews(ImGuiID &windowId, AbstractPanel *panel) const;
 
-        void createDockSpace(DockDTO &dockSpace, ImGuiID &dockMainId);
+        static void createDockSpace(DockDTO *dockSpace, ImGuiID &dockMainId);
 
-        void addWindow(DockDTO &d, AbstractPanel *panel);
+        static void addWindow(DockDTO *d, AbstractPanel *panel);
 
-        void prepareForRemoval(DockDTO &dock, DockSpacePanel *dockSpacePanel);
+        void prepareForRemoval(DockDTO *dock, DockSpacePanel *dockSpacePanel) const;
 
-        void updateForRemoval(AbstractPanel *panel);
+        void updateForRemoval(AbstractPanel *panel) const;
 
         explicit DockService(ApplicationContext &context);
     };

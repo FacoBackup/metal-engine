@@ -7,17 +7,17 @@
 namespace Metal {
     class DockSpacePanel;
 
-    struct DockRepository : public AbstractRuntimeComponent {
-        DockDTO center;
-        std::vector<DockDTO> bottom;
-        std::vector<DockDTO> left;
-        std::vector<DockDTO> right;
+    struct DockRepository final : AbstractRuntimeComponent {
+        DockDTO center{&DockSpace::VIEWPORT};
+        std::vector<DockDTO *> bottom;
+        std::vector<DockDTO *> left;
+        std::vector<DockDTO *> right;
         DockDTO *dockToRemove;
         DockSpacePanel *dockPanelToRemove;
+        bool isInitialized = false;
 
         explicit DockRepository(ApplicationContext &context);
     };
-
 } // Metal
 
 #endif

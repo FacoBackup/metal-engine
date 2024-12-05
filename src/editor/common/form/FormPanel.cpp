@@ -1,6 +1,7 @@
 #include "FormPanel.h"
 #include "AccordionPanel.h"
 #include "../../../common/inspection/FieldType.h"
+#include "../../../common/inspection/Inspectable.h"
 #include "types/IntField.h"
 #include "types/FloatField.h"
 #include "types/BooleanField.h"

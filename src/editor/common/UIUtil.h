@@ -5,17 +5,18 @@
 #include <string>
 
 namespace Metal::UIUtil {
-    static const int FIXED_WINDOW_FLAGS =
+    static constexpr int FIXED_WINDOW_FLAGS =
             ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar |
             ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
-    static const ImVec2 MEDIUM_SPACING(5, 0);
-    static const ImVec2 LARGE_SPACING(40, 0);
-    static const ImVec2 VEC2_ZERO(0.0f, 0.0f);
+    static constexpr ImVec2 MEDIUM_SPACING(5, 0);
+    static constexpr ImVec2 LARGE_SPACING(40, 0);
+    static constexpr ImVec2 VEC2_ZERO(0.0f, 0.0f);
     static ImVec2 AUX_VEC2(0, 0);
-    static const int ONLY_ICON_BUTTON_SIZE = 23;
+    static constexpr int ONLY_ICON_BUTTON_SIZE = 23;
     static bool OPEN = true;
 
-    static bool RenderOption(const std::string &label, bool selected, float sizeX, float sizeY, ImVec4 accent) {
+    static bool RenderOption(const std::string &label, const bool selected, const float sizeX, const float sizeY,
+                             const ImVec4 &accent) {
         int popStyle = 0;
         if (selected) {
             ImGui::PushStyleColor(ImGuiCol_Button, accent);
@@ -34,14 +35,15 @@ namespace Metal::UIUtil {
         return value;
     }
 
-    static bool ButtonSimple(const std::string &label, float sizeX, float sizeY) {
+    static bool ButtonSimple(const std::string &label, const float sizeX, const float sizeY) {
         AUX_VEC2.x = sizeX;
         AUX_VEC2.y = sizeY;
         return ImGui::Button(label.c_str(), AUX_VEC2);
     }
 
-    static bool RenderOption(const std::string &label, bool selected, bool fixedSize, ImVec4 accent) {
-        float size = fixedSize ? ONLY_ICON_BUTTON_SIZE : -1;
+    static bool RenderOption(const std::string &label, const bool selected, const bool fixedSize,
+                             const ImVec4 &accent) {
+        const float size = fixedSize ? ONLY_ICON_BUTTON_SIZE : -1;
         return RenderOption(label, selected, size, size, accent);
     }
 
