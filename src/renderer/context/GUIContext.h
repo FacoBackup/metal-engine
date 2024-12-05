@@ -3,7 +3,6 @@
 
 #include "GLFWContext.h"
 #include "imgui_impl_glfw.h"
-#include "../../ui/common/IPanel.h"
 
 namespace Metal {
 
@@ -24,8 +23,11 @@ namespace Metal {
 
         void endFrame();
     private:
+        static void applySpacing();
 
-        GLFWContext windowContext;
+        static void applyFonts();
+
+        GLFWContext windowContext{};
     };
 
 }

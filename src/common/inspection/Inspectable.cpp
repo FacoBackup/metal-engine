@@ -29,7 +29,7 @@ namespace Metal {
     void Inspectable::registerInt(int &v,
                                   std::string group, std::string name,
                                   int min, int max, bool disabled) {
-        std::unique_ptr<InspectedField<int>> field = std::make_unique<InspectedField<int>>(v);
+        std::unique_ptr<InspectedField<int>> field = std::make_unique<InspectedField<int>>(&v);
 
         field->name = std::move(name);
         field->nameWithId = field->name + Metal::Util::uuidV4();
@@ -46,8 +46,7 @@ namespace Metal {
     void Inspectable::registerFloat(float &v,
                                     std::string group, std::string name,
                                     float min, float max, bool disabled) {
-        std::unique_ptr<InspectedField<float>> field = std::make_unique<InspectedField<float>>(v);
-
+        std::unique_ptr<InspectedField<float>> field = std::make_unique<InspectedField<float>>(&v);
 
         field->name = std::move(name);
         field->nameWithId = field->name + Metal::Util::uuidV4();
@@ -64,7 +63,7 @@ namespace Metal {
 
     void Inspectable::registerBool(bool &v,
                                    std::string group, std::string name, bool disabled) {
-        std::unique_ptr<InspectedField<bool>> field = std::make_unique<InspectedField<bool>>(v);
+        std::unique_ptr<InspectedField<bool>> field = std::make_unique<InspectedField<bool>>(&v);
 
         field->name = std::move(name);
         field->nameWithId = field->name + Metal::Util::uuidV4();

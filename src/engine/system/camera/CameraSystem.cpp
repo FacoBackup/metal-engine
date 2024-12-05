@@ -3,10 +3,10 @@
 
 namespace Metal {
     void CameraSystem::onSync() {
-        if (context.getEngine().cameraRepository.movementSensitivity > 1.) {
+        if (context.getEngineContext().cameraRepository.movementSensitivity > 1.) {
             // TODO
         }
     }
 
-    CameraSystem::CameraSystem(ApplicationContext &context) : AbstractSystem(context) {}
+    CameraSystem::CameraSystem(ApplicationContext &context) : AbstractRuntimeComponent(context) {}
 }

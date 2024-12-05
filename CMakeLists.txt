@@ -6,14 +6,19 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVK_PROTOTYPES")
 
 add_subdirectory(dependencies/vk-bootstrap)
 
+set(FONTS_SOURCE_DIR "${CMAKE_SOURCE_DIR}/dependencies/fonts")
+set(FONTS_DESTINATION_DIR "${CMAKE_BINARY_DIR}/fonts")
+
+file(COPY ${FONTS_SOURCE_DIR} DESTINATION ${CMAKE_BINARY_DIR})
+
 add_executable(
         metal_engine
         src/main.cpp
-        src/ui/EditorPanel.cpp
-        src/ui/EditorPanel.h
-        src/ui/common/IPanel.h
-        src/engine/Engine.cpp
-        src/engine/Engine.h
+        src/editor/EditorPanel.cpp
+        src/editor/EditorPanel.h
+        src/editor/common/IPanel.h
+        src/engine/EngineContext.cpp
+        src/engine/EngineContext.h
         src/renderer/VulkanUtils.cpp
         src/renderer/VulkanUtils.h
         src/renderer/context/VulkanContext.cpp
@@ -22,14 +27,14 @@ add_executable(
         src/renderer/context/GLFWContext.h
         src/renderer/context/GUIContext.cpp
         src/renderer/context/GUIContext.h
-        src/ui/views/viewport/ViewportPanel.cpp
-        src/ui/views/viewport/ViewportPanel.h
-        src/ui/docks/AbstractDockSpacePanel.cpp
-        src/ui/docks/AbstractDockSpacePanel.h
+        src/editor/ui/viewport/ViewportPanel.cpp
+        src/editor/ui/viewport/ViewportPanel.h
+        src/editor/ui/docks/AbstractDockPanel.cpp
+        src/editor/ui/docks/AbstractDockPanel.h
         src/common/runtime/ApplicationContext.cpp
         src/common/runtime/ApplicationContext.h
-        src/ui/common/AbstractPanel.h
-        src/ui/common/AbstractPanel.cpp
+        src/editor/common/AbstractPanel.h
+        src/editor/common/AbstractPanel.cpp
         src/common/Synchornizable.h
         src/engine/system/camera/CameraSystem.cpp
         src/engine/system/camera/CameraSystem.h
@@ -42,27 +47,60 @@ add_executable(
         src/common/inspection/Inspectable.h
         src/common/inspection/Inspectable.cpp
         src/common/inspection/InspectedField.h
-        src/ui/views/inspector/InspectorPanel.cpp
-        src/ui/views/inspector/InspectorPanel.h
-        src/ui/common/form/FormPanel.cpp
-        src/ui/common/form/FormPanel.h
-        src/ui/common/form/AccordionPanel.cpp
-        src/ui/common/form/AccordionPanel.h
+        src/editor/ui/inspector/InspectorPanel.cpp
+        src/editor/ui/inspector/InspectorPanel.h
+        src/editor/common/form/FormPanel.cpp
+        src/editor/common/form/FormPanel.h
+        src/editor/common/form/AccordionPanel.cpp
+        src/editor/common/form/AccordionPanel.h
         src/common/inspection/FieldType.h
         src/common/inspection/InspectableMember.h
-        src/common/runtime/AbstractSystem.cpp
-        src/common/runtime/AbstractSystem.h
+        src/common/runtime/AbstractRuntimeComponent.cpp
+        src/common/runtime/AbstractRuntimeComponent.h
         src/common/runtime/AbstractRepository.h
         src/engine/repository/camera/CameraRepository.cpp
         src/common/runtime/AbstractRepository.cpp
-        src/ui/common/form/types/BooleanField.cpp
-        src/ui/common/form/types/BooleanField.h
-        src/ui/common/form/types/IntField.cpp
-        src/ui/common/form/types/IntField.h
-        src/ui/common/form/types/FloatField.cpp
-        src/ui/common/form/types/FloatField.h
-        src/ui/common/form/types/MethodField.cpp
-        src/ui/common/form/types/MethodField.h
+        src/editor/common/form/types/BooleanField.cpp
+        src/editor/common/form/types/BooleanField.h
+        src/editor/common/form/types/IntField.cpp
+        src/editor/common/form/types/IntField.h
+        src/editor/common/form/types/FloatField.cpp
+        src/editor/common/form/types/FloatField.h
+        src/editor/common/form/types/MethodField.cpp
+        src/editor/common/form/types/MethodField.h
+        src/editor/common/UIUtil.h
+        src/editor/ui/header/EditorHeaderPanel.cpp
+        src/editor/ui/header/EditorHeaderPanel.h
+        src/editor/ui/header/GlobalSettingsPanel.cpp
+        src/editor/ui/header/GlobalSettingsPanel.h
+        src/common/Icons.h
+        src/editor/service/DockService.cpp
+        src/editor/service/DockService.h
+        src/editor/EditorContext.cpp
+        src/editor/EditorContext.h
+        src/editor/repository/dock/DockRepository.cpp
+        src/editor/repository/dock/DockRepository.h
+        src/editor/repository/dock/DockDTO.cpp
+        src/editor/repository/dock/DockDTO.h
+        src/common/MEnum.h
+        src/editor/repository/dock/DockSpace.h
+        src/editor/repository/dock/DockPosition.h
+        src/editor/ui/docks/DockSpacePanel.cpp
+        src/editor/ui/docks/DockSpacePanel.h
+        src/editor/repository/dock/DockSpace.cpp
+        src/editor/service/ThemeService.cpp
+        src/editor/service/ThemeService.h
+        src/editor/repository/EditorRepository.cpp
+        src/editor/repository/EditorRepository.h
+        src/common/EntityID.h
+        src/editor/ui/metrics/MetricsPanel.cpp
+        src/editor/ui/metrics/MetricsPanel.h
+        src/editor/ui/files/FilesPanel.cpp
+        src/editor/ui/files/FilesPanel.h
+        src/editor/ui/console/ConsolePanel.cpp
+        src/editor/ui/console/ConsolePanel.h
+        src/editor/ui/hierarchy/HierarchyPanel.cpp
+        src/editor/ui/hierarchy/HierarchyPanel.h
 )
 
 find_package(glfw3 REQUIRED)

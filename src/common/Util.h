@@ -4,8 +4,13 @@
 #include <sstream>
 #include <string>
 #include <__random/random_device.h>
+#include <limits>
+
+#define MAX_INT std::numeric_limits<int>::max()
+#define MAX_FLOAT std::numeric_limits<float>::max()
 
 namespace Metal::Util {
+
     static float TO_RADIANS = (3.1415926535f / 180);
     static std::random_device rd;
     static std::mt19937 gen(rd());
@@ -37,6 +42,11 @@ namespace Metal::Util {
             ss << dis(gen);
         };
         return ss.str();
+    }
+
+    template <typename T>
+    int indexOf(const std::vector<T> &v, T val) {
+        return std::find(v.begin(), v.end(), val) != v.end();
     }
 }
 #endif //UTIL_H

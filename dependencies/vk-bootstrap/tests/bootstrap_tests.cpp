@@ -298,7 +298,7 @@ TEST_CASE("Swapchain", "[VkBootstrap.bootstrap]") {
             REQUIRE(swapchain_ret.has_value());
             auto swapchain = swapchain_ret.value();
 
-            THEN("Acquire swapchain images and views") {
+            THEN("Acquire swapchain images and ui") {
                 auto images = swapchain.get_images();
                 REQUIRE(images.has_value());
                 REQUIRE(images.value().size() > 0);
@@ -308,13 +308,13 @@ TEST_CASE("Swapchain", "[VkBootstrap.bootstrap]") {
                 REQUIRE(image_views.value().size() > 0);
                 swapchain.destroy_image_views(image_views.value());
             }
-            AND_THEN("Acquire swapchain images views with nullptr pNext chain") {
+            AND_THEN("Acquire swapchain images ui with nullptr pNext chain") {
                 auto image_views = swapchain.get_image_views(nullptr);
                 REQUIRE(image_views.has_value());
                 REQUIRE(image_views.value().size() > 0);
                 swapchain.destroy_image_views(image_views.value());
             }
-            AND_THEN("Acquire swapchain image views with valid pNext chain") {
+            AND_THEN("Acquire swapchain image ui with valid pNext chain") {
                 VkImageViewUsageCreateInfo usage = { VK_STRUCTURE_TYPE_IMAGE_VIEW_USAGE_CREATE_INFO, nullptr, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT };
                 auto image_views = swapchain.get_image_views(&usage);
                 REQUIRE(image_views.has_value());
