@@ -83,6 +83,8 @@ add_executable(
         src/editor/ui/docks/DockSpacePanel.cpp
         src/editor/ui/docks/DockSpacePanel.h
         src/editor/repository/dock/DockSpace.cpp
+        src/editor/service/ThemeService.cpp
+        src/editor/service/ThemeService.h
 )
 
 find_package(glfw3 REQUIRED)

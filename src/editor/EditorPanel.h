@@ -21,7 +21,7 @@ namespace Metal {
 
         void renderDockSpaces();
 
-        void renderHeader(ImGuiViewport *viewport);
+        void renderHeader(const ImGuiViewport *viewport);
 
     public:
         void onInitialize() override;

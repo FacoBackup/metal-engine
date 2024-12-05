@@ -3,13 +3,13 @@
 #include "../common/runtime/ApplicationContext.h"
 
 namespace Metal {
-    int  EditorPanel::FLAGS = ImGuiWindowFlags_NoDocking |
-                              ImGuiWindowFlags_NoTitleBar |
-                              ImGuiWindowFlags_NoCollapse |
-                              ImGuiWindowFlags_NoResize |
-                              ImGuiWindowFlags_NoMove |
-                              ImGuiWindowFlags_NoBringToFrontOnFocus |
-                              ImGuiWindowFlags_NoNavFocus;
+    int EditorPanel::FLAGS = ImGuiWindowFlags_NoDocking |
+                             ImGuiWindowFlags_NoTitleBar |
+                             ImGuiWindowFlags_NoCollapse |
+                             ImGuiWindowFlags_NoResize |
+                             ImGuiWindowFlags_NoMove |
+                             ImGuiWindowFlags_NoBringToFrontOnFocus |
+                             ImGuiWindowFlags_NoNavFocus;
     const char *EditorPanel::NAME = "##main_window";
     const char *EditorPanel::NAME_HEADER = "##header_window";
     ImVec2 EditorPanel::CENTER(0.0f, 0.0f);
@@ -49,7 +49,7 @@ namespace Metal {
         ImGui::End();
     }
 
-    void EditorPanel::renderHeader(ImGuiViewport *viewport) {
+    void EditorPanel::renderHeader(const ImGuiViewport *viewport) {
         UIUtil::AUX_VEC2.x = viewport->Pos.x;
         UIUtil::AUX_VEC2.y = 0;
         ImGui::SetNextWindowPos(UIUtil::AUX_VEC2);
@@ -59,7 +59,7 @@ namespace Metal {
         ImGui::SetNextWindowSize(UIUtil::AUX_VEC2);
 
         SetWindowStyle();
-        ImGui::Begin(NAME_HEADER, &Metal::UIUtil::OPEN, FLAGS | ImGuiWindowFlags_NoScrollbar);
+        ImGui::Begin(NAME_HEADER, &UIUtil::OPEN, FLAGS | ImGuiWindowFlags_NoScrollbar);
         ImGui::PopStyleVar(3);
 
         headerPanel.onSync();
@@ -73,6 +73,7 @@ namespace Metal {
     }
 
     void EditorPanel::onSync() {
+        context->getEditorContext().themeService.onSync();
         renderDockSpaces();
     }
 

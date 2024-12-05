@@ -10,7 +10,7 @@ namespace Metal {
     DockService::DockService(ApplicationContext &context) : AbstractRuntimeComponent(context) {
     }
 
-    void DockService::buildViews(ImGuiID &windowId, AbstractPanel *panel) const {
+    void DockService::buildViews(const ImGuiID windowId, AbstractPanel *panel) const {
         DockRepository &dockRepository = context.getEditorContext().dockRepository;
 
         if (dockRepository.isInitialized) {
@@ -83,17 +83,17 @@ namespace Metal {
             addWindow(dockSpace, panel);
         }
 
-        ImGui::DockBuilderDockWindow(dockRepository.center.internalId.c_str(), windowId);
+        ImGui::DockBuilderDockWindow(dockRepository.center.internalId, windowId);
         ImGui::DockBuilderFinish(windowId);
     }
 
 
-    void DockService::createDockSpace(DockDTO *dockSpace, ImGuiID &dockMainId) {
-        ImGuiID &origin = dockMainId;
+    void DockService::createDockSpace(DockDTO *dockSpace, const ImGuiID dockMainId) {
+        ImGuiID origin = dockMainId;
         if (dockSpace->origin != nullptr) {
             origin = dockSpace->origin->nodeId;
         }
-        ImGuiID &target = dockMainId;
+        ImGuiID target = dockMainId;
         if (dockSpace->outAtOppositeDir != nullptr) {
             target = dockSpace->outAtOppositeDir->nodeId;
         }
@@ -106,7 +106,7 @@ namespace Metal {
     }
 
     void DockService::addWindow(DockDTO *d, AbstractPanel *panel) {
-        ImGui::DockBuilderDockWindow(d->internalId.c_str(), d->nodeId);
+        ImGui::DockBuilderDockWindow(d->internalId, d->nodeId);
         for (auto *l: panel->getChildren()) {
             if (dynamic_cast<DockSpacePanel *>(l)) {
                 panel->appendChild(new DockSpacePanel(dynamic_cast<DockSpacePanel *>(l), d));

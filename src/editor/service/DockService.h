@@ -9,14 +9,14 @@
 namespace Metal {
     class AbstractPanel;
 
-    class DockService : public AbstractRuntimeComponent {
+    class DockService final : public AbstractRuntimeComponent {
         static constexpr int NO_TAB_BAR_FLAG = 1 << 12;
 
         bool isInitialized = false;
     public:
-        void buildViews(ImGuiID &windowId, AbstractPanel *panel) const;
+        void buildViews(ImGuiID windowId, AbstractPanel *panel) const;
 
-        static void createDockSpace(DockDTO *dockSpace, ImGuiID &dockMainId);
+        static void createDockSpace(DockDTO *dockSpace, ImGuiID dockMainId);
 
         static void addWindow(DockDTO *d, AbstractPanel *panel);
 
