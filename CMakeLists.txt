@@ -85,6 +85,9 @@ add_executable(
         src/editor/repository/dock/DockSpace.cpp
         src/editor/service/ThemeService.cpp
         src/editor/service/ThemeService.h
+        src/editor/repository/EditorRepository.cpp
+        src/editor/repository/EditorRepository.h
+        src/common/EntityID.h
 )
 
 find_package(glfw3 REQUIRED)
