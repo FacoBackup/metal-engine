@@ -17,7 +17,7 @@ namespace Metal {
 
 
     void EditorPanel::renderDockSpaces() {
-        ImGuiViewport *viewport = ImGui::GetMainViewport();
+        const ImGuiViewport *viewport = ImGui::GetMainViewport();
         renderHeader(viewport);
 
         // Begin window
@@ -32,9 +32,9 @@ namespace Metal {
             ImGui::SetNextWindowViewport(viewport->ID);
 
             SetWindowStyle();
-            ImGui::Begin(NAME, &UIUtil::OPEN, FLAGS);
         }
 
+        ImGui::Begin(NAME, &UIUtil::OPEN, FLAGS);
         windowId = ImGui::GetID(NAME);
 
         ImGui::PopStyleVar(3);

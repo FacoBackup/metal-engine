@@ -6,8 +6,9 @@
 
 namespace Metal {
 
-    class ViewportPanel : public AbstractDockPanel {
-
+    class ViewportPanel final : public AbstractDockPanel {
+        public:
+        void onSync() override;
     };
 
 }

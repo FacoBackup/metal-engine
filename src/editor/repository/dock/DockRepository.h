@@ -12,8 +12,8 @@ namespace Metal {
         std::vector<DockDTO *> bottom;
         std::vector<DockDTO *> left;
         std::vector<DockDTO *> right;
-        DockDTO *dockToRemove;
-        DockSpacePanel *dockPanelToRemove;
+        DockDTO *dockToRemove = nullptr;
+        DockSpacePanel *dockPanelToRemove = nullptr;
         bool isInitialized = false;
 
         explicit DockRepository(ApplicationContext &context);

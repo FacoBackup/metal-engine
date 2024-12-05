@@ -23,8 +23,11 @@ namespace Metal {
 
         void endFrame();
     private:
+        static void applySpacing();
 
-        GLFWContext windowContext;
+        static void applyFonts();
+
+        GLFWContext windowContext{};
     };
 
 }

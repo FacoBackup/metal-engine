@@ -6,6 +6,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVK_PROTOTYPES")
 
 add_subdirectory(dependencies/vk-bootstrap)
 
+set(FONTS_SOURCE_DIR "${CMAKE_SOURCE_DIR}/dependencies/fonts")
+set(FONTS_DESTINATION_DIR "${CMAKE_BINARY_DIR}/fonts")
+
+file(COPY ${FONTS_SOURCE_DIR} DESTINATION ${CMAKE_BINARY_DIR})
+
 add_executable(
         metal_engine
         src/main.cpp
@@ -88,6 +93,14 @@ add_executable(
         src/editor/repository/EditorRepository.cpp
         src/editor/repository/EditorRepository.h
         src/common/EntityID.h
+        src/editor/ui/metrics/MetricsPanel.cpp
+        src/editor/ui/metrics/MetricsPanel.h
+        src/editor/ui/files/FilesPanel.cpp
+        src/editor/ui/files/FilesPanel.h
+        src/editor/ui/console/ConsolePanel.cpp
+        src/editor/ui/console/ConsolePanel.h
+        src/editor/ui/hierarchy/HierarchyPanel.cpp
+        src/editor/ui/hierarchy/HierarchyPanel.h
 )
 
 find_package(glfw3 REQUIRED)

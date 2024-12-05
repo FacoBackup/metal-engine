@@ -34,6 +34,10 @@ namespace Metal {
         explicit DockSpacePanel(DockSpacePanel *mainWindow, DockDTO *dock) : mainWindow(mainWindow), dock(dock) {
         }
 
+        [[nodiscard]] DockDTO * getDock() const {
+            return dock;
+        }
+
         void onInitialize() override;
 
         void initializeView();

@@ -16,7 +16,7 @@ namespace Metal {
         ImGuiDir splitDir = ImGuiDir_Down;
         float sizeX{};
         float sizeY{};
-        float sizeRatioForNodeAtDir{};
+        float sizeRatioForNodeAtDir;
         DockDTO *outAtOppositeDir = nullptr;
         DockDTO *origin = nullptr;
         DockSpace *description;

@@ -5,10 +5,10 @@ namespace Metal {
     }
 
     void BooleanField::onSync() {
-        if (ImGui::Checkbox(field.name.c_str(), &field.field)) {
-            if (!field.disabled) {
-                field.field = !field.field;
-            }
+        if (!field.disabled) {
+            ImGui::Checkbox(field.name.c_str(), field.field);
+        } else {
+            ImGui::Text("%s: %b", field.name.c_str(), *field.field);
         }
     }
 }

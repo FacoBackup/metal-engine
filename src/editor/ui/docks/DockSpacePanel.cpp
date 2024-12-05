@@ -14,12 +14,13 @@ namespace Metal {
     const ImVec2 DockSpacePanel::MIN_SIZE{300.f, 300.f};
 
     void DockSpacePanel::onInitialize() {
-        Initializable::onInitialize();
+        initializeView();
+        isNotCenter = dock->direction != CENTER;
     }
 
     void DockSpacePanel::initializeView() {
         removeAllChildren();
-        view = dock->description->getPanel().get();
+        view = dock->description->getPanel();
         view->size = &size;
         view->dock = dock;
         view->position = &position;
@@ -32,7 +33,12 @@ namespace Metal {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, padding);
             stylePushCount++;
         }
-
+        if (!sizeInitialized && dock->sizeX > 0 && dock->sizeY > 0) {
+            UIUtil::AUX_VEC2.x = dock->sizeX;
+            UIUtil::AUX_VEC2.y = dock->sizeY;
+            ImGui::SetNextWindowSize(UIUtil::AUX_VEC2);
+            sizeInitialized = true;
+        }
         beforeWindow();
         if (ImGui::Begin(dock->internalId, &UIUtil::OPEN, FLAGS)) {
             view->isWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);

@@ -1,6 +1,7 @@
 #ifndef METAL_ENGINE_ICONS_H
 #define METAL_ENGINE_ICONS_H
 
+#include <imgui.h>
 #include <string>
 
 namespace Metal::Icons {
@@ -2237,7 +2238,6 @@ namespace Metal::Icons {
     static const std::string zoom_in_map = "\ueb2d";
     static const std::string zoom_out = "\ue900";
     static const std::string zoom_out_map = "\ue56b";
-    static short RANGE[3]{static_cast<short>(0xF1000), static_cast<short>(0xFF000), 0};
     static int ONLY_ICON_BUTTON_SIZE = 23;
 }
 #endif //METAL_ENGINE_ICONS_H

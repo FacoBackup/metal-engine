@@ -8,7 +8,7 @@
 namespace Metal {
     template<typename T>
     struct InspectedField : InspectableMember {
-        T &field;
+        T *field;
 
         std::optional<int> max;
         std::optional<int> min;
@@ -16,7 +16,7 @@ namespace Metal {
         std::optional<float> minF;
         bool disabled = false;
 
-        explicit InspectedField(T &field) : field(field) {}
+        explicit InspectedField(T *field) : field(field) {}
 
         ~InspectedField() override = default;
     };
