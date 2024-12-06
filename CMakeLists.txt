@@ -106,6 +106,10 @@ add_executable(
         src/engine/service/resources/IGPUResource.h
         src/engine/render-pass/FrameCompositionPass.cpp
         src/engine/render-pass/FrameCompositionPass.h
+        src/engine/service/shader/ShaderService.cpp
+        src/engine/service/shader/ShaderService.h
+        src/engine/service/shader/ShaderResource.cpp
+        src/engine/service/shader/ShaderResource.h
 )
 
 find_package(glfw3 REQUIRED)
@@ -115,7 +119,8 @@ find_package(spdlog CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Vulkan)
 find_package(VulkanMemoryAllocator CONFIG REQUIRED)
-
+find_package(glslang CONFIG REQUIRED)
+find_package(VulkanMemoryAllocator CONFIG REQUIRED)
 set(COMMON_LIBRARIES
         glfw
         Vulkan::Headers
@@ -126,6 +131,10 @@ set(COMMON_LIBRARIES
         imgui::imgui
         spdlog::spdlog
         nlohmann_json::nlohmann_json
+
+        glslang::glslang
+        glslang::glslang-default-resource-limits
+        glslang::SPVRemapper
 )
 
 target_link_libraries(metal_engine PRIVATE ${COMMON_LIBRARIES})
