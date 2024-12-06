@@ -10,8 +10,6 @@ namespace Metal {
     class AbstractPanel;
 
     class DockService final : public AbstractRuntimeComponent {
-        bool isInitialized = false;
-
     public:
         void buildViews(ImGuiID windowId, AbstractPanel *panel) const;
 

@@ -12,18 +12,19 @@ namespace Metal {
         const std::string id = Util::uuidV4();
         ImGuiID nodeId{};
         int selectedOption;
-        const char * internalId;
+        const char * internalId = nullptr;
         ImGuiDir splitDir = ImGuiDir_Down;
         float sizeX{};
         float sizeY{};
-        float sizeRatioForNodeAtDir;
+        float sizeRatioForNodeAtDir{};
         DockDTO *outAtOppositeDir = nullptr;
         DockDTO *origin = nullptr;
         DockSpace *description;
         DockPosition direction = LEFT;
 
-        explicit DockDTO(DockSpace *description) : selectedOption(description->index), internalId(("##" + Util::uuidV4()).c_str()),
+        explicit DockDTO(DockSpace *description) : selectedOption(description->index),
                                                    description(description) {
+            internalId = ("##" + Util::uuidV4()).c_str();
         }
     };
 } // Metal

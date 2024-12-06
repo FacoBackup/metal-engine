@@ -7,11 +7,12 @@
 
 
 namespace Metal {
-
     class VulkanContext {
-    public:
-        void build(bool debugMode);
 
+        void frameRender(ImDrawData *draw_data);
+
+        void createSurface(GLFWwindow *window);
+    public:
         bool debugMode = false;
         int g_MinImageCount = 2;
         bool g_SwapChainRebuild = false;
@@ -27,19 +28,15 @@ namespace Metal {
         ImGui_ImplVulkanH_Window g_MainWindowData;
         VkSurfaceKHR surface = VK_NULL_HANDLE;
 
-        void shutdown();
+        void build(bool debugMode);
+
+        void shutdown() const;
 
         void renderFrame(ImDrawData *main_draw_data);
 
         void setupVulkan();
 
         void setupVulkanWindow(GLFWwindow *window);
-
-    private:
-
-        void frameRender(ImDrawData *draw_data);
-
-        void createSurface(GLFWwindow *window);
     };
 
 } // Metal

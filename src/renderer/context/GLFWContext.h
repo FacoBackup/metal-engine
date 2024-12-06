@@ -10,27 +10,27 @@
 
 
 namespace Metal {
+    class ApplicationContext;
 
     class GLFWContext {
+        GLFWwindow *window = nullptr;
+        bool validContext = true;
+        ApplicationContext &context;
+
     public:
+        explicit GLFWContext(ApplicationContext &context) : context(context) {}
+
         void build(bool debugMode);
 
-        GLFWwindow *getWindow() const;
+        [[nodiscard]] GLFWwindow *getWindow() const;
 
         bool isValidContext() const;
 
-        bool beginFrame();
+        bool beginFrame() const;
 
-        VulkanContext &getVulkanContext();
+        void shutdown() const;
 
-        void shutdown();
-
-        ImGui_ImplVulkanH_Window &getGUIWindow();
-
-    private:
-        GLFWwindow *window;
-        bool validContext = true;
-        VulkanContext context;
+        ImGui_ImplVulkanH_Window &getGUIWindow() const;
     };
 }
 

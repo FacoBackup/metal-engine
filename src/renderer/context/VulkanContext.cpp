@@ -4,7 +4,7 @@
 #define VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME "VK_KHR_portability_subset"
 
 namespace Metal {
-    void VulkanContext::shutdown() {
+    void VulkanContext::shutdown() const {
         vkDestroyDescriptorPool(g_Device, g_DescriptorPool,
                                 g_Allocator);
 
@@ -39,25 +39,25 @@ namespace Metal {
             g_SwapChainRebuild = true;
             return;
         }
-        Metal::VulkanUtils::check_vk_result(err);
+        VulkanUtils::check_vk_result(err);
 
         ImGui_ImplVulkanH_Frame *fd = &g_MainWindowData.Frames[g_MainWindowData.FrameIndex];
         {
             err = vkWaitForFences(g_Device, 1, &fd->Fence, VK_TRUE,
                                   UINT64_MAX);    // wait indefinitely instead of periodically checking
-            Metal::VulkanUtils::check_vk_result(err);
+            VulkanUtils::check_vk_result(err);
 
             err = vkResetFences(g_Device, 1, &fd->Fence);
-            Metal::VulkanUtils::check_vk_result(err);
+            VulkanUtils::check_vk_result(err);
         }
         {
             err = vkResetCommandPool(g_Device, fd->CommandPool, 0);
-            Metal::VulkanUtils::check_vk_result(err);
+            VulkanUtils::check_vk_result(err);
             VkCommandBufferBeginInfo info = {};
             info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
             info.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
             err = vkBeginCommandBuffer(fd->CommandBuffer, &info);
-            Metal::VulkanUtils::check_vk_result(err);
+            VulkanUtils::check_vk_result(err);
         }
         {
             VkRenderPassBeginInfo info = {};
@@ -89,15 +89,15 @@ namespace Metal {
             info.pSignalSemaphores = &render_complete_semaphore;
 
             err = vkEndCommandBuffer(fd->CommandBuffer);
-            Metal::VulkanUtils::check_vk_result(err);
+            VulkanUtils::check_vk_result(err);
             err = vkQueueSubmit(g_Queue, 1, &info, fd->Fence);
-            Metal::VulkanUtils::check_vk_result(err);
+            VulkanUtils::check_vk_result(err);
         }
     }
 
     void VulkanContext::renderFrame(ImDrawData *main_draw_data) {
         frameRender(main_draw_data);
-        Metal::VulkanUtils::FramePresent(&g_MainWindowData, g_Queue, g_SwapChainRebuild);
+        VulkanUtils::FramePresent(&g_MainWindowData, g_Queue, g_SwapChainRebuild);
 
     }
 
@@ -121,14 +121,14 @@ namespace Metal {
             vkEnumerateInstanceExtensionProperties(nullptr, &properties_count, nullptr);
             properties.resize(properties_count);
             err = vkEnumerateInstanceExtensionProperties(nullptr, &properties_count, properties.Data);
-            Metal::VulkanUtils::check_vk_result(err);
+            VulkanUtils::check_vk_result(err);
 
             // Enable required extensions
-            if (Metal::VulkanUtils::IsExtensionAvailable(properties,VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME))
+            if (VulkanUtils::IsExtensionAvailable(properties,VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME))
                 instance_extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
 
             #ifdef VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME
-            if (Metal::VulkanUtils::IsExtensionAvailable(properties, VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME)) {
+            if (VulkanUtils::IsExtensionAvailable(properties, VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME)) {
                 instance_extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
                 create_info.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
             }
@@ -146,7 +146,7 @@ namespace Metal {
             create_info.enabledExtensionCount = (uint32_t) instance_extensions.Size;
             create_info.ppEnabledExtensionNames = instance_extensions.Data;
             err = vkCreateInstance(&create_info, g_Allocator, &g_Instance);
-            Metal::VulkanUtils::check_vk_result(err);
+            VulkanUtils::check_vk_result(err);
 
 
             // Setup the debug report setValue
@@ -158,16 +158,16 @@ namespace Metal {
                 debug_report_ci.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
                 debug_report_ci.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT |
                                         VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
-                debug_report_ci.pfnCallback = Metal::VulkanUtils::debug_report;
+                debug_report_ci.pfnCallback = VulkanUtils::debug_report;
                 debug_report_ci.pUserData = nullptr;
                 err = f_vkCreateDebugReportCallbackEXT(g_Instance, &debug_report_ci,
                                                        g_Allocator, &g_DebugReport);
-                Metal::VulkanUtils::check_vk_result(err);
+                VulkanUtils::check_vk_result(err);
             }
         }
 
         // Select Physical Device (GPU)
-        g_PhysicalDevice = Metal::VulkanUtils::SelectPhysicalDevice(*this);
+        g_PhysicalDevice = VulkanUtils::SelectPhysicalDevice(*this);
 
         // Select graphics queue family
         {
@@ -199,7 +199,7 @@ namespace Metal {
             vkEnumerateDeviceExtensionProperties(g_PhysicalDevice, nullptr, &properties_count,
                                                  properties.Data);
             #ifdef VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME
-            if (Metal::VulkanUtils::IsExtensionAvailable(properties, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME))
+            if (VulkanUtils::IsExtensionAvailable(properties, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME))
             device_extensions.push_back(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME);
             #endif
 
@@ -217,7 +217,7 @@ namespace Metal {
             create_info.ppEnabledExtensionNames = device_extensions.Data;
             err = vkCreateDevice(g_PhysicalDevice, &create_info, g_Allocator,
                                  &g_Device);
-            Metal::VulkanUtils::check_vk_result(err);
+            VulkanUtils::check_vk_result(err);
             vkGetDeviceQueue(g_Device, g_QueueFamily, 0,
                              &g_Queue);
         }
@@ -238,7 +238,7 @@ namespace Metal {
             pool_info.pPoolSizes = pool_sizes;
             err = vkCreateDescriptorPool(g_Device, &pool_info, g_Allocator,
                                          &g_DescriptorPool);
-            Metal::VulkanUtils::check_vk_result(err);
+            VulkanUtils::check_vk_result(err);
         }
     }
 
@@ -289,6 +289,6 @@ namespace Metal {
 
     void VulkanContext::createSurface(GLFWwindow *window) {
         VkResult err = glfwCreateWindowSurface(g_Instance, window, g_Allocator, &surface);
-        Metal::VulkanUtils::check_vk_result(err);
+        VulkanUtils::check_vk_result(err);
     }
 }
