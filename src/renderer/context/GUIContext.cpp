@@ -9,15 +9,90 @@
 #define IMGUI_ENABLE_FREETYPE
 
 namespace Metal {
+    void GUIContext::frameRender(ImDrawData *draw_data) {
+        ImGui_ImplVulkanH_Window &g_MainWindowData = context.getVulkanContext().g_MainWindowData;
+        VkDevice &device = context.getVulkanContext().device.device;
+
+        VkResult err;
+        VkSemaphore image_acquired_semaphore = g_MainWindowData.FrameSemaphores[g_MainWindowData.SemaphoreIndex].
+                ImageAcquiredSemaphore;
+        VkSemaphore render_complete_semaphore = g_MainWindowData.FrameSemaphores[g_MainWindowData.SemaphoreIndex].
+                RenderCompleteSemaphore;
+        err = vkAcquireNextImageKHR(device, g_MainWindowData.Swapchain, UINT64_MAX,
+                                    image_acquired_semaphore,
+                                    VK_NULL_HANDLE,
+                                    &g_MainWindowData.FrameIndex);
+        if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR) {
+            isSwapChainRebuild = true;
+            return;
+        }
+        VulkanUtils::CheckVKResult(err);
+
+        ImGui_ImplVulkanH_Frame *fd = &g_MainWindowData.Frames[g_MainWindowData.FrameIndex]; {
+            err = vkWaitForFences(device, 1, &fd->Fence, VK_TRUE,
+                                  UINT64_MAX); // wait indefinitely instead of periodically checking
+            VulkanUtils::CheckVKResult(err);
+
+            err = vkResetFences(device, 1, &fd->Fence);
+            VulkanUtils::CheckVKResult(err);
+        } {
+            err = vkResetCommandPool(device, fd->CommandPool, 0);
+            VulkanUtils::CheckVKResult(err);
+            VkCommandBufferBeginInfo info = {};
+            info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+            info.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+            err = vkBeginCommandBuffer(fd->CommandBuffer, &info);
+            VulkanUtils::CheckVKResult(err);
+        } {
+            VkRenderPassBeginInfo info = {};
+            info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+            info.renderPass = g_MainWindowData.RenderPass;
+            info.framebuffer = fd->Framebuffer;
+            info.renderArea.extent.width = g_MainWindowData.Width;
+            info.renderArea.extent.height = g_MainWindowData.Height;
+            info.clearValueCount = 1;
+            info.pClearValues = &g_MainWindowData.ClearValue;
+            vkCmdBeginRenderPass(fd->CommandBuffer, &info, VK_SUBPASS_CONTENTS_INLINE);
+        }
+
+        // Record dear imgui primitives into command buffer
+        ImGui_ImplVulkan_RenderDrawData(draw_data, fd->CommandBuffer);
+
+        // Submit command buffer
+        vkCmdEndRenderPass(fd->CommandBuffer); {
+            VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+            VkSubmitInfo info = {};
+            info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+            info.waitSemaphoreCount = 1;
+            info.pWaitSemaphores = &image_acquired_semaphore;
+            info.pWaitDstStageMask = &wait_stage;
+            info.commandBufferCount = 1;
+            info.pCommandBuffers = &fd->CommandBuffer;
+            info.signalSemaphoreCount = 1;
+            info.pSignalSemaphores = &render_complete_semaphore;
+
+            err = vkEndCommandBuffer(fd->CommandBuffer);
+            VulkanUtils::CheckVKResult(err);
+            err = vkQueueSubmit(context.getVulkanContext().graphicsQueue, 1, &info, fd->Fence);
+            VulkanUtils::CheckVKResult(err);
+        }
+    }
+
+    void GUIContext::renderFrame(ImDrawData *main_draw_data) {
+        frameRender(main_draw_data);
+        VulkanUtils::FramePresent(&context.getVulkanContext().g_MainWindowData,
+                                  context.getVulkanContext().graphicsQueue, isSwapChainRebuild);
+    }
 
     void GUIContext::shutdown() const {
-        const VkResult err = vkDeviceWaitIdle(context.getVulkanContext().g_Device);
-        VulkanUtils::check_vk_result(err);
+        const VkResult err = vkDeviceWaitIdle(context.getVulkanContext().device.device);
+        VulkanUtils::CheckVKResult(err);
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
-        ImGui_ImplVulkanH_DestroyWindow(context.getVulkanContext().g_Instance, context.getVulkanContext().g_Device,
-                                        &context.getGLFWContext().getGUIWindow(), context.getVulkanContext().g_Allocator);
+        ImGui_ImplVulkanH_DestroyWindow(context.getVulkanContext().instance, context.getVulkanContext().device.device,
+                                        &context.getGLFWContext().getGUIWindow(),
+                                        context.getVulkanContext().instance.allocation_callbacks);
         context.getGLFWContext().shutdown();
     }
 
@@ -32,12 +107,11 @@ namespace Metal {
         return true;
     }
 
-    void GUIContext::endFrame() const {
+    void GUIContext::endFrame() {
         ImGui::Render();
         ImDrawData *main_draw_data = ImGui::GetDrawData();
-        const bool main_is_minimized = (main_draw_data->DisplaySize.x <= 0.0f || main_draw_data->DisplaySize.y <= 0.0f);
-        if (!main_is_minimized) {
-            context.getVulkanContext().renderFrame(main_draw_data);
+        if (!(main_draw_data->DisplaySize.x <= 0.0f || main_draw_data->DisplaySize.y <= 0.0f)) {
+            renderFrame(main_draw_data);
         }
     }
 
@@ -64,20 +138,20 @@ namespace Metal {
         // Setup Platform/Renderer backends
         ImGui_ImplGlfw_InitForVulkan(context.getGLFWContext().getWindow(), true);
         ImGui_ImplVulkan_InitInfo init_info = {};
-        init_info.Instance = context.getVulkanContext().g_Instance;
-        init_info.PhysicalDevice = context.getVulkanContext().g_PhysicalDevice;
-        init_info.Device = context.getVulkanContext().g_Device;
-        init_info.QueueFamily = context.getVulkanContext().g_QueueFamily;
-        init_info.Queue = context.getVulkanContext().g_Queue;
-        init_info.PipelineCache = context.getVulkanContext().g_PipelineCache;
-        init_info.DescriptorPool = context.getVulkanContext().g_DescriptorPool;
+        init_info.Instance = context.getVulkanContext().instance.instance;
+        init_info.PhysicalDevice = context.getVulkanContext().physDevice.physical_device;
+        init_info.Device = context.getVulkanContext().device.device;
+        init_info.QueueFamily = context.getVulkanContext().queueFamily;
+        init_info.Queue = context.getVulkanContext().graphicsQueue;
+        init_info.PipelineCache = context.getVulkanContext().pipelineCache;
+        init_info.DescriptorPool = context.getVulkanContext().descriptorPool;
         init_info.RenderPass = context.getVulkanContext().g_MainWindowData.RenderPass;
         init_info.Subpass = 0;
-        init_info.MinImageCount = context.getVulkanContext().g_MinImageCount;
+        init_info.MinImageCount = MIN_IMAGE_COUNT;
         init_info.ImageCount = context.getVulkanContext().g_MainWindowData.ImageCount;
         init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
-        init_info.Allocator = context.getVulkanContext().g_Allocator;
-        init_info.CheckVkResultFn = VulkanUtils::check_vk_result;
+        init_info.Allocator = context.getVulkanContext().instance.allocation_callbacks;
+        init_info.CheckVkResultFn = VulkanUtils::CheckVKResult;
         ImGui_ImplVulkan_Init(&init_info);
 
         applySpacing();

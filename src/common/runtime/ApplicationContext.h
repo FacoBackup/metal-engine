@@ -1,8 +1,6 @@
 #ifndef METAL_ENGINE_APPLICATIONCONTEXT_H
 #define METAL_ENGINE_APPLICATIONCONTEXT_H
 
-#define ENGINE_NAME "Metal Engine"
-
 #include "../../engine/EngineContext.h"
 #include "../../renderer/context/GUIContext.h"
 #include "../../editor/common/IPanel.h"

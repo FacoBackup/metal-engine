@@ -10,6 +10,7 @@ namespace Metal {
         static void applyFonts();
 
         ApplicationContext &context;
+        bool isSwapChainRebuild = false;
 
     public:
         explicit GUIContext(ApplicationContext &context) : context(context) {
@@ -17,13 +18,17 @@ namespace Metal {
 
         void build(bool debugMode) const;
 
+        void frameRender(ImDrawData *draw_data);
+
+        void renderFrame(ImDrawData *main_draw_data);
+
         void shutdown() const;
 
         void setupContext() const;
 
         bool beginFrame() const;
 
-        void endFrame() const;
+        void endFrame() ;
     };
 }
 

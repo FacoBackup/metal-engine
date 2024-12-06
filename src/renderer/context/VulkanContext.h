@@ -2,43 +2,60 @@
 #define METAL_ENGINE_VULKANCONTEXT_H
 
 #include "imgui_impl_vulkan.h"
-#include "vulkan/vulkan.h"
 #include <GLFW/glfw3.h>
+#include "VkBootstrap.h"
 
+#define MIN_IMAGE_COUNT 2
 
 namespace Metal {
     class VulkanContext {
-
         void frameRender(ImDrawData *draw_data);
 
-        void createSurface(GLFWwindow *window);
+        static VkBool32 DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+                                      VkDebugUtilsMessageTypeFlagsEXT messageType,
+                                      const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
+                                      void *pUserData);
+
+        void addExtensions(vkb::InstanceBuilder &instanceBuilder,
+                           const ImVector<const char *> &instanceExtensions) const;
+
+        void createDescriptorPool();
+
+        int w{}, h{};
+        GLFWwindow *window = nullptr;
+
     public:
         bool debugMode = false;
-        int g_MinImageCount = 2;
-        bool g_SwapChainRebuild = false;
-        VkAllocationCallbacks *g_Allocator = nullptr;
-        VkInstance g_Instance = VK_NULL_HANDLE;
-        VkPhysicalDevice g_PhysicalDevice = VK_NULL_HANDLE;
-        VkDevice g_Device = VK_NULL_HANDLE;
-        uint32_t g_QueueFamily{};
-        VkQueue g_Queue = VK_NULL_HANDLE;
-        VkDebugReportCallbackEXT g_DebugReport = VK_NULL_HANDLE;
-        VkPipelineCache g_PipelineCache = VK_NULL_HANDLE;
-        VkDescriptorPool g_DescriptorPool = VK_NULL_HANDLE;
+        bool isSwapChainRebuild = false;
+        vkb::Instance instance{};
         ImGui_ImplVulkanH_Window g_MainWindowData;
         VkSurfaceKHR surface = VK_NULL_HANDLE;
+        VkPipelineCache pipelineCache = VK_NULL_HANDLE;
+        uint32_t queueFamily{};
+        vkb::PhysicalDevice physDevice;
+        vkb::Device device;
+        VkQueue graphicsQueue{};
+        VkSwapchainKHR swapChain{};
+        VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
 
         void build(bool debugMode);
 
         void shutdown() const;
 
-        void renderFrame(ImDrawData *main_draw_data);
+        void createSwapChain();
 
-        void setupVulkan();
+        void createQueue();
 
-        void setupVulkanWindow(GLFWwindow *window);
+        void createDevice();
+
+        void createPhysicalDevice();
+
+        void createPresentMode();
+
+        void createSurfaceFormat();
+
+        void setupVulkan(GLFWwindow *window, const ImVector<const char *> &instanceExtensions);
     };
-
 } // Metal
 
 #endif

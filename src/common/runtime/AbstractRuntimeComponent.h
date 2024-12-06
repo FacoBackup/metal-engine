@@ -2,6 +2,7 @@
 #define METAL_ENGINE_ABSTRACTRUNTIMECOMPONENT_H
 
 #include "../Synchornizable.h"
+#define ENGINE_NAME "Metal Engine"
 
 namespace Metal {
     class ApplicationContext;
