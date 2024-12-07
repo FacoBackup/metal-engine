@@ -23,7 +23,6 @@ namespace Metal {
             renderPassService.createFrameBuffer(gBufferRenderPass);
         } {
             // Aux-Buffer
-
             auxRenderPass = renderPassService.createPipeline(vulkanContext.getWindowWidth(),
                                                                vulkanContext.getWindowHeight());
             renderPassService.createAttachment("Color", VK_FORMAT_R32G32B32A32_SFLOAT,

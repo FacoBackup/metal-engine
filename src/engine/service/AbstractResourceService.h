@@ -20,9 +20,6 @@ namespace Metal {
 
     public:
         explicit AbstractResourceService(ApplicationContext &context);
-
-        virtual void dispose() {
-        }
     };
 } // Metal
 

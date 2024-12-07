@@ -74,7 +74,7 @@ namespace Metal {
                                   context.getGLFWContext().isSwapChainRebuild());
     }
 
-    void GUIContext::shutdown() const {
+    void GUIContext::dispose() const {
         const VkResult err = vkDeviceWaitIdle(context.getVulkanContext().device.device);
         VulkanUtils::CheckVKResult(err);
         ImGui_ImplVulkan_Shutdown();
@@ -83,7 +83,7 @@ namespace Metal {
         ImGui_ImplVulkanH_DestroyWindow(context.getVulkanContext().instance, context.getVulkanContext().device.device,
                                         &context.getGLFWContext().getGUIWindow(),
                                         context.getVulkanContext().instance.allocation_callbacks);
-        context.getGLFWContext().shutdown();
+        context.getGLFWContext().dispose();
     }
 
     bool GUIContext::beginFrame() const {

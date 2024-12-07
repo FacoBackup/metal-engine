@@ -38,8 +38,11 @@ namespace Metal {
                                                instance.allocation_callbacks,
                                                w, h, MIN_IMAGE_COUNT);
         swapChain = imguiVulkanWindow.Swapchain;
-        this->w = w;
-        this->h = h;
+
+        int wW{}, hW{};
+        glfwGetWindowSize(window, &wW, &hW);
+        this->w = wW;
+        this->h = hW;
     }
 
     void VulkanContext::createQueue() {
@@ -225,7 +228,7 @@ namespace Metal {
         createMemoryAllocator();
     }
 
-    void VulkanContext::shutdown() const {
+    void VulkanContext::dispose() const {
         vkDestroyDescriptorPool(device.device, descriptorPool,
                                 instance.allocation_callbacks);
         vkb::destroy_device(device);

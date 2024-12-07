@@ -61,7 +61,7 @@ namespace Metal {
 
         VulkanFrameData &getFrameData();
 
-        void shutdown() const;
+        void dispose() const;
 
         void setupVulkan(GLFWwindow *window, const ImVector<const char *> &instanceExtensions);
 

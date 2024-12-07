@@ -119,11 +119,14 @@ add_executable(
         src/engine/core/CoreRenderPasses.h
         src/engine/core/AbstractCoreRepository.h
         src/engine/core/AbstractCoreRepository.cpp
-        src/engine/core/CoreShaders.cpp
-        src/engine/core/CoreShaders.h
+        src/engine/core/CorePipelines.cpp
+        src/engine/core/CorePipelines.h
         src/engine/service/render-pass/RenderPassService.cpp
         src/engine/service/render-pass/RenderPassService.h
         src/engine/service/render-pass/RenderPassInstance.h
+        src/engine/service/pipeline/PipelineService.cpp
+        src/engine/service/pipeline/PipelineService.h
+        src/engine/service/pipeline/PipelineInstance.h
 )
 
 

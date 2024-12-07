@@ -21,7 +21,7 @@ namespace Metal {
 
         void renderFrame(ImDrawData *main_draw_data) const;
 
-        void shutdown() const;
+        void dispose() const;
 
         void setupContext() const;
 

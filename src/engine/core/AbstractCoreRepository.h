@@ -15,10 +15,6 @@ namespace Metal {
         VulkanContext &vulkanContext;
         RenderPassService &renderPassService;
         ShaderService &shaderService;
-
-    public:
-        virtual void dispose() {
-        }
     };
 
 

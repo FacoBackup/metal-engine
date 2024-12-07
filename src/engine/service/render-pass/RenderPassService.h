@@ -1,5 +1,5 @@
-#ifndef PIPELINESERVICE_H
-#define PIPELINESERVICE_H
+#ifndef RENDERPASSSERVICE_H
+#define RENDERPASSSERVICE_H
 #include <vulkan/vulkan_core.h>
 
 #include "../AbstractResourceService.h"

@@ -1,16 +1,14 @@
-#ifndef CORESHADERS_H
-#define CORESHADERS_H
+#ifndef COREPIPELINES_H
+#define COREPIPELINES_H
 #include "AbstractCoreRepository.h"
 
 namespace Metal {
-    struct CoreShaders final : AbstractCoreRepository {
-        explicit CoreShaders(ApplicationContext &context)
+    struct CorePipelines final : AbstractCoreRepository {
+        explicit CorePipelines(ApplicationContext &context)
             : AbstractCoreRepository(context) {
         }
 
         void onInitialize() override;
-
-        void dispose() override;
     };
 } // Metal
 

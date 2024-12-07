@@ -8,7 +8,16 @@
 
 namespace Metal {
     class ApplicationContext {
+        EngineContext engineContext{*this};
+        EditorContext editorContext{*this};
+        GLFWContext glfwContext{*this};
+        VulkanContext vulkanContext;
+        GUIContext guiContext{*this};
+        IPanel &rootPanel;
+
     public:
+        void dispose();
+
         EngineContext &getEngineContext();
 
         EditorContext &getEditorContext();
@@ -26,14 +35,6 @@ namespace Metal {
         bool isValidContext() const;
 
         explicit ApplicationContext(IPanel &root_panel);
-
-    private:
-        EngineContext engineContext{*this};
-        EditorContext editorContext{*this};
-        GLFWContext glfwContext{*this};
-        VulkanContext vulkanContext;
-        GUIContext guiContext{*this};
-        IPanel &rootPanel;
     };
 }
 

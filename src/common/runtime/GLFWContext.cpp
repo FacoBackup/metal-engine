@@ -42,8 +42,8 @@ namespace Metal {
         return false;
     }
 
-    void GLFWContext::shutdown() const {
-        context.getVulkanContext().shutdown();
+    void GLFWContext::dispose() const {
+        context.getVulkanContext().dispose();
         glfwDestroyWindow(window);
         glfwTerminate();
     }

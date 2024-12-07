@@ -35,7 +35,7 @@ namespace Metal {
 
         bool beginFrame();
 
-        void shutdown() const;
+        void dispose() const;
 
         [[nodiscard]] ImGui_ImplVulkanH_Window &getGUIWindow() const;
     };

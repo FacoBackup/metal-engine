@@ -5,6 +5,11 @@ namespace Metal {
         guiContext.build(true);
     }
 
+    void ApplicationContext::dispose() {
+        guiContext.dispose();
+        engineContext.dispose();
+    }
+
     EngineContext &ApplicationContext::getEngineContext() {
         return engineContext;
     }
@@ -13,32 +18,32 @@ namespace Metal {
         return guiContext;
     }
 
-    GLFWContext & ApplicationContext::getGLFWContext() {
+    GLFWContext &ApplicationContext::getGLFWContext() {
         return glfwContext;
     }
 
-    VulkanContext & ApplicationContext::getVulkanContext() {
+    VulkanContext &ApplicationContext::getVulkanContext() {
         return vulkanContext;
     }
 
-    GUIContext & ApplicationContext::getGUIContext() {
+    GUIContext &ApplicationContext::getGUIContext() {
         return guiContext;
     }
 
     void ApplicationContext::start() {
-            engineContext.onInitialize();
-            rootPanel.onInitialize();
+        engineContext.onInitialize();
+        rootPanel.onInitialize();
 
-            GLFWwindow *window = glfwContext.getWindow();
-            while (!glfwWindowShouldClose(window)) {
-                if (guiContext.beginFrame()) {
-                    continue;
-                }
-                engineContext.onSync();
-                rootPanel.onSync();
-                guiContext.endFrame();
+        GLFWwindow *window = glfwContext.getWindow();
+        while (!glfwWindowShouldClose(window)) {
+            if (guiContext.beginFrame()) {
+                continue;
             }
-            guiContext.shutdown();
+            engineContext.onSync();
+            rootPanel.onSync();
+            guiContext.endFrame();
+        }
+        guiContext.dispose();
     }
 
     bool ApplicationContext::isValidContext() const {

@@ -1,5 +1,5 @@
-#ifndef PIPELINEINSTANCE_H
-#define PIPELINEINSTANCE_H
+#ifndef RENDERPASSINSTANCE_H
+#define RENDERPASSINSTANCE_H
 #include "../../repository/resource/RuntimeResource.h"
 #include "../framebuffer/FramebufferInstance.h"
 #include "../shader/ShaderModuleInstance.h"
