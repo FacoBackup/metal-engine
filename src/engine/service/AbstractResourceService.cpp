@@ -5,7 +5,7 @@
 
 namespace Metal {
     void AbstractResourceService::registerResource(const RuntimeResource *resource) const {
-        repository.resources.insert_or_assign(resource->id, repository);
+//        repository.resources.insert({resource->id, repository});
     }
 
     AbstractResourceService::AbstractResourceService(ApplicationContext &context)

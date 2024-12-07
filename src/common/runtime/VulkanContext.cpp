@@ -1,14 +1,12 @@
 #include "VulkanContext.h"
 
-#include <iostream>
-
 #include "VkBootstrap.h"
 #include "../util/VulkanUtils.h"
 #include "ApplicationContext.h"
 
 namespace Metal {
-    void VulkanContext::build(const bool debugMode) {
-        this->debugMode = debugMode;
+    void VulkanContext::build(const bool d) {
+        this->debugMode = d;
         imguiVulkanWindow.ClearValue.color.float32[0] = 0;
         imguiVulkanWindow.ClearValue.color.float32[1] = 0;
         imguiVulkanWindow.ClearValue.color.float32[2] = 0;
@@ -33,12 +31,15 @@ namespace Metal {
     }
 
     void VulkanContext::createSwapChain() {
+        int w{}, h{};
         glfwGetFramebufferSize(window, &w, &h);
         ImGui_ImplVulkanH_CreateOrResizeWindow(instance.instance, physDevice.physical_device,
                                                device.device, &imguiVulkanWindow, queueFamily,
                                                instance.allocation_callbacks,
                                                w, h, MIN_IMAGE_COUNT);
         swapChain = imguiVulkanWindow.Swapchain;
+        this->w = w;
+        this->h = h;
     }
 
     void VulkanContext::createQueue() {

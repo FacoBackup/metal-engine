@@ -5,7 +5,9 @@
 namespace Metal {
     class Identifiable {
     public:
-        const std::string id = Util::uuidV4();
+        virtual ~Identifiable() = default;
+
+        std::string id = Util::uuidV4();
     };
 }
 #endif

@@ -14,8 +14,8 @@ namespace Metal {
         return textureService;
     }
 
-    FrameBufferService &EngineContext::getFrameBufferService() {
-        return frameBufferService;
+    RenderPassService &EngineContext::getRenderPassService() {
+        return renderPassService;
     }
 
     ShaderService &EngineContext::getShaderService() {

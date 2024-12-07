@@ -7,7 +7,7 @@
 #include "vulkan/vulkan.h"
 
 namespace Metal {
-    struct ShaderInstance final : RuntimeResource {
+    struct ShaderModuleInstance final : RuntimeResource {
         std::vector<uint32_t> SPIRV;
         VkShaderModule shaderModule = VK_NULL_HANDLE;
 

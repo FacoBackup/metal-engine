@@ -5,8 +5,11 @@
 #include "../../repository/resource/RuntimeResource.h"
 
 namespace Metal {
-    struct  FramebufferInstance final : RuntimeResource{
-        VkFramebuffer framebuffer = VK_NULL_HANDLE;
+    struct FrameBufferAttachment;
+
+    struct FramebufferInstance final : RuntimeResource {
+        VkFramebuffer vkFramebuffer = VK_NULL_HANDLE;
+        std::vector<FrameBufferAttachment *> attachments{};
     };
 } // Metal
 

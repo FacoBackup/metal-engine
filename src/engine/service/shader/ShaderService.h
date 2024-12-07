@@ -8,13 +8,13 @@
 #include <glslang/Include/glslang_c_shader_types.h>
 #include <vulkan/vulkan_core.h>
 
-#include "ShaderInstance.h"
+#include "ShaderModuleInstance.h"
 #include "../AbstractResourceService.h"
 #include "../../../common/interface/AbstractRuntimeComponent.h"
 
 namespace Metal {
     class ShaderService final : public AbstractResourceService {
-        bool compileShader(glslang_stage_t Stage, const char *pShaderCode, ShaderInstance *shaderModule) const;
+        bool compileShader(glslang_stage_t Stage, const char *pShaderCode, ShaderModuleInstance *shaderModule) const;
 
         static glslang_stage_t ShaderStageFromFilename(const char *pFilename);
 
@@ -23,7 +23,7 @@ namespace Metal {
             : AbstractResourceService(context) {
         }
 
-        ShaderInstance *createShaderModule(const char *pFilename) const;
+        ShaderModuleInstance *createShaderModule(const char *pFilename) const;
     };
 } // Metal
 

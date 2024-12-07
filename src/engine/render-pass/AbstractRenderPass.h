@@ -17,6 +17,9 @@ namespace Metal {
 
         virtual VkRenderPass createRenderPassInternal() { return nullptr; }
 
+        virtual void initializeFrameBuffers() {
+        }
+
         virtual void updateCommandBufferInternal() {
         }
 

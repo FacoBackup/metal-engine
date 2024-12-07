@@ -97,8 +97,8 @@ add_executable(
         src/engine/repository/resource/RuntimeResource.h
         src/engine/service/shader/ShaderService.cpp
         src/engine/service/shader/ShaderService.h
-        src/engine/service/shader/ShaderInstance.cpp
-        src/engine/service/shader/ShaderInstance.h
+        src/engine/service/shader/ShaderModuleInstance.cpp
+        src/engine/service/shader/ShaderModuleInstance.h
         src/common/runtime/VulkanFrameData.cpp
         src/common/runtime/VulkanFrameData.h
         src/engine/render-pass/AbstractRenderPass.cpp
@@ -113,9 +113,17 @@ add_executable(
         src/engine/repository/resource/ResourceRepository.h
         src/engine/service/AbstractResourceService.cpp
         src/engine/service/AbstractResourceService.h
-        src/engine/service/framebuffer/FrameBufferService.cpp
-        src/engine/service/framebuffer/FrameBufferService.h
         src/engine/service/framebuffer/FramebufferInstance.h
+        src/engine/service/framebuffer/FrameBufferAttachment.h
+        src/engine/core/CoreRenderPasses.cpp
+        src/engine/core/CoreRenderPasses.h
+        src/engine/core/AbstractCoreRepository.h
+        src/engine/core/AbstractCoreRepository.cpp
+        src/engine/core/CoreShaders.cpp
+        src/engine/core/CoreShaders.h
+        src/engine/service/render-pass/RenderPassService.cpp
+        src/engine/service/render-pass/RenderPassService.h
+        src/engine/service/render-pass/RenderPassInstance.h
 )
 
 

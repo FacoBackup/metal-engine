@@ -64,4 +64,23 @@ namespace Metal {
             return gpus[0];
         return VK_NULL_HANDLE;
     }
+
+    VkFormat VulkanUtils::GetValidDepthFormat(VkPhysicalDevice physicalDevice) {
+            VkFormat candidates[] = {
+                VK_FORMAT_D32_SFLOAT,
+                VK_FORMAT_D32_SFLOAT_S8_UINT,
+                VK_FORMAT_D24_UNORM_S8_UINT
+            };
+
+            for (const VkFormat format : candidates) {
+                VkFormatProperties props;
+                vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
+
+                if (props.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
+                    return format;
+                }
+            }
+
+            throw std::runtime_error("Failed to find a suitable depth format!");
+    }
 }

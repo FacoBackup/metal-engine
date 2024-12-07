@@ -1,6 +1,9 @@
 #include "AbstractRenderPass.h"
 
+#include <vector>
+
 namespace Metal {
+
     void AbstractRenderPass::onSync() {
     }
 
@@ -8,5 +11,6 @@ namespace Metal {
         createCommandBufferInternal();
         createDescriptorSetInternal();
         createRenderPassInternal();
+        initializeFrameBuffers();
     }
 } // Metal

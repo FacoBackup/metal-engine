@@ -9,8 +9,6 @@
 namespace Metal {
     class ApplicationContext {
     public:
-        explicit ApplicationContext();
-
         EngineContext &getEngineContext();
 
         EditorContext &getEditorContext();

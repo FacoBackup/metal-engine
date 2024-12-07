@@ -1,3 +1,4 @@
+#define VMA_IMPLEMENTATION
 #include "common/runtime/ApplicationContext.h"
 #include "editor/EditorPanel.h"
 

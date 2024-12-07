@@ -8,9 +8,9 @@
 namespace Metal {
     class ApplicationContext;
 
-    class AbstractRuntimeComponent : public Syncronizable, public Initializable{
+    class AbstractRuntimeComponent : public Syncronizable, public Initializable {
     public:
-         explicit AbstractRuntimeComponent(ApplicationContext &context);
+        explicit AbstractRuntimeComponent(ApplicationContext &context);
 
     protected:
         ApplicationContext &context;

@@ -1,7 +1,8 @@
 #ifndef METAL_ENGINE_VULKANCONTEXT_H
 #define METAL_ENGINE_VULKANCONTEXT_H
 
-#include <vk_mem_alloc.h>
+
+#include "vk_mem_alloc.h"
 
 #include "imgui_impl_vulkan.h"
 #include <GLFW/glfw3.h>
@@ -38,7 +39,7 @@ namespace Metal {
 
         void createMemoryAllocator();
 
-        int w{}, h{};
+        uint32_t w{}, h{};
         GLFWwindow *window = nullptr;
         bool debugMode = false;
         VulkanFrameData frameData{};
@@ -63,6 +64,14 @@ namespace Metal {
         void shutdown() const;
 
         void setupVulkan(GLFWwindow *window, const ImVector<const char *> &instanceExtensions);
+
+        [[nodiscard]] uint32_t getWindowWidth() const {
+            return w;
+        }
+
+        [[nodiscard]] uint32_t getWindowHeight() const {
+            return h;
+        }
     };
 } // Metal
 
