@@ -1,13 +1,24 @@
 #include "EngineContext.h"
 
 namespace Metal {
-    void EngineContext::onInitialize() {
-    }
-
     void EngineContext::onSync() {
         cameraSystem.onSync();
+        renderPassSystem.onSync();
     }
 
-    EngineContext::EngineContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {}
+    ResourceRepository &EngineContext::getResourceRepository() {
+        return resourceRepository;
+    }
 
+    TextureService &EngineContext::getTextureService() {
+        return textureService;
+    }
+
+    FrameBufferService &EngineContext::getFrameBufferService() {
+        return frameBufferService;
+    }
+
+    ShaderService &EngineContext::getShaderService() {
+        return shaderService;
+    }
 }

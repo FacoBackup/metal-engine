@@ -2,7 +2,7 @@
 #define METAL_ENGINE_APPLICATIONCONTEXT_H
 
 #include "../../engine/EngineContext.h"
-#include "../../renderer/context/GUIContext.h"
+#include "GUIContext.h"
 #include "../../editor/common/IPanel.h"
 #include "../../editor/EditorContext.h"
 
@@ -27,13 +27,15 @@ namespace Metal {
 
         bool isValidContext() const;
 
+        explicit ApplicationContext(IPanel &root_panel);
+
     private:
         EngineContext engineContext{*this};
         EditorContext editorContext{*this};
         GLFWContext glfwContext{*this};
         VulkanContext vulkanContext;
         GUIContext guiContext{*this};
-        IPanel *rootPanel = nullptr;
+        IPanel &rootPanel;
     };
 }
 

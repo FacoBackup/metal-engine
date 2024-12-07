@@ -3,9 +3,9 @@
 
 #include <string>
 #include <imgui.h>
-#include "../../../common/Util.h"
 #include "DockSpace.h"
 #include "DockPosition.h"
+#include "../../../common/util/Util.h"
 
 namespace Metal {
     struct DockDTO {

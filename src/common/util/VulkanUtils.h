@@ -2,7 +2,7 @@
 #define METAL_ENGINE_VULKANUTILS_H
 
 #include "imgui_impl_vulkan.h"
-#include "context/VulkanContext.h"
+#include "../runtime/VulkanContext.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -13,7 +13,7 @@ namespace Metal {
 
         static void CheckVKResult(VkResult err);
 
-        static void FramePresent(ImGui_ImplVulkanH_Window *wd, VkQueue &g_Queue, bool &g_SwapChainRebuild);
+        static void FramePresent(ImGui_ImplVulkanH_Window *wd, const VkQueue &graphicsQueue, bool &isSwapChainRebuild);
 
         static VkPhysicalDevice SelectPhysicalDevice(const VulkanContext &context);
     };

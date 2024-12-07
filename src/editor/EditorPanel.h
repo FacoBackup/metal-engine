@@ -8,13 +8,13 @@
 
 
 namespace Metal {
-    class EditorPanel : public AbstractPanel {
+    class EditorPanel final : public AbstractPanel {
         static int FLAGS;
         static const char *NAME;
         static const char *NAME_HEADER;
         static ImVec2 CENTER;
         static float HEADER_HEIGHT;
-        ImGuiID windowId;
+        ImGuiID windowId = 0;
         EditorHeaderPanel headerPanel;
 
         static void SetWindowStyle();

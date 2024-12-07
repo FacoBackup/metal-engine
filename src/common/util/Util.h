@@ -50,7 +50,7 @@ namespace Metal::Util {
     }
 
 
-    inline void WriteBinaryFile(const char *pFilename, const void *pData, int size) {
+    inline void WriteBinaryFile(const char *pFilename, const void *pData, size_t size) {
         FILE *f = fopen(pFilename, "wb");
         if (!f) {
             throw std::runtime_error("Error opening file : " + std::string(pFilename));

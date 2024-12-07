@@ -1,10 +1,10 @@
 #ifndef METAL_ENGINE_DOCKSERVICE_H
 #define METAL_ENGINE_DOCKSERVICE_H
 
-#include "../../common/runtime/AbstractRuntimeComponent.h"
 #include "imgui.h"
 #include "../repository/dock/DockDTO.h"
 #include "../ui/docks/DockSpacePanel.h"
+#include "../../common/interface/AbstractRuntimeComponent.h"
 
 namespace Metal {
     class AbstractPanel;

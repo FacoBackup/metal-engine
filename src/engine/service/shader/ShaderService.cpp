@@ -1,15 +1,15 @@
 #include "ShaderService.h"
 
-#include "ShaderResource.h"
-#include "../../../renderer/VulkanUtils.h"
-#include "../../../common/Util.h"
+#include "ShaderInstance.h"
+#include "../../../common/util/VulkanUtils.h"
+#include "../../../common/util/Util.h"
 #include "../../../common/runtime/ApplicationContext.h"
 #include "glslang/Include/glslang_c_interface.h"
 #include "glslang/Public/resource_limits_c.h"
 
 namespace Metal {
     bool ShaderService::compileShader(const glslang_stage_t Stage, const char *pShaderCode,
-                                      ShaderResource &shaderModule) const {
+                                      ShaderInstance *shaderModule) const {
         const glslang_input_t input = {
             .language = GLSLANG_SOURCE_GLSL,
             .stage = Stage,
@@ -43,7 +43,7 @@ namespace Metal {
 
         glslang_program_SPIRV_generate(program, Stage);
 
-        shaderModule.initialize(program);
+        shaderModule->initialize(program);
 
         if (const char *spirv_messages = glslang_program_SPIRV_get_messages(program)) {
             fprintf(stderr, "SPIR-V message: '%s'", spirv_messages);
@@ -62,7 +62,7 @@ namespace Metal {
         glslang_program_delete(program);
         glslang_shader_delete(shader);
 
-        return !shaderModule.SPIRV.empty();
+        return !shaderModule->SPIRV.empty();
     }
 
     glslang_stage_t ShaderService::ShaderStageFromFilename(const char *pFilename) {
@@ -94,23 +94,25 @@ namespace Metal {
         throw std::runtime_error("Unknown shader stage in file");
     }
 
-    VkShaderModule ShaderService::createShaderModule(const char *pFilename) const {
+    ShaderInstance *ShaderService::createShaderModule(const char *pFilename) const {
         std::string source;
         Util::ReadFile(pFilename, source);
 
         const glslang_stage_t ShaderStage = ShaderStageFromFilename(pFilename);
 
-        VkShaderModule ret = nullptr;
         glslang_initialize_process();
-        if (ShaderResource shader; compileShader(ShaderStage, source.c_str(), shader)) {
-            printf("Created shader from text file '%s'\n", pFilename);
-            ret = shader.shaderModule;
+        auto *shader = new ShaderInstance;
+        if (compileShader(ShaderStage, source.c_str(), shader)) {
             const std::string BinaryFilename = std::string(pFilename) + ".spv";
-            Util::WriteBinaryFile(BinaryFilename.c_str(), shader.SPIRV.data(),
-                                  static_cast<int>(shader.SPIRV.size()) * sizeof(uint32_t));
+            Util::WriteBinaryFile(BinaryFilename.c_str(), shader->SPIRV.data(),
+                                  shader->SPIRV.size() * sizeof(uint32_t));
+            registerResource(shader);
+        } else {
+            delete shader;
+            shader = nullptr;
         }
         glslang_finalize_process();
 
-        return ret;
+        return shader;
     }
 }

@@ -3,35 +3,42 @@
 #include <iostream>
 
 #include "VkBootstrap.h"
-#include "../VulkanUtils.h"
-#include "../../common/runtime/AbstractRuntimeComponent.h"
-
-#define VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME "VK_KHR_portability_subset"
+#include "../util/VulkanUtils.h"
+#include "ApplicationContext.h"
 
 namespace Metal {
-    void VulkanContext::shutdown() const {
-        vkDestroyDescriptorPool(device.device, descriptorPool,
-                                instance.allocation_callbacks);
-        vkb::destroy_device(device);
-        vkb::destroy_instance(instance);
-    }
-
     void VulkanContext::build(const bool debugMode) {
         this->debugMode = debugMode;
-        g_MainWindowData.ClearValue.color.float32[0] = 0;
-        g_MainWindowData.ClearValue.color.float32[1] = 0;
-        g_MainWindowData.ClearValue.color.float32[2] = 0;
-        g_MainWindowData.ClearValue.color.float32[3] = 0;
+        imguiVulkanWindow.ClearValue.color.float32[0] = 0;
+        imguiVulkanWindow.ClearValue.color.float32[1] = 0;
+        imguiVulkanWindow.ClearValue.color.float32[2] = 0;
+        imguiVulkanWindow.ClearValue.color.float32[3] = 0;
+    }
+
+    VulkanFrameData &VulkanContext::getFrameData() {
+        auto [CommandPool, CommandBuffer, Fence, Backbuffer, BackbufferView, Framebuffer] = imguiVulkanWindow.Frames[
+            imguiVulkanWindow.FrameIndex];
+        frameData.commandPool = CommandPool;
+        frameData.commandBuffer = CommandBuffer;
+        frameData.fence = Fence;
+        frameData.backbuffer = Backbuffer;
+        frameData.backbufferView = BackbufferView;
+        frameData.framebuffer = Framebuffer;
+        frameData.imageAcquiredSemaphore = imguiVulkanWindow.FrameSemaphores[imguiVulkanWindow.SemaphoreIndex].
+                ImageAcquiredSemaphore;
+        frameData.renderCompleteSemaphore = imguiVulkanWindow.FrameSemaphores[imguiVulkanWindow.SemaphoreIndex].
+                RenderCompleteSemaphore;
+        frameData.frameIndex = imguiVulkanWindow.FrameIndex;
+        return frameData;
     }
 
     void VulkanContext::createSwapChain() {
         glfwGetFramebufferSize(window, &w, &h);
-        IM_ASSERT(MIN_IMAGE_COUNT >= 2);
         ImGui_ImplVulkanH_CreateOrResizeWindow(instance.instance, physDevice.physical_device,
-                                               device.device, &g_MainWindowData, queueFamily,
+                                               device.device, &imguiVulkanWindow, queueFamily,
                                                instance.allocation_callbacks,
                                                w, h, MIN_IMAGE_COUNT);
-        swapChain = g_MainWindowData.Swapchain;
+        swapChain = imguiVulkanWindow.Swapchain;
     }
 
     void VulkanContext::createQueue() {
@@ -92,7 +99,6 @@ namespace Metal {
                 .set_surface(surface)
                 .select();
         if (!physicalDeviceResult) {
-
             throw std::runtime_error("Failed to create physical device " + physicalDeviceResult.error().message());
         }
 
@@ -108,24 +114,32 @@ namespace Metal {
             VK_PRESENT_MODE_MAILBOX_KHR, VK_PRESENT_MODE_IMMEDIATE_KHR,
             VK_PRESENT_MODE_FIFO_KHR
         };
-        g_MainWindowData.PresentMode = ImGui_ImplVulkanH_SelectPresentMode(
-            physDevice.physical_device, g_MainWindowData.Surface,
+        imguiVulkanWindow.PresentMode = ImGui_ImplVulkanH_SelectPresentMode(
+            physDevice.physical_device, imguiVulkanWindow.Surface,
             &present_modes[0],
             IM_ARRAYSIZE(present_modes));
     }
 
     void VulkanContext::createSurfaceFormat() {
-        g_MainWindowData.Surface = surface;
+        imguiVulkanWindow.Surface = surface;
         constexpr VkFormat requestSurfaceImageFormat[] = {
             VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_R8G8B8A8_UNORM,
             VK_FORMAT_B8G8R8_UNORM, VK_FORMAT_R8G8B8_UNORM
         };
         constexpr VkColorSpaceKHR requestSurfaceColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
-        g_MainWindowData.SurfaceFormat = ImGui_ImplVulkanH_SelectSurfaceFormat(physDevice.physical_device,
-                                                                               g_MainWindowData.Surface,
-                                                                               requestSurfaceImageFormat,
-                                                                               IM_ARRAYSIZE(requestSurfaceImageFormat),
-                                                                               requestSurfaceColorSpace);
+        imguiVulkanWindow.SurfaceFormat = ImGui_ImplVulkanH_SelectSurfaceFormat(physDevice.physical_device,
+            imguiVulkanWindow.Surface,
+            requestSurfaceImageFormat,
+            IM_ARRAYSIZE(requestSurfaceImageFormat),
+            requestSurfaceColorSpace);
+    }
+
+    void VulkanContext::createMemoryAllocator() {
+        VmaAllocatorCreateInfo allocatorInfo = {};
+        allocatorInfo.physicalDevice = physDevice.physical_device;
+        allocatorInfo.device = device.device;
+        allocatorInfo.instance = instance.instance;
+        vmaCreateAllocator(&allocatorInfo, &allocator);
     }
 
     VkBool32 VulkanContext::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -170,12 +184,12 @@ namespace Metal {
     void VulkanContext::createDescriptorPool() {
         constexpr VkDescriptorPoolSize pool_sizes[] =
         {
-            {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1},
+            {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, MAX_DESCRIPTOR_SETS},
         };
         VkDescriptorPoolCreateInfo pool_info = {};
         pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-        pool_info.maxSets = 1;
+        pool_info.maxSets = MAX_DESCRIPTOR_SETS;
         pool_info.poolSizeCount = static_cast<uint32_t>(IM_ARRAYSIZE(pool_sizes));
         pool_info.pPoolSizes = pool_sizes;
         VulkanUtils::CheckVKResult(vkCreateDescriptorPool(device.device, &pool_info, instance.allocation_callbacks,
@@ -207,5 +221,13 @@ namespace Metal {
         createSurfaceFormat();
         createPresentMode();
         createSwapChain();
+        createMemoryAllocator();
+    }
+
+    void VulkanContext::shutdown() const {
+        vkDestroyDescriptorPool(device.device, descriptorPool,
+                                instance.allocation_callbacks);
+        vkb::destroy_device(device);
+        vkb::destroy_instance(instance);
     }
 }

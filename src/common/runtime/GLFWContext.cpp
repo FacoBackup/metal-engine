@@ -1,8 +1,8 @@
 #include <imgui_impl_glfw.h>
 #include "GLFWContext.h"
-#include "../VulkanUtils.h"
-#include "../../common/runtime/ApplicationContext.h"
+#include "ApplicationContext.h"
 #include "VulkanContext.h"
+#include "../util/VulkanUtils.h"
 
 namespace Metal {
     GLFWwindow *GLFWContext::getWindow() const {
@@ -13,27 +13,27 @@ namespace Metal {
         return validContext;
     }
 
-    bool GLFWContext::beginFrame() const {
+    bool GLFWContext::beginFrame() {
         glfwPollEvents();
 
         // Resize swap chain?
         int fb_width, fb_height;
         glfwGetFramebufferSize(window, &fb_width, &fb_height);
         if (fb_width > 0 && fb_height > 0 &&
-            (context.getVulkanContext().isSwapChainRebuild || context.getVulkanContext().g_MainWindowData.Width !=
+            (swapChainRebuild || context.getVulkanContext().imguiVulkanWindow.Width !=
              fb_width ||
-             context.getVulkanContext().g_MainWindowData.Height != fb_height)) {
+             context.getVulkanContext().imguiVulkanWindow.Height != fb_height)) {
             ImGui_ImplVulkan_SetMinImageCount(MIN_IMAGE_COUNT);
             ImGui_ImplVulkanH_CreateOrResizeWindow(context.getVulkanContext().instance.instance,
                                                    context.getVulkanContext().physDevice.physical_device,
                                                    context.getVulkanContext().device.device,
-                                                   &context.getVulkanContext().g_MainWindowData,
+                                                   &context.getVulkanContext().imguiVulkanWindow,
                                                    context.getVulkanContext().queueFamily,
                                                    context.getVulkanContext().instance.allocation_callbacks, fb_width,
                                                    fb_height,
                                                    MIN_IMAGE_COUNT);
-            context.getVulkanContext().g_MainWindowData.FrameIndex = 0;
-            context.getVulkanContext().isSwapChainRebuild = false;
+            context.getVulkanContext().imguiVulkanWindow.FrameIndex = 0;
+            swapChainRebuild = false;
         }
         if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0) {
             ImGui_ImplGlfw_Sleep(10);
@@ -49,7 +49,15 @@ namespace Metal {
     }
 
     ImGui_ImplVulkanH_Window &GLFWContext::getGUIWindow() const {
-        return context.getVulkanContext().g_MainWindowData;
+        return context.getVulkanContext().imguiVulkanWindow;
+    }
+
+    bool &GLFWContext::isSwapChainRebuild() {
+        return swapChainRebuild;
+    }
+
+    void GLFWContext::setSwapChainRebuild(const bool val) {
+        swapChainRebuild = val;
     }
 
     void GLFWContext::build(const bool debugMode) {
