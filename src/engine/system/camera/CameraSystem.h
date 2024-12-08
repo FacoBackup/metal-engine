@@ -1,8 +1,7 @@
 #ifndef CAMERASYSTEM_H
 #define CAMERASYSTEM_H
 #include "../../repository/camera/CameraRepository.h"
-#include "../../../common/Synchornizable.h"
-#include "../../../common/runtime/AbstractRuntimeComponent.h"
+#include "../../../common/interface/Synchornizable.h"
 
 namespace Metal {
     class CameraSystem final : public AbstractRuntimeComponent {

@@ -4,8 +4,8 @@
 #include "Camera.h"
 #include "Frustum.h"
 #include "../../../common/inspection/Inspectable.h"
-#include "../../../common/runtime/AbstractRepository.h"
 #include "glm/mat4x4.hpp"
+#include "../../../common/interface/AbstractRepository.h"
 
 namespace Metal {
     class CameraRepository final : public AbstractRepository {

@@ -1,17 +1,15 @@
 #ifndef METAL_ENGINE_DOCKSERVICE_H
 #define METAL_ENGINE_DOCKSERVICE_H
 
-#include "../../common/runtime/AbstractRuntimeComponent.h"
 #include "imgui.h"
 #include "../repository/dock/DockDTO.h"
 #include "../ui/docks/DockSpacePanel.h"
+#include "../../common/interface/AbstractRuntimeComponent.h"
 
 namespace Metal {
     class AbstractPanel;
 
     class DockService final : public AbstractRuntimeComponent {
-        bool isInitialized = false;
-
     public:
         void buildViews(ImGuiID windowId, AbstractPanel *panel) const;
 

@@ -1,5 +1,5 @@
 #include "DockSpace.h"
-#include "../../../common/Icons.h"
+#include "../../../common/interface/Icons.h"
 #include "../../ui/console/ConsolePanel.h"
 #include "../../ui/files/FilesPanel.h"
 #include "../../ui/inspector/InspectorPanel.h"

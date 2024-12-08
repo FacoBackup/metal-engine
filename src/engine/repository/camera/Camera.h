@@ -2,8 +2,8 @@
 #define CAMERA_H
 #include <glm/vec3.hpp>
 
-#include "../../../common/Util.h"
-#include "../../../common/Identifiable.h"
+#include "../../../common/interface/Identifiable.h"
+#include "../../../common/util/Util.h"
 
 namespace Metal {
     class Camera : public Identifiable {

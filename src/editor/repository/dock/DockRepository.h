@@ -1,8 +1,8 @@
 #ifndef METAL_ENGINE_DOCKREPOSITORY_H
 #define METAL_ENGINE_DOCKREPOSITORY_H
 
-#include "../../../common/runtime/AbstractRuntimeComponent.h"
 #include "DockDTO.h"
+#include "../../../common/interface/AbstractRuntimeComponent.h"
 
 namespace Metal {
     class DockSpacePanel;

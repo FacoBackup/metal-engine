@@ -2,8 +2,8 @@
 #define THEMESERVICE_H
 #include <imgui.h>
 #include <glm/vec3.hpp>
+#include "../../common/interface/AbstractRuntimeComponent.h"
 
-#include "../../common/runtime/AbstractRuntimeComponent.h"
 
 namespace Metal {
     class ThemeService final : public AbstractRuntimeComponent {

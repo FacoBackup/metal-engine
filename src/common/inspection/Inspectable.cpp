@@ -2,7 +2,7 @@
 
 #include <utility>
 #include "InspectedMethod.h"
-#include "../Util.h"
+#include "../util/Util.h"
 
 namespace Metal {
 
@@ -10,7 +10,7 @@ namespace Metal {
         std::unique_ptr<InspectedMethod> field = std::make_unique<InspectedMethod>();
         field->group = std::move(group);
         field->name = std::move(name);
-        field->nameWithId = field->name + Metal::Util::uuidV4();
+        field->nameWithId = field->name + Util::uuidV4();
 
 
         field->callback = updateCallback;

@@ -2,15 +2,21 @@
 #define METAL_ENGINE_APPLICATIONCONTEXT_H
 
 #include "../../engine/EngineContext.h"
-#include "../../renderer/context/GUIContext.h"
+#include "GUIContext.h"
 #include "../../editor/common/IPanel.h"
-#include "../../editor/service/DockService.h"
 #include "../../editor/EditorContext.h"
 
 namespace Metal {
     class ApplicationContext {
+        EngineContext engineContext{*this};
+        EditorContext editorContext{*this};
+        GLFWContext glfwContext{*this};
+        VulkanContext vulkanContext;
+        GUIContext guiContext{*this};
+        IPanel &rootPanel;
+
     public:
-        explicit ApplicationContext();
+        void dispose();
 
         EngineContext &getEngineContext();
 
@@ -18,17 +24,18 @@ namespace Metal {
 
         GUIContext &getGuiContext();
 
+        GLFWContext &getGLFWContext();
+
+        VulkanContext &getVulkanContext();
+
+        GUIContext &getGUIContext();
+
         void start();
 
-        bool isValidContext();
+        bool isValidContext() const;
 
-    private:
-        EngineContext engineContext{*this};
-        EditorContext editorContext{*this};
-        GUIContext guiContext;
-        IPanel *rootPanel = nullptr;
+        explicit ApplicationContext(IPanel &root_panel);
     };
-
 }
 
 #endif

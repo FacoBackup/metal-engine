@@ -2,7 +2,7 @@
 #define METAL_ENGINE_EDITORHEADERPANEL_H
 
 #include "../../common/AbstractPanel.h"
-#include "../../../common/Icons.h"
+#include "../../../common/interface/Icons.h"
 
 namespace Metal {
 
