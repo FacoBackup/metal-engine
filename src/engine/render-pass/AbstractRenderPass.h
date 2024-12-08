@@ -1,38 +1,31 @@
 #ifndef ABSTRACTRENDERPASS_H
 #define ABSTRACTRENDERPASS_H
-#include <vulkan/vulkan_core.h>
 
 #include "../../common/interface/AbstractRuntimeComponent.h"
 
 namespace Metal {
+    struct PipelineInstance;
+}
+
+namespace Metal {
+    struct VulkanFrameData;
+    struct CoreFrameBuffers;
+    struct CorePipelines;
+    struct CoreBuffers;
+
     class AbstractRenderPass : public AbstractRuntimeComponent {
     protected:
-        VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
-        VkCommandBuffer commandBuffer = VK_NULL_HANDLE;
-        VkRenderPass renderPass = VK_NULL_HANDLE;
-
-        virtual VkDescriptorSet createDescriptorSetInternal() { return nullptr; }
-
-        virtual VkCommandBuffer createCommandBufferInternal() { return nullptr; }
-
-        virtual VkRenderPass createRenderPassInternal() { return nullptr; }
-
-        virtual void initializeFrameBuffers() {
-        }
-
-        virtual void updateCommandBufferInternal() {
-        }
+        CoreBuffers &buffers;
+        CorePipelines &pipelines;
+        CoreFrameBuffers &frameBuffers;
 
     public:
-        explicit AbstractRenderPass(ApplicationContext &context)
-            : AbstractRuntimeComponent(context) {
+        explicit AbstractRenderPass(ApplicationContext &context);
+
+        static void BindPipeline(const PipelineInstance *pipeline);
+
+        virtual void render(VulkanFrameData &frameData) {
         }
-
-        void onSync() override;
-
-        void onInitialize() override;
-
-        VkRenderPass &getRenderPass() { return renderPass; }
     };
 }
 

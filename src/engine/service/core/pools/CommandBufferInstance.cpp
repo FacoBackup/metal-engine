@@ -4,12 +4,11 @@
 #include "../framebuffer/FrameBufferInstance.h"
 
 namespace Metal {
-    void CommandBufferInstance::startMapping() const {
+    void CommandBufferInstance::startMapping() {
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         vkBeginCommandBuffer(vkBuffer, &beginInfo);
 
-        VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderPassInfo.renderPass = pipeline->frameBuffer->vkRenderPass;
         renderPassInfo.framebuffer = pipeline->frameBuffer->vkFramebuffer;

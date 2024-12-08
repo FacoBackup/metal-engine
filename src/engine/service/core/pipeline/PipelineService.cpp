@@ -98,7 +98,7 @@ namespace Metal {
         layoutInfo.pSetLayouts = nullptr;
 
         VulkanUtils::CheckVKResult(vkCreatePipelineLayout(vulkanContext.device.device, &layoutInfo, nullptr,
-                                                          &pipeline->pipelineLayout));
+                                                          &pipeline->vkPipelineLayout));
 
         VkGraphicsPipelineCreateInfo pipelineCreateInfo = {};
         pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -110,7 +110,7 @@ namespace Metal {
         pipelineCreateInfo.pRasterizationState = &RastCreateInfo;
         pipelineCreateInfo.pMultisampleState = &PipelineMSCreateInfo;
         pipelineCreateInfo.pColorBlendState = &BlendCreateInfo;
-        pipelineCreateInfo.layout = pipeline->pipelineLayout;
+        pipelineCreateInfo.layout = pipeline->vkPipelineLayout;
         pipelineCreateInfo.renderPass = frameBuffer->vkRenderPass;
         pipelineCreateInfo.subpass = 0;
         pipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;

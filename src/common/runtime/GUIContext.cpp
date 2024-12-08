@@ -186,14 +186,14 @@ namespace Metal {
         auto *fontConfig = new ImFontConfig();
         fontConfig->PixelSnapH = true;
 
-        io.Fonts->AddFontFromFileTTF("fonts/Roboto-Regular.ttf", 14, fontConfig,
+        io.Fonts->AddFontFromFileTTF("resources/fonts/Roboto-Regular.ttf", 14, fontConfig,
                                      io.Fonts->GetGlyphRangesDefault());
         fontConfig->MergeMode = true;
         fontConfig->GlyphOffset = ImVec2(-2, 4);
         constexpr auto MIN = static_cast<ImWchar16>(0xF1000);
         constexpr auto MAX = static_cast<ImWchar16>(0xFF000);
         constexpr ImWchar RANGES[] = {MIN, MAX, 0};
-        io.Fonts->AddFontFromFileTTF("fonts/MaterialIcons.ttf", 18, fontConfig, RANGES);
+        io.Fonts->AddFontFromFileTTF("resources/fonts/MaterialIcons.ttf", 18, fontConfig, RANGES);
 
         io.Fonts->Build();
         delete fontConfig;

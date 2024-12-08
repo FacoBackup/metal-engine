@@ -14,7 +14,7 @@
 
 namespace Metal {
     class ShaderService final : public AbstractResourceService {
-        bool compileShader(glslang_stage_t Stage, const char *pShaderCode, ShaderModuleInstance *shaderModule) const;
+        bool compileShader(glslang_stage_t stage, const char *pShaderCode, ShaderModuleInstance *shaderModule) const;
 
         static glslang_stage_t ShaderStageFromFilename(const char *pFilename);
 

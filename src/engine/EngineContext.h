@@ -44,6 +44,10 @@ namespace Metal {
         CoreBuffers coreBuffers{context};
         // ----------- CORE REPOSITORIES
 
+        VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
+        VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
+
+
         void dispose() const;
 
         void onInitialize() override;

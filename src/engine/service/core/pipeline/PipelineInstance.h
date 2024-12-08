@@ -9,12 +9,13 @@ namespace Metal {
     struct ShaderModuleInstance;
 
     struct PipelineInstance final : RuntimeResource {
-        VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
+        VkPipelineLayout vkPipelineLayout = VK_NULL_HANDLE;
         VkPipeline vkPipeline = VK_NULL_HANDLE;
         FrameBufferInstance *frameBuffer = nullptr;
         ShaderModuleInstance *vertexShader = nullptr;
         ShaderModuleInstance *fragmentShader = nullptr;
         CommandBufferInstance *commandBuffer = nullptr;
+        VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
 
         void dispose(VulkanContext &context) override {
             // TODO

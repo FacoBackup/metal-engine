@@ -48,7 +48,6 @@ add_executable(
         src/editor/common/form/AccordionPanel.h
         src/common/inspection/FieldType.h
         src/common/inspection/InspectableMember.h
-        src/common/interface/AbstractRuntimeComponent.cpp
         src/common/interface/AbstractRuntimeComponent.h
         src/common/interface/AbstractRepository.h
         src/engine/repository/camera/CameraRepository.cpp
@@ -170,9 +169,7 @@ add_subdirectory(dependencies/vk-bootstrap)
 # ------ LIBS
 
 # ------ STATIC RESOURCES
-set(RESOURCES_SOURCE_DIR "${CMAKE_SOURCE_DIR}/resources")
-set(RESOURCES_SOURCE_DIR "${CMAKE_BINARY_DIR}/")
-file(COPY ${RESOURCES_SOURCE_DIR} DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY "${CMAKE_SOURCE_DIR}/resources" DESTINATION "${CMAKE_BINARY_DIR}/")
 # ------ STATIC RESOURCES
 
 # ------ VCPKG

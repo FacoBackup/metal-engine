@@ -8,7 +8,7 @@
 namespace Metal {
     void CorePipelines::onInitialize() {
         debugPipeline = pipelineService.createRenderingPipeline(
-            context.getEngineContext().coreFrameBuffers.auxRenderPass, "shaders/QUAD.vert", "shaders/DEBUG.frag");
+            context.getEngineContext().coreFrameBuffers.auxRenderPass, "resources/shaders/QUAD.vert", "resources/shaders/DEBUG.frag");
         debugPipeline->commandBuffer->startMapping();
         vkCmdBindPipeline(debugPipeline->commandBuffer->vkBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                           debugPipeline->vkPipeline);

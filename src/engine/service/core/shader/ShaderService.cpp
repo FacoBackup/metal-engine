@@ -8,11 +8,11 @@
 #include "glslang/Public/resource_limits_c.h"
 
 namespace Metal {
-    bool ShaderService::compileShader(const glslang_stage_t Stage, const char *pShaderCode,
+    bool ShaderService::compileShader(const glslang_stage_t stage, const char *pShaderCode,
                                       ShaderModuleInstance *shaderModule) const {
         const glslang_input_t input = {
             .language = GLSLANG_SOURCE_GLSL,
-            .stage = Stage,
+            .stage = stage,
             .client = GLSLANG_CLIENT_VULKAN,
             .client_version = GLSLANG_TARGET_VULKAN_1_1,
             .target_language = GLSLANG_TARGET_SPV,
@@ -41,7 +41,7 @@ namespace Metal {
             throw std::runtime_error("Failed to link program");
         }
 
-        glslang_program_SPIRV_generate(program, Stage);
+        glslang_program_SPIRV_generate(program, stage);
 
         shaderModule->initialize(program);
 

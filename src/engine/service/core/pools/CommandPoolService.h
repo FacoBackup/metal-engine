@@ -8,7 +8,7 @@ namespace Metal {
     class PipelineInstance;
 
     class CommandPoolService final : public AbstractResourceService {
-        CommandPoolRepository poolRepository;
+        CommandPoolRepository &poolRepository;
 
     public:
         explicit CommandPoolService(ApplicationContext &context);
