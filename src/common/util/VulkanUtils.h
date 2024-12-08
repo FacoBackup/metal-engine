@@ -15,9 +15,10 @@ namespace Metal {
 
         static void FramePresent(ImGui_ImplVulkanH_Window *wd, const VkQueue &graphicsQueue, bool &isSwapChainRebuild);
 
-        static VkPhysicalDevice SelectPhysicalDevice(const VulkanContext &context);
-
         static VkFormat GetValidDepthFormat(VkPhysicalDevice physicalDevice);
+
+        static uint32_t GetMemTypeIndex(const VkPhysicalDeviceMemoryProperties &deviceMemProps, uint32_t typeBits,
+                                        VkFlags properties);
     };
 }
 

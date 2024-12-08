@@ -29,7 +29,7 @@ namespace Metal {
                                                    context.getVulkanContext().device.device,
                                                    &context.getVulkanContext().imguiVulkanWindow,
                                                    context.getVulkanContext().queueFamily,
-                                                   context.getVulkanContext().instance.allocation_callbacks, fb_width,
+                                                   nullptr, fb_width,
                                                    fb_height,
                                                    IMAGE_COUNT);
             context.getVulkanContext().imguiVulkanWindow.FrameIndex = 0;

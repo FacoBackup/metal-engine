@@ -114,8 +114,8 @@ add_executable(
         src/engine/service/AbstractResourceService.cpp
         src/engine/service/AbstractResourceService.h
         src/engine/service/core/framebuffer/FrameBufferAttachment.h
-        src/engine/core/CoreRenderPasses.cpp
-        src/engine/core/CoreRenderPasses.h
+        src/engine/core/CoreFrameBuffers.cpp
+        src/engine/core/CoreFrameBuffers.h
         src/engine/core/AbstractCoreRepository.h
         src/engine/core/AbstractCoreRepository.cpp
         src/engine/core/CorePipelines.cpp

@@ -16,7 +16,7 @@ namespace Metal {
         cmdPoolCreateInfo.flags = 0;
         cmdPoolCreateInfo.queueFamilyIndex = vulkanContext.queueFamily;
         VulkanUtils::CheckVKResult(vkCreateCommandPool(vulkanContext.device.device, &cmdPoolCreateInfo,
-                                                       vulkanContext.instance.allocation_callbacks,
+                                                       nullptr,
                                                        &poolRepository.commandPool));
 
 
@@ -27,7 +27,7 @@ namespace Metal {
         descriptorPoolCreateInfo.poolSizeCount = 0;
         descriptorPoolCreateInfo.pPoolSizes = nullptr;
         VulkanUtils::CheckVKResult(vkCreateDescriptorPool(vulkanContext.device.device, &descriptorPoolCreateInfo,
-                                                          vulkanContext.instance.allocation_callbacks, &poolRepository.descriptorPool));
+                                                          nullptr, &poolRepository.descriptorPool));
     }
 
     /**

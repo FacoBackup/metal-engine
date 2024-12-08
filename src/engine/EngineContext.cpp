@@ -9,10 +9,10 @@ namespace Metal {
             delete resource.second;
         }
         vkDestroyDescriptorPool(context.getVulkanContext().device.device, poolRepository.descriptorPool,
-                                context.getVulkanContext().instance.allocation_callbacks);
+                                nullptr);
 
         vkDestroyCommandPool(context.getVulkanContext().device.device, poolRepository.commandPool,
-                             context.getVulkanContext().instance.allocation_callbacks);
+                             nullptr);
     }
 
     void EngineContext::onInitialize() {
@@ -23,7 +23,7 @@ namespace Metal {
         cameraSystem.onInitialize();
         renderPassSystem.onInitialize();
         poolService.onInitialize();
-        coreRenderPasses.onInitialize();
+        coreFrameBuffers.onInitialize();
         corePipelines.onInitialize();
     }
 

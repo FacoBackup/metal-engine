@@ -15,12 +15,14 @@ namespace Metal {
         VkRenderPass vkRenderPass = VK_NULL_HANDLE;
         std::vector<VkAttachmentDescription> attachmentDescriptions;
         std::vector<VkAttachmentReference> colorReferences;
+        VkAttachmentReference *depthRef = nullptr;
         VkFramebuffer vkFramebuffer = VK_NULL_HANDLE;
         std::vector<FrameBufferAttachment *> attachments{};
 
         void dispose(VulkanContext &context) override {
-            vkDestroyFramebuffer(context.device.device, vkFramebuffer, context.instance.allocation_callbacks);
-            vkDestroyRenderPass(context.device.device, vkRenderPass, context.instance.allocation_callbacks);
+            delete depthRef;
+            vkDestroyFramebuffer(context.device.device, vkFramebuffer, nullptr);
+            vkDestroyRenderPass(context.device.device, vkRenderPass, nullptr);
         }
     };
 }

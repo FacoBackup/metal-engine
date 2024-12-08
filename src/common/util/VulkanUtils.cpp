@@ -38,49 +38,35 @@ namespace Metal {
                 (wd->SemaphoreIndex + 1) % wd->SemaphoreCount; // Now we can use the next set of semaphores
     }
 
-    VkPhysicalDevice VulkanUtils::SelectPhysicalDevice(const VulkanContext &context) {
-        uint32_t gpu_count;
-        VkResult err = vkEnumeratePhysicalDevices(context.instance.instance, &gpu_count, nullptr);
-        CheckVKResult(err);
-        IM_ASSERT(gpu_count > 0);
+    VkFormat VulkanUtils::GetValidDepthFormat(VkPhysicalDevice physicalDevice) {
+        VkFormat candidates[] = {
+            VK_FORMAT_D32_SFLOAT,
+            VK_FORMAT_D32_SFLOAT_S8_UINT,
+            VK_FORMAT_D24_UNORM_S8_UINT
+        };
 
-        ImVector<VkPhysicalDevice> gpus;
-        gpus.resize(gpu_count);
-        err = vkEnumeratePhysicalDevices(context.instance.instance, &gpu_count, gpus.Data);
-        CheckVKResult(err);
+        for (const VkFormat format: candidates) {
+            VkFormatProperties props;
+            vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
 
-        // If a number >1 of GPUs got reported, find discrete GPU if present, or use first one available. This covers
-        // most common cases (multi-gpu/integrated+dedicated graphics). Handling more complicated setups (multiple
-        // dedicated GPUs) is out of scope of this sample.
-        for (VkPhysicalDevice &device: gpus) {
-            VkPhysicalDeviceProperties properties;
-            vkGetPhysicalDeviceProperties(device, &properties);
-            if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
-                return device;
+            if (props.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
+                return format;
+            }
         }
 
-        // Use first GPU (Integrated) is a Discrete one is not available.
-        if (gpu_count > 0)
-            return gpus[0];
-        return VK_NULL_HANDLE;
+        throw std::runtime_error("Failed to find a suitable depth format!");
     }
 
-    VkFormat VulkanUtils::GetValidDepthFormat(VkPhysicalDevice physicalDevice) {
-            VkFormat candidates[] = {
-                VK_FORMAT_D32_SFLOAT,
-                VK_FORMAT_D32_SFLOAT_S8_UINT,
-                VK_FORMAT_D24_UNORM_S8_UINT
-            };
-
-            for (const VkFormat format : candidates) {
-                VkFormatProperties props;
-                vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
-
-                if (props.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
-                    return format;
+    uint32_t VulkanUtils::GetMemTypeIndex(const VkPhysicalDeviceMemoryProperties &deviceMemProps, uint32_t typeBits,
+                                          VkFlags properties) {
+        for (uint32_t i = 0; i < 32; i++) {
+            if ((typeBits & 1) == 1) {
+                if ((deviceMemProps.memoryTypes[i].propertyFlags & properties) == properties) {
+                    return i;
                 }
             }
-
-            throw std::runtime_error("Failed to find a suitable depth format!");
+            typeBits >>= 1;
+        }
+        return 0;
     }
 }

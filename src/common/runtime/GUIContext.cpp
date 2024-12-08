@@ -82,7 +82,7 @@ namespace Metal {
         ImGui::DestroyContext();
         ImGui_ImplVulkanH_DestroyWindow(context.getVulkanContext().instance, context.getVulkanContext().device.device,
                                         &context.getGLFWContext().getGUIWindow(),
-                                        context.getVulkanContext().instance.allocation_callbacks);
+                                        nullptr);
         context.getGLFWContext().dispose();
     }
 
@@ -140,7 +140,7 @@ namespace Metal {
         init_info.MinImageCount = IMAGE_COUNT;
         init_info.ImageCount = context.getVulkanContext().imguiVulkanWindow.ImageCount;
         init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
-        init_info.Allocator = context.getVulkanContext().instance.allocation_callbacks;
+        init_info.Allocator = nullptr;
         init_info.CheckVkResultFn = VulkanUtils::CheckVKResult;
         ImGui_ImplVulkan_Init(&init_info);
 

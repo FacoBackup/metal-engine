@@ -118,7 +118,7 @@ namespace Metal {
 
         VulkanUtils::CheckVKResult(vkCreateGraphicsPipelines(vulkanContext.device.device, VK_NULL_HANDLE, 1,
                                                              &pipelineCreateInfo,
-                                                             vulkanContext.instance.allocation_callbacks,
+                                                             nullptr,
                                                              &pipeline->vkPipeline));
         return pipeline;
     }

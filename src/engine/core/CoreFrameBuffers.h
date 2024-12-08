@@ -5,11 +5,11 @@
 namespace Metal {
     struct FrameBufferInstance;
 
-    struct CoreRenderPasses final : AbstractCoreRepository {
+    struct CoreFrameBuffers final : AbstractCoreRepository {
         FrameBufferInstance *gBufferRenderPass = nullptr;
         FrameBufferInstance *auxRenderPass = nullptr;
 
-        explicit CoreRenderPasses(ApplicationContext &context)
+        explicit CoreFrameBuffers(ApplicationContext &context)
             : AbstractCoreRepository(context) {
         }
 

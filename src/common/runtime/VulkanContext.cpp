@@ -35,7 +35,7 @@ namespace Metal {
         glfwGetFramebufferSize(window, &w, &h);
         ImGui_ImplVulkanH_CreateOrResizeWindow(instance.instance, physDevice.physical_device,
                                                device.device, &imguiVulkanWindow, queueFamily,
-                                               instance.allocation_callbacks,
+                                               nullptr,
                                                w, h, IMAGE_COUNT);
         swapChain = imguiVulkanWindow.Swapchain;
 
@@ -108,6 +108,8 @@ namespace Metal {
         }
 
         physDevice = physicalDeviceResult.value();
+        vkGetPhysicalDeviceProperties(physDevice.physical_device, &physicalDeviceProperties);
+        vkGetPhysicalDeviceMemoryProperties(physDevice.physical_device, &physicalDeviceMemoryProperties);
         if (!physDevice.enable_extension_if_present("VK_KHR_timeline_semaphore")) {
             throw std::runtime_error("Failed to enable core extension");
         }
@@ -162,9 +164,9 @@ namespace Metal {
         if (auto sysInfoResult = vkb::SystemInfo::get_system_info(); sysInfoResult && debugMode) {
             const auto &sysInfo = sysInfoResult.value();
             if (sysInfo.validation_layers_available) {
-                // if (sysInfo.is_layer_available("VK_LAYER_LUNARG_api_dump")) {
-                //     instanceBuilder.enable_layer("VK_LAYER_LUNARG_api_dump");
-                // }
+                if (sysInfo.is_layer_available("VK_LAYER_LUNARG_api_dump")) {
+                    instanceBuilder.enable_layer("VK_LAYER_LUNARG_api_dump");
+                }
                 instanceBuilder.enable_validation_layers();
                 instanceBuilder.request_validation_layers();
                 instanceBuilder.set_debug_callback(DebugCallback);
@@ -197,7 +199,7 @@ namespace Metal {
         pool_info.maxSets = MAX_DESCRIPTOR_SETS;
         pool_info.poolSizeCount = static_cast<uint32_t>(IM_ARRAYSIZE(pool_sizes));
         pool_info.pPoolSizes = pool_sizes;
-        VulkanUtils::CheckVKResult(vkCreateDescriptorPool(device.device, &pool_info, instance.allocation_callbacks,
+        VulkanUtils::CheckVKResult(vkCreateDescriptorPool(device.device, &pool_info, nullptr,
                                                           &imguiDescriptorPool));
     }
 
@@ -217,7 +219,7 @@ namespace Metal {
         }
         instance = vkbResult.value();
         VulkanUtils::CheckVKResult(
-            glfwCreateWindowSurface(instance.instance, window, instance.allocation_callbacks, &surface));
+            glfwCreateWindowSurface(instance.instance, window, nullptr, &surface));
 
         createPhysicalDevice();
         createDevice();
@@ -230,7 +232,7 @@ namespace Metal {
     }
 
     void VulkanContext::dispose() const {
-        vkDestroyDescriptorPool(device.device, imguiDescriptorPool, instance.allocation_callbacks);
+        vkDestroyDescriptorPool(device.device, imguiDescriptorPool, nullptr);
         vkb::destroy_device(device);
         vkb::destroy_instance(instance);
     }

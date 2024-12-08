@@ -3,7 +3,7 @@
 
 #include "core/CoreBuffers.h"
 #include "core/CorePipelines.h"
-#include "core/CoreRenderPasses.h"
+#include "core/CoreFrameBuffers.h"
 #include "repository/backend/CommandPoolRepository.h"
 #include "repository/resource/ResourceRepository.h"
 #include "service/core/buffer/BufferService.h"
@@ -39,7 +39,7 @@ namespace Metal {
         // ----------- REPOSITORIES
 
         // // ----------- CORE REPOSITORIES
-        CoreRenderPasses coreRenderPasses{context};
+        CoreFrameBuffers coreFrameBuffers{context};
         CorePipelines corePipelines{context};
         CoreBuffers coreBuffers{context};
         // ----------- CORE REPOSITORIES

@@ -12,9 +12,9 @@ namespace Metal {
         const char *name = nullptr;
 
         void dispose(VulkanContext &context) override {
-            vkDestroyImage(context.device.device, vkImage, context.instance.allocation_callbacks);
-            vkDestroyImageView(context.device.device, vkImageView, context.instance.allocation_callbacks);
-            vkFreeMemory(context.device.device, mem, context.instance.allocation_callbacks);
+            vkDestroyImage(context.device.device, vkImage, nullptr);
+            vkDestroyImageView(context.device.device, vkImageView, nullptr);
+            vkFreeMemory(context.device.device, mem, nullptr);
         }
     };
 }

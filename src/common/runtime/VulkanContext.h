@@ -45,6 +45,8 @@ namespace Metal {
         VulkanFrameData frameData{};
 
     public:
+        VkPhysicalDeviceProperties physicalDeviceProperties{};
+        VkPhysicalDeviceMemoryProperties physicalDeviceMemoryProperties{};
         vkb::Instance instance{};
         ImGui_ImplVulkanH_Window imguiVulkanWindow;
         VkSurfaceKHR surface = VK_NULL_HANDLE;
