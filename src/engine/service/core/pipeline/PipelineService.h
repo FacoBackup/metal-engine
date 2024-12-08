@@ -12,7 +12,7 @@ namespace Metal {
             : AbstractResourceService(context) {
         }
 
-        PipelineInstance *createRenderingPipeline(FrameBufferInstance *renderPass, const char *vertexShader, const char *fragmentShader) const;
+        PipelineInstance *createRenderingPipeline(FrameBufferInstance *frameBuffer, const char *vertexShader, const char *fragmentShader) const;
     };
 } // Metal
 

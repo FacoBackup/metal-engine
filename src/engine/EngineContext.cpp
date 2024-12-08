@@ -23,6 +23,7 @@ namespace Metal {
         cameraSystem.onInitialize();
         renderPassSystem.onInitialize();
         poolService.onInitialize();
+
         coreFrameBuffers.onInitialize();
         corePipelines.onInitialize();
     }

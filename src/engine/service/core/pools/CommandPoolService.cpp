@@ -33,7 +33,7 @@ namespace Metal {
     /**
      * Commands still need to be recorded
      */
-    CommandBufferInstance *CommandPoolService::createCommandBuffer() const {
+    CommandBufferInstance *CommandPoolService::createCommandBuffer(PipelineInstance *pipeline) const {
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocInfo.commandPool = poolRepository.commandPool;
@@ -41,11 +41,13 @@ namespace Metal {
         allocInfo.commandBufferCount = 1;
 
         std::array<VkCommandBuffer, 1> commandBuffers{};
-        VulkanUtils::CheckVKResult(vkAllocateCommandBuffers(vulkanContext.device.device, &allocInfo, commandBuffers.data()));
+        VulkanUtils::CheckVKResult(
+            vkAllocateCommandBuffers(vulkanContext.device.device, &allocInfo, commandBuffers.data()));
 
         auto *buffer = new CommandBufferInstance;
-        buffer->buffer = commandBuffers[0];
+        buffer->vkBuffer = commandBuffers[0];
         registerResource(buffer);
+        buffer->pipeline = pipeline;
         return buffer;
     }
 

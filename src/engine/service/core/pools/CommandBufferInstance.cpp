@@ -4,24 +4,23 @@
 #include "../framebuffer/FrameBufferInstance.h"
 
 namespace Metal {
-    VkRenderPassBeginInfo CommandBufferInstance::startMapping(const PipelineInstance *pipeline) const {
+    void CommandBufferInstance::startMapping() const {
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        vkBeginCommandBuffer(buffer, &beginInfo);
+        vkBeginCommandBuffer(vkBuffer, &beginInfo);
 
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = pipeline->renderPass->vkRenderPass;
-        renderPassInfo.framebuffer = pipeline->renderPass->vkFramebuffer;
+        renderPassInfo.renderPass = pipeline->frameBuffer->vkRenderPass;
+        renderPassInfo.framebuffer = pipeline->frameBuffer->vkFramebuffer;
         renderPassInfo.renderArea.offset = {0, 0};
-        renderPassInfo.renderArea.extent = {pipeline->renderPass->bufferWidth, pipeline->renderPass->bufferHeight};
+        renderPassInfo.renderArea.extent = {pipeline->frameBuffer->bufferWidth, pipeline->frameBuffer->bufferHeight};
 
         constexpr VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
         renderPassInfo.clearValueCount = 1;
         renderPassInfo.pClearValues = &clearColor;
 
-        vkCmdBeginRenderPass(buffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-        return renderPassInfo;
+        vkCmdBeginRenderPass(vkBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     }
 
     void CommandBufferInstance::stopMapping() const {
@@ -29,7 +28,7 @@ namespace Metal {
         // vkCmdBindPipeline(buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->vkPipeline);
         // vkCmdDraw(buffer, 3, 1, 0, 0);
 
-        vkCmdEndRenderPass(buffer);
-        vkEndCommandBuffer(buffer);
+        vkCmdEndRenderPass(vkBuffer);
+        vkEndCommandBuffer(vkBuffer);
     }
 }

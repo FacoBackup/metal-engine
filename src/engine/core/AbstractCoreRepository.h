@@ -8,6 +8,7 @@ namespace Metal {
     class ShaderService;
     class BufferService;
     class CommandPoolService;
+    class PipelineService;
 
     class AbstractCoreRepository : public AbstractRuntimeComponent {
     public:
@@ -18,6 +19,7 @@ namespace Metal {
         FrameBufferService &framebufferService;
         ShaderService &shaderService;
         BufferService &bufferService;
+        PipelineService &pipelineService;
         CommandPoolService &commandPoolService;
     };
 

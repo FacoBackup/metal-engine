@@ -5,6 +5,7 @@
 
 namespace Metal {
     class CommandBufferInstance;
+    class PipelineInstance;
 
     class CommandPoolService final : public AbstractResourceService {
         CommandPoolRepository poolRepository;
@@ -14,7 +15,7 @@ namespace Metal {
 
         void onInitialize() override;
 
-        [[nodiscard]] CommandBufferInstance *createCommandBuffer() const;
+        [[nodiscard]] CommandBufferInstance *createCommandBuffer(PipelineInstance *pipeline) const;
 
         VkDescriptorSet createDescriptorSet();
     };

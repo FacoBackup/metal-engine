@@ -5,10 +5,11 @@
 #include "PipelineInstance.h"
 
 namespace Metal {
-    PipelineInstance *PipelineService::createRenderingPipeline(FrameBufferInstance *renderPass, const char *vertexShader,
-                                                      const char *fragmentShader) const {
+    PipelineInstance *PipelineService::createRenderingPipeline(FrameBufferInstance *frameBuffer,
+                                                               const char *vertexShader,
+                                                               const char *fragmentShader) const {
         auto *pipeline = new PipelineInstance();
-        pipeline->renderPass = renderPass;
+        pipeline->frameBuffer = frameBuffer;
         pipeline->fragmentShader = context.getEngineContext().shaderService.createShaderModule(fragmentShader);
         pipeline->vertexShader = context.getEngineContext().shaderService.createShaderModule(vertexShader);
         registerResource(pipeline);
@@ -37,8 +38,8 @@ namespace Metal {
         VkViewport VP = {
             .x = 0.0f,
             .y = 0.0f,
-            .width = static_cast<float>(renderPass->bufferWidth),
-            .height = static_cast<float>(renderPass->bufferHeight),
+            .width = static_cast<float>(frameBuffer->bufferWidth),
+            .height = static_cast<float>(frameBuffer->bufferHeight),
             .minDepth = 0.0f,
             .maxDepth = 1.0f
         };
@@ -49,8 +50,8 @@ namespace Metal {
                 .y = 0,
             },
             .extent = {
-                .width = renderPass->bufferWidth,
-                .height = renderPass->bufferHeight
+                .width = frameBuffer->bufferWidth,
+                .height = frameBuffer->bufferHeight
             }
         };
 
@@ -110,7 +111,7 @@ namespace Metal {
         pipelineCreateInfo.pMultisampleState = &PipelineMSCreateInfo;
         pipelineCreateInfo.pColorBlendState = &BlendCreateInfo;
         pipelineCreateInfo.layout = pipeline->pipelineLayout;
-        pipelineCreateInfo.renderPass = renderPass->vkRenderPass;
+        pipelineCreateInfo.renderPass = frameBuffer->vkRenderPass;
         pipelineCreateInfo.subpass = 0;
         pipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
         pipelineCreateInfo.basePipelineIndex = -1;
@@ -120,6 +121,8 @@ namespace Metal {
                                                              &pipelineCreateInfo,
                                                              nullptr,
                                                              &pipeline->vkPipeline));
+
+        pipeline->commandBuffer = context.getEngineContext().poolService.createCommandBuffer(pipeline);
         return pipeline;
     }
 } // Metal
