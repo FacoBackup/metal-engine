@@ -3,11 +3,11 @@
 #include "AbstractCoreRepository.h"
 
 namespace Metal {
-    struct RenderPassInstance;
+    struct FrameBufferInstance;
 
     struct CoreRenderPasses final : AbstractCoreRepository {
-        RenderPassInstance *gBufferRenderPass = nullptr;
-        RenderPassInstance *auxRenderPass = nullptr;
+        FrameBufferInstance *gBufferRenderPass = nullptr;
+        FrameBufferInstance *auxRenderPass = nullptr;
 
         explicit CoreRenderPasses(ApplicationContext &context)
             : AbstractCoreRepository(context) {

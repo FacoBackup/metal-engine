@@ -36,7 +36,7 @@ namespace Metal {
         ImGui_ImplVulkanH_CreateOrResizeWindow(instance.instance, physDevice.physical_device,
                                                device.device, &imguiVulkanWindow, queueFamily,
                                                instance.allocation_callbacks,
-                                               w, h, MIN_IMAGE_COUNT);
+                                               w, h, IMAGE_COUNT);
         swapChain = imguiVulkanWindow.Swapchain;
 
         int wW{}, hW{};
@@ -86,6 +86,7 @@ namespace Metal {
         // features.sparseResidencyImage2D = true;
         // features.sparseBinding = true;
 
+        features.shaderStorageImageWriteWithoutFormat = true;
         features.shaderStorageImageWriteWithoutFormat = true;
         features.fragmentStoresAndAtomics = true;
         features.shaderInt64 = true;
@@ -161,9 +162,9 @@ namespace Metal {
         if (auto sysInfoResult = vkb::SystemInfo::get_system_info(); sysInfoResult && debugMode) {
             const auto &sysInfo = sysInfoResult.value();
             if (sysInfo.validation_layers_available) {
-                if (sysInfo.is_layer_available("VK_LAYER_LUNARG_api_dump")) {
-                    instanceBuilder.enable_layer("VK_LAYER_LUNARG_api_dump");
-                }
+                // if (sysInfo.is_layer_available("VK_LAYER_LUNARG_api_dump")) {
+                //     instanceBuilder.enable_layer("VK_LAYER_LUNARG_api_dump");
+                // }
                 instanceBuilder.enable_validation_layers();
                 instanceBuilder.request_validation_layers();
                 instanceBuilder.set_debug_callback(DebugCallback);
@@ -197,7 +198,7 @@ namespace Metal {
         pool_info.poolSizeCount = static_cast<uint32_t>(IM_ARRAYSIZE(pool_sizes));
         pool_info.pPoolSizes = pool_sizes;
         VulkanUtils::CheckVKResult(vkCreateDescriptorPool(device.device, &pool_info, instance.allocation_callbacks,
-                                                          &descriptorPool));
+                                                          &imguiDescriptorPool));
     }
 
     void VulkanContext::setupVulkan(GLFWwindow *w, const ImVector<const char *> &instanceExtensions) {
@@ -229,8 +230,7 @@ namespace Metal {
     }
 
     void VulkanContext::dispose() const {
-        vkDestroyDescriptorPool(device.device, descriptorPool,
-                                instance.allocation_callbacks);
+        vkDestroyDescriptorPool(device.device, imguiDescriptorPool, instance.allocation_callbacks);
         vkb::destroy_device(device);
         vkb::destroy_instance(instance);
     }

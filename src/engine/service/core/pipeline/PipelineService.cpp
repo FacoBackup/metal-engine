@@ -1,11 +1,11 @@
 #include "PipelineService.h"
-#include "../../../common/runtime/ApplicationContext.h"
-#include "../../../common/util/VulkanUtils.h"
-#include "../render-pass/RenderPassInstance.h"
+#include "../../../../common/runtime/ApplicationContext.h"
+#include "../../../../common/util/VulkanUtils.h"
+#include "../framebuffer/FrameBufferInstance.h"
 #include "PipelineInstance.h"
 
 namespace Metal {
-    PipelineInstance *PipelineService::createPipeline(RenderPassInstance *renderPass, const char *vertexShader,
+    PipelineInstance *PipelineService::createRenderingPipeline(FrameBufferInstance *renderPass, const char *vertexShader,
                                                       const char *fragmentShader) const {
         auto *pipeline = new PipelineInstance();
         pipeline->renderPass = renderPass;
@@ -119,7 +119,7 @@ namespace Metal {
         VulkanUtils::CheckVKResult(vkCreateGraphicsPipelines(vulkanContext.device.device, VK_NULL_HANDLE, 1,
                                                              &pipelineCreateInfo,
                                                              vulkanContext.instance.allocation_callbacks,
-                                                             &pipeline->pipeline));
+                                                             &pipeline->vkPipeline));
         return pipeline;
     }
 } // Metal

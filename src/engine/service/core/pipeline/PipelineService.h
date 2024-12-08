@@ -1,9 +1,9 @@
 #ifndef PIPELINESERVICE_H
 #define PIPELINESERVICE_H
-#include "../AbstractResourceService.h"
+#include "../../AbstractResourceService.h"
 
 namespace Metal {
-    struct RenderPassInstance;
+    struct FrameBufferInstance;
     struct PipelineInstance;
 
     class PipelineService final : public AbstractResourceService {
@@ -12,7 +12,7 @@ namespace Metal {
             : AbstractResourceService(context) {
         }
 
-        PipelineInstance *createPipeline(RenderPassInstance *renderPass, const char *vertexShader, const char *fragmentShader) const;
+        PipelineInstance *createRenderingPipeline(FrameBufferInstance *renderPass, const char *vertexShader, const char *fragmentShader) const;
     };
 } // Metal
 

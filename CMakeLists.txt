@@ -95,10 +95,10 @@ add_executable(
         src/editor/ui/hierarchy/HierarchyPanel.cpp
         src/editor/ui/hierarchy/HierarchyPanel.h
         src/engine/repository/resource/RuntimeResource.h
-        src/engine/service/shader/ShaderService.cpp
-        src/engine/service/shader/ShaderService.h
-        src/engine/service/shader/ShaderModuleInstance.cpp
-        src/engine/service/shader/ShaderModuleInstance.h
+        src/engine/service/core/shader/ShaderService.cpp
+        src/engine/service/core/shader/ShaderService.h
+        src/engine/service/core/shader/ShaderModuleInstance.cpp
+        src/engine/service/core/shader/ShaderModuleInstance.h
         src/common/runtime/VulkanFrameData.cpp
         src/common/runtime/VulkanFrameData.h
         src/engine/render-pass/AbstractRenderPass.cpp
@@ -107,26 +107,37 @@ add_executable(
         src/engine/system/RenderPassSystem.h
         src/engine/render-pass/impl/VoxelVisualizerRenderPass.cpp
         src/engine/render-pass/impl/VoxelVisualizerRenderPass.h
-        src/engine/service/texture/TextureService.cpp
-        src/engine/service/texture/TextureService.h
-        src/engine/service/texture/TextureInstance.h
+        src/engine/service/core/texture/TextureService.cpp
+        src/engine/service/core/texture/TextureService.h
+        src/engine/service/core/texture/TextureInstance.h
         src/engine/repository/resource/ResourceRepository.h
         src/engine/service/AbstractResourceService.cpp
         src/engine/service/AbstractResourceService.h
-        src/engine/service/framebuffer/FramebufferInstance.h
-        src/engine/service/framebuffer/FrameBufferAttachment.h
+        src/engine/service/core/framebuffer/FrameBufferAttachment.h
         src/engine/core/CoreRenderPasses.cpp
         src/engine/core/CoreRenderPasses.h
         src/engine/core/AbstractCoreRepository.h
         src/engine/core/AbstractCoreRepository.cpp
         src/engine/core/CorePipelines.cpp
         src/engine/core/CorePipelines.h
-        src/engine/service/render-pass/RenderPassService.cpp
-        src/engine/service/render-pass/RenderPassService.h
-        src/engine/service/render-pass/RenderPassInstance.h
-        src/engine/service/pipeline/PipelineService.cpp
-        src/engine/service/pipeline/PipelineService.h
-        src/engine/service/pipeline/PipelineInstance.h
+        src/engine/service/core/framebuffer/FrameBufferService.cpp
+        src/engine/service/core/framebuffer/FrameBufferService.h
+        src/engine/service/core/framebuffer/FrameBufferInstance.h
+        src/engine/service/core/pipeline/PipelineService.cpp
+        src/engine/service/core/pipeline/PipelineService.h
+        src/engine/service/core/pipeline/PipelineInstance.h
+        src/engine/repository/backend/CommandPoolRepository.cpp
+        src/engine/repository/backend/CommandPoolRepository.h
+        src/engine/service/core/pools/CommandPoolService.cpp
+        src/engine/service/core/pools/CommandPoolService.h
+        src/engine/core/CoreBuffers.cpp
+        src/engine/core/CoreBuffers.h
+        src/engine/service/core/buffer/BufferService.cpp
+        src/engine/service/core/buffer/BufferService.h
+        src/engine/service/core/buffer/BufferInstance.h
+        src/engine/service/core/buffer/BufferType.h
+        src/engine/service/core/pools/CommandBufferInstance.h
+        src/engine/service/core/pools/CommandBufferInstance.cpp
 )
 
 

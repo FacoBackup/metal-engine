@@ -9,7 +9,7 @@
 #include "VkBootstrap.h"
 #include "VulkanFrameData.h"
 
-#define MIN_IMAGE_COUNT 2
+#define IMAGE_COUNT 2
 #define MAX_DESCRIPTOR_SETS 1
 #define VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME "VK_KHR_portability_subset"
 
@@ -54,7 +54,7 @@ namespace Metal {
         vkb::Device device;
         VkQueue graphicsQueue = VK_NULL_HANDLE;
         VkSwapchainKHR swapChain = VK_NULL_HANDLE;
-        VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
+        VkDescriptorPool imguiDescriptorPool = VK_NULL_HANDLE;
         VmaAllocator allocator = VK_NULL_HANDLE;
 
         void build(bool debugMode);

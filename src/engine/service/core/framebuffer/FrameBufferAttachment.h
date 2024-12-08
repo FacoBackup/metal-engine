@@ -1,6 +1,6 @@
 #ifndef FRAMEBUFFERATTACHMENT_H
 #define FRAMEBUFFERATTACHMENT_H
-#include "../../repository/resource/RuntimeResource.h"
+#include "../../../repository/resource/RuntimeResource.h"
 
 namespace Metal {
     struct FrameBufferAttachment final : RuntimeResource {

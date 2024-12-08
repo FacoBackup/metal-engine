@@ -16,7 +16,7 @@ namespace Metal {
         VulkanContext &vulkanContext;
         ResourceRepository &repository;
 
-        void registerResource(const RuntimeResource *resource) const;
+        void registerResource(RuntimeResource *resource) const;
 
     public:
         explicit AbstractResourceService(ApplicationContext &context);

@@ -9,8 +9,8 @@
 #include <vulkan/vulkan_core.h>
 
 #include "ShaderModuleInstance.h"
-#include "../AbstractResourceService.h"
-#include "../../../common/interface/AbstractRuntimeComponent.h"
+#include "../../AbstractResourceService.h"
+#include "../../../../common/interface/AbstractRuntimeComponent.h"
 
 namespace Metal {
     class ShaderService final : public AbstractResourceService {

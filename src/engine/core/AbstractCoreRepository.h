@@ -4,8 +4,10 @@
 
 namespace Metal {
     class VulkanContext;
-    class RenderPassService;
+    class FrameBufferService;
     class ShaderService;
+    class BufferService;
+    class CommandPoolService;
 
     class AbstractCoreRepository : public AbstractRuntimeComponent {
     public:
@@ -13,8 +15,10 @@ namespace Metal {
 
     protected:
         VulkanContext &vulkanContext;
-        RenderPassService &renderPassService;
+        FrameBufferService &framebufferService;
         ShaderService &shaderService;
+        BufferService &bufferService;
+        CommandPoolService &commandPoolService;
     };
 
 

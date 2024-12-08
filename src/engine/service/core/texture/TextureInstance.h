@@ -2,7 +2,7 @@
 #define TEXTUREINSTANCE_H
 #include <vulkan/vulkan_core.h>
 
-#include "../../repository/resource/RuntimeResource.h"
+#include "../../../repository/resource/RuntimeResource.h"
 
 namespace Metal {
     struct TextureInstance : RuntimeResource{

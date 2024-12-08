@@ -12,11 +12,11 @@ namespace Metal {
     static VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 
     void GUIContext::frameRender(ImDrawData *draw_data) const {
-        ImGui_ImplVulkanH_Window &guiVkWindow = context.getVulkanContext().imguiVulkanWindow;
+        ImGui_ImplVulkanH_Window &imguiVkWindow = context.getVulkanContext().imguiVulkanWindow;
         const VkDevice &device = context.getVulkanContext().device.device;
 
         VulkanFrameData &frameData = context.getVulkanContext().getFrameData();
-        const VkResult err = vkAcquireNextImageKHR(device, guiVkWindow.Swapchain, UINT64_MAX,
+        const VkResult err = vkAcquireNextImageKHR(device, imguiVkWindow.Swapchain, UINT64_MAX,
                                                    frameData.imageAcquiredSemaphore,
                                                    VK_NULL_HANDLE,
                                                    &frameData.frameIndex);
@@ -38,12 +38,12 @@ namespace Metal {
 
         VkRenderPassBeginInfo passBeginInfo = {};
         passBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        passBeginInfo.renderPass = guiVkWindow.RenderPass;
+        passBeginInfo.renderPass = imguiVkWindow.RenderPass;
         passBeginInfo.framebuffer = frameData.framebuffer;
-        passBeginInfo.renderArea.extent.width = guiVkWindow.Width;
-        passBeginInfo.renderArea.extent.height = guiVkWindow.Height;
+        passBeginInfo.renderArea.extent.width = imguiVkWindow.Width;
+        passBeginInfo.renderArea.extent.height = imguiVkWindow.Height;
         passBeginInfo.clearValueCount = 1;
-        passBeginInfo.pClearValues = &guiVkWindow.ClearValue;
+        passBeginInfo.pClearValues = &imguiVkWindow.ClearValue;
         vkCmdBeginRenderPass(frameData.commandBuffer, &passBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
         // Record dear imgui primitives into command buffer
@@ -134,10 +134,10 @@ namespace Metal {
         init_info.QueueFamily = context.getVulkanContext().queueFamily;
         init_info.Queue = context.getVulkanContext().graphicsQueue;
         init_info.PipelineCache = context.getVulkanContext().pipelineCache;
-        init_info.DescriptorPool = context.getVulkanContext().descriptorPool;
+        init_info.DescriptorPool = context.getVulkanContext().imguiDescriptorPool;
         init_info.RenderPass = context.getVulkanContext().imguiVulkanWindow.RenderPass;
         init_info.Subpass = 0;
-        init_info.MinImageCount = MIN_IMAGE_COUNT;
+        init_info.MinImageCount = IMAGE_COUNT;
         init_info.ImageCount = context.getVulkanContext().imguiVulkanWindow.ImageCount;
         init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
         init_info.Allocator = context.getVulkanContext().instance.allocation_callbacks;

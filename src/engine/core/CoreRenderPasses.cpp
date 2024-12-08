@@ -1,35 +1,33 @@
 #include "CoreRenderPasses.h"
 
-#include "../../common/runtime/VulkanContext.h"
-#include "../service/render-pass/RenderPassService.h"
-#include "../service/render-pass/RenderPassInstance.h"
+#include "../../common/runtime/ApplicationContext.h"
 
 namespace Metal {
     void CoreRenderPasses::onInitialize() { {
             // G-Buffer
-            gBufferRenderPass = renderPassService.createPipeline(vulkanContext.getWindowWidth(),
+            gBufferRenderPass = framebufferService.createPipeline(vulkanContext.getWindowWidth(),
                                                              vulkanContext.getWindowHeight());
-            renderPassService.createAttachment("Albedo Emission", VK_FORMAT_R16G16B16A16_SFLOAT,
+            framebufferService.createAttachment("Albedo Emission", VK_FORMAT_R16G16B16A16_SFLOAT,
                                              VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, gBufferRenderPass);
-            renderPassService.createAttachment("Roughness Metallic AO", VK_FORMAT_R16G16B16A16_SFLOAT,
+            framebufferService.createAttachment("Roughness Metallic AO", VK_FORMAT_R16G16B16A16_SFLOAT,
                                              VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, gBufferRenderPass);
-            renderPassService.createAttachment("Normal", VK_FORMAT_R16G16B16A16_SFLOAT,
+            framebufferService.createAttachment("Normal", VK_FORMAT_R16G16B16A16_SFLOAT,
                                              VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
                                              gBufferRenderPass);
-            renderPassService.createAttachment("Depth ID UV", VK_FORMAT_R32G32B32A32_SFLOAT,
+            framebufferService.createAttachment("Depth ID UV", VK_FORMAT_R32G32B32A32_SFLOAT,
                                              VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, gBufferRenderPass);
-            renderPassService.createDepthAttachment(gBufferRenderPass);
-            renderPassService.createRenderPass(gBufferRenderPass);
-            renderPassService.createFrameBuffer(gBufferRenderPass);
+            framebufferService.createDepthAttachment(gBufferRenderPass);
+            framebufferService.createRenderPass(gBufferRenderPass);
+            framebufferService.createFrameBuffer(gBufferRenderPass);
         } {
             // Aux-Buffer
-            auxRenderPass = renderPassService.createPipeline(vulkanContext.getWindowWidth(),
+            auxRenderPass = framebufferService.createPipeline(vulkanContext.getWindowWidth(),
                                                                vulkanContext.getWindowHeight());
-            renderPassService.createAttachment("Color", VK_FORMAT_R32G32B32A32_SFLOAT,
+            framebufferService.createAttachment("Color", VK_FORMAT_R32G32B32A32_SFLOAT,
                                              VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, auxRenderPass);
-            renderPassService.createDepthAttachment(auxRenderPass);
-            renderPassService.createRenderPass(auxRenderPass);
-            renderPassService.createFrameBuffer(auxRenderPass);
+            framebufferService.createDepthAttachment(auxRenderPass);
+            framebufferService.createRenderPass(auxRenderPass);
+            framebufferService.createFrameBuffer(auxRenderPass);
         }
     }
 }

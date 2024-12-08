@@ -3,7 +3,7 @@
 #include <vector>
 #include <glslang/Include/glslang_c_interface.h>
 
-#include "../../repository/resource/RuntimeResource.h"
+#include "../../../repository/resource/RuntimeResource.h"
 #include "vulkan/vulkan.h"
 
 namespace Metal {

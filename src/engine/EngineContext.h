@@ -1,13 +1,17 @@
 #ifndef METAL_ENGINE_ENGINECONTEXT_H
 #define METAL_ENGINE_ENGINECONTEXT_H
 
+#include "core/CoreBuffers.h"
 #include "core/CorePipelines.h"
 #include "core/CoreRenderPasses.h"
+#include "repository/backend/CommandPoolRepository.h"
 #include "repository/resource/ResourceRepository.h"
-#include "service/pipeline/PipelineService.h"
-#include "service/render-pass/RenderPassService.h"
-#include "service/shader/ShaderService.h"
-#include "service/texture/TextureService.h"
+#include "service/core/buffer/BufferService.h"
+#include "service/core/pipeline/PipelineService.h"
+#include "service/core/pools/CommandPoolService.h"
+#include "service/core/framebuffer/FrameBufferService.h"
+#include "service/core/shader/ShaderService.h"
+#include "service/core/texture/TextureService.h"
 #include "system/RenderPassSystem.h"
 #include "system/camera/CameraSystem.h"
 
@@ -19,21 +23,25 @@ namespace Metal {
 
         // ----------- SYSTEMS
         TextureService textureService{context};
-        RenderPassService renderPassService{context};
+        FrameBufferService framebufferService{context};
         PipelineService pipelineService{context};
         ShaderService shaderService{context};
         CameraSystem cameraSystem{context};
         RenderPassSystem renderPassSystem{context};
+        CommandPoolService poolService{context};
+        BufferService bufferService{context};
         // ----------- SYSTEMS
 
         // ----------- REPOSITORIES
         CameraRepository cameraRepository{context};
         ResourceRepository resourceRepository{};
+        CommandPoolRepository poolRepository{};
         // ----------- REPOSITORIES
 
         // // ----------- CORE REPOSITORIES
         CoreRenderPasses coreRenderPasses{context};
         CorePipelines corePipelines{context};
+        CoreBuffers coreBuffers{context};
         // ----------- CORE REPOSITORIES
 
         void dispose() const;
@@ -43,14 +51,6 @@ namespace Metal {
         void onSync() override;
 
         ResourceRepository &getResourceRepository();
-
-        TextureService &getTextureService();
-
-        RenderPassService &getRenderPassService();
-
-        ShaderService &getShaderService();
-
-        PipelineService &getPipelineService();
     };
 }
 #endif

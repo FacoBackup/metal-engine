@@ -8,9 +8,21 @@ namespace Metal {
             resource.second->dispose(context.getVulkanContext());
             delete resource.second;
         }
+        vkDestroyDescriptorPool(context.getVulkanContext().device.device, poolRepository.descriptorPool,
+                                context.getVulkanContext().instance.allocation_callbacks);
+
+        vkDestroyCommandPool(context.getVulkanContext().device.device, poolRepository.commandPool,
+                             context.getVulkanContext().instance.allocation_callbacks);
     }
 
     void EngineContext::onInitialize() {
+        textureService.onInitialize();
+        framebufferService.onInitialize();
+        pipelineService.onInitialize();
+        shaderService.onInitialize();
+        cameraSystem.onInitialize();
+        renderPassSystem.onInitialize();
+        poolService.onInitialize();
         coreRenderPasses.onInitialize();
         corePipelines.onInitialize();
     }
@@ -22,21 +34,5 @@ namespace Metal {
 
     ResourceRepository &EngineContext::getResourceRepository() {
         return resourceRepository;
-    }
-
-    TextureService &EngineContext::getTextureService() {
-        return textureService;
-    }
-
-    RenderPassService &EngineContext::getRenderPassService() {
-        return renderPassService;
-    }
-
-    ShaderService &EngineContext::getShaderService() {
-        return shaderService;
-    }
-
-    PipelineService &EngineContext::getPipelineService() {
-        return pipelineService;
     }
 }

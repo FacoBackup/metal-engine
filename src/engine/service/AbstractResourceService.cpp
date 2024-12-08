@@ -4,8 +4,8 @@
 #include "../../common/runtime/ApplicationContext.h"
 
 namespace Metal {
-    void AbstractResourceService::registerResource(const RuntimeResource *resource) const {
-        repository.resources.insert({resource->id, repository});
+    void AbstractResourceService::registerResource( RuntimeResource *resource) const {
+        repository.resources.insert({resource->id, resource});
     }
 
     AbstractResourceService::AbstractResourceService(ApplicationContext &context)

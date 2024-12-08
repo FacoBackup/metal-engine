@@ -23,7 +23,7 @@ namespace Metal {
             (swapChainRebuild || context.getVulkanContext().imguiVulkanWindow.Width !=
              fb_width ||
              context.getVulkanContext().imguiVulkanWindow.Height != fb_height)) {
-            ImGui_ImplVulkan_SetMinImageCount(MIN_IMAGE_COUNT);
+            ImGui_ImplVulkan_SetMinImageCount(IMAGE_COUNT);
             ImGui_ImplVulkanH_CreateOrResizeWindow(context.getVulkanContext().instance.instance,
                                                    context.getVulkanContext().physDevice.physical_device,
                                                    context.getVulkanContext().device.device,
@@ -31,7 +31,7 @@ namespace Metal {
                                                    context.getVulkanContext().queueFamily,
                                                    context.getVulkanContext().instance.allocation_callbacks, fb_width,
                                                    fb_height,
-                                                   MIN_IMAGE_COUNT);
+                                                   IMAGE_COUNT);
             context.getVulkanContext().imguiVulkanWindow.FrameIndex = 0;
             swapChainRebuild = false;
         }
