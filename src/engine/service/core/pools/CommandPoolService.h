@@ -10,6 +10,9 @@ namespace Metal {
     class CommandPoolService final : public AbstractResourceService {
         CommandPoolRepository &poolRepository;
 
+        void createCommandPool() const;
+
+        void createDescriptorPool() const;
     public:
         explicit CommandPoolService(ApplicationContext &context);
 

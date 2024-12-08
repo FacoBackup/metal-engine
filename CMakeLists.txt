@@ -98,8 +98,8 @@ add_executable(
         src/engine/service/core/shader/ShaderService.h
         src/engine/service/core/shader/ShaderModuleInstance.cpp
         src/engine/service/core/shader/ShaderModuleInstance.h
-        src/common/runtime/VulkanFrameData.cpp
-        src/common/runtime/VulkanFrameData.h
+        src/common/runtime/FrameData.cpp
+        src/common/runtime/FrameData.h
         src/engine/render-pass/AbstractRenderPass.cpp
         src/engine/render-pass/AbstractRenderPass.h
         src/engine/system/RenderPassSystem.cpp

@@ -6,11 +6,7 @@
 #include "../../service/core/pools/CommandBufferInstance.h"
 
 namespace Metal {
-    void VoxelVisualizerRenderPass::render(VulkanFrameData &frameData) {
-        VkCommandBuffer buffer = pipelines.debugPipeline->commandBuffer->vkBuffer;
-        vkCmdBeginRenderPass(buffer, &pipelines.debugPipeline->commandBuffer->renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-        BindPipeline(pipelines.debugPipeline);
-        vkCmdEndRenderPass(buffer);
-        VulkanUtils::CheckVKResult(vkEndCommandBuffer(buffer));
+    void VoxelVisualizerRenderPass::onSync() {
+        context.getVulkanContext().getFrameData().commandBuffers.push_back(pipelines.debugPipeline->commandBuffer->vkCommandBuffer);
     }
 } // Metal

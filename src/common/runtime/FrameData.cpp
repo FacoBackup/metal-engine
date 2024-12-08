@@ -2,7 +2,7 @@
 // Created by Gustavo Roque on 07/12/24.
 //
 
-#include "VulkanFrameData.h"
+#include "FrameData.h"
 
 namespace Metal {
 } // Metal

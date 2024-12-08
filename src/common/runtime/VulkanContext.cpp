@@ -13,11 +13,16 @@ namespace Metal {
         imguiVulkanWindow.ClearValue.color.float32[3] = 0;
     }
 
-    VulkanFrameData &VulkanContext::getFrameData() {
+    FrameData &VulkanContext::getFrameData() {
+        return frameData;
+    }
+
+    void VulkanContext::updateFrameData() {
         auto [CommandPool, CommandBuffer, Fence, Backbuffer, BackbufferView, Framebuffer] = imguiVulkanWindow.Frames[
             imguiVulkanWindow.FrameIndex];
         frameData.commandPool = CommandPool;
-        frameData.commandBuffer = CommandBuffer;
+        frameData.commandBuffers.push_back(CommandBuffer);
+        frameData.imguiCommandBuffer = CommandBuffer;
         frameData.fence = Fence;
         frameData.backbuffer = Backbuffer;
         frameData.backbufferView = BackbufferView;
@@ -27,7 +32,6 @@ namespace Metal {
         frameData.renderCompleteSemaphore = imguiVulkanWindow.FrameSemaphores[imguiVulkanWindow.SemaphoreIndex].
                 RenderCompleteSemaphore;
         frameData.frameIndex = imguiVulkanWindow.FrameIndex;
-        return frameData;
     }
 
     void VulkanContext::createSwapChain() {

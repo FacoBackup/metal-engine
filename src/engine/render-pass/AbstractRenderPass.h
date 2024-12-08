@@ -8,7 +8,7 @@ namespace Metal {
 }
 
 namespace Metal {
-    struct VulkanFrameData;
+    struct FrameData;
     struct CoreFrameBuffers;
     struct CorePipelines;
     struct CoreBuffers;
@@ -21,11 +21,6 @@ namespace Metal {
 
     public:
         explicit AbstractRenderPass(ApplicationContext &context);
-
-        static void BindPipeline(const PipelineInstance *pipeline);
-
-        virtual void render(VulkanFrameData &frameData) {
-        }
     };
 }
 

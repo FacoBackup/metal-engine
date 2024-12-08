@@ -74,7 +74,7 @@ namespace Metal {
 
     void EngineContext::onSync() {
         cameraSystem.onSync();
-        renderPassSystem.render(context.getVulkanContext().getFrameData());
+        renderPassSystem.onSync();
     }
 
     ResourceRepository &EngineContext::getResourceRepository() {

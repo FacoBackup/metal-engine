@@ -10,6 +10,7 @@ namespace Metal {
         static void applyFonts();
 
         ApplicationContext &context;
+        ImDrawData *drawData = nullptr;
 
     public:
         explicit GUIContext(ApplicationContext &context) : context(context) {
@@ -17,9 +18,9 @@ namespace Metal {
 
         void build(bool debugMode) const;
 
-        void frameRender(ImDrawData *draw_data) const;
+        void recordCommandBuffer() const;
 
-        void renderFrame(ImDrawData *main_draw_data) const;
+        void frameRender() const;
 
         void dispose() const;
 

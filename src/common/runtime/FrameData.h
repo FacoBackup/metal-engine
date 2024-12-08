@@ -1,11 +1,13 @@
 #ifndef VULKANFRAMEDATA_H
 #define VULKANFRAMEDATA_H
+#include <vector>
 #include <vulkan/vulkan_core.h>
 
 namespace Metal {
-    struct VulkanFrameData {
+    struct FrameData {
         VkCommandPool commandPool = VK_NULL_HANDLE;
-        VkCommandBuffer commandBuffer = VK_NULL_HANDLE;
+        std::vector<VkCommandBuffer> commandBuffers{};
+        VkCommandBuffer imguiCommandBuffer{};
         VkFence fence = VK_NULL_HANDLE;
         VkImage backbuffer = VK_NULL_HANDLE;
         VkImageView backbufferView = VK_NULL_HANDLE;

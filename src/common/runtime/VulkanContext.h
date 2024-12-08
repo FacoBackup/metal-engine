@@ -7,7 +7,7 @@
 #include "imgui_impl_vulkan.h"
 #include <GLFW/glfw3.h>
 #include "VkBootstrap.h"
-#include "VulkanFrameData.h"
+#include "FrameData.h"
 
 #define IMAGE_COUNT 2
 #define MAX_DESCRIPTOR_SETS 1
@@ -42,7 +42,7 @@ namespace Metal {
         uint32_t w{}, h{};
         GLFWwindow *window = nullptr;
         bool debugMode = false;
-        VulkanFrameData frameData{};
+        FrameData frameData{};
 
     public:
         VkPhysicalDeviceProperties physicalDeviceProperties{};
@@ -61,7 +61,9 @@ namespace Metal {
 
         void build(bool debugMode);
 
-        VulkanFrameData &getFrameData();
+        FrameData &getFrameData();
+
+        void updateFrameData();
 
         void dispose() const;
 

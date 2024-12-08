@@ -9,7 +9,7 @@ namespace Metal {
             : AbstractRenderPass(context) {
         }
 
-        void render(VulkanFrameData &frameData) override;
+        void onSync() override;
     };
 }
 

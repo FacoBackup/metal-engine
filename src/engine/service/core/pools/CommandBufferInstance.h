@@ -9,7 +9,7 @@ namespace Metal {
 
     struct CommandBufferInstance final : RuntimeResource {
         VkRenderPassBeginInfo renderPassInfo{};
-        VkCommandBuffer vkBuffer = VK_NULL_HANDLE;
+        VkCommandBuffer vkCommandBuffer = VK_NULL_HANDLE;
         PipelineInstance *pipeline = nullptr;
 
         void startMapping();

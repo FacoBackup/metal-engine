@@ -11,11 +11,51 @@
 namespace Metal {
     static VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 
-    void GUIContext::frameRender(ImDrawData *draw_data) const {
+    bool GUIContext::beginFrame() const {
+        context.getVulkanContext().getFrameData().commandBuffers.clear();
+        context.getVulkanContext().updateFrameData();
+        if (!context.getGLFWContext().beginFrame()) {
+            // Start the Dear ImGui frame
+            ImGui_ImplVulkan_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+            return false;
+        }
+        return true;
+    }
+
+    void GUIContext::recordCommandBuffer() const {
+        FrameData &frameData = context.getVulkanContext().getFrameData();
+        ImGui_ImplVulkanH_Window &imguiVkWindow = context.getVulkanContext().imguiVulkanWindow;
+
+        VkCommandBufferBeginInfo bufferBeginInfo = {};
+        bufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        bufferBeginInfo.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+        VulkanUtils::CheckVKResult(vkBeginCommandBuffer(frameData.imguiCommandBuffer, &bufferBeginInfo));
+
+        VkRenderPassBeginInfo passBeginInfo = {};
+        passBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        passBeginInfo.renderPass = imguiVkWindow.RenderPass;
+        passBeginInfo.framebuffer = frameData.framebuffer;
+        passBeginInfo.renderArea.extent.width = imguiVkWindow.Width;
+        passBeginInfo.renderArea.extent.height = imguiVkWindow.Height;
+        passBeginInfo.clearValueCount = 1;
+        passBeginInfo.pClearValues = &imguiVkWindow.ClearValue;
+        vkCmdBeginRenderPass(frameData.imguiCommandBuffer, &passBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        // Record dear imgui primitives into command buffer
+        ImGui_ImplVulkan_RenderDrawData(drawData, frameData.imguiCommandBuffer);
+
+        // Submit command buffer
+        vkCmdEndRenderPass(frameData.imguiCommandBuffer);
+        VulkanUtils::CheckVKResult(vkEndCommandBuffer(frameData.imguiCommandBuffer));
+    }
+
+    void GUIContext::frameRender() const {
         ImGui_ImplVulkanH_Window &imguiVkWindow = context.getVulkanContext().imguiVulkanWindow;
         const VkDevice &device = context.getVulkanContext().device.device;
 
-        VulkanFrameData &frameData = context.getVulkanContext().getFrameData();
+        FrameData &frameData = context.getVulkanContext().getFrameData();
         const VkResult err = vkAcquireNextImageKHR(device, imguiVkWindow.Swapchain, UINT64_MAX,
                                                    frameData.imageAcquiredSemaphore,
                                                    VK_NULL_HANDLE,
@@ -29,79 +69,31 @@ namespace Metal {
         VulkanUtils::CheckVKResult(vkWaitForFences(device, 1, &frameData.fence, VK_TRUE,
                                                    UINT64_MAX));
         VulkanUtils::CheckVKResult(vkResetFences(device, 1, &frameData.fence));
-
         VulkanUtils::CheckVKResult(vkResetCommandPool(device, frameData.commandPool, 0));
-        VkCommandBufferBeginInfo bufferBeginInfo = {};
-        bufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        bufferBeginInfo.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-        VulkanUtils::CheckVKResult(vkBeginCommandBuffer(frameData.commandBuffer, &bufferBeginInfo));
 
-        VkRenderPassBeginInfo passBeginInfo = {};
-        passBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        passBeginInfo.renderPass = imguiVkWindow.RenderPass;
-        passBeginInfo.framebuffer = frameData.framebuffer;
-        passBeginInfo.renderArea.extent.width = imguiVkWindow.Width;
-        passBeginInfo.renderArea.extent.height = imguiVkWindow.Height;
-        passBeginInfo.clearValueCount = 1;
-        passBeginInfo.pClearValues = &imguiVkWindow.ClearValue;
-        vkCmdBeginRenderPass(frameData.commandBuffer, &passBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+        recordCommandBuffer();
 
-        // Record dear imgui primitives into command buffer
-        ImGui_ImplVulkan_RenderDrawData(draw_data, frameData.commandBuffer);
-
-        // Submit command buffer
-        vkCmdEndRenderPass(frameData.commandBuffer); {
-            VkSubmitInfo info = {};
-            info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-            info.waitSemaphoreCount = 1;
-            info.pWaitSemaphores = &frameData.imageAcquiredSemaphore;
-            info.pWaitDstStageMask = &wait_stage;
-            info.commandBufferCount = 1;
-            info.pCommandBuffers = &frameData.commandBuffer;
-            info.signalSemaphoreCount = 1;
-            info.pSignalSemaphores = &frameData.renderCompleteSemaphore;
-
-            VulkanUtils::CheckVKResult(vkEndCommandBuffer(frameData.commandBuffer));
-            VulkanUtils::CheckVKResult(vkQueueSubmit(context.getVulkanContext().graphicsQueue, 1, &info,
-                                                     frameData.fence));
-        }
-    }
-
-    void GUIContext::renderFrame(ImDrawData *main_draw_data) const {
-        frameRender(main_draw_data);
-        VulkanUtils::FramePresent(&context.getVulkanContext().imguiVulkanWindow,
-                                  context.getVulkanContext().graphicsQueue,
-                                  context.getGLFWContext().isSwapChainRebuild());
-    }
-
-    void GUIContext::dispose() const {
-        const VkResult err = vkDeviceWaitIdle(context.getVulkanContext().device.device);
-        VulkanUtils::CheckVKResult(err);
-        ImGui_ImplVulkan_Shutdown();
-        ImGui_ImplGlfw_Shutdown();
-        ImGui::DestroyContext();
-        ImGui_ImplVulkanH_DestroyWindow(context.getVulkanContext().instance, context.getVulkanContext().device.device,
-                                        &context.getGLFWContext().getGUIWindow(),
-                                        nullptr);
-        context.getGLFWContext().dispose();
-    }
-
-    bool GUIContext::beginFrame() const {
-        if (!context.getGLFWContext().beginFrame()) {
-            // Start the Dear ImGui frame
-            ImGui_ImplVulkan_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
-            return false;
-        }
-        return true;
+        VkSubmitInfo info = {};
+        info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        info.waitSemaphoreCount = 1;
+        info.pWaitSemaphores = &frameData.imageAcquiredSemaphore;
+        info.pWaitDstStageMask = &wait_stage;
+        info.commandBufferCount = frameData.commandBuffers.size();
+        info.pCommandBuffers = frameData.commandBuffers.data();
+        info.signalSemaphoreCount = 1;
+        info.pSignalSemaphores = &frameData.renderCompleteSemaphore;
+        VulkanUtils::CheckVKResult(vkQueueSubmit(context.getVulkanContext().graphicsQueue, 1, &info,
+                                                 frameData.fence));
     }
 
     void GUIContext::endFrame() {
         ImGui::Render();
-        if (ImDrawData *main_draw_data = ImGui::GetDrawData(); !(
-            main_draw_data->DisplaySize.x <= 0.0f || main_draw_data->DisplaySize.y <= 0.0f)) {
-            renderFrame(main_draw_data);
+        drawData = ImGui::GetDrawData();
+        if (!(drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f)) {
+            frameRender();
+            VulkanUtils::FramePresent(&context.getVulkanContext().imguiVulkanWindow,
+                                      context.getVulkanContext().graphicsQueue,
+                                      context.getGLFWContext().isSwapChainRebuild());
         }
     }
 
@@ -197,5 +189,17 @@ namespace Metal {
 
         io.Fonts->Build();
         delete fontConfig;
+    }
+
+    void GUIContext::dispose() const {
+        const VkResult err = vkDeviceWaitIdle(context.getVulkanContext().device.device);
+        VulkanUtils::CheckVKResult(err);
+        ImGui_ImplVulkan_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+        ImGui_ImplVulkanH_DestroyWindow(context.getVulkanContext().instance, context.getVulkanContext().device.device,
+                                        &context.getGLFWContext().getGUIWindow(),
+                                        nullptr);
+        context.getGLFWContext().dispose();
     }
 }

@@ -1,10 +1,11 @@
 #include "RenderPassSystem.h"
 
 namespace Metal {
-    void RenderPassSystem::render(VulkanFrameData &frameData) {
-        for (auto *pass : renderPasses) {
-            pass->onSync();
-            pass->render(frameData);
+    void RenderPassSystem::onSync() {
+        for (auto *pass: renderPasses) {
+            if (pass != nullptr) {
+                pass->onSync();
+            }
         }
     }
 } // Metal

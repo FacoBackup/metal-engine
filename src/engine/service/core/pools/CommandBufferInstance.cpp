@@ -7,7 +7,7 @@ namespace Metal {
     void CommandBufferInstance::startMapping() {
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        vkBeginCommandBuffer(vkBuffer, &beginInfo);
+        vkBeginCommandBuffer(vkCommandBuffer, &beginInfo);
 
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderPassInfo.renderPass = pipeline->frameBuffer->vkRenderPass;
@@ -19,15 +19,21 @@ namespace Metal {
         renderPassInfo.clearValueCount = 1;
         renderPassInfo.pClearValues = &clearColor;
 
-        vkCmdBeginRenderPass(vkBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdBindPipeline(vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->vkPipeline);
+        if (pipeline->descriptorSet != VK_NULL_HANDLE) {
+            vkCmdBindDescriptorSets(vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->vkPipelineLayout,
+                                    0,  // firstSet
+                                    1,  // descriptorSetCount
+                                    &pipeline->descriptorSet,
+                                    0,	// dynamicOffsetCount
+                                    nullptr);	// pDynamicOffsets
+        }
+
+        vkCmdBeginRenderPass(vkCommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     }
 
     void CommandBufferInstance::stopMapping() const {
-        // EXAMPLE
-        // vkCmdBindPipeline(buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->vkPipeline);
-        // vkCmdDraw(buffer, 3, 1, 0, 0);
-
-        vkCmdEndRenderPass(vkBuffer);
-        vkEndCommandBuffer(vkBuffer);
+        vkCmdEndRenderPass(vkCommandBuffer);
+        vkEndCommandBuffer(vkCommandBuffer);
     }
 }

@@ -14,16 +14,4 @@ namespace Metal {
                                                                              coreFrameBuffers) {
     }
 
-    void AbstractRenderPass::BindPipeline(const PipelineInstance *pipeline) {
-        vkCmdBindPipeline(pipeline->commandBuffer->vkBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->vkPipeline);
-
-        if (pipeline->descriptorSet != VK_NULL_HANDLE) {
-            vkCmdBindDescriptorSets(pipeline->commandBuffer->vkBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->vkPipelineLayout,
-                                    0,  // firstSet
-                                    1,  // descriptorSetCount
-                                    &pipeline->descriptorSet,
-                                    0,	// dynamicOffsetCount
-                                    nullptr);	// pDynamicOffsets
-        }
-    }
 } // Metal
