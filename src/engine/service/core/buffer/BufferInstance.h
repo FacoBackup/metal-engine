@@ -21,14 +21,10 @@ namespace Metal {
             }
         }
 
-        void updateData(VulkanContext &context, const void *data, VkDeviceSize dataSize) {
-            if (dataSize > size) {
-                throw std::runtime_error("Data size exceeds buffer size!");
-            }
-
+        void updateData(const VulkanContext &context, const void *data) const {
             void *mappedData;
             vmaMapMemory(context.allocator, allocation, &mappedData);
-            std::memcpy(mappedData, data, static_cast<size_t>(dataSize));
+            std::memcpy(mappedData, data, size);
             vmaUnmapMemory(context.allocator, allocation);
         }
     };

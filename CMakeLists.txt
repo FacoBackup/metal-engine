@@ -125,18 +125,26 @@ add_executable(
         src/engine/service/core/pipeline/PipelineService.cpp
         src/engine/service/core/pipeline/PipelineService.h
         src/engine/service/core/pipeline/PipelineInstance.h
-        src/engine/repository/backend/CommandPoolRepository.cpp
-        src/engine/repository/backend/CommandPoolRepository.h
-        src/engine/service/core/pools/CommandPoolService.cpp
-        src/engine/service/core/pools/CommandPoolService.h
+        src/engine/repository/backend/CommandDescriptorRepository.cpp
+        src/engine/repository/backend/CommandDescriptorRepository.h
+        src/engine/service/core/command/CommandService.cpp
+        src/engine/service/core/command/CommandService.h
         src/engine/core/CoreBuffers.cpp
         src/engine/core/CoreBuffers.h
         src/engine/service/core/buffer/BufferService.cpp
         src/engine/service/core/buffer/BufferService.h
         src/engine/service/core/buffer/BufferInstance.h
         src/engine/service/core/buffer/BufferType.h
-        src/engine/service/core/pools/CommandBufferInstance.h
-        src/engine/service/core/pools/CommandBufferInstance.cpp
+        src/engine/service/core/command/CommandBufferInstance.h
+        src/engine/service/core/command/CommandBufferInstance.cpp
+        src/engine/service/core/descriptor/DescriptorService.cpp
+        src/engine/service/core/descriptor/DescriptorService.h
+        src/engine/service/core/descriptor/DescriptorInstance.cpp
+        src/engine/service/core/descriptor/DescriptorInstance.h
+        src/engine/core/GlobalDataUBO.h
+        src/engine/service/camera/CameraMovementService.cpp
+        src/engine/service/camera/CameraMovementService.h
+        src/engine/repository/RuntimeRepository.h
 )
 
 
@@ -149,6 +157,7 @@ find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Vulkan)
 find_package(VulkanMemoryAllocator CONFIG REQUIRED)
 find_package(glslang CONFIG REQUIRED)
+find_package(imguizmo CONFIG REQUIRED)
 set(COMMON_LIBRARIES
         glfw
         Vulkan::Headers
@@ -157,6 +166,7 @@ set(COMMON_LIBRARIES
         GPUOpen::VulkanMemoryAllocator
         glm::glm
         imgui::imgui
+        imguizmo::imguizmo
         spdlog::spdlog
         nlohmann_json::nlohmann_json
 

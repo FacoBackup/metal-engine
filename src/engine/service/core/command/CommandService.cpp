@@ -1,4 +1,4 @@
-#include "CommandPoolService.h"
+#include "CommandService.h"
 
 #include "CommandBufferInstance.h"
 #include "../../../../common/runtime/ApplicationContext.h"
@@ -6,11 +6,11 @@
 #include "../pipeline/PipelineInstance.h"
 
 namespace Metal {
-    CommandPoolService::CommandPoolService(ApplicationContext &context)
+    CommandService::CommandService(ApplicationContext &context)
         : AbstractResourceService(context), poolRepository(context.getEngineContext().poolRepository) {
     }
 
-    void CommandPoolService::createCommandPool() const {
+    void CommandService::onInitialize() {
         VkCommandPoolCreateInfo cmdPoolCreateInfo = {};
         cmdPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
         cmdPoolCreateInfo.pNext = nullptr;
@@ -19,32 +19,13 @@ namespace Metal {
         VulkanUtils::CheckVKResult(vkCreateCommandPool(vulkanContext.device.device, &cmdPoolCreateInfo,
                                                        nullptr,
                                                        &poolRepository.commandPool));
-    }
 
-    void CommandPoolService::createDescriptorPool() const {
-        VkDescriptorPoolSize poolSize{};
-        poolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        poolSize.descriptorCount = 1; // Adjust this based on your needs
-
-        VkDescriptorPoolCreateInfo poolInfo{};
-        poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        poolInfo.poolSizeCount = 1;
-        poolInfo.pPoolSizes = &poolSize;
-        poolInfo.flags = 0;
-        poolInfo.maxSets = 1; // NUM OF IMAGES
-        VulkanUtils::CheckVKResult(vkCreateDescriptorPool(vulkanContext.device.device, &poolInfo,
-                                                          nullptr, &poolRepository.descriptorPool));
-    }
-
-    void CommandPoolService::onInitialize() {
-        createCommandPool();
-        createDescriptorPool();
     }
 
     /**
      * Commands still need to be recorded
      */
-    CommandBufferInstance *CommandPoolService::createCommandBuffer(PipelineInstance *pipeline) const {
+    CommandBufferInstance *CommandService::createCommandBuffer(PipelineInstance *pipeline) const {
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocInfo.commandPool = poolRepository.commandPool;
@@ -63,7 +44,7 @@ namespace Metal {
         return buffer;
     }
 
-    VkDescriptorSet CommandPoolService::createDescriptorSet() {
+    VkDescriptorSet CommandService::createDescriptorSet() {
         return nullptr;
     }
 } // Metal

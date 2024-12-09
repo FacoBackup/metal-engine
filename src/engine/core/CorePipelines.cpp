@@ -4,7 +4,7 @@
 #include "../../common/util/VulkanUtils.h"
 #include "../service/core/pipeline/PipelineInstance.h"
 #include "../service/core/pipeline/PipelineService.h"
-#include "../service/core/pools/CommandBufferInstance.h"
+#include "../service/core/command/CommandBufferInstance.h"
 
 namespace Metal {
     void CorePipelines::onInitialize() {

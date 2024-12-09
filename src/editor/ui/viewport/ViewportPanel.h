@@ -5,12 +5,16 @@
 #include "../docks/AbstractDockPanel.h"
 
 namespace Metal {
-
     class ViewportPanel final : public AbstractDockPanel {
-        public:
-        void onSync() override;
-    };
+        bool isFirstMovement = false;
 
+    public:
+        void onSync() override;
+
+        void updateCamera();
+
+        void updateInputs() const;
+    };
 }
 
 #endif

@@ -1,7 +1,7 @@
 #include "AbstractRenderPass.h"
 #include "../../common/runtime/ApplicationContext.h"
 #include "../service/core/pipeline/PipelineInstance.h"
-#include "../service/core/pools/CommandBufferInstance.h"
+#include "../service/core/command/CommandBufferInstance.h"
 
 namespace Metal {
     AbstractRenderPass::AbstractRenderPass(ApplicationContext &context): AbstractRuntimeComponent(context),

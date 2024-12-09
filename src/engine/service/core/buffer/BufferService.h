@@ -7,7 +7,7 @@
 #include "vulkan/vulkan.h"
 
 namespace Metal {
-    class BufferInstance;
+    struct BufferInstance;
 
     class BufferService final : public AbstractResourceService {
     public:
@@ -15,7 +15,7 @@ namespace Metal {
             : AbstractResourceService(context) {
         }
 
-        BufferInstance *createBuffer(BufferType type, VkDeviceSize bufferSize,
+        [[nodiscard]] BufferInstance *createBuffer(BufferType type, VkDeviceSize bufferSize,
                                      VkBufferUsageFlags usage,
                                      VmaMemoryUsage memoryUsage) const;
     };

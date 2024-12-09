@@ -3,7 +3,7 @@
 #include <vulkan/vulkan_core.h>
 
 namespace Metal {
-    struct CommandPoolRepository {
+    struct CommandDescriptorRepository {
         VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
         VkCommandPool commandPool = VK_NULL_HANDLE;
     };

@@ -11,8 +11,11 @@
 namespace Metal {
     class Inspectable {
         const std::string uniqueIdentifier = typeid(this).name();
-        std::vector<std::unique_ptr<InspectableMember>> fields;
+        std::vector<std::unique_ptr<InspectableMember> > fields;
         bool fieldsRegistered = false;
+        int changes = 0;
+        int frozenVersion = -1;
+
     protected:
         virtual void registerFields() {
         }
@@ -28,7 +31,15 @@ namespace Metal {
         void registerMethod(const std::function<void()> &updateCallback, std::string name, std::string group);
 
     public:
-        std::vector<std::unique_ptr<InspectableMember>> &getFields();
+        std::vector<std::unique_ptr<InspectableMember> > &getFields();
+
+        [[nodiscard]] int getChangeId() const;
+
+        void registerChange();
+
+        [[nodiscard]] bool isNotFrozen() const;
+
+        void freezeVersion();
 
         virtual ~Inspectable() = default;
     };

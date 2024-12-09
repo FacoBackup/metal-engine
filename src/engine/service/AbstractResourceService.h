@@ -5,7 +5,7 @@
 namespace Metal {
     class VulkanContext;
     class RuntimeResource;
-    class ResourceRepository;
+    struct ResourceRepository;
     class TextureService;
 
 

@@ -122,7 +122,7 @@ namespace Metal {
                                                              nullptr,
                                                              &pipeline->vkPipeline));
 
-        pipeline->commandBuffer = context.getEngineContext().poolService.createCommandBuffer(pipeline);
+        pipeline->commandBuffer = context.getEngineContext().commandService.createCommandBuffer(pipeline);
         return pipeline;
     }
 } // Metal
