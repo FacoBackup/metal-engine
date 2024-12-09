@@ -1,12 +1,13 @@
 #include "ApplicationContext.h"
-#include "../../editor/EditorPanel.h"
 
 namespace Metal {
-    ApplicationContext::ApplicationContext() {
-        auto *editorPanel = new EditorPanel;
-        rootPanel = editorPanel;
-        editorPanel->setContext(this);
+    ApplicationContext::ApplicationContext(IPanel &r) : rootPanel(r) {
         guiContext.build(true);
+    }
+
+    void ApplicationContext::dispose() {
+        guiContext.dispose();
+        engineContext.dispose();
     }
 
     EngineContext &ApplicationContext::getEngineContext() {
@@ -17,26 +18,36 @@ namespace Metal {
         return guiContext;
     }
 
-    void ApplicationContext::start() {
-        if (rootPanel != nullptr) {
-            engineContext.onInitialize();
-            rootPanel->onInitialize();
-
-            GLFWwindow *window = guiContext.getWindowContext().getWindow();
-            while (!glfwWindowShouldClose(window)) {
-                if (guiContext.beginFrame()) {
-                    continue;
-                }
-                engineContext.onSync();
-                rootPanel->onSync();
-                guiContext.endFrame();
-            }
-            guiContext.shutdown();
-        }
+    GLFWContext &ApplicationContext::getGLFWContext() {
+        return glfwContext;
     }
 
-    bool ApplicationContext::isValidContext() {
-        return guiContext.getWindowContext().isValidContext();
+    VulkanContext &ApplicationContext::getVulkanContext() {
+        return vulkanContext;
+    }
+
+    GUIContext &ApplicationContext::getGUIContext() {
+        return guiContext;
+    }
+
+    void ApplicationContext::start() {
+        engineContext.onInitialize();
+        rootPanel.onInitialize();
+
+        GLFWwindow *window = glfwContext.getWindow();
+        while (!glfwWindowShouldClose(window)) {
+            if (guiContext.beginFrame()) {
+                continue;
+            }
+            engineContext.onSync();
+            rootPanel.onSync();
+            guiContext.endFrame();
+        }
+        guiContext.dispose();
+    }
+
+    bool ApplicationContext::isValidContext() const {
+        return glfwContext.isValidContext();
     }
 
     EditorContext &ApplicationContext::getEditorContext() {

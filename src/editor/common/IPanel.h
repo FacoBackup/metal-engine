@@ -2,8 +2,8 @@
 #define METAL_ENGINE_IPANEL_H
 
 #include "vector"
-#include "../../common/Synchornizable.h"
-#include "../../common/Initializable.h"
+#include "../../common/interface/Synchornizable.h"
+#include "../../common/interface/Initializable.h"
 
 namespace Metal {
     class IPanel : public Syncronizable, public Initializable {
