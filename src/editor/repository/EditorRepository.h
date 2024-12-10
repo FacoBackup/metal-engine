@@ -56,7 +56,7 @@ namespace Metal {
         EntityID mainSelection = nullptr;
         std::unordered_map<EntityID, bool> selected{};
         std::vector<EntityID> copied{};
-        std::unordered_map<std::string, Camera> viewportCamera;
+        std::unordered_map<std::string, Camera *> viewportCamera;
 
         // BrushMode brushMode = BrushMode.ADD;
         float brushRadius = 10;

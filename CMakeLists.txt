@@ -14,18 +14,18 @@ add_executable(
         src/engine/EngineContext.h
         src/common/util/VulkanUtils.cpp
         src/common/util/VulkanUtils.h
-        src/common/runtime/VulkanContext.cpp
-        src/common/runtime/VulkanContext.h
-        src/common/runtime/GLFWContext.cpp
-        src/common/runtime/GLFWContext.h
-        src/common/runtime/GUIContext.cpp
-        src/common/runtime/GUIContext.h
+        src/context/VulkanContext.cpp
+        src/context/VulkanContext.h
+        src/context/GLFWContext.cpp
+        src/context/GLFWContext.h
+        src/context/GuiContext.cpp
+        src/context/GuiContext.h
         src/editor/ui/viewport/ViewportPanel.cpp
         src/editor/ui/viewport/ViewportPanel.h
         src/editor/ui/docks/AbstractDockPanel.cpp
         src/editor/ui/docks/AbstractDockPanel.h
-        src/common/runtime/ApplicationContext.cpp
-        src/common/runtime/ApplicationContext.h
+        src/context/ApplicationContext.cpp
+        src/context/ApplicationContext.h
         src/editor/common/AbstractPanel.h
         src/editor/common/AbstractPanel.cpp
         src/common/interface/Synchornizable.h
@@ -93,50 +93,57 @@ add_executable(
         src/editor/ui/console/ConsolePanel.h
         src/editor/ui/hierarchy/HierarchyPanel.cpp
         src/editor/ui/hierarchy/HierarchyPanel.h
-        src/engine/repository/resource/RuntimeResource.h
-        src/engine/service/core/shader/ShaderService.cpp
-        src/engine/service/core/shader/ShaderService.h
-        src/engine/service/core/shader/ShaderModuleInstance.cpp
-        src/engine/service/core/shader/ShaderModuleInstance.h
-        src/common/runtime/FrameData.cpp
-        src/common/runtime/FrameData.h
+        src/context/runtime/RuntimeResource.h
+        src/context/service/ShaderService.cpp
+        src/context/service/ShaderService.h
+        src/context/runtime/ShaderModuleInstance.cpp
+        src/context/runtime/ShaderModuleInstance.h
+        src/context/runtime/FrameData.h
         src/engine/render-pass/AbstractRenderPass.cpp
         src/engine/render-pass/AbstractRenderPass.h
         src/engine/system/RenderPassSystem.cpp
         src/engine/system/RenderPassSystem.h
         src/engine/render-pass/impl/VoxelVisualizerRenderPass.cpp
         src/engine/render-pass/impl/VoxelVisualizerRenderPass.h
-        src/engine/service/core/texture/TextureService.cpp
-        src/engine/service/core/texture/TextureService.h
-        src/engine/service/core/texture/TextureInstance.h
-        src/engine/repository/resource/ResourceRepository.h
-        src/engine/service/AbstractResourceService.cpp
-        src/engine/service/AbstractResourceService.h
-        src/engine/service/core/framebuffer/FrameBufferAttachment.h
-        src/engine/core/CoreFrameBuffers.cpp
-        src/engine/core/CoreFrameBuffers.h
-        src/engine/core/AbstractCoreRepository.h
-        src/engine/core/AbstractCoreRepository.cpp
-        src/engine/core/CorePipelines.cpp
-        src/engine/core/CorePipelines.h
-        src/engine/service/core/framebuffer/FrameBufferService.cpp
-        src/engine/service/core/framebuffer/FrameBufferService.h
-        src/engine/service/core/framebuffer/FrameBufferInstance.h
-        src/engine/service/core/pipeline/PipelineService.cpp
-        src/engine/service/core/pipeline/PipelineService.h
-        src/engine/service/core/pipeline/PipelineInstance.h
-        src/engine/repository/backend/CommandPoolRepository.cpp
-        src/engine/repository/backend/CommandPoolRepository.h
-        src/engine/service/core/pools/CommandPoolService.cpp
-        src/engine/service/core/pools/CommandPoolService.h
-        src/engine/core/CoreBuffers.cpp
-        src/engine/core/CoreBuffers.h
-        src/engine/service/core/buffer/BufferService.cpp
-        src/engine/service/core/buffer/BufferService.h
-        src/engine/service/core/buffer/BufferInstance.h
-        src/engine/service/core/buffer/BufferType.h
-        src/engine/service/core/pools/CommandBufferInstance.h
-        src/engine/service/core/pools/CommandBufferInstance.cpp
+        src/context/service/TextureService.cpp
+        src/context/service/TextureService.h
+        src/context/runtime/TextureInstance.h
+        src/context/repository/ResourceRepository.h
+        src/common/interface/AbstractResourceService.cpp
+        src/common/interface/AbstractResourceService.h
+        src/context/runtime/FrameBufferAttachment.h
+        src/context/repository/CoreFrameBuffers.cpp
+        src/context/repository/CoreFrameBuffers.h
+        src/context/repository/AbstractCoreRepository.h
+        src/context/repository/AbstractCoreRepository.cpp
+        src/context/repository/CorePipelines.cpp
+        src/context/repository/CorePipelines.h
+        src/context/service/FrameBufferService.cpp
+        src/context/service/FrameBufferService.h
+        src/context/runtime/FrameBufferInstance.h
+        src/context/service/PipelineService.cpp
+        src/context/service/PipelineService.h
+        src/context/runtime/PipelineInstance.h
+        src/context/service/CommandService.cpp
+        src/context/service/CommandService.h
+        src/context/repository/CoreBuffers.cpp
+        src/context/repository/CoreBuffers.h
+        src/context/service/BufferService.cpp
+        src/context/service/BufferService.h
+        src/context/runtime/CommandBufferInstance.h
+        src/context/runtime/CommandBufferInstance.cpp
+        src/context/service/DescriptorService.cpp
+        src/context/service/DescriptorService.h
+        src/context/runtime/DescriptorInstance.cpp
+        src/context/runtime/DescriptorInstance.h
+        src/context/repository/GlobalDataUBO.h
+        src/engine/service/camera/CameraMovementService.cpp
+        src/engine/service/camera/CameraMovementService.h
+        src/engine/repository/RuntimeRepository.h
+        src/context/repository/CoreDescriptorSets.cpp
+        src/context/repository/CoreDescriptorSets.h
+        src/context/runtime/BufferInstance.cpp
+        src/context/runtime/BufferInstance.h
 )
 
 
@@ -149,6 +156,7 @@ find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Vulkan)
 find_package(VulkanMemoryAllocator CONFIG REQUIRED)
 find_package(glslang CONFIG REQUIRED)
+find_package(imguizmo CONFIG REQUIRED)
 set(COMMON_LIBRARIES
         glfw
         Vulkan::Headers
@@ -157,6 +165,7 @@ set(COMMON_LIBRARIES
         GPUOpen::VulkanMemoryAllocator
         glm::glm
         imgui::imgui
+        imguizmo::imguizmo
         spdlog::spdlog
         nlohmann_json::nlohmann_json
 

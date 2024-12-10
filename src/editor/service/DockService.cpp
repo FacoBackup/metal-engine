@@ -4,7 +4,7 @@
 #include "../common/AbstractPanel.h"
 #include "../ui/docks/AbstractDockPanel.h"
 #include "../ui/docks/DockSpacePanel.h"
-#include "../../common/runtime/ApplicationContext.h"
+#include "../../context/ApplicationContext.h"
 
 namespace Metal {
     DockService::DockService(ApplicationContext &context) : AbstractRuntimeComponent(context) {

@@ -10,13 +10,6 @@ namespace Metal {
     class AbstractDockPanel;
 
     class DockSpacePanel final : public AbstractPanel {
-        static constexpr int FLAGS = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_MenuBar;
-        static const ImVec2 DEFAULT;
-        static const ImVec2 MAX_SIZE;
-        static const ImVec2 PIVOT;
-        static const float FRAME_SIZE;
-        static const ImVec2 MIN_SIZE;
-
         ImVec2 padding{DEFAULT.x, DEFAULT.y};
         ImVec2 position{DEFAULT.x, DEFAULT.y};
         glm::vec2 size{};
@@ -31,10 +24,17 @@ namespace Metal {
         ImVec2 headerPadding{0, 3};
 
     public:
+        static constexpr int FLAGS = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_MenuBar;
+        static const ImVec2 DEFAULT;
+        static const ImVec2 MAX_SIZE;
+        static const ImVec2 PIVOT;
+        static const float FRAME_SIZE;
+        static const ImVec2 MIN_SIZE;
+
         explicit DockSpacePanel(DockSpacePanel *mainWindow, DockDTO *dock) : mainWindow(mainWindow), dock(dock) {
         }
 
-        [[nodiscard]] DockDTO * getDock() const {
+        [[nodiscard]] DockDTO *getDock() const {
             return dock;
         }
 

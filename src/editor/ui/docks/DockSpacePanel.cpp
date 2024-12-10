@@ -1,7 +1,7 @@
 #include "DockSpacePanel.h"
 
 #include "AbstractDockPanel.h"
-#include "../../../common/runtime/ApplicationContext.h"
+#include "../../../context/ApplicationContext.h"
 #include "../../../common/interface/Icons.h"
 #include "../../repository/dock/DockDTO.h"
 #include "../../common/UIUtil.h"

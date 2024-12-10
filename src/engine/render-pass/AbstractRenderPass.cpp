@@ -1,17 +1,21 @@
 #include "AbstractRenderPass.h"
-#include "../../common/runtime/ApplicationContext.h"
-#include "../service/core/pipeline/PipelineInstance.h"
-#include "../service/core/pools/CommandBufferInstance.h"
+#include "../../context/ApplicationContext.h"
+#include "../../context/runtime/PipelineInstance.h"
+#include "../../context/runtime/CommandBufferInstance.h"
 
 namespace Metal {
     AbstractRenderPass::AbstractRenderPass(ApplicationContext &context): AbstractRuntimeComponent(context),
                                                                          buffers(
-                                                                             context.getEngineContext().coreBuffers),
+                                                                             context.getVulkanContext().coreBuffers),
                                                                          pipelines(
-                                                                             context.getEngineContext().corePipelines),
+                                                                             context.getVulkanContext().corePipelines),
                                                                          frameBuffers(
-                                                                             context.getEngineContext().
+                                                                             context.getVulkanContext().
                                                                              coreFrameBuffers) {
+    }
+
+    void AbstractRenderPass::registerCommandBuffer(PipelineInstance *pipeline) {
+        context.getVulkanContext().getFrameData().commandBuffers.push_back(pipeline->commandBuffer->vkCommandBuffer);
     }
 
 } // Metal

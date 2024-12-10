@@ -1,6 +1,6 @@
 #include "InspectorPanel.h"
 #include "../../common/form/FormPanel.h"
-#include "../../../common/runtime/ApplicationContext.h"
+#include "../../../context/ApplicationContext.h"
 
 namespace Metal {
     void InspectorPanel::onInitialize() {

@@ -4,6 +4,8 @@
 namespace Metal {
     class Initializable {
     public:
+        virtual ~Initializable() = default;
+
         virtual void onInitialize() {}
     };
 }

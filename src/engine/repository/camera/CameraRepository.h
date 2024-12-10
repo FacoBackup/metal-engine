@@ -44,7 +44,7 @@ namespace Metal {
         glm::mat4x4 invSkyboxProjectionMatrix{};
 
         Frustum frustum{};
-        Camera currentCamera{};
+        Camera *currentCamera = nullptr;
 
         float lastMouseX = 0;
         float lastMouseY = 0;

@@ -1,10 +1,10 @@
 #define VMA_IMPLEMENTATION
-#include "common/runtime/ApplicationContext.h"
+#include "context/ApplicationContext.h"
 #include "editor/EditorPanel.h"
 
 int main(int, char **) {
     auto editorPanel = Metal::EditorPanel{};
-    Metal::ApplicationContext context{editorPanel};
+    Metal::ApplicationContext context{editorPanel, true};
     editorPanel.setContext(&context);
 
     if (!context.isValidContext()) {
