@@ -15,7 +15,7 @@ namespace Metal {
 
         void addLayoutBinding(DescriptorInstance *instance, VkShaderStageFlagBits stageFlags,
                               VkDescriptorType descriptorType,
-                              unsigned int bindingPoint);
+                              unsigned int bindingPoint) const;
     };
 } // Metal
 

@@ -5,8 +5,10 @@
 #include "RuntimeResource.h"
 
 namespace Metal {
+    class BufferInstance;
+
     struct DescriptorInstance final : RuntimeResource {
-        VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
+        VkDescriptorSetLayout vkDescriptorSetLayout = VK_NULL_HANDLE;
         VkDescriptorSet vkDescriptorSet = VK_NULL_HANDLE;
         bool ready = false;
 
@@ -14,7 +16,7 @@ namespace Metal {
 
         void create(const VulkanContext &context, VkDescriptorPool pool);
 
-        void addBufferDescriptor(uint32_t bindingPoint, VkDescriptorType type, VkBuffer buffer, uint64_t offset);
+        void addBufferDescriptor(uint32_t bindingPoint, VkDescriptorType type, BufferInstance *bufferInstance);
 
         void addImageDescriptor(uint32_t bindingPoint, VkDescriptorType type, VkSampler sampler, VkImageView view);
 

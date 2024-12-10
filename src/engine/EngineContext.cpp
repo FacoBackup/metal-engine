@@ -4,7 +4,6 @@
 #include "../context/runtime/BufferInstance.h"
 
 namespace Metal {
-
     void EngineContext::dispose() const {
         for (auto &resource: resourceRepository.resources) {
             resource.second->dispose(context.getVulkanContext());
@@ -33,6 +32,7 @@ namespace Metal {
             globalDataUBO.viewProj = cameraRepository.viewProjectionMatrix;
             globalDataUBO.invProj = cameraRepository.invProjectionMatrix;
             globalDataUBO.invView = cameraRepository.invViewMatrix;
+            globalDataUBO.color = {1, 0, 1, 1};
 
             context.getVulkanContext().coreBuffers.globalData->writeToBuffer(&globalDataUBO);
             context.getVulkanContext().coreBuffers.globalData->flush();

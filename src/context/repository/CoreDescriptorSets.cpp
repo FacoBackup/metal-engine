@@ -14,7 +14,8 @@ namespace Metal {
         service.addLayoutBinding(debugDescriptor, VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0);
 
         currentFrameImageDescriptor = service.createDescriptor();
-        service.addLayoutBinding(currentFrameImageDescriptor, VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
+        service.addLayoutBinding(currentFrameImageDescriptor, VK_SHADER_STAGE_FRAGMENT_BIT,
+                                 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
     }
 
     void CoreDescriptorSets::createDescriptors() const {
@@ -26,13 +27,15 @@ namespace Metal {
 
     void CoreDescriptorSets::writeBindings() const {
         debugDescriptor->addBufferDescriptor(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                             context.getVulkanContext().coreBuffers.globalData->getBuffer(), 0);
+                                             context.getVulkanContext().coreBuffers.globalData);
         debugDescriptor->write(context.getVulkanContext());
 
 
         currentFrameImageDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                        context.getVulkanContext().coreFrameBuffers.auxRenderPass->attachments[0]->vkImageSampler,
-                                                        context.getVulkanContext().coreFrameBuffers.auxRenderPass->attachments[0]->vkImageView);
+                                                        context.getVulkanContext().coreFrameBuffers.auxRenderPass->
+                                                        attachments[0]->vkImageSampler,
+                                                        context.getVulkanContext().coreFrameBuffers.auxRenderPass->
+                                                        attachments[0]->vkImageView);
         currentFrameImageDescriptor->write(context.getVulkanContext());
     }
 } // Metal

@@ -10,13 +10,13 @@ namespace Metal {
     }
 
     void DescriptorService::addLayoutBinding(DescriptorInstance *instance, VkShaderStageFlagBits stageFlags,
-                                             VkDescriptorType descriptorType, uint32_t bindingPoint) {
+                                             VkDescriptorType descriptorType, uint32_t bindingPoint) const {
         auto &samplerLayoutBinding = instance->descriptorSetLayoutBindings.emplace_back();
-        samplerLayoutBinding.binding = bindingPoint; // Binding index in the shader
+        samplerLayoutBinding.binding = bindingPoint;
         samplerLayoutBinding.descriptorType = descriptorType;
-        samplerLayoutBinding.descriptorCount = 1; // Single texture
-        samplerLayoutBinding.stageFlags = stageFlags; // Used in fragment shader
-        samplerLayoutBinding.pImmutableSamplers = nullptr; // Set this if you're using immutable samplers
+        samplerLayoutBinding.descriptorCount = 1;
+        samplerLayoutBinding.stageFlags = stageFlags;
+        samplerLayoutBinding.pImmutableSamplers = nullptr;
         context.getVulkanContext().registerDescriptorBinding(descriptorType);
     }
 

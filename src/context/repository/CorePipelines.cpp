@@ -8,9 +8,10 @@
 
 namespace Metal {
     void CorePipelines::onInitialize() {
+        const std::vector descriptors = {context.getVulkanContext().coreDescriptorSets.debugDescriptor};
         debugPipeline = pipelineService.createRenderingPipeline(
             context.getVulkanContext().coreFrameBuffers.auxRenderPass, "resources/shaders/QUAD.vert",
-            "resources/shaders/DEBUG.frag", context.getVulkanContext().coreDescriptorSets.debugDescriptor);
+            "resources/shaders/DEBUG.frag", descriptors);
 
         debugPipeline->commandBuffer->startMapping();
         vkCmdDraw(debugPipeline->commandBuffer->vkCommandBuffer, 3, 1, 0, 0);

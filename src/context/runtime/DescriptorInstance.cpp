@@ -1,11 +1,13 @@
 #include "DescriptorInstance.h"
+
+#include "BufferInstance.h"
 #include "../VulkanContext.h"
 #include "../../common/util/VulkanUtils.h"
 
 namespace Metal {
     void DescriptorInstance::dispose(VulkanContext &context) {
         if (ready)
-            vkDestroyDescriptorSetLayout(context.device.device, descriptorSetLayout, nullptr);
+            vkDestroyDescriptorSetLayout(context.device.device, vkDescriptorSetLayout, nullptr);
     }
 
     void DescriptorInstance::create(const VulkanContext &context, VkDescriptorPool pool) {
@@ -19,29 +21,29 @@ namespace Metal {
 
         VulkanUtils::CheckVKResult(vkCreateDescriptorSetLayout(context.device.device, &layoutInfo,
                                                                nullptr,
-                                                               &descriptorSetLayout));
+                                                               &vkDescriptorSetLayout));
 
         VkDescriptorSetAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         allocInfo.descriptorPool = pool; // Created during setup
         allocInfo.descriptorSetCount = 1;
-        allocInfo.pSetLayouts = &descriptorSetLayout;
+        allocInfo.pSetLayouts = &vkDescriptorSetLayout;
 
         VulkanUtils::CheckVKResult(vkAllocateDescriptorSets(context.device.device, &allocInfo, &vkDescriptorSet));
         ready = true;
     }
 
-    void DescriptorInstance::addBufferDescriptor(const uint32_t bindingPoint, VkDescriptorType type, VkBuffer buffer,
-                                                 uint64_t offset) {
+    void DescriptorInstance::addBufferDescriptor(const uint32_t bindingPoint, VkDescriptorType type,
+                                                 BufferInstance *bufferInstance) {
         if (!ready) {
             throw std::runtime_error("Descriptor instance is not ready");
         }
 
         auto &bufferInfo = bufferInfos.emplace_back();
 
-        bufferInfo.buffer = buffer;
+        bufferInfo.buffer = bufferInstance->getBuffer();
         bufferInfo.range = VK_WHOLE_SIZE;
-        bufferInfo.offset = offset;
+        bufferInfo.offset = 0;
 
         VkWriteDescriptorSet descriptorWrite{};
         descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

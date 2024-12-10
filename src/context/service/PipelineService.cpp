@@ -9,7 +9,8 @@ namespace Metal {
     PipelineInstance *PipelineService::createRenderingPipeline(FrameBufferInstance *frameBuffer,
                                                                const char *vertexShader,
                                                                const char *fragmentShader,
-                                                               DescriptorInstance* descriptor) const {
+                                                               const std::vector<DescriptorInstance *> &descriptor)
+    const {
         auto *pipeline = new PipelineInstance();
         pipeline->frameBuffer = frameBuffer;
         pipeline->fragmentShader = context.getVulkanContext().shaderService.createShaderModule(fragmentShader);
@@ -97,16 +98,19 @@ namespace Metal {
         VkPipelineLayoutCreateInfo layoutInfo = {};
         layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 
-        if (descriptor != nullptr) {
-            layoutInfo.setLayoutCount = 0;
-            layoutInfo.pSetLayouts = &descriptor->descriptorSetLayout;
-        }else {
-            layoutInfo.setLayoutCount = 0;
-            layoutInfo.pSetLayouts = nullptr;
+        // BIND LAYOUTS
+        std::vector<VkDescriptorSetLayout> descriptorLayouts;
+        descriptorLayouts.resize(descriptor.size());
+        for (int i = 0; i < descriptor.size(); i++) {
+            descriptorLayouts[i] = descriptor[i]->vkDescriptorSetLayout;
         }
+        layoutInfo.pSetLayouts = descriptorLayouts.data();
+        layoutInfo.setLayoutCount = descriptorLayouts.size();
 
         VulkanUtils::CheckVKResult(vkCreatePipelineLayout(vulkanContext.device.device, &layoutInfo, nullptr,
                                                           &pipeline->vkPipelineLayout));
+        // BIND LAYOUTS
+
 
         VkGraphicsPipelineCreateInfo pipelineCreateInfo = {};
         pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;

@@ -1,5 +1,7 @@
 #ifndef PIPELINESERVICE_H
 #define PIPELINESERVICE_H
+#include <vector>
+
 #include "../../common/interface/AbstractResourceService.h"
 
 namespace Metal {
@@ -15,7 +17,7 @@ namespace Metal {
 
         PipelineInstance *createRenderingPipeline(FrameBufferInstance *frameBuffer, const char *vertexShader,
                                                   const char *fragmentShader,
-                                                  DescriptorInstance *descriptor) const;
+                                                  const std::vector<DescriptorInstance*> &descriptor) const;
     };
 } // Metal
 
