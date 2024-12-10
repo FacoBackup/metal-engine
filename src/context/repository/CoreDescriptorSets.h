@@ -18,8 +18,6 @@ namespace Metal {
 
         void onInitialize() override;
 
-        void writeBindings() const;
-
         void createDescriptors() const;
     };
 } // Metal

@@ -17,7 +17,8 @@ namespace Metal {
 
         PipelineInstance *createRenderingPipeline(FrameBufferInstance *frameBuffer, const char *vertexShader,
                                                   const char *fragmentShader,
-                                                  const std::vector<DescriptorInstance*> &descriptor) const;
+                                                  const std::vector<DescriptorInstance *> &descriptor,
+                                                  uint32_t pushConstantsSize = 0) const;
     };
 } // Metal
 

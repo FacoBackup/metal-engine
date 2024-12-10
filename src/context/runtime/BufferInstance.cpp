@@ -3,6 +3,8 @@
 #include <cassert>
 #include <cstring>
 
+#include "../../common/util/VulkanUtils.h"
+
 // THANKS TO https://github.com/blurrypiano/littleVulkanEngine/blob/master/littleVulkanEngine/tutorial19
 namespace Metal {
     /**
@@ -12,7 +14,6 @@ namespace Metal {
      * @param minOffsetAlignment The minimum required alignment, in bytes, for the offset member (eg
      * minUniformBufferOffsetAlignment)
      *
-     * @return VkResult of the vkBuffer mapping call
      */
     VkDeviceSize BufferInstance::getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment) {
         if (minOffsetAlignment > 0) {
@@ -22,17 +23,17 @@ namespace Metal {
     }
 
     BufferInstance::BufferInstance(
-            VkDevice device,
-            VkDeviceSize instanceSize,
-            uint32_t instanceCount,
-            VkBufferUsageFlags usageFlags,
-            VkMemoryPropertyFlags memoryPropertyFlags,
-            VkDeviceSize minOffsetAlignment)
-            : vkDevice(device),
-              vkInstanceSize{instanceSize},
-              instanceCount{instanceCount},
-              vkUsageFlags{usageFlags},
-              vkMemoryPropertyFlags{memoryPropertyFlags} {
+        VkDevice device,
+        VkDeviceSize instanceSize,
+        uint32_t instanceCount,
+        VkBufferUsageFlags usageFlags,
+        VkMemoryPropertyFlags memoryPropertyFlags,
+        VkDeviceSize minOffsetAlignment)
+        : vkDevice(device),
+          vkInstanceSize{instanceSize},
+          instanceCount{instanceCount},
+          vkUsageFlags{usageFlags},
+          vkMemoryPropertyFlags{memoryPropertyFlags} {
         vkAlignmentSize = getAlignment(instanceSize, minOffsetAlignment);
         vkBufferSize = vkAlignmentSize * instanceCount;
     }
@@ -44,11 +45,10 @@ namespace Metal {
      * vkBuffer range.
      * @param offset (Optional) Byte offset from beginning
      *
-     * @return VkResult of the vkBuffer mapping call
      */
-    VkResult BufferInstance::map(VkDeviceSize size, VkDeviceSize offset) {
+    void BufferInstance::map(VkDeviceSize size, VkDeviceSize offset) {
         assert(vkBuffer && vkDeviceMemory && "Called map on vkBuffer before create");
-        return vkMapMemory(vkDevice, vkDeviceMemory, offset, size, 0, &mapped);
+        VulkanUtils::CheckVKResult(vkMapMemory(vkDevice, vkDeviceMemory, offset, size, 0, &mapped));
     }
 
     /**
@@ -72,13 +72,13 @@ namespace Metal {
      * @param offset (Optional) Byte offset from beginning of mapped region
      *
      */
-    void BufferInstance::writeToBuffer(void *data, VkDeviceSize size, VkDeviceSize offset) {
+    void BufferInstance::writeToBuffer(const void *data, VkDeviceSize size, VkDeviceSize offset) const {
         assert(mapped && "Cannot copy to unmapped vkBuffer");
 
         if (size == VK_WHOLE_SIZE) {
             memcpy(mapped, data, vkBufferSize);
-        } else {
-            char *memOffset = (char *) mapped;
+        } else if (mapped) {
+            auto memOffset = static_cast<char *>(mapped);
             memOffset += offset;
             memcpy(memOffset, data, size);
         }
@@ -92,16 +92,14 @@ namespace Metal {
      * @param size (Optional) Size of the vkDeviceMemory range to flush. Pass VK_WHOLE_SIZE to flush the
      * complete vkBuffer range.
      * @param offset (Optional) Byte offset from beginning
-     *
-     * @return VkResult of the flush call
      */
-    VkResult BufferInstance::flush(VkDeviceSize size, VkDeviceSize offset) {
+    void BufferInstance::flush(VkDeviceSize size, VkDeviceSize offset) const {
         VkMappedMemoryRange mappedRange = {};
         mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
         mappedRange.memory = vkDeviceMemory;
         mappedRange.offset = offset;
         mappedRange.size = size;
-        return vkFlushMappedMemoryRanges(vkDevice, 1, &mappedRange);
+        VulkanUtils::CheckVKResult(vkFlushMappedMemoryRanges(vkDevice, 1, &mappedRange));
     }
 
     /**
@@ -112,16 +110,14 @@ namespace Metal {
      * @param size (Optional) Size of the vkDeviceMemory range to invalidate. Pass VK_WHOLE_SIZE to invalidate
      * the complete vkBuffer range.
      * @param offset (Optional) Byte offset from beginning
-     *
-     * @return VkResult of the invalidate call
      */
-    VkResult BufferInstance::invalidate(VkDeviceSize size, VkDeviceSize offset) {
+    void BufferInstance::invalidate(VkDeviceSize size, VkDeviceSize offset) const {
         VkMappedMemoryRange mappedRange = {};
         mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
         mappedRange.memory = vkDeviceMemory;
         mappedRange.offset = offset;
         mappedRange.size = size;
-        return vkInvalidateMappedMemoryRanges(vkDevice, 1, &mappedRange);
+        VulkanUtils::CheckVKResult(vkInvalidateMappedMemoryRanges(vkDevice, 1, &mappedRange));
     }
 
     /**
@@ -134,9 +130,9 @@ namespace Metal {
      */
     VkDescriptorBufferInfo BufferInstance::descriptorInfo(VkDeviceSize size, VkDeviceSize offset) {
         return VkDescriptorBufferInfo{
-                vkBuffer,
-                offset,
-                size,
+            vkBuffer,
+            offset,
+            size,
         };
     }
 
@@ -157,7 +153,7 @@ namespace Metal {
      * @param index Used in offset calculation
      *
      */
-    VkResult BufferInstance::flushIndex(int index) { return flush(vkAlignmentSize, index * vkAlignmentSize); }
+    void BufferInstance::flushIndex(const int index) const { flush(vkAlignmentSize, index * vkAlignmentSize); }
 
     /**
      * Create a vkBuffer info descriptor
@@ -176,11 +172,9 @@ namespace Metal {
      * @note Only required for non-coherent vkDeviceMemory
      *
      * @param index Specifies the region to invalidate: index * vkAlignmentSize
-     *
-     * @return VkResult of the invalidate call
      */
-    VkResult BufferInstance::invalidateIndex(int index) {
-        return invalidate(vkAlignmentSize, index * vkAlignmentSize);
+    void BufferInstance::invalidateIndex(const int index) const {
+        invalidate(vkAlignmentSize, index * vkAlignmentSize);
     }
 
     void BufferInstance::dispose(VulkanContext &context) {

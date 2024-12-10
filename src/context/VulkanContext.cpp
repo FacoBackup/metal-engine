@@ -227,7 +227,6 @@ namespace Metal {
         coreDescriptorSets.onInitialize();
         createDescriptorPool();
         coreDescriptorSets.createDescriptors();
-        coreDescriptorSets.writeBindings();
         corePipelines.onInitialize();
         // ------- REPOSITORY INITIALIZATION
     }

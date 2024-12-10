@@ -9,9 +9,10 @@ namespace Metal {
     PipelineInstance *PipelineService::createRenderingPipeline(FrameBufferInstance *frameBuffer,
                                                                const char *vertexShader,
                                                                const char *fragmentShader,
-                                                               const std::vector<DescriptorInstance *> &descriptor)
-    const {
+                                                               const std::vector<DescriptorInstance *> &descriptor,
+                                                               const uint32_t pushConstantsSize) const {
         auto *pipeline = new PipelineInstance();
+        pipeline->pushConstantsSize = pushConstantsSize;
         pipeline->frameBuffer = frameBuffer;
         pipeline->fragmentShader = context.getVulkanContext().shaderService.createShaderModule(fragmentShader);
         pipeline->vertexShader = context.getVulkanContext().shaderService.createShaderModule(vertexShader);
@@ -95,10 +96,10 @@ namespace Metal {
             .pAttachments = &BlendAttachState
         };
 
-        VkPipelineLayoutCreateInfo layoutInfo = {};
-        layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 
         // BIND LAYOUTS
+        VkPipelineLayoutCreateInfo layoutInfo = {};
+        layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         std::vector<VkDescriptorSetLayout> descriptorLayouts;
         descriptorLayouts.resize(descriptor.size());
         for (int i = 0; i < descriptor.size(); i++) {
@@ -106,6 +107,15 @@ namespace Metal {
         }
         layoutInfo.pSetLayouts = descriptorLayouts.data();
         layoutInfo.setLayoutCount = descriptorLayouts.size();
+
+        if (pushConstantsSize > 0) {
+            VkPushConstantRange pushConstantRange{};
+            pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+            pushConstantRange.offset = 0;
+            pushConstantRange.size = pushConstantsSize;
+            layoutInfo.pushConstantRangeCount = 1;
+            layoutInfo.pPushConstantRanges = &pushConstantRange;
+        }
 
         VulkanUtils::CheckVKResult(vkCreatePipelineLayout(vulkanContext.device.device, &layoutInfo, nullptr,
                                                           &pipeline->vkPipelineLayout));

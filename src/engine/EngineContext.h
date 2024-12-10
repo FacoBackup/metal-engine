@@ -23,7 +23,7 @@ namespace Metal {
         }
 
         float deltaTime = 0;
-        bool globalDataNeedsUpdate = false;
+        bool globalDataNeedsUpdate = true;
 
         // ----------- SYSTEMS / SERVICE
         CameraMovementService cameraMovementService{context};

@@ -12,12 +12,16 @@ namespace Metal {
         VkCommandBuffer vkCommandBuffer = VK_NULL_HANDLE;
         PipelineInstance *pipeline = nullptr;
 
-        void startMapping();
+        void startRecording();
 
-        void stopMapping() const;
+        void stopRecording() const;
 
         void dispose(VulkanContext &context) override {
         }
+
+        void recordPushConstant(void *data) const;
+
+        void recordDrawSimpleInstanced(uint32_t vertexCount, uint32_t instanceCount) const;
     };
 }
 #endif //COMMANDBUFFERINSTANCE_H

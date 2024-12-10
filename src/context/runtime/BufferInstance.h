@@ -37,25 +37,25 @@ namespace Metal {
 
         BufferInstance &operator=(const BufferInstance &) = delete;
 
-        VkResult map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
+        void map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
 
         void unmap();
 
-        void writeToBuffer(void *data, VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
+        void writeToBuffer(const void *data, VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0) const;
 
-        VkResult flush(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
+        void flush(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0) const;
 
         VkDescriptorBufferInfo descriptorInfo(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
 
-        VkResult invalidate(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
+        void invalidate(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0) const;
 
         void writeToIndex(void *data, int index);
 
-        VkResult flushIndex(int index);
+        void flushIndex(int index) const;
 
         VkDescriptorBufferInfo descriptorInfoForIndex(int index);
 
-        VkResult invalidateIndex(int index);
+        void invalidateIndex(int index) const;
 
         [[nodiscard]] VkBuffer &getBuffer() { return vkBuffer; }
 

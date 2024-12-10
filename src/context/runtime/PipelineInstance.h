@@ -16,6 +16,7 @@ namespace Metal {
         ShaderModuleInstance *fragmentShader = nullptr;
         CommandBufferInstance *commandBuffer = nullptr;
         VkDescriptorSet descriptorSet = VK_NULL_HANDLE; // TODO - Pointer to a list of DescriptorInstance; allow multiple descriptor sets for a given pipeline
+        uint32_t pushConstantsSize = 0;
 
         void dispose(VulkanContext &context) override {
             vkDestroyPipelineLayout(context.device.device, vkPipelineLayout, nullptr);

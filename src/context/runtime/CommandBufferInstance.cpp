@@ -4,7 +4,7 @@
 #include "FrameBufferInstance.h"
 
 namespace Metal {
-    void CommandBufferInstance::startMapping() {
+    void CommandBufferInstance::startRecording() {
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         vkBeginCommandBuffer(vkCommandBuffer, &beginInfo);
@@ -22,18 +22,32 @@ namespace Metal {
         vkCmdBindPipeline(vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->vkPipeline);
         if (pipeline->descriptorSet != VK_NULL_HANDLE) {
             vkCmdBindDescriptorSets(vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->vkPipelineLayout,
-                                    0,  // firstSet
-                                    1,  // descriptorSetCount
+                                    0, // firstSet
+                                    1, // descriptorSetCount
                                     &pipeline->descriptorSet,
-                                    0,	// dynamicOffsetCount
-                                    nullptr);	// pDynamicOffsets
+                                    0, // dynamicOffsetCount
+                                    nullptr); // pDynamicOffsets
         }
 
         vkCmdBeginRenderPass(vkCommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     }
 
-    void CommandBufferInstance::stopMapping() const {
+    void CommandBufferInstance::stopRecording() const {
         vkCmdEndRenderPass(vkCommandBuffer);
         vkEndCommandBuffer(vkCommandBuffer);
+    }
+
+    void CommandBufferInstance::recordPushConstant(void *data) const {
+        vkCmdPushConstants(
+            vkCommandBuffer,
+            pipeline->vkPipelineLayout,
+            VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+            0,
+            pipeline->pushConstantsSize,
+            data);
+    }
+
+    void CommandBufferInstance::recordDrawSimpleInstanced(const uint32_t vertexCount, const uint32_t instanceCount) const {
+        vkCmdDraw(vkCommandBuffer, vertexCount, instanceCount, 0, 0);
     }
 }
