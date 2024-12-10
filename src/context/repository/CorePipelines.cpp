@@ -8,12 +8,11 @@
 
 namespace Metal {
     void CorePipelines::onInitialize() {
-        const std::vector descriptors = {context.getVulkanContext().coreDescriptorSets.debugDescriptor};
         debugPipeline = pipelineService.createRenderingPipeline(
             context.getVulkanContext().coreFrameBuffers.auxRenderPass,
             "resources/shaders/QUAD.vert",
             "resources/shaders/DEBUG.frag",
-            descriptors,
+            {context.getVulkanContext().coreDescriptorSets.debugDescriptor},
             sizeof(glm::vec4));
 
         debugPipeline->commandBuffer->startRecording();

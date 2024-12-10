@@ -10,17 +10,17 @@ namespace Metal {
     struct BufferInstance;
 
     class BufferService final : public AbstractResourceService {
-        uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
+        [[nodiscard]] uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
 
-        void createVkBuffer(BufferInstance *instance, VkMemoryPropertyFlags properties) const;
+        void createVkBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
+                            BufferInstance *buffer) const;
 
     public:
         explicit BufferService(ApplicationContext &context)
             : AbstractResourceService(context) {
         }
 
-        [[nodiscard]] BufferInstance *createBuffer(VkDeviceSize instanceSize,
-                                                   uint32_t instanceCount,
+        [[nodiscard]] BufferInstance *createBuffer(VkDeviceSize bufferSize,
                                                    VkBufferUsageFlags usageFlags,
                                                    VkMemoryPropertyFlags memoryPropertyFlags) const;
     };

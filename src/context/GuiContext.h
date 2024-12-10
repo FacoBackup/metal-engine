@@ -3,19 +3,12 @@
 
 #include "GLFWContext.h"
 #include "../common/interface/AbstractRuntimeComponent.h"
-#include "runtime/FrameData.h"
 
 namespace Metal {
     class GuiContext final : public AbstractRuntimeComponent {
         static void applySpacing();
 
         static void applyFonts();
-
-        void updateFrameData() const;
-
-        void recordCommandBuffer() const;
-
-        void frameRender() const;
 
         ImDrawData *drawData = nullptr;
     public:

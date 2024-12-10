@@ -40,7 +40,7 @@ namespace Metal {
         }
 
         auto &bufferInfo = bufferInfos.emplace_back();
-        bufferInfo.buffer = bufferInstance->getBuffer();
+        bufferInfo.buffer = bufferInstance->vkBuffer;
         bufferInfo.range = VK_WHOLE_SIZE;
         bufferInfo.offset = 0;
 

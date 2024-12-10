@@ -244,6 +244,8 @@ namespace Metal {
     void VulkanContext::createDescriptorPool() {
         // IMGUI REQUIREMENT
         registerDescriptorBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+        registerDescriptorSet();
+        // IMGUI REQUIREMENT
 
         std::vector<VkDescriptorPoolSize> sizes{};
         sizes.reserve(descriptorPoolSizes.size());
@@ -256,7 +258,7 @@ namespace Metal {
         poolInfo.poolSizeCount = sizes.size();
         poolInfo.pPoolSizes = sizes.data();
         poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-        poolInfo.maxSets = maxDescriptorSets + 1;
+        poolInfo.maxSets = maxDescriptorSets;
 
         VulkanUtils::CheckVKResult(vkCreateDescriptorPool(device.device, &poolInfo,
                                                           nullptr, &context.getVulkanContext().descriptorPool));
