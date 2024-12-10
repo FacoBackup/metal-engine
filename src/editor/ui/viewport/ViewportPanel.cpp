@@ -1,13 +1,15 @@
 #include "ViewportPanel.h"
-
-#include "../../../common/runtime/ApplicationContext.h"
-#include "../../../engine/service/core/descriptor/DescriptorInstance.h"
+#include "ImGuizmo.h"
+#include "../../../context/ApplicationContext.h"
+#include "../../../context/runtime/DescriptorInstance.h"
 
 namespace Metal {
     void ViewportPanel::onSync() {
         ImGui::Text("Viewport");
-        ImGui::Image(reinterpret_cast<ImTextureID>(context->getEngineContext().descriptor->descriptorSet),
-                     ImVec2(800, 600));
+        ImGui::Image(
+            reinterpret_cast<ImTextureID>(context->getVulkanContext().coreDescriptorSets.currentFrameImageDescriptor->
+                vkDescriptorSet),
+            ImVec2(800, 600));
     }
 
     void ViewportPanel::updateCamera() {
@@ -17,7 +19,8 @@ namespace Metal {
 
         auto *camera = editorRepository.viewportCamera[dock->id];
         if (camera == nullptr) {
-            editorRepository.viewportCamera.insert({dock->id, new Camera{}});
+            camera = new Camera{};
+            editorRepository.viewportCamera.insert({dock->id, camera});
             camera->pitch = -(glm::pi<float>() / 4);
             camera->yaw = glm::pi<float>() / 4;
             camera->position.x = 10;

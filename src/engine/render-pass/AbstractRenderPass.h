@@ -11,6 +11,7 @@ namespace Metal {
     struct FrameData;
     struct CoreFrameBuffers;
     struct CorePipelines;
+    struct PipelineInstance;
     struct CoreBuffers;
 
     class AbstractRenderPass : public AbstractRuntimeComponent {
@@ -21,6 +22,8 @@ namespace Metal {
 
     public:
         explicit AbstractRenderPass(ApplicationContext &context);
+
+        void registerCommandBuffer(PipelineInstance *pipeline);
     };
 }
 

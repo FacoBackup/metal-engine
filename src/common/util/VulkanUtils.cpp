@@ -6,7 +6,7 @@ namespace Metal {
     void VulkanUtils::CheckVKResult(VkResult err) {
         if (err == VK_SUCCESS)
             return;
-        fprintf(stderr, "[vulkan] Error: VkResult = %d\n", err);
+        printf("[runtime] Error: VkResult = %d\n", err);
         if (err < VK_SUCCESS)
             abort();
     }

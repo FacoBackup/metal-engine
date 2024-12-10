@@ -1,6 +1,6 @@
 #include "CameraMovementService.h"
 
-#include "../../../common/runtime/ApplicationContext.h"
+#include "../../../context/ApplicationContext.h"
 #include "../../repository/camera/Camera.h"
 
 namespace Metal {

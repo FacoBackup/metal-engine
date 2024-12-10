@@ -1,6 +1,6 @@
 #include "EditorPanel.h"
 #include "common/UIUtil.h"
-#include "../common/runtime/ApplicationContext.h"
+#include "../context/ApplicationContext.h"
 
 namespace Metal {
     int EditorPanel::FLAGS = ImGuiWindowFlags_NoDocking |

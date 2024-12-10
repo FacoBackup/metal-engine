@@ -1,16 +1,17 @@
 #include "CameraSystem.h"
-#include "../../../common/runtime/ApplicationContext.h"
-#include "../../service/core/buffer/BufferInstance.h"
+#include "../../../context/ApplicationContext.h"
 
 namespace Metal {
     void CameraSystem::onSync() {
         const auto &repository = context.getEngineContext().cameraRepository;
         camera = repository.currentCamera;
-        updateAspectRatio();
-        if (camera->isNotFrozen()) {
-            updateMatrices();
-            context.getEngineContext().globalDataNeedsUpdate = true;
-            camera->freezeVersion();
+        if (camera != nullptr) {
+            updateAspectRatio();
+            if (camera->isNotFrozen()) {
+                updateMatrices();
+                context.getEngineContext().globalDataNeedsUpdate = true;
+                camera->freezeVersion();
+            }
         }
     }
 

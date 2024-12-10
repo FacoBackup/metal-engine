@@ -1,6 +1,6 @@
 #include "ThemeService.h"
 
-#include "../../common/runtime/ApplicationContext.h"
+#include "../../context/ApplicationContext.h"
 
 namespace Metal {
     glm::vec3 ThemeService::BACKGROUND_COLOR = glm::vec3(0.f);
