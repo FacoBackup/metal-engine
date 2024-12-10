@@ -25,18 +25,14 @@ namespace Metal {
         cameraSystem.onSync();
         if (globalDataNeedsUpdate) {
             globalDataNeedsUpdate = false;
-            // globalDataUBO.proj = cameraRepository.projectionMatrix;
-            // globalDataUBO.view = cameraRepository.viewMatrix;
-            // globalDataUBO.viewProj = cameraRepository.viewProjectionMatrix;
-            // globalDataUBO.invProj = cameraRepository.invProjectionMatrix;
-            // globalDataUBO.invView = cameraRepository.invViewMatrix;
+            globalDataUBO.proj = cameraRepository.projectionMatrix;
+            globalDataUBO.view = cameraRepository.viewMatrix;
+            globalDataUBO.viewProj = cameraRepository.viewProjectionMatrix;
+            globalDataUBO.invProj = cameraRepository.invProjectionMatrix;
+            globalDataUBO.invView = cameraRepository.invViewMatrix;
             globalDataUBO.color = {1, 0, 1};
             context.getVulkanContext().coreBuffers.globalData->update(&globalDataUBO);
         }
         renderPassSystem.onSync();
-    }
-
-    ResourceRepository &EngineContext::getResourceRepository() {
-        return resourceRepository;
     }
 }

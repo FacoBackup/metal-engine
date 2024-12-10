@@ -34,9 +34,10 @@ namespace Metal {
             if (guiContext.beginFrame()) {
                 continue;
             }
-            engineContext.onSync();
             rootPanel.onSync();
+            engineContext.onSync();
             guiContext.endFrame();
+
         }
         guiContext.dispose();
     }

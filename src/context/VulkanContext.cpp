@@ -144,7 +144,7 @@ namespace Metal {
             const auto &sysInfo = sysInfoResult.value();
             if (sysInfo.validation_layers_available && debugMode) {
                 if (sysInfo.is_layer_available("VK_LAYER_LUNARG_api_dump")) {
-                    // instanceBuilder.enable_layer("VK_LAYER_LUNARG_api_dump");
+                    instanceBuilder.enable_layer("VK_LAYER_LUNARG_api_dump");
                 }
                 instanceBuilder.enable_validation_layers();
                 instanceBuilder.request_validation_layers();

@@ -5,6 +5,8 @@
 
 namespace Metal {
     void ViewportPanel::onSync() {
+        updateInputs();
+        updateCamera();
         ImGui::Text("Viewport");
         ImGui::Image(
             reinterpret_cast<ImTextureID>(context->getVulkanContext().coreDescriptorSets.currentFrameImageDescriptor->
@@ -20,7 +22,7 @@ namespace Metal {
         auto *camera = editorRepository.viewportCamera[dock->id];
         if (camera == nullptr) {
             camera = new Camera{};
-            editorRepository.viewportCamera.insert({dock->id, camera});
+            editorRepository.viewportCamera[dock->id] = camera;
             camera->pitch = -(glm::pi<float>() / 4);
             camera->yaw = glm::pi<float>() / 4;
             camera->position.x = 10;
