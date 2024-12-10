@@ -33,7 +33,6 @@ namespace Metal {
             globalDataUBO.invProj = cameraRepository.invProjectionMatrix;
             globalDataUBO.invView = cameraRepository.invViewMatrix;
             globalDataUBO.color = {1, 0, 1, 1};
-
             context.getVulkanContext().coreBuffers.globalData->writeToBuffer(&globalDataUBO);
             context.getVulkanContext().coreBuffers.globalData->flush();
         }

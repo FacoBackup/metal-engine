@@ -10,6 +10,5 @@ namespace Metal {
                                                 1,
                                                 VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-        globalData->map();
     }
 }

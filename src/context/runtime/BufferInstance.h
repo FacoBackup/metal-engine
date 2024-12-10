@@ -45,15 +45,11 @@ namespace Metal {
 
         void flush(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0) const;
 
-        VkDescriptorBufferInfo descriptorInfo(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
-
         void invalidate(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0) const;
 
         void writeToIndex(void *data, int index);
 
         void flushIndex(int index) const;
-
-        VkDescriptorBufferInfo descriptorInfoForIndex(int index);
 
         void invalidateIndex(int index) const;
 

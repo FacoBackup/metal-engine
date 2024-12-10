@@ -9,7 +9,7 @@ namespace Metal {
     PipelineInstance *PipelineService::createRenderingPipeline(FrameBufferInstance *frameBuffer,
                                                                const char *vertexShader,
                                                                const char *fragmentShader,
-                                                               const std::vector<DescriptorInstance *> &descriptor,
+                                                               const std::vector<DescriptorInstance *> &descriptors,
                                                                const uint32_t pushConstantsSize) const {
         auto *pipeline = new PipelineInstance();
         pipeline->pushConstantsSize = pushConstantsSize;
@@ -101,9 +101,9 @@ namespace Metal {
         VkPipelineLayoutCreateInfo layoutInfo = {};
         layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         std::vector<VkDescriptorSetLayout> descriptorLayouts;
-        descriptorLayouts.resize(descriptor.size());
-        for (int i = 0; i < descriptor.size(); i++) {
-            descriptorLayouts[i] = descriptor[i]->vkDescriptorSetLayout;
+        descriptorLayouts.resize(descriptors.size());
+        for (int i = 0; i < descriptors.size(); i++) {
+            descriptorLayouts[i] = descriptors[i]->vkDescriptorSetLayout;
         }
         layoutInfo.pSetLayouts = descriptorLayouts.data();
         layoutInfo.setLayoutCount = descriptorLayouts.size();

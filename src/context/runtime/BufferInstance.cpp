@@ -121,22 +121,6 @@ namespace Metal {
     }
 
     /**
-     * Create a vkBuffer info descriptor
-     *
-     * @param size (Optional) Size of the vkDeviceMemory range of the descriptor
-     * @param offset (Optional) Byte offset from beginning
-     *
-     * @return VkDescriptorBufferInfo of specified offset and range
-     */
-    VkDescriptorBufferInfo BufferInstance::descriptorInfo(VkDeviceSize size, VkDeviceSize offset) {
-        return VkDescriptorBufferInfo{
-            vkBuffer,
-            offset,
-            size,
-        };
-    }
-
-    /**
      * Copies "vkInstanceSize" bytes of data to the mapped vkBuffer at an offset of index * vkAlignmentSize
      *
      * @param data Pointer to the data to copy
@@ -154,17 +138,6 @@ namespace Metal {
      *
      */
     void BufferInstance::flushIndex(const int index) const { flush(vkAlignmentSize, index * vkAlignmentSize); }
-
-    /**
-     * Create a vkBuffer info descriptor
-     *
-     * @param index Specifies the region given by index * vkAlignmentSize
-     *
-     * @return VkDescriptorBufferInfo for instance at index
-     */
-    VkDescriptorBufferInfo BufferInstance::descriptorInfoForIndex(int index) {
-        return descriptorInfo(vkAlignmentSize, index * vkAlignmentSize);
-    }
 
     /**
      * Invalidate a vkDeviceMemory range of the vkBuffer to make it visible to the host

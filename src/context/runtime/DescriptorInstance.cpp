@@ -40,12 +40,11 @@ namespace Metal {
         }
 
         auto &bufferInfo = bufferInfos.emplace_back();
-
         bufferInfo.buffer = bufferInstance->getBuffer();
         bufferInfo.range = VK_WHOLE_SIZE;
         bufferInfo.offset = 0;
 
-        VkWriteDescriptorSet descriptorWrite{};
+        auto &descriptorWrite = writeDescriptorSets.emplace_back();
         descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         descriptorWrite.dstSet = vkDescriptorSet;
         descriptorWrite.dstBinding = bindingPoint;
@@ -53,8 +52,6 @@ namespace Metal {
         descriptorWrite.descriptorType = type;
         descriptorWrite.descriptorCount = 1;
         descriptorWrite.pBufferInfo = &bufferInfo;
-
-        writeDescriptorSets.push_back(descriptorWrite);
     }
 
     void DescriptorInstance::addImageDescriptor(const uint32_t bindingPoint, VkDescriptorType type, VkSampler sampler,
@@ -68,7 +65,7 @@ namespace Metal {
         imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         imageInfo.sampler = sampler;
 
-        VkWriteDescriptorSet descriptorWrite{};
+        auto &descriptorWrite = writeDescriptorSets.emplace_back();
         descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         descriptorWrite.dstSet = vkDescriptorSet;
         descriptorWrite.dstBinding = bindingPoint;
@@ -76,8 +73,6 @@ namespace Metal {
         descriptorWrite.descriptorType = type;
         descriptorWrite.descriptorCount = 1;
         descriptorWrite.pImageInfo = &imageInfo;
-
-        writeDescriptorSets.push_back(descriptorWrite);
     }
 
     void DescriptorInstance::write(const VulkanContext &context) {
@@ -88,9 +83,14 @@ namespace Metal {
             throw std::runtime_error("No write descriptor sets were created");
         }
 
-        vkUpdateDescriptorSets(context.device.device, writeDescriptorSets.size(), writeDescriptorSets.data(), 0,
+        vkUpdateDescriptorSets(context.device.device,
+                               writeDescriptorSets.size(),
+                               writeDescriptorSets.data(),
+                               0,
                                nullptr);
         imageInfos.clear();
         bufferInfos.clear();
+        writeDescriptorSets.clear();
+        descriptorSetLayoutBindings.clear();
     }
 } // Metal

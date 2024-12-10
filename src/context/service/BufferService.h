@@ -12,9 +12,7 @@ namespace Metal {
     class BufferService final : public AbstractResourceService {
         uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
 
-        void createVkBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
-                            VkMemoryPropertyFlags properties,
-                            VkBuffer &buffer, VkDeviceMemory &bufferMemory);
+        void createVkBuffer(BufferInstance *instance, VkMemoryPropertyFlags properties) const;
 
     public:
         explicit BufferService(ApplicationContext &context)
@@ -24,7 +22,7 @@ namespace Metal {
         [[nodiscard]] BufferInstance *createBuffer(VkDeviceSize instanceSize,
                                                    uint32_t instanceCount,
                                                    VkBufferUsageFlags usageFlags,
-                                                   VkMemoryPropertyFlags memoryPropertyFlags);
+                                                   VkMemoryPropertyFlags memoryPropertyFlags) const;
     };
 } // Metal
 
