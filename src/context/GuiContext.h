@@ -25,7 +25,7 @@ namespace Metal {
 
         void onInitialize() override;
 
-        bool beginFrame();
+        bool beginFrame() const;
 
         void endFrame();
 

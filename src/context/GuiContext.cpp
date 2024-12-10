@@ -9,12 +9,9 @@
 
 
 namespace Metal {
-    static VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-
-    bool GuiContext::beginFrame() {
+    bool GuiContext::beginFrame() const {
         context.getVulkanContext().getFrameData().commandBuffers.clear();
-        updateFrameData();
-        if (!context.getGLFWContext().beginFrame()) {
+        if (context.getGLFWContext().beginFrame()) {
             // Start the Dear ImGui frame
             ImGui_ImplVulkan_NewFrame();
             ImGui_ImplGlfw_NewFrame();
@@ -24,99 +21,14 @@ namespace Metal {
         return true;
     }
 
-    void GuiContext::updateFrameData() const {
-        FrameData &frameData = context.getVulkanContext().getFrameData();
-
-        auto &imguiVulkanWindow = context.getVulkanContext().imguiVulkanWindow;
-        auto [CommandPool, CommandBuffer, Fence, Backbuffer, BackbufferView, Framebuffer] = imguiVulkanWindow.Frames[
-                imguiVulkanWindow.FrameIndex];
-        frameData.commandPool = CommandPool;
-        frameData.commandBuffers.push_back(CommandBuffer);
-        frameData.imguiCommandBuffer = CommandBuffer;
-        frameData.fence = Fence;
-        frameData.backbuffer = Backbuffer;
-        frameData.backbufferView = BackbufferView;
-        frameData.framebuffer = Framebuffer;
-        frameData.imageAcquiredSemaphore = imguiVulkanWindow.FrameSemaphores[imguiVulkanWindow.SemaphoreIndex].
-                ImageAcquiredSemaphore;
-        frameData.renderCompleteSemaphore = imguiVulkanWindow.FrameSemaphores[imguiVulkanWindow.SemaphoreIndex].
-                RenderCompleteSemaphore;
-        frameData.frameIndex = imguiVulkanWindow.FrameIndex;
-    }
-
-    void GuiContext::recordCommandBuffer() const {
-        FrameData &frameData = context.getVulkanContext().getFrameData();
-
-        ImGui_ImplVulkanH_Window &imguiVkWindow = context.getVulkanContext().imguiVulkanWindow;
-
-        VkCommandBufferBeginInfo bufferBeginInfo = {};
-        bufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        bufferBeginInfo.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-        VulkanUtils::CheckVKResult(vkBeginCommandBuffer(frameData.imguiCommandBuffer, &bufferBeginInfo));
-
-        VkRenderPassBeginInfo passBeginInfo = {};
-        passBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        passBeginInfo.renderPass = imguiVkWindow.RenderPass;
-        passBeginInfo.framebuffer = frameData.framebuffer;
-        passBeginInfo.renderArea.extent.width = imguiVkWindow.Width;
-        passBeginInfo.renderArea.extent.height = imguiVkWindow.Height;
-        passBeginInfo.clearValueCount = 1;
-        passBeginInfo.pClearValues = &imguiVkWindow.ClearValue;
-        vkCmdBeginRenderPass(frameData.imguiCommandBuffer, &passBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-        // Record dear imgui primitives into command vkBuffer
-        ImGui_ImplVulkan_RenderDrawData(drawData, frameData.imguiCommandBuffer);
-
-        // Submit command vkBuffer
-        vkCmdEndRenderPass(frameData.imguiCommandBuffer);
-        VulkanUtils::CheckVKResult(vkEndCommandBuffer(frameData.imguiCommandBuffer));
-    }
-
-    void GuiContext::frameRender() const {
-        FrameData &frameData = context.getVulkanContext().getFrameData();
-
-        ImGui_ImplVulkanH_Window &imguiVkWindow = context.getVulkanContext().imguiVulkanWindow;
-        const VkDevice &device = context.getVulkanContext().device.device;
-
-        const VkResult err = vkAcquireNextImageKHR(device, imguiVkWindow.Swapchain, UINT64_MAX,
-                                                   frameData.imageAcquiredSemaphore,
-                                                   VK_NULL_HANDLE,
-                                                   &frameData.frameIndex);
-        if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR) {
-            context.getGLFWContext().setSwapChainRebuild(true);
-            return;
-        }
-        VulkanUtils::CheckVKResult(err);
-        // wait indefinitely instead of periodically checking
-        VulkanUtils::CheckVKResult(vkWaitForFences(device, 1, &frameData.fence, VK_TRUE,
-                                                   UINT64_MAX));
-        VulkanUtils::CheckVKResult(vkResetFences(device, 1, &frameData.fence));
-        VulkanUtils::CheckVKResult(vkResetCommandPool(device, frameData.commandPool, 0));
-
-        recordCommandBuffer();
-
-        VkSubmitInfo info = {};
-        info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        info.waitSemaphoreCount = 1;
-        info.pWaitSemaphores = &frameData.imageAcquiredSemaphore;
-        info.pWaitDstStageMask = &wait_stage;
-        info.commandBufferCount = frameData.commandBuffers.size();
-        info.pCommandBuffers = frameData.commandBuffers.data();
-        info.signalSemaphoreCount = 1;
-        info.pSignalSemaphores = &frameData.renderCompleteSemaphore;
-        VulkanUtils::CheckVKResult(vkQueueSubmit(context.getVulkanContext().graphicsQueue, 1, &info,
-                                                 frameData.fence));
-    }
-
     void GuiContext::endFrame() {
         ImGui::Render();
         drawData = ImGui::GetDrawData();
-        if (!(drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f)) {
-            frameRender();
-            VulkanUtils::FramePresent(&context.getVulkanContext().imguiVulkanWindow,
-                                      context.getVulkanContext().graphicsQueue,
-                                      context.getGLFWContext().isSwapChainRebuild());
-        }
+        const bool main_is_minimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
+        if (!main_is_minimized)
+            context.getGLFWContext().renderFrame(drawData);
+        if (!main_is_minimized)
+            context.getGLFWContext().presentFrame();
     }
 
     void GuiContext::onInitialize() {
@@ -124,7 +36,6 @@ namespace Metal {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO &io = ImGui::GetIO();
-        (void) io;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
 
@@ -218,5 +129,6 @@ namespace Metal {
         context.getGLFWContext().dispose();
     }
 
-    GuiContext::GuiContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {}
+    GuiContext::GuiContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {
+    }
 }

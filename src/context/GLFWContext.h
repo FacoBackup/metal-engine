@@ -12,7 +12,7 @@
 namespace Metal {
     class ApplicationContext;
 
-    class GLFWContext final : public Initializable{
+    class GLFWContext final : public Initializable {
         GLFWwindow *window = nullptr;
         bool validContext = true;
         ApplicationContext &context;
@@ -20,9 +20,11 @@ namespace Metal {
         ImVector<const char *> instance_extensions{};
 
     public:
-        bool &isSwapChainRebuild();
-
         void setSwapChainRebuild(bool val);
+
+        void presentFrame();
+
+        void renderFrame(ImDrawData *drawData) const;
 
         explicit GLFWContext(ApplicationContext &context) : context(context) {
         }

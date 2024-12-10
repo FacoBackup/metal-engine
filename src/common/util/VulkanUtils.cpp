@@ -15,29 +15,6 @@ namespace Metal {
         fprintf(stderr, "GLFW Error %d: %s\n", error, description);
     }
 
-    void VulkanUtils::FramePresent(ImGui_ImplVulkanH_Window *wd, const VkQueue &graphicsQueue,
-                                   bool &isSwapChainRebuild) {
-        if (isSwapChainRebuild) {
-            return;
-        }
-        VkSemaphore semaphore = wd->FrameSemaphores[wd->SemaphoreIndex].RenderCompleteSemaphore;
-        VkPresentInfoKHR info = {};
-        info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-        info.waitSemaphoreCount = 1;
-        info.pWaitSemaphores = &semaphore;
-        info.swapchainCount = 1;
-        info.pSwapchains = &wd->Swapchain;
-        info.pImageIndices = &wd->FrameIndex;
-        VkResult err = vkQueuePresentKHR(graphicsQueue, &info);
-        if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR) {
-            isSwapChainRebuild = true;
-            return;
-        }
-        CheckVKResult(err);
-        wd->SemaphoreIndex =
-                (wd->SemaphoreIndex + 1) % wd->SemaphoreCount; // Now we can use the next set of semaphores
-    }
-
     VkFormat VulkanUtils::GetValidDepthFormat(VkPhysicalDevice physicalDevice) {
         VkFormat candidates[] = {
             VK_FORMAT_D32_SFLOAT,
