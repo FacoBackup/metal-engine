@@ -6,18 +6,44 @@
 #include "../runtime/DescriptorInstance.h"
 
 namespace Metal {
+    void PipelineService::createPipelineLayout(const std::vector<DescriptorInstance *> &descriptorSetsToBind, const uint32_t pushConstantsSize, PipelineInstance *pipeline) {
+        VkPipelineLayoutCreateInfo layoutInfo = {};
+        layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        std::vector<VkDescriptorSetLayout> descriptorLayouts;
+        descriptorLayouts.resize(descriptorSetsToBind.size());
+        for (int i = 0; i < descriptorSetsToBind.size(); i++) {
+            descriptorLayouts[i] = descriptorSetsToBind[i]->vkDescriptorSetLayout;
+        }
+        layoutInfo.pSetLayouts = descriptorLayouts.data();
+        layoutInfo.setLayoutCount = descriptorLayouts.size();
+
+
+        if (pushConstantsSize > 0) {
+            VkPushConstantRange pushConstantRange{};
+            pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+            pushConstantRange.offset = 0;
+            pushConstantRange.size = pushConstantsSize;
+            layoutInfo.pushConstantRangeCount = 1;
+            layoutInfo.pPushConstantRanges = &pushConstantRange;
+        }
+
+        VulkanUtils::CheckVKResult(vkCreatePipelineLayout(vulkanContext.device.device, &layoutInfo, nullptr,
+                                                          &pipeline->vkPipelineLayout));
+    }
+
     PipelineInstance *PipelineService::createRenderingPipeline(FrameBufferInstance *frameBuffer,
                                                                VkCullModeFlagBits cullMode,
                                                                const char *vertexShader,
                                                                const char *fragmentShader,
-                                                               const std::vector<DescriptorInstance *> &descriptors,
-                                                               const uint32_t pushConstantsSize) const {
+                                                               const std::vector<DescriptorInstance *> &descriptorSetsToBind,
+                                                               const uint32_t pushConstantsSize) {
         auto *pipeline = new PipelineInstance();
         pipeline->pushConstantsSize = pushConstantsSize;
         pipeline->frameBuffer = frameBuffer;
         pipeline->fragmentShader = context.getVulkanContext().shaderService.createShaderModule(fragmentShader);
         pipeline->vertexShader = context.getVulkanContext().shaderService.createShaderModule(vertexShader);
         registerResource(pipeline);
+        createPipelineLayout(descriptorSetsToBind, pushConstantsSize, pipeline);
 
         std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages{};
 
@@ -32,14 +58,6 @@ namespace Metal {
 
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-
-        // auto bindingDescription = Vertex::getBindingDescription();
-        // auto attributeDescriptions = Vertex::getAttributeDescriptions();
-        //
-        // vertexInputInfo.vertexBindingDescriptionCount = 1;
-        // vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
-        // vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
-        // vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
         VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
         inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -91,35 +109,6 @@ namespace Metal {
         dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
         dynamicState.pDynamicStates = dynamicStates.data();
 
-
-        // BIND LAYOUTS
-        VkPipelineLayoutCreateInfo layoutInfo = {};
-        layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        std::vector<VkDescriptorSetLayout> descriptorLayouts;
-        descriptorLayouts.resize(descriptors.size());
-        for (int i = 0; i < descriptors.size(); i++) {
-            descriptorLayouts[i] = descriptors[i]->vkDescriptorSetLayout;
-        }
-
-        layoutInfo.pSetLayouts = descriptorLayouts.data();
-        layoutInfo.setLayoutCount = descriptorLayouts.size();
-
-
-
-        if (pushConstantsSize > 0) {
-            VkPushConstantRange pushConstantRange{};
-            pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-            pushConstantRange.offset = 0;
-            pushConstantRange.size = pushConstantsSize;
-            layoutInfo.pushConstantRangeCount = 1;
-            layoutInfo.pPushConstantRanges = &pushConstantRange;
-        }
-
-        VulkanUtils::CheckVKResult(vkCreatePipelineLayout(vulkanContext.device.device, &layoutInfo, nullptr,
-                                                          &pipeline->vkPipelineLayout));
-        // BIND LAYOUTS
-
-
         VkGraphicsPipelineCreateInfo pipelineInfo{};
         pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
         pipelineInfo.stageCount = shaderStages.size();
@@ -140,8 +129,25 @@ namespace Metal {
                                                              &pipelineInfo,
                                                              nullptr,
                                                              &pipeline->vkPipeline));
-
-        pipeline->commandBuffer = context.getVulkanContext().commandService.createCommandBuffer(pipeline);
+        pipeline->descriptorSets = descriptorSetsToBind;
+        createCommandBuffer(pipeline);
         return pipeline;
+    }
+
+    /**
+ * Commands still need to be recorded
+ */
+    void *PipelineService::createCommandBuffer(PipelineInstance *pipeline) const {
+        VkCommandBufferAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocInfo.commandPool = context.getVulkanContext().commandPool;
+        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocInfo.commandBufferCount = 1;
+
+        VkCommandBuffer commandBuffer{};
+        VulkanUtils::CheckVKResult(
+            vkAllocateCommandBuffers(vulkanContext.device.device, &allocInfo, &commandBuffer));
+
+        pipeline->vkCommandBuffer = commandBuffer;
     }
 } // Metal

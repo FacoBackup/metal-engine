@@ -124,14 +124,10 @@ add_executable(
         src/context/service/PipelineService.cpp
         src/context/service/PipelineService.h
         src/context/runtime/PipelineInstance.h
-        src/context/service/CommandService.cpp
-        src/context/service/CommandService.h
         src/context/repository/CoreBuffers.cpp
         src/context/repository/CoreBuffers.h
         src/context/service/BufferService.cpp
         src/context/service/BufferService.h
-        src/context/runtime/CommandBufferInstance.h
-        src/context/runtime/CommandBufferInstance.cpp
         src/context/service/DescriptorService.cpp
         src/context/service/DescriptorService.h
         src/context/runtime/DescriptorInstance.cpp
@@ -144,6 +140,7 @@ add_executable(
         src/context/repository/CoreDescriptorSets.h
         src/context/runtime/BufferInstance.cpp
         src/context/runtime/BufferInstance.h
+        src/context/runtime/PipelineInstance.cpp
 )
 
 

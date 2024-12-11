@@ -1,8 +1,6 @@
 #ifndef BUFFERSERVICE_H
 #define BUFFERSERVICE_H
 
-#include <vk_mem_alloc.h>
-
 #include "../../common/interface/AbstractResourceService.h"
 #include "vulkan/vulkan.h"
 

@@ -4,7 +4,6 @@
 #include "../../common/util/VulkanUtils.h"
 #include "../runtime/PipelineInstance.h"
 #include "../service//PipelineService.h"
-#include "../runtime/CommandBufferInstance.h"
 
 namespace Metal {
     void CorePipelines::onInitialize() {
@@ -16,10 +15,10 @@ namespace Metal {
             {context.getVulkanContext().coreDescriptorSets.globalDataDescriptor},
             sizeof(glm::vec4));
 
-        debugPipeline->commandBuffer->startRecording();
+        debugPipeline->startRecording();
         glm::vec4 c = glm::vec4(0, 1, 1, 1.0f);
-        debugPipeline->commandBuffer->recordPushConstant(&c);
-        debugPipeline->commandBuffer->recordDrawSimpleInstanced(3, 1);
-        debugPipeline->commandBuffer->stopRecording();
+        debugPipeline->recordPushConstant(&c);
+        debugPipeline->recordDrawSimpleInstanced(3, 1);
+        debugPipeline->stopRecording();
     }
 } // Metal

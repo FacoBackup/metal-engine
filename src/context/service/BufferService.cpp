@@ -40,11 +40,8 @@ namespace Metal {
     }
 
     uint32_t BufferService::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const {
-        VkPhysicalDeviceMemoryProperties memProperties;
-        vkGetPhysicalDeviceMemoryProperties(context.getVulkanContext().physDevice.physical_device, &memProperties);
-
-        for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
-            if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+        for (uint32_t i = 0; i < context.getVulkanContext().physicalDeviceMemoryProperties.memoryTypeCount; i++) {
+            if ((typeFilter & (1 << i)) && (context.getVulkanContext().physicalDeviceMemoryProperties.memoryTypes[i].propertyFlags & properties) == properties) {
                 return i;
             }
         }

@@ -30,7 +30,7 @@ namespace Metal {
             globalDataUBO.viewProj = cameraRepository.viewProjectionMatrix;
             globalDataUBO.invProj = cameraRepository.invProjectionMatrix;
             globalDataUBO.invView = cameraRepository.invViewMatrix;
-            globalDataUBO.color = {1, 0, 1, 1};
+            globalDataUBO.color = {1, 1, 0, 1};
             context.getVulkanContext().coreBuffers.globalData->update(&globalDataUBO);
         }
         renderPassSystem.onSync();

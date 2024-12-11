@@ -77,7 +77,6 @@ namespace Metal {
 
         physDeviceSelector.set_required_features(features);
 
-        physDeviceSelector.add_required_extension("VK_KHR_timeline_semaphore");
         auto physicalDeviceResult = physDeviceSelector
                 .set_surface(surface)
                 .select();
@@ -220,16 +219,15 @@ namespace Metal {
         pipelineService.onInitialize();
         shaderService.onInitialize();
         descriptorService.onInitialize();
-        commandService.onInitialize();
         // ------- SERVICE INITIALIZATION
 
         // ------- REPOSITORY INITIALIZATION
         coreBuffers.onInitialize();
         coreFrameBuffers.onInitialize();
         coreDescriptorSets.onInitialize();
-        corePipelines.onInitialize();
         createDescriptorPool();
         coreDescriptorSets.createDescriptors();
+        corePipelines.onInitialize();
         // ------- REPOSITORY INITIALIZATION
     }
 
