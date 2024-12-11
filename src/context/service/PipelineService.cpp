@@ -46,7 +46,6 @@ namespace Metal {
         createPipelineLayout(descriptorSetsToBind, pushConstantsSize, pipeline);
 
         std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages{};
-
         shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
         shaderStages[0].module = pipeline->vertexShader->vkShaderModule;
