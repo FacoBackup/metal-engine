@@ -1,6 +1,5 @@
 #include "BufferInstance.h"
 
-#include <cassert>
 #include <cstring>
 
 #include "../../common/util/VulkanUtils.h"
@@ -16,6 +15,6 @@ namespace Metal {
         if (mapped == nullptr) {
             throw std::runtime_error("BufferInstance::update() called on a non-mapped buffer");
         }
-        memcpy(mapped, newData, sizeof(newData));
+        memcpy(mapped, newData, dataSize);
     }
 } // Metal

@@ -10,9 +10,10 @@ namespace Metal {
     void CorePipelines::onInitialize() {
         debugPipeline = pipelineService.createRenderingPipeline(
             context.getVulkanContext().coreFrameBuffers.auxRenderPass,
-            "resources/shaders/QUAD.vert",
-            "resources/shaders/DEBUG.frag",
-            {context.getVulkanContext().coreDescriptorSets.debugDescriptor},
+            VK_CULL_MODE_NONE,
+            "../resources/shaders/QUAD.vert",
+            "../resources/shaders/DEBUG.frag",
+            {context.getVulkanContext().coreDescriptorSets.globalDataDescriptor},
             sizeof(glm::vec4));
 
         debugPipeline->commandBuffer->startRecording();

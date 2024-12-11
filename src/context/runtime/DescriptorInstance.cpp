@@ -41,7 +41,7 @@ namespace Metal {
 
         auto &bufferInfo = bufferInfos.emplace_back();
         bufferInfo.buffer = bufferInstance->vkBuffer;
-        bufferInfo.range = VK_WHOLE_SIZE;
+        bufferInfo.range = bufferInstance->dataSize;
         bufferInfo.offset = 0;
 
         auto &descriptorWrite = writeDescriptorSets.emplace_back();

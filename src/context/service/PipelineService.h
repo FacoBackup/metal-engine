@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "../../common/interface/AbstractResourceService.h"
+#include "vulkan/vulkan.h"
 
 namespace Metal {
     struct FrameBufferInstance;
@@ -15,7 +16,9 @@ namespace Metal {
             : AbstractResourceService(context) {
         }
 
-        PipelineInstance *createRenderingPipeline(FrameBufferInstance *frameBuffer, const char *vertexShader,
+        PipelineInstance *createRenderingPipeline(FrameBufferInstance *frameBuffer,
+                                                  VkCullModeFlagBits cullMode,
+                                                  const char *vertexShader,
                                                   const char *fragmentShader,
                                                   const std::vector<DescriptorInstance *> &descriptors,
                                                   uint32_t pushConstantsSize = 0) const;

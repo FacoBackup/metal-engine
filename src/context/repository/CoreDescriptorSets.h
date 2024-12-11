@@ -13,7 +13,7 @@ namespace Metal {
                 : AbstractCoreRepository(context) {
         }
 
-        DescriptorInstance *debugDescriptor = nullptr;
+        DescriptorInstance *globalDataDescriptor = nullptr;
         DescriptorInstance *currentFrameImageDescriptor = nullptr;
 
         void onInitialize() override;
