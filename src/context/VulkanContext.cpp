@@ -144,12 +144,14 @@ namespace Metal {
             const auto &sysInfo = sysInfoResult.value();
             if (sysInfo.validation_layers_available && debugMode) {
                 if (sysInfo.is_layer_available("VK_LAYER_LUNARG_api_dump")) {
-                    instanceBuilder.enable_layer("VK_LAYER_LUNARG_api_dump");
+                    // instanceBuilder.enable_layer("VK_LAYER_LUNARG_api_dump");
                 }
                 instanceBuilder.enable_validation_layers();
                 instanceBuilder.request_validation_layers();
                 instanceBuilder.set_debug_callback(DebugCallback);
                 instanceBuilder.set_debug_messenger_severity(
+                    VK_DEBUG_REPORT_INFORMATION_BIT_EXT |
+                    VK_DEBUG_REPORT_DEBUG_BIT_EXT |
                     VK_DEBUG_REPORT_ERROR_BIT_EXT |
                     VK_DEBUG_REPORT_WARNING_BIT_EXT |
                     VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT);

@@ -24,7 +24,6 @@ namespace Metal {
                                                                vulkanContext.getWindowHeight());
             framebufferService.createAttachment("Color", VK_FORMAT_R32G32B32A32_SFLOAT,
                                              VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, auxRenderPass);
-            framebufferService.createDepthAttachment(auxRenderPass);
             framebufferService.createRenderPass(auxRenderPass);
         }
     }

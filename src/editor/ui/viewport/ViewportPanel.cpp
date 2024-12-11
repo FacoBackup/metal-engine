@@ -7,11 +7,10 @@ namespace Metal {
     void ViewportPanel::onSync() {
         updateInputs();
         updateCamera();
-        ImGui::Text("Viewport");
         ImGui::Image(
             reinterpret_cast<ImTextureID>(context->getVulkanContext().coreDescriptorSets.currentFrameImageDescriptor->
                 vkDescriptorSet),
-            ImVec2(800, 600));
+            ImVec2{size->x, size->y});
     }
 
     void ViewportPanel::updateCamera() {

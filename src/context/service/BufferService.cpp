@@ -23,10 +23,8 @@ namespace Metal {
         bufferInfo.usage = usage;
         bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-        if (vkCreateBuffer(context.getVulkanContext().device.device, &bufferInfo, nullptr, &buffer->vkBuffer) !=
-            VK_SUCCESS) {
-            throw std::runtime_error("failed to create buffer!");
-        }
+        VulkanUtils::CheckVKResult(vkCreateBuffer(context.getVulkanContext().device.device, &bufferInfo, nullptr,
+                                                  &buffer->vkBuffer));
 
         VkMemoryRequirements memRequirements;
         vkGetBufferMemoryRequirements(context.getVulkanContext().device.device, buffer->vkBuffer, &memRequirements);

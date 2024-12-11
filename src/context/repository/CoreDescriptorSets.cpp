@@ -10,13 +10,13 @@
 namespace Metal {
     void CoreDescriptorSets::onInitialize() {
         const DescriptorService &service = context.getVulkanContext().descriptorService;
-        currentFrameImageDescriptor = service.createDescriptor();
-        service.addLayoutBinding(currentFrameImageDescriptor, VK_SHADER_STAGE_FRAGMENT_BIT,
-                                 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-
 
         debugDescriptor = service.createDescriptor();
         service.addLayoutBinding(debugDescriptor, VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0);
+
+        currentFrameImageDescriptor = service.createDescriptor();
+        service.addLayoutBinding(currentFrameImageDescriptor, VK_SHADER_STAGE_FRAGMENT_BIT,
+                                 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
     }
 
     void CoreDescriptorSets::createDescriptors() const {
