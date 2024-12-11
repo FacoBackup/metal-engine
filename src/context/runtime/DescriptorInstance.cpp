@@ -10,10 +10,11 @@ namespace Metal {
             vkDestroyDescriptorSetLayout(context.device.device, vkDescriptorSetLayout, nullptr);
     }
 
-    void DescriptorInstance::create(const VulkanContext &context, VkDescriptorPool pool) {
+    void DescriptorInstance::createLayout(VulkanContext &context) {
         if (descriptorSetLayoutBindings.empty()) {
             throw std::runtime_error("No descriptor layout sets were created");
         }
+
         VkDescriptorSetLayoutCreateInfo layoutInfo{};
         layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         layoutInfo.bindingCount = descriptorSetLayoutBindings.size();
@@ -22,7 +23,9 @@ namespace Metal {
         VulkanUtils::CheckVKResult(vkCreateDescriptorSetLayout(context.device.device, &layoutInfo,
                                                                nullptr,
                                                                &vkDescriptorSetLayout));
+    }
 
+    void DescriptorInstance::create(const VulkanContext &context, VkDescriptorPool pool) {
         VkDescriptorSetAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         allocInfo.descriptorPool = pool; // Created during setup

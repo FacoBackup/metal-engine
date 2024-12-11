@@ -17,5 +17,5 @@ layout (location = 0) out vec4 finalColor;
 layout(location = 0) in vec2 texCoord;
 
 void main () {
-    finalColor = vec4(globalData.color.rgb, 1);
+    finalColor = vec4(globalData.color.rgb + vec3(.1), 1);
 }

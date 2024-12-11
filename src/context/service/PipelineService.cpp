@@ -100,9 +100,11 @@ namespace Metal {
         for (int i = 0; i < descriptors.size(); i++) {
             descriptorLayouts[i] = descriptors[i]->vkDescriptorSetLayout;
         }
-        layoutInfo.pSetLayouts = &context.getVulkanContext().coreDescriptorSets.currentFrameImageDescriptor->
-                vkDescriptorSetLayout;
-        layoutInfo.setLayoutCount = 1;
+
+        layoutInfo.pSetLayouts = descriptorLayouts.data();
+        layoutInfo.setLayoutCount = descriptorLayouts.size();
+
+
 
         if (pushConstantsSize > 0) {
             VkPushConstantRange pushConstantRange{};

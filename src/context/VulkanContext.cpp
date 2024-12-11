@@ -66,7 +66,6 @@ namespace Metal {
         // features.sparseBinding = true;
 
         features.shaderStorageImageWriteWithoutFormat = true;
-        features.shaderStorageImageWriteWithoutFormat = true;
         features.fragmentStoresAndAtomics = true;
         features.shaderInt64 = true;
         features.multiDrawIndirect = true;
@@ -93,6 +92,7 @@ namespace Metal {
             throw std::runtime_error("Failed to enable core extension");
         }
         physDevice.enable_extension_if_present(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME);
+        physDevice.enable_extension_if_present(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
     }
 
     void VulkanContext::createPresentMode() {
@@ -227,9 +227,9 @@ namespace Metal {
         coreBuffers.onInitialize();
         coreFrameBuffers.onInitialize();
         coreDescriptorSets.onInitialize();
+        corePipelines.onInitialize();
         createDescriptorPool();
         coreDescriptorSets.createDescriptors();
-        corePipelines.onInitialize();
         // ------- REPOSITORY INITIALIZATION
     }
 

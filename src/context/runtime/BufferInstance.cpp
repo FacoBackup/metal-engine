@@ -4,7 +4,6 @@
 
 #include "../../common/util/VulkanUtils.h"
 
-// THANKS TO https://github.com/blurrypiano/littleVulkanEngine/blob/master/littleVulkanEngine/tutorial19
 namespace Metal {
     void BufferInstance::dispose(VulkanContext &context) {
         vkDestroyBuffer(context.device.device, vkBuffer, nullptr);
