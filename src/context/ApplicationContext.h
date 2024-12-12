@@ -14,6 +14,9 @@ namespace Metal {
         VulkanContext vulkanContext;
         GuiContext guiContext{*this};
         IPanel &rootPanel;
+        std::string rootDirectory;
+
+        void updateRootPath();
 
     public:
         void dispose();
@@ -31,6 +34,10 @@ namespace Metal {
         bool isValidContext() const;
 
         explicit ApplicationContext(IPanel &root_panel, bool debugMode);
+
+        [[nodiscard]] const std::string &getRootDirectory() const {
+            return rootDirectory;
+        }
     };
 }
 

@@ -4,9 +4,7 @@
 
 namespace Metal {
     struct BufferInstance;
-}
 
-namespace Metal {
     class MeshInstance final : public RuntimeResource {
         BufferInstance *vertexBuffer = nullptr;
         BufferInstance *indexBuffer = nullptr;

@@ -84,7 +84,7 @@ add_executable(
         src/editor/service/ThemeService.h
         src/editor/repository/EditorRepository.cpp
         src/editor/repository/EditorRepository.h
-        src/common/interface/EntityID.h
+        src/common/interface/engine-definitions.h
         src/editor/ui/metrics/MetricsPanel.cpp
         src/editor/ui/metrics/MetricsPanel.h
         src/editor/ui/files/FilesPanel.cpp
@@ -146,6 +146,13 @@ add_executable(
         src/engine/service/mesh/MeshData.h
         src/engine/service/mesh/MeshInstance.cpp
         src/engine/service/mesh/MeshInstance.h
+        src/common/util/files/FilesUtil.h
+        src/common/util/files/FileEntry.h
+        src/common/util/files/EntryType.h
+        src/editor/ui/files/FilesContext.h
+        src/common/util/files/FileDialogUtil.h
+        src/editor/ui/files/FilesHeader.cpp
+        src/editor/ui/files/FilesHeader.h
 )
 
 
@@ -159,8 +166,10 @@ find_package(Vulkan)
 find_package(VulkanMemoryAllocator CONFIG REQUIRED)
 find_package(glslang CONFIG REQUIRED)
 find_package(imguizmo CONFIG REQUIRED)
+find_package(nfd CONFIG REQUIRED)
 set(COMMON_LIBRARIES
         glfw
+        nfd::nfd
         Vulkan::Headers
         vk-bootstrap
         vk-bootstrap-compiler-warnings

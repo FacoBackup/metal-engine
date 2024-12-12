@@ -4,7 +4,10 @@
 #include "imgui.h"
 #include <string>
 
+#include "../../common/util/files/EntryType.h"
+
 namespace Metal::UIUtil {
+    static constexpr ImVec4 DIRECTORY_COLOR{188 / 255.f, 128 / 255.f, 78 / 255.f, 1};
     static constexpr int FIXED_WINDOW_FLAGS =
             ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar |
             ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
@@ -65,6 +68,20 @@ namespace Metal::UIUtil {
         AUX_VEC2.y = 0;
         ImGui::Dummy(AUX_VEC2);
         ImGui::SameLine();
+    }
+
+    static std::string GetFileIcon(const EntryType type) {
+        switch (type) {
+            case EntryType::MESH:
+                return Icons::view_in_ar;
+            case EntryType::TEXTURE:
+                return Icons::texture;
+            case EntryType::MATERIAL:
+                return Icons::format_paint;
+            case EntryType::DIRECTORY:
+                return Icons::folder;
+            default: return "";
+        }
     }
 }
 #endif

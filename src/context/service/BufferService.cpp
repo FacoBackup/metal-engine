@@ -50,19 +50,17 @@ namespace Metal {
         throw std::runtime_error("failed to find suitable memory type!");
     }
 
-    template<class T>
-    BufferInstance *BufferService::createBuffer(std::vector<T> bufferData) {
-        VkDeviceSize bufferSize = sizeof(bufferData[0]) * bufferData.size();
-        auto *stagingBuffer = new BufferInstance{bufferSize};
-        auto *finalBuffer = new BufferInstance{bufferSize};
+    BufferInstance *BufferService::createBuffer(VkDeviceSize dataSize, const void *bufferData) const {
+        auto *stagingBuffer = new BufferInstance{dataSize};
+        auto *finalBuffer = new BufferInstance{dataSize};
         registerResource(finalBuffer);
 
         createVkBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer);
 
         void *data;
-        vkMapMemory(vulkanContext.device.device, stagingBuffer->vkDeviceMemory, 0, bufferSize, 0, &data);
-        memcpy(data, bufferData.data(), bufferSize);
+        vkMapMemory(vulkanContext.device.device, stagingBuffer->vkDeviceMemory, 0, dataSize, 0, &data);
+        memcpy(data, bufferData, dataSize);
         vkUnmapMemory(vulkanContext.device.device, stagingBuffer->vkDeviceMemory);
 
         createVkBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,

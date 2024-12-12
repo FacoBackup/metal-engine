@@ -4,6 +4,7 @@
 #include "../../common/util/VulkanUtils.h"
 #include "../../common/util/Util.h"
 #include "../ApplicationContext.h"
+#include "../../common/util/files/FilesUtil.h"
 #include "glslang/Include/glslang_c_interface.h"
 #include "glslang/Public/resource_limits_c.h"
 
@@ -95,7 +96,7 @@ namespace Metal {
 
     ShaderModuleInstance *ShaderService::createShaderModule(const char *pFilename) const {
         std::string source;
-        Util::ReadFile(pFilename, source);
+        FilesUtil::ReadFile(pFilename, source);
 
         const glslang_stage_t shaderStage = ShaderStageFromFilename(pFilename);
 
@@ -103,7 +104,7 @@ namespace Metal {
         auto *shader = new ShaderModuleInstance;
         if (compileShader(shaderStage, source.c_str(), shader)) {
             const std::string BinaryFilename = std::string(pFilename) + ".spv";
-            Util::WriteBinaryFile(BinaryFilename.c_str(), shader->SPIRV.data(),
+            FilesUtil::WriteBinaryFile(BinaryFilename.c_str(), shader->SPIRV.data(),
                                   shader->SPIRV.size() * sizeof(uint32_t));
             registerResource(shader);
         } else {

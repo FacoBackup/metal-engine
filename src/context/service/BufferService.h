@@ -2,7 +2,6 @@
 #define BUFFERSERVICE_H
 
 #include <vector>
-
 #include "../../common/interface/AbstractResourceService.h"
 #include "vulkan/vulkan.h"
 
@@ -27,8 +26,7 @@ namespace Metal {
                                                    VkBufferUsageFlags usageFlags,
                                                    VkMemoryPropertyFlags memoryPropertyFlags) const;
 
-        template<class T>
-        BufferInstance *createBuffer(std::vector<T> bufferData);
+        BufferInstance *createBuffer(VkDeviceSize dataSize, const void *bufferData) const;
     };
 } // Metal
 

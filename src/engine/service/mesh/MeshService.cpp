@@ -1,7 +1,5 @@
 #include "MeshService.h"
 
-#include <glm/vec3.hpp>
-
 #include "MeshData.h"
 #include "MeshInstance.h"
 #include "../../../context/VulkanContext.h"
@@ -12,9 +10,15 @@ namespace Metal {
     MeshInstance *MeshService::createMesh(const MeshData &data) const {
         auto *instance = new MeshInstance;
         registerResource(instance);
-        instance->setVertexBuffer(vulkanContext.bufferService.createBuffer<glm::vec3>(data.vertices));
-        instance->setIndexBuffer(vulkanContext.bufferService.createBuffer<uint32_t>(data.indices));
-        instance->setNormalBuffer(vulkanContext.bufferService.createBuffer<glm::vec3>(data.normals));
+
+        VkDeviceSize bufferSize = sizeof(data.vertices[0]) * data.vertices.size();
+        instance->setVertexBuffer(vulkanContext.bufferService.createBuffer(bufferSize, &data.vertices));
+
+        bufferSize = sizeof(data.indices[0]) * data.indices.size();
+        instance->setIndexBuffer(vulkanContext.bufferService.createBuffer(bufferSize, &data.indices));
+
+        bufferSize = sizeof(data.normals[0]) * data.normals.size();
+        instance->setNormalBuffer(vulkanContext.bufferService.createBuffer(bufferSize, &data.normals));
         return instance;
     }
 
