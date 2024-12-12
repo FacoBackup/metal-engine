@@ -2,14 +2,23 @@
 #include "ImGuizmo.h"
 #include "../../../context/ApplicationContext.h"
 #include "../../../context/runtime/DescriptorInstance.h"
+#include "../../../context/runtime/FrameBufferInstance.h"
+#include "../../../context/runtime/FrameBufferAttachment.h"
 
 namespace Metal {
     void ViewportPanel::onSync() {
+        auto &coreSets = context->getVulkanContext().coreDescriptorSets;
+        coreSets.updateImageSamplerDescriptor(
+            context->getVulkanContext().coreFrameBuffers.auxRenderPass->
+            attachments[0]->vkImageSampler,
+            context->getVulkanContext().coreFrameBuffers.auxRenderPass->
+            attachments[0]->vkImageView
+        );
+
         updateInputs();
         updateCamera();
         ImGui::Image(
-            reinterpret_cast<ImTextureID>(context->getVulkanContext().coreDescriptorSets.currentFrameImageDescriptor->
-                vkDescriptorSet),
+            reinterpret_cast<ImTextureID>(coreSets.imageSampler->vkDescriptorSet),
             ImVec2{size->x, size->y});
     }
 

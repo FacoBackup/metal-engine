@@ -9,9 +9,6 @@ namespace Metal {
     struct BufferInstance;
 
     class BufferService final : public AbstractResourceService {
-        [[nodiscard]] uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
-
-
         void copyBuffer(const BufferInstance *srcBuffer, const BufferInstance *dstBuffer) const;
 
         void createVkBuffer(VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
@@ -21,6 +18,8 @@ namespace Metal {
         explicit BufferService(ApplicationContext &context)
             : AbstractResourceService(context) {
         }
+
+        [[nodiscard]] uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
 
         [[nodiscard]] BufferInstance *createBuffer(VkDeviceSize bufferSize,
                                                    VkBufferUsageFlags usageFlags,

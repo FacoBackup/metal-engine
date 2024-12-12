@@ -39,5 +39,11 @@
   }, {
     "name" : "assimp",
     "version>=" : "5.4.3"
+  }, {
+    "name" : "meshoptimizer",
+    "version>=" : "0.22"
+  }, {
+    "name" : "stb",
+    "version>=" : "2024-07-29#1"
   } ]
 }

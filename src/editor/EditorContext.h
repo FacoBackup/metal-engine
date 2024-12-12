@@ -7,6 +7,7 @@
 #include "service/ThemeService.h"
 #include "../common/interface/AbstractRuntimeComponent.h"
 #include "service/import/MeshImporter.h"
+#include "service/import/TextureImporter.h"
 
 namespace Metal {
     class EditorContext final : public AbstractRuntimeComponent {
@@ -18,6 +19,7 @@ namespace Metal {
 
         // ------ IMPORTERS
         MeshImporter meshImporter{context};
+        TextureImporter textureImporter{context};
         // ------ IMPORTERS
 
         explicit EditorContext(ApplicationContext &context);

@@ -72,7 +72,6 @@ add_executable(
         src/editor/EditorContext.h
         src/editor/repository/dock/DockRepository.cpp
         src/editor/repository/dock/DockRepository.h
-        src/editor/repository/dock/DockDTO.cpp
         src/editor/repository/dock/DockDTO.h
         src/common/interface/MEnum.h
         src/editor/repository/dock/DockSpace.h
@@ -105,8 +104,6 @@ add_executable(
         src/engine/system/RenderPassSystem.h
         src/engine/render-pass/impl/VoxelVisualizerRenderPass.cpp
         src/engine/render-pass/impl/VoxelVisualizerRenderPass.h
-        src/context/service/TextureService.cpp
-        src/context/service/TextureService.h
         src/context/runtime/TextureInstance.h
         src/context/repository/ResourceRepository.h
         src/common/interface/AbstractResourceService.cpp
@@ -156,6 +153,15 @@ add_executable(
         src/editor/service/import/MeshImporter.cpp
         src/editor/service/import/MeshImporter.h
         src/editor/service/import/AbstractImporter.h
+        src/common/interface/Serializable.h
+        src/engine/LevelOfDetail.h
+        src/engine/LevelOfDetail.cpp
+        src/editor/service/import/TextureImporter.cpp
+        src/editor/service/import/TextureImporter.h
+        src/editor/service/import/FileMetadata.h
+        src/editor/service/import/TextureData.h
+        src/context/service/TextureService.cpp
+        src/context/service/TextureService.h
 )
 
 
@@ -171,9 +177,14 @@ find_package(glslang CONFIG REQUIRED)
 find_package(imguizmo CONFIG REQUIRED)
 find_package(nfd CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
+find_package(meshoptimizer CONFIG REQUIRED)
+find_package(Stb REQUIRED)
+
 set(COMMON_LIBRARIES
         glfw
         nfd::nfd
+        Stb
+        meshoptimizer::meshoptimizer
         assimp::assimp
         Vulkan::Headers
         vk-bootstrap

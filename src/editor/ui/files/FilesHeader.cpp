@@ -26,7 +26,9 @@ namespace Metal {
             auto files = FileDialogUtil::PickFiles({{"Mesh", "fbx,gltf,obj,glb"}, {"Image", "png,jpg,jpeg"}});
             for (const std::string &file: files) {
                 if (context->getEditorContext().meshImporter.isCompatible(file)) {
-                    context->getEditorContext().meshImporter.importMesh(file);
+                    context->getEditorContext().meshImporter.importMesh(filesContext->currentDirectory->absolutePath, file);
+                }else if (context->getEditorContext().textureImporter.isCompatible(file)) {
+                    context->getEditorContext().textureImporter.importTexture(filesContext->currentDirectory->absolutePath, file);
                 }
             }
         }

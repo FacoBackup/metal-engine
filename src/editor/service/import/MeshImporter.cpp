@@ -6,7 +6,10 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 
+#include "FileMetadata.h"
 #include "../../../common/util/files/FilesUtil.h"
+#include "meshoptimizer.h"
+#include "../../../engine/LevelOfDetail.h"
 
 namespace Metal {
     std::vector<MeshData> MeshImporter::ImportMeshes(const std::string &pathToFile) {
@@ -26,7 +29,8 @@ namespace Metal {
 
         for (unsigned int i = 0; i < scene->mNumMeshes; ++i) {
             aiMesh *mesh = scene->mMeshes[i];
-            MeshData meshData{mesh->mName.data};
+            MeshData meshData;
+            meshData.name = mesh->mName.data;
 
             for (unsigned int j = 0; j < mesh->mNumVertices; ++j) {
                 aiVector3D vertex = mesh->mVertices[j];
@@ -60,9 +64,31 @@ namespace Metal {
     }
 
     void MeshImporter::importMesh(const std::string &targetDir, const std::string &pathToFile) {
+        auto metadata = FileMetadata{};
+
         auto imported = ImportMeshes(pathToFile);
         for (MeshData &mesh: imported) {
-            // FilesUtil::WriteFile(targetDir + "/" + mesh.name, ); // TODO - SERIALIZE TO BINARY - CREATE INTERFACE FOR SERIALIZING BINARY
+            simplifyMesh(metadata.associatedFiles, metadata.getId(), targetDir, mesh, LevelOfDetail::LOD_0);
+            simplifyMesh(metadata.associatedFiles, metadata.getId(), targetDir, mesh, LevelOfDetail::LOD_1);
+            simplifyMesh(metadata.associatedFiles, metadata.getId(), targetDir, mesh, LevelOfDetail::LOD_2);
+            simplifyMesh(metadata.associatedFiles, metadata.getId(), targetDir, mesh, LevelOfDetail::LOD_3);
         }
+    }
+
+    void MeshImporter::simplifyMesh(std::vector<std::string> &paths, const std::string &fileId,
+                                    const std::string &targetDir,
+                                    const MeshData &mesh, const LevelOfDetail &levelOfDetail) {
+        MeshData lowerRes;
+        lowerRes.name = mesh.name;
+        lowerRes.normals = mesh.normals;
+        lowerRes.vertices = mesh.vertices;
+        lowerRes.indices = mesh.indices;
+        lowerRes.uvs = mesh.uvs;
+        // TODO
+
+        // meshoptimizer::simplify_mesh(vertices, indices, (lowerRes.indices.size() / 3) / lod.level);
+        const std::string newPath = targetDir + "/" +
+                                    LevelOfDetail::GetFormattedName(fileId, levelOfDetail, EntryType::MESH);
+        lowerRes.serialize(newPath);
     }
 } // Metal

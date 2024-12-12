@@ -1,3 +1,5 @@
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #define VMA_IMPLEMENTATION
 #include "context/ApplicationContext.h"
 #include "editor/EditorPanel.h"
