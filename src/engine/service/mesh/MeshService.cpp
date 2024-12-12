@@ -19,6 +19,9 @@ namespace Metal {
 
         bufferSize = sizeof(data.normals[0]) * data.normals.size();
         instance->setNormalBuffer(vulkanContext.bufferService.createBuffer(bufferSize, &data.normals));
+
+        bufferSize = sizeof(data.uvs[0]) * data.uvs.size();
+        instance->setNormalBuffer(vulkanContext.bufferService.createBuffer(bufferSize, &data.uvs));
         return instance;
     }
 

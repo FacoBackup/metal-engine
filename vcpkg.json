@@ -36,5 +36,8 @@
   }, {
     "name" : "nativefiledialog-extended",
     "version>=" : "1.2.1"
+  }, {
+    "name" : "assimp",
+    "version>=" : "5.4.3"
   } ]
 }

@@ -170,9 +170,11 @@ find_package(VulkanMemoryAllocator CONFIG REQUIRED)
 find_package(glslang CONFIG REQUIRED)
 find_package(imguizmo CONFIG REQUIRED)
 find_package(nfd CONFIG REQUIRED)
+find_package(assimp CONFIG REQUIRED)
 set(COMMON_LIBRARIES
         glfw
         nfd::nfd
+        assimp::assimp
         Vulkan::Headers
         vk-bootstrap
         vk-bootstrap-compiler-warnings
