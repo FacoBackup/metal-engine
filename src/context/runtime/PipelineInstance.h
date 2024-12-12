@@ -14,14 +14,20 @@ namespace Metal {
         FrameBufferInstance *frameBuffer = nullptr;
         ShaderModuleInstance *vertexShader = nullptr;
         ShaderModuleInstance *fragmentShader = nullptr;
-        CommandBufferInstance *commandBuffer = nullptr;
-        VkDescriptorSet descriptorSet = VK_NULL_HANDLE; // TODO - Pointer to a list of DescriptorInstance; allow multiple descriptor sets for a given pipeline
+        std::vector<DescriptorInstance *> descriptorSets{};
         uint32_t pushConstantsSize = 0;
+        VkRenderPassBeginInfo renderPassInfo{};
+        VkCommandBuffer vkCommandBuffer = VK_NULL_HANDLE;
 
-        void dispose(VulkanContext &context) override {
-            vkDestroyPipelineLayout(context.device.device, vkPipelineLayout, nullptr);
-            vkDestroyPipeline(context.device.device, vkPipeline, nullptr);
-        }
+        void startRecording();
+
+        void stopRecording() const;
+
+        void recordPushConstant(void *data) const;
+
+        void recordDrawSimpleInstanced(uint32_t vertexCount, uint32_t instanceCount) const;
+
+        void dispose(VulkanContext &context) override;
     };
 }
 #endif //PIPELINEINSTANCE_H

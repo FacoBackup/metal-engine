@@ -24,6 +24,8 @@ namespace Metal {
         view->size = &size;
         view->dock = dock;
         view->position = &position;
+        padding.x = static_cast<float>(dock->description->paddingX);
+        padding.y = static_cast<float>(dock->description->paddingY);
         appendChild(view);
     }
 

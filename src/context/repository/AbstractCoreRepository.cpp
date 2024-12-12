@@ -8,7 +8,6 @@ namespace Metal {
           framebufferService(context.getVulkanContext().framebufferService),
           shaderService(context.getVulkanContext().shaderService),
           bufferService(context.getVulkanContext().bufferService),
-          pipelineService(context.getVulkanContext().pipelineService),
-          commandPoolService(context.getVulkanContext().commandService) {
+          pipelineService(context.getVulkanContext().pipelineService){
     }
 }

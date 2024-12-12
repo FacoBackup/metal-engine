@@ -4,21 +4,21 @@
 #include "../../common/util/VulkanUtils.h"
 #include "../runtime/PipelineInstance.h"
 #include "../service//PipelineService.h"
-#include "../runtime/CommandBufferInstance.h"
 
 namespace Metal {
     void CorePipelines::onInitialize() {
         debugPipeline = pipelineService.createRenderingPipeline(
             context.getVulkanContext().coreFrameBuffers.auxRenderPass,
-            "resources/shaders/QUAD.vert",
-            "resources/shaders/DEBUG.frag",
-            {context.getVulkanContext().coreDescriptorSets.debugDescriptor},
+            VK_CULL_MODE_NONE,
+            "../resources/shaders/QUAD.vert",
+            "../resources/shaders/DEBUG.frag",
+            {context.getVulkanContext().coreDescriptorSets.globalDataDescriptor},
             sizeof(glm::vec4));
 
-        debugPipeline->commandBuffer->startRecording();
+        debugPipeline->startRecording();
         glm::vec4 c = glm::vec4(0, 1, 1, 1.0f);
-        debugPipeline->commandBuffer->recordPushConstant(&c);
-        debugPipeline->commandBuffer->recordDrawSimpleInstanced(3, 1);
-        debugPipeline->commandBuffer->stopRecording();
+        debugPipeline->recordPushConstant(&c);
+        debugPipeline->recordDrawSimpleInstanced(3, 1);
+        debugPipeline->stopRecording();
     }
 } // Metal

@@ -18,6 +18,7 @@ namespace Metal {
         TimePoint previousTime = Clock::now();
         GlobalDataUBO globalDataUBO{};
         long long start = -1;
+
     public:
         explicit EngineContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {
         }
@@ -42,8 +43,6 @@ namespace Metal {
         void onInitialize() override;
 
         void onSync() override;
-
-        ResourceRepository &getResourceRepository();
     };
 }
 #endif

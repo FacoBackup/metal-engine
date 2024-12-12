@@ -1,7 +1,6 @@
 #include "CoreBuffers.h"
 
 #include "GlobalDataUBO.h"
-#include "../runtime/BufferInstance.h"
 #include "../service//BufferService.h"
 
 namespace Metal {

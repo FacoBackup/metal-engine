@@ -6,107 +6,17 @@
 #include "../runtime/DescriptorInstance.h"
 
 namespace Metal {
-    PipelineInstance *PipelineService::createRenderingPipeline(FrameBufferInstance *frameBuffer,
-                                                               const char *vertexShader,
-                                                               const char *fragmentShader,
-                                                               const std::vector<DescriptorInstance *> &descriptors,
-                                                               const uint32_t pushConstantsSize) const {
-        auto *pipeline = new PipelineInstance();
-        pipeline->pushConstantsSize = pushConstantsSize;
-        pipeline->frameBuffer = frameBuffer;
-        pipeline->fragmentShader = context.getVulkanContext().shaderService.createShaderModule(fragmentShader);
-        pipeline->vertexShader = context.getVulkanContext().shaderService.createShaderModule(vertexShader);
-        registerResource(pipeline);
-
-        std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages{};
-
-        shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
-        shaderStages[0].module = pipeline->vertexShader->vkShaderModule;
-        shaderStages[0].pName = "main";
-
-        shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-        shaderStages[1].module = pipeline->fragmentShader->vkShaderModule;
-        shaderStages[1].pName = "main";
-
-        VkPipelineVertexInputStateCreateInfo VertexInputInfo = {
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO
-        };
-
-        VkPipelineInputAssemblyStateCreateInfo PipelineIACreateInfo = {
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
-            .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
-            .primitiveRestartEnable = VK_FALSE
-        };
-
-        VkViewport VP = {
-            .x = 0.0f,
-            .y = 0.0f,
-            .width = static_cast<float>(frameBuffer->bufferWidth),
-            .height = static_cast<float>(frameBuffer->bufferHeight),
-            .minDepth = 0.0f,
-            .maxDepth = 1.0f
-        };
-
-        VkRect2D Scissor{
-            .offset = {
-                .x = 0,
-                .y = 0,
-            },
-            .extent = {
-                .width = frameBuffer->bufferWidth,
-                .height = frameBuffer->bufferHeight
-            }
-        };
-
-        VkPipelineViewportStateCreateInfo VPCreateInfo = {
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
-            .viewportCount = 1,
-            .pViewports = &VP,
-            .scissorCount = 1,
-            .pScissors = &Scissor
-        };
-
-        VkPipelineRasterizationStateCreateInfo RastCreateInfo = {
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
-            .polygonMode = VK_POLYGON_MODE_FILL,
-            .cullMode = VK_CULL_MODE_NONE,
-            .frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
-            .lineWidth = 1.0f
-        };
-
-        VkPipelineMultisampleStateCreateInfo PipelineMSCreateInfo = {
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
-            .rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
-            .sampleShadingEnable = VK_FALSE,
-            .minSampleShading = 1.0f
-        };
-
-        VkPipelineColorBlendAttachmentState BlendAttachState = {
-            .blendEnable = VK_FALSE,
-            .colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
-                              VK_COLOR_COMPONENT_A_BIT
-        };
-
-        VkPipelineColorBlendStateCreateInfo BlendCreateInfo = {
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
-            .logicOpEnable = VK_FALSE,
-            .logicOp = VK_LOGIC_OP_COPY,
-            .attachmentCount = 1,
-            .pAttachments = &BlendAttachState
-        };
-
-
-        // BIND LAYOUTS
+    void PipelineService::createPipelineLayout(const std::vector<DescriptorInstance *> &descriptorSetsToBind, const uint32_t pushConstantsSize, PipelineInstance *pipeline) {
         VkPipelineLayoutCreateInfo layoutInfo = {};
         layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         std::vector<VkDescriptorSetLayout> descriptorLayouts;
-        descriptorLayouts.resize(descriptors.size());
-        for (int i = 0; i < descriptors.size(); i++) {
-            descriptorLayouts[i] = descriptors[i]->vkDescriptorSetLayout;
+        descriptorLayouts.resize(descriptorSetsToBind.size());
+        for (int i = 0; i < descriptorSetsToBind.size(); i++) {
+            descriptorLayouts[i] = descriptorSetsToBind[i]->vkDescriptorSetLayout;
         }
         layoutInfo.pSetLayouts = descriptorLayouts.data();
         layoutInfo.setLayoutCount = descriptorLayouts.size();
+
 
         if (pushConstantsSize > 0) {
             VkPushConstantRange pushConstantRange{};
@@ -119,32 +29,124 @@ namespace Metal {
 
         VulkanUtils::CheckVKResult(vkCreatePipelineLayout(vulkanContext.device.device, &layoutInfo, nullptr,
                                                           &pipeline->vkPipelineLayout));
-        // BIND LAYOUTS
+    }
 
+    PipelineInstance *PipelineService::createRenderingPipeline(FrameBufferInstance *frameBuffer,
+                                                               VkCullModeFlagBits cullMode,
+                                                               const char *vertexShader,
+                                                               const char *fragmentShader,
+                                                               const std::vector<DescriptorInstance *> &descriptorSetsToBind,
+                                                               const uint32_t pushConstantsSize) {
+        auto *pipeline = new PipelineInstance();
+        pipeline->pushConstantsSize = pushConstantsSize;
+        pipeline->frameBuffer = frameBuffer;
+        pipeline->fragmentShader = context.getVulkanContext().shaderService.createShaderModule(fragmentShader);
+        pipeline->vertexShader = context.getVulkanContext().shaderService.createShaderModule(vertexShader);
+        registerResource(pipeline);
+        createPipelineLayout(descriptorSetsToBind, pushConstantsSize, pipeline);
 
-        VkGraphicsPipelineCreateInfo pipelineCreateInfo = {};
-        pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-        pipelineCreateInfo.stageCount = shaderStages.size();
-        pipelineCreateInfo.pStages = shaderStages.data();
-        pipelineCreateInfo.pVertexInputState = &VertexInputInfo;
-        pipelineCreateInfo.pInputAssemblyState = &PipelineIACreateInfo;
-        pipelineCreateInfo.pViewportState = &VPCreateInfo;
-        pipelineCreateInfo.pRasterizationState = &RastCreateInfo;
-        pipelineCreateInfo.pMultisampleState = &PipelineMSCreateInfo;
-        pipelineCreateInfo.pColorBlendState = &BlendCreateInfo;
-        pipelineCreateInfo.layout = pipeline->vkPipelineLayout;
-        pipelineCreateInfo.renderPass = frameBuffer->vkRenderPass;
-        pipelineCreateInfo.subpass = 0;
-        pipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
-        pipelineCreateInfo.basePipelineIndex = -1;
-        pipelineCreateInfo.flags = VK_PIPELINE_CREATE_ALLOW_DERIVATIVES_BIT;
+        std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages{};
+        shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+        shaderStages[0].module = pipeline->vertexShader->vkShaderModule;
+        shaderStages[0].pName = "main";
+
+        shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+        shaderStages[1].module = pipeline->fragmentShader->vkShaderModule;
+        shaderStages[1].pName = "main";
+
+        VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+        vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+
+        VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
+        inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+        inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+        inputAssembly.primitiveRestartEnable = VK_FALSE;
+
+        VkPipelineViewportStateCreateInfo viewportState{};
+        viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+        viewportState.viewportCount = 1;
+        viewportState.scissorCount = 1;
+
+        VkPipelineRasterizationStateCreateInfo rasterizer{};
+        rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+        rasterizer.depthClampEnable = VK_FALSE;
+        rasterizer.rasterizerDiscardEnable = VK_FALSE;
+        rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+        rasterizer.lineWidth = 1.0f;
+        rasterizer.cullMode = cullMode;
+        rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+        rasterizer.depthBiasEnable = VK_FALSE;
+
+        VkPipelineMultisampleStateCreateInfo multisampling{};
+        multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+        multisampling.sampleShadingEnable = VK_FALSE;
+        multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+
+        VkPipelineColorBlendAttachmentState colorBlendAttachment{};
+        colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
+                                              VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+        colorBlendAttachment.blendEnable = VK_FALSE;
+
+        VkPipelineColorBlendStateCreateInfo colorBlending{};
+        colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+        colorBlending.logicOpEnable = VK_FALSE;
+        colorBlending.logicOp = VK_LOGIC_OP_COPY;
+        colorBlending.attachmentCount = 1;
+        colorBlending.pAttachments = &colorBlendAttachment;
+        colorBlending.blendConstants[0] = 0.0f;
+        colorBlending.blendConstants[1] = 0.0f;
+        colorBlending.blendConstants[2] = 0.0f;
+        colorBlending.blendConstants[3] = 0.0f;
+
+        std::vector<VkDynamicState> dynamicStates = {
+            VK_DYNAMIC_STATE_VIEWPORT,
+            VK_DYNAMIC_STATE_SCISSOR
+        };
+        VkPipelineDynamicStateCreateInfo dynamicState{};
+        dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+        dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
+        dynamicState.pDynamicStates = dynamicStates.data();
+
+        VkGraphicsPipelineCreateInfo pipelineInfo{};
+        pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+        pipelineInfo.stageCount = shaderStages.size();
+        pipelineInfo.pStages = shaderStages.data();
+        pipelineInfo.pVertexInputState = &vertexInputInfo;
+        pipelineInfo.pInputAssemblyState = &inputAssembly;
+        pipelineInfo.pViewportState = &viewportState;
+        pipelineInfo.pRasterizationState = &rasterizer;
+        pipelineInfo.pMultisampleState = &multisampling;
+        pipelineInfo.pColorBlendState = &colorBlending;
+        pipelineInfo.pDynamicState = &dynamicState;
+        pipelineInfo.layout = pipeline->vkPipelineLayout;
+        pipelineInfo.renderPass = frameBuffer->vkRenderPass;
+        pipelineInfo.subpass = 0;
+        pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
         VulkanUtils::CheckVKResult(vkCreateGraphicsPipelines(vulkanContext.device.device, VK_NULL_HANDLE, 1,
-                                                             &pipelineCreateInfo,
+                                                             &pipelineInfo,
                                                              nullptr,
                                                              &pipeline->vkPipeline));
-
-        pipeline->commandBuffer = context.getVulkanContext().commandService.createCommandBuffer(pipeline);
+        pipeline->descriptorSets = descriptorSetsToBind;
+        createCommandBuffer(pipeline);
         return pipeline;
+    }
+
+    /**
+ * Commands still need to be recorded
+ */
+    void *PipelineService::createCommandBuffer(PipelineInstance *pipeline) const {
+        VkCommandBufferAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocInfo.commandPool = context.getVulkanContext().commandPool;
+        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocInfo.commandBufferCount = 1;
+
+        VkCommandBuffer commandBuffer{};
+        VulkanUtils::CheckVKResult(
+            vkAllocateCommandBuffers(vulkanContext.device.device, &allocInfo, &commandBuffer));
+
+        pipeline->vkCommandBuffer = commandBuffer;
     }
 } // Metal

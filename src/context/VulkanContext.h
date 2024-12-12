@@ -19,7 +19,6 @@
 #include "service/FrameBufferService.h"
 #include "service/PipelineService.h"
 #include "service/ShaderService.h"
-#include "service/CommandService.h"
 #include "service/BufferService.h"
 
 #define IMAGE_COUNT 2
@@ -90,7 +89,6 @@ namespace Metal {
         FrameBufferService framebufferService{context};
         PipelineService pipelineService{context};
         ShaderService shaderService{context};
-        CommandService commandService{context};
         BufferService bufferService{context};
         DescriptorService descriptorService{context};
         // ----------- Services

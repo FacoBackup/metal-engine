@@ -14,6 +14,8 @@ namespace Metal {
 
         void dispose(VulkanContext &context) override;
 
+        void createLayout(VulkanContext &context);
+
         void create(const VulkanContext &context, VkDescriptorPool pool);
 
         void addBufferDescriptor(uint32_t bindingPoint, VkDescriptorType type, BufferInstance *bufferInstance);

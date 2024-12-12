@@ -66,7 +66,6 @@ namespace Metal {
         // features.sparseBinding = true;
 
         features.shaderStorageImageWriteWithoutFormat = true;
-        features.shaderStorageImageWriteWithoutFormat = true;
         features.fragmentStoresAndAtomics = true;
         features.shaderInt64 = true;
         features.multiDrawIndirect = true;
@@ -78,7 +77,6 @@ namespace Metal {
 
         physDeviceSelector.set_required_features(features);
 
-        physDeviceSelector.add_required_extension("VK_KHR_timeline_semaphore");
         auto physicalDeviceResult = physDeviceSelector
                 .set_surface(surface)
                 .select();
@@ -93,6 +91,7 @@ namespace Metal {
             throw std::runtime_error("Failed to enable core extension");
         }
         physDevice.enable_extension_if_present(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME);
+        physDevice.enable_extension_if_present(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
     }
 
     void VulkanContext::createPresentMode() {
@@ -150,6 +149,8 @@ namespace Metal {
                 instanceBuilder.request_validation_layers();
                 instanceBuilder.set_debug_callback(DebugCallback);
                 instanceBuilder.set_debug_messenger_severity(
+                    VK_DEBUG_REPORT_INFORMATION_BIT_EXT |
+                    VK_DEBUG_REPORT_DEBUG_BIT_EXT |
                     VK_DEBUG_REPORT_ERROR_BIT_EXT |
                     VK_DEBUG_REPORT_WARNING_BIT_EXT |
                     VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT);
@@ -218,7 +219,6 @@ namespace Metal {
         pipelineService.onInitialize();
         shaderService.onInitialize();
         descriptorService.onInitialize();
-        commandService.onInitialize();
         // ------- SERVICE INITIALIZATION
 
         // ------- REPOSITORY INITIALIZATION
