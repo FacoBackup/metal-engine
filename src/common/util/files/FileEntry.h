@@ -14,11 +14,12 @@ namespace Metal {
         std::string formattedSize;
         bool isHovered = false;
         const std::string id = Util::uuidV4();
-        std::vector<FileEntry> childDirectories{};
+        std::vector<FileEntry> children{};
+        FileEntry *parent = nullptr;
 
-        FileEntry(std::string name, std::string absolute_path, std::string formatted_date,
+        FileEntry(FileEntry *parent, std::string name, std::string absolute_path, std::string formatted_date,
                   EntryType type, std::string formatted_size)
-            : name(std::move(name)),
+            : parent(parent), name(std::move(name)),
               absolutePath(std::move(absolute_path)),
               formattedDate(std::move(formatted_date)),
               type(type),

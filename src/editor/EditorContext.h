@@ -6,6 +6,7 @@
 #include "repository/dock/DockRepository.h"
 #include "service/ThemeService.h"
 #include "../common/interface/AbstractRuntimeComponent.h"
+#include "service/import/MeshImporter.h"
 
 namespace Metal {
     class EditorContext final : public AbstractRuntimeComponent {
@@ -14,6 +15,10 @@ namespace Metal {
         DockService dockService{context};
         DockRepository dockRepository{context};
         EditorRepository editorRepository{};
+
+        // ------ IMPORTERS
+        MeshImporter meshImporter{context};
+        // ------ IMPORTERS
 
         explicit EditorContext(ApplicationContext &context);
     };

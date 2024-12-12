@@ -21,12 +21,11 @@ namespace Metal::FilesUtil {
         return EntryType::NONE;
     }
 
-    static std::vector<FileEntry> GetEntries(const std::string &directoryPath) {
-        std::vector<FileEntry> metaFiles;
-
+    static void GetEntries(FileEntry &root) {
         try {
-            for (const auto &entry: fs::directory_iterator(directoryPath)) {
-                if (entry.is_regular_file()) {
+            root.children.clear();
+            for (const auto &entry: fs::directory_iterator(root.absolutePath)) {
+                if (!entry.is_directory()) {
                     std::string extension = entry.path().extension().string();
                     auto type = GetExtensionType(entry.path().extension().string());
                     if (type != EntryType::NONE && extension.find(FILE_METADATA) != std::string::npos) {
@@ -47,7 +46,8 @@ namespace Metal::FilesUtil {
                         std::string lastChangeDate = std::asctime(std::localtime(&timeT));
                         lastChangeDate.pop_back(); // Remove trailing newline
 
-                        metaFiles.emplace_back(
+                        root.children.emplace_back(
+                            &root,
                             entry.path().filename().string(),
                             fs::absolute(entry.path()).string(),
                             lastChangeDate,
@@ -56,33 +56,14 @@ namespace Metal::FilesUtil {
                         );
                     }
                 } else {
-                    metaFiles.emplace_back(entry.path().filename(), fs::absolute(entry.path()).string(),
-                                           "",
-                                           EntryType::DIRECTORY, "0");
+                    root.children.emplace_back(&root, entry.path().filename(),
+                                               fs::absolute(entry.path()).string(),
+                                               "",
+                                               EntryType::DIRECTORY, "0");
                 }
             }
         } catch (const std::exception &ex) {
             std::cerr << "Error: " << ex.what() << std::endl;
-        }
-
-        return metaFiles;
-    }
-
-    static void GetDirectoriesFromRoot(FileEntry &root) {
-        try {
-            if (fs::exists(root.absolutePath) && fs::is_directory(root.absolutePath)) {
-                for (const auto &entry: fs::recursive_directory_iterator(root.absolutePath)) {
-                    if (fs::is_directory(entry.status())) {
-                        root.childDirectories.emplace_back(entry.path().filename(), fs::absolute(entry.path()).string(),
-                                                           "",
-                                                           EntryType::DIRECTORY, "0");
-                    }
-                }
-            } else {
-                std::cerr << "The provided path is not a valid directory.\n";
-            }
-        } catch (const std::filesystem::filesystem_error &e) {
-            std::cerr << "Filesystem error: " << e.what() << std::endl;
         }
     }
 

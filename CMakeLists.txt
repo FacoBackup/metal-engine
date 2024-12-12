@@ -153,6 +153,9 @@ add_executable(
         src/common/util/files/FileDialogUtil.h
         src/editor/ui/files/FilesHeader.cpp
         src/editor/ui/files/FilesHeader.h
+        src/editor/service/import/MeshImporter.cpp
+        src/editor/service/import/MeshImporter.h
+        src/editor/service/import/AbstractImporter.h
 )
 
 

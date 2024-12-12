@@ -7,16 +7,23 @@
 
 namespace Metal {
     struct FilesContext final {
-        std::vector<FileEntry> entriesCurrentDir{};
         FileEntry rootDirectory;
         FileEntry *currentDirectory;
         std::unordered_map<std::string, FileEntry *> selected{};
         std::unordered_map<std::string, FileEntry *> toCut{};
+        std::string pathToCurrentDirectory;
 
-        FilesContext(std::string rootPath, const std::vector<FileEntry> &files_current_dir)
-            : entriesCurrentDir(files_current_dir),
-              rootDirectory({"Root", std::move(rootPath), "", EntryType::DIRECTORY, ""}),
+        explicit FilesContext(std::string rootPath)
+            : rootDirectory({nullptr, "Root", std::move(rootPath), "", EntryType::DIRECTORY, ""}),
               currentDirectory(&rootDirectory) {
+        }
+
+        void setCurrentDirectory(FileEntry *entry) {
+            if (entry == nullptr)
+                return;
+            currentDirectory = entry;
+            pathToCurrentDirectory = currentDirectory->absolutePath.substr(
+                rootDirectory.absolutePath.size(), currentDirectory->absolutePath.size());
         }
     };
 }

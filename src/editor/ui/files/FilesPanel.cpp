@@ -8,9 +8,8 @@
 
 namespace Metal {
     void FilesPanel::onInitialize() {
-        filesContext = std::make_unique<FilesContext>(context->getRootDirectory(),
-                                                      FilesUtil::GetEntries(context->getRootDirectory()));
-        FilesUtil::GetDirectoriesFromRoot(*filesContext->currentDirectory);
+        filesContext = std::make_unique<FilesContext>(context->getRootDirectory());
+        FilesUtil::GetEntries(*filesContext->currentDirectory);
         appendChild(new FilesHeader(filesContext));
     }
 
@@ -23,8 +22,8 @@ namespace Metal {
             }
             float size = std::round(ImGui::GetWindowSize().x / CARD_SIZE) * CARD_SIZE - CARD_SIZE;
             int rowIndex = 1;
-            for (auto &child: filesContext->entriesCurrentDir) {
-                bool isSelected = filesContext->selected.contains(child.id);
+            for (auto &child: filesContext->currentDirectory->children) {
+                const bool isSelected = filesContext->selected.contains(child.id);
                 ImGui::PushStyleColor(ImGuiCol_ChildBg,
                                       isSelected || child.isHovered
                                           ? context->getEditorContext().editorRepository.accent
@@ -39,13 +38,13 @@ namespace Metal {
                 }
                 hotkeys();
             }
-            ImGui::EndChild();
         }
+        ImGui::EndChild();
     }
 
     void FilesPanel::renderItem(FileEntry &fEntry) {
         UIUtil::AUX_VEC2.x = CARD_SIZE;
-        UIUtil::AUX_VEC2.x = CARD_SIZE + 15;
+        UIUtil::AUX_VEC2.y = CARD_SIZE + 15;
         if (ImGui::BeginChild(fEntry.id.c_str(), UIUtil::AUX_VEC2, ImGuiChildFlags_Border)) {
             fEntry.isHovered = ImGui::IsWindowHovered();
             isSomethingHovered = isSomethingHovered || fEntry.isHovered;
@@ -126,7 +125,7 @@ namespace Metal {
     }
 
     void FilesPanel::selectAll() const {
-        for (auto &entry: filesContext->entriesCurrentDir) {
+        for (auto &entry: filesContext->currentDirectory->children) {
             filesContext->selected[entry.id] = &entry;
         }
     }
@@ -153,7 +152,7 @@ namespace Metal {
 
     void FilesPanel::openResource(FileEntry &root) const {
         if (root.type == EntryType::DIRECTORY) {
-            filesContext->currentDirectory = &root;
+            filesContext->setCurrentDirectory(&root);
             filesContext->selected.clear();
         } else {
             // OPEN FILE
