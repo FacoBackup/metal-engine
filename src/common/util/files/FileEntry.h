@@ -4,26 +4,24 @@
 
 #include "../../../common/util/Util.h"
 #include "EntryType.h"
+#include "FileMetadata.h"
 
 namespace Metal {
-    struct FileEntry final {
-        std::string name;
+    struct FileEntry final : FileMetadata {
         std::string absolutePath;
         std::string formattedDate;
-        EntryType type;
         std::string formattedSize;
         bool isHovered = false;
         const std::string id = Util::uuidV4();
-        std::vector<FileEntry> children{};
+        std::vector<FileEntry *> children{};
         FileEntry *parent = nullptr;
 
-        FileEntry(FileEntry *parent, std::string name, std::string absolute_path, std::string formatted_date,
-                  EntryType type, std::string formatted_size)
-            : parent(parent), name(std::move(name)),
-              absolutePath(std::move(absolute_path)),
+        FileEntry(FileEntry *parent, std::string absolute_path, std::string formatted_date,
+                  std::string formatted_size)
+            : absolutePath(std::move(absolute_path)),
               formattedDate(std::move(formatted_date)),
-              type(type),
-              formattedSize(std::move(formatted_size)) {
+              formattedSize(std::move(formatted_size)),
+              parent(parent) {
         }
     };
 }

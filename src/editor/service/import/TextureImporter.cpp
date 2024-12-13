@@ -4,9 +4,10 @@
 #include "stb_image_write.h"
 #include <filesystem>
 
-#include "FileMetadata.h"
+#include "../../../common/util/files/FileMetadata.h"
 #include "TextureData.h"
 #include "../../../common/util/files/EntryType.h"
+#include "../../../common/util/files/FilesUtil.h"
 #include "../../../context/ApplicationContext.h"
 #include "../../../engine/LevelOfDetail.h"
 
@@ -15,6 +16,9 @@ namespace fs = std::filesystem;
 namespace Metal {
     void TextureImporter::importTexture(const std::string &targetDir, const std::string &pathToFile) {
         auto metadata = FileMetadata{};
+        metadata.type = EntryType::TEXTURE;
+        metadata.name = fs::path(pathToFile).filename().string();
+        metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.') + 1);
 
         int width, height, channels;
         unsigned char *data = stbi_load(pathToFile.c_str(), &width, &height, &channels, 0);
@@ -27,7 +31,10 @@ namespace Metal {
         reduceImage(metadata.associatedFiles, metadata.getId(), targetDir, textureData, LevelOfDetail::LOD_1);
         reduceImage(metadata.associatedFiles, metadata.getId(), targetDir, textureData, LevelOfDetail::LOD_2);
         reduceImage(metadata.associatedFiles, metadata.getId(), targetDir, textureData, LevelOfDetail::LOD_3);
-        metadata.serialize(targetDir + '/' + metadata.getId() + FILE_METADATA);
+
+        FilesUtil::WriteFile((targetDir + '/' + metadata.getId() + FILE_METADATA).c_str(),
+                             metadata.serialize().c_str());
+        stbi_image_free(textureData.data);
     }
 
     void TextureImporter::reduceImage(std::vector<std::string> &paths, const std::string &fileId,
@@ -45,7 +52,8 @@ namespace Metal {
                 int srcX = x * textureData.width / newWidth;
                 int srcY = y * textureData.height / newHeight;
                 for (int c = 0; c < textureData.channels; ++c) {
-                    resizedData[(y * newWidth + x) * textureData.channels + c] = textureData.data[(srcY * textureData.width + srcX) * textureData.channels + c];
+                    resizedData[(y * newWidth + x) * textureData.channels + c] = textureData.data[
+                        (srcY * textureData.width + srcX) * textureData.channels + c];
                 }
             }
         }
@@ -53,13 +61,13 @@ namespace Metal {
         const std::string newPath = targetDir + "/" +
                                     LevelOfDetail::GetFormattedName(fileId, levelOfDetail, EntryType::TEXTURE);
         paths.push_back(newPath);
-        if (!stbi_write_png(newPath.c_str(), newWidth, newHeight, textureData.channels, resizedData, newWidth *textureData. channels)) {
+        if (!stbi_write_png(newPath.c_str(), newWidth, newHeight, textureData.channels, resizedData,
+                            newWidth * textureData.channels)) {
             stbi_image_free(textureData.data);
             delete[] resizedData;
             throw std::runtime_error("Failed to write resized image: " + newPath);
         }
 
-        stbi_image_free(textureData.data);
         delete[] resizedData;
     }
 } // Metal

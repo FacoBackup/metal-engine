@@ -25,7 +25,6 @@ namespace Metal {
         return image;
     }
 
-
     void TextureService::createVkImage(const uint32_t width, const uint32_t height,
                                        const VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
                                        VkMemoryPropertyFlags properties, VkImage &image,

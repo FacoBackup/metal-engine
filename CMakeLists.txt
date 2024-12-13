@@ -153,15 +153,18 @@ add_executable(
         src/editor/service/import/MeshImporter.cpp
         src/editor/service/import/MeshImporter.h
         src/editor/service/import/AbstractImporter.h
-        src/common/interface/Serializable.h
+        src/common/interface/BinarySerializable.h
         src/engine/LevelOfDetail.h
         src/engine/LevelOfDetail.cpp
         src/editor/service/import/TextureImporter.cpp
         src/editor/service/import/TextureImporter.h
-        src/editor/service/import/FileMetadata.h
+        src/common/util/files/FileMetadata.h
         src/editor/service/import/TextureData.h
         src/context/service/TextureService.cpp
         src/context/service/TextureService.h
+        src/editor/repository/FilesService.cpp
+        src/editor/repository/FilesService.h
+        src/editor/ui/files/FilesContext.cpp
 )
 
 

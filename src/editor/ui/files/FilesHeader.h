@@ -5,11 +5,14 @@
 
 namespace Metal {
     class FilesHeader final : public AbstractPanel {
-        std::unique_ptr<FilesContext> &filesContext;
+        FilesContext &filesContext;
+
     public:
-        explicit FilesHeader(std::unique_ptr<FilesContext> &files_context)
+        explicit FilesHeader(FilesContext &files_context)
             : filesContext(files_context) {
         }
+
+        void renderOptions() const;
 
         void onSync() override;
     };

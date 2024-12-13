@@ -14,7 +14,6 @@ namespace Metal {
         char projectName[128] = "";
 
         ImGuiIO *io = nullptr;
-        bool copied = false;
 
         void renderFileTab();
 

@@ -1,14 +1,14 @@
 #include "MeshImporter.h"
 
+
+#include "../../../common/interface/Serializable.h"
+#include "../../../common/util/files/FileEntry.h"
 #include "../../../context/runtime/MeshData.h"
 #include <iostream>
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
-
-#include "FileMetadata.h"
-#include "../../../common/util/files/FilesUtil.h"
-#include "meshoptimizer.h"
+#include "../../../common/util/files/FileMetadata.h"
 #include "../../../engine/LevelOfDetail.h"
 
 namespace Metal {
@@ -63,19 +63,19 @@ namespace Metal {
         return meshList;
     }
 
-    void MeshImporter::importMesh(const std::string &targetDir, const std::string &pathToFile) {
+    void MeshImporter::ImportMesh(const std::string &targetDir, const std::string &pathToFile) {
         auto metadata = FileMetadata{};
 
         auto imported = ImportMeshes(pathToFile);
         for (MeshData &mesh: imported) {
-            simplifyMesh(metadata.associatedFiles, metadata.getId(), targetDir, mesh, LevelOfDetail::LOD_0);
-            simplifyMesh(metadata.associatedFiles, metadata.getId(), targetDir, mesh, LevelOfDetail::LOD_1);
-            simplifyMesh(metadata.associatedFiles, metadata.getId(), targetDir, mesh, LevelOfDetail::LOD_2);
-            simplifyMesh(metadata.associatedFiles, metadata.getId(), targetDir, mesh, LevelOfDetail::LOD_3);
+            SimplifyMesh(metadata.associatedFiles, metadata.getId(), targetDir, mesh, LevelOfDetail::LOD_0);
+            SimplifyMesh(metadata.associatedFiles, metadata.getId(), targetDir, mesh, LevelOfDetail::LOD_1);
+            SimplifyMesh(metadata.associatedFiles, metadata.getId(), targetDir, mesh, LevelOfDetail::LOD_2);
+            SimplifyMesh(metadata.associatedFiles, metadata.getId(), targetDir, mesh, LevelOfDetail::LOD_3);
         }
     }
 
-    void MeshImporter::simplifyMesh(std::vector<std::string> &paths, const std::string &fileId,
+    void MeshImporter::SimplifyMesh(std::vector<std::string> &paths, const std::string &fileId,
                                     const std::string &targetDir,
                                     const MeshData &mesh, const LevelOfDetail &levelOfDetail) {
         MeshData lowerRes;
