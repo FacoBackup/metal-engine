@@ -1,6 +1,8 @@
 #ifndef COREDESCRIPTORSETS_H
 #define COREDESCRIPTORSETS_H
 
+#include <vulkan/vulkan_core.h>
+
 #include "AbstractCoreRepository.h"
 
 namespace Metal {
@@ -10,15 +12,20 @@ namespace Metal {
 namespace Metal {
     struct CoreDescriptorSets final : AbstractCoreRepository {
         explicit CoreDescriptorSets(ApplicationContext &context)
-                : AbstractCoreRepository(context) {
+            : AbstractCoreRepository(context) {
         }
 
         DescriptorInstance *globalDataDescriptor = nullptr;
-        DescriptorInstance *currentFrameImageDescriptor = nullptr;
+        DescriptorInstance *imageSampler = nullptr;
 
         void onInitialize() override;
 
-        void createDescriptors() const;
+        void createDescriptors();
+
+        void updateImageSamplerDescriptor(VkSampler sampler, VkImageView view);
+
+    private:
+        VkSampler lastSampler = VK_NULL_HANDLE;
     };
 } // Metal
 

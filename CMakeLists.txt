@@ -72,7 +72,6 @@ add_executable(
         src/editor/EditorContext.h
         src/editor/repository/dock/DockRepository.cpp
         src/editor/repository/dock/DockRepository.h
-        src/editor/repository/dock/DockDTO.cpp
         src/editor/repository/dock/DockDTO.h
         src/common/interface/MEnum.h
         src/editor/repository/dock/DockSpace.h
@@ -84,7 +83,7 @@ add_executable(
         src/editor/service/ThemeService.h
         src/editor/repository/EditorRepository.cpp
         src/editor/repository/EditorRepository.h
-        src/common/interface/EntityID.h
+        src/common/interface/engine-definitions.h
         src/editor/ui/metrics/MetricsPanel.cpp
         src/editor/ui/metrics/MetricsPanel.h
         src/editor/ui/files/FilesPanel.cpp
@@ -105,8 +104,6 @@ add_executable(
         src/engine/system/RenderPassSystem.h
         src/engine/render-pass/impl/VoxelVisualizerRenderPass.cpp
         src/engine/render-pass/impl/VoxelVisualizerRenderPass.h
-        src/context/service/TextureService.cpp
-        src/context/service/TextureService.h
         src/context/runtime/TextureInstance.h
         src/context/repository/ResourceRepository.h
         src/common/interface/AbstractResourceService.cpp
@@ -141,11 +138,33 @@ add_executable(
         src/context/runtime/BufferInstance.cpp
         src/context/runtime/BufferInstance.h
         src/context/runtime/PipelineInstance.cpp
-        src/engine/service/mesh/MeshService.cpp
-        src/engine/service/mesh/MeshService.h
-        src/engine/service/mesh/MeshData.h
-        src/engine/service/mesh/MeshInstance.cpp
-        src/engine/service/mesh/MeshInstance.h
+        src/context/service/MeshService.cpp
+        src/context/service/MeshService.h
+        src/context/runtime/MeshData.h
+        src/context/runtime/MeshInstance.cpp
+        src/context/runtime/MeshInstance.h
+        src/common/util/files/FilesUtil.h
+        src/common/util/files/FileEntry.h
+        src/common/util/files/EntryType.h
+        src/editor/ui/files/FilesContext.h
+        src/common/util/files/FileDialogUtil.h
+        src/editor/ui/files/FilesHeader.cpp
+        src/editor/ui/files/FilesHeader.h
+        src/editor/service/import/MeshImporter.cpp
+        src/editor/service/import/MeshImporter.h
+        src/editor/service/import/AbstractImporter.h
+        src/common/interface/BinarySerializable.h
+        src/engine/LevelOfDetail.h
+        src/engine/LevelOfDetail.cpp
+        src/editor/service/import/TextureImporter.cpp
+        src/editor/service/import/TextureImporter.h
+        src/common/util/files/FileMetadata.h
+        src/editor/service/import/TextureData.h
+        src/context/service/TextureService.cpp
+        src/context/service/TextureService.h
+        src/editor/repository/FilesService.cpp
+        src/editor/repository/FilesService.h
+        src/editor/ui/files/FilesContext.cpp
 )
 
 
@@ -159,8 +178,15 @@ find_package(Vulkan)
 find_package(VulkanMemoryAllocator CONFIG REQUIRED)
 find_package(glslang CONFIG REQUIRED)
 find_package(imguizmo CONFIG REQUIRED)
+find_package(nfd CONFIG REQUIRED)
+find_package(assimp CONFIG REQUIRED)
+find_package(meshoptimizer CONFIG REQUIRED)
+
 set(COMMON_LIBRARIES
         glfw
+        nfd::nfd
+        meshoptimizer::meshoptimizer
+        assimp::assimp
         Vulkan::Headers
         vk-bootstrap
         vk-bootstrap-compiler-warnings
@@ -176,6 +202,7 @@ set(COMMON_LIBRARIES
         glslang::SPVRemapper
 )
 target_link_libraries(metal_engine PRIVATE ${COMMON_LIBRARIES})
+target_include_directories(metal_engine PRIVATE dependencies/stb)
 add_subdirectory(dependencies/vk-bootstrap)
 # ------ LIBS
 

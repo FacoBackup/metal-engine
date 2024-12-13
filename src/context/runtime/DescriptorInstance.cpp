@@ -37,7 +37,7 @@ namespace Metal {
     }
 
     void DescriptorInstance::addBufferDescriptor(const uint32_t bindingPoint, VkDescriptorType type,
-                                                 BufferInstance *bufferInstance) {
+                                                 const std::shared_ptr<BufferInstance> &bufferInstance) {
         if (!ready) {
             throw std::runtime_error("Descriptor instance is not ready");
         }

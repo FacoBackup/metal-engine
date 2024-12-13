@@ -24,20 +24,17 @@ namespace Metal::Util {
         for (i = 0; i < 8; i++) {
             ss << dis(gen);
         }
-        ss << "-";
         for (i = 0; i < 4; i++) {
             ss << dis(gen);
         }
-        ss << "-4";
+        ss << "4";
         for (i = 0; i < 3; i++) {
             ss << dis(gen);
         }
-        ss << "-";
         ss << dis2(gen);
         for (i = 0; i < 3; i++) {
             ss << dis(gen);
         }
-        ss << "-";
         for (i = 0; i < 12; i++) {
             ss << dis(gen);
         };
@@ -47,33 +44,6 @@ namespace Metal::Util {
     template<typename T>
     int indexOf(const std::vector<T> &v, T val) {
         return std::find(v.begin(), v.end(), val) != v.end();
-    }
-
-
-    inline void WriteBinaryFile(const char *pFilename, const void *pData, size_t size) {
-        FILE *f = fopen(pFilename, "wb");
-        if (!f) {
-            throw std::runtime_error("Error opening file : " + std::string(pFilename));
-        }
-
-        if (const size_t bytes_written = fwrite(pData, 1, size, f); bytes_written != size) {
-            throw std::runtime_error("Error writing to binary file: " + std::string(pFilename));
-        }
-        fclose(f);
-    }
-
-    inline void ReadFile(const char *pFileName, std::string &outFile) {
-        if (std::ifstream f(pFileName); f.is_open()) {
-            std::string line;
-            while (getline(f, line)) {
-                outFile.append(line);
-                outFile.append("\n");
-            }
-
-            f.close();
-        } else {
-            throw std::runtime_error("Error opening file : " + std::string(pFileName));
-        }
     }
 }
 #endif //UTIL_H

@@ -11,7 +11,7 @@ namespace Metal {
     public:
         explicit DescriptorService(ApplicationContext &context);
 
-        [[nodiscard]] DescriptorInstance *createDescriptor() const;
+        DescriptorInstance *createDescriptor();
 
         void addLayoutBinding(DescriptorInstance *instance, VkShaderStageFlagBits stageFlags,
                               VkDescriptorType descriptorType,

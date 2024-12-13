@@ -48,6 +48,18 @@
     {
       "name": "vulkan-memory-allocator",
       "version>=": "3.1.0"
+    },
+    {
+      "name": "nativefiledialog-extended",
+      "version>=": "1.2.1"
+    },
+    {
+      "name": "assimp",
+      "version>=": "5.4.3"
+    },
+    {
+      "name": "meshoptimizer",
+      "version>=": "0.22"
     }
   ]
 }

@@ -3,7 +3,6 @@
 
 #include "repository/RuntimeRepository.h"
 #include "repository/camera/CameraRepository.h"
-#include "../context/repository/ResourceRepository.h"
 #include "service/camera/CameraMovementService.h"
 #include "system/RenderPassSystem.h"
 #include "system/camera/CameraSystem.h"
@@ -34,11 +33,8 @@ namespace Metal {
 
         // ----------- REPOSITORIES
         CameraRepository cameraRepository{context};
-        ResourceRepository resourceRepository{};
         RuntimeRepository runtimeRepository{};
         // ----------- REPOSITORIES
-
-        void dispose() const;
 
         void onInitialize() override;
 

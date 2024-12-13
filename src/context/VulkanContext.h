@@ -20,6 +20,7 @@
 #include "service/PipelineService.h"
 #include "service/ShaderService.h"
 #include "service/BufferService.h"
+#include "service/MeshService.h"
 
 #define IMAGE_COUNT 2
 #define VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME "VK_KHR_portability_subset"
@@ -85,6 +86,7 @@ namespace Metal {
         // ----------- CORE REPOSITORIES
 
         // ----------- Services
+        MeshService meshService{context};
         TextureService textureService{context};
         FrameBufferService framebufferService{context};
         PipelineService pipelineService{context};
@@ -93,7 +95,7 @@ namespace Metal {
         DescriptorService descriptorService{context};
         // ----------- Services
 
-        void dispose() const;
+        void dispose();
 
         void onInitialize() override;
 

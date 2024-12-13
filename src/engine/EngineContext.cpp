@@ -4,13 +4,6 @@
 #include "../context/runtime/BufferInstance.h"
 
 namespace Metal {
-    void EngineContext::dispose() const {
-        for (auto &resource: resourceRepository.resources) {
-            resource.second->dispose(context.getVulkanContext());
-            delete resource.second;
-        }
-    }
-
     void EngineContext::onInitialize() {
         cameraSystem.onInitialize();
     }

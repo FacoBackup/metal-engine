@@ -12,6 +12,8 @@ namespace Metal {
 
         void onInitialize() override;
 
+        void dispose();
+
         PipelineInstance *debugPipeline = nullptr;
     };
 } // Metal

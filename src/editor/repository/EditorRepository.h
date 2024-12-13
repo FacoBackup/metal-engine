@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <glm/vec3.hpp>
 
-#include "../../common/interface/EntityID.h"
+#include "../../common/interface/engine-definitions.h"
 #include "../../engine/repository/camera/Camera.h"
 
 namespace Metal {

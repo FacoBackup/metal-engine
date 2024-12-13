@@ -3,7 +3,7 @@
 #include "RuntimeResource.h"
 
 namespace Metal {
-    struct FrameBufferAttachment final : RuntimeResource {
+    struct FrameBufferAttachment final {
         VkImage vkImage = VK_NULL_HANDLE;
         VkDeviceMemory mem = VK_NULL_HANDLE;
         VkImageView vkImageView = VK_NULL_HANDLE;
@@ -12,7 +12,7 @@ namespace Metal {
         bool depth = false;
         const char *name = nullptr;
 
-        void dispose(VulkanContext &context) override {
+        void dispose(const VulkanContext &context) const {
             vkDestroySampler(context.device.device, vkImageSampler, nullptr);
             vkDestroyImage(context.device.device, vkImage, nullptr);
             vkDestroyImageView(context.device.device, vkImageView, nullptr);

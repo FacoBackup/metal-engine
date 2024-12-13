@@ -21,4 +21,8 @@ namespace Metal {
         debugPipeline->recordDrawSimpleInstanced(3, 1);
         debugPipeline->stopRecording();
     }
+
+    void CorePipelines::dispose() {
+        debugPipeline->dispose(vulkanContext);
+    }
 } // Metal

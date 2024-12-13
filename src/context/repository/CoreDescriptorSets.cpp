@@ -9,33 +9,44 @@
 
 namespace Metal {
     void CoreDescriptorSets::onInitialize() {
-        const DescriptorService &service = context.getVulkanContext().descriptorService;
+        DescriptorService &service = vulkanContext.descriptorService;
 
         globalDataDescriptor = service.createDescriptor();
-        service.addLayoutBinding(globalDataDescriptor, static_cast<VkShaderStageFlagBits>(VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0);
-        globalDataDescriptor->createLayout(context.getVulkanContext());
+        service.addLayoutBinding(globalDataDescriptor,
+                                 static_cast<VkShaderStageFlagBits>(
+                                     VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT),
+                                 VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0);
+        globalDataDescriptor->createLayout(vulkanContext);
 
-        currentFrameImageDescriptor = service.createDescriptor();
-        service.addLayoutBinding(currentFrameImageDescriptor, VK_SHADER_STAGE_FRAGMENT_BIT,
+        imageSampler = service.createDescriptor();
+        service.addLayoutBinding(imageSampler, VK_SHADER_STAGE_FRAGMENT_BIT,
                                  VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-        currentFrameImageDescriptor->createLayout(context.getVulkanContext());
+        imageSampler->createLayout(vulkanContext);
     }
 
-    void CoreDescriptorSets::createDescriptors() const {
-        const auto pool = context.getVulkanContext().descriptorPool;
+    void CoreDescriptorSets::createDescriptors() {
+        const auto pool = vulkanContext.descriptorPool;
 
-        globalDataDescriptor->create(context.getVulkanContext(), pool);
+        globalDataDescriptor->create(vulkanContext, pool);
         globalDataDescriptor->addBufferDescriptor(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                             context.getVulkanContext().coreBuffers.globalData);
-        globalDataDescriptor->write(context.getVulkanContext());
+                                                  vulkanContext.coreBuffers.globalData);
+        globalDataDescriptor->write(vulkanContext);
 
 
-        currentFrameImageDescriptor->create(context.getVulkanContext(), pool);
-        currentFrameImageDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                        context.getVulkanContext().coreFrameBuffers.auxRenderPass->
-                                                        attachments[0]->vkImageSampler,
-                                                        context.getVulkanContext().coreFrameBuffers.auxRenderPass->
-                                                        attachments[0]->vkImageView);
-        currentFrameImageDescriptor->write(context.getVulkanContext());
+        imageSampler->create(vulkanContext, pool);
+        updateImageSamplerDescriptor(vulkanContext.coreFrameBuffers.auxRenderPass->
+                                     attachments[0]->vkImageSampler,
+                                     vulkanContext.coreFrameBuffers.auxRenderPass->
+                                     attachments[0]->vkImageView);
+    }
+
+    void CoreDescriptorSets::updateImageSamplerDescriptor(VkSampler sampler, VkImageView view) {
+        if (sampler != lastSampler) {
+            lastSampler = sampler;
+            imageSampler->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                             sampler,
+                                             view);
+            imageSampler->write(vulkanContext);
+        }
     }
 } // Metal

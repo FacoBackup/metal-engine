@@ -31,7 +31,7 @@ namespace Metal {
         colors[ImGuiCol_ChildBg] = palette1;
         colors[ImGuiCol_PopupBg] = palette1;
         colors[ImGuiCol_Border] = palette3;
-        colors[ImGuiCol_BorderShadow] = palette0;
+        colors[ImGuiCol_BorderShadow] = ImVec4(0.f, 0.f, 0.f, 0.f);
         colors[ImGuiCol_FrameBg] = palette2;
         colors[ImGuiCol_TitleBg] = palette1;
         colors[ImGuiCol_TitleBgActive] = palette1;
@@ -71,7 +71,7 @@ namespace Metal {
         colors[ImGuiCol_FrameBgActive] = editorRepository.accent;
         colors[ImGuiCol_CheckMark] = editorRepository.accent;
         colors[ImGuiCol_SliderGrabActive] = editorRepository.accent;
-        colors[ImGuiCol_Button] = editorRepository.accent;
+        colors[ImGuiCol_Button] = palette3;
         colors[ImGuiCol_ButtonHovered] = editorRepository.accent;
         colors[ImGuiCol_Header] = editorRepository.accent;
         colors[ImGuiCol_HeaderHovered] = editorRepository.accent;

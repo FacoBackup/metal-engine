@@ -5,7 +5,7 @@
 #include "../runtime/FrameBufferAttachment.h"
 
 namespace Metal {
-    FrameBufferInstance *FrameBufferService::createFrameBuffer(const uint32_t w, const uint32_t h) const {
+    FrameBufferInstance *FrameBufferService::createFrameBuffer(const uint32_t w, const uint32_t h) {
         auto *framebuffer = new FrameBufferInstance();
         framebuffer->bufferWidth = w;
         framebuffer->bufferHeight = h;
@@ -15,25 +15,25 @@ namespace Metal {
 
     void FrameBufferService::createDepthAttachment(FrameBufferInstance *framebuffer) const {
         VkFormat depthFormat = VulkanUtils::GetValidDepthFormat(vulkanContext.physDevice.physical_device);
-        FrameBufferAttachment *att = createAttachmentInternal("Depth attachment", depthFormat,
-                                                              VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, framebuffer);
+        const auto att = createAttachmentInternal("Depth attachment", depthFormat,
+                                                  VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, framebuffer);
         att->depth = true;
     }
 
     void FrameBufferService::createAttachment(const char *name, VkFormat format, VkImageUsageFlagBits usage,
                                               FrameBufferInstance *pipeline) const {
-        FrameBufferAttachment *att = createAttachmentInternal(name, format, usage, pipeline);
+        const auto att = createAttachmentInternal(name, format, usage, pipeline);
         att->depth = false;
     }
 
-    FrameBufferAttachment *FrameBufferService::createAttachmentInternal(const char *name, VkFormat format,
-                                                                        VkImageUsageFlagBits usage,
-                                                                        FrameBufferInstance *framebuffer) const {
-        auto *attachment = new FrameBufferAttachment;
+    std::shared_ptr<FrameBufferAttachment> FrameBufferService::createAttachmentInternal(
+        const char *name, VkFormat format,
+        VkImageUsageFlagBits usage,
+        FrameBufferInstance *framebuffer) const {
+        std::shared_ptr<FrameBufferAttachment> attachment(new FrameBufferAttachment);
         attachment->name = name;
         framebuffer->attachments.push_back(attachment);
         attachment->format = format;
-        registerResource(attachment);
 
 
         VkImageAspectFlags aspectMask = 0;
@@ -102,7 +102,8 @@ namespace Metal {
         samplerCreateInfo.maxAnisotropy = 8;
         samplerCreateInfo.anisotropyEnable = VK_TRUE;
         samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
-        VulkanUtils::CheckVKResult(vkCreateSampler(vulkanContext.device.device, &samplerCreateInfo, nullptr, &attachment->vkImageSampler));
+        VulkanUtils::CheckVKResult(vkCreateSampler(vulkanContext.device.device, &samplerCreateInfo, nullptr,
+                                                   &attachment->vkImageSampler));
 
         return attachment;
     }
@@ -111,7 +112,7 @@ namespace Metal {
         for (uint32_t i = 0; i < static_cast<uint32_t>(framebuffer->attachments.size()); i++) {
             // ATTACHMENT DESCRIPTION
             VkAttachmentDescription attachmentDescription{};
-            const auto *fbAttachment = framebuffer->attachments[i];
+            const std::shared_ptr<FrameBufferAttachment> fbAttachment = framebuffer->attachments[i];
             attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
             attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
             attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;

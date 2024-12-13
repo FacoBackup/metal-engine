@@ -11,6 +11,7 @@ namespace Metal {
         const std::string BUTTON_OPEN_PROJECT = Icons::file_open + "Open##openProject";
         const std::string BUTTON_SAVE_PROJECT = (Icons::save + "Save##save");
         const std::string BUTTON_FULL_SCREEN = Icons::fullscreen + "##fullscreen";
+        char projectName[128] = "";
 
         ImGuiIO *io = nullptr;
 
