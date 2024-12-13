@@ -12,6 +12,8 @@ namespace Metal {
         VkShaderModule vkShaderModule = VK_NULL_HANDLE;
 
         void initialize(glslang_program_t *program);
+
+        void dispose(VulkanContext &context) override;
     };
 } // Metal
 

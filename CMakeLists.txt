@@ -178,12 +178,10 @@ find_package(imguizmo CONFIG REQUIRED)
 find_package(nfd CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(meshoptimizer CONFIG REQUIRED)
-find_package(Stb REQUIRED)
 
 set(COMMON_LIBRARIES
         glfw
         nfd::nfd
-        Stb
         meshoptimizer::meshoptimizer
         assimp::assimp
         Vulkan::Headers
@@ -201,6 +199,7 @@ set(COMMON_LIBRARIES
         glslang::SPVRemapper
 )
 target_link_libraries(metal_engine PRIVATE ${COMMON_LIBRARIES})
+target_include_directories(metal_engine PRIVATE dependencies/stb)
 add_subdirectory(dependencies/vk-bootstrap)
 # ------ LIBS
 

@@ -18,6 +18,12 @@ namespace Metal {
 
     void EditorHeaderPanel::renderFileTab() {
         if (ImGui::BeginMainMenuBar()) {
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0, 0, 0));
+            if (UIUtil::ButtonSimple(Icons::save, UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
+                // Action for save
+            }
+            ImGui::PopStyleColor();
+            ImGui::SameLine();
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("New")) {
                     // Action for "New"
@@ -55,26 +61,24 @@ namespace Metal {
                 }
                 ImGui::EndMenu();
             }
-            UIUtil::Spacing();
-            if (ImGui::Button(Icons::save.c_str())) {
-                // Action for save
-            }
 
             UIUtil::Spacing();
-            ImGui::Text(Icons::file_open.c_str());
+            ImGui::Text(Icons::inventory_2.c_str());
             ImGui::SameLine();
 
             if (!copied) {
                 strcpy(projectName, context->getProjectName().c_str());
                 copied = true;
             }
+            ImGui::SetNextItemWidth(150.0f);
             if (ImGui::InputText(id.c_str(), projectName, 128, ImGuiInputTextFlags_EnterReturnsTrue)) {
                 context->updateProjectName(projectName);
             }
+
+            UIUtil::DynamicSpacing(150);
+            framerate();
             ImGui::EndMainMenuBar();
         }
-        UIUtil::DynamicSpacing(150);
-        framerate();
     }
 
     void EditorHeaderPanel::framerate() {
