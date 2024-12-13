@@ -95,6 +95,9 @@ namespace Metal {
     }
 
     ShaderModuleInstance *ShaderService::createShaderModule(const char *pFilename) {
+        const std::string basePath = context.getRootDirectory() + "/shaders/";
+
+        FilesUtil::MkDir(basePath);
         std::string source;
         FilesUtil::ReadFile(pFilename, source);
 
@@ -103,7 +106,9 @@ namespace Metal {
         glslang_initialize_process();
         auto *shader = new ShaderModuleInstance;
         if (compileShader(shaderStage, source.c_str(), shader)) {
-            const std::string BinaryFilename = std::string(pFilename) + ".spv";
+            const std::string part(pFilename);
+            const std::string BinaryFilename = basePath + part.substr(
+                                                   part.find_last_of('/') + 1, part.size()) + ".spv";
             FilesUtil::WriteBinaryFile(BinaryFilename.c_str(), shader->SPIRV.data(),
                                        shader->SPIRV.size() * sizeof(uint32_t));
             registerResource(shader);

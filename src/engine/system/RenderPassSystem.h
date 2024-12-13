@@ -3,7 +3,7 @@
 #include <array>
 
 #include "../render-pass/AbstractRenderPass.h"
-#include "../render-pass/impl/VoxelVisualizerRenderPass.h"
+#include "../render-pass/impl/OpaqueRenderPass.h"
 
 namespace Metal {
     class ApplicationContext;
@@ -15,7 +15,7 @@ namespace Metal {
 
     public:
         explicit RenderPassSystem(ApplicationContext &context) : AbstractRuntimeComponent(context) {
-            renderPasses[0] = new VoxelVisualizerRenderPass(context);
+            renderPasses[0] = new OpaqueRenderPass(context);
         }
 
         void onSync() override;

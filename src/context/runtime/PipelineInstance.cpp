@@ -1,6 +1,8 @@
 #include "PipelineInstance.h"
 
+#include "BufferInstance.h"
 #include "DescriptorInstance.h"
+#include "MeshInstance.h"
 #include "FrameBufferInstance.h"
 
 namespace Metal {
@@ -58,5 +60,12 @@ namespace Metal {
     void PipelineInstance::dispose(VulkanContext &context) {
         vkDestroyPipelineLayout(context.device.device, vkPipelineLayout, nullptr);
         vkDestroyPipeline(context.device.device, vkPipeline, nullptr);
+    }
+
+    void PipelineInstance::bindMesh(const MeshInstance *instance, const uint32_t instanceCount) const {
+        constexpr VkDeviceSize offsets[] = {0};
+        vkCmdBindVertexBuffers(vkCommandBuffer, 0, 1, &instance->dataBuffer->vkBuffer, offsets);
+        vkCmdBindIndexBuffer(vkCommandBuffer, instance->indexBuffer->vkBuffer, 0, VK_INDEX_TYPE_UINT32);
+        vkCmdDrawIndexed(vkCommandBuffer, instance->indexCount, instanceCount, 0, 0, 0);
     }
 }

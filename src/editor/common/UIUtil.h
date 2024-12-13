@@ -5,6 +5,7 @@
 #include <string>
 
 #include "../../common/util/files/EntryType.h"
+#include "../../common/interface/Icons.h"
 
 namespace Metal::UIUtil {
     static constexpr ImVec4 DIRECTORY_COLOR{188 / 255.f, 128 / 255.f, 78 / 255.f, 1};
@@ -17,6 +18,7 @@ namespace Metal::UIUtil {
     static ImVec2 AUX_VEC2(0, 0);
     static constexpr int ONLY_ICON_BUTTON_SIZE = 23;
     static bool OPEN = true;
+    static ImVec2 DEFAULT_PADDING(4, 4);
 
     static bool RenderOption(const std::string &label, const bool selected, const float sizeX, const float sizeY,
                              const ImVec4 &accent) {

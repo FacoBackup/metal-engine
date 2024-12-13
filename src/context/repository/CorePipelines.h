@@ -4,6 +4,7 @@
 
 namespace Metal {
     struct PipelineInstance;
+    struct MeshInstance;
 
     struct CorePipelines final : AbstractCoreRepository {
         explicit CorePipelines(ApplicationContext &context)
@@ -15,6 +16,7 @@ namespace Metal {
         void dispose();
 
         PipelineInstance *debugPipeline = nullptr;
+        MeshInstance *sampleMesh = nullptr;
     };
 } // Metal
 

@@ -6,10 +6,9 @@ namespace Metal {
     struct BufferInstance;
 
     struct MeshInstance final : RuntimeResource {
-        std::shared_ptr<BufferInstance> vertexBuffer = nullptr;
+        std::shared_ptr<BufferInstance> dataBuffer = nullptr;
         std::shared_ptr<BufferInstance> indexBuffer = nullptr;
-        std::shared_ptr<BufferInstance> normalBuffer = nullptr;
-        std::shared_ptr<BufferInstance> uvBuffer = nullptr;
+        uint32_t indexCount = -1;
 
         void dispose(VulkanContext &context) override;
     };

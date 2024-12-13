@@ -3,10 +3,13 @@
 #include "../../common/util/VulkanUtils.h"
 #include "../runtime/FrameBufferInstance.h"
 #include "../runtime/PipelineInstance.h"
+#include "../runtime/MeshData.h"
+#include "../runtime/VertexData.h"
 #include "../runtime/DescriptorInstance.h"
 
 namespace Metal {
-    void PipelineService::createPipelineLayout(const std::vector<DescriptorInstance *> &descriptorSetsToBind, const uint32_t pushConstantsSize, PipelineInstance *pipeline) {
+    void PipelineService::createPipelineLayout(const std::vector<DescriptorInstance *> &descriptorSetsToBind,
+                                               const uint32_t pushConstantsSize, PipelineInstance *pipeline) const {
         VkPipelineLayoutCreateInfo layoutInfo = {};
         layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         std::vector<VkDescriptorSetLayout> descriptorLayouts;
@@ -35,8 +38,13 @@ namespace Metal {
                                                                VkCullModeFlagBits cullMode,
                                                                const char *vertexShader,
                                                                const char *fragmentShader,
-                                                               const std::vector<DescriptorInstance *> &descriptorSetsToBind,
-                                                               const uint32_t pushConstantsSize) {
+                                                               const std::vector<DescriptorInstance *> &
+                                                               descriptorSetsToBind,
+                                                               const uint32_t pushConstantsSize,
+                                                               bool prepareForMesh) {
+        VkVertexInputBindingDescription *meshBindingDescription = nullptr;
+        auto meshDescriptions = VertexData::GetAttributeDescriptions();
+
         auto *pipeline = new PipelineInstance();
         pipeline->pushConstantsSize = pushConstantsSize;
         pipeline->frameBuffer = frameBuffer;
@@ -57,6 +65,18 @@ namespace Metal {
 
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+
+        if (prepareForMesh) {
+            meshBindingDescription = new VkVertexInputBindingDescription;
+            meshBindingDescription->binding = 0;
+            meshBindingDescription->stride = sizeof(VertexData);
+            meshBindingDescription->inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+            vertexInputInfo.vertexBindingDescriptionCount = 1;
+            vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(meshDescriptions.size());
+            vertexInputInfo.pVertexBindingDescriptions = meshBindingDescription;
+            vertexInputInfo.pVertexAttributeDescriptions = meshDescriptions.data();
+        }
 
         VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
         inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -99,7 +119,7 @@ namespace Metal {
         colorBlending.blendConstants[2] = 0.0f;
         colorBlending.blendConstants[3] = 0.0f;
 
-        std::vector<VkDynamicState> dynamicStates = {
+        std::vector dynamicStates = {
             VK_DYNAMIC_STATE_VIEWPORT,
             VK_DYNAMIC_STATE_SCISSOR
         };
@@ -130,6 +150,7 @@ namespace Metal {
                                                              &pipeline->vkPipeline));
         pipeline->descriptorSets = descriptorSetsToBind;
         createCommandBuffer(pipeline);
+        delete meshBindingDescription;
         return pipeline;
     }
 

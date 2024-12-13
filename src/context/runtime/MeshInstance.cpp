@@ -5,13 +5,9 @@
 namespace Metal {
     void MeshInstance::dispose(VulkanContext &context) {
         indexBuffer->dispose(context);
-        normalBuffer->dispose(context);
-        vertexBuffer->dispose(context);
-        uvBuffer->dispose(context);
+        dataBuffer->dispose(context);
 
         indexBuffer = nullptr;
-        normalBuffer = nullptr;
-        vertexBuffer = nullptr;
-        uvBuffer = nullptr;
+        dataBuffer = nullptr;
     }
 } // Metal

@@ -102,8 +102,8 @@ add_executable(
         src/engine/render-pass/AbstractRenderPass.h
         src/engine/system/RenderPassSystem.cpp
         src/engine/system/RenderPassSystem.h
-        src/engine/render-pass/impl/VoxelVisualizerRenderPass.cpp
-        src/engine/render-pass/impl/VoxelVisualizerRenderPass.h
+        src/engine/render-pass/impl/OpaqueRenderPass.cpp
+        src/engine/render-pass/impl/OpaqueRenderPass.h
         src/context/runtime/TextureInstance.h
         src/context/repository/ResourceRepository.h
         src/common/interface/AbstractResourceService.cpp
@@ -165,6 +165,10 @@ add_executable(
         src/editor/repository/FilesService.cpp
         src/editor/repository/FilesService.h
         src/editor/ui/files/FilesContext.cpp
+        src/context/repository/MeshPushConstant.h
+        src/context/runtime/VertexData.h
+        src/editor/ui/viewport/CameraPositionPanel.cpp
+        src/editor/ui/viewport/CameraPositionPanel.h
 )
 
 

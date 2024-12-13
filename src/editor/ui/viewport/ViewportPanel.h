@@ -9,6 +9,9 @@ namespace Metal {
         bool isFirstMovement = false;
 
     public:
+
+        void onInitialize() override;
+
         void onSync() override;
 
         void updateCamera();
