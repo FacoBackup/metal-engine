@@ -1,6 +1,6 @@
 #ifndef MESHSERVICE_H
 #define MESHSERVICE_H
-#include "../../../common/interface/AbstractResourceService.h"
+#include "../../common/interface/AbstractResourceService.h"
 
 namespace Metal {
     struct MeshData;
@@ -12,7 +12,7 @@ namespace Metal {
             : AbstractResourceService(context) {
         }
 
-        [[nodiscard]] MeshInstance *createMesh(const MeshData &data) const;
+        MeshInstance *createMesh(const MeshData &data);
 
         void dispose(MeshInstance *instance) const;
     };

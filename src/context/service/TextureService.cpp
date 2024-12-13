@@ -5,7 +5,7 @@
 #include "../runtime/TextureInstance.h"
 
 namespace Metal {
-    TextureInstance *TextureService::loadTexture(const std::string &pathToImage) const {
+    TextureInstance *TextureService::loadTexture(const std::string &pathToImage)  {
         auto *image = new TextureInstance;
         registerResource(image);
 

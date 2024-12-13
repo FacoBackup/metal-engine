@@ -1,5 +1,7 @@
 #ifndef COREBUFFERS_H
 #define COREBUFFERS_H
+#include <memory>
+
 #include "AbstractCoreRepository.h"
 
 namespace Metal {
@@ -12,7 +14,7 @@ namespace Metal {
 
         void onInitialize() override;
 
-        BufferInstance *globalData = nullptr;
+        std::shared_ptr<BufferInstance> globalData = nullptr;
     };
 } // Metal
 

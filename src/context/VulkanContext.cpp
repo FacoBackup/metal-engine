@@ -231,7 +231,13 @@ namespace Metal {
         // ------- REPOSITORY INITIALIZATION
     }
 
-    void VulkanContext::dispose() const {
+    void VulkanContext::dispose() {
+        pipelineService.disposeAll();
+        descriptorService.disposeAll();
+        framebufferService.disposeAll();
+        shaderService.disposeAll();
+        textureService.disposeAll();
+        meshService.disposeAll();
         vkDestroyDescriptorPool(context.getVulkanContext().device.device, descriptorPool,
                                 nullptr);
         vkDestroyCommandPool(context.getVulkanContext().device.device, commandPool,

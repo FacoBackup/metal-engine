@@ -9,7 +9,7 @@ namespace Metal {
     struct TextureInstance;
 
     class TextureService final : public AbstractResourceService {
-        VkSampler createVkSampler() const;
+        [[nodiscard]] VkSampler createVkSampler() const;
 
         VkImageView createVkImageView(VkImage image, VkFormat format) const;
 
@@ -18,11 +18,11 @@ namespace Metal {
             : AbstractResourceService(context) {
         }
 
-        [[nodiscard]] TextureInstance *loadTexture(const std::string &pathToImage) const;
+        TextureInstance *loadTexture(const std::string &pathToImage);
 
         void createVkImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
-                         VkImageUsageFlags usage,
-                         VkMemoryPropertyFlags properties, VkImage &image, VkDeviceMemory &imageMemory) const;
+                           VkImageUsageFlags usage,
+                           VkMemoryPropertyFlags properties, VkImage &image, VkDeviceMemory &imageMemory) const;
     };
 } // Metal
 

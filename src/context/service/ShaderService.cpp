@@ -94,7 +94,7 @@ namespace Metal {
         throw std::runtime_error("Unknown shader stage in file");
     }
 
-    ShaderModuleInstance *ShaderService::createShaderModule(const char *pFilename) const {
+    ShaderModuleInstance *ShaderService::createShaderModule(const char *pFilename) {
         std::string source;
         FilesUtil::ReadFile(pFilename, source);
 
@@ -105,7 +105,7 @@ namespace Metal {
         if (compileShader(shaderStage, source.c_str(), shader)) {
             const std::string BinaryFilename = std::string(pFilename) + ".spv";
             FilesUtil::WriteBinaryFile(BinaryFilename.c_str(), shader->SPIRV.data(),
-                                  shader->SPIRV.size() * sizeof(uint32_t));
+                                       shader->SPIRV.size() * sizeof(uint32_t));
             registerResource(shader);
         } else {
             delete shader;

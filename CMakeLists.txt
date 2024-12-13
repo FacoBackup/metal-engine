@@ -138,11 +138,11 @@ add_executable(
         src/context/runtime/BufferInstance.cpp
         src/context/runtime/BufferInstance.h
         src/context/runtime/PipelineInstance.cpp
-        src/engine/service/mesh/MeshService.cpp
-        src/engine/service/mesh/MeshService.h
-        src/engine/service/mesh/MeshData.h
-        src/engine/service/mesh/MeshInstance.cpp
-        src/engine/service/mesh/MeshInstance.h
+        src/context/service/MeshService.cpp
+        src/context/service/MeshService.h
+        src/context/runtime/MeshData.h
+        src/context/runtime/MeshInstance.cpp
+        src/context/runtime/MeshInstance.h
         src/common/util/files/FilesUtil.h
         src/common/util/files/FileEntry.h
         src/common/util/files/EntryType.h

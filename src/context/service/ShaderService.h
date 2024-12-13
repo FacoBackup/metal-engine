@@ -23,7 +23,7 @@ namespace Metal {
             : AbstractResourceService(context) {
         }
 
-        ShaderModuleInstance *createShaderModule(const char *pFilename) const;
+        ShaderModuleInstance *createShaderModule(const char *pFilename);
     };
 } // Metal
 

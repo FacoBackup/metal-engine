@@ -1,22 +1,27 @@
 #ifndef ABSTRACTRESOURCESERVICE_H
 #define ABSTRACTRESOURCESERVICE_H
+#include <string>
+#include <unordered_map>
+
 #include "AbstractRuntimeComponent.h"
 
 namespace Metal {
     class VulkanContext;
     class RuntimeResource;
-    struct ResourceRepository;
-
-    class ApplicationContext;
 
     class AbstractResourceService : public AbstractRuntimeComponent {
+        std::unordered_map<std::string, RuntimeResource *> resources{};
+
     protected:
         VulkanContext &vulkanContext;
-        ResourceRepository &repository;
 
-        void registerResource(RuntimeResource *resource) const;
+        void registerResource(RuntimeResource *resource);
+
+        void dispose(RuntimeResource *resource);
 
     public:
+        void disposeAll();
+
         explicit AbstractResourceService(ApplicationContext &context);
     };
 } // Metal

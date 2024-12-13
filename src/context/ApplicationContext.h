@@ -1,6 +1,6 @@
 #ifndef METAL_ENGINE_APPLICATIONCONTEXT_H
 #define METAL_ENGINE_APPLICATIONCONTEXT_H
-
+#define PROJECT_METADATA_FILE "metal-project.txt"
 #include "../engine/EngineContext.h"
 #include "GuiContext.h"
 #include "../editor/common/IPanel.h"
@@ -15,29 +15,46 @@ namespace Metal {
         GuiContext guiContext{*this};
         IPanel &rootPanel;
         std::string rootDirectory;
-
-        void updateRootPath();
+        std::string projectName;
 
     public:
+        void updateRootPath(bool forceSelection);
+
+        void updateProjectName(const std::string &projectName);
+
         void dispose();
 
-        EngineContext &getEngineContext();
+        [[nodiscard]] bool isValidContext() const {
+            return glfwContext.isValidContext();
+        }
 
-        EditorContext &getEditorContext();
+        EditorContext &getEditorContext() {
+            return editorContext;
+        }
 
-        GLFWContext &getGLFWContext();
+        EngineContext &getEngineContext() {
+            return engineContext;
+        }
 
-        VulkanContext &getVulkanContext();
+        GLFWContext &getGLFWContext() {
+            return glfwContext;
+        }
 
-        void start();
+        VulkanContext &getVulkanContext() {
+            return vulkanContext;
+        }
 
-        bool isValidContext() const;
-
-        explicit ApplicationContext(IPanel &root_panel, bool debugMode);
+        const std::string &getProjectName() {
+            return projectName;
+        }
 
         [[nodiscard]] const std::string &getRootDirectory() const {
             return rootDirectory;
         }
+
+        void start();
+
+        explicit ApplicationContext(IPanel &root_panel, bool debugMode);
     };
 }
 

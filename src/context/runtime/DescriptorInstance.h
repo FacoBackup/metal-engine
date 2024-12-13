@@ -18,11 +18,12 @@ namespace Metal {
 
         void create(const VulkanContext &context, VkDescriptorPool pool);
 
-        void addBufferDescriptor(uint32_t bindingPoint, VkDescriptorType type, BufferInstance *bufferInstance);
+        void addBufferDescriptor(uint32_t bindingPoint, VkDescriptorType type,
+                                 const std::shared_ptr<BufferInstance> &bufferInstance);
 
         void addImageDescriptor(uint32_t bindingPoint, VkDescriptorType type, VkSampler sampler, VkImageView view);
 
-        void write(const VulkanContext &context) ;
+        void write(const VulkanContext &context);
 
         std::vector<VkDescriptorSetLayoutBinding> descriptorSetLayoutBindings;
         std::vector<VkWriteDescriptorSet> writeDescriptorSets;

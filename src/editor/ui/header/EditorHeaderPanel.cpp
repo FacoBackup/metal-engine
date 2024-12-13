@@ -1,6 +1,7 @@
 #include "EditorHeaderPanel.h"
 #include "GlobalSettingsPanel.h"
 #include "../../common/UIUtil.h"
+#include "../../../context/ApplicationContext.h"
 
 namespace Metal {
     void EditorHeaderPanel::onSync() {
@@ -16,45 +17,63 @@ namespace Metal {
     }
 
     void EditorHeaderPanel::renderFileTab() {
-        if (ImGui::Button(BUTTON_NEW_PROJECT.c_str())) {
+        if (ImGui::BeginMainMenuBar()) {
+            if (ImGui::BeginMenu("File")) {
+                if (ImGui::MenuItem("New")) {
+                    // Action for "New"
+                }
+                if (ImGui::MenuItem("Open", "Ctrl+O")) {
+                    context->updateRootPath(true); // TODO - CLEAN STATE
+                }
+                if (ImGui::MenuItem("Save", "Ctrl+S")) {
+                    // Action for "Save"
+                }
+                ImGui::Separator(); // Adds a separator line
+                if (ImGui::MenuItem("Exit")) {
+                    exit(0);
+                }
+                ImGui::EndMenu(); // End "File" menu
+            }
 
+            // Create an "Edit" menu
+            if (ImGui::BeginMenu("Edit")) {
+                if (ImGui::MenuItem("Undo", "Ctrl+Z")) {
+                    // Action for "Undo"
+                }
+                if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false)) {
+                    // Action for "Redo", disabled here
+                }
+                ImGui::Separator();
+                if (ImGui::MenuItem("Cut", "Ctrl+X")) {
+                    // Action for "Cut"
+                }
+                if (ImGui::MenuItem("Copy", "Ctrl+C")) {
+                    // Action for "Copy"
+                }
+                if (ImGui::MenuItem("Paste", "Ctrl+V")) {
+                    // Action for "Paste"
+                }
+                ImGui::EndMenu();
+            }
+            UIUtil::Spacing();
+            if (ImGui::Button(Icons::save.c_str())) {
+                // Action for save
+            }
+
+            UIUtil::Spacing();
+            ImGui::Text(Icons::file_open.c_str());
+            ImGui::SameLine();
+
+            if (!copied) {
+                strcpy(projectName, context->getProjectName().c_str());
+                copied = true;
+            }
+            if (ImGui::InputText(id.c_str(), projectName, 128, ImGuiInputTextFlags_EnterReturnsTrue)) {
+                context->updateProjectName(projectName);
+            }
+            ImGui::EndMainMenuBar();
         }
-        ImGui::SameLine();
-
-        if (ImGui::Button(BUTTON_OPEN_PROJECT.c_str())) {
-
-        }
-        ImGui::SameLine();
-
-        UIUtil::Spacing();
-        if (ImGui::Button(BUTTON_SAVE_PROJECT.c_str())) {
-
-        }
-        ImGui::SameLine();
-        UIUtil::Spacing();
-
-        if (UIUtil::ButtonSimple(BUTTON_FULL_SCREEN, UIUtil::ONLY_ICON_BUTTON_SIZE,
-                                 UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-
-        }
-        ImGui::SameLine();
-        UIUtil::Spacing();
-
-        if (UIUtil::ButtonSimple(Icons::undo, UIUtil::ONLY_ICON_BUTTON_SIZE,
-                                 UIUtil::ONLY_ICON_BUTTON_SIZE)) { /* Action for Undo */ }
-        ImGui::SameLine();
-
-        if (UIUtil::ButtonSimple(Icons::redo, UIUtil::ONLY_ICON_BUTTON_SIZE,
-                                 UIUtil::ONLY_ICON_BUTTON_SIZE)) { /* Action for Redo */ }
-        ImGui::SameLine();
-
-
-        ImGui::SameLine();
-        UIUtil::DynamicSpacing(300);
-
-//        ImGui::SetNextItemWidth(200);
-//        ImGui::InputText((id + "input").c_str(), pathToProject, ImGuiInputTextFlags_ReadOnly);
-//        ImGui::SameLine();
+        UIUtil::DynamicSpacing(150);
         framerate();
     }
 
@@ -64,6 +83,6 @@ namespace Metal {
     }
 
     void EditorHeaderPanel::hotKeys() {
-// TODO
+        // TODO
     }
 }

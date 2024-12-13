@@ -20,7 +20,7 @@ namespace Metal {
         context.getVulkanContext().registerDescriptorBinding(descriptorType);
     }
 
-    DescriptorInstance *DescriptorService::createDescriptor() const {
+    DescriptorInstance *DescriptorService::createDescriptor() {
         auto *instance = new DescriptorInstance;
         registerResource(instance);
         context.getVulkanContext().registerDescriptorSet();

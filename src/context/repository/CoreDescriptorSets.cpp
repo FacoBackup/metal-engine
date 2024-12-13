@@ -9,7 +9,7 @@
 
 namespace Metal {
     void CoreDescriptorSets::onInitialize() {
-        const DescriptorService &service = vulkanContext.descriptorService;
+        DescriptorService &service = vulkanContext.descriptorService;
 
         globalDataDescriptor = service.createDescriptor();
         service.addLayoutBinding(globalDataDescriptor,

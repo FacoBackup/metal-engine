@@ -1,34 +1,21 @@
 #include "ApplicationContext.h"
 #include <nfd.h>
 #include "../common/util/files/FilesUtil.h"
-#include <stdlib.h>
 
 #include "../common/util/files/FileDialogUtil.h"
 
 namespace Metal {
     void ApplicationContext::dispose() {
         guiContext.dispose();
-        engineContext.dispose();
+        vulkanContext.dispose();
     }
 
-    EngineContext &ApplicationContext::getEngineContext() {
-        return engineContext;
-    }
-
-    GLFWContext &ApplicationContext::getGLFWContext() {
-        return glfwContext;
-    }
-
-    VulkanContext &ApplicationContext::getVulkanContext() {
-        return vulkanContext;
-    }
-
-    void ApplicationContext::updateRootPath() {
+    void ApplicationContext::updateRootPath(bool forceSelection) {
         std::string cachedPath;
         std::string cachePathFile = std::filesystem::current_path().string() + "/metal-engine-cached.txt";
         FilesUtil::ReadFile(cachePathFile.c_str(), cachedPath);
 
-        if (cachedPath.empty()) {
+        if (cachedPath.empty() || forceSelection) {
             rootDirectory = FileDialogUtil::SelectDirectory();
             if (rootDirectory.empty()) {
                 throw std::runtime_error("No directory selected.");
@@ -38,12 +25,21 @@ namespace Metal {
             rootDirectory = cachedPath;
         }
         rootDirectory.erase(std::ranges::remove(rootDirectory, '\n').begin(), rootDirectory.cend());
+        FilesUtil::ReadFile((rootDirectory + "/" + PROJECT_METADATA_FILE).c_str(), projectName);
+        if (projectName.empty()) {
+            updateProjectName("New project");
+        }
+    }
+
+    void ApplicationContext::updateProjectName(const std::string &projectName) {
+        FilesUtil::WriteFile((rootDirectory + "/" + PROJECT_METADATA_FILE).c_str(), projectName.c_str());
+        this->projectName = projectName;
     }
 
     void ApplicationContext::start() {
         NFD_Init();
 
-        updateRootPath();
+        updateRootPath(false);
 
         glfwContext.onInitialize();
         if (!glfwContext.isValidContext()) {
@@ -66,14 +62,6 @@ namespace Metal {
         }
         guiContext.dispose();
         NFD_Quit();
-    }
-
-    bool ApplicationContext::isValidContext() const {
-        return glfwContext.isValidContext();
-    }
-
-    EditorContext &ApplicationContext::getEditorContext() {
-        return editorContext;
     }
 
     ApplicationContext::ApplicationContext(IPanel &root_panel, bool debugMode) : vulkanContext(*this, debugMode),

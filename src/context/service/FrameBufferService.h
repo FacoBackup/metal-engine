@@ -17,8 +17,9 @@ namespace Metal {
      * - Framebuffers
      */
     class FrameBufferService final : public AbstractResourceService {
-        FrameBufferAttachment *createAttachmentInternal(const char *name, VkFormat format, VkImageUsageFlagBits usage,
-                                                        FrameBufferInstance *framebuffer) const;
+        std::shared_ptr<FrameBufferAttachment> createAttachmentInternal(const char *name, VkFormat format,
+                                                                        VkImageUsageFlagBits usage,
+                                                                        FrameBufferInstance *framebuffer) const;
 
         void createVKFrameBuffer(FrameBufferInstance *framebuffer) const;
 
@@ -27,7 +28,7 @@ namespace Metal {
             : AbstractResourceService(context) {
         }
 
-        [[nodiscard]] FrameBufferInstance *createFrameBuffer(uint32_t w, uint32_t h) const;
+        FrameBufferInstance *createFrameBuffer(uint32_t w, uint32_t h);
 
         void createDepthAttachment(FrameBufferInstance *framebuffer) const;
 

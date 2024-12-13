@@ -2,30 +2,32 @@
 #define BUFFERSERVICE_H
 
 #include <vector>
+#include <memory>
 #include "../../common/interface/AbstractResourceService.h"
 #include "vulkan/vulkan.h"
 
 namespace Metal {
     struct BufferInstance;
+    class VulkanContext;
 
-    class BufferService final : public AbstractResourceService {
-        void copyBuffer(const BufferInstance *srcBuffer, const BufferInstance *dstBuffer) const;
+    class BufferService final : public AbstractRuntimeComponent {
+        VulkanContext &vulkanContext;
+
+        void copyBuffer(const std::shared_ptr<BufferInstance> &srcBuffer, const std::shared_ptr<BufferInstance> &dstBuffer) const;
 
         void createVkBuffer(VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
-                            BufferInstance *buffer) const;
+                            const std::shared_ptr<BufferInstance> &buffer) const;
 
     public:
-        explicit BufferService(ApplicationContext &context)
-            : AbstractResourceService(context) {
-        }
+        explicit BufferService(ApplicationContext &context);
 
         [[nodiscard]] uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
 
-        [[nodiscard]] BufferInstance *createBuffer(VkDeviceSize bufferSize,
-                                                   VkBufferUsageFlags usageFlags,
-                                                   VkMemoryPropertyFlags memoryPropertyFlags) const;
+        [[nodiscard]] std::shared_ptr<BufferInstance> createBuffer(VkDeviceSize bufferSize,
+                                                     VkBufferUsageFlags usageFlags,
+                                                     VkMemoryPropertyFlags memoryPropertyFlags) const;
 
-        BufferInstance *createBuffer(VkDeviceSize dataSize, const void *bufferData) const;
+        std::shared_ptr<BufferInstance> createBuffer(VkDeviceSize dataSize, const void *bufferData) const;
     };
 } // Metal
 

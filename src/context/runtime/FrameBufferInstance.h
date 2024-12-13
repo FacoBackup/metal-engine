@@ -17,7 +17,7 @@ namespace Metal {
         std::vector<VkAttachmentReference> colorReferences;
         VkAttachmentReference *depthRef = nullptr;
         VkFramebuffer vkFramebuffer = VK_NULL_HANDLE;
-        std::vector<FrameBufferAttachment *> attachments{};
+        std::vector<std::shared_ptr<FrameBufferAttachment> > attachments{};
 
         void dispose(VulkanContext &context) override {
             delete depthRef;

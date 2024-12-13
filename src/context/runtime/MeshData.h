@@ -1,9 +1,9 @@
 #ifndef MESHDATA_H
 #define MESHDATA_H
 #include <vector>
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-#include "../../../common/interface/Serializable.h"
+#include <../../../cmake-build-debug/vcpkg_installed/arm64-osx/include/glm/vec2.hpp>
+#include <../../../cmake-build-debug/vcpkg_installed/arm64-osx/include/glm/vec3.hpp>
+#include "../../common/interface/Serializable.h"
 
 namespace Metal {
     struct LevelOfDetail;
