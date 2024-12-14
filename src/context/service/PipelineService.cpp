@@ -80,7 +80,6 @@ namespace Metal {
 
         auto *pipeline = new PipelineInstance();
         pipeline->pushConstantsSize = pushConstantsSize;
-        pipeline->frameBuffer = frameBuffer;
         auto fragmentShaderModule = ShaderUtil::CreateShaderModule(context, fragmentShader);
         auto vertexShaderModule = ShaderUtil::CreateShaderModule(context, vertexShader);
         registerResource(pipeline);
@@ -169,23 +168,10 @@ namespace Metal {
                                                              nullptr,
                                                              &pipeline->vkPipeline));
         pipeline->descriptorSets = descriptorSetsToBind;
-        createCommandBuffer(pipeline);
         delete meshBindingDescription;
-
         vkDestroyShaderModule(vulkanContext.device.device, fragmentShaderModule, nullptr);
         vkDestroyShaderModule(vulkanContext.device.device, vertexShaderModule, nullptr);
         delete colorBlending.pAttachments;
         return pipeline;
-    }
-
-    void PipelineService::createCommandBuffer(PipelineInstance *pipeline) const {
-        VkCommandBufferAllocateInfo allocInfo{};
-        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo.commandPool = context.getVulkanContext().commandPool;
-        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandBufferCount = 1;
-
-        VulkanUtils::CheckVKResult(
-            vkAllocateCommandBuffers(vulkanContext.device.device, &allocInfo, &pipeline->vkCommandBuffer));
     }
 } // Metal

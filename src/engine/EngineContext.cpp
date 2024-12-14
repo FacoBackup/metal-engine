@@ -2,10 +2,15 @@
 
 #include "../context/ApplicationContext.h"
 #include "../context/runtime/BufferInstance.h"
+#include "../context/runtime/RenderPass.h"
+#include "render-pass/impl/OpaqueRenderPass.h"
+#include "render-pass/tools/GridRenderPass.h"
 
 namespace Metal {
     void EngineContext::onInitialize() {
         cameraSystem.onInitialize();
+        context.getVulkanContext().coreRenderPasses.fullScreenPass->addRenderPass(&opaqueRenderPass);
+        context.getVulkanContext().coreRenderPasses.fullScreenPass->addRenderPass(&gridRenderPass);
     }
 
     void EngineContext::onSync() {
@@ -28,6 +33,7 @@ namespace Metal {
             globalDataUBO.cameraWorldPosition = cameraRepository.currentCamera->position;
             context.getVulkanContext().coreBuffers.globalData->update(&globalDataUBO);
         }
-        renderPassSystem.onSync();
+
+        context.getVulkanContext().coreRenderPasses.fullScreenPass->onSync();
     }
 }

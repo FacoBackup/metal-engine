@@ -21,6 +21,7 @@ namespace Metal {
         registerResource(instance);
 
         instance->indexCount = data.indices.size();
+
         instance->dataBuffer = vulkanContext.bufferService.createBuffer(
             sizeof(VertexData) * data.data.size(),
             VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,

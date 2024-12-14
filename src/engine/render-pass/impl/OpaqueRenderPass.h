@@ -12,6 +12,8 @@ namespace Metal {
         }
 
         void onSync() override;
+
+        PipelineInstance *getPipeline() override;
     };
 }
 

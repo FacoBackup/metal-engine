@@ -1,5 +1,5 @@
-#ifndef CORERENDERPASSES_H
-#define CORERENDERPASSES_H
+#ifndef COREREFRAMEBUFFERS_H
+#define COREREFRAMEBUFFERS_H
 #include "AbstractCoreRepository.h"
 
 namespace Metal {

@@ -100,8 +100,6 @@ add_executable(
         src/context/runtime/FrameData.h
         src/engine/render-pass/AbstractRenderPass.cpp
         src/engine/render-pass/AbstractRenderPass.h
-        src/engine/system/RenderPassSystem.cpp
-        src/engine/system/RenderPassSystem.h
         src/engine/render-pass/impl/OpaqueRenderPass.cpp
         src/engine/render-pass/impl/OpaqueRenderPass.h
         src/context/runtime/TextureInstance.h
@@ -170,6 +168,10 @@ add_executable(
         src/editor/ui/viewport/CameraPositionPanel.h
         src/engine/render-pass/tools/GridRenderPass.cpp
         src/engine/render-pass/tools/GridRenderPass.h
+        src/context/runtime/RenderPass.cpp
+        src/context/runtime/RenderPass.h
+        src/context/repository/CoreRenderPasses.cpp
+        src/context/repository/CoreRenderPasses.h
 )
 
 

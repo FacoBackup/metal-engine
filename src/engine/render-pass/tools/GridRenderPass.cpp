@@ -1,13 +1,15 @@
 #include "GridRenderPass.h"
+
+#include "../../../context/ApplicationContext.h"
 #include "../../../context/repository/CorePipelines.h"
 #include "../../../context/runtime/PipelineInstance.h"
 
 namespace Metal {
-    void GridRenderPass::onSync() {
-        pipelines.gridPipeline->startRecording(false);
-        pipelines.gridPipeline->recordDrawSimpleInstanced(3, 1);
-        pipelines.gridPipeline->stopRecording();
+    PipelineInstance *GridRenderPass::getPipeline() {
+        return context.getVulkanContext().corePipelines.gridPipeline;
+    }
 
-        registerCommandBuffer(pipelines.gridPipeline);
+    void GridRenderPass::onSync() {
+        recordDrawSimpleInstanced(3, 1);
     }
 } // Metal

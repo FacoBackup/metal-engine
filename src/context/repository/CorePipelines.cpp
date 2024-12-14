@@ -28,10 +28,9 @@ namespace Metal {
             0,
             true
         );
-
     }
 
-    void CorePipelines::dispose() {
+    void CorePipelines::dispose() const {
         // TODO - Add button to UI to re-create pipelines and reload shaders
         debugPipeline->dispose(vulkanContext);
     }

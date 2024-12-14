@@ -98,7 +98,7 @@ namespace Metal {
         yAxis = glm::vec3(sinYaw * sinPitch, cosPitch, cosYaw * sinPitch);
         zAxis = glm::vec3(sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw);
 
-        cameraRepository.viewMatrix = glm::transpose(glm::mat4(
+        cameraRepository.viewMatrix = glm::mat4(
             glm::vec4(xAxis, 0.0f),
             glm::vec4(yAxis, 0.0f),
             glm::vec4(zAxis, 0.0f),
@@ -106,7 +106,7 @@ namespace Metal {
                       -dot(yAxis, camera.position),
                       -dot(zAxis, camera.position),
                       1.0f)
-        ));
+        );
         toApplyTranslation = glm::vec3(0.0f);
     }
 } // Metal

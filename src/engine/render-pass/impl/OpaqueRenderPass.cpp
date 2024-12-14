@@ -1,19 +1,21 @@
 #include "OpaqueRenderPass.h"
 
 #include <glm/ext/matrix_transform.hpp>
+
+#include "../../../context/ApplicationContext.h"
 #include "../../../context/repository/CorePipelines.h"
 #include "../../../context/runtime/PipelineInstance.h"
 
 namespace Metal {
     void OpaqueRenderPass::onSync() {
+        const auto &pipelines = context.getVulkanContext().corePipelines;
         if (pipelines.sampleMesh == nullptr) return;
-        pipelines.debugPipeline->startRecording();
         mPushConstant.model = glm::identity<glm::mat4x4>();
+        recordPushConstant(&mPushConstant);
+        bindMesh(pipelines.sampleMesh);
+    }
 
-        pipelines.debugPipeline->recordPushConstant(&mPushConstant);
-        pipelines.debugPipeline->bindMesh(pipelines.sampleMesh);
-        pipelines.debugPipeline->stopRecording();
-
-        registerCommandBuffer(pipelines.debugPipeline);
+    PipelineInstance *OpaqueRenderPass::getPipeline() {
+        return context.getVulkanContext().corePipelines.debugPipeline;
     }
 } // Metal

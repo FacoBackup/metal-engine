@@ -38,7 +38,7 @@ namespace Metal {
         auto &repository = context.getEngineContext().cameraRepository;
 
         context.getEngineContext().cameraMovementService.createViewMatrix(*camera);
-        repository.invViewMatrix = inverse(repository.viewMatrix);
+        repository.invViewMatrix = transpose(inverse(repository.viewMatrix));
     }
 
     void CameraSystem::updateProjection() const {
@@ -56,8 +56,7 @@ namespace Metal {
             repository.projectionMatrix = glm::perspective(camera->fov, camera->aspectRatio, camera->zNear,
                                                            camera->zFar);
         }
-        repository.projectionMatrix = glm::transpose(repository.projectionMatrix);
-        repository.invProjectionMatrix = inverse(repository.projectionMatrix);
+        repository.invProjectionMatrix = transpose(inverse(repository.projectionMatrix));
     }
 
     CameraSystem::CameraSystem(ApplicationContext &context) : AbstractRuntimeComponent(context) {

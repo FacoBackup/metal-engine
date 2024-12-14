@@ -30,8 +30,6 @@ namespace Metal {
                                                   uint32_t pushConstantsSize = 0,
                                                   bool blendEnabled = false,
                                                   bool prepareForMesh = false);
-
-        void createCommandBuffer(PipelineInstance *pipeline) const;
     };
 } // Metal
 

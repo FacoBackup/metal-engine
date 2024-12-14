@@ -13,7 +13,7 @@ namespace Metal {
 
         void onInitialize() override;
 
-        void dispose();
+        void dispose() const;
 
         PipelineInstance *debugPipeline = nullptr;
         PipelineInstance *gridPipeline = nullptr;

@@ -9,6 +9,7 @@ namespace Metal {
             : AbstractRenderPass(context) {
         }
 
+        PipelineInstance *getPipeline() override;
         void onSync() override;
     };
 } // Metal

@@ -13,26 +13,10 @@ namespace Metal {
     struct PipelineInstance final : RuntimeResource {
         VkPipelineLayout vkPipelineLayout = VK_NULL_HANDLE;
         VkPipeline vkPipeline = VK_NULL_HANDLE;
-        FrameBufferInstance *frameBuffer = nullptr;
         std::vector<DescriptorInstance *> descriptorSets{};
         uint32_t pushConstantsSize = 0;
-        VkRenderPassBeginInfo renderPassInfo{};
-        VkCommandBuffer vkCommandBuffer = VK_NULL_HANDLE;
-
-        void startRecording(bool clear = true);
-
-        void stopRecording() const;
-
-        void recordPushConstant(void *data) const;
-
-        void recordDrawSimpleInstanced(uint32_t vertexCount, uint32_t instanceCount) const;
 
         void dispose(VulkanContext &context) override;
-
-        void bindMesh(const MeshInstance *instance, uint32_t instanceCount = 1) const;
-
-    private:
-        void beginRenderPass(bool clear);
     };
 }
 #endif //PIPELINEINSTANCE_H
