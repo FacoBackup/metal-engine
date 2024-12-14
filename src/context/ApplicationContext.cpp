@@ -29,6 +29,8 @@ namespace Metal {
         if (projectName.empty()) {
             updateProjectName("New project");
         }
+        FilesUtil::MkDir(getShadersDirectory());
+        FilesUtil::MkDir(getAssetsDirectory());
     }
 
     void ApplicationContext::updateProjectName(const std::string &projectName) {

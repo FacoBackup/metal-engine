@@ -19,7 +19,7 @@ namespace Metal {
         VkRenderPassBeginInfo renderPassInfo{};
         VkCommandBuffer vkCommandBuffer = VK_NULL_HANDLE;
 
-        void startRecording();
+        void startRecording(bool clear = true);
 
         void stopRecording() const;
 
@@ -30,6 +30,9 @@ namespace Metal {
         void dispose(VulkanContext &context) override;
 
         void bindMesh(const MeshInstance *instance, uint32_t instanceCount = 1) const;
+
+    private:
+        void beginRenderPass(bool clear);
     };
 }
 #endif //PIPELINEINSTANCE_H

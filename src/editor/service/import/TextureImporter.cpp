@@ -18,7 +18,7 @@ namespace Metal {
         auto metadata = FileMetadata{};
         metadata.type = EntryType::TEXTURE;
         metadata.name = fs::path(pathToFile).filename().string();
-        metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.') + 1);
+        metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.'));
 
         int width, height, channels;
         unsigned char *data = stbi_load(pathToFile.c_str(), &width, &height, &channels, 0);

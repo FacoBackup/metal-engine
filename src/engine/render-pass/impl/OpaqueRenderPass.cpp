@@ -6,9 +6,10 @@
 
 namespace Metal {
     void OpaqueRenderPass::onSync() {
+        if (pipelines.sampleMesh == nullptr) return;
         pipelines.debugPipeline->startRecording();
         mPushConstant.model = glm::identity<glm::mat4x4>();
-    
+
         pipelines.debugPipeline->recordPushConstant(&mPushConstant);
         pipelines.debugPipeline->bindMesh(pipelines.sampleMesh);
         pipelines.debugPipeline->stopRecording();

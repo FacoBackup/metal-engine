@@ -172,7 +172,7 @@ namespace Metal {
         VkCommandPoolCreateInfo cmdPoolCreateInfo = {};
         cmdPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
         cmdPoolCreateInfo.pNext = nullptr;
-        cmdPoolCreateInfo.flags = 0;
+        cmdPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
         cmdPoolCreateInfo.queueFamilyIndex = queueFamily;
         VulkanUtils::CheckVKResult(vkCreateCommandPool(device.device, &cmdPoolCreateInfo,
                                                        nullptr,

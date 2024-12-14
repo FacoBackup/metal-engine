@@ -153,7 +153,6 @@ add_executable(
         src/editor/service/import/MeshImporter.cpp
         src/editor/service/import/MeshImporter.h
         src/editor/service/import/AbstractImporter.h
-        src/common/interface/BinarySerializable.h
         src/engine/LevelOfDetail.h
         src/engine/LevelOfDetail.cpp
         src/editor/service/import/TextureImporter.cpp
@@ -187,10 +186,12 @@ find_package(imguizmo CONFIG REQUIRED)
 find_package(nfd CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(meshoptimizer CONFIG REQUIRED)
+find_package(cereal CONFIG REQUIRED)
 
 set(COMMON_LIBRARIES
         glfw
         nfd::nfd
+        cereal::cereal
         meshoptimizer::meshoptimizer
         assimp::assimp
         Vulkan::Headers

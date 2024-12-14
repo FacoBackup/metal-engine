@@ -4,7 +4,7 @@
 
 namespace Metal {
     void GridRenderPass::onSync() {
-        pipelines.gridPipeline->startRecording();
+        pipelines.gridPipeline->startRecording(false);
         pipelines.gridPipeline->recordDrawSimpleInstanced(3, 1);
         pipelines.gridPipeline->stopRecording();
 

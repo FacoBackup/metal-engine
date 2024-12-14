@@ -39,9 +39,7 @@ namespace Metal {
         glm::mat4x4 projectionMatrix{};
         glm::mat4x4 invViewMatrix{};
         glm::mat4x4 invProjectionMatrix{};
-        glm::mat4x4 viewProjectionMatrix{};
-        glm::mat4x4 skyboxProjectionMatrix{};
-        glm::mat4x4 invSkyboxProjectionMatrix{};
+        glm::mat4x4 projViewMatrix{};
 
         Frustum frustum{};
         Camera *currentCamera = nullptr;

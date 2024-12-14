@@ -54,6 +54,15 @@ namespace Metal {
             return rootDirectory;
         }
 
+
+        [[nodiscard]] std::string getAssetsDirectory() const {
+            return rootDirectory + "/assets/";
+        }
+
+        [[nodiscard]] std::string getShadersDirectory() const {
+            return rootDirectory + "/shaders/";
+        }
+
         void start();
 
         explicit ApplicationContext(IPanel &root_panel, bool debugMode);

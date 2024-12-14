@@ -1,10 +1,10 @@
 layout(set = 0, binding = 0) uniform GlobalDataBlock {
     mat4 view;
     mat4 proj;
-    mat4 viewProj;
+    mat4 projView;
     mat4 invView;
     mat4 invProj;
-    vec4 color;
+    vec3 cameraWorldPosition;
 } globalData;
 
 layout(push_constant) uniform Push {
@@ -20,5 +20,5 @@ layout(location = 0) out vec3 position;
 
 void main(){
     position = inPosition;
-    gl_Position = globalData.viewProj * push.model * vec4(inPosition, 1.0);
+    gl_Position = globalData.projView *  vec4(inPosition, 1.0);
 }

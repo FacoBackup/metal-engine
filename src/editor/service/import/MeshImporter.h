@@ -14,12 +14,17 @@ namespace Metal {
                                  const std::string &targetDir,
                                  const MeshData &mesh, const LevelOfDetail &levelOfDetail);
 
+        std::vector<std::string> getSupportedTypes() override;
+
     public:
         explicit MeshImporter(ApplicationContext &context)
             : AbstractImporter(context) {
         }
 
+
         static void ImportMesh(const std::string &targetDir, const std::string &pathToFile);
+
+        static void serializeMesh(const MeshData& simplifiedMesh, const std::string &newPath);
     };
 } // Metal
 

@@ -109,9 +109,8 @@ namespace Metal {
     }
 
     VkShaderModule ShaderUtil::CreateShaderModule(ApplicationContext &context, const char *pFilename) {
-        const std::string basePath = context.getRootDirectory() + "/shaders/";
+        const std::string basePath = context.getShadersDirectory();
 
-        FilesUtil::MkDir(basePath);
         std::string source;
         FilesUtil::ReadFile(pFilename, source);
 

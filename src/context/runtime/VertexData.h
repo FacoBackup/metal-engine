@@ -30,6 +30,13 @@ namespace Metal {
 
             return attributeDescriptions;
         }
+
+        template<class Archive>
+        void serialize(Archive &ar) {
+            ar(vertex.x, vertex.y, vertex.z,
+               normal.x, normal.y, normal.z,
+               uv.x, uv.y);
+        }
     };
 }
 

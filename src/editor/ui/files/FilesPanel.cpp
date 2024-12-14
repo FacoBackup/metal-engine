@@ -200,12 +200,20 @@ namespace Metal {
     }
 
     void FilesPanel::openResource(FileEntry *root) {
-        if (root->type == EntryType::DIRECTORY) {
-            filesContext.setCurrentDirectory(root);
-            FilesService::GetEntries(root);
-            filesContext.selected.clear();
-        } else {
-            // OPEN FILE
+        switch (root->type) {
+            case EntryType::MESH: {
+                context->getVulkanContext().corePipelines.sampleMesh = context->getVulkanContext().meshService.
+                        createMesh(root->associatedFiles[0]);
+                break;
+            }
+            case EntryType::DIRECTORY: {
+                filesContext.setCurrentDirectory(root);
+                FilesService::GetEntries(root);
+                filesContext.selected.clear();
+                break;
+            }
+            default:
+                break;
         }
     }
 } // Metal
