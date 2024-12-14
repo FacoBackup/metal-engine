@@ -16,6 +16,7 @@ namespace Metal {
         void dispose();
 
         PipelineInstance *debugPipeline = nullptr;
+        PipelineInstance *gridPipeline = nullptr;
         MeshInstance *sampleMesh = nullptr;
     };
 } // Metal

@@ -1,4 +1,6 @@
 #include "PipelineService.h"
+
+#include "ShaderUtil.h"
 #include "../ApplicationContext.h"
 #include "../../common/util/VulkanUtils.h"
 #include "../runtime/FrameBufferInstance.h"
@@ -48,19 +50,19 @@ namespace Metal {
         auto *pipeline = new PipelineInstance();
         pipeline->pushConstantsSize = pushConstantsSize;
         pipeline->frameBuffer = frameBuffer;
-        pipeline->fragmentShader = context.getVulkanContext().shaderService.createShaderModule(fragmentShader);
-        pipeline->vertexShader = context.getVulkanContext().shaderService.createShaderModule(vertexShader);
+        auto fragmentShaderModule = ShaderUtil::CreateShaderModule(context, fragmentShader);
+        auto vertexShaderModule = ShaderUtil::CreateShaderModule(context, vertexShader);
         registerResource(pipeline);
         createPipelineLayout(descriptorSetsToBind, pushConstantsSize, pipeline);
 
         std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages{};
         shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
-        shaderStages[0].module = pipeline->vertexShader->vkShaderModule;
+        shaderStages[0].module = vertexShaderModule;
         shaderStages[0].pName = "main";
 
         shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-        shaderStages[1].module = pipeline->fragmentShader->vkShaderModule;
+        shaderStages[1].module = fragmentShaderModule;
         shaderStages[1].pName = "main";
 
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
@@ -151,13 +153,17 @@ namespace Metal {
         pipeline->descriptorSets = descriptorSetsToBind;
         createCommandBuffer(pipeline);
         delete meshBindingDescription;
+
+        vkDestroyShaderModule(vulkanContext.device.device, fragmentShaderModule, nullptr);
+        vkDestroyShaderModule(vulkanContext.device.device, vertexShaderModule, nullptr);
+
         return pipeline;
     }
 
     /**
  * Commands still need to be recorded
  */
-    void *PipelineService::createCommandBuffer(PipelineInstance *pipeline) const {
+    void PipelineService::createCommandBuffer(PipelineInstance *pipeline) const {
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocInfo.commandPool = context.getVulkanContext().commandPool;

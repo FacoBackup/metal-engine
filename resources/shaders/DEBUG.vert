@@ -20,5 +20,5 @@ layout(location = 0) out vec3 position;
 
 void main(){
     position = inPosition;
-    gl_Position =   globalData.viewProj * push.model * vec4(inPosition, 1.0);
+    gl_Position = globalData.viewProj * push.model * vec4(inPosition, 1.0);
 }

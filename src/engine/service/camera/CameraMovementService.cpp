@@ -21,10 +21,8 @@ namespace Metal {
         forward = glm::normalize(forward);
         right = glm::normalize(right);
 
-        const float multiplier = (runtimeRepository.fasterPressed ? 80.0f : 40.0f) *
-                                 cameraRepository.movementSensitivity *
+        const float multiplier = 10 * cameraRepository.movementSensitivity *
                                  context.getEngineContext().deltaTime;
-
         if (runtimeRepository.leftPressed) {
             camera.position += right * multiplier;
             camera.registerChange();
@@ -51,7 +49,7 @@ namespace Metal {
         }
     }
 
-    void CameraMovementService::handleMouse(Camera &camera, bool isFirstMovement) {
+    void CameraMovementService::handleMouse(Camera &camera, bool isFirstMovement) const {
         const auto &cameraRepository = context.getEngineContext().cameraRepository;
 
         updateDelta(isFirstMovement);
@@ -67,7 +65,7 @@ namespace Metal {
         camera.registerChange();
     }
 
-    void CameraMovementService::updateDelta(bool isFirstMovement) {
+    void CameraMovementService::updateDelta(const bool isFirstMovement) const {
         const auto &runtimeRepository = context.getEngineContext().runtimeRepository;
         auto &cameraRepository = context.getEngineContext().cameraRepository;
 

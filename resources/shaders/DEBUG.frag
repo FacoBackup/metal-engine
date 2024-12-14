@@ -10,8 +10,8 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
 } globalData;
 
 layout (location = 0) out vec4 finalColor;
-layout(location = 0) in vec2 texCoord;
+layout(location = 0) in vec3 position;
 
 void main () {
-    finalColor = vec4(globalData.color.rgb + vec3(.1), 1);
+    finalColor = vec4(position, 1);
 }

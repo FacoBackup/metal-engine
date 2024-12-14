@@ -2,20 +2,18 @@
 #define PIPELINEINSTANCE_H
 #include <vulkan/vulkan_core.h>
 
-#include "../VulkanContext.h"
-
+#include "RuntimeResource.h"
 
 namespace Metal {
     struct FrameBufferInstance;
-    struct ShaderModuleInstance;
+    struct ShaderModule;
     struct MeshInstance;
+    struct DescriptorInstance;
 
     struct PipelineInstance final : RuntimeResource {
         VkPipelineLayout vkPipelineLayout = VK_NULL_HANDLE;
         VkPipeline vkPipeline = VK_NULL_HANDLE;
         FrameBufferInstance *frameBuffer = nullptr;
-        ShaderModuleInstance *vertexShader = nullptr;
-        ShaderModuleInstance *fragmentShader = nullptr;
         std::vector<DescriptorInstance *> descriptorSets{};
         uint32_t pushConstantsSize = 0;
         VkRenderPassBeginInfo renderPassInfo{};

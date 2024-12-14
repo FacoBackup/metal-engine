@@ -24,11 +24,11 @@ namespace Metal {
                                                   VkCullModeFlagBits cullMode,
                                                   const char *vertexShader,
                                                   const char *fragmentShader,
-                                                  const std::vector<DescriptorInstance *> &descriptorSetsToBind,
+                                                  const std::vector<DescriptorInstance *> &descriptorSetsToBind = {},
                                                   uint32_t pushConstantsSize = 0,
                                                   bool prepareForMesh = false);
 
-        void *createCommandBuffer(PipelineInstance *pipeline) const;
+        void createCommandBuffer(PipelineInstance *pipeline) const;
     };
 } // Metal
 

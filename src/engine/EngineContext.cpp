@@ -10,7 +10,9 @@ namespace Metal {
 
     void EngineContext::onSync() {
         currentTime = Clock::now();
-        deltaTime = static_cast<float>((currentTime - previousTime).count()) / 1000.f;
+        std::chrono::duration<float> delta = currentTime - previousTime;
+        deltaTime = delta.count() ;
+        previousTime = currentTime;
         if (start == -1) {
             start = Clock::now().time_since_epoch().count();
         }

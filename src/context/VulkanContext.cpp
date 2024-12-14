@@ -217,7 +217,6 @@ namespace Metal {
         textureService.onInitialize();
         framebufferService.onInitialize();
         pipelineService.onInitialize();
-        shaderService.onInitialize();
         descriptorService.onInitialize();
         // ------- SERVICE INITIALIZATION
 
@@ -235,7 +234,6 @@ namespace Metal {
         pipelineService.disposeAll();
         descriptorService.disposeAll();
         framebufferService.disposeAll();
-        shaderService.disposeAll();
         textureService.disposeAll();
         meshService.disposeAll();
         vkDestroyDescriptorPool(context.getVulkanContext().device.device, descriptorPool,

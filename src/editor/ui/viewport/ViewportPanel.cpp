@@ -72,7 +72,6 @@ namespace Metal {
         repo.viewportY = windowPos.y + DockSpacePanel::FRAME_SIZE;
 
         repo.isFocused = ImGui::IsWindowHovered();
-        repo.fasterPressed = ImGui::IsKeyDown(ImGuiKey_LeftShift);
         repo.forwardPressed = ImGui::IsKeyDown(ImGuiKey_W);
         repo.backwardPressed = ImGui::IsKeyDown(ImGuiKey_S);
         repo.leftPressed = ImGui::IsKeyDown(ImGuiKey_A);

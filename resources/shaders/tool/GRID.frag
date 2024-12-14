@@ -1,15 +1,15 @@
-in vec2 texCoords;
-uniform vec4 settings;
+const vec4 settings = vec4(0, 1, 100, 2/100);
 
-uniform sampler2D sceneDepth;
-
-#include "../util/SCENE_DEPTH_UTILS.glsl"
+//uniform sampler2D sceneDepth;
+//
+//#include "../util/SCENE_DEPTH_UTILS.glsl"
 #define OVERLAY_OBJECTS settings.x == 1.
 #define SCALE settings.y
 #define THREASHOLD settings.z
 #define THICKNESS settings.w
 
-out vec4 finalColor;
+layout(location = 0) in vec2 texCoords;
+layout(location = 0) out vec4 finalColor;
 
 vec3 createRay() {
     vec2 pxNDS = texCoords * 2. - 1.;
@@ -46,15 +46,15 @@ void main() {
 
     bool hasData = false;
     bool isOverlay = false;
-    if (depthData != 1){
-        hasData = OVERLAY_OBJECTS;
-        isOverlay = true;
-        vec3 viewSpacePosition = viewSpacePositionFromDepth(depthData, texCoords);
-        p = vec3(invViewMatrix * vec4(viewSpacePosition, 1.));
-    } else {
-        vec3 rayDir = createRay();
-        hasData = rayMarch(cameraWorldPosition.xyz, rayDir, 1);
-    }
+    //    if (depthData != 1){
+    //        hasData = OVERLAY_OBJECTS;
+    //        isOverlay = true;
+    //        vec3 viewSpacePosition = viewSpacePositionFromDepth(depthData, texCoords);
+    //        p = vec3(invViewMatrix * vec4(viewSpacePosition, 1.));
+    //    } else {
+    vec3 rayDir = createRay();
+    hasData = rayMarch(cameraWorldPosition.xyz, rayDir, 1);
+    //    }
 
     if (hasData){
         float distanceFromCamera = length(cameraWorldPosition.xyz - p.xyz);

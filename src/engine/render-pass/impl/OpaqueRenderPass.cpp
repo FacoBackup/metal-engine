@@ -1,5 +1,7 @@
 #include "OpaqueRenderPass.h"
-#include "../../../context/ApplicationContext.h"
+
+#include <glm/ext/matrix_transform.hpp>
+#include "../../../context/repository/CorePipelines.h"
 #include "../../../context/runtime/PipelineInstance.h"
 
 namespace Metal {

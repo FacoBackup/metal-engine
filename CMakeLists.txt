@@ -93,10 +93,10 @@ add_executable(
         src/editor/ui/hierarchy/HierarchyPanel.cpp
         src/editor/ui/hierarchy/HierarchyPanel.h
         src/context/runtime/RuntimeResource.h
-        src/context/service/ShaderService.cpp
-        src/context/service/ShaderService.h
-        src/context/runtime/ShaderModuleInstance.cpp
-        src/context/runtime/ShaderModuleInstance.h
+        src/context/service/ShaderUtil.cpp
+        src/context/service/ShaderUtil.h
+        src/context/runtime/ShaderModule.cpp
+        src/context/runtime/ShaderModule.h
         src/context/runtime/FrameData.h
         src/engine/render-pass/AbstractRenderPass.cpp
         src/engine/render-pass/AbstractRenderPass.h
@@ -169,6 +169,8 @@ add_executable(
         src/context/runtime/VertexData.h
         src/editor/ui/viewport/CameraPositionPanel.cpp
         src/editor/ui/viewport/CameraPositionPanel.h
+        src/engine/render-pass/tools/GridRenderPass.cpp
+        src/engine/render-pass/tools/GridRenderPass.h
 )
 
 

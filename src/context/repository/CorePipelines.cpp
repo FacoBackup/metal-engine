@@ -72,10 +72,18 @@ namespace Metal {
             sizeof(MeshPushConstant),
             true);
 
+        gridPipeline = pipelineService.createRenderingPipeline(
+            context.getVulkanContext().coreFrameBuffers.auxRenderPass,
+            VK_CULL_MODE_NONE,
+            "../resources/shaders/QUAD.vert",
+            "../resources/shaders/tool/GRID.frag");
+
         sampleMesh = context.getVulkanContext().meshService.createMesh(createCube());
     }
 
     void CorePipelines::dispose() {
+        // TODO - Add button to UI to re-create pipelines and reload shaders
+        // TODO - Discard shader module after pipeline is built
         debugPipeline->dispose(vulkanContext);
     }
 } // Metal

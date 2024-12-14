@@ -18,15 +18,15 @@ namespace Metal {
             attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
             attributeDescriptions[0].offset = offsetof(VertexData, vertex);
 
-            attributeDescriptions[2].binding = 0;
-            attributeDescriptions[2].location = 1;
-            attributeDescriptions[2].format = VK_FORMAT_R32G32B32_SFLOAT;
-            attributeDescriptions[2].offset = offsetof(VertexData, normal);
-
             attributeDescriptions[1].binding = 0;
-            attributeDescriptions[1].location = 2;
-            attributeDescriptions[1].format = VK_FORMAT_R32G32_SFLOAT;
-            attributeDescriptions[1].offset = offsetof(VertexData, uv);
+            attributeDescriptions[1].location = 1;
+            attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+            attributeDescriptions[1].offset = offsetof(VertexData, normal);
+
+            attributeDescriptions[2].binding = 0;
+            attributeDescriptions[2].location = 2;
+            attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+            attributeDescriptions[2].offset = offsetof(VertexData, uv);
 
             return attributeDescriptions;
         }

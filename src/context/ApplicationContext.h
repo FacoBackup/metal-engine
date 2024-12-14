@@ -3,6 +3,8 @@
 #define PROJECT_METADATA_FILE "metal-project.txt"
 #include "../engine/EngineContext.h"
 #include "GuiContext.h"
+#include "GLFWContext.h"
+#include "VulkanContext.h"
 #include "../editor/common/IPanel.h"
 #include "../editor/EditorContext.h"
 

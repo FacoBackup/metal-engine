@@ -26,9 +26,9 @@ namespace Metal {
 
         void handleInputInternal(Camera &camera);
 
-        void handleMouse(Camera &camera, bool isFirstMovement);
+        void handleMouse(Camera &camera, bool isFirstMovement) const;
 
-        void updateDelta(bool isFirstMovement) ;
+        void updateDelta(bool isFirstMovement) const;
 
         void handleInput(Camera &camera, bool isFirstMovement) {
             handleInputInternal(camera);

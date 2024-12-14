@@ -18,7 +18,6 @@
 #include "service/TextureService.h"
 #include "service/FrameBufferService.h"
 #include "service/PipelineService.h"
-#include "service/ShaderService.h"
 #include "service/BufferService.h"
 #include "service/MeshService.h"
 
@@ -90,7 +89,6 @@ namespace Metal {
         TextureService textureService{context};
         FrameBufferService framebufferService{context};
         PipelineService pipelineService{context};
-        ShaderService shaderService{context};
         BufferService bufferService{context};
         DescriptorService descriptorService{context};
         // ----------- Services
