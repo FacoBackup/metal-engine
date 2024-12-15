@@ -8,20 +8,13 @@
 #include "../../engine/engine-definitions.h"
 #include "../../engine/enum/EditorMode.h"
 #include "../../engine/enum/ShadingMode.h"
+#include "../../common/inspection/Inspectable.h"
 
 namespace Metal {
     struct TransformComponent;
     struct Camera;
 
-    namespace ShadingMode {
-        enum class ShadingMode;
-    }
-
-    namespace EditorMode {
-        enum class EditorMode;
-    }
-
-    struct EditorRepository {
+    struct EditorRepository final : Inspectable {
         bool showIcons = true;
         float iconScale = 1;
         glm::vec3 iconColor{1.f};
@@ -67,13 +60,17 @@ namespace Metal {
         EntityID mainSelection = EMPTY_ENTITY;
         std::unordered_map<EntityID, bool> selected{};
         std::vector<EntityID> copied{};
-        std::unordered_map<std::string, Camera*> viewportCamera;
+        std::unordered_map<std::string, Camera *> viewportCamera;
 
         // BrushMode brushMode = BrushMode.ADD;
         float brushRadius = 10;
         float brushDensity = .5f;
         EditorMode::EditorMode editorMode = EditorMode::EditorMode::TRANSFORM;
         ShadingMode::ShadingMode shadingMode = ShadingMode::ShadingMode::LIT;
+
+        const char *getIcon() override;
+
+        const char *getTitle() override;
     };
 } // Metal
 

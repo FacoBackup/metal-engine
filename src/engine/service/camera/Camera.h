@@ -60,6 +60,11 @@ namespace Metal {
         float deltaX = 0;
         float deltaY = 0;
 
+        const char *getTitle() override;
+
+        const char *getIcon() override;
+
+        void registerFields() override;
     private:
         static void extractPlane(const glm::mat4 &matrix, int index, glm::vec4 &plane);
 

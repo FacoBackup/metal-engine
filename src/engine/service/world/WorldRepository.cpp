@@ -2,9 +2,9 @@
 
 #include "../../enum/ComponentType.h"
 #include "../../../common/util/Util.h"
-#include "impl/MeshComponent.h"
+#include "components/MeshComponent.h"
 #include "../camera/Camera.h"
-#include "impl/TransformComponent.h"
+#include "components/TransformComponent.h"
 
 namespace Metal {
     EntityID WorldRepository::createEntity(std::string name, const bool container) {

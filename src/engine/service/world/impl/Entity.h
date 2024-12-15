@@ -26,6 +26,8 @@ namespace Metal {
             return id;
         }
 
+        void registerFields() override;
+
         const char *getIcon() override;
 
         const char *getTitle() override {

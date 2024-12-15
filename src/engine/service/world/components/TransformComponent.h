@@ -4,8 +4,7 @@
 #include <glm/fwd.hpp>
 #include <glm/mat4x4.hpp>
 
-#include "AbstractComponent.h"
-#include "../../../../common/interface/Icons.h"
+#include "../impl/AbstractComponent.h"
 
 namespace Metal {
     struct TransformComponent final : AbstractComponent {
@@ -14,13 +13,11 @@ namespace Metal {
         glm::vec4 rotation = {0, 0, 0, 1};
         glm::vec3 scale{};
 
-        const char *getIcon() override {
-            return Icons::transform.c_str();
-        }
+        const char *getIcon() override;
 
-        const char *getTitle() override {
-            return "Transformation Component";
-        }
+        const char *getTitle() override;
+
+        void registerFields() override;
     };
 }
 

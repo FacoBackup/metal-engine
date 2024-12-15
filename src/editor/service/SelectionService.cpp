@@ -1,7 +1,7 @@
 #include "SelectionService.h"
 
 #include "../../context/ApplicationContext.h"
-#include "../../engine/service/world/impl/TransformComponent.h"
+#include "../../engine/service/world/components/TransformComponent.h"
 
 namespace Metal {
     void SelectionService::addSelected(EntityID entity) const {

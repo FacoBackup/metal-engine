@@ -172,8 +172,8 @@ add_executable(
         src/engine/service/world/impl/Entity.h
         src/engine/enum/ComponentType.h
         src/engine/service/world/impl/AbstractComponent.h
-        src/engine/service/world/impl/MeshComponent.h
-        src/engine/service/world/impl/TransformComponent.h
+        src/engine/service/world/components/MeshComponent.h
+        src/engine/service/world/components/TransformComponent.h
         src/engine/enum/ShadingMode.h
         src/engine/enum/EditorMode.h
         src/editor/ui/hierarchy/HierarchyHeaderPanel.cpp
@@ -181,6 +181,8 @@ add_executable(
         src/editor/service/SelectionService.cpp
         src/editor/service/SelectionService.h
         src/engine/service/world/impl/Entity.cpp
+        src/engine/service/world/components/TransformComponent.cpp
+        src/engine/service/world/components/MeshComponent.cpp
 )
 
 

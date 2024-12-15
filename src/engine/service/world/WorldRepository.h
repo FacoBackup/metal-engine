@@ -16,7 +16,7 @@ namespace Metal {
 
         explicit WorldRepository();
 
-        Camera *camera;
+        Camera *camera = nullptr;
         std::unordered_map<EntityID, std::unique_ptr<Entity> > entities{};
         std::unordered_map<EntityID, bool> culled{};
         std::unordered_map<EntityID, bool> hiddenEntities{};
