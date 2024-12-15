@@ -1,13 +1,13 @@
-#include "Frustum.h"
+#include "Camera.h"
 
 namespace Metal {
-    void Frustum::extractFrustumPlanes(glm::mat4x4 m) {
+    void Camera::extractFrustumPlanes(glm::mat4x4 m) {
         for (int i = 0; i < 6; i++) {
             extractPlane(m, i, planes[i]);
         }
     }
 
-    bool Frustum::isSphereInsideFrustum(const glm::vec3 center, const float radius) const {
+    bool Camera::isSphereInsideFrustum(const glm::vec3 center, const float radius) const {
         for (const auto plane: planes) {
             if (const float distance = plane.x * center.x + plane.y * center.y + plane.z * center.z + plane.w;
                 distance < -radius) {
@@ -17,7 +17,7 @@ namespace Metal {
         return true;
     }
 
-    void Frustum::extractPlane(const glm::mat4 &matrix, const int index, glm::vec4 &plane) {
+    void Camera::extractPlane(const glm::mat4 &matrix, const int index, glm::vec4 &plane) {
         switch (index) {
             case 0: // Left
                 plane = matrix[3] + matrix[0];

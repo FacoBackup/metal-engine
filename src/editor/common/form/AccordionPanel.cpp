@@ -1,4 +1,5 @@
 #include "AccordionPanel.h"
+#include "imgui.h"
 
 namespace Metal {
     void AccordionPanel::setTitle(const std::string &t) {

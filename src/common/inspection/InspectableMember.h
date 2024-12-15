@@ -1,7 +1,6 @@
 #ifndef METAL_ENGINE_INSPECTABLEMEMBER_H
 #define METAL_ENGINE_INSPECTABLEMEMBER_H
 
-#include <string>
 #include "FieldType.h"
 
 namespace Metal {
@@ -9,7 +8,7 @@ namespace Metal {
         std::string name;
         std::string nameWithId;
         std::string group;
-        FieldType type = FieldType::BOOLEAN;
+        FieldType type = BOOLEAN;
 
         virtual ~InspectableMember() = default;
     };

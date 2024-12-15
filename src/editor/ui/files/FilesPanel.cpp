@@ -4,7 +4,7 @@
 #include "../../../common/interface/Icons.h"
 #include "../../../common/util/files/FilesUtil.h"
 #include "../../../context/ApplicationContext.h"
-#include "../../common/UIUtil.h"
+#include "../../../common/util/UIUtil.h"
 #include "../../../common/util/files/FileEntry.h"
 #include "FilesContext.h"
 

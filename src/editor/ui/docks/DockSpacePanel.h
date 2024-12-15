@@ -1,6 +1,7 @@
 #ifndef METAL_ENGINE_DOCKSPACEPANEL_H
 #define METAL_ENGINE_DOCKSPACEPANEL_H
 
+#include <imgui.h>
 #include <glm/vec2.hpp>
 
 #include "../../common/AbstractPanel.h"

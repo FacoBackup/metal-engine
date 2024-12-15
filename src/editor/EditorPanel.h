@@ -2,7 +2,6 @@
 #define METAL_ENGINE_EDITORPANEL_H
 
 #include "imgui.h"
-#include "common/IPanel.h"
 #include "common/AbstractPanel.h"
 #include "ui/header/EditorHeaderPanel.h"
 
@@ -28,7 +27,6 @@ namespace Metal {
 
         void onSync() override;
     };
-
 }
 
 

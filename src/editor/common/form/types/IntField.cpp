@@ -1,5 +1,7 @@
 #include "IntField.h"
 
+#include <imgui.h>
+
 namespace Metal {
     void IntField::onSync() {
         if (field.disabled) {

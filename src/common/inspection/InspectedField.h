@@ -1,13 +1,11 @@
 #ifndef INSPECTEDFIELD_H
 #define INSPECTEDFIELD_H
 
-#include <any>
-#include <utility>
 #include "InspectableMember.h"
 
 namespace Metal {
     template<typename T>
-    struct InspectedField : InspectableMember {
+    struct InspectedField final : InspectableMember {
         T *field;
 
         std::optional<int> max;

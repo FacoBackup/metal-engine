@@ -2,11 +2,9 @@
 #define INSPECTABLE_H
 
 #include <functional>
-#include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
-#include "InspectedField.h"
+#include "InspectableMember.h"
 
 namespace Metal {
     class Inspectable {
@@ -42,6 +40,14 @@ namespace Metal {
         void freezeVersion();
 
         virtual ~Inspectable() = default;
+
+        virtual const char *getIcon() {
+            throw std::logic_error("Not implemented");
+        }
+
+        virtual const char *getTitle() {
+            throw std::logic_error("Not implemented");
+        }
     };
 }
 #endif

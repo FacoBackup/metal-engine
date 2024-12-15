@@ -29,12 +29,9 @@ add_executable(
         src/editor/common/AbstractPanel.h
         src/editor/common/AbstractPanel.cpp
         src/common/interface/Synchornizable.h
-        src/engine/system/camera/CameraSystem.cpp
-        src/engine/system/camera/CameraSystem.h
-        src/engine/repository/camera/CameraRepository.h
-        src/engine/repository/camera/Camera.h
-        src/engine/repository/camera/Frustum.cpp
-        src/engine/repository/camera/Frustum.h
+        src/engine/service/camera/CameraService.cpp
+        src/engine/service/camera/CameraService.h
+        src/engine/service/camera/Camera.h
         src/common/util/Util.h
         src/common/interface/Identifiable.h
         src/common/inspection/Inspectable.h
@@ -50,7 +47,6 @@ add_executable(
         src/common/inspection/InspectableMember.h
         src/common/interface/AbstractRuntimeComponent.h
         src/common/interface/AbstractRepository.h
-        src/engine/repository/camera/CameraRepository.cpp
         src/common/interface/AbstractRepository.cpp
         src/editor/common/form/types/BooleanField.cpp
         src/editor/common/form/types/BooleanField.h
@@ -60,7 +56,7 @@ add_executable(
         src/editor/common/form/types/FloatField.h
         src/editor/common/form/types/MethodField.cpp
         src/editor/common/form/types/MethodField.h
-        src/editor/common/UIUtil.h
+        src/common/util/UIUtil.h
         src/editor/ui/header/EditorHeaderPanel.cpp
         src/editor/ui/header/EditorHeaderPanel.h
         src/editor/ui/header/GlobalSettingsPanel.cpp
@@ -83,7 +79,7 @@ add_executable(
         src/editor/service/ThemeService.h
         src/editor/repository/EditorRepository.cpp
         src/editor/repository/EditorRepository.h
-        src/common/interface/engine-definitions.h
+        src/engine/engine-definitions.h
         src/editor/ui/metrics/MetricsPanel.cpp
         src/editor/ui/metrics/MetricsPanel.h
         src/editor/ui/files/FilesPanel.cpp
@@ -128,9 +124,7 @@ add_executable(
         src/context/runtime/DescriptorInstance.cpp
         src/context/runtime/DescriptorInstance.h
         src/context/repository/GlobalDataUBO.h
-        src/engine/service/camera/CameraMovementService.cpp
-        src/engine/service/camera/CameraMovementService.h
-        src/engine/repository/RuntimeRepository.h
+        src/engine/RuntimeRepository.h
         src/context/repository/CoreDescriptorSets.cpp
         src/context/repository/CoreDescriptorSets.h
         src/context/runtime/BufferInstance.cpp
@@ -151,8 +145,8 @@ add_executable(
         src/editor/service/import/MeshImporter.cpp
         src/editor/service/import/MeshImporter.h
         src/editor/service/import/AbstractImporter.h
-        src/engine/LevelOfDetail.h
-        src/engine/LevelOfDetail.cpp
+        src/engine/enum/LevelOfDetail.h
+        src/engine/enum/LevelOfDetail.cpp
         src/editor/service/import/TextureImporter.cpp
         src/editor/service/import/TextureImporter.h
         src/common/util/files/FileMetadata.h
@@ -172,6 +166,21 @@ add_executable(
         src/context/runtime/RenderPass.h
         src/context/repository/CoreRenderPasses.cpp
         src/context/repository/CoreRenderPasses.h
+        src/engine/service/camera/Camera.cpp
+        src/engine/service/world/WorldRepository.cpp
+        src/engine/service/world/WorldRepository.h
+        src/engine/service/world/impl/Entity.h
+        src/engine/enum/ComponentType.h
+        src/engine/service/world/impl/AbstractComponent.h
+        src/engine/service/world/impl/MeshComponent.h
+        src/engine/service/world/impl/TransformComponent.h
+        src/engine/enum/ShadingMode.h
+        src/engine/enum/EditorMode.h
+        src/editor/ui/hierarchy/HierarchyHeaderPanel.cpp
+        src/editor/ui/hierarchy/HierarchyHeaderPanel.h
+        src/editor/service/SelectionService.cpp
+        src/editor/service/SelectionService.h
+        src/engine/service/world/impl/Entity.cpp
 )
 
 

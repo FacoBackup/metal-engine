@@ -1,15 +1,13 @@
-#ifndef CAMERAREPOSITORY_H
-#define CAMERAREPOSITORY_H
+#ifndef CAMERA_H
+#define CAMERA_H
+#include <glm/mat4x4.hpp>
+#include <glm/vec3.hpp>
 
-#include "Camera.h"
-#include "Frustum.h"
 #include "../../../common/inspection/Inspectable.h"
-#include "glm/mat4x4.hpp"
-#include "../../../common/interface/AbstractRepository.h"
+#include "../../../common/util/Util.h"
 
 namespace Metal {
-    class CameraRepository final : public AbstractRepository {
-    public:
+    struct Camera final : Inspectable {
         float rotationSensitivity = 1;
         float movementSensitivity = 1.0f;
         float zoomSensitivity = 1.0f;
@@ -41,17 +39,31 @@ namespace Metal {
         glm::mat4x4 invProjectionMatrix{};
         glm::mat4x4 projViewMatrix{};
 
-        Frustum frustum{};
-        Camera *currentCamera = nullptr;
+        glm::vec3 position{};
+
+        bool isOrthographic = false;
+        float zFar = 10000;
+        float zNear = .1f;
+        float fov = 90 * Util::TO_RADIANS;
+        float aspectRatio = 1;
+        float orthographicProjectionSize = 50;
+
+        void extractFrustumPlanes(glm::mat4x4 m);
+
+        bool isSphereInsideFrustum(glm::vec3 center, float radius) const;
+
+        float pitch = 0.f;
+        float yaw = 0.f;
 
         float lastMouseX = 0;
         float lastMouseY = 0;
         float deltaX = 0;
         float deltaY = 0;
 
-        explicit CameraRepository(ApplicationContext &context);
+    private:
+        static void extractPlane(const glm::mat4 &matrix, int index, glm::vec4 &plane);
 
-        void registerFields() override;
+        glm::vec4 planes[6] = {glm::vec4{}, glm::vec4{}, glm::vec4{}, glm::vec4{}, glm::vec4{}, glm::vec4{}};
     };
 }
 

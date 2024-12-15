@@ -1,6 +1,6 @@
 #ifndef RUNTIMEREPOSITORY_H
 #define RUNTIMEREPOSITORY_H
-#include <glm/vec2.hpp>
+#include <../../cmake-build-debug/vcpkg_installed/arm64-osx/include/glm/vec2.hpp>
 
 namespace Metal {
     struct RuntimeRepository {

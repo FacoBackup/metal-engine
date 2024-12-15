@@ -1,18 +1,19 @@
 #include "EditorHeaderPanel.h"
 #include "GlobalSettingsPanel.h"
-#include "../../common/UIUtil.h"
+#include "../../../common/util/UIUtil.h"
 #include "../../../context/ApplicationContext.h"
 
 namespace Metal {
     void EditorHeaderPanel::onSync() {
         hotKeys();
         renderFileTab();
-        ImGui::Separator();
+        ImGui::Dummy(ImVec2(0, UIUtil::ONLY_ICON_BUTTON_SIZE));
+        ImGui::Dummy(ImVec2(2, 0));
+        ImGui::SameLine();
         onSyncChildren();
     }
 
     void EditorHeaderPanel::onInitialize() {
-        io = &ImGui::GetIO();
         appendChild(new GlobalSettingsPanel());
     }
 
@@ -79,7 +80,7 @@ namespace Metal {
     }
 
     void EditorHeaderPanel::framerate() {
-        int framerate = static_cast<int>(round(io->Framerate));
+        const int framerate = static_cast<int>(round(ImGui::GetIO().Framerate));
         ImGui::Text("%i ms | %i fps", 1000 / framerate, framerate);
     }
 

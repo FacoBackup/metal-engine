@@ -1,11 +1,11 @@
 #ifndef METAL_ENGINE_UIUTIL_H
 #define METAL_ENGINE_UIUTIL_H
 
-#include "imgui.h"
+#include "../../../cmake-build-debug/vcpkg_installed/arm64-osx/include/imgui.h"
 #include <string>
 
-#include "../../common/util/files/EntryType.h"
-#include "../../common/interface/Icons.h"
+#include "files/EntryType.h"
+#include "../interface/Icons.h"
 
 namespace Metal::UIUtil {
     static constexpr ImVec4 DIRECTORY_COLOR{188 / 255.f, 128 / 255.f, 78 / 255.f, 1};

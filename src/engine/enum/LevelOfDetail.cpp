@@ -1,7 +1,7 @@
 #include "LevelOfDetail.h"
 
-#include "../common/util/files/EntryType.h"
-#include "../common/interface/engine-definitions.h"
+#include "../../common/util/files/EntryType.h"
+#include "../engine-definitions.h"
 
 namespace Metal {
     LevelOfDetail LevelOfDetail::LOD_0{1, "LOD-0"};

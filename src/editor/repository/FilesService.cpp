@@ -1,7 +1,7 @@
 #include "FilesService.h"
 #include "../../common/util/files/FileEntry.h"
 #include "../../common/util/files/EntryType.h"
-#include "../../common/interface/engine-definitions.h"
+#include "../../engine/engine-definitions.h"
 #include "../../common/util/files/FilesUtil.h"
 #include "../../context/ApplicationContext.h"
 #include <chrono>

@@ -5,10 +5,22 @@
 #include <unordered_map>
 #include <glm/vec3.hpp>
 
-#include "../../common/interface/engine-definitions.h"
-#include "../../engine/repository/camera/Camera.h"
+#include "../../engine/engine-definitions.h"
+#include "../../engine/enum/EditorMode.h"
+#include "../../engine/enum/ShadingMode.h"
 
 namespace Metal {
+    struct TransformComponent;
+    struct Camera;
+
+    namespace ShadingMode {
+        enum class ShadingMode;
+    }
+
+    namespace EditorMode {
+        enum class EditorMode;
+    }
+
     struct EditorRepository {
         bool showIcons = true;
         float iconScale = 1;
@@ -48,19 +60,20 @@ namespace Metal {
         bool gizmoUseSnapRotate = false;
         bool gizmoUseSnapScale = false;
 
-        // int shadingModelOption =  DebugShadingModel.LIT.getIndex() ;
         bool showOnlyEntitiesHierarchy = false;
 
         std::unordered_map<EntityID, bool> pinnedEntities{};
-        // TransformationComponent *primitiveSelected = nullptr;
+        TransformComponent *primitiveSelected = nullptr;
         EntityID mainSelection = nullptr;
         std::unordered_map<EntityID, bool> selected{};
         std::vector<EntityID> copied{};
-        std::unordered_map<std::string, Camera *> viewportCamera;
+        std::unordered_map<std::string, Camera*> viewportCamera;
 
         // BrushMode brushMode = BrushMode.ADD;
         float brushRadius = 10;
         float brushDensity = .5f;
+        EditorMode::EditorMode editorMode = EditorMode::EditorMode::TRANSFORM;
+        ShadingMode::ShadingMode shadingMode = ShadingMode::ShadingMode::LIT;
     };
 } // Metal
 

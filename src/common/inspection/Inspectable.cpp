@@ -1,13 +1,15 @@
 #include "Inspectable.h"
 
 #include <utility>
+
+#include "InspectedField.h"
 #include "InspectedMethod.h"
 #include "../util/Util.h"
 
 namespace Metal {
 
     void Inspectable::registerMethod(const std::function<void()> &updateCallback, std::string name, std::string group) {
-        std::unique_ptr<InspectedMethod> field = std::make_unique<InspectedMethod>();
+        auto field = std::make_unique<InspectedMethod>();
         field->group = std::move(group);
         field->name = std::move(name);
         field->nameWithId = field->name + Util::uuidV4();

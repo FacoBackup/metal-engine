@@ -9,7 +9,7 @@
 #include "../../../common/util/files/EntryType.h"
 #include "../../../common/util/files/FilesUtil.h"
 #include "../../../context/ApplicationContext.h"
-#include "../../../engine/LevelOfDetail.h"
+#include "../../../engine/enum/LevelOfDetail.h"
 
 namespace fs = std::filesystem;
 

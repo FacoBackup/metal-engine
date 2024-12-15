@@ -10,8 +10,8 @@
 #include <assimp/postprocess.h>
 #include "../../../common/util/files/FilesUtil.h"
 #include "../../../common/util/files/FileMetadata.h"
-#include "../../../common/interface/engine-definitions.h"
-#include "../../../engine/LevelOfDetail.h"
+#include "../../../engine/engine-definitions.h"
+#include "../../../engine/enum/LevelOfDetail.h"
 #include <meshoptimizer.h>
 
 namespace Metal {

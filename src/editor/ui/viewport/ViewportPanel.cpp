@@ -6,6 +6,7 @@
 #include "../../../context/runtime/DescriptorInstance.h"
 #include "../../../context/runtime/FrameBufferInstance.h"
 #include "../../../context/runtime/FrameBufferAttachment.h"
+#include "../../../engine/service/camera/Camera.h"
 
 namespace Metal {
     void ViewportPanel::onInitialize() {
@@ -30,27 +31,27 @@ namespace Metal {
     }
 
     void ViewportPanel::updateCamera() {
-        auto &cameraRepository = context->getEngineContext().cameraRepository;
-        auto &cameraMovementService = context->getEngineContext().cameraMovementService;
+        auto &worldRepository = context->getEngineContext().worldRepository;
+        auto &cameraService = context->getEngineContext().cameraService;
         auto &editorRepository = context->getEditorContext().editorRepository;
 
-        auto *camera = editorRepository.viewportCamera[dock->id];
-        if (camera == nullptr) {
-            camera = new Camera{};
-            editorRepository.viewportCamera[dock->id] = camera;
-            camera->pitch = -(glm::pi<float>() / 4);
-            camera->yaw = glm::pi<float>() / 4;
-            camera->position.x = 10;
-            camera->position.y = 10;
-            camera->position.z = 10;
+        if (!editorRepository.viewportCamera.contains(dock->id)) {
+            editorRepository.viewportCamera.insert({dock->id, new Camera{}});
+            editorRepository.viewportCamera[dock->id]->pitch = -(glm::pi<float>() / 4);
+            editorRepository.viewportCamera[dock->id]->yaw = glm::pi<float>() / 4;
+            editorRepository.viewportCamera[dock->id]->position.x = 10;
+            editorRepository.viewportCamera[dock->id]->position.y = 10;
+            editorRepository.viewportCamera[dock->id]->position.z = 10;
         }
-        cameraRepository.currentCamera = camera;
+        worldRepository.camera = editorRepository.viewportCamera[dock->id];
 
         if (ImGui::IsWindowHovered() && !ImGuizmo::IsUsing() && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-            cameraMovementService.handleInput(*camera, isFirstMovement);
+            cameraService.handleInput(isFirstMovement);
             if (const auto &io = ImGui::GetIO(); io.MouseWheel != 0) {
-                cameraRepository.movementSensitivity += io.MouseWheel * 100 * context->getEngineContext().deltaTime;
-                cameraRepository.movementSensitivity = std::max(.1f, cameraRepository.movementSensitivity);
+                worldRepository.camera->movementSensitivity += io.MouseWheel * 100 * context->getEngineContext().
+                        deltaTime;
+                worldRepository.camera->movementSensitivity =
+                        std::max(.1f, worldRepository.camera->movementSensitivity);
             }
             isFirstMovement = false;
         } else {

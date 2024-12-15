@@ -1,5 +1,7 @@
 #ifndef FILESPANEL_H
 #define FILESPANEL_H
+#include <imgui.h>
+
 #include "FilesContext.h"
 #include "../docks/AbstractDockPanel.h"
 

@@ -2,11 +2,10 @@
 #define INSPECTEDMETHOD_H
 
 #include <functional>
-#include <utility>
 #include "InspectableMember.h"
 
 namespace Metal {
-    struct InspectedMethod : InspectableMember {
+    struct InspectedMethod final : InspectableMember {
         std::function<void()> callback;
     };
 }

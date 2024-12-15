@@ -4,7 +4,7 @@
 #include "../../../common/util/files/FileDialogUtil.h"
 #include "../../../common/util/files/FilesUtil.h"
 #include "../../../context/ApplicationContext.h"
-#include "../../common/UIUtil.h"
+#include "../../../common/util/UIUtil.h"
 
 namespace Metal {
     void FilesHeader::onSync() {

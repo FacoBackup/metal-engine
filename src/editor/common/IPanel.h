@@ -1,7 +1,6 @@
 #ifndef METAL_ENGINE_IPANEL_H
 #define METAL_ENGINE_IPANEL_H
 
-#include "vector"
 #include "../../common/interface/Synchornizable.h"
 #include "../../common/interface/Initializable.h"
 

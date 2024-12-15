@@ -4,7 +4,7 @@
 #include "../../../context/ApplicationContext.h"
 #include "../../../common/interface/Icons.h"
 #include "../../repository/dock/DockDTO.h"
-#include "../../common/UIUtil.h"
+#include "../../../common/util/UIUtil.h"
 
 namespace Metal {
     const ImVec2 DockSpacePanel::DEFAULT{-1.f, -1.f};
@@ -105,7 +105,6 @@ namespace Metal {
                             dockRepository.bottom.insert(
                                 dockRepository.bottom.begin() + Util::indexOf(dockRepository.bottom, dock) + 1,
                                 dto);
-
                             break;
                         default:
                             break;

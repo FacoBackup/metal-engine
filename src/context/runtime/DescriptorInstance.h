@@ -5,7 +5,7 @@
 #include "RuntimeResource.h"
 
 namespace Metal {
-    class BufferInstance;
+    struct BufferInstance;
 
     struct DescriptorInstance final : RuntimeResource {
         VkDescriptorSetLayout vkDescriptorSetLayout = VK_NULL_HANDLE;
