@@ -14,7 +14,6 @@ namespace Metal {
     class Camera;
 
     class CameraMovementService final : public AbstractRuntimeComponent{
-        glm::vec3 toApplyTranslation{0.0f};
         glm::vec3 xAxis{0.0f};
         glm::vec3 yAxis{0.0f};
         glm::vec3 zAxis{0.0f};
@@ -24,16 +23,13 @@ namespace Metal {
             : AbstractRuntimeComponent(context) {
         }
 
-        void handleInputInternal(Camera &camera);
+        void handleInputInternal(Camera &camera) const;
 
         void handleMouse(Camera &camera, bool isFirstMovement) const;
 
         void updateDelta(bool isFirstMovement) const;
 
-        void handleInput(Camera &camera, bool isFirstMovement) {
-            handleInputInternal(camera);
-            handleMouse(camera, isFirstMovement);
-        }
+        void handleInput(Camera &camera, bool isFirstMovement) const;
 
         void createViewMatrix(const Camera &camera);
     };

@@ -9,7 +9,7 @@
 
 namespace Metal {
     RenderPass::RenderPass(const FrameBufferInstance *frameBuffer,
-                           ApplicationContext &applicationContext): AbstractRuntimeComponent(applicationContext) {
+                           ApplicationContext &applicationContext): context(applicationContext) {
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderPassInfo.renderPass = frameBuffer->vkRenderPass;
         renderPassInfo.framebuffer = frameBuffer->vkFramebuffer;
@@ -32,13 +32,14 @@ namespace Metal {
             vkAllocateCommandBuffers(context.getVulkanContext().device.device, &allocInfo, &vkCommandBuffer));
     }
 
-    void RenderPass::onSync() {
+    void RenderPass::recordCommands(const std::vector<std::unique_ptr<AbstractRenderPass> > &renderPasses) const {
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         vkBeginCommandBuffer(vkCommandBuffer, &beginInfo);
 
         vkCmdBeginRenderPass(vkCommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-        for (const auto &pass: renderPasses) {
+        for (auto &pass: renderPasses) {
+            pass->setCommandBuffer(vkCommandBuffer);
             vkCmdBindPipeline(vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pass->getPipeline()->vkPipeline);
 
             std::vector<VkDescriptorSet> sets;
@@ -62,10 +63,5 @@ namespace Metal {
         vkEndCommandBuffer(vkCommandBuffer);
 
         context.getVulkanContext().getFrameData().commandBuffers.push_back(vkCommandBuffer);
-    }
-
-    void RenderPass::addRenderPass(AbstractRenderPass *renderPass) {
-        renderPasses.push_back(renderPass);
-        renderPass->setCommandBuffer(vkCommandBuffer);
     }
 } // Metal

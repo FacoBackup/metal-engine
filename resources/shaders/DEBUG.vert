@@ -1,5 +1,3 @@
-#version 450
-
 layout(set = 0, binding = 0) uniform GlobalDataBlock {
     mat4 view;
     mat4 proj;
@@ -22,5 +20,6 @@ layout(location = 0) out vec3 position;
 
 void main(){
     position = inPosition;
-    gl_Position =  globalData.projView *  vec4(inPosition, 1.0);
+    gl_Position =  globalData.projView * push.model * vec4(inPosition, 1.0);
+    gl_Position.y = -gl_Position.y;
 }

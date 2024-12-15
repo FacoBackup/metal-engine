@@ -6,8 +6,7 @@
 #include "service/camera/CameraMovementService.h"
 #include "system/camera/CameraSystem.h"
 #include "../context/repository/GlobalDataUBO.h"
-#include "render-pass/impl/OpaqueRenderPass.h"
-#include "render-pass/tools/GridRenderPass.h"
+#include "render-pass/AbstractRenderPass.h"
 
 using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
@@ -19,11 +18,10 @@ namespace Metal {
         GlobalDataUBO globalDataUBO{};
         long long start = -1;
 
-        OpaqueRenderPass opaqueRenderPass{context};
-        GridRenderPass gridRenderPass{context};
+        std::vector<std::unique_ptr<AbstractRenderPass> > fullScreenRenderPasses;
+
     public:
-        explicit EngineContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {
-        }
+        explicit EngineContext(ApplicationContext &context);
 
         float deltaTime = 0;
         bool globalDataNeedsUpdate = true;
@@ -37,8 +35,6 @@ namespace Metal {
         CameraRepository cameraRepository{context};
         RuntimeRepository runtimeRepository{};
         // ----------- REPOSITORIES
-
-        void onInitialize() override;
 
         void onSync() override;
     };

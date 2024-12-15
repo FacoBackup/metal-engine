@@ -4,22 +4,19 @@
 #include <vulkan/vulkan.h>
 
 #include "PipelineInstance.h"
-#include "../../common/interface/AbstractRuntimeComponent.h"
 
 namespace Metal {
     class AbstractRenderPass;
+    class ApplicationContext;
 
-    class RenderPass final : public AbstractRuntimeComponent {
-        std::vector<AbstractRenderPass *> renderPasses;
+    class RenderPass final {
         VkCommandBuffer vkCommandBuffer = VK_NULL_HANDLE;
         VkRenderPassBeginInfo renderPassInfo{};
-
+        ApplicationContext &context;
     public:
         explicit RenderPass(const FrameBufferInstance *frameBuffer, ApplicationContext &applicationContext);
 
-        void onSync() override;
-
-        void addRenderPass(AbstractRenderPass *renderPass);
+        void recordCommands(const std::vector<std::unique_ptr<AbstractRenderPass> > &renderPasses) const;
     };
 } // Metal
 

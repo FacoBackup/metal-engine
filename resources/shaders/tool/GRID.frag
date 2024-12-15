@@ -7,7 +7,7 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     vec3 cameraWorldPosition;
 } globalData;
 
-const vec4 settings = vec4(0, 1, 100, .002);
+const vec4 settings = vec4(0, 1, 100, .02);
 
 //uniform sampler2D sceneDepth;
 //

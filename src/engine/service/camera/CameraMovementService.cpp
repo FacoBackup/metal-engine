@@ -1,10 +1,12 @@
 #include "CameraMovementService.h"
 
+#include <iostream>
+
 #include "../../../context/ApplicationContext.h"
 #include "../../repository/camera/Camera.h"
 
 namespace Metal {
-    void CameraMovementService::handleInputInternal(Camera &camera) {
+    void CameraMovementService::handleInputInternal(Camera &camera) const {
         const auto &runtimeRepository = context.getEngineContext().runtimeRepository;
         const auto &cameraRepository = context.getEngineContext().cameraRepository;
 
@@ -49,7 +51,7 @@ namespace Metal {
         }
     }
 
-    void CameraMovementService::handleMouse(Camera &camera, bool isFirstMovement) const {
+    void CameraMovementService::handleMouse(Camera &camera, const bool isFirstMovement) const {
         const auto &cameraRepository = context.getEngineContext().cameraRepository;
 
         updateDelta(isFirstMovement);
@@ -86,6 +88,11 @@ namespace Metal {
         cameraRepository.lastMouseY = mouseY;
     }
 
+    void CameraMovementService::handleInput(Camera &camera, const bool isFirstMovement) const {
+        handleInputInternal(camera);
+        handleMouse(camera, isFirstMovement);
+    }
+
     void CameraMovementService::createViewMatrix(const Camera &camera) {
         auto &cameraRepository = context.getEngineContext().cameraRepository;
 
@@ -98,15 +105,13 @@ namespace Metal {
         yAxis = glm::vec3(sinYaw * sinPitch, cosPitch, cosYaw * sinPitch);
         zAxis = glm::vec3(sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw);
 
-        cameraRepository.viewMatrix = glm::mat4(
-            glm::vec4(xAxis, 0.0f),
-            glm::vec4(yAxis, 0.0f),
-            glm::vec4(zAxis, 0.0f),
-            glm::vec4(-dot(xAxis, camera.position),
-                      -dot(yAxis, camera.position),
-                      -dot(zAxis, camera.position),
-                      1.0f)
-        );
-        toApplyTranslation = glm::vec3(0.0f);
+        cameraRepository.viewMatrix = glm::mat4x4(
+            xAxis.x, yAxis.x, zAxis.x, 0.0f,
+            xAxis.y, yAxis.y, zAxis.y, 0.0f,
+            xAxis.z, yAxis.z, zAxis.z, 0.0f,
+            -dot(xAxis, camera.position),
+            -dot(yAxis, camera.position),
+            -dot(zAxis, camera.position), 1.0f);
+
     }
 } // Metal

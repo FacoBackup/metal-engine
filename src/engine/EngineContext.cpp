@@ -7,10 +7,9 @@
 #include "render-pass/tools/GridRenderPass.h"
 
 namespace Metal {
-    void EngineContext::onInitialize() {
-        cameraSystem.onInitialize();
-        context.getVulkanContext().coreRenderPasses.fullScreenPass->addRenderPass(&opaqueRenderPass);
-        context.getVulkanContext().coreRenderPasses.fullScreenPass->addRenderPass(&gridRenderPass);
+    EngineContext::EngineContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {
+        fullScreenRenderPasses.push_back(std::make_unique<GridRenderPass>(context));
+        fullScreenRenderPasses.push_back(std::make_unique<OpaqueRenderPass>(context));
     }
 
     void EngineContext::onSync() {
@@ -34,6 +33,6 @@ namespace Metal {
             context.getVulkanContext().coreBuffers.globalData->update(&globalDataUBO);
         }
 
-        context.getVulkanContext().coreRenderPasses.fullScreenPass->onSync();
+        context.getVulkanContext().coreRenderPasses.fullScreenPass->recordCommands(fullScreenRenderPasses);
     }
 }

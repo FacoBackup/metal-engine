@@ -16,7 +16,7 @@ namespace Metal {
             "../resources/shaders/DEBUG.frag",
             {context.getVulkanContext().coreDescriptorSets.globalDataDescriptor},
             sizeof(MeshPushConstant),
-            false,
+            true,
             true);
 
         gridPipeline = pipelineService.createRenderingPipeline(
@@ -24,7 +24,7 @@ namespace Metal {
             VK_CULL_MODE_NONE,
             "../resources/shaders/QUAD.vert",
             "../resources/shaders/tool/GRID.frag",
-                {context.getVulkanContext().coreDescriptorSets.globalDataDescriptor},
+            {context.getVulkanContext().coreDescriptorSets.globalDataDescriptor},
             0,
             true
         );
@@ -33,5 +33,6 @@ namespace Metal {
     void CorePipelines::dispose() const {
         // TODO - Add button to UI to re-create pipelines and reload shaders
         debugPipeline->dispose(vulkanContext);
+        gridPipeline->dispose(vulkanContext);
     }
 } // Metal

@@ -49,7 +49,6 @@ namespace Metal {
         }
         vulkanContext.onInitialize();
         guiContext.onInitialize();
-        engineContext.onInitialize();
         editorContext.onInitialize();
         rootPanel.onInitialize();
 
