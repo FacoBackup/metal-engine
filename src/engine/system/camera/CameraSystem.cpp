@@ -25,20 +25,20 @@ namespace Metal {
         }
     }
 
-    void CameraSystem::updateMatrices() {
+    void CameraSystem::updateMatrices() const {
         auto &repository = context.getEngineContext().cameraRepository;
 
         updateProjection();
         updateView();
-        repository.viewProjectionMatrix = repository.projectionMatrix * repository.viewMatrix;
-        repository.frustum.extractFrustumPlanes(repository.viewProjectionMatrix);
+        repository.projViewMatrix = repository.projectionMatrix * repository.viewMatrix;
+        repository.frustum.extractFrustumPlanes(repository.projViewMatrix);
     }
 
     void CameraSystem::updateView() const {
         auto &repository = context.getEngineContext().cameraRepository;
 
         context.getEngineContext().cameraMovementService.createViewMatrix(*camera);
-        repository.viewMatrix = glm::inverse(repository.invViewMatrix);
+        repository.invViewMatrix = inverse(repository.viewMatrix);
     }
 
     void CameraSystem::updateProjection() const {
@@ -56,9 +56,7 @@ namespace Metal {
             repository.projectionMatrix = glm::perspective(camera->fov, camera->aspectRatio, camera->zNear,
                                                            camera->zFar);
         }
-        repository.skyboxProjectionMatrix = glm::perspective(camera->fov, camera->aspectRatio, 0.1f, 1000.f);
-        repository.invSkyboxProjectionMatrix = glm::inverse(repository.skyboxProjectionMatrix);
-        repository.invProjectionMatrix = glm::inverse(repository.projectionMatrix);
+        repository.invProjectionMatrix = inverse(repository.projectionMatrix);
     }
 
     CameraSystem::CameraSystem(ApplicationContext &context) : AbstractRuntimeComponent(context) {

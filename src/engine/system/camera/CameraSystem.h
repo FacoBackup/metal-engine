@@ -9,7 +9,7 @@ namespace Metal {
     class CameraSystem final : public AbstractRuntimeComponent {
         Camera *camera = nullptr;
 
-        void updateMatrices();
+        void updateMatrices() const;
 
         void updateView() const;
 

@@ -12,7 +12,7 @@ namespace Metal {
             : AbstractResourceService(context) {
         }
 
-        MeshInstance *createMesh(const MeshData &data);
+        MeshInstance *createMesh(const std::string &path);
 
         void dispose(MeshInstance *instance) const;
     };

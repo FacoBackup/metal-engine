@@ -1,23 +1,37 @@
-in vec2 texCoords;
-uniform vec4 settings;
+layout(set = 0, binding = 0) uniform GlobalDataBlock {
+    mat4 view;
+    mat4 proj;
+    mat4 projView;
+    mat4 invView;
+    mat4 invProj;
+    vec3 cameraWorldPosition;
+} globalData;
 
-uniform sampler2D sceneDepth;
+const vec4 settings = vec4(0, 1, 100, .02);
 
-#include "../util/SCENE_DEPTH_UTILS.glsl"
+//uniform sampler2D sceneDepth;
+//
+//#include "../util/SCENE_DEPTH_UTILS.glsl"
 #define OVERLAY_OBJECTS settings.x == 1.
 #define SCALE settings.y
 #define THREASHOLD settings.z
 #define THICKNESS settings.w
 
-out vec4 finalColor;
+layout(location = 0) in vec2 texCoords;
+layout(location = 0) out vec4 finalColor;
 
 vec3 createRay() {
-    vec2 pxNDS = texCoords * 2. - 1.;
-    vec3 pointNDS = vec3(pxNDS, -1.);
+    // Adjust texCoords for Vulkan's coordinate system
+    vec2 pxNDS = vec2(texCoords.x, 1.0 - texCoords.y) * 2.0 - 1.0;
+    vec3 pointNDS = vec3(pxNDS, -1.0);
     vec4 pointNDSH = vec4(pointNDS, 1.0);
-    vec4 dirEye = invProjectionMatrix * pointNDSH;
-    dirEye.w = 0.;
-    vec3 dirWorld = (invViewMatrix * dirEye).xyz;
+
+    // Transform from NDC to eye space
+    vec4 dirEye = globalData.invProj * pointNDSH;
+    dirEye.w = 0.0;
+
+    // Transform from eye space to world space
+    vec3 dirWorld = (globalData.invView * dirEye).xyz;
     return normalize(dirWorld);
 }
 
@@ -42,22 +56,22 @@ float getGridLine(float gridScale){
 }
 
 void main() {
-    float depthData = getLogDepth(texCoords);
+//    float depthData = getLogDepth(texCoords);
 
     bool hasData = false;
     bool isOverlay = false;
-    if (depthData != 1){
-        hasData = OVERLAY_OBJECTS;
-        isOverlay = true;
-        vec3 viewSpacePosition = viewSpacePositionFromDepth(depthData, texCoords);
-        p = vec3(invViewMatrix * vec4(viewSpacePosition, 1.));
-    } else {
-        vec3 rayDir = createRay();
-        hasData = rayMarch(cameraWorldPosition.xyz, rayDir, 1);
-    }
+    //    if (depthData != 1){
+    //        hasData = OVERLAY_OBJECTS;
+    //        isOverlay = true;
+    //        vec3 viewSpacePosition = viewSpacePositionFromDepth(depthData, texCoords);
+    //        p = vec3(invViewMatrix * vec4(viewSpacePosition, 1.));
+    //    } else {
+    vec3 rayDir = createRay();
+    hasData = rayMarch(globalData.cameraWorldPosition.xyz, rayDir, 1);
+    //    }
 
     if (hasData){
-        float distanceFromCamera = length(cameraWorldPosition.xyz - p.xyz);
+        float distanceFromCamera = length(globalData.cameraWorldPosition.xyz - p.xyz);
         float alpha = 1;
         if (distanceFromCamera >= THREASHOLD){
             alpha = 0;

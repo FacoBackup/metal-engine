@@ -1,7 +1,6 @@
 #ifndef METAL_ENGINE_VULKANCONTEXT_H
 #define METAL_ENGINE_VULKANCONTEXT_H
 
-
 #include "vk_mem_alloc.h"
 #include <unordered_map>
 
@@ -13,12 +12,12 @@
 #include "repository/CoreBuffers.h"
 #include "repository/CoreDescriptorSets.h"
 #include "../common/interface/AbstractRuntimeComponent.h"
+#include "repository/CoreRenderPasses.h"
 #include "runtime/FrameData.h"
 #include "service/DescriptorService.h"
 #include "service/TextureService.h"
 #include "service/FrameBufferService.h"
 #include "service/PipelineService.h"
-#include "service/ShaderService.h"
 #include "service/BufferService.h"
 #include "service/MeshService.h"
 
@@ -83,6 +82,7 @@ namespace Metal {
         CorePipelines corePipelines{context};
         CoreBuffers coreBuffers{context};
         CoreDescriptorSets coreDescriptorSets{context};
+        CoreRenderPasses coreRenderPasses{context};
         // ----------- CORE REPOSITORIES
 
         // ----------- Services
@@ -90,7 +90,6 @@ namespace Metal {
         TextureService textureService{context};
         FrameBufferService framebufferService{context};
         PipelineService pipelineService{context};
-        ShaderService shaderService{context};
         BufferService bufferService{context};
         DescriptorService descriptorService{context};
         // ----------- Services

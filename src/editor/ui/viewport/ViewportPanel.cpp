@@ -1,4 +1,6 @@
 #include "ViewportPanel.h"
+
+#include "CameraPositionPanel.h"
 #include "ImGuizmo.h"
 #include "../../../context/ApplicationContext.h"
 #include "../../../context/runtime/DescriptorInstance.h"
@@ -6,6 +8,10 @@
 #include "../../../context/runtime/FrameBufferAttachment.h"
 
 namespace Metal {
+    void ViewportPanel::onInitialize() {
+        appendChild(new CameraPositionPanel);
+    }
+
     void ViewportPanel::onSync() {
         auto &coreSets = context->getVulkanContext().coreDescriptorSets;
         coreSets.updateImageSamplerDescriptor(
@@ -20,6 +26,7 @@ namespace Metal {
         ImGui::Image(
             reinterpret_cast<ImTextureID>(coreSets.imageSampler->vkDescriptorSet),
             ImVec2{size->x, size->y});
+        onSyncChildren();
     }
 
     void ViewportPanel::updateCamera() {
@@ -65,7 +72,6 @@ namespace Metal {
         repo.viewportY = windowPos.y + DockSpacePanel::FRAME_SIZE;
 
         repo.isFocused = ImGui::IsWindowHovered();
-        repo.fasterPressed = ImGui::IsKeyDown(ImGuiKey_LeftShift);
         repo.forwardPressed = ImGui::IsKeyDown(ImGuiKey_W);
         repo.backwardPressed = ImGui::IsKeyDown(ImGuiKey_S);
         repo.leftPressed = ImGui::IsKeyDown(ImGuiKey_A);

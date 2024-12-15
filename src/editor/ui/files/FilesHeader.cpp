@@ -10,7 +10,6 @@ namespace Metal {
     void FilesHeader::onSync() {
         renderOptions();
 
-
         ImGui::Text(filesContext.pathToCurrentDirectory.c_str());
         UIUtil::DynamicSpacing(105);
         if (UIUtil::ButtonSimple(Icons::file_open + "Import file" + id, 100, UIUtil::ONLY_ICON_BUTTON_SIZE)) {

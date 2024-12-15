@@ -2,15 +2,21 @@
 
 #include "../context/ApplicationContext.h"
 #include "../context/runtime/BufferInstance.h"
+#include "../context/runtime/RenderPass.h"
+#include "render-pass/impl/OpaqueRenderPass.h"
+#include "render-pass/tools/GridRenderPass.h"
 
 namespace Metal {
-    void EngineContext::onInitialize() {
-        cameraSystem.onInitialize();
+    EngineContext::EngineContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {
+        fullScreenRenderPasses.push_back(std::make_unique<GridRenderPass>(context));
+        fullScreenRenderPasses.push_back(std::make_unique<OpaqueRenderPass>(context));
     }
 
     void EngineContext::onSync() {
         currentTime = Clock::now();
-        deltaTime = static_cast<float>((currentTime - previousTime).count()) / 1000.f;
+        std::chrono::duration<float> delta = currentTime - previousTime;
+        deltaTime = delta.count();
+        previousTime = currentTime;
         if (start == -1) {
             start = Clock::now().time_since_epoch().count();
         }
@@ -20,12 +26,13 @@ namespace Metal {
             globalDataNeedsUpdate = false;
             globalDataUBO.proj = cameraRepository.projectionMatrix;
             globalDataUBO.view = cameraRepository.viewMatrix;
-            globalDataUBO.viewProj = cameraRepository.viewProjectionMatrix;
+            globalDataUBO.projView = cameraRepository.projViewMatrix;
             globalDataUBO.invProj = cameraRepository.invProjectionMatrix;
             globalDataUBO.invView = cameraRepository.invViewMatrix;
-            globalDataUBO.color = {1, 1, 0, 1};
+            globalDataUBO.cameraWorldPosition = cameraRepository.currentCamera->position;
             context.getVulkanContext().coreBuffers.globalData->update(&globalDataUBO);
         }
-        renderPassSystem.onSync();
+
+        context.getVulkanContext().coreRenderPasses.fullScreenPass->recordCommands(fullScreenRenderPasses);
     }
 }

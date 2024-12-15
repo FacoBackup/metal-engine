@@ -14,7 +14,7 @@ namespace fs = std::filesystem;
 
 namespace Metal {
     void FilesService::onInitialize() {
-        root = new FileEntry(nullptr, context.getRootDirectory(), "", "");
+        root = new FileEntry(nullptr, context.getAssetsDirectory(), "", "");
         root->type = EntryType::DIRECTORY;
         root->name = "Files";
         GetEntries(root);

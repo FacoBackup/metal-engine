@@ -1,6 +1,6 @@
-#include "ShaderService.h"
+#include "ShaderUtil.h"
 
-#include "../runtime/ShaderModuleInstance.h"
+#include "../runtime/ShaderModule.h"
 #include "../../common/util/VulkanUtils.h"
 #include "../../common/util/Util.h"
 #include "../ApplicationContext.h"
@@ -9,8 +9,20 @@
 #include "glslang/Public/resource_limits_c.h"
 
 namespace Metal {
-    bool ShaderService::compileShader(const glslang_stage_t stage, const char *pShaderCode,
-                                      ShaderModuleInstance *shaderModule) const {
+    void ShaderUtil::CheckShaderCompilation(glslang_shader_t *shader) {
+        const char *infoLog = glslang_shader_get_info_log(shader);
+        const char *debugLog = glslang_shader_get_info_debug_log(shader);
+
+        if (infoLog) {
+            printf("Shader Info Log:\n%s\n", infoLog);
+        }
+        if (debugLog) {
+            printf("Shader Debug Log:\n%s\n", debugLog);
+        }
+    }
+
+    bool ShaderUtil::CompileShader(const VulkanContext &context, glslang_stage_t stage, const char *pShaderCode,
+                                   ShaderModule *shaderModule) {
         const glslang_input_t input = {
             .language = GLSLANG_SOURCE_GLSL,
             .stage = stage,
@@ -31,9 +43,11 @@ namespace Metal {
         glslang_shader_t *shader = glslang_shader_create(&input);
 
         if (!glslang_shader_preprocess(shader, &input)) {
+            CheckShaderCompilation(shader);
             throw std::runtime_error("Failed to process shader");
         }
         if (!glslang_shader_parse(shader, &input)) {
+            CheckShaderCompilation(shader);
             throw std::runtime_error("Failed to parse shader");
         }
 
@@ -56,7 +70,7 @@ namespace Metal {
         shaderCreateInfo.codeSize = shaderModule->SPIRV.size() * sizeof(uint32_t);
         shaderCreateInfo.pCode = static_cast<const uint32_t *>(shaderModule->SPIRV.data());
 
-        VulkanUtils::CheckVKResult(vkCreateShaderModule(context.getVulkanContext().device.device, &shaderCreateInfo,
+        VulkanUtils::CheckVKResult(vkCreateShaderModule(context.device.device, &shaderCreateInfo,
                                                         nullptr,
                                                         &shaderModule->vkShaderModule));
         glslang_program_delete(program);
@@ -65,7 +79,7 @@ namespace Metal {
         return !shaderModule->SPIRV.empty();
     }
 
-    glslang_stage_t ShaderService::ShaderStageFromFilename(const char *pFilename) {
+    glslang_stage_t ShaderUtil::ShaderStageFromFilename(const char *pFilename) {
         const std::string s(pFilename);
 
         if (s.ends_with(".vert")) {
@@ -94,25 +108,24 @@ namespace Metal {
         throw std::runtime_error("Unknown shader stage in file");
     }
 
-    ShaderModuleInstance *ShaderService::createShaderModule(const char *pFilename) {
+    VkShaderModule ShaderUtil::CreateShaderModule(ApplicationContext &context, const char *pFilename) {
+        const std::string basePath = context.getShadersDirectory();
+
         std::string source;
         FilesUtil::ReadFile(pFilename, source);
 
         const glslang_stage_t shaderStage = ShaderStageFromFilename(pFilename);
 
         glslang_initialize_process();
-        auto *shader = new ShaderModuleInstance;
-        if (compileShader(shaderStage, source.c_str(), shader)) {
-            const std::string BinaryFilename = std::string(pFilename) + ".spv";
-            FilesUtil::WriteBinaryFile(BinaryFilename.c_str(), shader->SPIRV.data(),
-                                       shader->SPIRV.size() * sizeof(uint32_t));
-            registerResource(shader);
-        } else {
-            delete shader;
-            shader = nullptr;
+        ShaderModule shader{};
+        if (CompileShader(context.getVulkanContext(), shaderStage, source.c_str(), &shader)) {
+            const std::string part(pFilename);
+            const std::string BinaryFilename = basePath + part.substr(
+                                                   part.find_last_of('/') + 1, part.size()) + ".spv";
+            FilesUtil::WriteBinaryFile(BinaryFilename.c_str(), shader.SPIRV.data(),
+                                       shader.SPIRV.size() * sizeof(uint32_t));
         }
         glslang_finalize_process();
-
-        return shader;
+        return shader.vkShaderModule;
     }
 }

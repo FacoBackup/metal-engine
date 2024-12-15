@@ -1,12 +1,17 @@
 #include "PipelineService.h"
+
+#include "ShaderUtil.h"
 #include "../ApplicationContext.h"
 #include "../../common/util/VulkanUtils.h"
 #include "../runtime/FrameBufferInstance.h"
 #include "../runtime/PipelineInstance.h"
+#include "../runtime/MeshData.h"
+#include "../runtime/VertexData.h"
 #include "../runtime/DescriptorInstance.h"
 
 namespace Metal {
-    void PipelineService::createPipelineLayout(const std::vector<DescriptorInstance *> &descriptorSetsToBind, const uint32_t pushConstantsSize, PipelineInstance *pipeline) {
+    void PipelineService::createPipelineLayout(const std::vector<DescriptorInstance *> &descriptorSetsToBind,
+                                               const uint32_t pushConstantsSize, PipelineInstance *pipeline) const {
         VkPipelineLayoutCreateInfo layoutInfo = {};
         layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         std::vector<VkDescriptorSetLayout> descriptorLayouts;
@@ -31,32 +36,80 @@ namespace Metal {
                                                           &pipeline->vkPipelineLayout));
     }
 
+    void PipelineService::getBlendConfig(bool blendEnabled, VkPipelineColorBlendStateCreateInfo &colorBlending) {
+        auto *colorBlendAttachment = new VkPipelineColorBlendAttachmentState;
+        if (blendEnabled) {
+            colorBlendAttachment->blendEnable = VK_TRUE; // Enable blending
+            colorBlendAttachment->srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA; // Source color factor
+            colorBlendAttachment->dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA; // Destination color factor
+            colorBlendAttachment->colorBlendOp = VK_BLEND_OP_ADD; // Blend operation (add source and destination)
+            colorBlendAttachment->srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE; // Source alpha factor
+            colorBlendAttachment->dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // Destination alpha factor
+            colorBlendAttachment->alphaBlendOp = VK_BLEND_OP_ADD; // Blend operation for alpha
+            colorBlendAttachment->colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
+                                                   VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+        } else {
+            colorBlendAttachment->colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
+                                                   VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+            colorBlendAttachment->blendEnable = VK_FALSE;
+        }
+
+
+        colorBlending = {};
+        colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+        colorBlending.logicOpEnable = VK_FALSE;
+        colorBlending.logicOp = VK_LOGIC_OP_COPY;
+        colorBlending.attachmentCount = 1;
+        colorBlending.pAttachments = colorBlendAttachment;
+        colorBlending.blendConstants[0] = 0.0f;
+        colorBlending.blendConstants[1] = 0.0f;
+        colorBlending.blendConstants[2] = 0.0f;
+        colorBlending.blendConstants[3] = 0.0f;
+    }
+
     PipelineInstance *PipelineService::createRenderingPipeline(FrameBufferInstance *frameBuffer,
                                                                VkCullModeFlagBits cullMode,
                                                                const char *vertexShader,
                                                                const char *fragmentShader,
-                                                               const std::vector<DescriptorInstance *> &descriptorSetsToBind,
-                                                               const uint32_t pushConstantsSize) {
+                                                               const std::vector<DescriptorInstance *> &
+                                                               descriptorSetsToBind,
+                                                               const uint32_t pushConstantsSize,
+                                                               bool blendEnabled,
+                                                               bool prepareForMesh) {
+        VkVertexInputBindingDescription *meshBindingDescription = nullptr;
+        auto meshDescriptions = VertexData::GetAttributeDescriptions();
+
         auto *pipeline = new PipelineInstance();
         pipeline->pushConstantsSize = pushConstantsSize;
-        pipeline->frameBuffer = frameBuffer;
-        pipeline->fragmentShader = context.getVulkanContext().shaderService.createShaderModule(fragmentShader);
-        pipeline->vertexShader = context.getVulkanContext().shaderService.createShaderModule(vertexShader);
+        auto fragmentShaderModule = ShaderUtil::CreateShaderModule(context, fragmentShader);
+        auto vertexShaderModule = ShaderUtil::CreateShaderModule(context, vertexShader);
         registerResource(pipeline);
         createPipelineLayout(descriptorSetsToBind, pushConstantsSize, pipeline);
 
         std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages{};
         shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
-        shaderStages[0].module = pipeline->vertexShader->vkShaderModule;
+        shaderStages[0].module = vertexShaderModule;
         shaderStages[0].pName = "main";
 
         shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-        shaderStages[1].module = pipeline->fragmentShader->vkShaderModule;
+        shaderStages[1].module = fragmentShaderModule;
         shaderStages[1].pName = "main";
 
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+
+        if (prepareForMesh) {
+            meshBindingDescription = new VkVertexInputBindingDescription;
+            meshBindingDescription->binding = 0;
+            meshBindingDescription->stride = sizeof(VertexData);
+            meshBindingDescription->inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+            vertexInputInfo.vertexBindingDescriptionCount = 1;
+            vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(meshDescriptions.size());
+            vertexInputInfo.pVertexAttributeDescriptions = meshDescriptions.data();
+            vertexInputInfo.pVertexBindingDescriptions = meshBindingDescription;
+        }
 
         VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
         inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -83,23 +136,10 @@ namespace Metal {
         multisampling.sampleShadingEnable = VK_FALSE;
         multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
 
-        VkPipelineColorBlendAttachmentState colorBlendAttachment{};
-        colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
-                                              VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-        colorBlendAttachment.blendEnable = VK_FALSE;
+        VkPipelineColorBlendStateCreateInfo colorBlending;
+        getBlendConfig(blendEnabled, colorBlending);
 
-        VkPipelineColorBlendStateCreateInfo colorBlending{};
-        colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-        colorBlending.logicOpEnable = VK_FALSE;
-        colorBlending.logicOp = VK_LOGIC_OP_COPY;
-        colorBlending.attachmentCount = 1;
-        colorBlending.pAttachments = &colorBlendAttachment;
-        colorBlending.blendConstants[0] = 0.0f;
-        colorBlending.blendConstants[1] = 0.0f;
-        colorBlending.blendConstants[2] = 0.0f;
-        colorBlending.blendConstants[3] = 0.0f;
-
-        std::vector<VkDynamicState> dynamicStates = {
+        std::vector dynamicStates = {
             VK_DYNAMIC_STATE_VIEWPORT,
             VK_DYNAMIC_STATE_SCISSOR
         };
@@ -129,24 +169,10 @@ namespace Metal {
                                                              nullptr,
                                                              &pipeline->vkPipeline));
         pipeline->descriptorSets = descriptorSetsToBind;
-        createCommandBuffer(pipeline);
+        delete meshBindingDescription;
+        vkDestroyShaderModule(vulkanContext.device.device, fragmentShaderModule, nullptr);
+        vkDestroyShaderModule(vulkanContext.device.device, vertexShaderModule, nullptr);
+        delete colorBlending.pAttachments;
         return pipeline;
-    }
-
-    /**
- * Commands still need to be recorded
- */
-    void *PipelineService::createCommandBuffer(PipelineInstance *pipeline) const {
-        VkCommandBufferAllocateInfo allocInfo{};
-        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo.commandPool = context.getVulkanContext().commandPool;
-        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandBufferCount = 1;
-
-        VkCommandBuffer commandBuffer{};
-        VulkanUtils::CheckVKResult(
-            vkAllocateCommandBuffers(vulkanContext.device.device, &allocInfo, &commandBuffer));
-
-        pipeline->vkCommandBuffer = commandBuffer;
     }
 } // Metal

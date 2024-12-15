@@ -93,17 +93,15 @@ add_executable(
         src/editor/ui/hierarchy/HierarchyPanel.cpp
         src/editor/ui/hierarchy/HierarchyPanel.h
         src/context/runtime/RuntimeResource.h
-        src/context/service/ShaderService.cpp
-        src/context/service/ShaderService.h
-        src/context/runtime/ShaderModuleInstance.cpp
-        src/context/runtime/ShaderModuleInstance.h
+        src/context/service/ShaderUtil.cpp
+        src/context/service/ShaderUtil.h
+        src/context/runtime/ShaderModule.cpp
+        src/context/runtime/ShaderModule.h
         src/context/runtime/FrameData.h
         src/engine/render-pass/AbstractRenderPass.cpp
         src/engine/render-pass/AbstractRenderPass.h
-        src/engine/system/RenderPassSystem.cpp
-        src/engine/system/RenderPassSystem.h
-        src/engine/render-pass/impl/VoxelVisualizerRenderPass.cpp
-        src/engine/render-pass/impl/VoxelVisualizerRenderPass.h
+        src/engine/render-pass/impl/OpaqueRenderPass.cpp
+        src/engine/render-pass/impl/OpaqueRenderPass.h
         src/context/runtime/TextureInstance.h
         src/context/repository/ResourceRepository.h
         src/common/interface/AbstractResourceService.cpp
@@ -153,7 +151,6 @@ add_executable(
         src/editor/service/import/MeshImporter.cpp
         src/editor/service/import/MeshImporter.h
         src/editor/service/import/AbstractImporter.h
-        src/common/interface/BinarySerializable.h
         src/engine/LevelOfDetail.h
         src/engine/LevelOfDetail.cpp
         src/editor/service/import/TextureImporter.cpp
@@ -165,6 +162,16 @@ add_executable(
         src/editor/repository/FilesService.cpp
         src/editor/repository/FilesService.h
         src/editor/ui/files/FilesContext.cpp
+        src/context/repository/MeshPushConstant.h
+        src/context/runtime/VertexData.h
+        src/editor/ui/viewport/CameraPositionPanel.cpp
+        src/editor/ui/viewport/CameraPositionPanel.h
+        src/engine/render-pass/tools/GridRenderPass.cpp
+        src/engine/render-pass/tools/GridRenderPass.h
+        src/context/runtime/RenderPass.cpp
+        src/context/runtime/RenderPass.h
+        src/context/repository/CoreRenderPasses.cpp
+        src/context/repository/CoreRenderPasses.h
 )
 
 
@@ -181,10 +188,12 @@ find_package(imguizmo CONFIG REQUIRED)
 find_package(nfd CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(meshoptimizer CONFIG REQUIRED)
+find_package(cereal CONFIG REQUIRED)
 
 set(COMMON_LIBRARIES
         glfw
         nfd::nfd
+        cereal::cereal
         meshoptimizer::meshoptimizer
         assimp::assimp
         Vulkan::Headers

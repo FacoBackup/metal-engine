@@ -7,7 +7,7 @@
 
 namespace Metal {
     struct FrameBufferAttachment;
-    struct ShaderModuleInstance;
+    struct ShaderModule;
 
     struct FrameBufferInstance final : RuntimeResource {
         uint32_t bufferWidth{};

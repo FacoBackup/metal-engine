@@ -2,23 +2,35 @@
 #include "../runtime/MeshInstance.h"
 #include "../runtime/MeshData.h"
 #include "../VulkanContext.h"
+#include "../../common/util/files/FilesUtil.h"
+
+#include <cereal/types/vector.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/archives/binary.hpp>
+#include <fstream>
 
 namespace Metal {
-    MeshInstance *MeshService::createMesh(const MeshData &data) {
+    MeshInstance *MeshService::createMesh(const std::string &path) {
+        MeshData data;
+
+        std::ifstream os(path, std::ios::binary);
+        cereal::BinaryInputArchive archive(os);
+        data.load(archive);
+
         auto *instance = new MeshInstance;
         registerResource(instance);
 
-        VkDeviceSize bufferSize = sizeof(data.vertices[0]) * data.vertices.size();
-        instance->vertexBuffer = vulkanContext.bufferService.createBuffer(bufferSize, &data.vertices);
+        instance->indexCount = data.indices.size();
 
-        bufferSize = sizeof(data.indices[0]) * data.indices.size();
-        instance->indexBuffer = vulkanContext.bufferService.createBuffer(bufferSize, &data.indices);
+        instance->dataBuffer = vulkanContext.bufferService.createBuffer(
+            sizeof(VertexData) * data.data.size(),
+            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+            data.data.data());
 
-        bufferSize = sizeof(data.normals[0]) * data.normals.size();
-        instance->normalBuffer = vulkanContext.bufferService.createBuffer(bufferSize, &data.normals);
-
-        bufferSize = sizeof(data.uvs[0]) * data.uvs.size();
-        instance->uvBuffer = vulkanContext.bufferService.createBuffer(bufferSize, &data.uvs);
+        instance->indexBuffer = vulkanContext.bufferService.createBuffer(
+            sizeof(uint32_t) * data.indices.size(),
+            VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+            data.indices.data());
 
         return instance;
     }

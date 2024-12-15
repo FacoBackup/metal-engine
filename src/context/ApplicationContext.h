@@ -3,6 +3,8 @@
 #define PROJECT_METADATA_FILE "metal-project.txt"
 #include "../engine/EngineContext.h"
 #include "GuiContext.h"
+#include "GLFWContext.h"
+#include "VulkanContext.h"
 #include "../editor/common/IPanel.h"
 #include "../editor/EditorContext.h"
 
@@ -50,6 +52,15 @@ namespace Metal {
 
         [[nodiscard]] const std::string &getRootDirectory() const {
             return rootDirectory;
+        }
+
+
+        [[nodiscard]] std::string getAssetsDirectory() const {
+            return rootDirectory + "/assets/";
+        }
+
+        [[nodiscard]] std::string getShadersDirectory() const {
+            return rootDirectory + "/shaders/";
         }
 
         void start();

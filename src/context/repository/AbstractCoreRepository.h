@@ -5,7 +5,6 @@
 namespace Metal {
     class VulkanContext;
     class FrameBufferService;
-    class ShaderService;
     class BufferService;
     class PipelineService;
 
@@ -16,7 +15,6 @@ namespace Metal {
     protected:
         VulkanContext &vulkanContext;
         FrameBufferService &framebufferService;
-        ShaderService &shaderService;
         BufferService &bufferService;
         PipelineService &pipelineService;
     };

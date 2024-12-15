@@ -7,13 +7,12 @@
 #include "vulkan/vulkan.h"
 
 namespace Metal {
-    struct ShaderModuleInstance final : RuntimeResource {
+    struct ShaderModule final  {
         std::vector<uint32_t> SPIRV;
         VkShaderModule vkShaderModule = VK_NULL_HANDLE;
 
         void initialize(glslang_program_t *program);
 
-        void dispose(VulkanContext &context) override;
     };
 } // Metal
 

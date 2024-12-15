@@ -40,6 +40,9 @@ namespace Metal::FilesUtil {
     }
 
     static void MkDir(const std::string &pathToDir) {
+        if (std::filesystem::exists(pathToDir)) {
+            return;
+        }
         std::filesystem::create_directory(pathToDir);
     }
 } // Metal

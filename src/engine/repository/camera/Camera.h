@@ -11,11 +11,10 @@ namespace Metal {
         glm::vec3 position{};
         float pitch = 0.f;
         float yaw = 0.f;
-        bool orbitalMode = false;
         bool isOrthographic = false;
         float zFar = 10000;
         float zNear = .1f;
-        float fov = 60 * Util::TO_RADIANS;
+        float fov = 90 * Util::TO_RADIANS;
         float aspectRatio = 1;
         float orthographicProjectionSize = 50;
     };

@@ -18,20 +18,20 @@ namespace Metal {
         return buffer;
     }
 
-    std::shared_ptr<BufferInstance> BufferService::createBuffer(VkDeviceSize dataSize, const void *bufferData) const {
+    std::shared_ptr<BufferInstance> BufferService::createBuffer(VkDeviceSize dataSize,
+                                                                VkBufferUsageFlags usageFlags,
+                                                                const void *bufferData) const {
         std::shared_ptr<BufferInstance> stagingBuffer(new BufferInstance{dataSize});
         std::shared_ptr<BufferInstance> finalBuffer(new BufferInstance{dataSize});
-
 
         createVkBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer);
 
-        void *data;
-        vkMapMemory(vulkanContext.device.device, stagingBuffer->vkDeviceMemory, 0, dataSize, 0, &data);
-        memcpy(data, bufferData, dataSize);
+        vkMapMemory(vulkanContext.device.device, stagingBuffer->vkDeviceMemory, 0, dataSize, 0, &stagingBuffer->mapped);
+        memcpy(stagingBuffer->mapped, bufferData, dataSize);
         vkUnmapMemory(vulkanContext.device.device, stagingBuffer->vkDeviceMemory);
 
-        createVkBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+        createVkBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | usageFlags,
                        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, finalBuffer);
 
         copyBuffer(stagingBuffer, finalBuffer);

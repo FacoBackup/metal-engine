@@ -6,7 +6,6 @@ namespace Metal {
         : AbstractRuntimeComponent(context),
           vulkanContext(context.getVulkanContext()),
           framebufferService(context.getVulkanContext().framebufferService),
-          shaderService(context.getVulkanContext().shaderService),
           bufferService(context.getVulkanContext().bufferService),
           pipelineService(context.getVulkanContext().pipelineService){
     }

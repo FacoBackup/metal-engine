@@ -10,7 +10,6 @@ namespace Metal {
         int displayH;
 
         glm::vec2 invResolution{};
-        bool fasterPressed = false;
         bool forwardPressed = false;
         bool backwardPressed = false;
         bool leftPressed = false;

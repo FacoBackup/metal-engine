@@ -1,10 +1,12 @@
 #include "CameraMovementService.h"
 
+#include <iostream>
+
 #include "../../../context/ApplicationContext.h"
 #include "../../repository/camera/Camera.h"
 
 namespace Metal {
-    void CameraMovementService::handleInputInternal(Camera &camera) {
+    void CameraMovementService::handleInputInternal(Camera &camera) const {
         const auto &runtimeRepository = context.getEngineContext().runtimeRepository;
         const auto &cameraRepository = context.getEngineContext().cameraRepository;
 
@@ -21,10 +23,8 @@ namespace Metal {
         forward = glm::normalize(forward);
         right = glm::normalize(right);
 
-        const float multiplier = (runtimeRepository.fasterPressed ? 80.0f : 40.0f) *
-                                 cameraRepository.movementSensitivity *
+        const float multiplier = 10 * cameraRepository.movementSensitivity *
                                  context.getEngineContext().deltaTime;
-
         if (runtimeRepository.leftPressed) {
             camera.position += right * multiplier;
             camera.registerChange();
@@ -51,7 +51,7 @@ namespace Metal {
         }
     }
 
-    void CameraMovementService::handleMouse(Camera &camera, bool isFirstMovement) {
+    void CameraMovementService::handleMouse(Camera &camera, const bool isFirstMovement) const {
         const auto &cameraRepository = context.getEngineContext().cameraRepository;
 
         updateDelta(isFirstMovement);
@@ -67,7 +67,7 @@ namespace Metal {
         camera.registerChange();
     }
 
-    void CameraMovementService::updateDelta(bool isFirstMovement) {
+    void CameraMovementService::updateDelta(const bool isFirstMovement) const {
         const auto &runtimeRepository = context.getEngineContext().runtimeRepository;
         auto &cameraRepository = context.getEngineContext().cameraRepository;
 
@@ -88,6 +88,11 @@ namespace Metal {
         cameraRepository.lastMouseY = mouseY;
     }
 
+    void CameraMovementService::handleInput(Camera &camera, const bool isFirstMovement) const {
+        handleInputInternal(camera);
+        handleMouse(camera, isFirstMovement);
+    }
+
     void CameraMovementService::createViewMatrix(const Camera &camera) {
         auto &cameraRepository = context.getEngineContext().cameraRepository;
 
@@ -100,15 +105,13 @@ namespace Metal {
         yAxis = glm::vec3(sinYaw * sinPitch, cosPitch, cosYaw * sinPitch);
         zAxis = glm::vec3(sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw);
 
-        cameraRepository.viewMatrix = glm::mat4(
-            glm::vec4(xAxis, 0.0f),
-            glm::vec4(yAxis, 0.0f),
-            glm::vec4(zAxis, 0.0f),
-            glm::vec4(-glm::dot(xAxis, camera.position),
-                      -glm::dot(yAxis, camera.position),
-                      -glm::dot(zAxis, camera.position),
-                      1.0f)
-        );
-        toApplyTranslation = glm::vec3(0.0f);
+        cameraRepository.viewMatrix = glm::mat4x4(
+            xAxis.x, yAxis.x, zAxis.x, 0.0f,
+            xAxis.y, yAxis.y, zAxis.y, 0.0f,
+            xAxis.z, yAxis.z, zAxis.z, 0.0f,
+            -dot(xAxis, camera.position),
+            -dot(yAxis, camera.position),
+            -dot(zAxis, camera.position), 1.0f);
+
     }
 } // Metal
