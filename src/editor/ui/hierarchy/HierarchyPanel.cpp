@@ -14,6 +14,7 @@ namespace Metal {
         editorRepository = &context->getEditorContext().editorRepository;
     }
 
+
     void HierarchyPanel::onSync() {
         isOnSearch = strlen(search) > 0;
         // hotKeys();
@@ -27,7 +28,7 @@ namespace Metal {
             for (const auto &key: editorRepository->pinnedEntities) {
                 renderNodePinned(world->getEntity(key.first));
             }
-            renderNode(WorldRepository::ROOT_ID.c_str());
+            renderNode(WorldRepository::ROOT_ID);
             ImGui::EndTable();
         }
     }
@@ -46,9 +47,9 @@ namespace Metal {
     bool HierarchyPanel::renderNode(const EntityID entityId) {
         Entity *node = world->getEntity(entityId);
         if (node == nullptr || (isOnSearch &&
-            searchMatch.contains(node->getId()) &&
-            searchMatchWith.contains(node->getId()) &&
-            strcmp(searchMatchWith[node->getId()].c_str(), search))) {
+                                searchMatch.contains(node->getId()) &&
+                                searchMatchWith.contains(node->getId()) &&
+                                strcmp(searchMatchWith[node->getId()].c_str(), search))) {
             return false;
         }
 
@@ -79,7 +80,7 @@ namespace Metal {
             }
         }
 
-        if (strcmp(node->getId(), WorldRepository::ROOT_ID.c_str()) != 0) {
+        if (node->getId() != WorldRepository::ROOT_ID) {
             handleDragDrop(node);
             renderEntityColumns(node, false);
         }
@@ -169,6 +170,7 @@ namespace Metal {
     }
 
     void HierarchyPanel::renderEntityColumns(const Entity *node, const bool isPinned) {
+        const auto idString = std::to_string(node->getId());
         handleClick(node);
         ImGui::TableNextColumn();
 
@@ -178,14 +180,14 @@ namespace Metal {
 
         bool isVisible = !world->hiddenEntities.contains(node->getId());
         if (UIUtil::ButtonSimple(
-            (isVisible ? Icons::visibility : Icons::visibility_off) + (isPinned ? "##vpinned" : "##v") + node->getId() +
+            (isVisible ? Icons::visibility : Icons::visibility_off) + (isPinned ? "##vpinned" : "##v") + idString +
             id, 20, 15)) {
             changeVisibilityRecursively(node->getId(), !isVisible);
         }
         ImGui::TableNextColumn();
         bool isNodePinned = editorRepository->pinnedEntities.contains(node->getId());
         if (UIUtil::ButtonSimple(
-            ((isNodePinned ? Icons::lock : Icons::lock_open) + (isPinned ? "##ppinned" : "##p") + node->getId()) + id,
+            ((isNodePinned ? Icons::lock : Icons::lock_open) + (isPinned ? "##ppinned" : "##p") + idString) + id,
             20, 15)) {
             if (isNodePinned) {
                 editorRepository->pinnedEntities.erase(node->getId());

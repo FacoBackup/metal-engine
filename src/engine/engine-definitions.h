@@ -1,7 +1,8 @@
 #ifndef ENGINEID_H
 #define ENGINEID_H
 
-typedef const char *EntityID;
+typedef uint64_t EntityID;
+#define EMPTY_ENTITY 0
 #define FILE_METADATA ".mjson"
 #define FILE_MESH "-mesh"
 #define FILE_TEXTURE "-texture"

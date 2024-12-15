@@ -8,12 +8,16 @@
 
 namespace Metal {
     EntityID WorldRepository::createEntity(std::string name, const bool container) {
-        auto id = entities.empty() ? ROOT_ID.c_str() : Util::uuidV4().c_str();
-        entities.insert({id, std::make_unique<Entity>(id)});
-        auto *emplace = getEntity(id);
+        lastId = entities.empty() ? ROOT_ID : lastId + 1;
+        entities.insert({lastId, std::make_unique<Entity>(lastId)});
+        auto *emplace = getEntity(lastId);
         emplace->isContainer = container;
         emplace->name = std::move(name);
-        return id;
+        emplace->parent = lastId == ROOT_ID ? EMPTY_ENTITY : ROOT_ID;
+        if (emplace->parent != EMPTY_ENTITY) {
+            getEntity(emplace->parent)->children.push_back(emplace->getId());
+        }
+        return lastId;
     }
 
     void WorldRepository::linkEntities(const Entity *target, Entity *toLink) const {
@@ -22,7 +26,7 @@ namespace Metal {
             std::ranges::remove(parent->children, toLink->getId()).begin(),
             parent->children.end());
 
-        const EntityID id = target != nullptr ? target->getId() : ROOT_ID.c_str();
+        const EntityID id = target != nullptr ? target->getId() : ROOT_ID;
         getEntity(id)->children.push_back(toLink->getId());
         toLink->parent = id;
     }
@@ -35,9 +39,6 @@ namespace Metal {
     }
 
     WorldRepository::WorldRepository(): camera(new Camera()) {
-    }
-
-    void WorldRepository::onInitialize() {
         createEntity("Scene", true);
     }
 
@@ -47,8 +48,8 @@ namespace Metal {
         }
         switch (type) {
             case ComponentTypes::ComponentType::MESH:
-                getEntity(entity)->components.insert({type, std::make_unique<MeshComponent>()});
-                getEntity(entity)->components.insert({type, std::make_unique<TransformComponent>()});
+                getEntity(entity)->components.insert({ComponentTypes::ComponentType::MESH, std::make_unique<MeshComponent>()});
+                getEntity(entity)->components.insert({ComponentTypes::ComponentType::TRANSFORM, std::make_unique<TransformComponent>()});
                 break;
             default:
                 break;

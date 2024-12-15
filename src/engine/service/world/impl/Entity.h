@@ -16,11 +16,11 @@ namespace Metal {
         std::string name = "New entity";
         glm::vec3 color{};
         bool isContainer = false;
-        std::unordered_map<ComponentTypes::ComponentType, std::unique_ptr<AbstractComponent>> components;
+        std::unordered_map<ComponentTypes::ComponentType, std::unique_ptr<AbstractComponent> > components;
         std::vector<EntityID> children{};
-        EntityID parent = nullptr;
+        EntityID parent = EMPTY_ENTITY;
 
-        explicit Entity(const std::string &rootId);
+        explicit Entity(EntityID id);
 
         [[nodiscard]] EntityID getId() const {
             return id;

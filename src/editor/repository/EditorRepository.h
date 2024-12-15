@@ -64,7 +64,7 @@ namespace Metal {
 
         std::unordered_map<EntityID, bool> pinnedEntities{};
         TransformComponent *primitiveSelected = nullptr;
-        EntityID mainSelection = nullptr;
+        EntityID mainSelection = EMPTY_ENTITY;
         std::unordered_map<EntityID, bool> selected{};
         std::vector<EntityID> copied{};
         std::unordered_map<std::string, Camera*> viewportCamera;

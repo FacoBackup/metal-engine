@@ -8,7 +8,7 @@ namespace Metal {
         const char *meshId = nullptr;
 
         const char *getIcon() override {
-            return Icons::transform.c_str();
+            return Icons::category.c_str();
         }
 
         const char *getTitle() override {
