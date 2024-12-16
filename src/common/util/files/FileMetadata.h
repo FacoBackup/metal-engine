@@ -15,7 +15,6 @@ namespace Metal {
 
     public:
         std::string name{};
-        std::vector<std::string> associatedFiles{};
         EntryType type = EntryType::NONE;
 
 
@@ -29,7 +28,6 @@ namespace Metal {
             const FileMetadata parsedData = jsonData.get<FileMetadata>();
             this->name = parsedData.name;
             this->id = parsedData.id;
-            this->associatedFiles = parsedData.associatedFiles;
             this->type = parsedData.type;
         }
 
@@ -37,7 +35,7 @@ namespace Metal {
             return id;
         }
 
-        NLOHMANN_DEFINE_TYPE_INTRUSIVE(FileMetadata, name, associatedFiles, type, id)
+        NLOHMANN_DEFINE_TYPE_INTRUSIVE(FileMetadata, name, type, id)
     };
 
 }

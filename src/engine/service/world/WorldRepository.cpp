@@ -1,9 +1,7 @@
 #include "WorldRepository.h"
 
 #include "../../enum/ComponentType.h"
-#include "../../../common/util/Util.h"
 #include "components/MeshComponent.h"
-#include "../camera/Camera.h"
 #include "components/TransformComponent.h"
 
 namespace Metal {
@@ -42,19 +40,25 @@ namespace Metal {
         createEntity("Scene", true);
     }
 
-    void WorldRepository::createComponent(const EntityID entity, ComponentTypes::ComponentType type) const {
+    void WorldRepository::createComponent(const EntityID entity, ComponentTypes::ComponentType type)  {
         if (!entities.contains(entity)) {
             return;
         }
         switch (type) {
-            case ComponentTypes::ComponentType::MESH:
+            case ComponentTypes::ComponentType::MESH: {
+                auto *m = new MeshComponent(entity);
                 getEntity(entity)->components.insert({
-                    ComponentTypes::ComponentType::MESH, std::make_unique<MeshComponent>()
+                    ComponentTypes::ComponentType::MESH, m
                 });
+                meshes[entity] = m;
+
+                auto *t = new TransformComponent(entity);
                 getEntity(entity)->components.insert({
-                    ComponentTypes::ComponentType::TRANSFORM, std::make_unique<TransformComponent>()
+                    ComponentTypes::ComponentType::TRANSFORM, t
                 });
+                transforms[entity] = t;
                 break;
+            }
             default:
                 break;
         }

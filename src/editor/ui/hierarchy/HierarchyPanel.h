@@ -43,11 +43,11 @@ namespace Metal {
 
         bool matchSearch(const Entity *node);
 
-        void renderEntityChildren(Entity *node);
+        void renderEntityChildren(const Entity *node);
 
-        void renderComponents(Entity *node) const;
+        void renderComponents(const Entity *node) const;
 
-        static void addComponent(const std::unique_ptr<AbstractComponent> &component);
+        static void addComponent(AbstractComponent *component);
 
         int getFlags(const Entity *node);
 

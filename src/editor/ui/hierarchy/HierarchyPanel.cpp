@@ -121,7 +121,7 @@ namespace Metal {
         return isSearchMatch;
     }
 
-    void HierarchyPanel::renderEntityChildren(Entity *node) {
+    void HierarchyPanel::renderEntityChildren(const Entity *node) {
         if (isOnSearch) {
             for (const auto child: node->children) {
                 if (searchMatch.contains(node->getId()) || renderNode(child)) {
@@ -140,7 +140,7 @@ namespace Metal {
         ImGui::TreePop();
     }
 
-    void HierarchyPanel::renderComponents(Entity *node) const {
+    void HierarchyPanel::renderComponents(const Entity *node) const {
         if (!editorRepository->showOnlyEntitiesHierarchy) {
             for (auto &val: node->components) {
                 addComponent(val.second);
@@ -148,7 +148,7 @@ namespace Metal {
         }
     }
 
-    void HierarchyPanel::addComponent(const std::unique_ptr<AbstractComponent> &component) {
+    void HierarchyPanel::addComponent(AbstractComponent *component) {
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::TextDisabled("%s%s", component->getIcon(), component->getTitle());

@@ -2,7 +2,6 @@
 #define MESHDATA_H
 #include <vector>
 #include "VertexData.h"
-#include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
 

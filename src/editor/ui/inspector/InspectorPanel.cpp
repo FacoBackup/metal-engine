@@ -1,8 +1,10 @@
 #include "InspectorPanel.h"
 #include "../../common/form/FormPanel.h"
 #include "../../../common/util/UIUtil.h"
+#include "../../../common/inspection/Inspectable.h"
 #include "../../../context/ApplicationContext.h"
 #include "../../../engine/service/world/impl/Entity.h"
+#include "../../../engine/service/world/impl/AbstractComponent.h"
 #include "../../../engine/service/camera/Camera.h"
 
 namespace Metal {
@@ -62,7 +64,7 @@ namespace Metal {
                 if (selectedEntity != nullptr) {
                     additionalInspection.push_back(selectedEntity);
                     for (auto &comp: context->getEngineContext().worldRepository.getEntity(selectedId)->components) {
-                        additionalInspection.push_back(comp.second.get());
+                        additionalInspection.push_back(comp.second);
                     }
                     currentInspection = additionalInspection[0];
                 }

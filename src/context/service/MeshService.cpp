@@ -4,20 +4,24 @@
 #include "../VulkanContext.h"
 #include "../../common/util/files/FilesUtil.h"
 
-#include <cereal/types/vector.hpp>
-#include <cereal/types/memory.hpp>
 #include <cereal/archives/binary.hpp>
 #include <fstream>
 
-namespace Metal {
-    MeshInstance *MeshService::createMesh(const std::string &path) {
-        MeshData data;
+#include "../ApplicationContext.h"
+#include "../../engine/enum/LevelOfDetail.h"
 
-        std::ifstream os(path, std::ios::binary);
+namespace Metal {
+    MeshInstance *MeshService::create(const std::string &id, const LevelOfDetail &levelOfDetail) {
+        MeshData data;
+        auto pathToFile = context.getAssetDirectory() + LevelOfDetail::GetFormattedName(id, levelOfDetail, EntryType::MESH);
+        std::cout << id << " Loading " << pathToFile << std::endl;
+        std::ifstream os(
+            pathToFile,
+            std::ios::binary);
         cereal::BinaryInputArchive archive(os);
         data.load(archive);
 
-        auto *instance = new MeshInstance;
+        auto *instance = new MeshInstance(id);
         registerResource(instance);
 
         instance->indexCount = data.indices.size();

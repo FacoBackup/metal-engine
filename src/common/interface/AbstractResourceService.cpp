@@ -4,12 +4,12 @@
 
 namespace Metal {
     void AbstractResourceService::registerResource(RuntimeResource *resource) {
-        resources[resource->id] = resource;
+        resources[resource->getId()] = resource;
     }
 
     void AbstractResourceService::dispose(RuntimeResource *resource) {
         resource->dispose(vulkanContext);
-        resources.erase(resource->id);
+        resources.erase(resource->getId());
         delete resource;
     }
 

@@ -8,6 +8,7 @@
 #include "../../../common/util/files/FileEntry.h"
 #include "FilesContext.h"
 #include "../../../common/util/files/FileDialogUtil.h"
+#include "../../../engine/service/world/components/MeshComponent.h"
 
 namespace Metal {
     std::string FilesPanel::getActionLabel() {
@@ -19,10 +20,10 @@ namespace Metal {
             auto files = FileDialogUtil::PickFiles({{"Mesh", "fbx,gltf,obj,glb"}, {"Image", "png,jpg,jpeg"}});
             for (const std::string &file: files) {
                 if (context->getEditorContext().meshImporter.isCompatible(file)) {
-                    MeshImporter::ImportMesh(filesContext.currentDirectory->absolutePath,
-                                             file);
+                    context->getEditorContext().meshImporter.importMesh(filesContext.currentDirectory->absolutePath,
+                                                                        file);
                 } else if (context->getEditorContext().textureImporter.isCompatible(file)) {
-                    TextureImporter::importTexture(
+                    context->getEditorContext().textureImporter.importTexture(
                         filesContext.currentDirectory->absolutePath, file);
                 }
             }
@@ -223,8 +224,9 @@ namespace Metal {
     void FilesPanel::openResource(FileEntry *root) {
         switch (root->type) {
             case EntryType::MESH: {
-                context->getVulkanContext().corePipelines.sampleMesh = context->getVulkanContext().meshService.
-                        createMesh(root->associatedFiles[0]);
+                auto id = context->getEngineContext().worldRepository.createEntity();
+                context->getEngineContext().worldRepository.createComponent(id, ComponentTypes::ComponentType::MESH);
+                context->getEngineContext().worldRepository.meshes[id]->meshId = root->getId();
                 break;
             }
             case EntryType::DIRECTORY: {

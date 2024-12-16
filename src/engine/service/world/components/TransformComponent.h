@@ -13,6 +13,10 @@ namespace Metal {
         glm::vec4 rotation = {0, 0, 0, 1};
         glm::vec3 scale{1, 1, 1};
 
+        explicit TransformComponent(const EntityID &entityId)
+            : AbstractComponent(entityId) {
+        }
+
         const char *getIcon() override;
 
         const char *getTitle() override;

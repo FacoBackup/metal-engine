@@ -1,18 +1,22 @@
 #include "OpaqueRenderPass.h"
 
-#include <glm/ext/matrix_transform.hpp>
-
 #include "../../../context/ApplicationContext.h"
 #include "../../../context/repository/CorePipelines.h"
-#include "../../../context/runtime/PipelineInstance.h"
+#include "../../enum/LevelOfDetail.h"
+#include "../../service/world/components/MeshComponent.h"
+#include "../../service/world/components/TransformComponent.h"
 
 namespace Metal {
     void OpaqueRenderPass::onSync() {
-        const auto &pipelines = context.getVulkanContext().corePipelines;
-        if (pipelines.sampleMesh == nullptr) return;
-        mPushConstant.model = glm::identity<glm::mat4x4>();
-        recordPushConstant(&mPushConstant);
-        bindMesh(pipelines.sampleMesh);
+        for (const auto &val: worldRepository.meshes | std::views::values) {
+            if (const auto *mesh = val; !mesh->meshId.empty()) {
+                if (const auto *r = streamingRepository.streamMesh(mesh->meshId, LevelOfDetail::LOD_0); r != nullptr) {
+                    mPushConstant.model = worldRepository.transforms[mesh->getEntityId()]->model;
+                    recordPushConstant(&mPushConstant);
+                    drawMesh(r);
+                }
+            }
+        }
     }
 
     PipelineInstance *OpaqueRenderPass::getPipeline() {

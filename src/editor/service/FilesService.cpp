@@ -28,7 +28,7 @@ namespace fs = std::filesystem;
 
 namespace Metal {
     void FilesService::onInitialize() {
-        root = new FileEntry(nullptr, context.getAssetsDirectory(), "", "");
+        root = new FileEntry(nullptr, context.getAssetRefDirectory(), "", "");
         root->type = EntryType::DIRECTORY;
         root->name = "Files";
         GetEntries(root);
@@ -63,12 +63,6 @@ namespace Metal {
                    targetDir->absolutePath + "/" + toMove->absolutePath.substr(
                        toMove->absolutePath.find_last_of('/') + 1));
 
-        for (int i = 0; i < toMove->associatedFiles.size(); i++) {
-            auto file = toMove->associatedFiles[i];
-            std::string newPath = targetDir->absolutePath + "/" + file.substr(file.find_last_of('/') + 1);
-            fs::rename(file, newPath);
-            toMove->associatedFiles[i] = newPath;
-        }
         toMove->children.erase(
             std::ranges::remove(toMove->children, toMove).begin(),
             toMove->children.end());

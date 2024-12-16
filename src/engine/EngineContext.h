@@ -5,6 +5,7 @@
 #include "service/camera/CameraService.h"
 #include "../context/repository/GlobalDataUBO.h"
 #include "render-pass/AbstractRenderPass.h"
+#include "service/streaming/StreamingRepository.h"
 #include "service/world/WorldRepository.h"
 
 using Clock = std::chrono::high_resolution_clock;
@@ -12,8 +13,6 @@ using TimePoint = std::chrono::time_point<Clock>;
 
 namespace Metal {
     class EngineContext final : public AbstractRuntimeComponent {
-        TimePoint currentTime;
-        TimePoint previousTime = Clock::now();
         GlobalDataUBO globalDataUBO{};
         long long start = -1;
 
@@ -22,12 +21,15 @@ namespace Metal {
     public:
         explicit EngineContext(ApplicationContext &context);
 
+        TimePoint currentTime;
+        TimePoint previousTime = Clock::now();
         float deltaTime = 0;
         bool globalDataNeedsUpdate = true;
 
         CameraService cameraService{context};
         WorldRepository worldRepository;
         RuntimeRepository runtimeRepository{};
+        StreamingRepository streamingRepository{context};
 
         void onSync() override;
     };

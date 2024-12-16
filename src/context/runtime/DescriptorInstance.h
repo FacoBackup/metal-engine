@@ -29,6 +29,10 @@ namespace Metal {
         std::vector<VkWriteDescriptorSet> writeDescriptorSets;
         std::vector<VkDescriptorImageInfo> imageInfos;
         std::vector<VkDescriptorBufferInfo> bufferInfos;
+
+        ResourceType resourceType() override {
+            return DESCRIPTOR;
+        }
     };
 } // Metal
 

@@ -33,7 +33,6 @@ add_executable(
         src/engine/service/camera/CameraService.h
         src/engine/service/camera/Camera.h
         src/common/util/Util.h
-        src/common/interface/Identifiable.h
         src/common/inspection/Inspectable.h
         src/common/inspection/Inspectable.cpp
         src/common/inspection/InspectedField.h
@@ -197,6 +196,9 @@ add_executable(
         src/editor/common/form/types/StringField.h
         src/editor/common/form/types/ResourceFilesPanel.h
         src/editor/common/form/types/ResourceFilesPanel.cpp
+        src/engine/service/streaming/StreamingRepository.cpp
+        src/engine/service/streaming/StreamingRepository.h
+        src/context/runtime/ResourceType.h
 )
 
 

@@ -13,6 +13,9 @@
 #include "../../../engine/engine-definitions.h"
 #include "../../../engine/enum/LevelOfDetail.h"
 #include <meshoptimizer.h>
+#include <cereal/archives/binary.hpp>
+
+#include "../../../context/ApplicationContext.h"
 
 namespace Metal {
     std::vector<MeshData> MeshImporter::ImportMeshes(const std::string &pathToFile) {
@@ -82,25 +85,22 @@ namespace Metal {
         return meshList;
     }
 
-    void MeshImporter::ImportMesh(const std::string &targetDir, const std::string &pathToFile) {
+    void MeshImporter::importMesh(const std::string &targetDir, const std::string &pathToFile) {
         auto metadata = FileMetadata{};
         metadata.type = EntryType::MESH;
         metadata.name = std::filesystem::path(pathToFile).filename().string();
         metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.'));
+        FilesUtil::WriteFile((targetDir + '/' + metadata.getId() + FILE_METADATA).c_str(),
+                             metadata.serialize().c_str());
 
         auto imported = ImportMeshes(pathToFile);
         for (MeshData &mesh: imported) {
-            const std::string newPath = targetDir + "/" +
-                                        LevelOfDetail::GetFormattedName(metadata.getId(), LevelOfDetail::LOD_0,
-                                                                        EntryType::MESH);
-            serializeMesh(mesh, newPath);
-            metadata.associatedFiles.push_back(newPath);
-            SimplifyMesh(metadata.associatedFiles, metadata.getId(), targetDir, mesh, LevelOfDetail::LOD_1);
-            SimplifyMesh(metadata.associatedFiles, metadata.getId(), targetDir, mesh, LevelOfDetail::LOD_2);
-            SimplifyMesh(metadata.associatedFiles, metadata.getId(), targetDir, mesh, LevelOfDetail::LOD_3);
+            serializeMesh(mesh, context.getAssetDirectory() + LevelOfDetail::GetFormattedName(
+                                    metadata.getId(), LevelOfDetail::LOD_0, EntryType::MESH));
+            simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_1);
+            simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_2);
+            simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_3);
         }
-        FilesUtil::WriteFile((targetDir + '/' + metadata.getId() + FILE_METADATA).c_str(),
-                             metadata.serialize().c_str());
     }
 
     void MeshImporter::serializeMesh(const MeshData &simplifiedMesh, const std::string &newPath) {
@@ -109,9 +109,8 @@ namespace Metal {
         archive(simplifiedMesh);
     }
 
-    void MeshImporter::SimplifyMesh(std::vector<std::string> &paths, const std::string &fileId,
-                                    const std::string &targetDir,
-                                    const MeshData &mesh, const LevelOfDetail &levelOfDetail) {
+    void MeshImporter::simplifyMesh(const std::string &fileId, const MeshData &mesh,
+                                    const LevelOfDetail &levelOfDetail) {
         size_t vertexCount = mesh.data.size();
         size_t indexCount = mesh.indices.size();
         size_t targetIndexCount = indexCount / levelOfDetail.level;
@@ -141,11 +140,8 @@ namespace Metal {
         simplifiedMesh.data = mesh.data; // Keep the same vertices (positions, normals, UVs)
         simplifiedMesh.indices = std::move(simplifiedIndices);
 
-        const std::string newPath = targetDir + "/" +
-                                    LevelOfDetail::GetFormattedName(fileId, levelOfDetail, EntryType::MESH);
-        paths.push_back(newPath);
-
-        serializeMesh(simplifiedMesh, newPath);
+        serializeMesh(simplifiedMesh, context.getAssetDirectory() + LevelOfDetail::GetFormattedName(
+                                          fileId, levelOfDetail, EntryType::MESH));
     }
 
     std::vector<std::string> MeshImporter::getSupportedTypes() {

@@ -5,8 +5,10 @@
 #include "vulkan/vulkan.h"
 
 namespace Metal {
+    struct WorldRepository;
     struct MeshInstance;
     struct FrameData;
+    class StreamingRepository;
     struct CoreFrameBuffers;
     struct CorePipelines;
     struct PipelineInstance;
@@ -15,10 +17,11 @@ namespace Metal {
     class AbstractRenderPass : public AbstractRuntimeComponent {
     protected:
         VkCommandBuffer vkCommandBuffer = VK_NULL_HANDLE;
+        WorldRepository &worldRepository;
+        StreamingRepository &streamingRepository;
 
     public:
-        explicit AbstractRenderPass(ApplicationContext &context): AbstractRuntimeComponent(context) {
-        }
+        explicit AbstractRenderPass(ApplicationContext &context);
 
         virtual PipelineInstance *getPipeline() {
             return nullptr;
@@ -28,7 +31,7 @@ namespace Metal {
 
         void recordDrawSimpleInstanced(uint32_t vertexCount, uint32_t instanceCount) const;
 
-        void bindMesh(const MeshInstance *instance, uint32_t instanceCount = 1) const;
+        void drawMesh(const MeshInstance *instance, uint32_t instanceCount = 1) const;
 
         virtual bool shouldClear() {
             return true;
