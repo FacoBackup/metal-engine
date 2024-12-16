@@ -2,6 +2,7 @@
 #define INSPECTEDFIELD_H
 
 #include "InspectableMember.h"
+#include "../util/files/EntryType.h"
 
 namespace Metal {
     template<typename T>
@@ -13,6 +14,7 @@ namespace Metal {
         std::optional<float> maxF;
         std::optional<float> minF;
         bool disabled = false;
+        EntryType resourceType = EntryType::NONE;
 
         explicit InspectedField(T *field) : field(field) {}
 

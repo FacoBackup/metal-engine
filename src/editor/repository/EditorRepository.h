@@ -12,7 +12,6 @@
 
 namespace Metal {
     struct TransformComponent;
-    struct Camera;
 
     struct EditorRepository final : Inspectable {
         bool showIcons = true;
@@ -35,7 +34,6 @@ namespace Metal {
         bool showOutline = true;
         float outlineWidth = 2.f;
         // Color outlineColor = new Color(1f, 0.5f, 0f);
-
 
         // ExecutionEnvironment environment = ExecutionEnvironment.DEVELOPMENT;
         // EditorMode editorMode = EditorMode.TRANSFORM;
@@ -60,7 +58,6 @@ namespace Metal {
         EntityID mainSelection = EMPTY_ENTITY;
         std::unordered_map<EntityID, bool> selected{};
         std::vector<EntityID> copied{};
-        std::unordered_map<std::string, Camera *> viewportCamera;
 
         // BrushMode brushMode = BrushMode.ADD;
         float brushRadius = 10;

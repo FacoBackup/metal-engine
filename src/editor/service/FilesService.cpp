@@ -12,12 +12,49 @@
 
 namespace fs = std::filesystem;
 
+#define DATA \
+        auto fileSizeInBytes = fs::file_size(entry.path());\
+        std::string fileSize;\
+        if (fileSizeInBytes >= 1'000'000'000) {\
+        fileSize = std::to_string(fileSizeInBytes / 1'000'000'000.0) + " GB";\
+        } else if (fileSizeInBytes >= 1'000'000) {\
+        fileSize = std::to_string(fileSizeInBytes / 1'000'000.0) + " MB";\
+        } else if (fileSizeInBytes >= 1'000) {\
+        fileSize = std::to_string(fileSizeInBytes / 1'000.0) + " KB";\
+        } else {\
+        fileSize = std::to_string(fileSizeInBytes) + " Bytes";\
+        }\
+        std::filesystem::file_time_type ftime = last_write_time(entry);
+
 namespace Metal {
     void FilesService::onInitialize() {
         root = new FileEntry(nullptr, context.getAssetsDirectory(), "", "");
         root->type = EntryType::DIRECTORY;
         root->name = "Files";
         GetEntries(root);
+    }
+
+    std::unique_ptr<FileEntry> FilesService::getResource(const std::string &id) {
+        try {
+            for (const auto &entry: fs::recursive_directory_iterator(root->absolutePath)) {
+                if (entry.is_regular_file() &&
+                    entry.path().filename().string() == id + FILE_METADATA) {
+                    DATA
+                    auto child = std::make_unique<FileEntry>(
+                        root,
+                        absolute(entry.path()).string(),
+                        std::format("{}", ftime),
+                        fileSize);
+                    std::string json;
+                    FilesUtil::ReadFile(child->absolutePath.c_str(), json);
+                    child->deserialize(json);
+                    return child;
+                }
+            }
+        } catch (const fs::filesystem_error &e) {
+            std::cerr << "Error while accessing directory: " << e.what() << '\n';
+        }
+        return nullptr;
     }
 
     void FilesService::Move(FileEntry *toMove,
@@ -52,20 +89,7 @@ namespace Metal {
             if (!entry.is_directory()) {
                 std::string extension = entry.path().extension().string();
                 if (extension.find(FILE_METADATA) != std::string::npos) {
-                    auto fileSizeInBytes = fs::file_size(entry.path());
-                    std::string fileSize;
-
-                    if (fileSizeInBytes >= 1'000'000'000) {
-                        fileSize = std::to_string(fileSizeInBytes / 1'000'000'000.0) + " GB";
-                    } else if (fileSizeInBytes >= 1'000'000) {
-                        fileSize = std::to_string(fileSizeInBytes / 1'000'000.0) + " MB";
-                    } else if (fileSizeInBytes >= 1'000) {
-                        fileSize = std::to_string(fileSizeInBytes / 1'000.0) + " KB";
-                    } else {
-                        fileSize = std::to_string(fileSizeInBytes) + " Bytes";
-                    }
-
-                    std::filesystem::file_time_type ftime = last_write_time(entry);
+                    DATA
                     auto &child = root->children.emplace_back(new FileEntry(
                         root,
                         fs::absolute(entry.path()).string(),

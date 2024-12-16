@@ -13,6 +13,8 @@ namespace Metal {
         void setTitle(const std::string &title);
 
         void onSync() override;
+
+        void onSyncChildren() const override;
     };
 }
 

@@ -11,7 +11,7 @@ namespace Metal {
         glm::mat4x4 model{};
         glm::vec3 translation{};
         glm::vec4 rotation = {0, 0, 0, 1};
-        glm::vec3 scale{};
+        glm::vec3 scale{1, 1, 1};
 
         const char *getIcon() override;
 

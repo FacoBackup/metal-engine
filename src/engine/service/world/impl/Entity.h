@@ -20,7 +20,7 @@ namespace Metal {
         std::vector<EntityID> children{};
         EntityID parent = EMPTY_ENTITY;
 
-        explicit Entity(EntityID id);
+        explicit Entity(EntityID id, bool container);
 
         [[nodiscard]] EntityID getId() const {
             return id;

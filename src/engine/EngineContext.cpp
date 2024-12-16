@@ -25,12 +25,12 @@ namespace Metal {
         cameraService.onSync();
         if (globalDataNeedsUpdate) {
             globalDataNeedsUpdate = false;
-            globalDataUBO.proj = worldRepository.camera->projectionMatrix;
-            globalDataUBO.view = worldRepository.camera->viewMatrix;
-            globalDataUBO.projView = worldRepository.camera->projViewMatrix;
-            globalDataUBO.invProj = worldRepository.camera->invProjectionMatrix;
-            globalDataUBO.invView = worldRepository.camera->invViewMatrix;
-            globalDataUBO.cameraWorldPosition = worldRepository.camera->position;
+            globalDataUBO.proj = worldRepository.camera.projectionMatrix;
+            globalDataUBO.view = worldRepository.camera.viewMatrix;
+            globalDataUBO.projView = worldRepository.camera.projViewMatrix;
+            globalDataUBO.invProj = worldRepository.camera.invProjectionMatrix;
+            globalDataUBO.invView = worldRepository.camera.invViewMatrix;
+            globalDataUBO.cameraWorldPosition = worldRepository.camera.position;
             context.getVulkanContext().coreBuffers.globalData->update(&globalDataUBO);
         }
 

@@ -9,7 +9,7 @@
 namespace Metal {
     EntityID WorldRepository::createEntity(std::string name, const bool container) {
         lastId = entities.empty() ? ROOT_ID : lastId + 1;
-        entities.insert({lastId, std::make_unique<Entity>(lastId)});
+        entities.insert({lastId, std::make_unique<Entity>(lastId, container)});
         auto *emplace = getEntity(lastId);
         emplace->isContainer = container;
         emplace->name = std::move(name);
@@ -38,7 +38,7 @@ namespace Metal {
         return nullptr;
     }
 
-    WorldRepository::WorldRepository(): camera(new Camera()) {
+    WorldRepository::WorldRepository() {
         createEntity("Scene", true);
     }
 
@@ -48,8 +48,12 @@ namespace Metal {
         }
         switch (type) {
             case ComponentTypes::ComponentType::MESH:
-                getEntity(entity)->components.insert({ComponentTypes::ComponentType::MESH, std::make_unique<MeshComponent>()});
-                getEntity(entity)->components.insert({ComponentTypes::ComponentType::TRANSFORM, std::make_unique<TransformComponent>()});
+                getEntity(entity)->components.insert({
+                    ComponentTypes::ComponentType::MESH, std::make_unique<MeshComponent>()
+                });
+                getEntity(entity)->components.insert({
+                    ComponentTypes::ComponentType::TRANSFORM, std::make_unique<TransformComponent>()
+                });
                 break;
             default:
                 break;

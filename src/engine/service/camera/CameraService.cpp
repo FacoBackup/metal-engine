@@ -5,7 +5,7 @@
 
 namespace Metal {
     void CameraService::onSync() {
-        camera = context.getEngineContext().worldRepository.camera;
+        camera = &context.getEngineContext().worldRepository.camera;
         if (camera != nullptr) {
             updateAspectRatio();
             if (camera->isNotFrozen()) {
@@ -46,7 +46,7 @@ namespace Metal {
                                                      camera->orthographicProjectionSize / camera->aspectRatio,
                                                      -camera->zFar, camera->zFar);
         } else {
-            camera->projectionMatrix = glm::perspective(camera->fov, camera->aspectRatio, camera->zNear,
+            camera->projectionMatrix = glm::perspective(camera->fov * Util::TO_RADIANS, camera->aspectRatio, camera->zNear,
                                                            camera->zFar);
         }
         camera->invProjectionMatrix = glm::inverse(camera->projectionMatrix);

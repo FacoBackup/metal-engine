@@ -3,10 +3,9 @@
 #include <string>
 
 #include "../../common/interface/AbstractRuntimeComponent.h"
+#include "../../common/util/files/FileEntry.h"
 
 namespace Metal {
-    struct FileEntry;
-
     enum class EntryType;
 
     class FilesService final : public AbstractRuntimeComponent {
@@ -22,6 +21,8 @@ namespace Metal {
         }
 
         void onInitialize() override;
+
+        std::unique_ptr<FileEntry> getResource(const std::string &id);
 
         static void Move(FileEntry *toMove, FileEntry *targetDir);
 

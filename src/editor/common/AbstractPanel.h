@@ -15,7 +15,7 @@ namespace Metal {
         std::vector<IPanel *> children;
         const std::string id;
 
-        void onSyncChildren() const;
+        virtual void onSyncChildren() const;
 
     public:
         explicit AbstractPanel();

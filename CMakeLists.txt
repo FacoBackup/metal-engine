@@ -153,8 +153,8 @@ add_executable(
         src/editor/service/import/TextureData.h
         src/context/service/TextureService.cpp
         src/context/service/TextureService.h
-        src/editor/repository/FilesService.cpp
-        src/editor/repository/FilesService.h
+        src/editor/service/FilesService.cpp
+        src/editor/service/FilesService.h
         src/editor/ui/files/FilesContext.cpp
         src/context/repository/MeshPushConstant.h
         src/context/runtime/VertexData.h
@@ -183,6 +183,20 @@ add_executable(
         src/engine/service/world/impl/Entity.cpp
         src/engine/service/world/components/TransformComponent.cpp
         src/engine/service/world/components/MeshComponent.cpp
+        src/editor/common/form/types/ResourceField.cpp
+        src/editor/common/form/types/ResourceField.h
+        src/editor/common/form/types/ColorField.cpp
+        src/editor/common/form/types/ColorField.h
+        src/editor/common/form/types/Vec4Field.cpp
+        src/editor/common/form/types/Vec4Field.h
+        src/editor/common/form/types/Vec3Field.cpp
+        src/editor/common/form/types/Vec3Field.h
+        src/editor/common/form/types/Vec2Field.cpp
+        src/editor/common/form/types/Vec2Field.h
+        src/editor/common/form/types/StringField.cpp
+        src/editor/common/form/types/StringField.h
+        src/editor/common/form/types/ResourceFilesPanel.h
+        src/editor/common/form/types/ResourceFilesPanel.cpp
 )
 
 

@@ -10,6 +10,7 @@ namespace Metal {
         formPanel = new FormPanel();
         appendChild(formPanel);
         repositories.push_back(&context->getEditorContext().editorRepository);
+        repositories.push_back(&context->getEngineContext().worldRepository.camera);
     }
 
     void InspectorPanel::onSync() {
@@ -28,10 +29,11 @@ namespace Metal {
         ImGui::Spacing();
         for (auto *additional: additionalInspection) {
             if (additional != nullptr) {
-                if (UIUtil::RenderOption(additional->getIcon(),
-                                         currentInspection == additional,
-                                         true,
-                                         editorRepository.accent)) {
+                if (UIUtil::RenderOption(
+                    std::format("{}##{}", additional->getIcon(), additional->getUniqueId()).c_str(),
+                    currentInspection == additional,
+                    true,
+                    editorRepository.accent)) {
                     currentInspection = additional;
                 }
             }
@@ -53,7 +55,6 @@ namespace Metal {
         if (auto &editorRepository = context->getEditorContext().editorRepository;
             editorRepository.mainSelection != selectedId) {
             additionalInspection.clear();
-            additionalInspection.push_back(context->getEngineContext().worldRepository.camera);
             selectedId = editorRepository.mainSelection;
 
             if (selectedId != EMPTY_ENTITY) {
@@ -72,8 +73,6 @@ namespace Metal {
             if (selectedId != EMPTY_ENTITY && selectedEntity == nullptr) {
                 currentInspection = repositories[0];
             }
-        } else if (additionalInspection.empty()) {
-            additionalInspection.push_back(context->getEngineContext().worldRepository.camera);
         }
     }
 }

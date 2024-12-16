@@ -4,7 +4,7 @@
 
 namespace Metal {
     struct MeshComponent final : AbstractComponent {
-        const char *meshId = nullptr;
+        std::string meshId;
 
         const char *getIcon() override;
 

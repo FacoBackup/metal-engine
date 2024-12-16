@@ -39,7 +39,8 @@ namespace Metal {
         if (editorRepository->selected.contains(node->getId())) {
             ImGui::TextColored(editorRepository->accent, "%s", getNodeLabel(node, false).c_str());
         } else {
-            ImGui::Text("%s", getNodeLabel(node, false).c_str());
+            ImGui::TextColored(ImVec4(node->color.x, node->color.y, node->color.z, 1), "%s",
+                               getNodeLabel(node, false).c_str());
         }
         renderEntityColumns(node, true);
     }
@@ -64,20 +65,16 @@ namespace Metal {
         bool open;
 
         if (world->culled.contains(entityId) || world->hiddenEntities.contains(entityId)) {
-            ImGui::PushStyleColor(ImGuiCol_Text, context->getEditorContext().themeService.textDisabled);
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(node->color.x, node->color.y, node->color.z, .5));
             open = isOpen(node, flags);
             ImGui::PopStyleColor();
         } else {
-            if (node->isContainer) {
-                rowColor.x = node->color.x;
-                rowColor.y = node->color.y;
-                rowColor.z = node->color.z;
-                ImGui::PushStyleColor(ImGuiCol_Text, rowColor);
-                open = isOpen(node, flags);
-                ImGui::PopStyleColor();
-            } else {
-                open = isOpen(node, flags);
-            }
+            rowColor.x = node->color.x;
+            rowColor.y = node->color.y;
+            rowColor.z = node->color.z;
+            ImGui::PushStyleColor(ImGuiCol_Text, rowColor);
+            open = isOpen(node, flags);
+            ImGui::PopStyleColor();
         }
 
         if (node->getId() != WorldRepository::ROOT_ID) {

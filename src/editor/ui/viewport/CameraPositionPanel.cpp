@@ -17,7 +17,7 @@ namespace Metal {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, UIUtil::DEFAULT_PADDING);
         ImGui::SetNextWindowBgAlpha(.4f);
         if (ImGui::Begin(id.c_str(), &UIUtil::OPEN, UIUtil::FIXED_WINDOW_FLAGS)) {
-            const auto &positionCamera = context->getEngineContext().worldRepository.camera->position;
+            const auto &positionCamera = context->getEngineContext().worldRepository.camera.position;
             // ImGui::Text(
             // "Current tile: " + worldService.getCurrentTile().getX() + " " + worldService.getCurrentTile().getZ());
             // ImGui::SameLine();
@@ -29,10 +29,10 @@ namespace Metal {
             ImGui::SameLine();
 
             ImGui::Text(
-                "Yaw: %i", static_cast<int>(context->getEngineContext().worldRepository.camera->yaw * TO_DEG));
+                "Yaw: %i", static_cast<int>(context->getEngineContext().worldRepository.camera.yaw * TO_DEG));
             ImGui::SameLine();
             ImGui::Text("Pitch: %i",
-                        static_cast<int>(context->getEngineContext().worldRepository.camera->pitch * TO_DEG));
+                        static_cast<int>(context->getEngineContext().worldRepository.camera.pitch * TO_DEG));
         }
         ImGui::PopStyleVar();
         ImGui::End();

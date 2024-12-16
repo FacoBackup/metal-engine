@@ -23,6 +23,8 @@ namespace Metal {
         if (ImGui::Combo((id + "##entities").c_str(), &option, options)) {
             auto id = context->getEngineContext().worldRepository.createEntity();
             context->getEngineContext().worldRepository.createComponent(id, ComponentTypes::ValueOfIndex(option - 1));
+            context->getEditorContext().selectionService.clearSelection();
+            context->getEditorContext().selectionService.addSelected(id);
         }
 
         cameraMode();
@@ -36,13 +38,13 @@ namespace Metal {
         ImGui::SameLine();
         if (UIUtil::ButtonSimple(Icons::center_focus_strong + "##centerCamera", UIUtil::ONLY_ICON_BUTTON_SIZE,
                                  UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            context->getEngineContext().worldRepository.camera->position = {0, 0, 0};
-            context->getEngineContext().worldRepository.camera->registerChange();
+            context->getEngineContext().worldRepository.camera.position = {0, 0, 0};
+            context->getEngineContext().worldRepository.camera.registerChange();
         }
 
         ImGui::SameLine();
         ImGui::SetNextItemWidth(75);
-        ImGui::DragFloat("##speedCamera", &context->getEngineContext().worldRepository.camera->movementSensitivity, .1f,
+        ImGui::DragFloat("##speedCamera", &context->getEngineContext().worldRepository.camera.movementSensitivity, .1f,
                          .1f);
     }
 

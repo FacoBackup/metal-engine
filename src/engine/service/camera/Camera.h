@@ -44,13 +44,9 @@ namespace Metal {
         bool isOrthographic = false;
         float zFar = 10000;
         float zNear = .1f;
-        float fov = 90 * Util::TO_RADIANS;
+        float fov = 90;
         float aspectRatio = 1;
         float orthographicProjectionSize = 50;
-
-        void extractFrustumPlanes(glm::mat4x4 m);
-
-        bool isSphereInsideFrustum(glm::vec3 center, float radius) const;
 
         float pitch = 0.f;
         float yaw = 0.f;
@@ -64,7 +60,14 @@ namespace Metal {
 
         const char *getIcon() override;
 
+        void extractFrustumPlanes(glm::mat4x4 m);
+
+        bool isSphereInsideFrustum(glm::vec3 center, float radius) const;
+
         void registerFields() override;
+
+        explicit Camera(float pitch, float yaw, glm::vec3 position);
+
     private:
         static void extractPlane(const glm::mat4 &matrix, int index, glm::vec4 &plane);
 

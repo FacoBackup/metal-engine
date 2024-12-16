@@ -7,6 +7,7 @@ namespace Metal {
     struct InspectableMember {
         std::string name;
         std::string nameWithId;
+        std::string id;
         std::string group;
         FieldType type = BOOLEAN;
 

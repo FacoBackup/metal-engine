@@ -16,4 +16,15 @@ namespace Metal {
             onSyncChildren();
         }
     }
+
+    void AccordionPanel::onSyncChildren() const {
+        for (int i = 0; i < children.size(); i++) {
+            children[i]->onSync();
+
+            if (i < children.size() - 1) {
+                ImGui::Dummy(ImVec2(0, 4));
+                ImGui::Separator();
+            }
+        }
+    }
 }

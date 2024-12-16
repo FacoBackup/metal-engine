@@ -33,25 +33,14 @@ namespace Metal {
     void ViewportPanel::updateCamera() {
         auto &worldRepository = context->getEngineContext().worldRepository;
         auto &cameraService = context->getEngineContext().cameraService;
-        auto &editorRepository = context->getEditorContext().editorRepository;
-
-        if (!editorRepository.viewportCamera.contains(dock->id)) {
-            editorRepository.viewportCamera.insert({dock->id, new Camera{}});
-            editorRepository.viewportCamera[dock->id]->pitch = -(glm::pi<float>() / 4);
-            editorRepository.viewportCamera[dock->id]->yaw = glm::pi<float>() / 4;
-            editorRepository.viewportCamera[dock->id]->position.x = 10;
-            editorRepository.viewportCamera[dock->id]->position.y = 10;
-            editorRepository.viewportCamera[dock->id]->position.z = 10;
-        }
-        worldRepository.camera = editorRepository.viewportCamera[dock->id];
 
         if (ImGui::IsWindowHovered() && !ImGuizmo::IsUsing() && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
             cameraService.handleInput(isFirstMovement);
             if (const auto &io = ImGui::GetIO(); io.MouseWheel != 0) {
-                worldRepository.camera->movementSensitivity += io.MouseWheel * 100 * context->getEngineContext().
+                worldRepository.camera.movementSensitivity += io.MouseWheel * 100 * context->getEngineContext().
                         deltaTime;
-                worldRepository.camera->movementSensitivity =
-                        std::max(.1f, worldRepository.camera->movementSensitivity);
+                worldRepository.camera.movementSensitivity =
+                        std::max(.1f, worldRepository.camera.movementSensitivity);
             }
             isFirstMovement = false;
         } else {

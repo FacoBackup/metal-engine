@@ -2,24 +2,24 @@
 #define WORLDREPOSITORY_H
 
 #include <unordered_map>
+#include <glm/ext/scalar_constants.hpp>
 
 #include "../../engine-definitions.h"
-#include "../../../common/interface/Initializable.h"
+#include "../camera/Camera.h"
 #include "impl/Entity.h"
 #include "../../enum/ComponentType.h"
 
 namespace Metal {
-    struct Camera;
-
     struct WorldRepository final {
         static constexpr EntityID ROOT_ID = 1;
 
         explicit WorldRepository();
 
-        Camera *camera = nullptr;
+        Camera camera{-(glm::pi<float>() / 4), glm::pi<float>() / 4, {10, 10, 10}};
         std::unordered_map<EntityID, std::unique_ptr<Entity> > entities{};
         std::unordered_map<EntityID, bool> culled{};
         std::unordered_map<EntityID, bool> hiddenEntities{};
+
         void createComponent(EntityID entity, ComponentTypes::ComponentType type) const;
 
         EntityID createEntity(std::string name = "New Entity", bool container = false);

@@ -54,6 +54,10 @@ namespace Metal {
     }
 
     void Camera::registerFields() {
+        registerFloat(fov, "View", "FOV", 60, 120, false);
+        registerFloat(zNear, "View", "Z-Near", 0, 1, false);
+        registerFloat(zFar, "View", "Z-Far", 1, MAX_INT, false);
+
         registerFloat(rotationSensitivity, "Controls", "Camera rotation sensitivity", 0, 10, false);
 
         registerFloat(movementSensitivity, "Controls", "Camera Movement speed", 0, 10, false);
@@ -107,5 +111,11 @@ namespace Metal {
                       MAX_FLOAT, false);
 
         registerFloat(distortionIntensity, "Post processing", "Distortion Strength", 0, MAX_FLOAT, false);
+    }
+
+    Camera::Camera(const float pitch, const float yaw, const glm::vec3 position) {
+        this->pitch = pitch;
+        this->yaw = yaw;
+        this->position = position;
     }
 }
