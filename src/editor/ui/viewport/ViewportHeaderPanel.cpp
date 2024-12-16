@@ -19,7 +19,7 @@ namespace Metal {
         } else {
             currentPanel = paintGizmo;
         }
-        ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y + DockSpacePanel::FRAME_SIZE));
+        ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y));
         ImGui::SetNextWindowSize(ImVec2(ImGui::GetWindowSize().x, HEIGHT));
         ImGui::SetNextWindowBgAlpha(.4f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, PADDING);

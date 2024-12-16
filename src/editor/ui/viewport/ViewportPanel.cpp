@@ -60,14 +60,14 @@ namespace Metal {
         auto &repo = context->getEngineContext().runtimeRepository;
         const ImVec2 windowSize = ImGui::GetWindowSize();
         size->x = windowSize.x;
-        size->y = windowSize.y - DockSpacePanel::FRAME_SIZE;
+        size->y = windowSize.y;
 
         repo.viewportH = size->y;
         repo.viewportW = size->x;
 
         const ImVec2 windowPos = ImGui::GetWindowPos();
         repo.viewportX = windowPos.x;
-        repo.viewportY = windowPos.y + DockSpacePanel::FRAME_SIZE;
+        repo.viewportY = windowPos.y;
 
         repo.isFocused = ImGui::IsWindowHovered();
         repo.forwardPressed = ImGui::IsKeyDown(ImGuiKey_W);
