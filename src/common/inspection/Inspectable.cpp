@@ -1,5 +1,6 @@
 #include "Inspectable.h"
 
+#include <glm/fwd.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
@@ -100,6 +101,13 @@ namespace Metal {
                                    std::string group, std::string name,
                                    float min, float max, bool disabled) {
         DECLARATION(glm::vec4, VECTOR4)
+        NUMERIC_DECLARATION
+    }
+
+    void Inspectable::registerQuat(glm::quat &v,
+                                   std::string group, std::string name,
+                                   float min, float max, bool disabled) {
+        DECLARATION(glm::quat, QUAT)
         NUMERIC_DECLARATION
     }
 

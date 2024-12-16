@@ -8,6 +8,7 @@
 #include "types/BooleanField.h"
 #include "types/ColorField.h"
 #include "types/MethodField.h"
+#include "types/QuatField.h"
 #include "types/ResourceField.h"
 #include "types/StringField.h"
 #include "types/Vec2Field.h"
@@ -57,6 +58,9 @@ namespace Metal {
                     break;
                 case VECTOR4:
                     group->appendChild(new Vec4Field{dynamic_cast<InspectedField<glm::vec4> &>(*field)});
+                    break;
+                case QUAT:
+                    group->appendChild(new QuatField{dynamic_cast<InspectedField<glm::quat> &>(*field)});
                     break;
                 case COLOR:
                     group->appendChild(new ColorField{dynamic_cast<InspectedField<glm::vec3> &>(*field)});

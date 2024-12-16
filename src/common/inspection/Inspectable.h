@@ -4,6 +4,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <glm/fwd.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
@@ -53,6 +54,11 @@ namespace Metal {
                           bool disabled = false);
 
         void registerVec4(glm::vec4 &v,
+                          std::string group, std::string name,
+                          float min = std::numeric_limits<float>::min(), float max = std::numeric_limits<float>::max(),
+                          bool disabled = false);
+
+        void registerQuat(glm::quat &v,
                           std::string group, std::string name,
                           float min = std::numeric_limits<float>::min(), float max = std::numeric_limits<float>::max(),
                           bool disabled = false);

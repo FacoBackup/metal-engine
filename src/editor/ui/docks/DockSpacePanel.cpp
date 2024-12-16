@@ -52,7 +52,9 @@ namespace Metal {
             dock->sizeY = size.y;
 
             position = ImGui::GetWindowPos();
-            renderHeader();
+            if (isNotCenter) {
+                renderHeader();
+            }
             view->onSync();
         }
         ImGui::End();

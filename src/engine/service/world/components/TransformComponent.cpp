@@ -13,6 +13,6 @@ namespace Metal {
     void TransformComponent::registerFields() {
         registerVec3(translation, "", "Translation");
         registerVec3(scale, "", "Scale");
-        registerVec4(rotation, "", "Rotation (Quaternion)");
+        registerQuat(rotation, "", "Rotation (Quaternion)");
     }
 }

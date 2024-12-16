@@ -1,6 +1,7 @@
 #ifndef EDITORREPOSITORY_H
 #define EDITORREPOSITORY_H
 #include <imgui.h>
+#include <ImGuizmo.h>
 #include <vector>
 #include <unordered_map>
 #include <glm/vec3.hpp>
@@ -26,7 +27,8 @@ namespace Metal {
         float gridScale = 1.f;
         int gridThreshold = 100;
         float gridThickness = 2;
-
+        ImGuizmo::OPERATION gizmoType = ImGuizmo::OPERATION::TRANSLATE;
+        ImGuizmo::MODE gizmoMode = ImGuizmo::MODE::WORLD;
         ImVec4 accent{};
         ImU32 accentU32 = 0;
 
@@ -37,11 +39,10 @@ namespace Metal {
 
         // ExecutionEnvironment environment = ExecutionEnvironment.DEVELOPMENT;
         // EditorMode editorMode = EditorMode.TRANSFORM;
-        // int gizmoType = Operation.SCALE;
-        // int gizmoMode = Mode.WORLD;
 
         float gizmoSnapRotate = 0.f;
         float gizmoSnapScale = 0.f;
+        float gizmoSnapTranslate = 0.f;
 
         int gizmoSnapTranslateOption = 0;
         int gizmoSnapRotateOption = 0;
@@ -64,6 +65,7 @@ namespace Metal {
         float brushDensity = .5f;
         EditorMode::EditorMode editorMode = EditorMode::EditorMode::TRANSFORM;
         ShadingMode::ShadingMode shadingMode = ShadingMode::ShadingMode::LIT;
+        bool brushModeAdd = true;
 
         const char *getIcon() override;
 

@@ -3,14 +3,16 @@
 
 #include <glm/fwd.hpp>
 #include <glm/mat4x4.hpp>
+#include <glm/detail/type_quat.hpp>
+#include <glm/ext/matrix_transform.hpp>
 
 #include "../impl/AbstractComponent.h"
 
 namespace Metal {
     struct TransformComponent final : AbstractComponent {
-        glm::mat4x4 model{};
+        glm::mat4x4 model = glm::identity<glm::mat4x4>();
         glm::vec3 translation{};
-        glm::vec4 rotation = {0, 0, 0, 1};
+        glm::quat rotation = {0, 0, 0, 1};
         glm::vec3 scale{1, 1, 1};
 
         explicit TransformComponent(const EntityID &entityId)

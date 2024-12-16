@@ -1,7 +1,9 @@
 #include "ViewportPanel.h"
 
 #include "CameraPositionPanel.h"
+#include "GizmoPanel.h"
 #include "ImGuizmo.h"
+#include "ViewportHeaderPanel.h"
 #include "../../../context/ApplicationContext.h"
 #include "../../../context/runtime/DescriptorInstance.h"
 #include "../../../context/runtime/FrameBufferInstance.h"
@@ -10,7 +12,9 @@
 
 namespace Metal {
     void ViewportPanel::onInitialize() {
-        appendChild(new CameraPositionPanel);
+        appendChild(headerPanel = new ViewportHeaderPanel());
+        appendChild(gizmoPanel = new GizmoPanel(position, size));
+        appendChild(cameraPanel = new CameraPositionPanel());
     }
 
     void ViewportPanel::onSync() {
@@ -22,17 +26,21 @@ namespace Metal {
             attachments[0]->vkImageView
         );
 
-        updateInputs();
         updateCamera();
+        updateInputs();
         ImGui::Image(
             reinterpret_cast<ImTextureID>(coreSets.imageSampler->vkDescriptorSet),
             ImVec2{size->x, size->y});
-        onSyncChildren();
+        if (context->getEditorContext().editorRepository.editorMode == EditorMode::EditorMode::TRANSFORM) {
+            gizmoPanel->onSync();
+        }
+        headerPanel->onSync();
+        cameraPanel->onSync();
     }
 
     void ViewportPanel::updateCamera() {
         auto &worldRepository = context->getEngineContext().worldRepository;
-        auto &cameraService = context->getEngineContext().cameraService;
+        const auto &cameraService = context->getEngineContext().cameraService;
 
         if (ImGui::IsWindowHovered() && !ImGuizmo::IsUsing() && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
             cameraService.handleInput(isFirstMovement);

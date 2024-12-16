@@ -199,6 +199,16 @@ add_executable(
         src/engine/service/streaming/StreamingRepository.cpp
         src/engine/service/streaming/StreamingRepository.h
         src/context/runtime/ResourceType.h
+        src/editor/ui/viewport/GizmoPanel.cpp
+        src/editor/ui/viewport/GizmoPanel.h
+        src/editor/ui/viewport/ViewportHeaderPanel.cpp
+        src/editor/ui/viewport/ViewportHeaderPanel.h
+        src/editor/ui/viewport/GizmoSettingsPanel.cpp
+        src/editor/ui/viewport/GizmoSettingsPanel.h
+        src/editor/ui/viewport/PaintingSettingsPanel.cpp
+        src/editor/ui/viewport/PaintingSettingsPanel.h
+        src/editor/common/form/types/QuatField.cpp
+        src/editor/common/form/types/QuatField.h
 )
 
 

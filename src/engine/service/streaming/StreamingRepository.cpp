@@ -10,13 +10,16 @@
 #define DISPOSAL(T, S)\
 for (auto &resource: S.getResources()) {\
     if (resource.second->lastUse.time_since_epoch().count() >= MAX_TIMEOUT) {\
+         std::cout << "Disposing of " << resource.first << std::endl;\
          S.dispose(resource.second);\
     }\
 }
 
 #define STREAM(T, V)\
 if (T.getResources().contains(id)) {\
-    return static_cast<V*>(T.getResources().at(id));\
+    auto *e = T.getResources().at(id);\
+    e->lastUse = context.getEngineContext().currentTime;\
+    return static_cast<V*>(e);\
 }\
 if (!tries.contains(id)) {\
     tries[id] = 0;\

@@ -1,12 +1,13 @@
-#include "Vec4Field.h"
+#include "QuatField.h"
 
 #include <imgui.h>
+#include <glm/detail/type_quat.hpp>
 
 namespace Metal {
-    Vec4Field::Vec4Field(InspectedField<glm::vec4> &field) : field(field) {
+    QuatField::QuatField(InspectedField<glm::quat> &field) : field(field) {
     }
 
-    void Vec4Field::onSync() {
+    void QuatField::onSync() {
         if (!field.disabled) {
             values[0] = field.field->x;
             values[1] = field.field->y;
