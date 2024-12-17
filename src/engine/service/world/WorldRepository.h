@@ -19,6 +19,7 @@ namespace Metal {
 
         explicit WorldRepository();
 
+        WorldGrid worldGrid{};
         Camera camera{-(glm::pi<float>() / 4), glm::pi<float>() / 4, {10, 10, 10}};
         std::unordered_map<EntityID, std::unique_ptr<Entity> > entities{};
         std::unordered_map<EntityID, MeshComponent *> meshes{};
@@ -26,7 +27,7 @@ namespace Metal {
         std::unordered_map<EntityID, bool> culled{};
         std::unordered_map<EntityID, bool> hiddenEntities{};
 
-        void createComponent(EntityID entity, ComponentTypes::ComponentType type) ;
+        void createComponent(EntityID entity, ComponentTypes::ComponentType type);
 
         EntityID createEntity(std::string name = "New Entity", bool container = false);
 

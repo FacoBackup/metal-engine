@@ -14,6 +14,7 @@ namespace Metal {
         EntityID id;
 
     public:
+        const char *onTile = nullptr;
         std::string name = "New entity";
         glm::vec3 color{};
         bool isContainer = false;

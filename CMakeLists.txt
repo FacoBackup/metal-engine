@@ -209,6 +209,19 @@ add_executable(
         src/editor/ui/viewport/PaintingSettingsPanel.h
         src/editor/common/form/types/QuatField.cpp
         src/editor/common/form/types/QuatField.h
+        src/engine/service/TransformService.cpp
+        src/engine/service/TransformService.h
+        src/engine/service/world/impl/WorldGrid.cpp
+        src/engine/service/world/impl/WorldGrid.h
+        src/engine/service/world/impl/WorldTile.h
+        src/engine/service/world/impl/BoundingBox.h
+        src/engine/service/voxel/impl/SparseVoxelOctree.cpp
+        src/engine/service/voxel/impl/SparseVoxelOctree.h
+        src/engine/service/voxel/impl/OctreeNode.cpp
+        src/engine/service/voxel/impl/OctreeNode.h
+        src/engine/service/voxel/impl/VoxelData.h
+        src/engine/service/voxel/VoxelizerService.cpp
+        src/engine/service/voxel/VoxelizerService.h
 )
 
 
