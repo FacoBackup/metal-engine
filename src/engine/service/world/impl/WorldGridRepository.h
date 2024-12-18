@@ -1,28 +1,35 @@
 #ifndef WORLDGRID_H
 #define WORLDGRID_H
-#include <../../../../../cmake-build-debug/vcpkg_installed/arm64-osx/include/nlohmann/detail/value_t.hpp>
+#include <unordered_map>
 
 #include "../../../engine-definitions.h"
 #include "WorldTile.h"
+#include "../../../../common/interface/AbstractRuntimeComponent.h"
 
 namespace Metal {
-    class WorldGrid final {
+    class WorldGridRepository final : public AbstractRuntimeComponent {
         std::unordered_map<std::string, WorldTile *> tiles{};
         std::array<WorldTile *, 9> loadedWorldTiles{};
+        WorldTile *currentTile = nullptr;
 
     public:
+        explicit WorldGridRepository(ApplicationContext &context)
+            : AbstractRuntimeComponent(context) {
+        }
+
         static int getTileLocation(const float v) {
             return static_cast<int>(std::floor(v / TILE_SIZE));
         }
 
         /**
          * Returns current tile and its adjacent ones
-         * @param point Approximate location of the current tile
          * @return May contain null elements
          */
-        std::array<WorldTile *, 9> &getLoadedTiles(const glm::vec3 &point);
+        std::array<WorldTile *, 9> &getLoadedTiles();
 
         WorldTile *getOrCreateTile(const glm::vec3 &point);
+
+        WorldTile *getCurrentTile() const;
 
         void createIfAbsent(int x, int z);
 
@@ -38,7 +45,7 @@ namespace Metal {
 
         void removeTile(const std::string &id);
 
-        static void MoveBetweenTiles(const EntityID entityId, WorldTile *previousWorldTile, WorldTile *newWorldTile);
+        void moveBetweenTiles(EntityID entityId, WorldTile *previousWorldTile, WorldTile *newWorldTile) const;
     };
 } // Metal
 

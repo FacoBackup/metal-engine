@@ -1,8 +1,6 @@
-//
-// Created by Gustavo Roque on 17/12/24.
-//
-
 #include "VoxelizerService.h"
 
 namespace Metal {
+    void VoxelizerService::voxelizeScene() {
+    }
 } // Metal

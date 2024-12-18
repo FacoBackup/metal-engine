@@ -14,5 +14,6 @@ namespace Metal {
         registerVec3(translation, "", "Translation");
         registerVec3(scale, "", "Scale");
         registerQuat(rotation, "", "Rotation (Quaternion)");
+        registerBool(isStatic, "", "Static?");
     }
 }

@@ -37,7 +37,7 @@ namespace Metal {
         ImGuizmo::SetOrthographic(context->getEngineContext().worldRepository.camera.isOrthographic);
         ImGuizmo::SetDrawlist();
         ImGuizmo::SetRect(position->x, position->y, size->x, size->y);
-        ImGuizmo::Manipulate(
+        Manipulate(
             viewMatrixCache,
             projectionMatrixCache,
             editorRepository->gizmoType,
@@ -91,6 +91,7 @@ namespace Metal {
 
         localSelected->registerChange();
         localChangeId = localSelected->getChangeId();
+        localSelected->forceTransform = true;
     }
 
     void GizmoPanel::recomposeMatrix() {

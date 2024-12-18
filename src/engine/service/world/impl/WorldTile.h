@@ -2,11 +2,12 @@
 #define WORLDTILE_H
 #include <array>
 #include <string>
+#include <vector>
 
 #include "BoundingBox.h"
+#include "../../../engine-definitions.h"
 #include "../../voxel/impl/SparseVoxelOctree.h"
 #define TILE_SIZE 32
-#define MAX_ENTITIES 1000
 
 namespace Metal {
     struct WorldTile final {
@@ -16,7 +17,7 @@ namespace Metal {
         std::string id;
         bool loaded = false;
         SparseVoxelOctree svo{this};
-        std::array<EntityID, MAX_ENTITIES> entities{};
+        std::vector<EntityID> entities{};
         BoundingBox boundingBox;
         int normalizedDistance = 0;
 

@@ -19,7 +19,6 @@ namespace Metal {
 
         explicit WorldRepository();
 
-        WorldGrid worldGrid{};
         Camera camera{-(glm::pi<float>() / 4), glm::pi<float>() / 4, {10, 10, 10}};
         std::unordered_map<EntityID, std::unique_ptr<Entity> > entities{};
         std::unordered_map<EntityID, MeshComponent *> meshes{};
@@ -33,7 +32,7 @@ namespace Metal {
 
         void linkEntities(const Entity *target, Entity *toLink) const;
 
-        Entity *getEntity(EntityID node) const;
+        [[nodiscard]] Entity *getEntity(EntityID node) const;
 
     private:
         EntityID lastId = ROOT_ID;

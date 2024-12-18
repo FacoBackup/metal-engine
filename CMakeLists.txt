@@ -211,8 +211,8 @@ add_executable(
         src/editor/common/form/types/QuatField.h
         src/engine/service/TransformService.cpp
         src/engine/service/TransformService.h
-        src/engine/service/world/impl/WorldGrid.cpp
-        src/engine/service/world/impl/WorldGrid.h
+        src/engine/service/world/impl/WorldGridRepository.cpp
+        src/engine/service/world/impl/WorldGridRepository.h
         src/engine/service/world/impl/WorldTile.h
         src/engine/service/world/impl/BoundingBox.h
         src/engine/service/voxel/impl/SparseVoxelOctree.cpp

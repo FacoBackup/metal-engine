@@ -7,6 +7,7 @@
 #include "render-pass/AbstractRenderPass.h"
 #include "service/streaming/StreamingRepository.h"
 #include "service/world/WorldRepository.h"
+#include "service/world/impl/WorldGridRepository.h"
 
 using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
@@ -26,8 +27,9 @@ namespace Metal {
         float deltaTime = 0;
         bool globalDataNeedsUpdate = true;
 
+        WorldGridRepository worldGridRepository{context};
         CameraService cameraService{context};
-        WorldRepository worldRepository;
+        WorldRepository worldRepository{};
         RuntimeRepository runtimeRepository{};
         StreamingRepository streamingRepository{context};
 

@@ -14,6 +14,8 @@ namespace Metal {
         glm::vec3 translation{};
         glm::quat rotation = {0, 0, 0, 1};
         glm::vec3 scale{1, 1, 1};
+        bool forceTransform = false;
+        bool isStatic = false;
 
         explicit TransformComponent(const EntityID &entityId)
             : AbstractComponent(entityId) {

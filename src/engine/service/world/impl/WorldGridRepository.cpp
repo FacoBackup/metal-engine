@@ -1,16 +1,21 @@
-#include "WorldGrid.h"
+#include "WorldGridRepository.h"
+
+#include "../../../../context/ApplicationContext.h"
 
 namespace Metal {
-    std::array<WorldTile *, 9> &WorldGrid::getLoadedTiles(const glm::vec3 &point) {
-        auto *center = getOrCreateTile(point);
-        loadedWorldTiles[0] = center;
-        for (int i = 0; i < 8; i++) {
-            loadedWorldTiles[i + 1] = tiles.at(center->adjacentTiles[i]);
+    std::array<WorldTile *, 9> &WorldGridRepository::getLoadedTiles() {
+        if (auto *center = getOrCreateTile(context.getEngineContext().worldRepository.camera.position);
+            currentTile != center) {
+            currentTile = center;
+            loadedWorldTiles[0] = center;
+            for (int i = 0; i < 8; i++) {
+                loadedWorldTiles[i + 1] = tiles.at(center->adjacentTiles[i]);
+            }
         }
         return loadedWorldTiles;
     }
 
-    WorldTile *WorldGrid::getOrCreateTile(const glm::vec3 &point) {
+    WorldTile *WorldGridRepository::getOrCreateTile(const glm::vec3 &point) {
         const int tileX = getTileLocation(point.x);
         const int tileZ = getTileLocation(point.z);
         const std::string id = WorldTile::GetId(tileX, tileZ);
@@ -20,14 +25,18 @@ namespace Metal {
         return tiles.at(id);
     }
 
-    void WorldGrid::createIfAbsent(const int x, const int z) {
+    WorldTile *WorldGridRepository::getCurrentTile() const {
+        return currentTile;
+    }
+
+    void WorldGridRepository::createIfAbsent(const int x, const int z) {
         if (std::string id = WorldTile::GetId(x, z); !tiles.contains(id)) {
             auto newTile = new WorldTile(x, z, id);
             tiles.insert({id, newTile});
         }
     }
 
-    void WorldGrid::addTile(const glm::vec3 &point) {
+    void WorldGridRepository::addTile(const glm::vec3 &point) {
         int x = getTileLocation(point.x);
         int z = getTileLocation(point.z);
         std::string id = WorldTile::GetId(x, z);
@@ -40,7 +49,7 @@ namespace Metal {
         updateAdjacentTiles(newTile);
     }
 
-    void WorldGrid::updateAdjacentTiles(WorldTile *newTile) const {
+    void WorldGridRepository::updateAdjacentTiles(WorldTile *newTile) const {
         const int x = newTile->x;
         const int z = newTile->z;
         const std::array westTile{x, z - 1};
@@ -62,7 +71,7 @@ namespace Metal {
         putAdjacentTile(southWestTile, newTile);
     }
 
-    void WorldGrid::putAdjacentTile(const std::array<int, 2> &tileLocation, WorldTile *newTile) const {
+    void WorldGridRepository::putAdjacentTile(const std::array<int, 2> &tileLocation, WorldTile *newTile) const {
         if (const std::string tileId = WorldTile::GetId(tileLocation[0], tileLocation[1]); tiles.contains(tileId)) {
             auto *tile = tiles.at(tileId);
             tile->putAdjacentTile(newTile);
@@ -70,7 +79,7 @@ namespace Metal {
         }
     }
 
-    void WorldGrid::removeTile(const std::string &id) {
+    void WorldGridRepository::removeTile(const std::string &id) {
         const auto *tileToRemove = tiles.at(id);
         tiles.erase(id);
         for (auto &tile: tiles) {
@@ -78,25 +87,19 @@ namespace Metal {
         }
     }
 
-    void WorldGrid::MoveBetweenTiles(const EntityID entityId, WorldTile *previousWorldTile, WorldTile *newWorldTile) {
-        if (newWorldTile != previousWorldTile) {
-            bool inserted = false;
-            bool removed = false;
-            for (unsigned int i = 0; i < MAX_ENTITIES; i++) {
-                if (!removed && previousWorldTile->entities[i] == entityId) {
-                    previousWorldTile->entities[i] = EMPTY_ENTITY;
-                    removed = true;
-                }
-
-                if (!inserted && newWorldTile->entities[i] == EMPTY_ENTITY) {
-                    inserted = true;
-                    newWorldTile->entities[i] = entityId;
-                }
-
-                if (inserted && removed) {
-                    break;
-                }
-            }
+    void WorldGridRepository::moveBetweenTiles(const EntityID entityId, WorldTile *previousWorldTile,
+                                               WorldTile *newWorldTile) const {
+        auto *entity = context.getEngineContext().worldRepository.getEntity(entityId);
+        entity->registerChange();
+        entity->freezeVersion();
+        if (entity->onTile != nullptr) {
+            previousWorldTile->entities.erase(
+                std::ranges::remove(previousWorldTile->entities, entityId).begin(),
+                previousWorldTile->entities.end());
+            newWorldTile->entities.push_back(entityId);
+        } else {
+            newWorldTile->entities.push_back(entityId);
         }
+        entity->onTile = newWorldTile->id.c_str();
     }
 } // Metal

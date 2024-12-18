@@ -19,8 +19,8 @@ namespace Metal {
         const std::string uniqueIdentifier = Util::uuidV4();
         std::vector<std::unique_ptr<InspectableMember> > fields;
         bool fieldsRegistered = false;
-        int changes = 0;
-        int frozenVersion = -1;
+        unsigned long changes = 0;
+        unsigned long frozenVersion = -1;
 
     protected:
         virtual void registerFields() {
@@ -69,7 +69,7 @@ namespace Metal {
     public:
         std::vector<std::unique_ptr<InspectableMember> > &getFields();
 
-        [[nodiscard]] int getChangeId() const;
+        [[nodiscard]] unsigned long getChangeId() const;
 
         void registerChange();
 
@@ -79,7 +79,7 @@ namespace Metal {
 
         virtual ~Inspectable() = default;
 
-        std::string getUniqueId() const {
+        [[nodiscard]] std::string getUniqueId() const {
             return uniqueIdentifier;
         }
 

@@ -8,6 +8,8 @@ namespace Metal {
         explicit VoxelizerService(ApplicationContext &context)
             : AbstractRuntimeComponent(context) {
         }
+
+        void voxelizeScene();
     };
 } // Metal
 

@@ -45,7 +45,7 @@ namespace Metal {
         return fields;
     }
 
-    int Inspectable::getChangeId() const {
+    unsigned long Inspectable::getChangeId() const {
         return changes;
     }
 
