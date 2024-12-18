@@ -6,7 +6,7 @@
 #include "RuntimeResource.h"
 
 namespace Metal {
-    struct BufferInstance final : RuntimeResource {
+    struct BufferInstance final {
         void *mapped = nullptr;
         const VkDeviceSize dataSize;
         VkBuffer vkBuffer = VK_NULL_HANDLE;
@@ -15,9 +15,9 @@ namespace Metal {
         explicit BufferInstance(const VkDeviceSize dataSize): dataSize(dataSize) {
         }
 
-        void dispose(VulkanContext &context) override;
+        void dispose(VulkanContext &context);
 
-        void update( void *newData) const;
+        void update(void *newData) const;
     };
 } // Metal
 

@@ -1,5 +1,7 @@
 #include "BooleanField.h"
 
+#include <imgui.h>
+
 namespace Metal {
     BooleanField::BooleanField(InspectedField<bool> &field) : field(field) {
     }

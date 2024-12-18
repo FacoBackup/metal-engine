@@ -1,9 +1,10 @@
 #ifndef METAL_ENGINE_ABSTRACTPANEL_H
 #define METAL_ENGINE_ABSTRACTPANEL_H
 
+#include <string>
+#include <vector>
+
 #include "IPanel.h"
-#include "imgui.h"
-#include "../../common/util/Util.h"
 
 namespace Metal {
     class ApplicationContext;
@@ -12,11 +13,13 @@ namespace Metal {
     protected:
         ApplicationContext *context = nullptr;
         std::vector<IPanel *> children;
-        const std::string id = "##" + Util::uuidV4();
+        const std::string id;
 
-        void onSyncChildren() const;
+        virtual void onSyncChildren() const;
 
     public:
+        explicit AbstractPanel();
+
         std::vector<IPanel *> &getChildren();
 
         void appendChild(AbstractPanel *panel);

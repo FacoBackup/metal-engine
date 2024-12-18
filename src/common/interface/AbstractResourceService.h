@@ -10,16 +10,20 @@ namespace Metal {
     class RuntimeResource;
 
     class AbstractResourceService : public AbstractRuntimeComponent {
+    protected:
         std::unordered_map<std::string, RuntimeResource *> resources{};
 
-    protected:
         VulkanContext &vulkanContext;
 
         void registerResource(RuntimeResource *resource);
 
+    public:
         void dispose(RuntimeResource *resource);
 
-    public:
+        std::unordered_map<std::string, RuntimeResource *> &getResources() {
+            return resources;
+        }
+
         void disposeAll();
 
         explicit AbstractResourceService(ApplicationContext &context);

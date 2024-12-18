@@ -5,7 +5,7 @@
 #include "RuntimeResource.h"
 
 namespace Metal {
-    class BufferInstance;
+    struct BufferInstance;
 
     struct DescriptorInstance final : RuntimeResource {
         VkDescriptorSetLayout vkDescriptorSetLayout = VK_NULL_HANDLE;
@@ -29,6 +29,10 @@ namespace Metal {
         std::vector<VkWriteDescriptorSet> writeDescriptorSets;
         std::vector<VkDescriptorImageInfo> imageInfos;
         std::vector<VkDescriptorBufferInfo> bufferInfos;
+
+        ResourceType resourceType() override {
+            return DESCRIPTOR;
+        }
     };
 } // Metal
 

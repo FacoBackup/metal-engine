@@ -1,5 +1,7 @@
 #include "MethodField.h"
 
+#include <imgui.h>
+
 namespace Metal {
     MethodField::MethodField(InspectedMethod &method) : method(method) {
     }

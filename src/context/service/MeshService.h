@@ -3,6 +3,7 @@
 #include "../../common/interface/AbstractResourceService.h"
 
 namespace Metal {
+    struct LevelOfDetail;
     struct MeshData;
     struct MeshInstance;
 
@@ -12,9 +13,7 @@ namespace Metal {
             : AbstractResourceService(context) {
         }
 
-        MeshInstance *createMesh(const std::string &path);
-
-        void dispose(MeshInstance *instance) const;
+        MeshInstance *create(const std::string &id, const LevelOfDetail &levelOfDetail);
     };
 } // Metal
 

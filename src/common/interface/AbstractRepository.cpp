@@ -1,6 +1,6 @@
-#include "../../context/ApplicationContext.h"
+#include "AbstractRepository.h"
 
 namespace Metal {
-
-    Metal::AbstractRepository::AbstractRepository(ApplicationContext &context) : AbstractRuntimeComponent(context) {}
+    AbstractRepository::AbstractRepository(ApplicationContext &context) : AbstractRuntimeComponent(context) {
+    }
 }

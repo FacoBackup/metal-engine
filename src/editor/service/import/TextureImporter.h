@@ -16,11 +16,10 @@ namespace Metal {
             return {"png", "jpg", "jpeg"};
         }
 
-        static void importTexture(const std::string &targetDir, const std::string &pathToFile);
+        void importTexture(const std::string &targetDir, const std::string &pathToFile) const;
 
-        static void reduceImage(std::vector<std::string> &paths, const std::string &fileId,
-                                const std::string &targetDir,
-                                const TextureData &textureData, const LevelOfDetail &levelOfDetail);
+        void reduceImage(const std::string &fileId,
+                         const TextureData &textureData, const LevelOfDetail &levelOfDetail) const;
     };
 }
 

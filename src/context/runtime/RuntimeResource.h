@@ -1,14 +1,35 @@
 #ifndef IGPURESOURCE_H
 #define IGPURESOURCE_H
-#include "../../common/interface/Identifiable.h"
+#include "ResourceType.h"
+#include "../../common/util/Util.h"
+
+using Clock = std::chrono::high_resolution_clock;
+using TimePoint = std::chrono::time_point<Clock>;
 
 namespace Metal {
     class VulkanContext;
 
-    class RuntimeResource : public Identifiable {
+    class RuntimeResource {
+        const std::string id;
+
     public:
+        virtual ~RuntimeResource() = default;
+
+        explicit RuntimeResource(const std::string &id = Util::uuidV4()): id(std::move(id)) {
+        }
+
+        TimePoint lastUse;
+
+        std::string getId() const {
+            return id;
+        }
+
         virtual void dispose(VulkanContext &context) {
-            throw std::runtime_error("RuntimeResource::dispose()");
+            throw std::runtime_error("Not implemented");
+        }
+
+        virtual ResourceType resourceType() {
+            throw std::runtime_error("Not implemented");
         }
     };
 }

@@ -16,6 +16,10 @@ namespace Metal {
             vkDestroyImageView(context.device.device, vkImageView, nullptr);
             vkDestroyImage(context.device.device, image, nullptr);
         }
+
+        ResourceType resourceType() override {
+            return TEXTURE;
+        }
     };
 } // Metal
 

@@ -10,9 +10,7 @@ namespace Metal {
     class MeshImporter final : public AbstractImporter {
         static std::vector<MeshData> ImportMeshes(const std::string &pathToFile);
 
-        static void SimplifyMesh(std::vector<std::string> &paths, const std::string &fileId,
-                                 const std::string &targetDir,
-                                 const MeshData &mesh, const LevelOfDetail &levelOfDetail);
+        void simplifyMesh(const std::string &fileId, const MeshData &mesh, const LevelOfDetail &levelOfDetail);
 
         std::vector<std::string> getSupportedTypes() override;
 
@@ -22,9 +20,9 @@ namespace Metal {
         }
 
 
-        static void ImportMesh(const std::string &targetDir, const std::string &pathToFile);
+        void importMesh(const std::string &targetDir, const std::string &pathToFile);
 
-        static void serializeMesh(const MeshData& simplifiedMesh, const std::string &newPath);
+        static void serializeMesh(const MeshData &simplifiedMesh, const std::string &newPath);
     };
 } // Metal
 

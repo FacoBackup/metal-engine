@@ -1,15 +1,20 @@
 #include "ViewportPanel.h"
 
 #include "CameraPositionPanel.h"
+#include "GizmoPanel.h"
 #include "ImGuizmo.h"
+#include "ViewportHeaderPanel.h"
 #include "../../../context/ApplicationContext.h"
 #include "../../../context/runtime/DescriptorInstance.h"
 #include "../../../context/runtime/FrameBufferInstance.h"
 #include "../../../context/runtime/FrameBufferAttachment.h"
+#include "../../../engine/service/camera/Camera.h"
 
 namespace Metal {
     void ViewportPanel::onInitialize() {
-        appendChild(new CameraPositionPanel);
+        appendChild(headerPanel = new ViewportHeaderPanel());
+        appendChild(gizmoPanel = new GizmoPanel(position, size));
+        appendChild(cameraPanel = new CameraPositionPanel());
     }
 
     void ViewportPanel::onSync() {
@@ -21,36 +26,29 @@ namespace Metal {
             attachments[0]->vkImageView
         );
 
-        updateInputs();
         updateCamera();
+        updateInputs();
         ImGui::Image(
             reinterpret_cast<ImTextureID>(coreSets.imageSampler->vkDescriptorSet),
             ImVec2{size->x, size->y});
-        onSyncChildren();
+        if (context->getEditorContext().editorRepository.editorMode == EditorMode::EditorMode::TRANSFORM) {
+            gizmoPanel->onSync();
+        }
+        headerPanel->onSync();
+        cameraPanel->onSync();
     }
 
     void ViewportPanel::updateCamera() {
-        auto &cameraRepository = context->getEngineContext().cameraRepository;
-        auto &cameraMovementService = context->getEngineContext().cameraMovementService;
-        auto &editorRepository = context->getEditorContext().editorRepository;
-
-        auto *camera = editorRepository.viewportCamera[dock->id];
-        if (camera == nullptr) {
-            camera = new Camera{};
-            editorRepository.viewportCamera[dock->id] = camera;
-            camera->pitch = -(glm::pi<float>() / 4);
-            camera->yaw = glm::pi<float>() / 4;
-            camera->position.x = 10;
-            camera->position.y = 10;
-            camera->position.z = 10;
-        }
-        cameraRepository.currentCamera = camera;
+        auto &worldRepository = context->getEngineContext().worldRepository;
+        const auto &cameraService = context->getEngineContext().cameraService;
 
         if (ImGui::IsWindowHovered() && !ImGuizmo::IsUsing() && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-            cameraMovementService.handleInput(*camera, isFirstMovement);
+            cameraService.handleInput(isFirstMovement);
             if (const auto &io = ImGui::GetIO(); io.MouseWheel != 0) {
-                cameraRepository.movementSensitivity += io.MouseWheel * 100 * context->getEngineContext().deltaTime;
-                cameraRepository.movementSensitivity = std::max(.1f, cameraRepository.movementSensitivity);
+                worldRepository.camera.movementSensitivity += io.MouseWheel * 100 * context->getEngineContext().
+                        deltaTime;
+                worldRepository.camera.movementSensitivity =
+                        std::max(.1f, worldRepository.camera.movementSensitivity);
             }
             isFirstMovement = false;
         } else {
@@ -62,14 +60,14 @@ namespace Metal {
         auto &repo = context->getEngineContext().runtimeRepository;
         const ImVec2 windowSize = ImGui::GetWindowSize();
         size->x = windowSize.x;
-        size->y = windowSize.y - DockSpacePanel::FRAME_SIZE;
+        size->y = windowSize.y;
 
         repo.viewportH = size->y;
         repo.viewportW = size->x;
 
         const ImVec2 windowPos = ImGui::GetWindowPos();
         repo.viewportX = windowPos.x;
-        repo.viewportY = windowPos.y + DockSpacePanel::FRAME_SIZE;
+        repo.viewportY = windowPos.y;
 
         repo.isFocused = ImGui::IsWindowHovered();
         repo.forwardPressed = ImGui::IsKeyDown(ImGuiKey_W);

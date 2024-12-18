@@ -12,7 +12,6 @@ namespace Metal {
         std::string formattedDate;
         std::string formattedSize;
         bool isHovered = false;
-        const std::string id = Util::uuidV4();
         std::vector<FileEntry *> children{};
         FileEntry *parent = nullptr;
 

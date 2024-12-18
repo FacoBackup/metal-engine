@@ -4,7 +4,7 @@
 #include "../../../context/ApplicationContext.h"
 #include "../../../common/interface/Icons.h"
 #include "../../repository/dock/DockDTO.h"
-#include "../../common/UIUtil.h"
+#include "../../../common/util/UIUtil.h"
 
 namespace Metal {
     const ImVec2 DockSpacePanel::DEFAULT{-1.f, -1.f};
@@ -15,7 +15,6 @@ namespace Metal {
 
     void DockSpacePanel::onInitialize() {
         initializeView();
-        isNotCenter = dock->direction != CENTER;
     }
 
     void DockSpacePanel::initializeView() {
@@ -42,7 +41,7 @@ namespace Metal {
             sizeInitialized = true;
         }
         beforeWindow();
-        if (ImGui::Begin(dock->internalId, &UIUtil::OPEN, FLAGS)) {
+        if (ImGui::Begin(dock->internalId, &UIUtil::OPEN, (dock->direction != CENTER ? FLAGS : FLAGS_CENTER))) {
             view->isWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
             sizeInternal = ImGui::GetWindowSize();
             size.x = sizeInternal.x;
@@ -52,7 +51,9 @@ namespace Metal {
             dock->sizeY = size.y;
 
             position = ImGui::GetWindowPos();
-            renderHeader();
+            if (dock->direction != CENTER) {
+                renderHeader();
+            }
             view->onSync();
         }
         ImGui::End();
@@ -81,7 +82,7 @@ namespace Metal {
             }
             ImGui::PopStyleVar();
 
-            if (isNotCenter) {
+            if (dock->direction != CENTER) {
                 UIUtil::DynamicSpacing(55);
                 if (UIUtil::ButtonSimple(
                     (isDownDirection ? Icons::horizontal_split : Icons::vertical_split) + id + "splitView",
@@ -105,7 +106,6 @@ namespace Metal {
                             dockRepository.bottom.insert(
                                 dockRepository.bottom.begin() + Util::indexOf(dockRepository.bottom, dock) + 1,
                                 dto);
-
                             break;
                         default:
                             break;

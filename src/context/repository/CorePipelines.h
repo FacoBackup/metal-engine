@@ -17,7 +17,6 @@ namespace Metal {
 
         PipelineInstance *debugPipeline = nullptr;
         PipelineInstance *gridPipeline = nullptr;
-        MeshInstance *sampleMesh = nullptr;
     };
 } // Metal
 

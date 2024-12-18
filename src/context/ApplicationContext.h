@@ -55,12 +55,16 @@ namespace Metal {
         }
 
 
-        [[nodiscard]] std::string getAssetsDirectory() const {
-            return rootDirectory + "/assets/";
+        [[nodiscard]] std::string getAssetRefDirectory() const {
+            return rootDirectory + "/assets-ref/";
         }
 
         [[nodiscard]] std::string getShadersDirectory() const {
             return rootDirectory + "/shaders/";
+        }
+
+        [[nodiscard]] std::string getAssetDirectory() const {
+            return rootDirectory + "/assets/";
         }
 
         void start();

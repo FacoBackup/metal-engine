@@ -5,6 +5,7 @@
 #include "../context/runtime/RenderPass.h"
 #include "render-pass/impl/OpaqueRenderPass.h"
 #include "render-pass/tools/GridRenderPass.h"
+#include "service/camera/Camera.h"
 
 namespace Metal {
     EngineContext::EngineContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {
@@ -21,15 +22,15 @@ namespace Metal {
             start = Clock::now().time_since_epoch().count();
         }
 
-        cameraSystem.onSync();
+        cameraService.onSync();
         if (globalDataNeedsUpdate) {
             globalDataNeedsUpdate = false;
-            globalDataUBO.proj = cameraRepository.projectionMatrix;
-            globalDataUBO.view = cameraRepository.viewMatrix;
-            globalDataUBO.projView = cameraRepository.projViewMatrix;
-            globalDataUBO.invProj = cameraRepository.invProjectionMatrix;
-            globalDataUBO.invView = cameraRepository.invViewMatrix;
-            globalDataUBO.cameraWorldPosition = cameraRepository.currentCamera->position;
+            globalDataUBO.proj = worldRepository.camera.projectionMatrix;
+            globalDataUBO.view = worldRepository.camera.viewMatrix;
+            globalDataUBO.projView = worldRepository.camera.projViewMatrix;
+            globalDataUBO.invProj = worldRepository.camera.invProjectionMatrix;
+            globalDataUBO.invView = worldRepository.camera.invViewMatrix;
+            globalDataUBO.cameraWorldPosition = worldRepository.camera.position;
             context.getVulkanContext().coreBuffers.globalData->update(&globalDataUBO);
         }
 

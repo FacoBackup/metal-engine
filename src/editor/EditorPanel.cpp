@@ -1,5 +1,5 @@
 #include "EditorPanel.h"
-#include "common/UIUtil.h"
+#include "../common/util/UIUtil.h"
 #include "../context/ApplicationContext.h"
 
 namespace Metal {
@@ -13,7 +13,7 @@ namespace Metal {
     const char *EditorPanel::NAME = "##main_window";
     const char *EditorPanel::NAME_HEADER = "##header_window";
     ImVec2 EditorPanel::CENTER(0.0f, 0.0f);
-    float EditorPanel::HEADER_HEIGHT = 62;
+    float EditorPanel::HEADER_HEIGHT = 58;
 
 
     void EditorPanel::renderDockSpaces() {

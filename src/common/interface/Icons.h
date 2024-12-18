@@ -1,7 +1,6 @@
 #ifndef METAL_ENGINE_ICONS_H
 #define METAL_ENGINE_ICONS_H
 
-#include <imgui.h>
 #include <string>
 
 namespace Metal::Icons {

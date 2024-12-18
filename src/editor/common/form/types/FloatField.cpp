@@ -1,5 +1,7 @@
 #include "FloatField.h"
 
+#include <imgui.h>
+
 namespace Metal {
     void FloatField::onSync() {
         if (field.disabled) {

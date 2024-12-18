@@ -30,7 +30,8 @@ namespace Metal {
             updateProjectName("New project");
         }
         FilesUtil::MkDir(getShadersDirectory());
-        FilesUtil::MkDir(getAssetsDirectory());
+        FilesUtil::MkDir(getAssetRefDirectory());
+        FilesUtil::MkDir(getAssetDirectory());
     }
 
     void ApplicationContext::updateProjectName(const std::string &projectName) {

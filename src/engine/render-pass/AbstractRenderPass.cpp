@@ -5,6 +5,15 @@
 #include "../../context/runtime/BufferInstance.h"
 
 namespace Metal {
+    AbstractRenderPass::AbstractRenderPass(ApplicationContext &context) : AbstractRuntimeComponent(context),
+                                                                          worldRepository(
+                                                                              context.getEngineContext().
+                                                                              worldRepository),
+                                                                          streamingRepository(
+                                                                              context.getEngineContext().
+                                                                              streamingRepository) {
+    }
+
     void AbstractRenderPass::recordPushConstant(const void *data) {
         vkCmdPushConstants(
             vkCommandBuffer,
@@ -19,7 +28,7 @@ namespace Metal {
         vkCmdDraw(vkCommandBuffer, vertexCount, instanceCount, 0, 0);
     }
 
-    void AbstractRenderPass::bindMesh(const MeshInstance *instance, const uint32_t instanceCount) const {
+    void AbstractRenderPass::drawMesh(const MeshInstance *instance, const uint32_t instanceCount) const {
         constexpr VkDeviceSize offsets[] = {0};
         vkCmdBindVertexBuffers(vkCommandBuffer, 0, 1, &instance->dataBuffer->vkBuffer, offsets);
         vkCmdBindIndexBuffer(vkCommandBuffer, instance->indexBuffer->vkBuffer, 0, VK_INDEX_TYPE_UINT32);

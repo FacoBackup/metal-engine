@@ -12,8 +12,6 @@ namespace Metal {
 
     class AbstractDockPanel : public AbstractPanel {
     public:
-        virtual ~AbstractDockPanel() = default;
-
         bool isWindowFocused = false;
         ImVec2 *position = nullptr;
         glm::vec2 *size = nullptr;

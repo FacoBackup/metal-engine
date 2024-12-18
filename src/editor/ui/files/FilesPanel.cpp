@@ -4,14 +4,36 @@
 #include "../../../common/interface/Icons.h"
 #include "../../../common/util/files/FilesUtil.h"
 #include "../../../context/ApplicationContext.h"
-#include "../../common/UIUtil.h"
+#include "../../../common/util/UIUtil.h"
 #include "../../../common/util/files/FileEntry.h"
 #include "FilesContext.h"
+#include "../../../common/util/files/FileDialogUtil.h"
+#include "../../../engine/service/world/components/MeshComponent.h"
 
 namespace Metal {
+    std::string FilesPanel::getActionLabel() {
+        return Icons::file_open + "Import file";
+    }
+
+    std::function<void()> FilesPanel::onAction() {
+        return [this]() {
+            auto files = FileDialogUtil::PickFiles({{"Mesh", "fbx,gltf,obj,glb"}, {"Image", "png,jpg,jpeg"}});
+            for (const std::string &file: files) {
+                if (context->getEditorContext().meshImporter.isCompatible(file)) {
+                    context->getEditorContext().meshImporter.importMesh(filesContext.currentDirectory->absolutePath,
+                                                                        file);
+                } else if (context->getEditorContext().textureImporter.isCompatible(file)) {
+                    context->getEditorContext().textureImporter.importTexture(
+                        filesContext.currentDirectory->absolutePath, file);
+                }
+            }
+            FilesService::GetEntries(filesContext.currentDirectory);
+        };
+    }
+
     void FilesPanel::onInitialize() {
         filesContext.setCurrentDirectory(context->getEditorContext().filesService.getRoot());
-        appendChild(new FilesHeader(filesContext));
+        appendChild(new FilesHeader(filesContext, getActionLabel(), onAction()));
     }
 
     void FilesPanel::handleDrag() const {
@@ -20,7 +42,7 @@ namespace Metal {
             UIUtil::AUX_VEC2.x += 10;
             UIUtil::AUX_VEC2.y += 10;
             ImGui::SetNextWindowPos(UIUtil::AUX_VEC2);
-            ImGui::Begin((onDrag->id + "drag").c_str(), &UIUtil::OPEN,
+            ImGui::Begin((onDrag->getId() + "drag").c_str(), &UIUtil::OPEN,
                          ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
             ImGui::Text("Dragging Node %s", onDrag->name.c_str());
             ImGui::End();
@@ -40,7 +62,7 @@ namespace Metal {
             float size = std::round(ImGui::GetWindowSize().x / CARD_SIZE) * CARD_SIZE - CARD_SIZE;
             int rowIndex = 1;
             for (auto &child: filesContext.currentDirectory->children) {
-                const bool isSelected = filesContext.selected.contains(child->id) || child->isHovered && onDrag !=
+                const bool isSelected = filesContext.selected.contains(child->getId()) || child->isHovered && onDrag !=
                                         nullptr;
                 ImGui::PushStyleColor(ImGuiCol_ChildBg, isSelected
                                                             ? context->getEditorContext().editorRepository.accent
@@ -65,7 +87,7 @@ namespace Metal {
     void FilesPanel::renderItem(FileEntry *root) {
         UIUtil::AUX_VEC2.x = CARD_SIZE;
         UIUtil::AUX_VEC2.y = CARD_SIZE + 15;
-        if (ImGui::BeginChild(root->id.c_str(), UIUtil::AUX_VEC2, ImGuiChildFlags_Border)) {
+        if (ImGui::BeginChild(root->getId().c_str(), UIUtil::AUX_VEC2, ImGuiChildFlags_Border)) {
             root->isHovered = ImGui::IsWindowHovered();
             isSomethingHovered = isSomethingHovered || root->isHovered;
             onClick(root);
@@ -86,7 +108,7 @@ namespace Metal {
             UIUtil::AUX_VEC2.y = ImGui::GetContentRegionAvail().y - TEXT_OFFSET;
             ImGui::Dummy(UIUtil::AUX_VEC2);
             ImGui::Separator();
-            if (filesContext.toCut.contains(root->id)) {
+            if (filesContext.toCut.contains(root->getId())) {
                 ImGui::TextDisabled(root->name.c_str());
             } else {
                 ImGui::Text(root->name.c_str());
@@ -175,7 +197,7 @@ namespace Metal {
 
     void FilesPanel::selectAll() {
         for (auto &entry: filesContext.currentDirectory->children) {
-            filesContext.selected[entry->id] = entry;
+            filesContext.selected[entry->getId()] = entry;
         }
     }
 
@@ -188,10 +210,10 @@ namespace Metal {
             if (!ImGui::IsKeyDown(ImGuiKey_LeftCtrl)) {
                 filesContext.selected.clear();
             }
-            if (filesContext.selected.contains(root->id) && ImGui::IsKeyDown(ImGuiKey_LeftCtrl)) {
-                filesContext.selected.erase(root->id);
+            if (filesContext.selected.contains(root->getId()) && ImGui::IsKeyDown(ImGuiKey_LeftCtrl)) {
+                filesContext.selected.erase(root->getId());
             } else {
-                filesContext.selected[root->id] = root;
+                filesContext.selected[root->getId()] = root;
             }
         }
         if (root->isHovered && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
@@ -202,8 +224,9 @@ namespace Metal {
     void FilesPanel::openResource(FileEntry *root) {
         switch (root->type) {
             case EntryType::MESH: {
-                context->getVulkanContext().corePipelines.sampleMesh = context->getVulkanContext().meshService.
-                        createMesh(root->associatedFiles[0]);
+                auto id = context->getEngineContext().worldRepository.createEntity();
+                context->getEngineContext().worldRepository.createComponent(id, ComponentTypes::ComponentType::MESH);
+                context->getEngineContext().worldRepository.meshes[id]->meshId = root->getId();
                 break;
             }
             case EntryType::DIRECTORY: {

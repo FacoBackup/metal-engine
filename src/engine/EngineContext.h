@@ -1,20 +1,19 @@
 #ifndef METAL_ENGINE_ENGINECONTEXT_H
 #define METAL_ENGINE_ENGINECONTEXT_H
 
-#include "repository/RuntimeRepository.h"
-#include "repository/camera/CameraRepository.h"
-#include "service/camera/CameraMovementService.h"
-#include "system/camera/CameraSystem.h"
+#include "RuntimeRepository.h"
+#include "service/camera/CameraService.h"
 #include "../context/repository/GlobalDataUBO.h"
 #include "render-pass/AbstractRenderPass.h"
+#include "service/streaming/StreamingRepository.h"
+#include "service/world/WorldRepository.h"
+#include "service/world/impl/WorldGridRepository.h"
 
 using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
 
 namespace Metal {
     class EngineContext final : public AbstractRuntimeComponent {
-        TimePoint currentTime;
-        TimePoint previousTime = Clock::now();
         GlobalDataUBO globalDataUBO{};
         long long start = -1;
 
@@ -23,18 +22,16 @@ namespace Metal {
     public:
         explicit EngineContext(ApplicationContext &context);
 
+        TimePoint currentTime;
+        TimePoint previousTime = Clock::now();
         float deltaTime = 0;
         bool globalDataNeedsUpdate = true;
 
-        // ----------- SYSTEMS / SERVICE
-        CameraMovementService cameraMovementService{context};
-        CameraSystem cameraSystem{context};
-        // ----------- SYSTEMS
-
-        // ----------- REPOSITORIES
-        CameraRepository cameraRepository{context};
+        WorldGridRepository worldGridRepository{context};
+        CameraService cameraService{context};
+        WorldRepository worldRepository{};
         RuntimeRepository runtimeRepository{};
-        // ----------- REPOSITORIES
+        StreamingRepository streamingRepository{context};
 
         void onSync() override;
     };
