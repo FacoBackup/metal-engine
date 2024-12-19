@@ -3,7 +3,7 @@
 #include "MeshPushConstant.h"
 #include "../ApplicationContext.h"
 #include "../../common/util/VulkanUtils.h"
-#include "../runtime/MeshData.h"
+#include "../runtime/assets/MeshData.h"
 #include "../runtime/PipelineInstance.h"
 #include "../service//PipelineService.h"
 

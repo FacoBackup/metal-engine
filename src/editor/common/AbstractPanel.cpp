@@ -1,4 +1,5 @@
 #include "AbstractPanel.h"
+#include "../../common/util/Util.h"
 
 namespace Metal {
     void AbstractPanel::appendChild(AbstractPanel *panel) {
@@ -11,6 +12,9 @@ namespace Metal {
         for (const auto panel: children) {
             panel->onSync();
         }
+    }
+
+    AbstractPanel::AbstractPanel(): id("##" + Util::uuidV4()) {
     }
 
     void AbstractPanel::removeAllChildren() {

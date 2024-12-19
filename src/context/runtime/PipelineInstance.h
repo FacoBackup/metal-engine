@@ -17,6 +17,10 @@ namespace Metal {
         uint32_t pushConstantsSize = 0;
 
         void dispose(VulkanContext &context) override;
+
+        ResourceType resourceType() override {
+            return PIPELINE;
+        }
     };
 }
 #endif //PIPELINEINSTANCE_H

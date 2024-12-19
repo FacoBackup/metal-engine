@@ -24,6 +24,10 @@ namespace Metal {
             vkDestroyFramebuffer(context.device.device, vkFramebuffer, nullptr);
             vkDestroyRenderPass(context.device.device, vkRenderPass, nullptr);
         }
+
+        ResourceType resourceType() override {
+            return FRAMEBUFFER;
+        }
     };
 }
 

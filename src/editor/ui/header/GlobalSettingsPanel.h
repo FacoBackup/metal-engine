@@ -4,11 +4,18 @@
 #include "../../common/AbstractPanel.h"
 
 namespace Metal {
+    class GlobalSettingsPanel final : public AbstractPanel {
+        void cameraMode() const;
 
-    class GlobalSettingsPanel : public AbstractPanel {
+        void shadingMode();
 
+        int editorMode = 0;
+        int shadingModelOption = 0;
+        const char *options = "Add Entity\0Mesh\0";
+
+    public:
+        void onSync() override;
     };
-
 } // Metal
 
 #endif

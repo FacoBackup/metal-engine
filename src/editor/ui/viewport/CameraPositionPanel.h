@@ -1,6 +1,6 @@
 #ifndef CAMERAPOSITIONPANEL_H
 #define CAMERAPOSITIONPANEL_H
-#include <glm/glm.hpp>
+#include <imgui.h>
 #include <glm/ext/scalar_constants.hpp>
 
 #include "../../common/AbstractPanel.h"

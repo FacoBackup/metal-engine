@@ -6,6 +6,7 @@ namespace Metal {
         LIST,
         COMPOSITE,
         CUSTOM,
+        RESOURCE,
         COLOR,
         OPTIONS,
         STRING,
@@ -15,7 +16,7 @@ namespace Metal {
         VECTOR2,
         VECTOR3,
         VECTOR4,
-        QUATERNION,
+        QUAT,
         METHOD
     };
 }

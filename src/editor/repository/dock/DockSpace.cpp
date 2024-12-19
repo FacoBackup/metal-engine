@@ -16,22 +16,20 @@ namespace Metal {
     DockSpace DockSpace::CONSOLE{3, "Console", Icons::terminal, 4, 4, CB(ConsolePanel)};
     DockSpace DockSpace::FILES{4, "Files", Icons::folder_open, 4, 4, CB(FilesPanel)};
     DockSpace DockSpace::METRICS{5, "Metrics", Icons::bar_chart, 4, 4, CB(MetricsPanel)};
-    const char *DockSpace::OPTIONS = "Viewport\0Inspector\0Hierarchy\0Console\0Files\0Metrics";
+    const char *DockSpace::OPTIONS = "Inspector\0Hierarchy\0Console\0Files\0Metrics";
 
 
     DockSpace *DockSpace::GetOption(const int selected) {
         switch (selected) {
             case 0:
-                return &VIEWPORT;
-            case 1:
                 return &INSPECTOR;
-            case 2:
+            case 1:
                 return &HIERARCHY;
-            case 3:
+            case 2:
                 return &CONSOLE;
-            case 4:
+            case 3:
                 return &FILES;
-            case 5:
+            case 4:
                 return &METRICS;
             default:
                 return nullptr;

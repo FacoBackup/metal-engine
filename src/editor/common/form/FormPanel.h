@@ -1,5 +1,7 @@
 #ifndef FORMPANEL_H
 #define FORMPANEL_H
+#include <unordered_map>
+
 #include "AccordionPanel.h"
 #include "../AbstractPanel.h"
 

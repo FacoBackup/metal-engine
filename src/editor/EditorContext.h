@@ -6,8 +6,9 @@
 #include "repository/dock/DockRepository.h"
 #include "service/ThemeService.h"
 #include "../common/interface/AbstractRuntimeComponent.h"
-#include "repository/FilesService.h"
-#include "service/import/MeshImporter.h"
+#include "service/FilesService.h"
+#include "service/SelectionService.h"
+#include "service/import/SceneImporter.h"
 #include "service/import/TextureImporter.h"
 
 namespace Metal {
@@ -17,9 +18,10 @@ namespace Metal {
         DockService dockService{context};
         DockRepository dockRepository{context};
         EditorRepository editorRepository{};
+        SelectionService selectionService{context};
 
         // ------ IMPORTERS
-        MeshImporter meshImporter{context};
+        SceneImporter meshImporter{context};
         TextureImporter textureImporter{context};
         // ------ IMPORTERS
 

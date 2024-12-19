@@ -5,16 +5,16 @@
 #include <filesystem>
 
 #include "../../../common/util/files/FileMetadata.h"
-#include "TextureData.h"
 #include "../../../common/util/files/EntryType.h"
 #include "../../../common/util/files/FilesUtil.h"
 #include "../../../context/ApplicationContext.h"
-#include "../../../engine/LevelOfDetail.h"
+#include "../../../context/runtime/assets/TextureData.h"
+#include "../../../engine/enum/LevelOfDetail.h"
 
 namespace fs = std::filesystem;
 
 namespace Metal {
-    void TextureImporter::importTexture(const std::string &targetDir, const std::string &pathToFile) {
+    void TextureImporter::importTexture(const std::string &targetDir, const std::string &pathToFile) const {
         auto metadata = FileMetadata{};
         metadata.type = EntryType::TEXTURE;
         metadata.name = fs::path(pathToFile).filename().string();
@@ -26,20 +26,19 @@ namespace Metal {
             throw std::runtime_error("Failed to load image: " + pathToFile);
         }
         const auto textureData = TextureData{width, height, channels, data};
-
-        reduceImage(metadata.associatedFiles, metadata.getId(), targetDir, textureData, LevelOfDetail::LOD_0);
-        reduceImage(metadata.associatedFiles, metadata.getId(), targetDir, textureData, LevelOfDetail::LOD_1);
-        reduceImage(metadata.associatedFiles, metadata.getId(), targetDir, textureData, LevelOfDetail::LOD_2);
-        reduceImage(metadata.associatedFiles, metadata.getId(), targetDir, textureData, LevelOfDetail::LOD_3);
-
-        FilesUtil::WriteFile((targetDir + '/' + metadata.getId() + FILE_METADATA).c_str(),
+        FilesUtil::WriteFile((targetDir + '/' + FORMAT_FILE_METADATA(metadata.getId())).c_str(),
                              metadata.serialize().c_str());
+
+        reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_0);
+        reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_1);
+        reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_2);
+        reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_3);
+
         stbi_image_free(textureData.data);
     }
 
-    void TextureImporter::reduceImage(std::vector<std::string> &paths, const std::string &fileId,
-                                      const std::string &targetDir,
-                                      const TextureData &textureData, const LevelOfDetail &levelOfDetail) {
+    void TextureImporter::reduceImage(const std::string &fileId,
+                                      const TextureData &textureData, const LevelOfDetail &levelOfDetail) const {
         const int newWidth = textureData.width / levelOfDetail.level;
         const int newHeight = textureData.height / levelOfDetail.level;
 
@@ -58,14 +57,12 @@ namespace Metal {
             }
         }
 
-        const std::string newPath = targetDir + "/" +
-                                    LevelOfDetail::GetFormattedName(fileId, levelOfDetail, EntryType::TEXTURE);
-        paths.push_back(newPath);
-        if (!stbi_write_png(newPath.c_str(), newWidth, newHeight, textureData.channels, resizedData,
+        if (!stbi_write_png((context.getAssetDirectory() + FORMAT_FILE_TEXTURE(fileId, levelOfDetail)).c_str(),
+                            newWidth, newHeight, textureData.channels, resizedData,
                             newWidth * textureData.channels)) {
             stbi_image_free(textureData.data);
             delete[] resizedData;
-            throw std::runtime_error("Failed to write resized image: " + newPath);
+            throw std::runtime_error("Failed to write resized image");
         }
 
         delete[] resizedData;

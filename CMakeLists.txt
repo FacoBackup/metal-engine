@@ -29,14 +29,10 @@ add_executable(
         src/editor/common/AbstractPanel.h
         src/editor/common/AbstractPanel.cpp
         src/common/interface/Synchornizable.h
-        src/engine/system/camera/CameraSystem.cpp
-        src/engine/system/camera/CameraSystem.h
-        src/engine/repository/camera/CameraRepository.h
-        src/engine/repository/camera/Camera.h
-        src/engine/repository/camera/Frustum.cpp
-        src/engine/repository/camera/Frustum.h
+        src/engine/service/camera/CameraService.cpp
+        src/engine/service/camera/CameraService.h
+        src/engine/service/camera/Camera.h
         src/common/util/Util.h
-        src/common/interface/Identifiable.h
         src/common/inspection/Inspectable.h
         src/common/inspection/Inspectable.cpp
         src/common/inspection/InspectedField.h
@@ -50,7 +46,6 @@ add_executable(
         src/common/inspection/InspectableMember.h
         src/common/interface/AbstractRuntimeComponent.h
         src/common/interface/AbstractRepository.h
-        src/engine/repository/camera/CameraRepository.cpp
         src/common/interface/AbstractRepository.cpp
         src/editor/common/form/types/BooleanField.cpp
         src/editor/common/form/types/BooleanField.h
@@ -60,7 +55,7 @@ add_executable(
         src/editor/common/form/types/FloatField.h
         src/editor/common/form/types/MethodField.cpp
         src/editor/common/form/types/MethodField.h
-        src/editor/common/UIUtil.h
+        src/common/util/UIUtil.h
         src/editor/ui/header/EditorHeaderPanel.cpp
         src/editor/ui/header/EditorHeaderPanel.h
         src/editor/ui/header/GlobalSettingsPanel.cpp
@@ -83,7 +78,7 @@ add_executable(
         src/editor/service/ThemeService.h
         src/editor/repository/EditorRepository.cpp
         src/editor/repository/EditorRepository.h
-        src/common/interface/engine-definitions.h
+        src/engine/engine-definitions.h
         src/editor/ui/metrics/MetricsPanel.cpp
         src/editor/ui/metrics/MetricsPanel.h
         src/editor/ui/files/FilesPanel.cpp
@@ -128,9 +123,7 @@ add_executable(
         src/context/runtime/DescriptorInstance.cpp
         src/context/runtime/DescriptorInstance.h
         src/context/repository/GlobalDataUBO.h
-        src/engine/service/camera/CameraMovementService.cpp
-        src/engine/service/camera/CameraMovementService.h
-        src/engine/repository/RuntimeRepository.h
+        src/engine/RuntimeRepository.h
         src/context/repository/CoreDescriptorSets.cpp
         src/context/repository/CoreDescriptorSets.h
         src/context/runtime/BufferInstance.cpp
@@ -138,7 +131,7 @@ add_executable(
         src/context/runtime/PipelineInstance.cpp
         src/context/service/MeshService.cpp
         src/context/service/MeshService.h
-        src/context/runtime/MeshData.h
+        src/context/runtime/assets/MeshData.h
         src/context/runtime/MeshInstance.cpp
         src/context/runtime/MeshInstance.h
         src/common/util/files/FilesUtil.h
@@ -148,22 +141,22 @@ add_executable(
         src/common/util/files/FileDialogUtil.h
         src/editor/ui/files/FilesHeader.cpp
         src/editor/ui/files/FilesHeader.h
-        src/editor/service/import/MeshImporter.cpp
-        src/editor/service/import/MeshImporter.h
+        src/editor/service/import/SceneImporter.cpp
+        src/editor/service/import/SceneImporter.h
         src/editor/service/import/AbstractImporter.h
-        src/engine/LevelOfDetail.h
-        src/engine/LevelOfDetail.cpp
+        src/engine/enum/LevelOfDetail.h
+        src/engine/enum/LevelOfDetail.cpp
         src/editor/service/import/TextureImporter.cpp
         src/editor/service/import/TextureImporter.h
         src/common/util/files/FileMetadata.h
-        src/editor/service/import/TextureData.h
+        src/context/runtime/assets/TextureData.h
         src/context/service/TextureService.cpp
         src/context/service/TextureService.h
-        src/editor/repository/FilesService.cpp
-        src/editor/repository/FilesService.h
+        src/editor/service/FilesService.cpp
+        src/editor/service/FilesService.h
         src/editor/ui/files/FilesContext.cpp
         src/context/repository/MeshPushConstant.h
-        src/context/runtime/VertexData.h
+        src/context/runtime/assets/VertexData.h
         src/editor/ui/viewport/CameraPositionPanel.cpp
         src/editor/ui/viewport/CameraPositionPanel.h
         src/engine/render-pass/tools/GridRenderPass.cpp
@@ -172,6 +165,65 @@ add_executable(
         src/context/runtime/RenderPass.h
         src/context/repository/CoreRenderPasses.cpp
         src/context/repository/CoreRenderPasses.h
+        src/engine/service/camera/Camera.cpp
+        src/engine/service/world/WorldRepository.cpp
+        src/engine/service/world/WorldRepository.h
+        src/engine/service/world/impl/Entity.h
+        src/engine/enum/ComponentType.h
+        src/engine/service/world/impl/AbstractComponent.h
+        src/engine/service/world/components/MeshComponent.h
+        src/engine/service/world/components/TransformComponent.h
+        src/engine/enum/ShadingMode.h
+        src/engine/enum/EditorMode.h
+        src/editor/ui/hierarchy/HierarchyHeaderPanel.cpp
+        src/editor/ui/hierarchy/HierarchyHeaderPanel.h
+        src/editor/service/SelectionService.cpp
+        src/editor/service/SelectionService.h
+        src/engine/service/world/impl/Entity.cpp
+        src/engine/service/world/components/TransformComponent.cpp
+        src/engine/service/world/components/MeshComponent.cpp
+        src/editor/common/form/types/ResourceField.cpp
+        src/editor/common/form/types/ResourceField.h
+        src/editor/common/form/types/ColorField.cpp
+        src/editor/common/form/types/ColorField.h
+        src/editor/common/form/types/Vec4Field.cpp
+        src/editor/common/form/types/Vec4Field.h
+        src/editor/common/form/types/Vec3Field.cpp
+        src/editor/common/form/types/Vec3Field.h
+        src/editor/common/form/types/Vec2Field.cpp
+        src/editor/common/form/types/Vec2Field.h
+        src/editor/common/form/types/StringField.cpp
+        src/editor/common/form/types/StringField.h
+        src/editor/common/form/types/ResourceFilesPanel.h
+        src/editor/common/form/types/ResourceFilesPanel.cpp
+        src/engine/service/streaming/StreamingRepository.cpp
+        src/engine/service/streaming/StreamingRepository.h
+        src/context/runtime/ResourceType.h
+        src/editor/ui/viewport/GizmoPanel.cpp
+        src/editor/ui/viewport/GizmoPanel.h
+        src/editor/ui/viewport/ViewportHeaderPanel.cpp
+        src/editor/ui/viewport/ViewportHeaderPanel.h
+        src/editor/ui/viewport/GizmoSettingsPanel.cpp
+        src/editor/ui/viewport/GizmoSettingsPanel.h
+        src/editor/ui/viewport/PaintingSettingsPanel.cpp
+        src/editor/ui/viewport/PaintingSettingsPanel.h
+        src/editor/common/form/types/QuatField.cpp
+        src/editor/common/form/types/QuatField.h
+        src/engine/service/TransformService.cpp
+        src/engine/service/TransformService.h
+        src/engine/service/world/impl/WorldGridRepository.cpp
+        src/engine/service/world/impl/WorldGridRepository.h
+        src/engine/service/world/impl/WorldTile.h
+        src/engine/service/world/impl/BoundingBox.h
+        src/engine/service/voxel/impl/SparseVoxelOctree.cpp
+        src/engine/service/voxel/impl/SparseVoxelOctree.h
+        src/engine/service/voxel/impl/OctreeNode.cpp
+        src/engine/service/voxel/impl/OctreeNode.h
+        src/engine/service/voxel/impl/VoxelData.h
+        src/engine/service/voxel/VoxelizerService.cpp
+        src/engine/service/voxel/VoxelizerService.h
+        src/context/runtime/assets/SceneData.h
+        src/context/runtime/assets/EntityAssetData.h
 )
 
 
