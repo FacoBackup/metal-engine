@@ -27,6 +27,8 @@ namespace Metal {
 
         void onInitialize() override;
 
+        void contextMenu();
+
         void handleDrag() const;
 
         void handleDragDrop(FileEntry *fileEntry);

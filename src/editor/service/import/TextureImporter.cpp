@@ -5,10 +5,10 @@
 #include <filesystem>
 
 #include "../../../common/util/files/FileMetadata.h"
-#include "TextureData.h"
 #include "../../../common/util/files/EntryType.h"
 #include "../../../common/util/files/FilesUtil.h"
 #include "../../../context/ApplicationContext.h"
+#include "../../../context/runtime/assets/TextureData.h"
 #include "../../../engine/enum/LevelOfDetail.h"
 
 namespace fs = std::filesystem;
@@ -26,7 +26,7 @@ namespace Metal {
             throw std::runtime_error("Failed to load image: " + pathToFile);
         }
         const auto textureData = TextureData{width, height, channels, data};
-        FilesUtil::WriteFile((targetDir + '/' + metadata.getId() + FILE_METADATA).c_str(),
+        FilesUtil::WriteFile((targetDir + '/' + FORMAT_FILE_METADATA(metadata.getId())).c_str(),
                              metadata.serialize().c_str());
 
         reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_0);
@@ -57,8 +57,7 @@ namespace Metal {
             }
         }
 
-        if (!stbi_write_png((context.getAssetDirectory() +
-                             LevelOfDetail::GetFormattedName(fileId, levelOfDetail, EntryType::TEXTURE)).c_str(),
+        if (!stbi_write_png((context.getAssetDirectory() + FORMAT_FILE_TEXTURE(fileId, levelOfDetail)).c_str(),
                             newWidth, newHeight, textureData.channels, resizedData,
                             newWidth * textureData.channels)) {
             stbi_image_free(textureData.data);

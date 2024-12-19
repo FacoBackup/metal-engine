@@ -1,6 +1,7 @@
 #include "TransformService.h"
 
 #include <iostream>
+#include <glm/gtc/quaternion.hpp>
 
 #include "../../context/ApplicationContext.h"
 #include "world/components/TransformComponent.h"
@@ -40,7 +41,7 @@ namespace Metal {
 
         auxMat42 = glm::identity<glm::mat4>();
         auxMat42 = glm::translate(auxMat42, st->translation); // Translation
-        auxMat42 *= glm::mat4(st->rotation);
+        auxMat42 *= glm::mat4_cast(st->rotation);
         auxMat42 = glm::scale(auxMat42, st->scale); // Scale
 
         glm::mat4 auxMat4 = auxMat4 * auxMat42;

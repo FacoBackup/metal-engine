@@ -24,6 +24,8 @@ namespace Metal {
 
         std::unique_ptr<FileEntry> getResource(const std::string &id);
 
+        void deleteFiles(std::unordered_map<std::string, FileEntry *> &files_context);
+
         static void Move(FileEntry *toMove, FileEntry *targetDir);
 
         static void GetEntries(FileEntry *root);

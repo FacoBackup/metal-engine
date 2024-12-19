@@ -1,8 +1,8 @@
 #ifndef VERTEXDATA_H
 #define VERTEXDATA_H
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-#include <vulkan/vulkan.h>
+#include <../../../../cmake-build-debug/vcpkg_installed/arm64-osx/include/glm/vec2.hpp>
+#include <../../../../cmake-build-debug/vcpkg_installed/arm64-osx/include/glm/vec3.hpp>
+#include <../../../../cmake-build-debug/vcpkg_installed/arm64-osx/include/vulkan/vulkan.h>
 
 namespace Metal {
     struct VertexData final {

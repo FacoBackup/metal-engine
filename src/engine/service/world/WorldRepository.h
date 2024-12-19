@@ -30,7 +30,7 @@ namespace Metal {
 
         EntityID createEntity(std::string name = "New Entity", bool container = false);
 
-        void linkEntities(const Entity *target, Entity *toLink) const;
+        void linkEntities(const Entity *parentEntity, Entity *child) const;
 
         [[nodiscard]] Entity *getEntity(EntityID node) const;
 

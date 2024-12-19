@@ -8,7 +8,7 @@
 #include "../common/interface/AbstractRuntimeComponent.h"
 #include "service/FilesService.h"
 #include "service/SelectionService.h"
-#include "service/import/MeshImporter.h"
+#include "service/import/SceneImporter.h"
 #include "service/import/TextureImporter.h"
 
 namespace Metal {
@@ -21,7 +21,7 @@ namespace Metal {
         SelectionService selectionService{context};
 
         // ------ IMPORTERS
-        MeshImporter meshImporter{context};
+        SceneImporter meshImporter{context};
         TextureImporter textureImporter{context};
         // ------ IMPORTERS
 

@@ -1,9 +1,12 @@
 #include "FilesPanel.h"
 
+#include <cereal/archives/binary.hpp>
+
 #include "FilesHeader.h"
 #include "../../../common/interface/Icons.h"
 #include "../../../common/util/files/FilesUtil.h"
 #include "../../../context/ApplicationContext.h"
+#include "../../../context/runtime/assets/SceneData.h"
 #include "../../../common/util/UIUtil.h"
 #include "../../../common/util/files/FileEntry.h"
 #include "FilesContext.h"
@@ -20,8 +23,8 @@ namespace Metal {
             auto files = FileDialogUtil::PickFiles({{"Mesh", "fbx,gltf,obj,glb"}, {"Image", "png,jpg,jpeg"}});
             for (const std::string &file: files) {
                 if (context->getEditorContext().meshImporter.isCompatible(file)) {
-                    context->getEditorContext().meshImporter.importMesh(filesContext.currentDirectory->absolutePath,
-                                                                        file);
+                    context->getEditorContext().meshImporter.importScene(filesContext.currentDirectory->absolutePath,
+                                                                         file);
                 } else if (context->getEditorContext().textureImporter.isCompatible(file)) {
                     context->getEditorContext().textureImporter.importTexture(
                         filesContext.currentDirectory->absolutePath, file);
@@ -34,6 +37,26 @@ namespace Metal {
     void FilesPanel::onInitialize() {
         filesContext.setCurrentDirectory(context->getEditorContext().filesService.getRoot());
         appendChild(new FilesHeader(filesContext, getActionLabel(), onAction()));
+    }
+
+    void FilesPanel::contextMenu() {
+        auto menuId = (id + "contextMenu").c_str();
+        if (ImGui::BeginPopupContextItem(menuId)) {
+            if (ImGui::MenuItem("Cut")) {
+                cutSelected();
+            }
+            if (ImGui::MenuItem("Paste")) {
+                pasteSelected();
+            }
+            if (ImGui::MenuItem("Delete")) {
+                deleteSelected();
+            }
+            ImGui::EndPopup();
+        }
+
+        if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
+            ImGui::OpenPopup(menuId);
+        }
     }
 
     void FilesPanel::handleDrag() const {
@@ -202,7 +225,7 @@ namespace Metal {
     }
 
     void FilesPanel::deleteSelected() {
-        // filesService.deleteSelected(selected.keySet());
+        context->getEditorContext().filesService.deleteFiles(filesContext.selected);
     }
 
     void FilesPanel::onClick(FileEntry *root) {
@@ -224,9 +247,11 @@ namespace Metal {
     void FilesPanel::openResource(FileEntry *root) {
         switch (root->type) {
             case EntryType::MESH: {
-                auto id = context->getEngineContext().worldRepository.createEntity();
-                context->getEngineContext().worldRepository.createComponent(id, ComponentTypes::ComponentType::MESH);
-                context->getEngineContext().worldRepository.meshes[id]->meshId = root->getId();
+                context->getVulkanContext().meshService.loadMesh(root->name, root->getId());
+                break;
+            }
+            case EntryType::SCENE: {
+                context->getVulkanContext().meshService.loadScene(root->getId());
                 break;
             }
             case EntryType::DIRECTORY: {

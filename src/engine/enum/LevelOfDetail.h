@@ -13,8 +13,6 @@ namespace Metal {
 
         const int level;
         const std::string suffix;
-
-        static std::string GetFormattedName(const std::string &baseName, const LevelOfDetail &lod, EntryType entryType);
     };
 }
 #endif //LEVELOFDETAIL_H

@@ -3,6 +3,7 @@
 #include <vector>
 #include "VertexData.h"
 #include <cereal/types/string.hpp>
+#include <cereal/types/array.hpp>
 #include <cereal/types/vector.hpp>
 
 namespace Metal {

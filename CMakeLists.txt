@@ -131,7 +131,7 @@ add_executable(
         src/context/runtime/PipelineInstance.cpp
         src/context/service/MeshService.cpp
         src/context/service/MeshService.h
-        src/context/runtime/MeshData.h
+        src/context/runtime/assets/MeshData.h
         src/context/runtime/MeshInstance.cpp
         src/context/runtime/MeshInstance.h
         src/common/util/files/FilesUtil.h
@@ -141,22 +141,22 @@ add_executable(
         src/common/util/files/FileDialogUtil.h
         src/editor/ui/files/FilesHeader.cpp
         src/editor/ui/files/FilesHeader.h
-        src/editor/service/import/MeshImporter.cpp
-        src/editor/service/import/MeshImporter.h
+        src/editor/service/import/SceneImporter.cpp
+        src/editor/service/import/SceneImporter.h
         src/editor/service/import/AbstractImporter.h
         src/engine/enum/LevelOfDetail.h
         src/engine/enum/LevelOfDetail.cpp
         src/editor/service/import/TextureImporter.cpp
         src/editor/service/import/TextureImporter.h
         src/common/util/files/FileMetadata.h
-        src/editor/service/import/TextureData.h
+        src/context/runtime/assets/TextureData.h
         src/context/service/TextureService.cpp
         src/context/service/TextureService.h
         src/editor/service/FilesService.cpp
         src/editor/service/FilesService.h
         src/editor/ui/files/FilesContext.cpp
         src/context/repository/MeshPushConstant.h
-        src/context/runtime/VertexData.h
+        src/context/runtime/assets/VertexData.h
         src/editor/ui/viewport/CameraPositionPanel.cpp
         src/editor/ui/viewport/CameraPositionPanel.h
         src/engine/render-pass/tools/GridRenderPass.cpp
@@ -222,6 +222,8 @@ add_executable(
         src/engine/service/voxel/impl/VoxelData.h
         src/engine/service/voxel/VoxelizerService.cpp
         src/engine/service/voxel/VoxelizerService.h
+        src/context/runtime/assets/SceneData.h
+        src/context/runtime/assets/EntityAssetData.h
 )
 
 

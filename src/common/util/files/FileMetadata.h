@@ -2,7 +2,6 @@
 #define FILEMETADATA_H
 
 #include <string>
-#include <vector>
 #include <nlohmann/json.hpp>
 #include "../Util.h"
 #include "EntryType.h"
@@ -17,6 +16,9 @@ namespace Metal {
         std::string name{};
         EntryType type = EntryType::NONE;
 
+        std::string getId() {
+            return id;
+        }
 
         std::string serialize() override {
             const nlohmann::json jsonData = *this;
@@ -29,10 +31,6 @@ namespace Metal {
             this->name = parsedData.name;
             this->id = parsedData.id;
             this->type = parsedData.type;
-        }
-
-        std::string getId() {
-            return id;
         }
 
         NLOHMANN_DEFINE_TYPE_INTRUSIVE(FileMetadata, name, type, id)

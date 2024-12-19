@@ -18,15 +18,15 @@ namespace Metal {
         return lastId;
     }
 
-    void WorldRepository::linkEntities(const Entity *target, Entity *toLink) const {
-        auto *parent = getEntity(toLink->parent);
+    void WorldRepository::linkEntities(const Entity *parentEntity, Entity *child) const {
+        auto *parent = getEntity(child->parent);
         parent->children.erase(
-            std::ranges::remove(parent->children, toLink->getId()).begin(),
+            std::ranges::remove(parent->children, child->getId()).begin(),
             parent->children.end());
 
-        const EntityID id = target != nullptr ? target->getId() : ROOT_ID;
-        getEntity(id)->children.push_back(toLink->getId());
-        toLink->parent = id;
+        const EntityID id = parentEntity != nullptr ? parentEntity->getId() : ROOT_ID;
+        getEntity(id)->children.push_back(child->getId());
+        child->parent = id;
     }
 
     Entity *WorldRepository::getEntity(const EntityID node) const {

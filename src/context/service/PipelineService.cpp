@@ -5,8 +5,8 @@
 #include "../../common/util/VulkanUtils.h"
 #include "../runtime/FrameBufferInstance.h"
 #include "../runtime/PipelineInstance.h"
-#include "../runtime/MeshData.h"
-#include "../runtime/VertexData.h"
+#include "../runtime/assets/MeshData.h"
+#include "../runtime/assets/VertexData.h"
 #include "../runtime/DescriptorInstance.h"
 
 namespace Metal {

@@ -82,6 +82,8 @@ namespace Metal::UIUtil {
                 return Icons::format_paint;
             case EntryType::DIRECTORY:
                 return Icons::folder;
+            case EntryType::SCENE:
+                return Icons::inventory_2;
             default: return "";
         }
     }

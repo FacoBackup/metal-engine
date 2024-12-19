@@ -57,6 +57,10 @@ namespace Metal {
         return nullptr;
     }
 
+    void FilesService::deleteFiles(std::unordered_map<std::string, FileEntry *> &filesContext) {
+        // TODO
+    }
+
     void FilesService::Move(FileEntry *toMove,
                             FileEntry *targetDir) {
         fs::rename(toMove->absolutePath,
