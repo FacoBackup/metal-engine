@@ -40,8 +40,7 @@ namespace Metal {
     }
 
     void FilesPanel::contextMenu() {
-        auto menuId = (id + "contextMenu").c_str();
-        if (ImGui::BeginPopupContextItem(menuId)) {
+        if (ImGui::BeginPopupContextItem((id + "contextMenu").c_str())) {
             if (ImGui::MenuItem("Cut")) {
                 cutSelected();
             }
@@ -54,8 +53,8 @@ namespace Metal {
             ImGui::EndPopup();
         }
 
-        if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
-            ImGui::OpenPopup(menuId);
+        if (isSomethingHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+            ImGui::OpenPopup((id + "contextMenu").c_str());
         }
     }
 
@@ -79,7 +78,7 @@ namespace Metal {
             if (ImGui::IsWindowFocused()) {
                 filesContext.selected.clear();
             }
-
+            contextMenu();
             handleDrag();
 
             float size = std::round(ImGui::GetWindowSize().x / CARD_SIZE) * CARD_SIZE - CARD_SIZE;
