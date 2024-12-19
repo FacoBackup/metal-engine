@@ -35,6 +35,8 @@ namespace Metal {
 
         void onSync() override;
 
+        void setIconPos(const char *text);
+
         void renderItem(FileEntry *root);
 
         void trackDrag();

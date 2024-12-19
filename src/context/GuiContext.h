@@ -4,15 +4,19 @@
 #include "GLFWContext.h"
 #include "../common/interface/AbstractRuntimeComponent.h"
 
+#define LARGE_FONT_SIZE 38
 namespace Metal {
     class GuiContext final : public AbstractRuntimeComponent {
         static void applySpacing();
 
-        static void applyFonts();
+        void applyFonts();
 
         ImDrawData *drawData = nullptr;
+
     public:
         explicit GuiContext(ApplicationContext &context);
+
+        ImFont *largeIconsFont = nullptr;
 
         void dispose() const;
 
@@ -21,7 +25,6 @@ namespace Metal {
         bool beginFrame() const;
 
         void endFrame();
-
     };
 }
 

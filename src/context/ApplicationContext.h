@@ -10,16 +10,17 @@
 
 namespace Metal {
     class ApplicationContext {
-        EngineContext engineContext{*this};
-        EditorContext editorContext{*this};
-        GLFWContext glfwContext{*this};
-        VulkanContext vulkanContext;
-        GuiContext guiContext{*this};
         IPanel &rootPanel;
         std::string rootDirectory;
         std::string projectName;
+        GLFWContext glfwContext{*this};
 
     public:
+        EngineContext engineContext{*this};
+        EditorContext editorContext{*this};
+        VulkanContext vulkanContext;
+        GuiContext guiContext{*this};
+
         void updateRootPath(bool forceSelection);
 
         void updateProjectName(const std::string &projectName);
