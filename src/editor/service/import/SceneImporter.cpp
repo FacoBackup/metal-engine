@@ -22,6 +22,8 @@
 #include "../../../context/ApplicationContext.h"
 #include "../../../context/runtime/assets/MaterialData.h"
 
+#define TEXTURE_P context.editorContext.textureImporter.importTexture(targetDir, rootDirectory + "/" + texturePath.data)
+
 namespace Metal {
     std::string SceneImporter::persistMesh(const std::string &targetDir, const MeshData &mesh) const {
         auto metadata = FileMetadata{};
@@ -85,7 +87,7 @@ namespace Metal {
 
     void SceneImporter::persistAllMaterials(const std::string &targetDir, const aiScene *scene,
                                             std::unordered_map<unsigned int, std::string> &materialMap,
-                                            std::unordered_map<std::string, std::string> &textureMap) const {
+                                            const std::string& rootDirectory) const {
         for (unsigned int i = 0; i < scene->mNumMaterials; ++i) {
             const aiMaterial *material = scene->mMaterials[i];
             auto materialMetadata = FileMetadata{};
@@ -102,32 +104,30 @@ namespace Metal {
                 if (unsigned int textureCount = material->GetTextureCount(type); textureCount > 0) {
                     for (unsigned int j = 0; j < textureCount; ++j) {
                         aiString texturePath;
-
-                        if (material->GetTexture(type, j, &texturePath) == AI_SUCCESS && textureMap.contains(
-                                texturePath.data)) {
+                        if (material->GetTexture(type, j, &texturePath) == AI_SUCCESS) {
                             switch (type) {
                                 case aiTextureType_BASE_COLOR: {
-                                    materialData.albedo = textureMap.at(texturePath.data);
+                                    materialData.albedo = TEXTURE_P;
                                     break;
                                 }
                                 case aiTextureType_NORMALS: {
-                                    materialData.normal = textureMap.at(texturePath.data);
+                                    materialData.normal = TEXTURE_P;
                                     break;
                                 }
                                 case aiTextureType_AMBIENT_OCCLUSION: {
-                                    materialData.ao = textureMap.at(texturePath.data);
+                                    materialData.ao = TEXTURE_P;
                                     break;
                                 }
                                 case aiTextureType_HEIGHT: {
-                                    materialData.height = textureMap.at(texturePath.data);
+                                    materialData.height = TEXTURE_P;
                                     break;
                                 }
                                 case aiTextureType_METALNESS: {
-                                    materialData.metallic = textureMap.at(texturePath.data);
+                                    materialData.metallic = TEXTURE_P;
                                     break;
                                 }
                                 case aiTextureType_DIFFUSE_ROUGHNESS: {
-                                    materialData.roughness = textureMap.at(texturePath.data);
+                                    materialData.roughness = TEXTURE_P;
                                     break;
                                 }
                                 default: break;
@@ -141,18 +141,6 @@ namespace Metal {
                              std::ios::binary);
             cereal::BinaryOutputArchive archive(os);
             archive(materialData);
-        }
-    }
-
-    void SceneImporter::persistAllTexture(const std::string &targetDir, const aiScene *scene,
-                                          std::unordered_map<std::string, std::string> &textureMap) const {
-        for (unsigned int i = 0; i < scene->mNumTextures; ++i) {
-            if (const aiTexture *texture = scene->mTextures[i]; texture->mFilename.length > 0) {
-                textureMap.insert({
-                    texture->mFilename.data,
-                    context.editorContext.textureImporter.importTexture(texture->mFilename.data, targetDir)
-                });
-            }
         }
     }
 
@@ -179,10 +167,11 @@ namespace Metal {
         std::unordered_map<unsigned int, std::string> meshMap{};
         std::unordered_map<std::string, unsigned int> meshMaterialMap{};
         persistAllMeshes(targetDir, scene, meshMap, meshMaterialMap);
-        std::unordered_map<std::string, std::string> textureMap{};
-        persistAllTexture(targetDir, scene, textureMap);
         std::unordered_map<unsigned int, std::string> materialsMap{};
-        persistAllMaterials(targetDir, scene, materialsMap, textureMap);
+        fs::path absolutePath = fs::absolute(pathToFile);
+        fs::path directoryPath = absolutePath.parent_path(); // Get the directory
+
+        persistAllMaterials(targetDir, scene, materialsMap, directoryPath.string());
 
         int increment = 0;
         ProcessNode(increment, sceneData, scene->mRootNode, -1, meshMap, meshMaterialMap, materialsMap);

@@ -35,7 +35,7 @@ namespace Metal {
 
         void onSync() override;
 
-        void setIconPos(const char *text);
+        static static void SetIconPos(const char *text);
 
         void renderItem(FileEntry *root);
 

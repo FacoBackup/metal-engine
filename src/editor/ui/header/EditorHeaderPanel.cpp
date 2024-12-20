@@ -11,6 +11,7 @@ namespace Metal {
         ImGui::Dummy(ImVec2(2, 0));
         ImGui::SameLine();
         onSyncChildren();
+        ImGui::Separator();
     }
 
     void EditorHeaderPanel::onInitialize() {

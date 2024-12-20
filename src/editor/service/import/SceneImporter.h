@@ -26,11 +26,7 @@ namespace Metal {
 
         void persistAllMaterials(const std::string &targetDir, const aiScene *scene,
                                  std::unordered_map<unsigned int, std::string> &materialMap,
-                                 std::unordered_map<std::string, std::string> &textureMap) const;
-
-        void persistAllTexture(const std::string &targetDir, const aiScene *scene,
-                               std::unordered_map<std::string, std::string> &textureMap) const;
-
+                                const std::string& rootDirectory) const;
 
         [[nodiscard]] std::string persistMesh(const std::string &targetDir,
                                               const MeshData &mesh) const;

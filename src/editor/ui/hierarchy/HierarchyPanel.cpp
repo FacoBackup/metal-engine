@@ -19,6 +19,7 @@ namespace Metal {
         isOnSearch = strlen(search) > 0;
         // hotKeys();
         onSyncChildren();
+        ImGui::Separator();
         if (ImGui::BeginTable((id + "hierarchyTable").c_str(), 3, TABLE_FLAGS)) {
             ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
             ImGui::TableSetupColumn(Icons::visibility.c_str(), ImGuiTableColumnFlags_WidthFixed, 20.f);
