@@ -21,11 +21,10 @@
 #include "../../../context/ApplicationContext.h"
 
 namespace Metal {
-    std::string SceneImporter::persistMesh(const std::string &targetDir, const std::string &pathToFile,
-                                           const MeshData &mesh) const {
+    std::string SceneImporter::persistMesh(const std::string &targetDir, const MeshData &mesh) const {
         auto metadata = FileMetadata{};
         metadata.type = EntryType::MESH;
-        metadata.name = std::filesystem::path(pathToFile).filename().string();
+        metadata.name = mesh.name;
         metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.'));
         FilesUtil::WriteFile((targetDir + '/' + metadata.getId() + FILE_METADATA).c_str(),
                              metadata.serialize().c_str());
@@ -37,8 +36,7 @@ namespace Metal {
         return metadata.getId();
     }
 
-    void SceneImporter::persistAllMeshes(const std::string &targetDir, const std::string &pathToFile,
-                                         const aiScene *scene,
+    void SceneImporter::persistAllMeshes(const std::string &targetDir, const aiScene *scene,
                                          std::unordered_map<unsigned int, std::string> &meshMap) const {
         for (unsigned int i = 0; i < scene->mNumMeshes; ++i) {
             aiMesh *assimpMesh = scene->mMeshes[i];
@@ -76,7 +74,37 @@ namespace Metal {
                     meshData.indices.push_back(face.mIndices[k]);
                 }
             }
-            meshMap.insert({i, persistMesh(targetDir, pathToFile, meshData)});
+            meshMap.insert({i, persistMesh(targetDir, meshData)});
+        }
+    }
+
+    void SceneImporter::persistAllMaterials(const std::string &targetDir, const aiScene *scene,
+                                            std::unordered_map<unsigned int, std::string> &materialMap,
+                                            std::unordered_map<std::string, std::string> &textureMap) const {
+        for (unsigned int i = 0; i < scene->mNumMaterials; ++i) {
+            const aiMaterial *material = scene->mMaterials[i];
+            for (int textureType = aiTextureType_NONE + 1; textureType <= aiTextureType_UNKNOWN; ++textureType) {
+                const auto type = static_cast<aiTextureType>(textureType);
+
+                if (unsigned int textureCount = material->GetTextureCount(type); textureCount > 0) {
+                    std::cout << "  Texture type " << type << " (" << textureCount << " textures)" << std::endl;
+                    for (unsigned int j = 0; j < textureCount; ++j) {
+                        aiString texturePath;
+                        if (material->GetTexture(type, j, &texturePath) == AI_SUCCESS) {
+                            // GET TEXTURE ID VIA THE PATH AND STORE IT INSIDE THE MATERIAL OBJECT
+                            std::cout << "    Texture " << j << ": " << texturePath.C_Str() << std::endl;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    void SceneImporter::persistAllTexture(const std::string &targetDir, const aiScene *scene,
+                                          std::unordered_map<std::string, std::string> &textureMap) const {
+        for (unsigned int i = 0; i < scene->mNumTextures; ++i) {
+            const aiTexture *texture = scene->mTextures[i];
+            // PERSIST TEXTURES AND UPDATE MAP WITH {PATH, ID}
         }
     }
 
@@ -101,7 +129,12 @@ namespace Metal {
                              sceneMetadata.serialize().c_str());
 
         std::unordered_map<unsigned int, std::string> meshMap{};
-        persistAllMeshes(targetDir, pathToFile, scene, meshMap);
+        persistAllMeshes(targetDir, scene, meshMap);
+        std::unordered_map<std::string, std::string> textureMap{};
+        persistAllTexture(targetDir, scene, textureMap);
+        std::unordered_map<unsigned int, std::string> materialsMap{};
+        persistAllMaterials(targetDir, scene, materialsMap, textureMap);
+
         int increment = 0;
         ProcessNode(increment, sceneData, scene->mRootNode, -1, meshMap);
 

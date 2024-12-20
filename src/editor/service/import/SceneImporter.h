@@ -18,16 +18,23 @@ namespace Metal {
         static void ProcessNode(int &increment, SceneData &scene, const aiNode *node, int parentId,
                                 std::unordered_map<unsigned int, std::string> &meshMap);
 
+        void persistAllMeshes(const std::string &targetDir, const aiScene *scene,
+                              std::unordered_map<unsigned int, std::string> &meshMap) const;
+
+        void persistAllMaterials(const std::string &targetDir, const aiScene *scene,
+                                 std::unordered_map<unsigned int, std::string> &materialMap,
+                                 std::unordered_map<std::string, std::string> &textureMap) const;
+
+        void persistAllTexture(const std::string &targetDir, const aiScene *scene,
+                               std::unordered_map<std::string, std::string> &textureMap) const;
+
     public:
         explicit SceneImporter(ApplicationContext &context)
             : AbstractImporter(context) {
         }
 
-        [[nodiscard]] std::string persistMesh(const std::string &targetDir, const std::string &pathToFile,
+        [[nodiscard]] std::string persistMesh(const std::string &targetDir,
                                               const MeshData &mesh) const;
-
-        void persistAllMeshes(const std::string &targetDir, const std::string &pathToFile, const aiScene *scene,
-                              std::unordered_map<unsigned int, std::string> &meshMap) const;
 
         void importScene(const std::string &targetDir, const std::string &pathToFile) const;
 
