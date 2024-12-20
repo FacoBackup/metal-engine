@@ -9,6 +9,7 @@ namespace Metal {
         std::array<float, 3> scale{};
         std::string name{};
         std::string meshId{};
+        std::string materialId{};
         int parentEntity = -1;
         int id;
 

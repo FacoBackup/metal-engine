@@ -112,6 +112,7 @@ namespace Metal {
         constexpr auto MAX = static_cast<ImWchar16>(0xFF000);
         constexpr ImWchar RANGES[] = {MIN, MAX, 0};
         io.Fonts->AddFontFromFileTTF("resources/fonts/MaterialIcons.ttf", 18, fontConfig, RANGES);
+        largeIconsFont = io.Fonts->AddFontFromFileTTF("resources/fonts/MaterialIcons.ttf", LARGE_FONT_SIZE, nullptr, RANGES);
 
         io.Fonts->Build();
         delete fontConfig;

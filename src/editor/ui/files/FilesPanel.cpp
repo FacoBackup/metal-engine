@@ -73,6 +73,7 @@ namespace Metal {
 
     void FilesPanel::onSync() {
         onSyncChildren();
+        ImGui::Separator();
         if (ImGui::BeginChild(id.c_str())) {
             isSomethingHovered = ImGui::IsWindowHovered();
             if (ImGui::IsWindowFocused()) {
@@ -106,6 +107,14 @@ namespace Metal {
         ImGui::EndChild();
     }
 
+    void FilesPanel::SetIconPos(const char *text) {
+        const auto windowWidth = ImGui::GetWindowSize().x;
+        const auto windowHeight = ImGui::GetWindowSize().y;
+        const auto textWidth = ImGui::CalcTextSize(text).x;
+        ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
+        ImGui::SetCursorPosY((windowHeight - LARGE_FONT_SIZE * 2) * 0.5f);
+    }
+
     void FilesPanel::renderItem(FileEntry *root) {
         UIUtil::AUX_VEC2.x = CARD_SIZE;
         UIUtil::AUX_VEC2.y = CARD_SIZE + 15;
@@ -114,7 +123,10 @@ namespace Metal {
             isSomethingHovered = isSomethingHovered || root->isHovered;
             onClick(root);
             handleDragDrop(root);
+            ImGui::PushFont(context->guiContext.largeIconsFont);
+
             if (root->type == EntryType::DIRECTORY) {
+                SetIconPos(Icons::folder.c_str());
                 ImGui::TextColored(UIUtil::DIRECTORY_COLOR, Icons::folder.c_str());
             } // else if (fEntry->type ==  EntryType::TEXTURE) {
             // var texture = streamingService.streamIn(child, StreamableResourceType.TEXTURE);
@@ -124,8 +136,11 @@ namespace Metal {
             // }
             // }
             else {
-                ImGui::Text(UIUtil::GetFileIcon(root->type).c_str());
+                std::string icon = UIUtil::GetFileIcon(root->type);
+                SetIconPos(icon.c_str());
+                ImGui::Text(icon.c_str());
             }
+            ImGui::PopFont();
             UIUtil::AUX_VEC2.x = 0;
             UIUtil::AUX_VEC2.y = ImGui::GetContentRegionAvail().y - TEXT_OFFSET;
             ImGui::Dummy(UIUtil::AUX_VEC2);

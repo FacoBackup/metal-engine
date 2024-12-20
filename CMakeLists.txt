@@ -224,6 +224,7 @@ add_executable(
         src/engine/service/voxel/VoxelizerService.h
         src/context/runtime/assets/SceneData.h
         src/context/runtime/assets/EntityAssetData.h
+        src/context/runtime/assets/MaterialData.h
 )
 
 

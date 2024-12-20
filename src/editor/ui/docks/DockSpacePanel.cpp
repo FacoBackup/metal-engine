@@ -96,7 +96,6 @@ namespace Metal {
                         case LEFT:
                             dockRepository.left.insert(
                                 dockRepository.left.begin() + Util::indexOf(dockRepository.left, dock) + 1, dto);
-
                             break;
                         case RIGHT:
                             dockRepository.right.insert(
