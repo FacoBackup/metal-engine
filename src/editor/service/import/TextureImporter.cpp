@@ -14,7 +14,7 @@
 namespace fs = std::filesystem;
 
 namespace Metal {
-    void TextureImporter::importTexture(const std::string &targetDir, const std::string &pathToFile) const {
+    std::string TextureImporter::importTexture(const std::string &targetDir, const std::string &pathToFile) const {
         auto metadata = FileMetadata{};
         metadata.type = EntryType::TEXTURE;
         metadata.name = fs::path(pathToFile).filename().string();
@@ -35,6 +35,7 @@ namespace Metal {
         reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_3);
 
         stbi_image_free(textureData.data);
+        return metadata.getId();
     }
 
     void TextureImporter::reduceImage(const std::string &fileId,
