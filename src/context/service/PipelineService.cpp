@@ -1,5 +1,6 @@
 #include "PipelineService.h"
 
+#include "PipelineBuilder.h"
 #include "ShaderUtil.h"
 #include "../ApplicationContext.h"
 #include "../../common/util/VulkanUtils.h"
@@ -21,7 +22,6 @@ namespace Metal {
         }
         layoutInfo.pSetLayouts = descriptorLayouts.data();
         layoutInfo.setLayoutCount = descriptorLayouts.size();
-
 
         if (pushConstantsSize > 0) {
             VkPushConstantRange pushConstantRange{};
@@ -67,30 +67,23 @@ namespace Metal {
         colorBlending.blendConstants[3] = 0.0f;
     }
 
-    PipelineInstance *PipelineService::createRenderingPipeline(FrameBufferInstance *frameBuffer,
-                                                               VkCullModeFlagBits cullMode,
-                                                               const char *vertexShader,
-                                                               const char *fragmentShader,
-                                                               const std::vector<DescriptorInstance *> &
-                                                               descriptorSetsToBind,
-                                                               const uint32_t pushConstantsSize,
-                                                               bool blendEnabled,
-                                                               bool prepareForMesh) {
+    PipelineInstance *PipelineService::createRenderingPipeline(PipelineBuilder &pipelineBuilder) {
         VkVertexInputBindingDescription *meshBindingDescription = nullptr;
         auto meshDescriptions = VertexData::GetAttributeDescriptions();
 
         auto *pipeline = new PipelineInstance();
-        pipeline->pushConstantsSize = pushConstantsSize;
-        auto fragmentShaderModule = ShaderUtil::CreateShaderModule(context, fragmentShader);
-        auto vertexShaderModule = ShaderUtil::CreateShaderModule(context, vertexShader);
+        pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
+        auto fragmentShaderModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.fragmentShader);
+        auto vertexShaderModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.vertexShader);
         registerResource(pipeline);
-        createPipelineLayout(descriptorSetsToBind, pushConstantsSize, pipeline);
+        createPipelineLayout(pipelineBuilder.descriptorSetsToBind, pipelineBuilder.pushConstantsSize, pipeline);
 
         std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages{};
         shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
         shaderStages[0].module = vertexShaderModule;
         shaderStages[0].pName = "main";
+        // shaderStages[0].pSpecializationInfo;
 
         shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
         shaderStages[1].module = fragmentShaderModule;
@@ -99,7 +92,7 @@ namespace Metal {
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-        if (prepareForMesh) {
+        if (pipelineBuilder.prepareForMesh) {
             meshBindingDescription = new VkVertexInputBindingDescription;
             meshBindingDescription->binding = 0;
             meshBindingDescription->stride = sizeof(VertexData);
@@ -127,7 +120,7 @@ namespace Metal {
         rasterizer.rasterizerDiscardEnable = VK_FALSE;
         rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
         rasterizer.lineWidth = 1.0f;
-        rasterizer.cullMode = cullMode;
+        rasterizer.cullMode = pipelineBuilder.cullMode;
         rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
         rasterizer.depthBiasEnable = VK_FALSE;
 
@@ -137,7 +130,7 @@ namespace Metal {
         multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
 
         VkPipelineColorBlendStateCreateInfo colorBlending;
-        getBlendConfig(blendEnabled, colorBlending);
+        getBlendConfig(pipelineBuilder.blendEnabled, colorBlending);
 
         std::vector dynamicStates = {
             VK_DYNAMIC_STATE_VIEWPORT,
@@ -157,10 +150,20 @@ namespace Metal {
         pipelineInfo.pViewportState = &viewportState;
         pipelineInfo.pRasterizationState = &rasterizer;
         pipelineInfo.pMultisampleState = &multisampling;
+
+        VkPipelineDepthStencilStateCreateInfo depthStencilState = {
+            .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+            .depthTestEnable = VK_TRUE,
+            .depthWriteEnable = VK_TRUE,
+            .depthCompareOp = VK_COMPARE_OP_LESS,
+            .depthBoundsTestEnable = VK_FALSE,
+            .stencilTestEnable = VK_FALSE,
+        };
+        pipelineInfo.pDepthStencilState = pipelineBuilder.depthTest ? &depthStencilState : nullptr;
         pipelineInfo.pColorBlendState = &colorBlending;
         pipelineInfo.pDynamicState = &dynamicState;
         pipelineInfo.layout = pipeline->vkPipelineLayout;
-        pipelineInfo.renderPass = frameBuffer->vkRenderPass;
+        pipelineInfo.renderPass = pipelineBuilder.frameBuffer->vkRenderPass;
         pipelineInfo.subpass = 0;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
@@ -168,7 +171,11 @@ namespace Metal {
                                                              &pipelineInfo,
                                                              nullptr,
                                                              &pipeline->vkPipeline));
-        pipeline->descriptorSets = descriptorSetsToBind;
+
+        pipeline->descriptorSets.resize(pipelineBuilder.descriptorSetsToBind.size());
+        for (int i = 0; i < pipelineBuilder.descriptorSetsToBind.size(); i++) {
+            pipeline->descriptorSets[i] = pipelineBuilder.descriptorSetsToBind[i]->vkDescriptorSet;
+        }
         delete meshBindingDescription;
         vkDestroyShaderModule(vulkanContext.device.device, fragmentShaderModule, nullptr);
         vkDestroyShaderModule(vulkanContext.device.device, vertexShaderModule, nullptr);

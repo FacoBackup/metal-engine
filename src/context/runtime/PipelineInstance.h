@@ -13,7 +13,7 @@ namespace Metal {
     struct PipelineInstance final : RuntimeResource {
         VkPipelineLayout vkPipelineLayout = VK_NULL_HANDLE;
         VkPipeline vkPipeline = VK_NULL_HANDLE;
-        std::vector<DescriptorInstance *> descriptorSets{};
+        std::vector<VkDescriptorSet> descriptorSets{};
         uint32_t pushConstantsSize = 0;
 
         void dispose(VulkanContext &context) override;

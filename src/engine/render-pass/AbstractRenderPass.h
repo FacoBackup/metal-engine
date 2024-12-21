@@ -31,7 +31,7 @@ namespace Metal {
 
         void recordDrawSimpleInstanced(uint32_t vertexCount, uint32_t instanceCount) const;
 
-        void drawMesh(const MeshInstance *instance, uint32_t instanceCount = 1) const;
+        void recordDrawMesh(const MeshInstance *instance, uint32_t instanceCount = 1) const;
 
         virtual bool shouldClear() {
             return true;

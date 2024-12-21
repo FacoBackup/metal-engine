@@ -1,41 +1,53 @@
 #include "CorePipelines.h"
 
-#include "MeshPushConstant.h"
+#include "../buffers/MeshPushConstant.h"
+#include "../buffers/GBufferShadingPushConstant.h"
 #include "../ApplicationContext.h"
-#include "../../common/util/VulkanUtils.h"
-#include "../runtime/assets/MeshData.h"
 #include "../runtime/PipelineInstance.h"
 #include "../service//PipelineService.h"
+#include "../service/PipelineBuilder.h"
 
 namespace Metal {
     void CorePipelines::onInitialize() {
-        gBufferPipeline = pipelineService.createRenderingPipeline(
-            context.vulkanContext.coreFrameBuffers.gBufferFBO,
-            VK_CULL_MODE_NONE,
-            "../resources/shaders/DEBUG.vert",
-            "../resources/shaders/DEBUG.frag",
-            {context.vulkanContext.coreDescriptorSets.globalDataDescriptor.get()},
-            sizeof(MeshPushConstant),
-            false,
-            true);
+        PipelineBuilder gBufferPipelineBuilder = PipelineBuilder::Of(
+                    context.vulkanContext.coreFrameBuffers.gBufferFBO,
+                    "../resources/shaders/DEBUG.vert",
+                    "../resources/shaders/DEBUG.frag"
+                )
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.globalDataDescriptor.get())
+                .setPrepareForMesh()
+                .setDepthTest()
+                .setCullMode(VK_CULL_MODE_BACK_BIT)
+                .setPushConstantsSize(sizeof(MeshPushConstant));
+        gBufferPipeline = pipelineService.createRenderingPipeline(gBufferPipelineBuilder);
 
-        gridPipeline = pipelineService.createRenderingPipeline(
-            context.vulkanContext.coreFrameBuffers.auxFBO,
-            VK_CULL_MODE_NONE,
-            "../resources/shaders/QUAD.vert",
-            "../resources/shaders/tool/GRID.frag",
-            {context.vulkanContext.coreDescriptorSets.globalDataDescriptor.get()},
-            0,
-            true
-        );
+        PipelineBuilder gridPipelineBuilder = PipelineBuilder::Of(
+                    context.vulkanContext.coreFrameBuffers.auxFBO,
+                    "../resources/shaders/QUAD.vert",
+                    "../resources/shaders/GRID.frag"
+                )
+                .setBlendEnabled()
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.globalDataDescriptor.get());
+        gridPipeline = pipelineService.createRenderingPipeline(gridPipelineBuilder);
 
-        postProcessingPipeline = pipelineService.createRenderingPipeline(
-            context.vulkanContext.coreFrameBuffers.postProcessingFBO,
-            VK_CULL_MODE_NONE,
-            "../resources/shaders/QUAD.vert",
-            "../resources/shaders/LENS_POST_PROCESSING.frag",
-            {context.vulkanContext.coreDescriptorSets.postProcessingDescriptor.get()}
-        );
+        PipelineBuilder ppPipelineBuilder = PipelineBuilder::Of(
+                    context.vulkanContext.coreFrameBuffers.postProcessingFBO,
+                    "../resources/shaders/QUAD.vert",
+                    "../resources/shaders/LENS_POST_PROCESSING.frag"
+                )
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.postProcessingDescriptor.get());
+        postProcessingPipeline = pipelineService.createRenderingPipeline(ppPipelineBuilder);
+
+
+        PipelineBuilder gBufferShadingPipelineBuilder = PipelineBuilder::Of(
+                    context.vulkanContext.coreFrameBuffers.postProcessingFBO,
+                    "../resources/shaders/QUAD.vert",
+                    "../resources/shaders/GBufferShading.frag"
+                )
+                .setPushConstantsSize(sizeof(GBufferShadingPushConstant))
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.gBufferShadingDescriptor.get());
+        gBufferShadingPipeline = pipelineService.createRenderingPipeline(gBufferShadingPipelineBuilder);
     }
 
     void CorePipelines::dispose() const {

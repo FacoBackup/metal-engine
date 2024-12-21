@@ -16,6 +16,7 @@ namespace Metal {
 
         std::unique_ptr<DescriptorInstance> globalDataDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> postProcessingDescriptor = nullptr;
+        std::unique_ptr<DescriptorInstance> gBufferShadingDescriptor = nullptr;
 
         void onInitialize() override;
     };

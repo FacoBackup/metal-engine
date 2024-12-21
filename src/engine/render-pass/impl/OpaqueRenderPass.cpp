@@ -13,7 +13,7 @@ namespace Metal {
                 if (const auto *r = streamingRepository.streamMesh(mesh->meshId, LevelOfDetail::LOD_0); r != nullptr) {
                     mPushConstant.model = worldRepository.transforms[mesh->getEntityId()]->model;
                     recordPushConstant(&mPushConstant);
-                    drawMesh(r);
+                    recordDrawMesh(r);
                 }
             }
         }

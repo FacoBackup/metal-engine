@@ -1,5 +1,7 @@
 #include "FrameBufferService.h"
 
+#include <iostream>
+
 #include "../runtime/FrameBufferInstance.h"
 #include "../../common/util/VulkanUtils.h"
 #include "../runtime/FrameBufferAttachment.h"
@@ -35,9 +37,7 @@ namespace Metal {
         framebuffer->attachments.push_back(attachment);
         attachment->format = format;
 
-
         VkImageAspectFlags aspectMask = 0;
-        attachment->format = format;
 
         if (usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT) {
             aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -59,6 +59,8 @@ namespace Metal {
         image.samples = VK_SAMPLE_COUNT_1_BIT;
         image.tiling = VK_IMAGE_TILING_OPTIMAL;
         image.usage = usage | VK_IMAGE_USAGE_SAMPLED_BIT;
+        image.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        image.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
         VulkanUtils::CheckVKResult(vkCreateImage(vulkanContext.device.device, &image, nullptr, &attachment->vkImage));
 
@@ -109,9 +111,8 @@ namespace Metal {
     }
 
     void FrameBufferService::createRenderPass(FrameBufferInstance *framebuffer) const {
-        for (uint32_t i = 0; i < static_cast<uint32_t>(framebuffer->attachments.size()); i++) {
-            // ATTACHMENT DESCRIPTION
-            VkAttachmentDescription attachmentDescription{};
+        for (uint32_t i = 0; i < framebuffer->attachments.size(); i++) {
+            VkAttachmentDescription &attachmentDescription = framebuffer->attachmentDescriptions.emplace_back();
             const std::shared_ptr<FrameBufferAttachment> fbAttachment = framebuffer->attachments[i];
             attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
             attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -123,15 +124,15 @@ namespace Metal {
                                                     : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
             attachmentDescription.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
             attachmentDescription.format = fbAttachment->format;
-            framebuffer->attachmentDescriptions.push_back(attachmentDescription);
 
             if (fbAttachment->depth) {
+                std::cout << "Depth Attachment " << i << std::endl;
                 framebuffer->depthRef = new VkAttachmentReference{i, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL};
             } else {
-                VkAttachmentReference colorRef{};
+                std::cout << "Color Attachment " << i << std::endl;
+                VkAttachmentReference &colorRef = framebuffer->colorReferences.emplace_back();
                 colorRef.attachment = i;
                 colorRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-                framebuffer->colorReferences.push_back(colorRef);
             }
         }
 
@@ -160,7 +161,7 @@ namespace Metal {
         VkSubpassDescription subpass = {};
         subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
         subpass.pColorAttachments = framebuffer->colorReferences.data();
-        subpass.colorAttachmentCount = static_cast<uint32_t>(framebuffer->colorReferences.size());
+        subpass.colorAttachmentCount = framebuffer->colorReferences.size();
         if (framebuffer->depthRef != nullptr) {
             subpass.pDepthStencilAttachment = framebuffer->depthRef;
         }
@@ -168,11 +169,11 @@ namespace Metal {
         VkRenderPassCreateInfo renderPassInfo = {};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
         renderPassInfo.pAttachments = framebuffer->attachmentDescriptions.data();
-        renderPassInfo.attachmentCount = static_cast<uint32_t>(framebuffer->attachmentDescriptions.size());
+        renderPassInfo.attachmentCount = framebuffer->attachmentDescriptions.size();
         renderPassInfo.subpassCount = 1;
         renderPassInfo.pSubpasses = &subpass;
-        renderPassInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
-        renderPassInfo.pDependencies = dependencies.data();
+        // renderPassInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
+        // renderPassInfo.pDependencies = dependencies.data();
 
         VulkanUtils::CheckVKResult(vkCreateRenderPass(vulkanContext.device.device,
                                                       &renderPassInfo,
@@ -196,7 +197,7 @@ namespace Metal {
             attachments.push_back(attachment->vkImageView);
         }
 
-        framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+        framebufferInfo.attachmentCount = attachments.size();
         framebufferInfo.pAttachments = attachments.data();
         framebufferInfo.width = framebuffer->bufferWidth;
         framebufferInfo.height = framebuffer->bufferHeight;

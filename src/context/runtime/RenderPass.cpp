@@ -17,9 +17,13 @@ namespace Metal {
         renderPassInfo.renderArea.extent = {
             frameBuffer->bufferWidth, frameBuffer->bufferHeight
         };
-        constexpr VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 0}}};
-        renderPassInfo.clearValueCount = 1;
-        renderPassInfo.pClearValues = &clearColor;
+
+        std::vector<VkClearValue> clearColors{};
+        for (int i = 0; i<frameBuffer->attachments.size(); i++) {
+            clearColors.push_back({{0.0f, 0.0f, 0.0f, 0}});
+        }
+        renderPassInfo.clearValueCount = clearColors.size();
+        renderPassInfo.pClearValues = clearColors.data();
 
 
         VkCommandBufferAllocateInfo allocInfo{};
@@ -41,19 +45,13 @@ namespace Metal {
         for (auto &pass: renderPasses) {
             pass->setCommandBuffer(vkCommandBuffer);
             vkCmdBindPipeline(vkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pass->getPipeline()->vkPipeline);
-
-            std::vector<VkDescriptorSet> sets;
-            sets.resize(pass->getPipeline()->descriptorSets.size());
-            for (int i = 0; i < pass->getPipeline()->descriptorSets.size(); i++) {
-                sets[i] = pass->getPipeline()->descriptorSets[i]->vkDescriptorSet;
-            }
             if (!pass->getPipeline()->descriptorSets.empty()) {
                 vkCmdBindDescriptorSets(vkCommandBuffer,
                                         VK_PIPELINE_BIND_POINT_GRAPHICS,
                                         pass->getPipeline()->vkPipelineLayout,
                                         0,
-                                        sets.size(),
-                                        sets.data(),
+                                        pass->getPipeline()->descriptorSets.size(),
+                                        pass->getPipeline()->descriptorSets.data(),
                                         0,
                                         nullptr);
             }

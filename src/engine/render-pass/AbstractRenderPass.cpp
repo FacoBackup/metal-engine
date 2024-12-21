@@ -28,7 +28,7 @@ namespace Metal {
         vkCmdDraw(vkCommandBuffer, vertexCount, instanceCount, 0, 0);
     }
 
-    void AbstractRenderPass::drawMesh(const MeshInstance *instance, const uint32_t instanceCount) const {
+    void AbstractRenderPass::recordDrawMesh(const MeshInstance *instance, const uint32_t instanceCount) const {
         constexpr VkDeviceSize offsets[] = {0};
         vkCmdBindVertexBuffers(vkCommandBuffer, 0, 1, &instance->dataBuffer->vkBuffer, offsets);
         vkCmdBindIndexBuffer(vkCommandBuffer, instance->indexBuffer->vkBuffer, 0, VK_INDEX_TYPE_UINT32);

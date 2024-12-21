@@ -3,6 +3,7 @@
 #include "../context/ApplicationContext.h"
 #include "../context/runtime/BufferInstance.h"
 #include "../context/runtime/RenderPass.h"
+#include "render-pass/impl/GBufferShadingPass.h"
 #include "render-pass/impl/OpaqueRenderPass.h"
 #include "render-pass/impl/PostProcessingPass.h"
 #include "render-pass/tools/GridRenderPass.h"
@@ -11,6 +12,7 @@
 namespace Metal {
     EngineContext::EngineContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {
         fullScreenRenderPasses.push_back(std::make_unique<GridRenderPass>(context));
+        fullScreenRenderPasses.push_back(std::make_unique<GBufferShadingPass>(context));
         postProcessingPasses.push_back(std::make_unique<PostProcessingPass>(context));
         gBufferPasses.push_back(std::make_unique<OpaqueRenderPass>(context));
     }

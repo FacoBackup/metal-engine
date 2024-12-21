@@ -2,7 +2,7 @@
 #define SHADINGMODE_H
 
 namespace Metal::ShadingMode {
-    enum class ShadingMode {
+    enum ShadingMode {
         LIT,
         ALBEDO,
         NORMAL,

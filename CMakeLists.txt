@@ -155,7 +155,7 @@ add_executable(
         src/editor/service/FilesService.cpp
         src/editor/service/FilesService.h
         src/editor/ui/files/FilesContext.cpp
-        src/context/repository/MeshPushConstant.h
+        src/context/buffers/MeshPushConstant.h
         src/context/runtime/assets/VertexData.h
         src/editor/ui/viewport/CameraPositionPanel.cpp
         src/editor/ui/viewport/CameraPositionPanel.h
@@ -228,6 +228,10 @@ add_executable(
         src/engine/render-pass/impl/PostProcessingPass.cpp
         src/engine/render-pass/impl/PostProcessingPass.h
         src/context/buffers/PPSettingsUBO.h
+        src/engine/render-pass/impl/GBufferShadingPass.cpp
+        src/engine/render-pass/impl/GBufferShadingPass.h
+        src/context/buffers/GBufferShadingPushConstant.h
+        src/context/service/PipelineBuilder.h
 )
 
 
