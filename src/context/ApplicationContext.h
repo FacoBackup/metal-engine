@@ -43,10 +43,6 @@ namespace Metal {
             return glfwContext;
         }
 
-        VulkanContext &getVulkanContext() {
-            return vulkanContext;
-        }
-
         const std::string &getProjectName() {
             return projectName;
         }

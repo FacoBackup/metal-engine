@@ -6,6 +6,8 @@
 
 namespace Metal {
     void CoreRenderPasses::onInitialize() {
-        fullScreenPass = new RenderPass(vulkanContext.coreFrameBuffers.auxRenderPass, context);
+        gBufferPass = new RenderPass(vulkanContext.coreFrameBuffers.gBufferFBO, context);
+        fullScreenPass = new RenderPass(vulkanContext.coreFrameBuffers.auxFBO, context);
+        postProcessingPass = new RenderPass(vulkanContext.coreFrameBuffers.postProcessingFBO, context);
     }
 } // Metal

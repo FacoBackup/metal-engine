@@ -234,9 +234,9 @@ namespace Metal {
         framebufferService.disposeAll();
         textureService.disposeAll();
         meshService.disposeAll();
-        vkDestroyDescriptorPool(context.getVulkanContext().device.device, descriptorPool,
+        vkDestroyDescriptorPool(context.vulkanContext.device.device, descriptorPool,
                                 nullptr);
-        vkDestroyCommandPool(context.getVulkanContext().device.device, commandPool,
+        vkDestroyCommandPool(context.vulkanContext.device.device, commandPool,
                              nullptr);
 
         vkb::destroy_device(device);
@@ -257,7 +257,7 @@ namespace Metal {
         poolInfo.maxSets = 101;
 
         VulkanUtils::CheckVKResult(vkCreateDescriptorPool(device.device, &poolInfo,
-                                                          nullptr, &context.getVulkanContext().descriptorPool));
+                                                          nullptr, &context.vulkanContext.descriptorPool));
     }
 
     VkCommandBuffer VulkanContext::beginSingleTimeCommands() const {

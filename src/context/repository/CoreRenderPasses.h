@@ -12,7 +12,9 @@ namespace Metal {
 
         void onInitialize() override;
 
+        RenderPass *gBufferPass = nullptr;
         RenderPass *fullScreenPass = nullptr;
+        RenderPass *postProcessingPass = nullptr;
     };
 } // Metal
 

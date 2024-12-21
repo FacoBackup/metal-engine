@@ -9,30 +9,39 @@
 
 namespace Metal {
     void CorePipelines::onInitialize() {
-        debugPipeline = pipelineService.createRenderingPipeline(
-            context.getVulkanContext().coreFrameBuffers.auxRenderPass,
+        gBufferPipeline = pipelineService.createRenderingPipeline(
+            context.vulkanContext.coreFrameBuffers.gBufferFBO,
             VK_CULL_MODE_NONE,
             "../resources/shaders/DEBUG.vert",
             "../resources/shaders/DEBUG.frag",
-            {context.getVulkanContext().coreDescriptorSets.globalDataDescriptor.get()},
+            {context.vulkanContext.coreDescriptorSets.globalDataDescriptor.get()},
             sizeof(MeshPushConstant),
-            true,
+            false,
             true);
 
         gridPipeline = pipelineService.createRenderingPipeline(
-            context.getVulkanContext().coreFrameBuffers.auxRenderPass,
+            context.vulkanContext.coreFrameBuffers.auxFBO,
             VK_CULL_MODE_NONE,
             "../resources/shaders/QUAD.vert",
             "../resources/shaders/tool/GRID.frag",
-            {context.getVulkanContext().coreDescriptorSets.globalDataDescriptor.get()},
+            {context.vulkanContext.coreDescriptorSets.globalDataDescriptor.get()},
             0,
             true
+        );
+
+        postProcessingPipeline = pipelineService.createRenderingPipeline(
+            context.vulkanContext.coreFrameBuffers.postProcessingFBO,
+            VK_CULL_MODE_NONE,
+            "../resources/shaders/QUAD.vert",
+            "../resources/shaders/LENS_POST_PROCESSING.frag",
+            {context.vulkanContext.coreDescriptorSets.postProcessingDescriptor.get()}
         );
     }
 
     void CorePipelines::dispose() const {
         // TODO - Add button to UI to re-create pipelines and reload shaders
-        debugPipeline->dispose(vulkanContext);
+        gBufferPipeline->dispose(vulkanContext);
         gridPipeline->dispose(vulkanContext);
+        postProcessingPipeline->dispose(vulkanContext);
     }
 } // Metal

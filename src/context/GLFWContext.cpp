@@ -20,19 +20,19 @@ namespace Metal {
         int fb_width, fb_height;
         glfwGetFramebufferSize(window, &fb_width, &fb_height);
         if (fb_width > 0 && fb_height > 0 &&
-            (swapChainRebuild || context.getVulkanContext().imguiVulkanWindow.Width !=
+            (swapChainRebuild || context.vulkanContext.imguiVulkanWindow.Width !=
              fb_width ||
-             context.getVulkanContext().imguiVulkanWindow.Height != fb_height)) {
+             context.vulkanContext.imguiVulkanWindow.Height != fb_height)) {
             ImGui_ImplVulkan_SetMinImageCount(IMAGE_COUNT);
-            ImGui_ImplVulkanH_CreateOrResizeWindow(context.getVulkanContext().instance.instance,
-                                                   context.getVulkanContext().physDevice.physical_device,
-                                                   context.getVulkanContext().device.device,
-                                                   &context.getVulkanContext().imguiVulkanWindow,
-                                                   context.getVulkanContext().queueFamily,
+            ImGui_ImplVulkanH_CreateOrResizeWindow(context.vulkanContext.instance.instance,
+                                                   context.vulkanContext.physDevice.physical_device,
+                                                   context.vulkanContext.device.device,
+                                                   &context.vulkanContext.imguiVulkanWindow,
+                                                   context.vulkanContext.queueFamily,
                                                    nullptr, fb_width,
                                                    fb_height,
                                                    IMAGE_COUNT);
-            context.getVulkanContext().imguiVulkanWindow.FrameIndex = 0;
+            context.vulkanContext.imguiVulkanWindow.FrameIndex = 0;
             swapChainRebuild = false;
         }
         if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0) {
@@ -43,13 +43,13 @@ namespace Metal {
     }
 
     void GLFWContext::dispose() const {
-        context.getVulkanContext().dispose();
+        context.vulkanContext.dispose();
         glfwDestroyWindow(window);
         glfwTerminate();
     }
 
     ImGui_ImplVulkanH_Window &GLFWContext::getGUIWindow() const {
-        return context.getVulkanContext().imguiVulkanWindow;
+        return context.vulkanContext.imguiVulkanWindow;
     }
 
     void GLFWContext::setSwapChainRebuild(const bool val) {
@@ -60,7 +60,7 @@ namespace Metal {
         if (swapChainRebuild) {
             return;
         }
-        auto &wd = context.getVulkanContext().imguiVulkanWindow;
+        auto &wd = context.vulkanContext.imguiVulkanWindow;
         VkSemaphore semaphore = wd.FrameSemaphores[wd.SemaphoreIndex].RenderCompleteSemaphore;
         VkPresentInfoKHR info = {};
         info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -69,7 +69,7 @@ namespace Metal {
         info.swapchainCount = 1;
         info.pSwapchains = &wd.Swapchain;
         info.pImageIndices = &wd.FrameIndex;
-        VkResult err = vkQueuePresentKHR(context.getVulkanContext().graphicsQueue, &info);
+        VkResult err = vkQueuePresentKHR(context.vulkanContext.graphicsQueue, &info);
         if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR) {
             swapChainRebuild = true;
             return;
@@ -81,11 +81,11 @@ namespace Metal {
 
     void GLFWContext::renderFrame(ImDrawData *drawData) const {
         VkResult err;
-        auto &wd = context.getVulkanContext().imguiVulkanWindow;
+        auto &wd = context.vulkanContext.imguiVulkanWindow;
 
         VkSemaphore image_acquired_semaphore = wd.FrameSemaphores[wd.SemaphoreIndex].ImageAcquiredSemaphore;
         VkSemaphore render_complete_semaphore = wd.FrameSemaphores[wd.SemaphoreIndex].RenderCompleteSemaphore;
-        err = vkAcquireNextImageKHR(context.getVulkanContext().device.device, wd.Swapchain, UINT64_MAX,
+        err = vkAcquireNextImageKHR(context.vulkanContext.device.device, wd.Swapchain, UINT64_MAX,
                                     image_acquired_semaphore, VK_NULL_HANDLE,
                                     &wd.FrameIndex);
         if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR) {
@@ -95,14 +95,14 @@ namespace Metal {
         VulkanUtils::CheckVKResult(err);
 
         ImGui_ImplVulkanH_Frame *fd = &wd.Frames[wd.FrameIndex]; {
-            err = vkWaitForFences(context.getVulkanContext().device.device, 1, &fd->Fence, VK_TRUE, UINT64_MAX);
+            err = vkWaitForFences(context.vulkanContext.device.device, 1, &fd->Fence, VK_TRUE, UINT64_MAX);
             // wait indefinitely instead of periodically checking
             VulkanUtils::CheckVKResult(err);
 
-            err = vkResetFences(context.getVulkanContext().device.device, 1, &fd->Fence);
+            err = vkResetFences(context.vulkanContext.device.device, 1, &fd->Fence);
             VulkanUtils::CheckVKResult(err);
         } {
-            err = vkResetCommandPool(context.getVulkanContext().device.device, fd->CommandPool, 0);
+            err = vkResetCommandPool(context.vulkanContext.device.device, fd->CommandPool, 0);
             VulkanUtils::CheckVKResult(err);
             VkCommandBufferBeginInfo info = {};
             info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -128,19 +128,19 @@ namespace Metal {
         vkCmdEndRenderPass(fd->CommandBuffer); {
             VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
             VkSubmitInfo info = {};
-            context.getVulkanContext().getFrameData().commandBuffers.push_back(fd->CommandBuffer);
+            context.vulkanContext.getFrameData().commandBuffers.push_back(fd->CommandBuffer);
             info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
             info.waitSemaphoreCount = 1;
             info.pWaitSemaphores = &image_acquired_semaphore;
             info.pWaitDstStageMask = &wait_stage;
-            info.commandBufferCount = context.getVulkanContext().getFrameData().commandBuffers.size();
-            info.pCommandBuffers = context.getVulkanContext().getFrameData().commandBuffers.data();
+            info.commandBufferCount = context.vulkanContext.getFrameData().commandBuffers.size();
+            info.pCommandBuffers = context.vulkanContext.getFrameData().commandBuffers.data();
             info.signalSemaphoreCount = 1;
             info.pSignalSemaphores = &render_complete_semaphore;
 
             err = vkEndCommandBuffer(fd->CommandBuffer);
             VulkanUtils::CheckVKResult(err);
-            err = vkQueueSubmit(context.getVulkanContext().graphicsQueue, 1, &info, fd->Fence);
+            err = vkQueueSubmit(context.vulkanContext.graphicsQueue, 1, &info, fd->Fence);
             VulkanUtils::CheckVKResult(err);
         }
     }

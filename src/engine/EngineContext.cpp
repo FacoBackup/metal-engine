@@ -4,13 +4,15 @@
 #include "../context/runtime/BufferInstance.h"
 #include "../context/runtime/RenderPass.h"
 #include "render-pass/impl/OpaqueRenderPass.h"
+#include "render-pass/impl/PostProcessingPass.h"
 #include "render-pass/tools/GridRenderPass.h"
 #include "service/camera/Camera.h"
 
 namespace Metal {
     EngineContext::EngineContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {
         fullScreenRenderPasses.push_back(std::make_unique<GridRenderPass>(context));
-        fullScreenRenderPasses.push_back(std::make_unique<OpaqueRenderPass>(context));
+        postProcessingPasses.push_back(std::make_unique<PostProcessingPass>(context));
+        gBufferPasses.push_back(std::make_unique<OpaqueRenderPass>(context));
     }
 
     void EngineContext::onSync() {
@@ -27,17 +29,28 @@ namespace Metal {
         }
         streamingRepository.onSync();
         cameraService.onSync();
+
+        auto &camera = worldRepository.camera;
         if (globalDataNeedsUpdate) {
             globalDataNeedsUpdate = false;
-            globalDataUBO.proj = worldRepository.camera.projectionMatrix;
-            globalDataUBO.view = worldRepository.camera.viewMatrix;
-            globalDataUBO.projView = worldRepository.camera.projViewMatrix;
-            globalDataUBO.invProj = worldRepository.camera.invProjectionMatrix;
-            globalDataUBO.invView = worldRepository.camera.invViewMatrix;
-            globalDataUBO.cameraWorldPosition = worldRepository.camera.position;
-            context.getVulkanContext().coreBuffers.globalData->update(&globalDataUBO);
+            globalDataUBO.proj = camera.projectionMatrix;
+            globalDataUBO.view = camera.viewMatrix;
+            globalDataUBO.projView = camera.projViewMatrix;
+            globalDataUBO.invProj = camera.invProjectionMatrix;
+            globalDataUBO.invView = camera.invViewMatrix;
+            globalDataUBO.cameraWorldPosition = camera.position;
+            context.vulkanContext.coreBuffers.globalData->update(&globalDataUBO);
         }
+        postProcessingUBO.distortionIntensity = camera.distortionIntensity;
+        postProcessingUBO.chromaticAberrationIntensity = camera.chromaticAberrationIntensity;
+        postProcessingUBO.distortionEnabled = camera.distortionEnabled;
+        postProcessingUBO.chromaticAberrationEnabled = camera.chromaticAberrationEnabled;
+        postProcessingUBO.vignetteEnabled = camera.vignetteEnabled;
+        postProcessingUBO.vignetteStrength = camera.vignetteStrength;
+        context.vulkanContext.coreBuffers.postProcessingSettings->update(&postProcessingUBO);
 
-        context.getVulkanContext().coreRenderPasses.fullScreenPass->recordCommands(fullScreenRenderPasses);
+        context.vulkanContext.coreRenderPasses.gBufferPass->recordCommands(gBufferPasses);
+        context.vulkanContext.coreRenderPasses.fullScreenPass->recordCommands(fullScreenRenderPasses);
+        context.vulkanContext.coreRenderPasses.postProcessingPass->recordCommands(postProcessingPasses);
     }
 }

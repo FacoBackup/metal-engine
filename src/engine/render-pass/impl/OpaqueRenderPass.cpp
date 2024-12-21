@@ -20,6 +20,6 @@ namespace Metal {
     }
 
     PipelineInstance *OpaqueRenderPass::getPipeline() {
-        return context.getVulkanContext().corePipelines.debugPipeline;
+        return context.vulkanContext.corePipelines.gBufferPipeline;
     }
 } // Metal

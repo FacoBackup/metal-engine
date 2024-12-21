@@ -6,7 +6,7 @@
 
 namespace Metal {
     BufferService::BufferService(ApplicationContext &context) : AbstractRuntimeComponent(context),
-                                                                vulkanContext(context.getVulkanContext()) {
+                                                                vulkanContext(context.vulkanContext) {
     }
 
     std::shared_ptr<BufferInstance> BufferService::createBuffer(VkDeviceSize bufferSize,

@@ -21,7 +21,7 @@ namespace Metal {
         updateCamera();
         updateInputs();
 
-        context->guiContext.renderImage(context->getVulkanContext().coreFrameBuffers.auxRenderPass->attachments[0].get(), size->x, size->y);
+        context->guiContext.renderImage(context->vulkanContext.coreFrameBuffers.postProcessingFBO->attachments[0].get(), size->x, size->y);
         if (context->getEditorContext().editorRepository.editorMode == EditorMode::EditorMode::TRANSFORM) {
             gizmoPanel->onSync();
         }

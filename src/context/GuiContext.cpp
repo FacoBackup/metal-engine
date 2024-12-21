@@ -11,7 +11,7 @@
 
 namespace Metal {
     bool GuiContext::beginFrame() const {
-        context.getVulkanContext().getFrameData().commandBuffers.clear();
+        context.vulkanContext.getFrameData().commandBuffers.clear();
         if (context.getGLFWContext().beginFrame()) {
             // Start the Dear ImGui frame
             ImGui_ImplVulkan_NewFrame();
@@ -57,17 +57,17 @@ namespace Metal {
         // Setup Platform/Renderer backends
         ImGui_ImplGlfw_InitForVulkan(context.getGLFWContext().getWindow(), true);
         ImGui_ImplVulkan_InitInfo init_info = {};
-        init_info.Instance = context.getVulkanContext().instance.instance;
-        init_info.PhysicalDevice = context.getVulkanContext().physDevice.physical_device;
-        init_info.Device = context.getVulkanContext().device.device;
-        init_info.QueueFamily = context.getVulkanContext().queueFamily;
-        init_info.Queue = context.getVulkanContext().graphicsQueue;
-        init_info.PipelineCache = context.getVulkanContext().pipelineCache;
-        init_info.DescriptorPool = context.getVulkanContext().descriptorPool;
-        init_info.RenderPass = context.getVulkanContext().imguiVulkanWindow.RenderPass;
+        init_info.Instance = context.vulkanContext.instance.instance;
+        init_info.PhysicalDevice = context.vulkanContext.physDevice.physical_device;
+        init_info.Device = context.vulkanContext.device.device;
+        init_info.QueueFamily = context.vulkanContext.queueFamily;
+        init_info.Queue = context.vulkanContext.graphicsQueue;
+        init_info.PipelineCache = context.vulkanContext.pipelineCache;
+        init_info.DescriptorPool = context.vulkanContext.descriptorPool;
+        init_info.RenderPass = context.vulkanContext.imguiVulkanWindow.RenderPass;
         init_info.Subpass = 0;
         init_info.MinImageCount = IMAGE_COUNT;
-        init_info.ImageCount = context.getVulkanContext().imguiVulkanWindow.ImageCount;
+        init_info.ImageCount = context.vulkanContext.imguiVulkanWindow.ImageCount;
         init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
         init_info.Allocator = nullptr;
         init_info.CheckVkResultFn = VulkanUtils::CheckVKResult;
@@ -131,12 +131,12 @@ namespace Metal {
     }
 
     void GuiContext::dispose() const {
-        const VkResult err = vkDeviceWaitIdle(context.getVulkanContext().device.device);
+        const VkResult err = vkDeviceWaitIdle(context.vulkanContext.device.device);
         VulkanUtils::CheckVKResult(err);
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
-        ImGui_ImplVulkanH_DestroyWindow(context.getVulkanContext().instance, context.getVulkanContext().device.device,
+        ImGui_ImplVulkanH_DestroyWindow(context.vulkanContext.instance, context.vulkanContext.device.device,
                                         &context.getGLFWContext().getGUIWindow(),
                                         nullptr);
         context.getGLFWContext().dispose();

@@ -6,8 +6,9 @@ namespace Metal {
     struct FrameBufferInstance;
 
     struct CoreFrameBuffers final : AbstractCoreRepository {
-        FrameBufferInstance *gBufferRenderPass = nullptr;
-        FrameBufferInstance *auxRenderPass = nullptr;
+        FrameBufferInstance *gBufferFBO = nullptr;
+        FrameBufferInstance *auxFBO = nullptr;
+        FrameBufferInstance *postProcessingFBO = nullptr;
 
         explicit CoreFrameBuffers(ApplicationContext &context)
             : AbstractCoreRepository(context) {

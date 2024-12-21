@@ -122,7 +122,7 @@ add_executable(
         src/context/service/DescriptorService.h
         src/context/runtime/DescriptorInstance.cpp
         src/context/runtime/DescriptorInstance.h
-        src/context/repository/GlobalDataUBO.h
+        src/context/buffers/GlobalDataUBO.h
         src/engine/RuntimeRepository.h
         src/context/repository/CoreDescriptorSets.cpp
         src/context/repository/CoreDescriptorSets.h
@@ -225,6 +225,9 @@ add_executable(
         src/context/runtime/assets/SceneData.h
         src/context/runtime/assets/EntityAssetData.h
         src/context/runtime/assets/MaterialData.h
+        src/engine/render-pass/impl/PostProcessingPass.cpp
+        src/engine/render-pass/impl/PostProcessingPass.h
+        src/context/buffers/PPSettingsUBO.h
 )
 
 

@@ -1,4 +1,4 @@
-in vec2 texCoords;
+layout(location = 0) in vec2 texCoords;
 #define A  0.15
 #define B  0.50
 #define C  0.10
@@ -7,31 +7,28 @@ in vec2 texCoords;
 #define F  0.30
 #define W  11.2
 
-uniform float distortionIntensity;
-uniform float chromaticAberrationIntensity;
-uniform bool distortionEnabled;
-uniform bool chromaticAberrationEnabled;
-uniform bool bloomEnabled;
-uniform float focusDistanceDOF;
-uniform float apertureDOF;
-uniform float focalLengthDOF;
-uniform float samplesDOF;
-uniform bool vignetteEnabled;
-uniform float vignetteStrength;
+layout(set = 0, binding = 0) uniform PPSettings {
+    float   distortionIntensity;
+    float   chromaticAberrationIntensity;
+    bool    distortionEnabled;
+    bool    chromaticAberrationEnabled;
+    bool    vignetteEnabled;
+    float   vignetteStrength;
+} postProcessing;
+layout(set = 0, binding = 1) uniform sampler2D sceneColor;
 
-layout(binding = 0)uniform sampler2D bloomColor;
-layout(binding = 1)uniform sampler2D sceneColor;
+layout(location = 0) out vec4 finalColor;
 
-out vec4 fragColor;
 
 vec3 chromaticAberration(vec2 uv) {
-    float amount = chromaticAberrationIntensity * .001;
+    float amount = postProcessing.chromaticAberrationIntensity * .001;
     vec3 col;
     col.r = texture(sceneColor, vec2(uv.x + amount, uv.y)).r;
     col.g = texture(sceneColor, uv).g;
     col.b = texture(sceneColor, vec2(uv.x - amount, uv.y)).b;
     return col;
 }
+
 vec2 lensDistortion(vec2 uv, float k) {
     vec2 t = uv - .5;
     float r2 = t.x * t.x + t.y * t.y;
@@ -42,7 +39,7 @@ vec2 lensDistortion(vec2 uv, float k) {
 }
 
 // https://github.com/KhronosGroup/ToneMapping/blob/main/PBR_Neutral/pbrNeutral.glsl
-vec3 PBRNeutralToneMapping( vec3 color ) {
+vec3 PBRNeutralToneMapping(vec3 color) {
     const float startCompression = 0.8 - 0.04;
     const float desaturation = 0.15;
 
@@ -61,7 +58,7 @@ vec3 PBRNeutralToneMapping( vec3 color ) {
     return mix(color, newPeak * vec3(1, 1, 1), g);
 }
 
-vec3 aces( vec3 x ) {
+vec3 aces(vec3 x) {
     // Narkowicz 2015, "ACES Filmic Tone Mapping Curve"
     const float a = 2.51;
     const float b = 0.03;
@@ -73,15 +70,14 @@ vec3 aces( vec3 x ) {
 
 void main(void) {
 
-    vec2 texCoords = distortionEnabled ? lensDistortion(texCoords, distortionIntensity * .5) : texCoords;
-    vec3 color = bloomEnabled ? aces(texture(bloomColor, texCoords).rgb) : vec3(0.);
-    color += chromaticAberrationEnabled ? chromaticAberration(texCoords) : texture(sceneColor, texCoords).rgb;
-    fragColor = vec4(aces(color), 1.);
+    vec2 texCoords = postProcessing.distortionEnabled ? lensDistortion(texCoords, postProcessing.distortionIntensity * .5) : texCoords;
+    vec3 color = postProcessing.chromaticAberrationEnabled ? chromaticAberration(texCoords) : texture(sceneColor, texCoords).rgb;
+    finalColor = vec4(aces(color), 1.);
 
-    if (vignetteEnabled) {
+    if (postProcessing.vignetteEnabled) {
         vec2 uv = texCoords;
         uv *= 1.0 - uv.yx;
-        float vig = pow(uv.x * uv.y * 15., vignetteStrength);
-        fragColor.rgb *= vig;
+        float vig = pow(uv.x * uv.y * 15., postProcessing.vignetteStrength);
+        finalColor.rgb *= vig;
     }
 }

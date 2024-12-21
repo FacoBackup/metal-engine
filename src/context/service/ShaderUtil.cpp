@@ -118,7 +118,7 @@ namespace Metal {
 
         glslang_initialize_process();
         ShaderModule shader{};
-        if (CompileShader(context.getVulkanContext(), shaderStage, source.c_str(), &shader)) {
+        if (CompileShader(context.vulkanContext, shaderStage, source.c_str(), &shader)) {
             const std::string part(pFilename);
             const std::string BinaryFilename = basePath + part.substr(
                                                    part.find_last_of('/') + 1, part.size()) + ".spv";

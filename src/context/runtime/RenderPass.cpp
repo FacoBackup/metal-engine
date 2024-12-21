@@ -24,12 +24,12 @@ namespace Metal {
 
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo.commandPool = context.getVulkanContext().commandPool;
+        allocInfo.commandPool = context.vulkanContext.commandPool;
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
         allocInfo.commandBufferCount = 1;
 
         VulkanUtils::CheckVKResult(
-            vkAllocateCommandBuffers(context.getVulkanContext().device.device, &allocInfo, &vkCommandBuffer));
+            vkAllocateCommandBuffers(context.vulkanContext.device.device, &allocInfo, &vkCommandBuffer));
     }
 
     void RenderPass::recordCommands(const std::vector<std::unique_ptr<AbstractRenderPass> > &renderPasses) const {
@@ -62,6 +62,6 @@ namespace Metal {
         vkCmdEndRenderPass(vkCommandBuffer);
         vkEndCommandBuffer(vkCommandBuffer);
 
-        context.getVulkanContext().getFrameData().commandBuffers.push_back(vkCommandBuffer);
+        context.vulkanContext.getFrameData().commandBuffers.push_back(vkCommandBuffer);
     }
 } // Metal
