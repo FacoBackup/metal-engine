@@ -9,6 +9,7 @@
 #include "../runtime/assets/MeshData.h"
 #include "../runtime/assets/VertexData.h"
 #include "../runtime/DescriptorInstance.h"
+#include "../runtime/FrameBufferAttachment.h"
 
 namespace Metal {
     void PipelineService::createPipelineLayout(const std::vector<DescriptorInstance *> &descriptorSetsToBind,
@@ -34,37 +35,6 @@ namespace Metal {
 
         VulkanUtils::CheckVKResult(vkCreatePipelineLayout(vulkanContext.device.device, &layoutInfo, nullptr,
                                                           &pipeline->vkPipelineLayout));
-    }
-
-    void PipelineService::getBlendConfig(bool blendEnabled, VkPipelineColorBlendStateCreateInfo &colorBlending) {
-        auto *colorBlendAttachment = new VkPipelineColorBlendAttachmentState;
-        if (blendEnabled) {
-            colorBlendAttachment->blendEnable = VK_TRUE; // Enable blending
-            colorBlendAttachment->srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA; // Source color factor
-            colorBlendAttachment->dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA; // Destination color factor
-            colorBlendAttachment->colorBlendOp = VK_BLEND_OP_ADD; // Blend operation (add source and destination)
-            colorBlendAttachment->srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE; // Source alpha factor
-            colorBlendAttachment->dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // Destination alpha factor
-            colorBlendAttachment->alphaBlendOp = VK_BLEND_OP_ADD; // Blend operation for alpha
-            colorBlendAttachment->colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
-                                                   VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-        } else {
-            colorBlendAttachment->colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
-                                                   VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-            colorBlendAttachment->blendEnable = VK_FALSE;
-        }
-
-
-        colorBlending = {};
-        colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-        colorBlending.logicOpEnable = VK_FALSE;
-        colorBlending.logicOp = VK_LOGIC_OP_COPY;
-        colorBlending.attachmentCount = 1;
-        colorBlending.pAttachments = colorBlendAttachment;
-        colorBlending.blendConstants[0] = 0.0f;
-        colorBlending.blendConstants[1] = 0.0f;
-        colorBlending.blendConstants[2] = 0.0f;
-        colorBlending.blendConstants[3] = 0.0f;
     }
 
     PipelineInstance *PipelineService::createRenderingPipeline(PipelineBuilder &pipelineBuilder) {
@@ -129,8 +99,37 @@ namespace Metal {
         multisampling.sampleShadingEnable = VK_FALSE;
         multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
 
-        VkPipelineColorBlendStateCreateInfo colorBlending;
-        getBlendConfig(pipelineBuilder.blendEnabled, colorBlending);
+        VkPipelineColorBlendStateCreateInfo colorBlending{};
+        std::vector<VkPipelineColorBlendAttachmentState> colorBlendAttachments{};
+        for (int i = 0; i < pipelineBuilder.frameBuffer->attachments.size(); i++) {
+            if (!pipelineBuilder.frameBuffer->attachments[i]->depth) {
+                auto &colorBlendAttachment = colorBlendAttachments.emplace_back();
+                if (pipelineBuilder.blendEnabled) {
+                    colorBlendAttachment.blendEnable = VK_TRUE;
+                    colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+                    colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+                    colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
+                    colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+                    colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+                    colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
+                    colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
+                                                          VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+                } else {
+                    colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
+                                                          VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+                    colorBlendAttachment.blendEnable = VK_FALSE;
+                }
+            }
+        }
+        colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+        colorBlending.logicOpEnable = VK_FALSE;
+        colorBlending.logicOp = VK_LOGIC_OP_COPY;
+        colorBlending.attachmentCount = colorBlendAttachments.size();
+        colorBlending.pAttachments = colorBlendAttachments.data();
+        colorBlending.blendConstants[0] = 0.0f;
+        colorBlending.blendConstants[1] = 0.0f;
+        colorBlending.blendConstants[2] = 0.0f;
+        colorBlending.blendConstants[3] = 0.0f;
 
         std::vector dynamicStates = {
             VK_DYNAMIC_STATE_VIEWPORT,
@@ -138,7 +137,7 @@ namespace Metal {
         };
         VkPipelineDynamicStateCreateInfo dynamicState{};
         dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-        dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
+        dynamicState.dynamicStateCount = dynamicStates.size();
         dynamicState.pDynamicStates = dynamicStates.data();
 
         VkGraphicsPipelineCreateInfo pipelineInfo{};
@@ -155,9 +154,11 @@ namespace Metal {
             .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
             .depthTestEnable = VK_TRUE,
             .depthWriteEnable = VK_TRUE,
-            .depthCompareOp = VK_COMPARE_OP_LESS,
+            .depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL,
             .depthBoundsTestEnable = VK_FALSE,
             .stencilTestEnable = VK_FALSE,
+            // .maxDepthBounds = 1,
+            // .minDepthBounds = 0
         };
         pipelineInfo.pDepthStencilState = pipelineBuilder.depthTest ? &depthStencilState : nullptr;
         pipelineInfo.pColorBlendState = &colorBlending;
@@ -179,7 +180,6 @@ namespace Metal {
         delete meshBindingDescription;
         vkDestroyShaderModule(vulkanContext.device.device, fragmentShaderModule, nullptr);
         vkDestroyShaderModule(vulkanContext.device.device, vertexShaderModule, nullptr);
-        delete colorBlending.pAttachments;
         return pipeline;
     }
 } // Metal

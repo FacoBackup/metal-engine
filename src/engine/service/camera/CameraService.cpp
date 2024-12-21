@@ -41,14 +41,16 @@ namespace Metal {
     void CameraService::updateProjection() const {
         if (camera->isOrthographic) {
             camera->projectionMatrix = glm::ortho(-camera->orthographicProjectionSize,
-                                                     camera->orthographicProjectionSize,
-                                                     -camera->orthographicProjectionSize / camera->aspectRatio,
-                                                     camera->orthographicProjectionSize / camera->aspectRatio,
-                                                     -camera->zFar, camera->zFar);
+                                                  camera->orthographicProjectionSize,
+                                                  -camera->orthographicProjectionSize / camera->aspectRatio,
+                                                  camera->orthographicProjectionSize / camera->aspectRatio,
+                                                  -camera->zFar, camera->zFar);
         } else {
-            camera->projectionMatrix = glm::perspective(camera->fov * Util::TO_RADIANS, camera->aspectRatio, camera->zNear,
-                                                           camera->zFar);
+            camera->projectionMatrix = glm::perspective(camera->fov * Util::TO_RADIANS, camera->aspectRatio,
+                                                        camera->zNear,
+                                                        camera->zFar);
         }
+        camera->projectionMatrix[1][1] *= -1;
         camera->invProjectionMatrix = glm::inverse(camera->projectionMatrix);
     }
 
@@ -124,9 +126,9 @@ namespace Metal {
         }
 
         camera->deltaX = (mouseX - camera->lastMouseX) * camera->rotationSensitivity *
-                                  0.25f;
+                         0.25f;
         camera->deltaY = (camera->lastMouseY - mouseY) * camera->rotationSensitivity *
-                                  0.25f;
+                         0.25f;
 
         camera->lastMouseX = mouseX;
         camera->lastMouseY = mouseY;
@@ -138,7 +140,6 @@ namespace Metal {
     }
 
     void CameraService::createViewMatrix() {
-
         const float cosPitch = std::cos(camera->pitch);
         const float sinPitch = std::sin(camera->pitch);
         const float cosYaw = std::cos(camera->yaw);

@@ -29,6 +29,9 @@ layout(push_constant) uniform Push {
 layout(location = 0) out vec4 finalColor;
 
 void main() {
+    if (texture(gBufferDepthIdUV, texCoords).r != 1){
+        discard;
+    }
     if (push.mode == ALBEDO){
         finalColor = vec4(texture(gBufferAlbedoEmissive, texCoords).rgb, 1);
     } else if (push.mode == NORMAL){
@@ -40,6 +43,6 @@ void main() {
     } else if (push.mode == AO){
         finalColor = vec4(vec3(texture(gBufferRoughnessMetallicAO, texCoords).b), 1);
     } else {
-        discard;
+        finalColor = vec4(vec3(texture(gBufferDepthIdUV, texCoords).r), 1);
     }
 }

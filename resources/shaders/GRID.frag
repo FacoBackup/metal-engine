@@ -22,7 +22,7 @@ layout(location = 0) out vec4 finalColor;
 
 vec3 createRay() {
     // Adjust texCoords for Vulkan's coordinate system
-    vec2 pxNDS = vec2(texCoords.x, 1.0 - texCoords.y) * 2.0 - 1.0;
+    vec2 pxNDS = vec2(texCoords.x, texCoords.y) * 2.0 - 1.0;
     vec3 pointNDS = vec3(pxNDS, -1.0);
     vec4 pointNDSH = vec4(pointNDS, 1.0);
 
@@ -56,7 +56,7 @@ float getGridLine(float gridScale){
 }
 
 void main() {
-//    float depthData = getLogDepth(texCoords);
+    //    float depthData = getLogDepth(texCoords);
 
     bool hasData = false;
     bool isOverlay = false;

@@ -16,6 +16,7 @@ namespace Metal {
 
     class GizmoPanel final : public AbstractPanel {
         glm::mat4x4 auxMat4{};
+        glm::mat4x4 cacheProjection{};
         glm::vec3 auxTranslation{};
         glm::vec3 auxScale{};
         glm::quat auxRot{};

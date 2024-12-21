@@ -21,7 +21,6 @@ namespace Metal {
                                   uint32_t pushConstantsSize,
                                   PipelineInstance *pipeline) const;
 
-        static void getBlendConfig(bool blendEnabled, VkPipelineColorBlendStateCreateInfo &colorBlending);
 
         PipelineInstance *createRenderingPipeline(PipelineBuilder &pipelineBuilder);
     };

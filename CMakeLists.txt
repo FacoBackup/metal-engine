@@ -232,6 +232,7 @@ add_executable(
         src/engine/render-pass/impl/GBufferShadingPass.h
         src/context/buffers/GBufferShadingPushConstant.h
         src/context/service/PipelineBuilder.h
+        src/context/runtime/FrameBufferAttachment.cpp
 )
 
 

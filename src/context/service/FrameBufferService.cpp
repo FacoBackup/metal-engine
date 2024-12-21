@@ -24,7 +24,9 @@ namespace Metal {
 
     void FrameBufferService::createAttachment(const char *name, VkFormat format, VkImageUsageFlagBits usage,
                                               FrameBufferInstance *pipeline) const {
-        const auto att = createAttachmentInternal(name, format, usage, pipeline);
+        const auto att = createAttachmentInternal(name, format,
+                                                  static_cast<VkImageUsageFlagBits>(usage | VK_IMAGE_USAGE_SAMPLED_BIT),
+                                                  pipeline);
         att->depth = false;
     }
 
@@ -32,18 +34,20 @@ namespace Metal {
         const char *name, VkFormat format,
         VkImageUsageFlagBits usage,
         FrameBufferInstance *framebuffer) const {
-        std::shared_ptr<FrameBufferAttachment> attachment(new FrameBufferAttachment);
+        std::shared_ptr<FrameBufferAttachment> attachment = std::make_shared<FrameBufferAttachment>();
         attachment->name = name;
         framebuffer->attachments.push_back(attachment);
         attachment->format = format;
 
         VkImageAspectFlags aspectMask = 0;
+        VkImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
 
         if (usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT) {
             aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        }
-        if (usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) {
-            aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+            layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        } else if (usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) {
+            aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+            layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
         }
 
         assert(aspectMask > 0);
@@ -58,8 +62,8 @@ namespace Metal {
         image.arrayLayers = 1;
         image.samples = VK_SAMPLE_COUNT_1_BIT;
         image.tiling = VK_IMAGE_TILING_OPTIMAL;
-        image.usage = usage | VK_IMAGE_USAGE_SAMPLED_BIT;
-        image.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        image.usage = usage;
+        image.initialLayout = layout;
         image.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
         VulkanUtils::CheckVKResult(vkCreateImage(vulkanContext.device.device, &image, nullptr, &attachment->vkImage));
@@ -111,8 +115,11 @@ namespace Metal {
     }
 
     void FrameBufferService::createRenderPass(FrameBufferInstance *framebuffer) const {
+        std::vector<VkAttachmentDescription> attachmentDescriptions{};
+        std::vector<VkAttachmentReference> colorReferences{};
+        VkAttachmentReference *depthRef = nullptr;
         for (uint32_t i = 0; i < framebuffer->attachments.size(); i++) {
-            VkAttachmentDescription &attachmentDescription = framebuffer->attachmentDescriptions.emplace_back();
+            VkAttachmentDescription &attachmentDescription = attachmentDescriptions.emplace_back();
             const std::shared_ptr<FrameBufferAttachment> fbAttachment = framebuffer->attachments[i];
             attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
             attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -127,10 +134,10 @@ namespace Metal {
 
             if (fbAttachment->depth) {
                 std::cout << "Depth Attachment " << i << std::endl;
-                framebuffer->depthRef = new VkAttachmentReference{i, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL};
+                depthRef = new VkAttachmentReference{i, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL};
             } else {
                 std::cout << "Color Attachment " << i << std::endl;
-                VkAttachmentReference &colorRef = framebuffer->colorReferences.emplace_back();
+                VkAttachmentReference &colorRef = colorReferences.emplace_back();
                 colorRef.attachment = i;
                 colorRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
             }
@@ -160,16 +167,16 @@ namespace Metal {
         // SUB PASS DESCRIPTOR
         VkSubpassDescription subpass = {};
         subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-        subpass.pColorAttachments = framebuffer->colorReferences.data();
-        subpass.colorAttachmentCount = framebuffer->colorReferences.size();
-        if (framebuffer->depthRef != nullptr) {
-            subpass.pDepthStencilAttachment = framebuffer->depthRef;
+        subpass.pColorAttachments = colorReferences.data();
+        subpass.colorAttachmentCount = colorReferences.size();
+        if (depthRef != nullptr) {
+            subpass.pDepthStencilAttachment = depthRef;
         }
 
         VkRenderPassCreateInfo renderPassInfo = {};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-        renderPassInfo.pAttachments = framebuffer->attachmentDescriptions.data();
-        renderPassInfo.attachmentCount = framebuffer->attachmentDescriptions.size();
+        renderPassInfo.pAttachments = attachmentDescriptions.data();
+        renderPassInfo.attachmentCount = attachmentDescriptions.size();
         renderPassInfo.subpassCount = 1;
         renderPassInfo.pSubpasses = &subpass;
         // renderPassInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
@@ -180,6 +187,7 @@ namespace Metal {
                                                       nullptr,
                                                       &framebuffer->vkRenderPass));
         createVKFrameBuffer(framebuffer);
+        delete depthRef;
     }
 
     void FrameBufferService::createVKFrameBuffer(FrameBufferInstance *framebuffer) const {

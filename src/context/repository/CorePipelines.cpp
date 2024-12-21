@@ -40,7 +40,7 @@ namespace Metal {
 
 
         PipelineBuilder gBufferShadingPipelineBuilder = PipelineBuilder::Of(
-                    context.vulkanContext.coreFrameBuffers.postProcessingFBO,
+                    context.vulkanContext.coreFrameBuffers.auxFBO,
                     "../resources/shaders/QUAD.vert",
                     "../resources/shaders/GBufferShading.frag"
                 )
