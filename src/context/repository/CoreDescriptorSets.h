@@ -1,31 +1,22 @@
 #ifndef COREDESCRIPTORSETS_H
 #define COREDESCRIPTORSETS_H
 
-#include <vulkan/vulkan_core.h>
+#include <memory>
 
 #include "AbstractCoreRepository.h"
+#include "../runtime/DescriptorInstance.h"
 
 namespace Metal {
-    struct DescriptorInstance;
-}
-
-namespace Metal {
+    struct TextureInstance;
+    struct FrameBufferAttachment;
     struct CoreDescriptorSets final : AbstractCoreRepository {
         explicit CoreDescriptorSets(ApplicationContext &context)
             : AbstractCoreRepository(context) {
         }
 
-        DescriptorInstance *globalDataDescriptor = nullptr;
-        DescriptorInstance *imageSampler = nullptr;
+        std::unique_ptr<DescriptorInstance> globalDataDescriptor = nullptr;
 
         void onInitialize() override;
-
-        void createDescriptors();
-
-        void updateImageSamplerDescriptor(VkSampler sampler, VkImageView view);
-
-    private:
-        VkSampler lastSampler = VK_NULL_HANDLE;
     };
 } // Metal
 

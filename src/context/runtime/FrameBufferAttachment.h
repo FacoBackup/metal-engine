@@ -1,6 +1,6 @@
 #ifndef FRAMEBUFFERATTACHMENT_H
 #define FRAMEBUFFERATTACHMENT_H
-#include "RuntimeResource.h"
+#include "DescriptorInstance.h"
 
 namespace Metal {
     struct FrameBufferAttachment final {
@@ -9,6 +9,7 @@ namespace Metal {
         VkImageView vkImageView = VK_NULL_HANDLE;
         VkSampler vkImageSampler = VK_NULL_HANDLE;
         VkFormat format = VK_FORMAT_MAX_ENUM;
+        std::unique_ptr<DescriptorInstance> imageDescriptor = nullptr;
         bool depth = false;
         const char *name = nullptr;
 
@@ -17,6 +18,10 @@ namespace Metal {
             vkDestroyImage(context.device.device, vkImage, nullptr);
             vkDestroyImageView(context.device.device, vkImageView, nullptr);
             vkFreeMemory(context.device.device, mem, nullptr);
+
+            if (imageDescriptor != nullptr) {
+                imageDescriptor->dispose(context);
+            }
         }
     };
 }

@@ -6,6 +6,7 @@
 #include "../../../common/util/files/EntryType.h"
 
 namespace Metal {
+    struct TextureInstance;
 }
 
 using Clock = std::chrono::high_resolution_clock;
@@ -25,6 +26,8 @@ namespace Metal {
         }
 
         MeshInstance *streamMesh(const std::string &id, const LevelOfDetail &lod);
+
+        TextureInstance *streamTexture(const std::string &id, const LevelOfDetail &lod);
 
         void onSync() override;
     };

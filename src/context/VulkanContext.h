@@ -50,15 +50,12 @@ namespace Metal {
 
         void createCommandPool();
 
-        void createDescriptorPool();
+        void createDescriptorPool() const;
 
         uint32_t w{}, h{};
         GLFWwindow *window = nullptr;
         bool debugMode = false;
-        std::unordered_map<VkDescriptorType, uint32_t> descriptorPoolSizes{};
         FrameData frameData{};
-        uint32_t maxDescriptorSets = 0;
-
     public:
         explicit VulkanContext(ApplicationContext &context, bool debugMode);
 
@@ -104,9 +101,9 @@ namespace Metal {
 
         [[nodiscard]] uint32_t getWindowHeight() const;
 
-        void registerDescriptorBinding(VkDescriptorType type);
+        VkCommandBuffer beginSingleTimeCommands() const;
 
-        void registerDescriptorSet();
+        void endSingleTimeCommands(VkCommandBuffer  commandBuffer) const;
     };
 } // Metal
 

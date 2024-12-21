@@ -5,17 +5,17 @@
 #include "../../common/interface/AbstractResourceService.h"
 
 namespace Metal {
+    struct TextureInstance;
+    struct FrameBufferAttachment;
     struct DescriptorInstance;
 
-    class DescriptorService final : public AbstractResourceService {
+    class DescriptorService final : public AbstractRuntimeComponent {
     public:
         explicit DescriptorService(ApplicationContext &context);
 
-        DescriptorInstance *createDescriptor();
+        void updateImageSamplerDescriptor(FrameBufferAttachment *attachment) const;
 
-        void addLayoutBinding(DescriptorInstance *instance, VkShaderStageFlagBits stageFlags,
-                              VkDescriptorType descriptorType,
-                              unsigned int bindingPoint) const;
+        void updateImageSamplerDescriptor(TextureInstance *texture) const;
     };
 } // Metal
 

@@ -1,12 +1,13 @@
 #include "GuiContext.h"
 
 #include <imgui_impl_glfw.h>
-
-#include "../common/interface/Icons.h"
 #include "imgui_freetype.h"
 #include "ApplicationContext.h"
 #include "../common/util/VulkanUtils.h"
-
+#include "repository/CoreDescriptorSets.h"
+#include "runtime/DescriptorInstance.h"
+#include "runtime/FrameBufferAttachment.h"
+#include "runtime/TextureInstance.h"
 
 namespace Metal {
     bool GuiContext::beginFrame() const {
@@ -29,6 +30,16 @@ namespace Metal {
             context.getGLFWContext().renderFrame(drawData);
         if (!main_is_minimized)
             context.getGLFWContext().presentFrame();
+    }
+
+    void GuiContext::renderImage(FrameBufferAttachment *attachment, const float sizeX, const float sizeY) const {
+        context.vulkanContext.descriptorService.updateImageSamplerDescriptor(attachment);
+        ImGui::Image(reinterpret_cast<ImTextureID>(attachment->imageDescriptor->vkDescriptorSet), ImVec2{sizeX, sizeY});
+    }
+
+    void GuiContext::renderImage(TextureInstance *texture, const float sizeX, const float sizeY) const {
+        context.vulkanContext.descriptorService.updateImageSamplerDescriptor(texture);
+        ImGui::Image(reinterpret_cast<ImTextureID>(texture->imageDescriptor->vkDescriptorSet), ImVec2{sizeX, sizeY});
     }
 
     void GuiContext::onInitialize() {
@@ -112,7 +123,8 @@ namespace Metal {
         constexpr auto MAX = static_cast<ImWchar16>(0xFF000);
         constexpr ImWchar RANGES[] = {MIN, MAX, 0};
         io.Fonts->AddFontFromFileTTF("resources/fonts/MaterialIcons.ttf", 18, fontConfig, RANGES);
-        largeIconsFont = io.Fonts->AddFontFromFileTTF("resources/fonts/MaterialIcons.ttf", LARGE_FONT_SIZE, nullptr, RANGES);
+        largeIconsFont = io.Fonts->AddFontFromFileTTF("resources/fonts/MaterialIcons.ttf", LARGE_FONT_SIZE, nullptr,
+                                                      RANGES);
 
         io.Fonts->Build();
         delete fontConfig;

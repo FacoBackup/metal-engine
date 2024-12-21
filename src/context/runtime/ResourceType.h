@@ -5,7 +5,6 @@ namespace Metal {
     enum ResourceType {
         MESH,
         FRAMEBUFFER,
-        DESCRIPTOR,
         TEXTURE,
         PIPELINE
     };

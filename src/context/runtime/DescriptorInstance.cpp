@@ -5,12 +5,12 @@
 #include "../../common/util/VulkanUtils.h"
 
 namespace Metal {
-    void DescriptorInstance::dispose(VulkanContext &context) {
+    void DescriptorInstance::dispose(const VulkanContext &context) const {
         if (ready)
             vkDestroyDescriptorSetLayout(context.device.device, vkDescriptorSetLayout, nullptr);
     }
 
-    void DescriptorInstance::createLayout(VulkanContext &context) {
+    void DescriptorInstance::createLayout(const VulkanContext &context) {
         if (descriptorSetLayoutBindings.empty()) {
             throw std::runtime_error("No descriptor layout sets were created");
         }
@@ -25,15 +25,25 @@ namespace Metal {
                                                                &vkDescriptorSetLayout));
     }
 
-    void DescriptorInstance::create(const VulkanContext &context, VkDescriptorPool pool) {
+    void DescriptorInstance::create(const VulkanContext &context) {
         VkDescriptorSetAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        allocInfo.descriptorPool = pool; // Created during setup
+        allocInfo.descriptorPool = context.descriptorPool; // Created during setup
         allocInfo.descriptorSetCount = 1;
         allocInfo.pSetLayouts = &vkDescriptorSetLayout;
 
         VulkanUtils::CheckVKResult(vkAllocateDescriptorSets(context.device.device, &allocInfo, &vkDescriptorSet));
         ready = true;
+    }
+
+    void DescriptorInstance::addLayoutBinding(VkShaderStageFlagBits stageFlags, VkDescriptorType descriptorType,
+                                              uint32_t bindingPoint) {
+        auto &samplerLayoutBinding = descriptorSetLayoutBindings.emplace_back();
+        samplerLayoutBinding.binding = bindingPoint;
+        samplerLayoutBinding.descriptorType = descriptorType;
+        samplerLayoutBinding.descriptorCount = 1;
+        samplerLayoutBinding.stageFlags = stageFlags;
+        samplerLayoutBinding.pImmutableSamplers = nullptr;
     }
 
     void DescriptorInstance::addBufferDescriptor(const uint32_t bindingPoint, VkDescriptorType type,

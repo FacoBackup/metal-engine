@@ -1,28 +1,45 @@
 #ifndef TEXTURESERVICE_H
 #define TEXTURESERVICE_H
 #include <string>
+#include <sys/types.h>
 #include <vulkan/vulkan_core.h>
 
 #include "../../common/interface/AbstractResourceService.h"
 
 namespace Metal {
+    struct LevelOfDetail;
+}
+
+namespace Metal {
     struct TextureInstance;
 
     class TextureService final : public AbstractResourceService {
-        [[nodiscard]] VkSampler createVkSampler() const;
+        void copyBufferToImage(const VkBuffer &vkBuffer, const TextureInstance *image, int layerCount) const;
 
-        VkImageView createVkImageView(VkImage image, VkFormat format) const;
+        void createImageWithInfo(const VkImageCreateInfo &imageInfo, VkMemoryPropertyFlagBits vkMemoryProperties,
+                                 TextureInstance *image) const;
+
+        void createSampler(TextureInstance *image) const;
+
+        void createImageView(VkFormat imageFormat, TextureInstance *image) const;
+
+        void createImage(VkFormat imageFormat, TextureInstance *image, int width, int height) const;
+
+        void transitionImageLayout(const TextureInstance *image, VkImageLayout oldLayout,
+                                   VkImageLayout newLayout) const;
+
+        void generateMipmaps(const TextureInstance *image) const;
 
     public:
         explicit TextureService(ApplicationContext &context)
             : AbstractResourceService(context) {
         }
 
-        TextureInstance *loadTexture(const std::string &pathToImage);
+        TextureInstance *loadTexture(const std::string &id, const std::string &pathToImage, bool generateMipMaps = false,
+                                     VkFormat imageFormat = VK_FORMAT_R8G8B8A8_SRGB);
 
-        void createVkImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
-                           VkImageUsageFlags usage,
-                           VkMemoryPropertyFlags properties, VkImage &image, VkDeviceMemory &imageMemory) const;
+        TextureInstance *create(const std::string &id, const LevelOfDetail &lod);
+
     };
 } // Metal
 

@@ -22,6 +22,7 @@ namespace Metal {
     public:
         explicit EngineContext(ApplicationContext &context);
 
+         long long currentTimeMs;
         TimePoint currentTime;
         TimePoint previousTime = Clock::now();
         float deltaTime = 0;

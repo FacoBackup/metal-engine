@@ -210,8 +210,8 @@ namespace Metal {
         createSwapChain();
         createMemoryAllocator();
         createCommandPool();
+        createDescriptorPool();
         // ------- CORE INITIALIZATION
-
 
         // ------- SERVICE INITIALIZATION
         textureService.onInitialize();
@@ -224,8 +224,6 @@ namespace Metal {
         coreBuffers.onInitialize();
         coreFrameBuffers.onInitialize();
         coreDescriptorSets.onInitialize();
-        createDescriptorPool();
-        coreDescriptorSets.createDescriptors();
         corePipelines.onInitialize();
         coreRenderPasses.onInitialize();
         // ------- REPOSITORY INITIALIZATION
@@ -233,7 +231,6 @@ namespace Metal {
 
     void VulkanContext::dispose() {
         pipelineService.disposeAll();
-        descriptorService.disposeAll();
         framebufferService.disposeAll();
         textureService.disposeAll();
         meshService.disposeAll();
@@ -246,38 +243,53 @@ namespace Metal {
         vkb::destroy_instance(instance);
     }
 
-    void VulkanContext::createDescriptorPool() {
-        // IMGUI REQUIREMENT
-        registerDescriptorBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-        registerDescriptorSet();
-        // IMGUI REQUIREMENT
-
-        std::vector<VkDescriptorPoolSize> sizes{};
-        sizes.reserve(descriptorPoolSizes.size());
-        for (const auto &item: descriptorPoolSizes) {
-            sizes.emplace_back(item.first, item.second);
-        }
+    void VulkanContext::createDescriptorPool() const {
+        const std::array sizes{
+            VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 100}, // 1 for imgui
+            VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}
+        };
 
         VkDescriptorPoolCreateInfo poolInfo{};
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         poolInfo.poolSizeCount = sizes.size();
         poolInfo.pPoolSizes = sizes.data();
         poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-        poolInfo.maxSets = maxDescriptorSets;
+        poolInfo.maxSets = 101;
 
         VulkanUtils::CheckVKResult(vkCreateDescriptorPool(device.device, &poolInfo,
                                                           nullptr, &context.getVulkanContext().descriptorPool));
     }
 
-    void VulkanContext::registerDescriptorBinding(VkDescriptorType type) {
-        if (!descriptorPoolSizes.contains(type)) {
-            descriptorPoolSizes.insert({type, 0});
-        }
-        descriptorPoolSizes.insert({type, descriptorPoolSizes[type]++});
+    VkCommandBuffer VulkanContext::beginSingleTimeCommands() const {
+        VkCommandBufferAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocInfo.commandPool = commandPool;
+        allocInfo.commandBufferCount = 1;
+
+        VkCommandBuffer commandBuffer;
+        vkAllocateCommandBuffers(device.device, &allocInfo, &commandBuffer);
+
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+        vkBeginCommandBuffer(commandBuffer, &beginInfo);
+        return commandBuffer;
     }
 
-    void VulkanContext::registerDescriptorSet() {
-        maxDescriptorSets++;
+    void VulkanContext::endSingleTimeCommands(VkCommandBuffer commandBuffer) const {
+        vkEndCommandBuffer(commandBuffer);
+
+        VkSubmitInfo submitInfo{};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &commandBuffer;
+
+        vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+        vkQueueWaitIdle(graphicsQueue);
+
+        vkFreeCommandBuffers(device.device, commandPool, 1, &commandBuffer);
     }
 
     uint32_t VulkanContext::getWindowHeight() const {
