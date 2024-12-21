@@ -18,9 +18,9 @@ namespace Metal {
         explicit RuntimeResource(const std::string &id = Util::uuidV4()): id(std::move(id)) {
         }
 
-        TimePoint lastUse;
+        long long lastUse = 0;
 
-        std::string getId() const {
+        [[nodiscard]] std::string getId() const {
             return id;
         }
 

@@ -18,8 +18,6 @@ namespace Metal {
         void registerResource(RuntimeResource *resource);
 
     public:
-        void dispose(RuntimeResource *resource);
-
         std::unordered_map<std::string, RuntimeResource *> &getResources() {
             return resources;
         }

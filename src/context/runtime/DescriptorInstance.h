@@ -7,16 +7,20 @@
 namespace Metal {
     struct BufferInstance;
 
-    struct DescriptorInstance final : RuntimeResource {
+    struct DescriptorInstance final {
         VkDescriptorSetLayout vkDescriptorSetLayout = VK_NULL_HANDLE;
         VkDescriptorSet vkDescriptorSet = VK_NULL_HANDLE;
         bool ready = false;
 
-        void dispose(VulkanContext &context) override;
+        void dispose(const VulkanContext &context) const;
 
-        void createLayout(VulkanContext &context);
+        void createLayout(const VulkanContext &context);
 
-        void create(const VulkanContext &context, VkDescriptorPool pool);
+        void create(const VulkanContext &context);
+
+        void addLayoutBinding(VkShaderStageFlagBits stageFlags,
+                              VkDescriptorType descriptorType,
+                              uint32_t bindingPoint);
 
         void addBufferDescriptor(uint32_t bindingPoint, VkDescriptorType type,
                                  const std::shared_ptr<BufferInstance> &bufferInstance);
@@ -29,10 +33,6 @@ namespace Metal {
         std::vector<VkWriteDescriptorSet> writeDescriptorSets;
         std::vector<VkDescriptorImageInfo> imageInfos;
         std::vector<VkDescriptorBufferInfo> bufferInfos;
-
-        ResourceType resourceType() override {
-            return DESCRIPTOR;
-        }
     };
 } // Metal
 

@@ -5,7 +5,11 @@
 #include "../common/interface/AbstractRuntimeComponent.h"
 
 #define LARGE_FONT_SIZE 38
+
 namespace Metal {
+    struct FrameBufferAttachment;
+    struct TextureInstance;
+
     class GuiContext final : public AbstractRuntimeComponent {
         static void applySpacing();
 
@@ -25,6 +29,10 @@ namespace Metal {
         bool beginFrame() const;
 
         void endFrame();
+
+        void renderImage(FrameBufferAttachment *attachment, float sizeX, float sizeY) const;
+
+        void renderImage(TextureInstance *texture, float sizeX, float sizeY) const;
     };
 }
 

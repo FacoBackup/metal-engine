@@ -1,16 +1,17 @@
 #include "FilesPanel.h"
 
-#include <cereal/archives/binary.hpp>
 
 #include "FilesHeader.h"
 #include "../../../common/interface/Icons.h"
 #include "../../../common/util/files/FilesUtil.h"
 #include "../../../context/ApplicationContext.h"
 #include "../../../context/runtime/assets/SceneData.h"
+#include "../../../context/runtime/TextureInstance.h"
 #include "../../../common/util/UIUtil.h"
 #include "../../../common/util/files/FileEntry.h"
 #include "FilesContext.h"
 #include "../../../common/util/files/FileDialogUtil.h"
+#include "../../../engine/enum/LevelOfDetail.h"
 #include "../../../engine/service/world/components/MeshComponent.h"
 
 namespace Metal {
@@ -128,14 +129,13 @@ namespace Metal {
             if (root->type == EntryType::DIRECTORY) {
                 SetIconPos(Icons::folder.c_str());
                 ImGui::TextColored(UIUtil::DIRECTORY_COLOR, Icons::folder.c_str());
-            } // else if (fEntry->type ==  EntryType::TEXTURE) {
-            // var texture = streamingService.streamIn(child, StreamableResourceType.TEXTURE);
-            // if (texture != null) {
-            //     texture.lastUse = clockRepository.totalTime;
-            //     ImGui::image(((TextureResourceRef) texture).texture, TEXTURE_SIZE, PreviewField.INV_X_L, INV_Y);
-            // }
-            // }
-            else {
+            } else if (root->type == EntryType::TEXTURE) {
+                auto *texture = context->engineContext.streamingRepository.streamTexture(
+                    root->getId(), LevelOfDetail::LOD_3);
+                if (texture != nullptr) {
+                    context->guiContext.renderImage(texture, CARD_SIZE - 8, CARD_SIZE - 22);
+                }
+            } else {
                 std::string icon = UIUtil::GetFileIcon(root->type);
                 SetIconPos(icon.c_str());
                 ImGui::Text(icon.c_str());

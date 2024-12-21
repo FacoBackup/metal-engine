@@ -18,10 +18,14 @@ namespace Metal {
         std::chrono::duration<float> delta = currentTime - previousTime;
         deltaTime = delta.count();
         previousTime = currentTime;
-        if (start == -1) {
-            start = Clock::now().time_since_epoch().count();
-        }
 
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime.time_since_epoch());
+        currentTimeMs = duration.count();
+
+        if (start == -1) {
+            start = currentTimeMs;
+        }
+        streamingRepository.onSync();
         cameraService.onSync();
         if (globalDataNeedsUpdate) {
             globalDataNeedsUpdate = false;

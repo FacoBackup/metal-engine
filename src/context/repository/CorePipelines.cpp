@@ -14,7 +14,7 @@ namespace Metal {
             VK_CULL_MODE_NONE,
             "../resources/shaders/DEBUG.vert",
             "../resources/shaders/DEBUG.frag",
-            {context.getVulkanContext().coreDescriptorSets.globalDataDescriptor},
+            {context.getVulkanContext().coreDescriptorSets.globalDataDescriptor.get()},
             sizeof(MeshPushConstant),
             true,
             true);
@@ -24,7 +24,7 @@ namespace Metal {
             VK_CULL_MODE_NONE,
             "../resources/shaders/QUAD.vert",
             "../resources/shaders/tool/GRID.frag",
-            {context.getVulkanContext().coreDescriptorSets.globalDataDescriptor},
+            {context.getVulkanContext().coreDescriptorSets.globalDataDescriptor.get()},
             0,
             true
         );

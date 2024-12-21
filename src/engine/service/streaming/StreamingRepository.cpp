@@ -5,21 +5,28 @@
 #include "../../../context/runtime/MeshInstance.h"
 #include <iostream>
 
+#include "../../../context/runtime/TextureInstance.h"
+
 #define MAX_TIMEOUT 1000
 #define MAX_TRIES 5
-#define DISPOSAL(T, S)\
-for (auto &resource: S.getResources()) {\
-    if (resource.second->lastUse.time_since_epoch().count() >= MAX_TIMEOUT) {\
-         std::cout << "Disposing of " << resource.first << std::endl;\
-         S.dispose(resource.second);\
+#define DISPOSAL(R)\
+for (auto it = R.begin(); it != R.end();) {\
+    if ((it->second->lastUse - context.engineContext.currentTimeMs) >= MAX_TIMEOUT) {\
+        std::cout << "Disposing of " << it->first << " Since last use: " << (it->second->lastUse - context.engineContext.currentTimeMs) <<std::endl;\
+        it->second->dispose(context.vulkanContext);\
+        auto newIt = R.erase(it);\
+        delete it->second;\
+        it = newIt;\
+    } else {\
+        ++it;\
     }\
 }
 
 #define STREAM(T, V)\
 if (T.getResources().contains(id)) {\
     auto *e = T.getResources().at(id);\
-    e->lastUse = context.getEngineContext().currentTime;\
-    return static_cast<V*>(e);\
+    e->lastUse = context.getEngineContext().currentTimeMs;\
+    return dynamic_cast<V*>(e);\
 }\
 if (!tries.contains(id)) {\
     tries[id] = 0;\
@@ -37,13 +44,18 @@ return nullptr;
 
 namespace Metal {
     MeshInstance *StreamingRepository::streamMesh(const std::string &id, const LevelOfDetail &lod) {
-        STREAM(context.getVulkanContext().meshService, MeshInstance)
+        STREAM(context.vulkanContext.meshService, MeshInstance)
+    }
+
+    TextureInstance *StreamingRepository::streamTexture(const std::string &id, const LevelOfDetail &lod) {
+        STREAM(context.vulkanContext.textureService, TextureInstance)
     }
 
     void StreamingRepository::onSync() {
         if ((context.getEngineContext().currentTime - sinceLastCleanup).count() >= MAX_TIMEOUT) {
             sinceLastCleanup = context.getEngineContext().currentTime;
-            DISPOSAL(MeshInstance, context.getVulkanContext().meshService)
+            DISPOSAL(context.vulkanContext.meshService.getResources())
+            DISPOSAL(context.vulkanContext.textureService.getResources())
         }
     }
 }
