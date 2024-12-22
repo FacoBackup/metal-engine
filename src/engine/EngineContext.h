@@ -6,6 +6,7 @@
 #include "../context/buffers/GlobalDataUBO.h"
 #include "../context/buffers/PPSettingsUBO.h"
 #include "render-pass/AbstractRenderPass.h"
+#include "service/AtmosphereRepository.h"
 #include "service/streaming/StreamingRepository.h"
 #include "service/world/WorldRepository.h"
 #include "service/world/impl/WorldGridRepository.h"
@@ -30,17 +31,22 @@ namespace Metal {
         TimePoint currentTime;
         TimePoint previousTime = Clock::now();
         float deltaTime = 0;
-        bool globalDataNeedsUpdate = true;
 
         WorldGridRepository worldGridRepository{context};
         CameraService cameraService{context};
         WorldRepository worldRepository{};
         RuntimeRepository runtimeRepository{};
         StreamingRepository streamingRepository{context};
+        AtmosphereRepository atmosphereRepository{};
+
+        void updateGlobalData();
 
         void onSync() override;
 
-        void dispose();
+        static glm::vec3 CalculateSunColor(float elevation, glm::vec3 &nightColor, glm::vec3 &dawnColor,
+                                                          glm::vec3 &middayColor);
+
+        static glm::vec3 BlendColors(glm::vec3 &c1, glm::vec3 &c2, float t);
     };
 }
 #endif

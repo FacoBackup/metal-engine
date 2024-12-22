@@ -1,11 +1,4 @@
-layout(set = 0, binding = 0) uniform GlobalDataBlock {
-    mat4 view;
-    mat4 proj;
-    mat4 projView;
-    mat4 invView;
-    mat4 invProj;
-    vec3 cameraWorldPosition;
-} globalData;
+#include "./GlobalData.glsl"
 
 const vec4 settings = vec4(0, 1, 100, .02);
 

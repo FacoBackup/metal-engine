@@ -33,16 +33,8 @@ namespace Metal {
         cameraService.onSync();
 
         auto &camera = worldRepository.camera;
-        if (globalDataNeedsUpdate) {
-            globalDataNeedsUpdate = false;
-            globalDataUBO.proj = camera.projectionMatrix;
-            globalDataUBO.view = camera.viewMatrix;
-            globalDataUBO.projView = camera.projViewMatrix;
-            globalDataUBO.invProj = camera.invProjectionMatrix;
-            globalDataUBO.invView = camera.invViewMatrix;
-            globalDataUBO.cameraWorldPosition = camera.position;
-            context.vulkanContext.coreBuffers.globalData->update(&globalDataUBO);
-        }
+        updateGlobalData();
+        context.vulkanContext.coreBuffers.globalData->update(&globalDataUBO);
         postProcessingUBO.distortionIntensity = camera.distortionIntensity;
         postProcessingUBO.chromaticAberrationIntensity = camera.chromaticAberrationIntensity;
         postProcessingUBO.distortionEnabled = camera.distortionEnabled;
@@ -54,5 +46,50 @@ namespace Metal {
         context.vulkanContext.coreRenderPasses.gBufferPass->recordCommands(gBufferPasses);
         context.vulkanContext.coreRenderPasses.fullScreenPass->recordCommands(fullScreenRenderPasses);
         context.vulkanContext.coreRenderPasses.postProcessingPass->recordCommands(postProcessingPasses);
+    }
+
+    void EngineContext::updateGlobalData() {
+        auto &camera = worldRepository.camera;
+        globalDataUBO.proj = camera.projectionMatrix;
+        globalDataUBO.view = camera.viewMatrix;
+        globalDataUBO.projView = camera.projViewMatrix;
+        globalDataUBO.invProj = camera.invProjectionMatrix;
+        globalDataUBO.invView = camera.invViewMatrix;
+        globalDataUBO.cameraWorldPosition = camera.position;
+
+        if (atmosphereRepository.incrementTime) {
+            atmosphereRepository.elapsedTime += .0005f * atmosphereRepository.elapsedTimeSpeed;
+        }
+        globalDataUBO.sunPosition = glm::vec3(std::sin(atmosphereRepository.elapsedTime),
+                                              std::cos(atmosphereRepository.elapsedTime),
+                                              0) * atmosphereRepository.sunDistance;
+        globalDataUBO.sunColor = CalculateSunColor(globalDataUBO.sunPosition.y / atmosphereRepository.sunDistance,
+                                                   atmosphereRepository.nightColor, atmosphereRepository.dawnColor,
+                                                   atmosphereRepository.middayColor);
+    }
+
+
+    glm::vec3 EngineContext::CalculateSunColor(const float elevation, glm::vec3 &nightColor, glm::vec3 &dawnColor,
+                                               glm::vec3 &middayColor) {
+        if (elevation <= -0.1f) {
+            return nightColor;
+        }
+        if (elevation <= 0.0f) {
+            float t = (elevation + 0.1f) / 0.1f;
+            return BlendColors(nightColor, dawnColor, t);
+        }
+        if (elevation <= 0.5f) {
+            float t = elevation / 0.5f;
+            return BlendColors(dawnColor, middayColor, t);
+        }
+        return middayColor;
+    }
+
+    glm::vec3 EngineContext::BlendColors(glm::vec3 &c1, glm::vec3 &c2, float t) {
+        return {
+            (c1.x * (1 - t) + c2.x * t),
+            (c1.y * (1 - t) + c2.y * t),
+            (c1.z * (1 - t) + c2.z * t)
+        };
     }
 }

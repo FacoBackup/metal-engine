@@ -11,8 +11,8 @@ namespace Metal {
     void CorePipelines::onInitialize() {
         PipelineBuilder gBufferPipelineBuilder = PipelineBuilder::Of(
                     context.vulkanContext.coreFrameBuffers.gBufferFBO,
-                    "../resources/shaders/DEBUG.vert",
-                    "../resources/shaders/DEBUG.frag"
+                    "DEBUG.vert",
+                    "DEBUG.frag"
                 )
                 .addDescriptorSet(context.vulkanContext.coreDescriptorSets.globalDataDescriptor.get())
                 .setPrepareForMesh()
@@ -23,8 +23,8 @@ namespace Metal {
 
         PipelineBuilder gridPipelineBuilder = PipelineBuilder::Of(
                     context.vulkanContext.coreFrameBuffers.auxFBO,
-                    "../resources/shaders/QUAD.vert",
-                    "../resources/shaders/GRID.frag"
+                    "QUAD.vert",
+                    "GRID.frag"
                 )
                 .setBlendEnabled()
                 .addDescriptorSet(context.vulkanContext.coreDescriptorSets.globalDataDescriptor.get());
@@ -32,8 +32,8 @@ namespace Metal {
 
         PipelineBuilder ppPipelineBuilder = PipelineBuilder::Of(
                     context.vulkanContext.coreFrameBuffers.postProcessingFBO,
-                    "../resources/shaders/QUAD.vert",
-                    "../resources/shaders/LENS_POST_PROCESSING.frag"
+                    "QUAD.vert",
+                    "LENS_POST_PROCESSING.frag"
                 )
                 .addDescriptorSet(context.vulkanContext.coreDescriptorSets.postProcessingDescriptor.get());
         postProcessingPipeline = pipelineService.createRenderingPipeline(ppPipelineBuilder);
@@ -41,8 +41,8 @@ namespace Metal {
 
         PipelineBuilder gBufferShadingPipelineBuilder = PipelineBuilder::Of(
                     context.vulkanContext.coreFrameBuffers.auxFBO,
-                    "../resources/shaders/QUAD.vert",
-                    "../resources/shaders/GBufferShading.frag"
+                    "QUAD.vert",
+                    "GBufferShading.frag"
                 )
                 .setPushConstantsSize(sizeof(GBufferShadingPushConstant))
                 .addDescriptorSet(context.vulkanContext.coreDescriptorSets.globalDataDescriptor.get())

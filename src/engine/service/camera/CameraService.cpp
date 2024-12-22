@@ -10,7 +10,6 @@ namespace Metal {
             updateAspectRatio();
             if (camera->isNotFrozen()) {
                 updateMatrices();
-                context.getEngineContext().globalDataNeedsUpdate = true;
                 camera->freezeVersion();
             }
         }

@@ -232,6 +232,8 @@ add_executable(
         src/context/buffers/GBufferShadingPushConstant.h
         src/context/service/PipelineBuilder.h
         src/context/runtime/FrameBufferAttachment.cpp
+        src/engine/service/AtmosphereRepository.cpp
+        src/engine/service/AtmosphereRepository.h
 )
 
 

@@ -12,6 +12,7 @@ namespace Metal {
         formPanel = new FormPanel();
         appendChild(formPanel);
         repositories.push_back(&context->getEditorContext().editorRepository);
+        repositories.push_back(&context->engineContext.atmosphereRepository);
         repositories.push_back(&context->getEngineContext().worldRepository.camera);
     }
 
@@ -32,7 +33,7 @@ namespace Metal {
         for (auto *additional: additionalInspection) {
             if (additional != nullptr) {
                 if (UIUtil::RenderOption(
-                    std::format("{}##{}", additional->getIcon(), additional->getUniqueId()).c_str(),
+                    std::format("{}##{}", additional->getIcon(), additional->getUniqueId()),
                     currentInspection == additional,
                     true,
                     editorRepository.accent)) {
