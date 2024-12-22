@@ -150,10 +150,12 @@ namespace Metal {
                 instanceBuilder.set_debug_callback(DebugCallback);
                 instanceBuilder.set_debug_messenger_severity(
                     VK_DEBUG_REPORT_INFORMATION_BIT_EXT |
-                    VK_DEBUG_REPORT_DEBUG_BIT_EXT |
-                    VK_DEBUG_REPORT_ERROR_BIT_EXT |
                     VK_DEBUG_REPORT_WARNING_BIT_EXT |
-                    VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT);
+                    VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT |
+                    VK_DEBUG_REPORT_ERROR_BIT_EXT |
+                    VK_DEBUG_REPORT_DEBUG_BIT_EXT |
+                    VK_DEBUG_REPORT_FLAG_BITS_MAX_ENUM_EXT
+                );
                 instanceBuilder.set_debug_messenger_type(VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT);
             }
             if (sysInfo.is_extension_available(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME)) {
@@ -287,7 +289,8 @@ namespace Metal {
     }
 
 
-    void VulkanContext::submitFrame(VkSemaphore image_acquired_semaphore, VkSemaphore render_complete_semaphore, ImGui_ImplVulkanH_Frame *fd) const {
+    void VulkanContext::submitFrame(VkSemaphore image_acquired_semaphore, VkSemaphore render_complete_semaphore,
+                                    ImGui_ImplVulkanH_Frame *fd) const {
         VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         VkSubmitInfo info = {};
         context.vulkanContext.pushCommandBuffer(fd->CommandBuffer);
@@ -302,5 +305,4 @@ namespace Metal {
         VulkanUtils::CheckVKResult(vkEndCommandBuffer(fd->CommandBuffer));
         VulkanUtils::CheckVKResult(vkQueueSubmit(context.vulkanContext.graphicsQueue, 1, &info, fd->Fence));
     }
-
 }

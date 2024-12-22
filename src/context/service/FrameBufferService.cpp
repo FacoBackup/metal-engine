@@ -112,9 +112,6 @@ namespace Metal {
         imageView.image = attachment->vkImage;
         VulkanUtils::CheckVKResult(vkCreateImageView(vulkanContext.device.device, &imageView, nullptr,
                                                      &attachment->vkImageView));
-
-
-
         return attachment;
     }
 
@@ -133,7 +130,7 @@ namespace Metal {
             attachmentDescription.finalLayout = fbAttachment->depth
                                                     ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
                                                     : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            attachmentDescription.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+            attachmentDescription.initialLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
             attachmentDescription.format = fbAttachment->format;
 
             if (fbAttachment->depth) {
@@ -147,8 +144,7 @@ namespace Metal {
             }
         }
 
-        std::array<VkSubpassDependency, 2> dependencies;
-
+        std::array<VkSubpassDependency, 2> dependencies{};
         dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
         dependencies[0].dstSubpass = 0;
         dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;

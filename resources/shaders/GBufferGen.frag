@@ -9,7 +9,7 @@ layout (location = 3) out vec4 outDepthIdUV;
 
 void main () {
     outAlbedoEmissive = vec4(1, 0, 0, 1);
-    outRoughnessMetallicAO = vec4(0, 1, 0, 1);
+    outRoughnessMetallicAO = vec4(1);
     outNormal = vec4(inNormal, 1);
     outDepthIdUV = vec4(gl_FragCoord.z, 1, inUV);
 }

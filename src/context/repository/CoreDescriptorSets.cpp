@@ -28,16 +28,16 @@ namespace Metal {
             gBufferShadingDescriptor->create(vulkanContext);
             gBufferShadingDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                                 context.vulkanContext.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[1]->vkImageView);
+                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[0]->vkImageView);
             gBufferShadingDescriptor->addImageDescriptor(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                                 context.vulkanContext.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[2]->vkImageView);
+                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[1]->vkImageView);
             gBufferShadingDescriptor->addImageDescriptor(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                                 context.vulkanContext.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[3]->vkImageView);
+                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[2]->vkImageView);
             gBufferShadingDescriptor->addImageDescriptor(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                                 context.vulkanContext.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[4]->vkImageView);
+                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[3]->vkImageView);
             gBufferShadingDescriptor->write(vulkanContext);
         }
 
