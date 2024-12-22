@@ -51,6 +51,10 @@ namespace Metal {
             if (ImGui::MenuItem("Delete")) {
                 deleteSelected();
             }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Select all")) {
+                selectAll();
+            }
             ImGui::EndPopup();
         }
 
@@ -82,25 +86,28 @@ namespace Metal {
             }
             contextMenu();
             handleDrag();
+            hotkeys();
 
-            float size = std::round(ImGui::GetWindowSize().x / CARD_SIZE) * CARD_SIZE - CARD_SIZE;
+            float size = std::floor(ImGui::GetWindowSize().x / CARD_SIZE) * CARD_SIZE - CARD_SIZE;
             int rowIndex = 1;
             for (auto &child: filesContext.currentDirectory->children) {
-                const bool isSelected = filesContext.selected.contains(child->getId()) || child->isHovered && onDrag !=
-                                        nullptr;
-                ImGui::PushStyleColor(ImGuiCol_ChildBg, isSelected
-                                                            ? context->getEditorContext().editorRepository.accent
-                                                            : context->getEditorContext().themeService.palette0);
-                renderItem(child);
-                ImGui::PopStyleColor();
+                if (filesContext.filterType == EntryType::NONE || child->type == filesContext.filterType) {
+                    const bool isSelected = filesContext.selected.contains(child->getId()) || child->isHovered && onDrag
+                                            !=
+                                            nullptr;
+                    ImGui::PushStyleColor(ImGuiCol_ChildBg, isSelected
+                                                                ? context->getEditorContext().editorRepository.accent
+                                                                : context->getEditorContext().themeService.palette0);
+                    renderItem(child);
+                    ImGui::PopStyleColor();
 
-                if (rowIndex * CARD_SIZE < size) {
-                    ImGui::SameLine();
-                    rowIndex++;
-                } else {
-                    rowIndex = 0;
+                    if (rowIndex * CARD_SIZE < size) {
+                        ImGui::SameLine();
+                        rowIndex++;
+                    } else {
+                        rowIndex = 0;
+                    }
                 }
-                hotkeys();
             }
             trackDrag();
         }
@@ -219,6 +226,7 @@ namespace Metal {
             // }
         }
         filesContext.toCut.clear();
+        FilesService::GetEntries(filesContext.currentDirectory);
     }
 
     void FilesPanel::openSelected() {
@@ -230,16 +238,18 @@ namespace Metal {
     void FilesPanel::cutSelected() {
         filesContext.toCut.clear();
         filesContext.toCut = filesContext.selected;
+        FilesService::GetEntries(filesContext.currentDirectory);
     }
 
     void FilesPanel::selectAll() {
         for (auto &entry: filesContext.currentDirectory->children) {
-            filesContext.selected[entry->getId()] = entry;
+            filesContext.selected.insert({entry->getId(), entry});
         }
     }
 
-    void FilesPanel::deleteSelected() {
-        context->getEditorContext().filesService.deleteFiles(filesContext.selected);
+    void FilesPanel::deleteSelected() const {
+        context->editorContext.filesService.deleteFiles(filesContext.selected);
+        FilesService::GetEntries(filesContext.currentDirectory);
     }
 
     void FilesPanel::onClick(FileEntry *root) {
@@ -261,11 +271,11 @@ namespace Metal {
     void FilesPanel::openResource(FileEntry *root) {
         switch (root->type) {
             case EntryType::MESH: {
-                context->getVulkanContext().meshService.loadMesh(root->name, root->getId());
+                context->vulkanContext.meshService.loadMesh(root->name, root->getId());
                 break;
             }
             case EntryType::SCENE: {
-                context->getVulkanContext().meshService.loadScene(root->getId());
+                context->vulkanContext.meshService.loadScene(root->getId());
                 break;
             }
             case EntryType::DIRECTORY: {

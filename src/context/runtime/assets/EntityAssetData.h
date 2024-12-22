@@ -4,9 +4,6 @@
 
 namespace Metal {
     struct EntityAssetData final {
-        std::array<float, 3> position{};
-        std::array<float, 4> rotation{};
-        std::array<float, 3> scale{};
         std::string name{};
         std::string meshId{};
         std::string materialId{};
@@ -17,9 +14,6 @@ namespace Metal {
         void serialize(Archive &ar) {
             ar(
                 id,
-                position,
-                rotation,
-                scale,
                 name,
                 meshId,
                 parentEntity

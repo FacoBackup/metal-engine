@@ -1,7 +1,7 @@
 #ifndef VOXELVISUALIZERRENDERPASS_H
 #define VOXELVISUALIZERRENDERPASS_H
 #include "../AbstractRenderPass.h"
-#include "../../../context/repository/MeshPushConstant.h"
+#include "../../../context/buffers/MeshPushConstant.h"
 
 namespace Metal {
     class OpaqueRenderPass final : public AbstractRenderPass {

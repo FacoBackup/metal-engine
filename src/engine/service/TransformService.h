@@ -11,10 +11,10 @@ namespace Metal {
     struct TransformComponent;
 
     class TransformService final : AbstractRuntimeComponent {
-        glm::vec3 distanceAux;
-        glm::mat4x4 auxMat4;
-        glm::vec3 translation;
-        glm::mat4x4 auxMat42;
+        glm::vec3 distanceAux{};
+        glm::mat4x4 auxMat4{};
+        glm::vec3 translation{};
+        glm::mat4x4 auxMat42{};
 
     public:
         explicit TransformService(ApplicationContext &context)
@@ -27,7 +27,7 @@ namespace Metal {
 
         void transform(TransformComponent *st, const TransformComponent *parentTransform);
 
-        TransformComponent *findParent(EntityID id) const;
+        [[nodiscard]] TransformComponent *findParent(EntityID id) const;
 
         float getDistanceFromCamera(glm::vec3 &translation);
     };

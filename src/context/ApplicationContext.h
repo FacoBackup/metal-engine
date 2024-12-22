@@ -10,6 +10,7 @@
 
 namespace Metal {
     class ApplicationContext {
+        bool debugMode;
         IPanel &rootPanel;
         std::string rootDirectory;
         std::string projectName;
@@ -21,11 +22,11 @@ namespace Metal {
         VulkanContext vulkanContext;
         GuiContext guiContext{*this};
 
+        [[nodiscard]] bool isDebugMode() const { return debugMode; }
+
         void updateRootPath(bool forceSelection);
 
         void updateProjectName(const std::string &projectName);
-
-        void dispose();
 
         [[nodiscard]] bool isValidContext() const {
             return glfwContext.isValidContext();
@@ -43,10 +44,6 @@ namespace Metal {
             return glfwContext;
         }
 
-        VulkanContext &getVulkanContext() {
-            return vulkanContext;
-        }
-
         const std::string &getProjectName() {
             return projectName;
         }
@@ -54,7 +51,6 @@ namespace Metal {
         [[nodiscard]] const std::string &getRootDirectory() const {
             return rootDirectory;
         }
-
 
         [[nodiscard]] std::string getAssetRefDirectory() const {
             return rootDirectory + "/assets-ref/";
@@ -67,6 +63,8 @@ namespace Metal {
         [[nodiscard]] std::string getAssetDirectory() const {
             return rootDirectory + "/assets/";
         }
+
+        [[nodiscard]] uint32_t getFrameIndex() const;
 
         void start();
 

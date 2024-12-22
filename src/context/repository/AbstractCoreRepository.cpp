@@ -4,9 +4,9 @@
 namespace Metal {
     AbstractCoreRepository::AbstractCoreRepository(ApplicationContext &context)
         : AbstractRuntimeComponent(context),
-          vulkanContext(context.getVulkanContext()),
-          framebufferService(context.getVulkanContext().framebufferService),
-          bufferService(context.getVulkanContext().bufferService),
-          pipelineService(context.getVulkanContext().pipelineService){
+          vulkanContext(context.vulkanContext),
+          framebufferService(context.vulkanContext.framebufferService),
+          bufferService(context.vulkanContext.bufferService),
+          pipelineService(context.vulkanContext.pipelineService){
     }
 }

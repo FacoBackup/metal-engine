@@ -2,10 +2,12 @@
 
 #include "../VulkanContext.h"
 #include "../repository/CoreFrameBuffers.h"
-#include "../runtime/RenderPass.h"
+#include "../runtime/CommandBufferRecorder.h"
 
 namespace Metal {
     void CoreRenderPasses::onInitialize() {
-        fullScreenPass = new RenderPass(vulkanContext.coreFrameBuffers.auxRenderPass, context);
+        gBufferPass = new CommandBufferRecorder(vulkanContext.coreFrameBuffers.gBufferFBO, context);
+        fullScreenPass = new CommandBufferRecorder(vulkanContext.coreFrameBuffers.auxFBO, context);
+        postProcessingPass = new CommandBufferRecorder(vulkanContext.coreFrameBuffers.postProcessingFBO, context);
     }
 } // Metal

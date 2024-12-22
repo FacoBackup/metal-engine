@@ -1,16 +1,20 @@
 #include "DescriptorInstance.h"
 
+#include <iostream>
+
 #include "BufferInstance.h"
 #include "../VulkanContext.h"
 #include "../../common/util/VulkanUtils.h"
 
 namespace Metal {
     void DescriptorInstance::dispose(const VulkanContext &context) const {
+        std::cout << "Disposing of descriptor instance" << std::endl;
+
         if (ready)
             vkDestroyDescriptorSetLayout(context.device.device, vkDescriptorSetLayout, nullptr);
     }
 
-    void DescriptorInstance::createLayout(const VulkanContext &context) {
+    void DescriptorInstance::create(const VulkanContext &context) {
         if (descriptorSetLayoutBindings.empty()) {
             throw std::runtime_error("No descriptor layout sets were created");
         }
@@ -23,9 +27,7 @@ namespace Metal {
         VulkanUtils::CheckVKResult(vkCreateDescriptorSetLayout(context.device.device, &layoutInfo,
                                                                nullptr,
                                                                &vkDescriptorSetLayout));
-    }
 
-    void DescriptorInstance::create(const VulkanContext &context) {
         VkDescriptorSetAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         allocInfo.descriptorPool = context.descriptorPool; // Created during setup
@@ -75,7 +77,7 @@ namespace Metal {
 
         auto &imageInfo = imageInfos.emplace_back();;
         imageInfo.imageView = view;
-        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        imageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
         imageInfo.sampler = sampler;
 
         auto &descriptorWrite = writeDescriptorSets.emplace_back();

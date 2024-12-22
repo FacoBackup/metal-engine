@@ -33,7 +33,7 @@ namespace Metal {
         void createDepthAttachment(FrameBufferInstance *framebuffer) const;
 
         void createAttachment(const char *name, VkFormat format, VkImageUsageFlagBits usage,
-                              FrameBufferInstance *pipeline) const;
+                              FrameBufferInstance *framebuffer) const;
 
 
         void createRenderPass(FrameBufferInstance *framebuffer) const;

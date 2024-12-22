@@ -15,7 +15,7 @@ namespace Metal {
         ImGui_ImplVulkanH_CreateOrResizeWindow(instance.instance, physDevice.physical_device,
                                                device.device, &imguiVulkanWindow, queueFamily,
                                                nullptr,
-                                               w, h, IMAGE_COUNT);
+                                               w, h, MAX_FRAMES_IN_FLIGHT);
         swapChain = imguiVulkanWindow.Swapchain;
 
         int wW{}, hW{};
@@ -150,10 +150,12 @@ namespace Metal {
                 instanceBuilder.set_debug_callback(DebugCallback);
                 instanceBuilder.set_debug_messenger_severity(
                     VK_DEBUG_REPORT_INFORMATION_BIT_EXT |
-                    VK_DEBUG_REPORT_DEBUG_BIT_EXT |
-                    VK_DEBUG_REPORT_ERROR_BIT_EXT |
                     VK_DEBUG_REPORT_WARNING_BIT_EXT |
-                    VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT);
+                    VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT |
+                    VK_DEBUG_REPORT_ERROR_BIT_EXT |
+                    VK_DEBUG_REPORT_DEBUG_BIT_EXT |
+                    VK_DEBUG_REPORT_FLAG_BITS_MAX_ENUM_EXT
+                );
                 instanceBuilder.set_debug_messenger_type(VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT);
             }
             if (sysInfo.is_extension_available(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME)) {
@@ -213,16 +215,10 @@ namespace Metal {
         createDescriptorPool();
         // ------- CORE INITIALIZATION
 
-        // ------- SERVICE INITIALIZATION
-        textureService.onInitialize();
-        framebufferService.onInitialize();
-        pipelineService.onInitialize();
-        descriptorService.onInitialize();
-        // ------- SERVICE INITIALIZATION
-
         // ------- REPOSITORY INITIALIZATION
         coreBuffers.onInitialize();
         coreFrameBuffers.onInitialize();
+        coreTextures.onInitialize();
         coreDescriptorSets.onInitialize();
         corePipelines.onInitialize();
         coreRenderPasses.onInitialize();
@@ -231,15 +227,16 @@ namespace Metal {
 
     void VulkanContext::dispose() {
         pipelineService.disposeAll();
-        framebufferService.disposeAll();
         textureService.disposeAll();
         meshService.disposeAll();
-        vkDestroyDescriptorPool(context.getVulkanContext().device.device, descriptorPool,
+        framebufferService.disposeAll();
+        vkDestroyDescriptorPool(context.vulkanContext.device.device, descriptorPool,
                                 nullptr);
-        vkDestroyCommandPool(context.getVulkanContext().device.device, commandPool,
+        vkDestroyCommandPool(context.vulkanContext.device.device, commandPool,
                              nullptr);
 
-        vkb::destroy_device(device);
+        vkDestroyDevice(device.device, nullptr);
+        vkDestroySurfaceKHR(instance.instance, surface, nullptr);
         vkb::destroy_instance(instance);
     }
 
@@ -257,7 +254,7 @@ namespace Metal {
         poolInfo.maxSets = 101;
 
         VulkanUtils::CheckVKResult(vkCreateDescriptorPool(device.device, &poolInfo,
-                                                          nullptr, &context.getVulkanContext().descriptorPool));
+                                                          nullptr, &context.vulkanContext.descriptorPool));
     }
 
     VkCommandBuffer VulkanContext::beginSingleTimeCommands() const {
@@ -292,15 +289,21 @@ namespace Metal {
         vkFreeCommandBuffers(device.device, commandPool, 1, &commandBuffer);
     }
 
-    uint32_t VulkanContext::getWindowHeight() const {
-        return h;
-    }
 
-    uint32_t VulkanContext::getWindowWidth() const {
-        return w;
-    }
-
-    FrameData &VulkanContext::getFrameData() {
-        return frameData;
+    void VulkanContext::submitFrame(VkSemaphore image_acquired_semaphore, VkSemaphore render_complete_semaphore,
+                                    ImGui_ImplVulkanH_Frame *fd) const {
+        VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        VkSubmitInfo info = {};
+        context.vulkanContext.pushCommandBuffer(fd->CommandBuffer);
+        info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        info.waitSemaphoreCount = 1;
+        info.pWaitSemaphores = &image_acquired_semaphore;
+        info.pWaitDstStageMask = &wait_stage;
+        info.commandBufferCount = context.vulkanContext.getCommandBuffers().size();
+        info.pCommandBuffers = context.vulkanContext.getCommandBuffers().data();
+        info.signalSemaphoreCount = 1;
+        info.pSignalSemaphores = &render_complete_semaphore;
+        VulkanUtils::CheckVKResult(vkEndCommandBuffer(fd->CommandBuffer));
+        VulkanUtils::CheckVKResult(vkQueueSubmit(context.vulkanContext.graphicsQueue, 1, &info, fd->Fence));
     }
 }

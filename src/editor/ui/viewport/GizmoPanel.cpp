@@ -96,6 +96,8 @@ namespace Metal {
 
     void GizmoPanel::recomposeMatrix() {
         viewMatrixCache = glm::value_ptr(context->getEngineContext().worldRepository.camera.viewMatrix);
-        projectionMatrixCache = glm::value_ptr(context->getEngineContext().worldRepository.camera.projectionMatrix);
+        cacheProjection = context->getEngineContext().worldRepository.camera.projectionMatrix;
+        cacheProjection[1][1] *= -1;
+        projectionMatrixCache = glm::value_ptr(cacheProjection);
     }
 } // Metal

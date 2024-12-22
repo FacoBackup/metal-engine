@@ -1,38 +1,63 @@
 #include "CorePipelines.h"
 
-#include "MeshPushConstant.h"
+#include "../buffers/MeshPushConstant.h"
+#include "../buffers/GBufferShadingPushConstant.h"
 #include "../ApplicationContext.h"
-#include "../../common/util/VulkanUtils.h"
-#include "../runtime/assets/MeshData.h"
 #include "../runtime/PipelineInstance.h"
 #include "../service//PipelineService.h"
+#include "../service/PipelineBuilder.h"
 
 namespace Metal {
     void CorePipelines::onInitialize() {
-        debugPipeline = pipelineService.createRenderingPipeline(
-            context.getVulkanContext().coreFrameBuffers.auxRenderPass,
-            VK_CULL_MODE_NONE,
-            "../resources/shaders/DEBUG.vert",
-            "../resources/shaders/DEBUG.frag",
-            {context.getVulkanContext().coreDescriptorSets.globalDataDescriptor.get()},
-            sizeof(MeshPushConstant),
-            true,
-            true);
+        PipelineBuilder gBufferPipelineBuilder = PipelineBuilder::Of(
+                    context.vulkanContext.coreFrameBuffers.gBufferFBO,
+                    "GBufferGen.vert",
+                    "GBufferGen.frag"
+                )
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.globalDataDescriptor.get())
+                .setPrepareForMesh()
+                .setDepthTest()
+                .setCullMode(VK_CULL_MODE_BACK_BIT)
+                .setPushConstantsSize(sizeof(MeshPushConstant));
+        gBufferPipeline = pipelineService.createRenderingPipeline(gBufferPipelineBuilder);
 
-        gridPipeline = pipelineService.createRenderingPipeline(
-            context.getVulkanContext().coreFrameBuffers.auxRenderPass,
-            VK_CULL_MODE_NONE,
-            "../resources/shaders/QUAD.vert",
-            "../resources/shaders/tool/GRID.frag",
-            {context.getVulkanContext().coreDescriptorSets.globalDataDescriptor.get()},
-            0,
-            true
-        );
+        PipelineBuilder gridPipelineBuilder = PipelineBuilder::Of(
+                    context.vulkanContext.coreFrameBuffers.auxFBO,
+                    "QUAD.vert",
+                    "Grid.frag"
+                )
+                .setBlendEnabled()
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.globalDataDescriptor.get());
+        gridPipeline = pipelineService.createRenderingPipeline(gridPipelineBuilder);
+
+        PipelineBuilder ppPipelineBuilder = PipelineBuilder::Of(
+                    context.vulkanContext.coreFrameBuffers.postProcessingFBO,
+                    "QUAD.vert",
+                    "PostProcessing.frag"
+                )
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.postProcessingDescriptor.get());
+        postProcessingPipeline = pipelineService.createRenderingPipeline(ppPipelineBuilder);
+
+
+        PipelineBuilder gBufferShadingPipelineBuilder = PipelineBuilder::Of(
+                    context.vulkanContext.coreFrameBuffers.auxFBO,
+                    "QUAD.vert",
+                    "GBufferShading.frag"
+                )
+                .setPushConstantsSize(sizeof(GBufferShadingPushConstant))
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.gBufferShadingDescriptor.get())
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.gBufferShadingDescriptor1.get())
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.gBufferShadingDescriptor2.get())
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.gBufferShadingDescriptor3.get())
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.brdfDescriptor.get());
+        gBufferShadingPipeline = pipelineService.createRenderingPipeline(gBufferShadingPipelineBuilder);
     }
 
     void CorePipelines::dispose() const {
         // TODO - Add button to UI to re-create pipelines and reload shaders
-        debugPipeline->dispose(vulkanContext);
+        gBufferPipeline->dispose(vulkanContext);
         gridPipeline->dispose(vulkanContext);
+        postProcessingPipeline->dispose(vulkanContext);
     }
 } // Metal

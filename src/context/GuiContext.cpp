@@ -10,36 +10,44 @@
 #include "runtime/TextureInstance.h"
 
 namespace Metal {
-    bool GuiContext::beginFrame() const {
-        context.getVulkanContext().getFrameData().commandBuffers.clear();
-        if (context.getGLFWContext().beginFrame()) {
-            // Start the Dear ImGui frame
-            ImGui_ImplVulkan_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
-            return false;
-        }
-        return true;
-    }
-
     void GuiContext::endFrame() {
-        ImGui::Render();
-        drawData = ImGui::GetDrawData();
-        const bool main_is_minimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
-        if (!main_is_minimized)
-            context.getGLFWContext().renderFrame(drawData);
-        if (!main_is_minimized)
-            context.getGLFWContext().presentFrame();
-    }
 
-    void GuiContext::renderImage(FrameBufferAttachment *attachment, const float sizeX, const float sizeY) const {
-        context.vulkanContext.descriptorService.updateImageSamplerDescriptor(attachment);
-        ImGui::Image(reinterpret_cast<ImTextureID>(attachment->imageDescriptor->vkDescriptorSet), ImVec2{sizeX, sizeY});
     }
 
     void GuiContext::renderImage(TextureInstance *texture, const float sizeX, const float sizeY) const {
-        context.vulkanContext.descriptorService.updateImageSamplerDescriptor(texture);
+        context.vulkanContext.descriptorService.setImageDescriptor(texture);
         ImGui::Image(reinterpret_cast<ImTextureID>(texture->imageDescriptor->vkDescriptorSet), ImVec2{sizeX, sizeY});
+    }
+
+    void GuiContext::BeginFrame() {
+        ImGui_ImplVulkan_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+    }
+
+    void GuiContext::RecordImguiCommandBuffer(ImDrawData *drawData, VkResult &err, ImGui_ImplVulkanH_Window &wd,
+                                              ImGui_ImplVulkanH_Frame *fd) {
+        VkCommandBufferBeginInfo info = {};
+        info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        info.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+        err = vkBeginCommandBuffer(fd->CommandBuffer, &info);
+        VulkanUtils::CheckVKResult(err); {
+            VkRenderPassBeginInfo info = {};
+            info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+            info.renderPass = wd.RenderPass;
+            info.framebuffer = fd->Framebuffer;
+            info.renderArea.extent.width = wd.Width;
+            info.renderArea.extent.height = wd.Height;
+            info.clearValueCount = 1;
+            info.pClearValues = &wd.ClearValue;
+            vkCmdBeginRenderPass(fd->CommandBuffer, &info, VK_SUBPASS_CONTENTS_INLINE);
+        }
+
+        // Record dear imgui primitives into command buffer
+        ImGui_ImplVulkan_RenderDrawData(drawData, fd->CommandBuffer);
+
+        // Submit command buffer
+        vkCmdEndRenderPass(fd->CommandBuffer);
     }
 
     void GuiContext::onInitialize() {
@@ -57,17 +65,17 @@ namespace Metal {
         // Setup Platform/Renderer backends
         ImGui_ImplGlfw_InitForVulkan(context.getGLFWContext().getWindow(), true);
         ImGui_ImplVulkan_InitInfo init_info = {};
-        init_info.Instance = context.getVulkanContext().instance.instance;
-        init_info.PhysicalDevice = context.getVulkanContext().physDevice.physical_device;
-        init_info.Device = context.getVulkanContext().device.device;
-        init_info.QueueFamily = context.getVulkanContext().queueFamily;
-        init_info.Queue = context.getVulkanContext().graphicsQueue;
-        init_info.PipelineCache = context.getVulkanContext().pipelineCache;
-        init_info.DescriptorPool = context.getVulkanContext().descriptorPool;
-        init_info.RenderPass = context.getVulkanContext().imguiVulkanWindow.RenderPass;
+        init_info.Instance = context.vulkanContext.instance.instance;
+        init_info.PhysicalDevice = context.vulkanContext.physDevice.physical_device;
+        init_info.Device = context.vulkanContext.device.device;
+        init_info.QueueFamily = context.vulkanContext.queueFamily;
+        init_info.Queue = context.vulkanContext.graphicsQueue;
+        init_info.PipelineCache = context.vulkanContext.pipelineCache;
+        init_info.DescriptorPool = context.vulkanContext.descriptorPool;
+        init_info.RenderPass = context.vulkanContext.imguiVulkanWindow.RenderPass;
         init_info.Subpass = 0;
-        init_info.MinImageCount = IMAGE_COUNT;
-        init_info.ImageCount = context.getVulkanContext().imguiVulkanWindow.ImageCount;
+        init_info.MinImageCount = MAX_FRAMES_IN_FLIGHT;
+        init_info.ImageCount = context.vulkanContext.imguiVulkanWindow.ImageCount;
         init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
         init_info.Allocator = nullptr;
         init_info.CheckVkResultFn = VulkanUtils::CheckVKResult;
@@ -131,15 +139,14 @@ namespace Metal {
     }
 
     void GuiContext::dispose() const {
-        const VkResult err = vkDeviceWaitIdle(context.getVulkanContext().device.device);
+        const VkResult err = vkDeviceWaitIdle(context.vulkanContext.device.device);
         VulkanUtils::CheckVKResult(err);
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
-        ImGui_ImplVulkanH_DestroyWindow(context.getVulkanContext().instance, context.getVulkanContext().device.device,
+        ImGui_ImplVulkanH_DestroyWindow(context.vulkanContext.instance, context.vulkanContext.device.device,
                                         &context.getGLFWContext().getGUIWindow(),
                                         nullptr);
-        context.getGLFWContext().dispose();
     }
 
     GuiContext::GuiContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {

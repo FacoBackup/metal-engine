@@ -16,8 +16,12 @@ namespace Metal {
 
         static glslang_stage_t ShaderStageFromFilename(const char *pFilename);
 
+        static std::string ProcessIncludes(const std::string &input);
+
+        static std::string ProcessShader(const std::string &file);
+
     public:
-        static VkShaderModule CreateShaderModule(ApplicationContext &context, const char *pFilename);
+        static VkShaderModule CreateShaderModule(const ApplicationContext &context, const std::string &pFilename, bool debugMode);
     };
 } // Metal
 

@@ -15,6 +15,7 @@ namespace Metal {
         void onInitialize() override;
 
         std::shared_ptr<BufferInstance> globalData = nullptr;
+        std::shared_ptr<BufferInstance> postProcessingSettings = nullptr;
     };
 } // Metal
 

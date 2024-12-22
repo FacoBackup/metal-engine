@@ -17,6 +17,6 @@ namespace Metal {
     }
 
     AbstractResourceService::AbstractResourceService(ApplicationContext &context)
-        : AbstractRuntimeComponent(context), vulkanContext(context.getVulkanContext()) {
+        : AbstractRuntimeComponent(context), vulkanContext(context.vulkanContext) {
     }
 }

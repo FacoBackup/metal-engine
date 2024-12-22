@@ -1,5 +1,7 @@
 #include "ShaderUtil.h"
 
+#include <regex>
+
 #include "../runtime/ShaderModule.h"
 #include "../../common/util/VulkanUtils.h"
 #include "../../common/util/Util.h"
@@ -7,6 +9,7 @@
 #include "../../common/util/files/FilesUtil.h"
 #include "glslang/Include/glslang_c_interface.h"
 #include "glslang/Public/resource_limits_c.h"
+#define BASE_PATH "../resources/shaders/"
 
 namespace Metal {
     void ShaderUtil::CheckShaderCompilation(glslang_shader_t *shader) {
@@ -108,18 +111,50 @@ namespace Metal {
         throw std::runtime_error("Unknown shader stage in file");
     }
 
-    VkShaderModule ShaderUtil::CreateShaderModule(ApplicationContext &context, const char *pFilename) {
-        const std::string basePath = context.getShadersDirectory();
+    std::string ShaderUtil::ProcessIncludes(const std::string &input) {
+        std::string result = input;
+        std::regex includePattern(R"(#include\s+"(.+))");
+        std::smatch match;
 
+        while (std::regex_search(result, match, includePattern)) {
+            std::string includeFile = match[1].str();
+            if (includeFile.find("./") == 0 || includeFile.find("../") == 0) {
+                includeFile = includeFile.substr(includeFile.find_first_of("/\\") + 1, includeFile.size());
+                includeFile.erase(std::ranges::remove(includeFile, '"').begin(), includeFile.end());
+            }
+            try {
+                std::string source;
+                FilesUtil::ReadFile((BASE_PATH + includeFile).c_str(), source);
+                result.replace(match.position(0), match.length(0), source);
+            } catch (const std::exception &e) {
+                std::cerr << "Error loading included shader: " << e.what() << std::endl;
+                return "";
+            }
+        }
+        if (result.find("#include") != std::string::npos) {
+            result = ProcessIncludes(result);
+        }
+        return result;
+    }
+
+    std::string ShaderUtil::ProcessShader(const std::string &file) {
         std::string source;
-        FilesUtil::ReadFile(pFilename, source);
+        FilesUtil::ReadFile(file.c_str(), source);
+        return ProcessIncludes(source);
+    }
 
-        const glslang_stage_t shaderStage = ShaderStageFromFilename(pFilename);
+    VkShaderModule ShaderUtil::CreateShaderModule(const ApplicationContext &context, const std::string &pFilename, bool debugMode) {
+        const std::string basePath = context.getShadersDirectory();
+        std::string source = ProcessShader(BASE_PATH + pFilename);
+        if (debugMode) {
+            source = "#define DEBUG\n" + source;
+        }
+        const glslang_stage_t shaderStage = ShaderStageFromFilename(pFilename.c_str());
 
         glslang_initialize_process();
         ShaderModule shader{};
-        if (CompileShader(context.getVulkanContext(), shaderStage, source.c_str(), &shader)) {
-            const std::string part(pFilename);
+        if (CompileShader(context.vulkanContext, shaderStage, source.c_str(), &shader)) {
+            const std::string part(BASE_PATH + pFilename);
             const std::string BinaryFilename = basePath + part.substr(
                                                    part.find_last_of('/') + 1, part.size()) + ".spv";
             FilesUtil::WriteBinaryFile(BinaryFilename.c_str(), shader.SPIRV.data(),

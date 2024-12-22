@@ -3,7 +3,7 @@
 #include "AbstractCoreRepository.h"
 
 namespace Metal {
-    class RenderPass;
+    class CommandBufferRecorder;
 
     struct CoreRenderPasses final : AbstractCoreRepository {
         explicit CoreRenderPasses(ApplicationContext &context)
@@ -12,7 +12,9 @@ namespace Metal {
 
         void onInitialize() override;
 
-        RenderPass *fullScreenPass = nullptr;
+        CommandBufferRecorder *gBufferPass = nullptr;
+        CommandBufferRecorder *fullScreenPass = nullptr;
+        CommandBufferRecorder *postProcessingPass = nullptr;
     };
 } // Metal
 

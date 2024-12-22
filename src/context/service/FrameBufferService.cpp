@@ -1,5 +1,7 @@
 #include "FrameBufferService.h"
 
+#include <iostream>
+
 #include "../runtime/FrameBufferInstance.h"
 #include "../../common/util/VulkanUtils.h"
 #include "../runtime/FrameBufferAttachment.h"
@@ -10,6 +12,25 @@ namespace Metal {
         framebuffer->bufferWidth = w;
         framebuffer->bufferHeight = h;
         registerResource(framebuffer);
+
+        VkSamplerCreateInfo samplerCreateInfo{};
+        // TODO - ENABLE/DISABLE LINEAR FILTERING
+        samplerCreateInfo.magFilter = VK_FILTER_LINEAR;
+        samplerCreateInfo.minFilter = VK_FILTER_LINEAR;
+        samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+        samplerCreateInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+        samplerCreateInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+        samplerCreateInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+        samplerCreateInfo.mipLodBias = 0.0f;
+        samplerCreateInfo.compareOp = VK_COMPARE_OP_NEVER;
+        samplerCreateInfo.minLod = 0.0f;
+        samplerCreateInfo.maxLod = 1;
+        // TODO - ENABLE/DISABLE ANISOTROPY
+        samplerCreateInfo.maxAnisotropy = 8;
+        samplerCreateInfo.anisotropyEnable = VK_TRUE;
+        samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
+        VulkanUtils::CheckVKResult(vkCreateSampler(vulkanContext.device.device, &samplerCreateInfo, nullptr,
+                                                   &framebuffer->vkImageSampler));
         return framebuffer;
     }
 
@@ -21,8 +42,10 @@ namespace Metal {
     }
 
     void FrameBufferService::createAttachment(const char *name, VkFormat format, VkImageUsageFlagBits usage,
-                                              FrameBufferInstance *pipeline) const {
-        const auto att = createAttachmentInternal(name, format, usage, pipeline);
+                                              FrameBufferInstance *framebuffer) const {
+        const auto att = createAttachmentInternal(name, format,
+                                                  usage,
+                                                  framebuffer);
         att->depth = false;
     }
 
@@ -30,20 +53,20 @@ namespace Metal {
         const char *name, VkFormat format,
         VkImageUsageFlagBits usage,
         FrameBufferInstance *framebuffer) const {
-        std::shared_ptr<FrameBufferAttachment> attachment(new FrameBufferAttachment);
+        std::shared_ptr<FrameBufferAttachment> attachment = std::make_shared<FrameBufferAttachment>();
         attachment->name = name;
         framebuffer->attachments.push_back(attachment);
         attachment->format = format;
 
-
         VkImageAspectFlags aspectMask = 0;
-        attachment->format = format;
+        VkImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
 
         if (usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT) {
             aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        }
-        if (usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) {
-            aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+            layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        } else if (usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) {
+            aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+            layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
         }
 
         assert(aspectMask > 0);
@@ -59,6 +82,8 @@ namespace Metal {
         image.samples = VK_SAMPLE_COUNT_1_BIT;
         image.tiling = VK_IMAGE_TILING_OPTIMAL;
         image.usage = usage | VK_IMAGE_USAGE_SAMPLED_BIT;
+        image.initialLayout = layout;
+        image.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
         VulkanUtils::CheckVKResult(vkCreateImage(vulkanContext.device.device, &image, nullptr, &attachment->vkImage));
 
@@ -70,9 +95,10 @@ namespace Metal {
                                                                 memReqs.memoryTypeBits,
                                                                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-        VulkanUtils::CheckVKResult(vkAllocateMemory(vulkanContext.device.device, &memAlloc, nullptr, &attachment->mem));
+        VulkanUtils::CheckVKResult(vkAllocateMemory(vulkanContext.device.device, &memAlloc, nullptr,
+                                                    &attachment->vkImageMemory));
         VulkanUtils::CheckVKResult(
-            vkBindImageMemory(vulkanContext.device.device, attachment->vkImage, attachment->mem, 0));
+            vkBindImageMemory(vulkanContext.device.device, attachment->vkImage, attachment->vkImageMemory, 0));
 
         VkImageViewCreateInfo imageView{};
         imageView.viewType = VK_IMAGE_VIEW_TYPE_2D;
@@ -86,32 +112,15 @@ namespace Metal {
         imageView.image = attachment->vkImage;
         VulkanUtils::CheckVKResult(vkCreateImageView(vulkanContext.device.device, &imageView, nullptr,
                                                      &attachment->vkImageView));
-
-
-        VkSamplerCreateInfo samplerCreateInfo{};
-        samplerCreateInfo.magFilter = VK_FILTER_LINEAR;
-        samplerCreateInfo.minFilter = VK_FILTER_LINEAR;
-        samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-        samplerCreateInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
-        samplerCreateInfo.addressModeV = samplerCreateInfo.addressModeU;
-        samplerCreateInfo.addressModeW = samplerCreateInfo.addressModeU;
-        samplerCreateInfo.mipLodBias = 0.0f;
-        samplerCreateInfo.compareOp = VK_COMPARE_OP_NEVER;
-        samplerCreateInfo.minLod = 0.0f;
-        samplerCreateInfo.maxLod = 1;
-        samplerCreateInfo.maxAnisotropy = 8;
-        samplerCreateInfo.anisotropyEnable = VK_TRUE;
-        samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
-        VulkanUtils::CheckVKResult(vkCreateSampler(vulkanContext.device.device, &samplerCreateInfo, nullptr,
-                                                   &attachment->vkImageSampler));
-
         return attachment;
     }
 
     void FrameBufferService::createRenderPass(FrameBufferInstance *framebuffer) const {
-        for (uint32_t i = 0; i < static_cast<uint32_t>(framebuffer->attachments.size()); i++) {
-            // ATTACHMENT DESCRIPTION
-            VkAttachmentDescription attachmentDescription{};
+        std::vector<VkAttachmentDescription> attachmentDescriptions{};
+        std::vector<VkAttachmentReference> colorReferences{};
+        VkAttachmentReference *depthRef = nullptr;
+        for (uint32_t i = 0; i < framebuffer->attachments.size(); i++) {
+            VkAttachmentDescription &attachmentDescription = attachmentDescriptions.emplace_back();
             const std::shared_ptr<FrameBufferAttachment> fbAttachment = framebuffer->attachments[i];
             attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
             attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -121,57 +130,53 @@ namespace Metal {
             attachmentDescription.finalLayout = fbAttachment->depth
                                                     ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
                                                     : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            attachmentDescription.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+            attachmentDescription.initialLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
             attachmentDescription.format = fbAttachment->format;
-            framebuffer->attachmentDescriptions.push_back(attachmentDescription);
 
             if (fbAttachment->depth) {
-                framebuffer->depthRef = new VkAttachmentReference{i, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL};
+                std::cout << "Depth Attachment " << i << std::endl;
+                depthRef = new VkAttachmentReference{i, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL};
             } else {
-                VkAttachmentReference colorRef{};
+                std::cout << "Color Attachment " << i << std::endl;
+                VkAttachmentReference &colorRef = colorReferences.emplace_back();
                 colorRef.attachment = i;
                 colorRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-                framebuffer->colorReferences.push_back(colorRef);
             }
         }
 
         std::array<VkSubpassDependency, 2> dependencies{};
-        // Prepare for rendering in the first subpass by synchronizing external operations and ensuring the attachment is ready for use.
         dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
         dependencies[0].dstSubpass = 0;
         dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
         dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         dependencies[0].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-        dependencies[0].dstAccessMask =
-                VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
         dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
-        // Ensure the subpass completes all rendering operations before handing off to external operations.
         dependencies[1].srcSubpass = 0;
         dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
         dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         dependencies[1].dstStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-        dependencies[1].srcAccessMask =
-                VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
         dependencies[1].dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
         dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
         // SUB PASS DESCRIPTOR
         VkSubpassDescription subpass = {};
         subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-        subpass.pColorAttachments = framebuffer->colorReferences.data();
-        subpass.colorAttachmentCount = static_cast<uint32_t>(framebuffer->colorReferences.size());
-        if (framebuffer->depthRef != nullptr) {
-            subpass.pDepthStencilAttachment = framebuffer->depthRef;
+        subpass.pColorAttachments = colorReferences.data();
+        subpass.colorAttachmentCount = colorReferences.size();
+        if (depthRef != nullptr) {
+            subpass.pDepthStencilAttachment = depthRef;
         }
 
         VkRenderPassCreateInfo renderPassInfo = {};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-        renderPassInfo.pAttachments = framebuffer->attachmentDescriptions.data();
-        renderPassInfo.attachmentCount = static_cast<uint32_t>(framebuffer->attachmentDescriptions.size());
+        renderPassInfo.pAttachments = attachmentDescriptions.data();
+        renderPassInfo.attachmentCount = attachmentDescriptions.size();
         renderPassInfo.subpassCount = 1;
         renderPassInfo.pSubpasses = &subpass;
-        renderPassInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
+        renderPassInfo.dependencyCount = dependencies.size();
         renderPassInfo.pDependencies = dependencies.data();
 
         VulkanUtils::CheckVKResult(vkCreateRenderPass(vulkanContext.device.device,
@@ -179,6 +184,7 @@ namespace Metal {
                                                       nullptr,
                                                       &framebuffer->vkRenderPass));
         createVKFrameBuffer(framebuffer);
+        delete depthRef;
     }
 
     void FrameBufferService::createVKFrameBuffer(FrameBufferInstance *framebuffer) const {
@@ -196,7 +202,7 @@ namespace Metal {
             attachments.push_back(attachment->vkImageView);
         }
 
-        framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+        framebufferInfo.attachmentCount = attachments.size();
         framebufferInfo.pAttachments = attachments.data();
         framebufferInfo.width = framebuffer->bufferWidth;
         framebufferInfo.height = framebuffer->bufferHeight;

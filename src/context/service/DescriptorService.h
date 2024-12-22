@@ -7,15 +7,16 @@
 namespace Metal {
     struct TextureInstance;
     struct FrameBufferAttachment;
+    struct FrameBufferInstance;
     struct DescriptorInstance;
 
     class DescriptorService final : public AbstractRuntimeComponent {
     public:
         explicit DescriptorService(ApplicationContext &context);
 
-        void updateImageSamplerDescriptor(FrameBufferAttachment *attachment) const;
+        void setImageDescriptor(const FrameBufferInstance *framebuffer, unsigned int attachmentIndex) const;
 
-        void updateImageSamplerDescriptor(TextureInstance *texture) const;
+        void setImageDescriptor(TextureInstance *texture) const;
     };
 } // Metal
 

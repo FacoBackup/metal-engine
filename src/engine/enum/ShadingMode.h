@@ -2,17 +2,19 @@
 #define SHADINGMODE_H
 
 namespace Metal::ShadingMode {
-    enum class ShadingMode {
+    enum ShadingMode {
         LIT,
         ALBEDO,
         NORMAL,
         ROUGHNESS,
         METALLIC,
         AO,
-        RANDOM
+        RANDOM,
+        DEPTH,
+        UV
     };
 
-    static auto Names = "Lit\0Albedo\0Normal\0Roughness\0Metallic\0AO\0Random\0";
+    static auto Names = "Lit\0Albedo\0Normal\0Roughness\0Metallic\0AO\0Random\0Depth\0UV\0";
 
     static ShadingMode ValueOfIndex(const int option) {
         if (option == 0) {
@@ -33,7 +35,13 @@ namespace Metal::ShadingMode {
         if (option == 5) {
             return ShadingMode::AO;
         }
-        return ShadingMode::RANDOM;
+        if (option == 6) {
+            return ShadingMode::RANDOM;
+        }
+        if (option == 7) {
+            return ShadingMode::DEPTH;
+        }
+        return ShadingMode::UV;
     }
 
     static int IndexOfValue(const ShadingMode mode) {
@@ -55,7 +63,13 @@ namespace Metal::ShadingMode {
         if (mode == ShadingMode::AO) {
             return 5;
         }
-        return 6;
+        if (mode == ShadingMode::RANDOM) {
+            return 6;
+        }
+        if (mode == ShadingMode::DEPTH) {
+            return 7;
+        }
+        return 8;
     }
 }
 

@@ -6,8 +6,6 @@
 #include "../../common/util/files/FileEntry.h"
 
 namespace Metal {
-    enum class EntryType;
-
     class FilesService final : public AbstractRuntimeComponent {
         FileEntry *root = nullptr;
 
@@ -24,7 +22,7 @@ namespace Metal {
 
         std::unique_ptr<FileEntry> getResource(const std::string &id);
 
-        void deleteFiles(std::unordered_map<std::string, FileEntry *> &files_context);
+        void deleteFiles(const std::unordered_map<std::string, FileEntry *> &files_context);
 
         static void Move(FileEntry *toMove, FileEntry *targetDir);
 

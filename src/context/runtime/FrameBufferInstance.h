@@ -4,6 +4,9 @@
 #include "../VulkanContext.h"
 #include "RuntimeResource.h"
 #include <vector>
+#include <iostream>
+
+#include "FrameBufferAttachment.h"
 
 namespace Metal {
     struct FrameBufferAttachment;
@@ -13,16 +16,20 @@ namespace Metal {
         uint32_t bufferWidth{};
         uint32_t bufferHeight{};
         VkRenderPass vkRenderPass = VK_NULL_HANDLE;
-        std::vector<VkAttachmentDescription> attachmentDescriptions;
-        std::vector<VkAttachmentReference> colorReferences;
-        VkAttachmentReference *depthRef = nullptr;
         VkFramebuffer vkFramebuffer = VK_NULL_HANDLE;
+        VkSampler vkImageSampler = VK_NULL_HANDLE;
         std::vector<std::shared_ptr<FrameBufferAttachment> > attachments{};
 
         void dispose(VulkanContext &context) override {
-            delete depthRef;
+            std::cout << "Disposing framebuffer instance" << std::endl;
+            vkDestroySampler(context.device.device, vkImageSampler, nullptr);
             vkDestroyFramebuffer(context.device.device, vkFramebuffer, nullptr);
             vkDestroyRenderPass(context.device.device, vkRenderPass, nullptr);
+
+            for (int i = 0; i < attachments.size(); i++) {
+                std::cout << "Disposing of attachment instance " << i << std::endl;
+                attachments[i]->dispose(context);
+            }
         }
 
         ResourceType resourceType() override {

@@ -14,7 +14,7 @@ namespace Metal {
 
     public:
         std::string name{};
-        EntryType type = EntryType::NONE;
+        EntryType::EntryType type = EntryType::NONE;
 
         std::string getId() {
             return id;

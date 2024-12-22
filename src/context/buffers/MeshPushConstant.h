@@ -5,7 +5,7 @@
 namespace Metal {
     struct MeshPushConstant final {
         glm::mat4x4 model;
-        glm::mat4x4 data;
+        alignas(4) unsigned int renderIndex;
     };
 }
 #endif //MESHPUSHCONSTANT_H

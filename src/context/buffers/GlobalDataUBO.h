@@ -10,6 +10,9 @@ namespace Metal {
         alignas(16) glm::mat4x4 invView{};
         alignas(16) glm::mat4x4 invProj{};
         alignas(16) glm::vec3 cameraWorldPosition{};
+        alignas(16) glm::vec3 sunColor{};
+        alignas(16) glm::vec3 sunPosition{};
+        alignas(4) float logDepthFC;
     };
 }
 

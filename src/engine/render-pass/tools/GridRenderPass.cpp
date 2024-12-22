@@ -6,7 +6,11 @@
 
 namespace Metal {
     PipelineInstance *GridRenderPass::getPipeline() {
-        return context.getVulkanContext().corePipelines.gridPipeline;
+        return context.vulkanContext.corePipelines.gridPipeline;
+    }
+
+    bool GridRenderPass::shouldRun() {
+        return context.isDebugMode() && context.editorContext.editorRepository.showGrid;
     }
 
     void GridRenderPass::onSync() {

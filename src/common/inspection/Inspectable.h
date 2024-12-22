@@ -5,16 +5,12 @@
 #include <string>
 #include <vector>
 #include <glm/fwd.hpp>
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
 
 #include "InspectableMember.h"
 #include "../util/Util.h"
+#include "../util/files/EntryType.h"
 
 namespace Metal {
-    enum class EntryType;
-
     class Inspectable {
         const std::string uniqueIdentifier = Util::uuidV4();
         std::vector<std::unique_ptr<InspectableMember> > fields;
@@ -38,7 +34,7 @@ namespace Metal {
 
         void registerBool(bool &v, std::string group, std::string name, bool disabled = false);
 
-        void registerResourceSelection(std::string &v, std::string group, std::string name, EntryType type,
+        void registerResourceSelection(std::string &v, std::string group, std::string name, EntryType::EntryType type,
                                        bool disabled = false);
 
         void registerMethod(const std::function<void()> &updateCallback, std::string name, std::string group);

@@ -14,8 +14,6 @@ namespace Metal {
 
         void dispose(const VulkanContext &context) const;
 
-        void createLayout(const VulkanContext &context);
-
         void create(const VulkanContext &context);
 
         void addLayoutBinding(VkShaderStageFlagBits stageFlags,

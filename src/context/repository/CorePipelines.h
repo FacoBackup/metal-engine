@@ -15,8 +15,10 @@ namespace Metal {
 
         void dispose() const;
 
-        PipelineInstance *debugPipeline = nullptr;
+        PipelineInstance *gBufferPipeline = nullptr;
         PipelineInstance *gridPipeline = nullptr;
+        PipelineInstance *postProcessingPipeline = nullptr;
+        PipelineInstance *gBufferShadingPipeline = nullptr;
     };
 } // Metal
 

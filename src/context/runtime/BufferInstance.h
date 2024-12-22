@@ -15,7 +15,7 @@ namespace Metal {
         explicit BufferInstance(const VkDeviceSize dataSize): dataSize(dataSize) {
         }
 
-        void dispose(VulkanContext &context);
+        void dispose(const VulkanContext &context) const;
 
         void update(void *newData) const;
     };

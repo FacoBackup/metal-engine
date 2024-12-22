@@ -1,10 +1,8 @@
 #ifndef METAL_ENGINE_VULKANUTILS_H
 #define METAL_ENGINE_VULKANUTILS_H
 
-#include "imgui_impl_vulkan.h"
 #include "../../context/VulkanContext.h"
-#include <stdio.h>
-#include <stdlib.h>
+#define MAX_FRAMES_IN_FLIGHT 2
 
 namespace Metal {
     class VulkanUtils {
@@ -12,8 +10,6 @@ namespace Metal {
         static void GLFWErrorCallback(int error, const char *description);
 
         static void CheckVKResult(VkResult err);
-
-        static void FramePresent(ImGui_ImplVulkanH_Window *wd, const VkQueue &graphicsQueue, bool &isSwapChainRebuild);
 
         static VkFormat GetValidDepthFormat(VkPhysicalDevice physicalDevice);
 

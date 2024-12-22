@@ -1,6 +1,7 @@
 #ifndef ENGINEID_H
 #define ENGINEID_H
 
+
 typedef unsigned long long EntityID;
 #define EMPTY_ENTITY 0
 #define FILE_METADATA ".mjson"

@@ -7,7 +7,7 @@
 #include "../../../context/ApplicationContext.h"
 #include "../../../context/runtime/DescriptorInstance.h"
 #include "../../../context/runtime/FrameBufferInstance.h"
-#include "../../../context/runtime/FrameBufferAttachment.h"
+#include "../../../context/runtime/TextureInstance.h"
 #include "../../../engine/service/camera/Camera.h"
 
 namespace Metal {
@@ -21,7 +21,10 @@ namespace Metal {
         updateCamera();
         updateInputs();
 
-        context->guiContext.renderImage(context->getVulkanContext().coreFrameBuffers.auxRenderPass->attachments[0].get(), size->x, size->y);
+        auto *framebuffer = context->vulkanContext.coreFrameBuffers.auxFBO;
+        context->vulkanContext.descriptorService.setImageDescriptor(framebuffer, 0);
+        ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet), ImVec2{size->x, size->y});
+
         if (context->getEditorContext().editorRepository.editorMode == EditorMode::EditorMode::TRANSFORM) {
             gizmoPanel->onSync();
         }

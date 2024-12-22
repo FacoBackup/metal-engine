@@ -24,8 +24,6 @@ namespace Metal {
 
         void presentFrame();
 
-        void renderFrame(ImDrawData *drawData) const;
-
         explicit GLFWContext(ApplicationContext &context) : context(context) {
         }
 

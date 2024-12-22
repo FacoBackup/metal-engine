@@ -92,7 +92,6 @@ add_executable(
         src/context/service/ShaderUtil.h
         src/context/runtime/ShaderModule.cpp
         src/context/runtime/ShaderModule.h
-        src/context/runtime/FrameData.h
         src/engine/render-pass/AbstractRenderPass.cpp
         src/engine/render-pass/AbstractRenderPass.h
         src/engine/render-pass/impl/OpaqueRenderPass.cpp
@@ -122,7 +121,7 @@ add_executable(
         src/context/service/DescriptorService.h
         src/context/runtime/DescriptorInstance.cpp
         src/context/runtime/DescriptorInstance.h
-        src/context/repository/GlobalDataUBO.h
+        src/context/buffers/GlobalDataUBO.h
         src/engine/RuntimeRepository.h
         src/context/repository/CoreDescriptorSets.cpp
         src/context/repository/CoreDescriptorSets.h
@@ -155,14 +154,14 @@ add_executable(
         src/editor/service/FilesService.cpp
         src/editor/service/FilesService.h
         src/editor/ui/files/FilesContext.cpp
-        src/context/repository/MeshPushConstant.h
+        src/context/buffers/MeshPushConstant.h
         src/context/runtime/assets/VertexData.h
         src/editor/ui/viewport/CameraPositionPanel.cpp
         src/editor/ui/viewport/CameraPositionPanel.h
         src/engine/render-pass/tools/GridRenderPass.cpp
         src/engine/render-pass/tools/GridRenderPass.h
-        src/context/runtime/RenderPass.cpp
-        src/context/runtime/RenderPass.h
+        src/context/runtime/CommandBufferRecorder.cpp
+        src/context/runtime/CommandBufferRecorder.h
         src/context/repository/CoreRenderPasses.cpp
         src/context/repository/CoreRenderPasses.h
         src/engine/service/camera/Camera.cpp
@@ -225,6 +224,18 @@ add_executable(
         src/context/runtime/assets/SceneData.h
         src/context/runtime/assets/EntityAssetData.h
         src/context/runtime/assets/MaterialData.h
+        src/engine/render-pass/impl/PostProcessingPass.cpp
+        src/engine/render-pass/impl/PostProcessingPass.h
+        src/context/buffers/PPSettingsUBO.h
+        src/engine/render-pass/impl/GBufferShadingPass.cpp
+        src/engine/render-pass/impl/GBufferShadingPass.h
+        src/context/buffers/GBufferShadingPushConstant.h
+        src/context/service/PipelineBuilder.h
+        src/context/runtime/FrameBufferAttachment.cpp
+        src/engine/service/AtmosphereRepository.cpp
+        src/engine/service/AtmosphereRepository.h
+        src/context/repository/CoreTextures.cpp
+        src/context/repository/CoreTextures.h
 )
 
 
