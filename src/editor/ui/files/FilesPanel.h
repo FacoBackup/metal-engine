@@ -51,7 +51,7 @@ namespace Metal {
 
         void selectAll();
 
-        void deleteSelected();
+        void deleteSelected() const;
 
         void onClick(FileEntry *root);
 

@@ -97,6 +97,6 @@ namespace Metal {
     }
 
     ApplicationContext::ApplicationContext(IPanel &root_panel, bool debugMode) : vulkanContext(*this, debugMode),
-        rootPanel(root_panel) {
+        rootPanel(root_panel), debugMode(debugMode) {
     }
 }

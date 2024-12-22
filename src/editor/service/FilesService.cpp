@@ -10,7 +10,20 @@
 #include <fstream>
 #include <iostream>
 
+#include "../../engine/enum/LevelOfDetail.h"
+
 namespace fs = std::filesystem;
+
+#define DELETE_F(F)\
+std::filesystem::remove_all(entry.second->absolutePath);\
+std::filesystem::remove_all(F(entry.second->getId(), LevelOfDetail::LOD_0));\
+std::filesystem::remove_all(F(entry.second->getId(), LevelOfDetail::LOD_1));\
+std::filesystem::remove_all(F(entry.second->getId(), LevelOfDetail::LOD_2));\
+std::filesystem::remove_all(F(entry.second->getId(), LevelOfDetail::LOD_3));
+
+#define DELETE_S(F)\
+std::filesystem::remove_all(entry.second->absolutePath);\
+std::filesystem::remove_all(F(entry.second->getId()));
 
 #define DATA \
         auto fileSizeInBytes = fs::file_size(entry.path());\
@@ -57,8 +70,38 @@ namespace Metal {
         return nullptr;
     }
 
-    void FilesService::deleteFiles(std::unordered_map<std::string, FileEntry *> &filesContext) {
-        // TODO
+    void FilesService::DeleteFiles(const std::unordered_map<std::string, FileEntry *> &selected) {
+        for (auto &entry: selected) {
+            switch (entry.second->type) {
+                case EntryType::DIRECTORY: {
+                    FilesService::GetEntries(entry.second);
+                    std::unordered_map<std::string, FileEntry *> files;
+                    for (auto *f: entry.second->children) {
+                        files.insert({f->getId(), f});
+                    }
+                    DeleteFiles(files);
+                    std::filesystem::remove_all(entry.second->absolutePath);
+                    break;
+                }
+                case EntryType::MESH: {
+                    DELETE_F(FORMAT_FILE_MESH)
+                    break;
+                }
+                case EntryType::MATERIAL: {
+                    DELETE_S(FORMAT_FILE_MATERIAL)
+                    break;
+                }
+                case EntryType::TEXTURE: {
+                    DELETE_F(FORMAT_FILE_TEXTURE)
+                    break;
+                }
+                case EntryType::SCENE: {
+                    DELETE_S(FORMAT_FILE_SCENE)
+                    break;
+                }
+                default: break;;
+            }
+        }
     }
 
     void FilesService::Move(FileEntry *toMove,

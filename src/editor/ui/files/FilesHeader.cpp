@@ -10,12 +10,13 @@ namespace Metal {
         renderOptions();
 
         ImGui::Text(filesContext.pathToCurrentDirectory.c_str());
-        UIUtil::DynamicSpacing(155);
+        UIUtil::DynamicSpacing(210);
+        ImGui::SetNextItemWidth(100);
         editorMode = EntryType::IndexOfValue(filesContext.filterType);
         if (ImGui::Combo((id + "filter").c_str(), &editorMode, EntryType::Names)) {
             filesContext.filterType = EntryType::ValueOfIndex(editorMode);
         }
-        UIUtil::Spacing();
+        ImGui::SameLine();
         if (UIUtil::ButtonSimple(actionLabel + id, 100,
                                  UIUtil::ONLY_ICON_BUTTON_SIZE)) {
             action();

@@ -10,6 +10,7 @@
 
 namespace Metal {
     class ApplicationContext {
+        bool debugMode;
         IPanel &rootPanel;
         std::string rootDirectory;
         std::string projectName;
@@ -20,6 +21,8 @@ namespace Metal {
         EditorContext editorContext{*this};
         VulkanContext vulkanContext;
         GuiContext guiContext{*this};
+
+        [[nodiscard]] bool isDebugMode() const { return debugMode; }
 
         void updateRootPath(bool forceSelection);
 

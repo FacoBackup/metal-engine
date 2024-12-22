@@ -143,9 +143,12 @@ namespace Metal {
         return ProcessIncludes(source);
     }
 
-    VkShaderModule ShaderUtil::CreateShaderModule(const ApplicationContext &context, const std::string &pFilename) {
+    VkShaderModule ShaderUtil::CreateShaderModule(const ApplicationContext &context, const std::string &pFilename, bool debugMode) {
         const std::string basePath = context.getShadersDirectory();
         std::string source = ProcessShader(BASE_PATH + pFilename);
+        if (debugMode) {
+            source = "#define DEBUG\n" + source;
+        }
         const glslang_stage_t shaderStage = ShaderStageFromFilename(pFilename.c_str());
 
         glslang_initialize_process();

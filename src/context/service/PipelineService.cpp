@@ -43,8 +43,10 @@ namespace Metal {
 
         auto *pipeline = new PipelineInstance();
         pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
-        auto fragmentShaderModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.fragmentShader);
-        auto vertexShaderModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.vertexShader);
+        auto fragmentShaderModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.fragmentShader,
+                                                                   context.isDebugMode());
+        auto vertexShaderModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.vertexShader,
+                                                                 context.isDebugMode());
         registerResource(pipeline);
         createPipelineLayout(pipelineBuilder.descriptorSetsToBind, pipelineBuilder.pushConstantsSize, pipeline);
 

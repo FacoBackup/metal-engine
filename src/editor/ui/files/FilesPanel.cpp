@@ -51,6 +51,10 @@ namespace Metal {
             if (ImGui::MenuItem("Delete")) {
                 deleteSelected();
             }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Select all")) {
+                selectAll();
+            }
             ImGui::EndPopup();
         }
 
@@ -88,8 +92,8 @@ namespace Metal {
             int rowIndex = 1;
             for (auto &child: filesContext.currentDirectory->children) {
                 if (filesContext.filterType == EntryType::NONE || child->type == filesContext.filterType) {
-
-                    const bool isSelected = filesContext.selected.contains(child->getId()) || child->isHovered && onDrag !=
+                    const bool isSelected = filesContext.selected.contains(child->getId()) || child->isHovered && onDrag
+                                            !=
                                             nullptr;
                     ImGui::PushStyleColor(ImGuiCol_ChildBg, isSelected
                                                                 ? context->getEditorContext().editorRepository.accent
@@ -222,6 +226,7 @@ namespace Metal {
             // }
         }
         filesContext.toCut.clear();
+        FilesService::GetEntries(filesContext.currentDirectory);
     }
 
     void FilesPanel::openSelected() {
@@ -233,16 +238,18 @@ namespace Metal {
     void FilesPanel::cutSelected() {
         filesContext.toCut.clear();
         filesContext.toCut = filesContext.selected;
+        FilesService::GetEntries(filesContext.currentDirectory);
     }
 
     void FilesPanel::selectAll() {
         for (auto &entry: filesContext.currentDirectory->children) {
-            filesContext.selected[entry->getId()] = entry;
+            filesContext.selected.insert({entry->getId(), entry});
         }
     }
 
-    void FilesPanel::deleteSelected() {
-        context->getEditorContext().filesService.deleteFiles(filesContext.selected);
+    void FilesPanel::deleteSelected() const {
+        FilesService::DeleteFiles(filesContext.selected);
+        FilesService::GetEntries(filesContext.currentDirectory);
     }
 
     void FilesPanel::onClick(FileEntry *root) {

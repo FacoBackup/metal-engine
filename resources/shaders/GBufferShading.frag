@@ -23,16 +23,21 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     vec3 cameraWorldPosition;
 } globalData;
 
+#ifdef DEBUG
 layout(push_constant) uniform Push {
     int mode;
 } push;
+#endif
 
 layout(location = 0) out vec4 finalColor;
 
 void main() {
-    if (texture(gBufferAlbedoEmissive, texCoords).r == 0){
+    if (texture(gBufferDepthIdUV, texCoords).r == 0){
         discard;
     }
+
+
+    #ifdef DEBUG
     if (push.mode == ALBEDO){
         finalColor = vec4(texture(gBufferAlbedoEmissive, texCoords).rgb, 1);
     } else if (push.mode == NORMAL){
@@ -46,6 +51,7 @@ void main() {
     } else if (push.mode == DEPTH){
         finalColor = vec4(vec3(texture(gBufferDepthIdUV, texCoords).r), 1);
     } else {
-        finalColor = vec4(1,0,1, 1);
+        finalColor = vec4(1, 0, 1, 1);
     }
+    #endif
 }
