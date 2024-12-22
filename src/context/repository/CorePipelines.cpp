@@ -46,7 +46,10 @@ namespace Metal {
                 )
                 .setPushConstantsSize(sizeof(GBufferShadingPushConstant))
                 .addDescriptorSet(context.vulkanContext.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.gBufferShadingDescriptor.get());
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.gBufferShadingDescriptor.get())
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.gBufferShadingDescriptor1.get())
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.gBufferShadingDescriptor2.get())
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.gBufferShadingDescriptor3.get());
         gBufferShadingPipeline = pipelineService.createRenderingPipeline(gBufferShadingPipelineBuilder);
     }
 

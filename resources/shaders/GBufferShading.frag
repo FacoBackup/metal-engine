@@ -13,9 +13,9 @@
 layout(location = 0) in vec2 texCoords;
 
 layout(set = 1, binding = 0) uniform sampler2D gBufferAlbedoEmissive;
-layout(set = 1, binding = 1) uniform sampler2D gBufferRoughnessMetallicAO;
-layout(set = 1, binding = 2) uniform sampler2D gBufferNormal;
-layout(set = 1, binding = 3) uniform sampler2D gBufferDepthIdUV;
+layout(set = 2, binding = 0) uniform sampler2D gBufferRoughnessMetallicAO;
+layout(set = 3, binding = 0) uniform sampler2D gBufferNormal;
+layout(set = 4, binding = 0) uniform sampler2D gBufferDepthIdUV;
 
 #ifdef DEBUG
 layout(push_constant) uniform Push {
