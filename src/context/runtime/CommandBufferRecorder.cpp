@@ -19,12 +19,15 @@ namespace Metal {
         renderPassInfo.renderArea.extent = {
             frameBuffer->bufferWidth, frameBuffer->bufferHeight
         };
-        std::vector<VkClearValue> clearColors{};
         if (clearBuffer) {
-            for (int i = 0; i < frameBuffer->attachments.size(); i++) {
+            for (const auto & attachment : frameBuffer->attachments) {
                 VkClearValue &clearValue = clearColors.emplace_back();
-                clearValue.depthStencil = {1.0f, 0};
-                clearValue.color = {0.0f, 0.0f, 0.0f, 0};
+                if (attachment->depth) {
+                    clearValue.depthStencil.depth = 1.0f;
+                    clearValue.depthStencil.stencil = 0;
+                } else {
+                    clearValue.color = {0.0f, 0.0f, 0.0f, 0.0f};
+                }
             }
         }
         renderPassInfo.clearValueCount = clearColors.size();
@@ -34,7 +37,6 @@ namespace Metal {
     CommandBufferRecorder::CommandBufferRecorder(FrameBufferInstance *frameBuffer,
                                                  ApplicationContext &applicationContext,
                                                  const bool clearBuffer): context(applicationContext) {
-
         createRenderPassInfo(frameBuffer, clearBuffer);
 
         viewport.width = static_cast<float>(frameBuffer->bufferWidth);
@@ -62,6 +64,7 @@ namespace Metal {
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         vkBeginCommandBuffer(vkCommandBuffer, &beginInfo);
+
         vkCmdBeginRenderPass(vkCommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
         vkCmdSetViewport(vkCommandBuffer, 0, 1, &viewport);
         vkCmdSetScissor(vkCommandBuffer, 0, 1, &scissor);

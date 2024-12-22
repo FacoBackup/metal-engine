@@ -15,6 +15,7 @@ namespace Metal {
         VkViewport viewport{};
         VkRect2D scissor{};
         VkRenderPassBeginInfo renderPassInfo{};
+        std::vector<VkClearValue> clearColors{};
 
     public:
         void createRenderPassInfo(FrameBufferInstance *frameBuffer, bool clearBuffer);

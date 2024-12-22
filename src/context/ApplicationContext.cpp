@@ -80,7 +80,7 @@ namespace Metal {
                     VulkanUtils::CheckVKResult(vkWaitForFences(vulkanContext.device.device, 1, &fd->Fence, VK_TRUE,
                                                                UINT64_MAX));
                     VulkanUtils::CheckVKResult(vkResetFences(vulkanContext.device.device, 1, &fd->Fence));
-                    VulkanUtils::CheckVKResult(vkResetCommandPool(vulkanContext.device.device, fd->CommandPool, 0));
+                    VulkanUtils::CheckVKResult(vkResetCommandPool(vulkanContext.device.device, fd->CommandPool, VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT));
                     engineContext.onSync();
                     GuiContext::RecordImguiCommandBuffer(drawData, err, wd, fd);
                     vulkanContext.submitFrame(imageAcquiredSemaphore, wd.FrameSemaphores[wd.SemaphoreIndex].
