@@ -25,8 +25,6 @@ namespace Metal {
 
         void updateProjectName(const std::string &projectName);
 
-        void dispose();
-
         [[nodiscard]] bool isValidContext() const {
             return glfwContext.isValidContext();
         }
@@ -51,7 +49,6 @@ namespace Metal {
             return rootDirectory;
         }
 
-
         [[nodiscard]] std::string getAssetRefDirectory() const {
             return rootDirectory + "/assets-ref/";
         }
@@ -63,6 +60,8 @@ namespace Metal {
         [[nodiscard]] std::string getAssetDirectory() const {
             return rootDirectory + "/assets/";
         }
+
+        [[nodiscard]] uint32_t getFrameIndex() const;
 
         void start();
 

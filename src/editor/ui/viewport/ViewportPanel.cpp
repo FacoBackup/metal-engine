@@ -21,7 +21,51 @@ namespace Metal {
         updateCamera();
         updateInputs();
 
-        context->guiContext.renderImage(context->vulkanContext.coreFrameBuffers.postProcessingFBO->attachments[0].get(), size->x, size->y);
+        switch (context->editorContext.editorRepository.shadingMode) {
+            case ShadingMode::LIT: {
+                context->vulkanContext.descriptorService.updateImageSamplerDescriptor(
+                    context->vulkanContext.coreFrameBuffers.auxFBO, 0);
+                ImGui::Image(
+                    reinterpret_cast<ImTextureID>(context->vulkanContext.coreFrameBuffers.auxFBO->attachments[0]
+                        ->imageDescriptor->vkDescriptorSet), ImVec2{size->x, size->y});
+                break;
+            }
+            case ShadingMode::ALBEDO: {
+                context->vulkanContext.descriptorService.updateImageSamplerDescriptor(
+                    context->vulkanContext.coreFrameBuffers.gBufferFBO, 1);
+                ImGui::Image(
+                    reinterpret_cast<ImTextureID>(context->vulkanContext.coreFrameBuffers.gBufferFBO->attachments[1]
+                        ->imageDescriptor->vkDescriptorSet), ImVec2{size->x, size->y});
+                break;
+            }
+            case ShadingMode::NORMAL: {
+                context->vulkanContext.descriptorService.updateImageSamplerDescriptor(
+                    context->vulkanContext.coreFrameBuffers.gBufferFBO, 3);
+                ImGui::Image(
+                    reinterpret_cast<ImTextureID>(context->vulkanContext.coreFrameBuffers.gBufferFBO->attachments[3]
+                        ->imageDescriptor->vkDescriptorSet), ImVec2{size->x, size->y});
+                break;
+            }
+            case ShadingMode::METALLIC:
+            case ShadingMode::AO:
+            case ShadingMode::ROUGHNESS: {
+                context->vulkanContext.descriptorService.updateImageSamplerDescriptor(
+                    context->vulkanContext.coreFrameBuffers.gBufferFBO, 2);
+                ImGui::Image(
+                    reinterpret_cast<ImTextureID>(context->vulkanContext.coreFrameBuffers.gBufferFBO->attachments[2]
+                        ->imageDescriptor->vkDescriptorSet), ImVec2{size->x, size->y});
+                break;
+            }
+            default: {
+                context->vulkanContext.descriptorService.updateImageSamplerDescriptor(
+              context->vulkanContext.coreFrameBuffers.gBufferFBO, 0);
+                ImGui::Image(
+                    reinterpret_cast<ImTextureID>(context->vulkanContext.coreFrameBuffers.gBufferFBO->attachments[0]
+                        ->imageDescriptor->vkDescriptorSet), ImVec2{size->x, size->y});
+                break;
+            }
+        }
+
         if (context->getEditorContext().editorRepository.editorMode == EditorMode::EditorMode::TRANSFORM) {
             gizmoPanel->onSync();
         }

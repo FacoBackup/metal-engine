@@ -1,11 +1,15 @@
 #include "DescriptorInstance.h"
 
+#include <iostream>
+
 #include "BufferInstance.h"
 #include "../VulkanContext.h"
 #include "../../common/util/VulkanUtils.h"
 
 namespace Metal {
     void DescriptorInstance::dispose(const VulkanContext &context) const {
+        std::cout << "Disposing of descriptor instance" << std::endl;
+
         if (ready)
             vkDestroyDescriptorSetLayout(context.device.device, vkDescriptorSetLayout, nullptr);
     }
@@ -73,7 +77,7 @@ namespace Metal {
 
         auto &imageInfo = imageInfos.emplace_back();;
         imageInfo.imageView = view;
-        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        imageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
         imageInfo.sampler = sampler;
 
         auto &descriptorWrite = writeDescriptorSets.emplace_back();

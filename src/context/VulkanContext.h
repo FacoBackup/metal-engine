@@ -13,7 +13,6 @@
 #include "repository/CoreDescriptorSets.h"
 #include "../common/interface/AbstractRuntimeComponent.h"
 #include "repository/CoreRenderPasses.h"
-#include "runtime/FrameData.h"
 #include "service/DescriptorService.h"
 #include "service/TextureService.h"
 #include "service/FrameBufferService.h"
@@ -21,7 +20,6 @@
 #include "service/BufferService.h"
 #include "service/MeshService.h"
 
-#define IMAGE_COUNT 2
 #define VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME "VK_KHR_portability_subset"
 
 namespace Metal {
@@ -55,8 +53,15 @@ namespace Metal {
         uint32_t w{}, h{};
         GLFWwindow *window = nullptr;
         bool debugMode = false;
-        FrameData frameData{};
+        std::vector<VkCommandBuffer> commandBuffers{};
+
     public:
+        void pushCommandBuffer(VkCommandBuffer commandBuffer) {
+            commandBuffers.push_back(commandBuffer);
+        }
+
+        std::vector<VkCommandBuffer> &getCommandBuffers() { return commandBuffers; }
+
         explicit VulkanContext(ApplicationContext &context, bool debugMode);
 
         VkPhysicalDeviceProperties physicalDeviceProperties{};
@@ -95,15 +100,20 @@ namespace Metal {
 
         void onInitialize() override;
 
-        FrameData &getFrameData();
+        [[nodiscard]] uint32_t getWindowHeight() const {
+            return h;
+        }
 
-        [[nodiscard]] uint32_t getWindowWidth() const;
+        [[nodiscard]] uint32_t getWindowWidth() const {
+            return w;
+        }
 
-        [[nodiscard]] uint32_t getWindowHeight() const;
+        [[nodiscard]] VkCommandBuffer beginSingleTimeCommands() const;
 
-        VkCommandBuffer beginSingleTimeCommands() const;
+        void endSingleTimeCommands(VkCommandBuffer commandBuffer) const;
 
-        void endSingleTimeCommands(VkCommandBuffer  commandBuffer) const;
+        void submitFrame(VkSemaphore image_acquired_semaphore, VkSemaphore render_complete_semaphore,
+                         ImGui_ImplVulkanH_Frame *fd) const;
     };
 } // Metal
 

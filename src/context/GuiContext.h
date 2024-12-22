@@ -26,13 +26,14 @@ namespace Metal {
 
         void onInitialize() override;
 
-        bool beginFrame() const;
-
         void endFrame();
 
-        void renderImage(FrameBufferAttachment *attachment, float sizeX, float sizeY) const;
-
         void renderImage(TextureInstance *texture, float sizeX, float sizeY) const;
+
+        static void BeginFrame();
+
+        static void RecordImguiCommandBuffer(ImDrawData *drawData, VkResult &err, ImGui_ImplVulkanH_Window &wd,
+                                             ImGui_ImplVulkanH_Frame *fd);
     };
 }
 

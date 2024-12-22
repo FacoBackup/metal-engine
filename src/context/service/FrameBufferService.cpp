@@ -12,6 +12,25 @@ namespace Metal {
         framebuffer->bufferWidth = w;
         framebuffer->bufferHeight = h;
         registerResource(framebuffer);
+
+        VkSamplerCreateInfo samplerCreateInfo{};
+        // TODO - ENABLE/DISABLE LINEAR FILTERING
+        samplerCreateInfo.magFilter = VK_FILTER_LINEAR;
+        samplerCreateInfo.minFilter = VK_FILTER_LINEAR;
+        samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+        samplerCreateInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+        samplerCreateInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+        samplerCreateInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+        samplerCreateInfo.mipLodBias = 0.0f;
+        samplerCreateInfo.compareOp = VK_COMPARE_OP_NEVER;
+        samplerCreateInfo.minLod = 0.0f;
+        samplerCreateInfo.maxLod = 1;
+        // TODO - ENABLE/DISABLE ANISOTROPY
+        samplerCreateInfo.maxAnisotropy = 8;
+        samplerCreateInfo.anisotropyEnable = VK_TRUE;
+        samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
+        VulkanUtils::CheckVKResult(vkCreateSampler(vulkanContext.device.device, &samplerCreateInfo, nullptr,
+                                                   &framebuffer->vkImageSampler));
         return framebuffer;
     }
 
@@ -23,10 +42,10 @@ namespace Metal {
     }
 
     void FrameBufferService::createAttachment(const char *name, VkFormat format, VkImageUsageFlagBits usage,
-                                              FrameBufferInstance *pipeline) const {
+                                              FrameBufferInstance *framebuffer) const {
         const auto att = createAttachmentInternal(name, format,
-                                                  static_cast<VkImageUsageFlagBits>(usage | VK_IMAGE_USAGE_SAMPLED_BIT),
-                                                  pipeline);
+                                                  usage,
+                                                  framebuffer);
         att->depth = false;
     }
 
@@ -62,7 +81,7 @@ namespace Metal {
         image.arrayLayers = 1;
         image.samples = VK_SAMPLE_COUNT_1_BIT;
         image.tiling = VK_IMAGE_TILING_OPTIMAL;
-        image.usage = usage;
+        image.usage = usage | VK_IMAGE_USAGE_SAMPLED_BIT;
         image.initialLayout = layout;
         image.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
@@ -76,9 +95,10 @@ namespace Metal {
                                                                 memReqs.memoryTypeBits,
                                                                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-        VulkanUtils::CheckVKResult(vkAllocateMemory(vulkanContext.device.device, &memAlloc, nullptr, &attachment->mem));
+        VulkanUtils::CheckVKResult(vkAllocateMemory(vulkanContext.device.device, &memAlloc, nullptr,
+                                                    &attachment->vkImageMemory));
         VulkanUtils::CheckVKResult(
-            vkBindImageMemory(vulkanContext.device.device, attachment->vkImage, attachment->mem, 0));
+            vkBindImageMemory(vulkanContext.device.device, attachment->vkImage, attachment->vkImageMemory, 0));
 
         VkImageViewCreateInfo imageView{};
         imageView.viewType = VK_IMAGE_VIEW_TYPE_2D;
@@ -94,22 +114,6 @@ namespace Metal {
                                                      &attachment->vkImageView));
 
 
-        VkSamplerCreateInfo samplerCreateInfo{};
-        samplerCreateInfo.magFilter = VK_FILTER_LINEAR;
-        samplerCreateInfo.minFilter = VK_FILTER_LINEAR;
-        samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-        samplerCreateInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
-        samplerCreateInfo.addressModeV = samplerCreateInfo.addressModeU;
-        samplerCreateInfo.addressModeW = samplerCreateInfo.addressModeU;
-        samplerCreateInfo.mipLodBias = 0.0f;
-        samplerCreateInfo.compareOp = VK_COMPARE_OP_NEVER;
-        samplerCreateInfo.minLod = 0.0f;
-        samplerCreateInfo.maxLod = 1;
-        samplerCreateInfo.maxAnisotropy = 8;
-        samplerCreateInfo.anisotropyEnable = VK_TRUE;
-        samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
-        VulkanUtils::CheckVKResult(vkCreateSampler(vulkanContext.device.device, &samplerCreateInfo, nullptr,
-                                                   &attachment->vkImageSampler));
 
         return attachment;
     }
@@ -143,26 +147,24 @@ namespace Metal {
             }
         }
 
-        std::array<VkSubpassDependency, 2> dependencies{};
-        // Prepare for rendering in the first subpass by synchronizing external operations and ensuring the attachment is ready for use.
+        std::array<VkSubpassDependency, 2> dependencies;
+
         dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
         dependencies[0].dstSubpass = 0;
         dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
         dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         dependencies[0].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-        dependencies[0].dstAccessMask =
-                VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
         dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
-        // Ensure the subpass completes all rendering operations before handing off to external operations.
         dependencies[1].srcSubpass = 0;
         dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
         dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         dependencies[1].dstStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-        dependencies[1].srcAccessMask =
-                VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
         dependencies[1].dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
         dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
 
         // SUB PASS DESCRIPTOR
         VkSubpassDescription subpass = {};
@@ -179,8 +181,8 @@ namespace Metal {
         renderPassInfo.attachmentCount = attachmentDescriptions.size();
         renderPassInfo.subpassCount = 1;
         renderPassInfo.pSubpasses = &subpass;
-        // renderPassInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
-        // renderPassInfo.pDependencies = dependencies.data();
+        renderPassInfo.dependencyCount = dependencies.size();
+        renderPassInfo.pDependencies = dependencies.data();
 
         VulkanUtils::CheckVKResult(vkCreateRenderPass(vulkanContext.device.device,
                                                       &renderPassInfo,

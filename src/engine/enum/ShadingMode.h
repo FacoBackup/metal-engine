@@ -9,10 +9,11 @@ namespace Metal::ShadingMode {
         ROUGHNESS,
         METALLIC,
         AO,
-        RANDOM
+        RANDOM,
+        DEPTH
     };
 
-    static auto Names = "Lit\0Albedo\0Normal\0Roughness\0Metallic\0AO\0Random\0";
+    static auto Names = "Lit\0Albedo\0Normal\0Roughness\0Metallic\0AO\0Random\0Depth\0";
 
     static ShadingMode ValueOfIndex(const int option) {
         if (option == 0) {
@@ -33,7 +34,10 @@ namespace Metal::ShadingMode {
         if (option == 5) {
             return ShadingMode::AO;
         }
-        return ShadingMode::RANDOM;
+        if (option == 6) {
+            return ShadingMode::RANDOM;
+        }
+        return ShadingMode::DEPTH;
     }
 
     static int IndexOfValue(const ShadingMode mode) {
@@ -55,7 +59,10 @@ namespace Metal::ShadingMode {
         if (mode == ShadingMode::AO) {
             return 5;
         }
-        return 6;
+        if (mode == ShadingMode::RANDOM) {
+            return 6;
+        }
+        return 7;
     }
 }
 

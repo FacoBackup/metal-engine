@@ -92,7 +92,6 @@ add_executable(
         src/context/service/ShaderUtil.h
         src/context/runtime/ShaderModule.cpp
         src/context/runtime/ShaderModule.h
-        src/context/runtime/FrameData.h
         src/engine/render-pass/AbstractRenderPass.cpp
         src/engine/render-pass/AbstractRenderPass.h
         src/engine/render-pass/impl/OpaqueRenderPass.cpp
@@ -161,8 +160,8 @@ add_executable(
         src/editor/ui/viewport/CameraPositionPanel.h
         src/engine/render-pass/tools/GridRenderPass.cpp
         src/engine/render-pass/tools/GridRenderPass.h
-        src/context/runtime/RenderPass.cpp
-        src/context/runtime/RenderPass.h
+        src/context/runtime/CommandBufferRecorder.cpp
+        src/context/runtime/CommandBufferRecorder.h
         src/context/repository/CoreRenderPasses.cpp
         src/context/repository/CoreRenderPasses.h
         src/engine/service/camera/Camera.cpp

@@ -4,6 +4,7 @@
 #include "../ApplicationContext.h"
 
 #include "../runtime/FrameBufferAttachment.h"
+#include "../runtime/FrameBufferInstance.h"
 #include "../runtime/TextureInstance.h"
 
 namespace Metal {
@@ -11,14 +12,15 @@ namespace Metal {
         : AbstractRuntimeComponent(context) {
     }
 
-    void DescriptorService::updateImageSamplerDescriptor(FrameBufferAttachment *attachment) const {
+    void DescriptorService::updateImageSamplerDescriptor(const FrameBufferInstance *framebuffer, unsigned int attachmentIndex) const {
+        auto attachment = framebuffer->attachments[attachmentIndex];
         if (attachment->imageDescriptor == nullptr) {
             attachment->imageDescriptor = std::make_unique<DescriptorInstance>();
             attachment->imageDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
                                                           VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
             attachment->imageDescriptor->create(context.vulkanContext);
             attachment->imageDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                            attachment->vkImageSampler,
+                                                            framebuffer->vkImageSampler,
                                                             attachment->vkImageView);
             attachment->imageDescriptor->write(context.vulkanContext);
         }

@@ -21,8 +21,8 @@ namespace Metal {
         float mouseY = 0;
         float normalizedMouseX = 0;
         float normalizedMouseY = 0;
-        float viewportW = 0;
-        float viewportH = 0;
+        float viewportW = 1;
+        float viewportH = 1;
         float viewportX = 0;
         float viewportY = 0;
     };

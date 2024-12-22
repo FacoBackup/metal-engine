@@ -8,7 +8,7 @@
 #include "../../../../common/inspection/Inspectable.h"
 
 namespace Metal {
-    class AbstractComponent;
+    struct AbstractComponent;
 
     class Entity final : public Inspectable {
         EntityID id;

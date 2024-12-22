@@ -9,6 +9,10 @@ namespace Metal {
         return context.vulkanContext.corePipelines.gridPipeline;
     }
 
+    bool GridRenderPass::shouldRun() {
+        return context.editorContext.editorRepository.showGrid;
+    }
+
     void GridRenderPass::onSync() {
         recordDrawSimpleInstanced(3, 1);
     }

@@ -5,6 +5,7 @@
 #define METALLIC 4
 #define AO 5
 #define RANDOM 6
+#define DEPTH 7
 
 layout(location = 0) in vec2 texCoords;
 
@@ -29,7 +30,7 @@ layout(push_constant) uniform Push {
 layout(location = 0) out vec4 finalColor;
 
 void main() {
-    if (texture(gBufferDepthIdUV, texCoords).r != 1){
+    if (texture(gBufferAlbedoEmissive, texCoords).r == 0){
         discard;
     }
     if (push.mode == ALBEDO){
@@ -42,7 +43,9 @@ void main() {
         finalColor = vec4(vec3(texture(gBufferRoughnessMetallicAO, texCoords).g), 1);
     } else if (push.mode == AO){
         finalColor = vec4(vec3(texture(gBufferRoughnessMetallicAO, texCoords).b), 1);
-    } else {
+    } else if (push.mode == DEPTH){
         finalColor = vec4(vec3(texture(gBufferDepthIdUV, texCoords).r), 1);
+    } else {
+        finalColor = vec4(1,0,1, 1);
     }
 }

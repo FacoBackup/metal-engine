@@ -39,6 +39,8 @@ namespace Metal {
         StreamingRepository streamingRepository{context};
 
         void onSync() override;
+
+        void dispose();
     };
 }
 #endif

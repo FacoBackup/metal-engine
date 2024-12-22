@@ -33,7 +33,7 @@ namespace Metal {
 
         void recordDrawMesh(const MeshInstance *instance, uint32_t instanceCount = 1) const;
 
-        virtual bool shouldClear() {
+        virtual bool shouldRun() {
             return true;
         }
 

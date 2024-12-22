@@ -27,17 +27,17 @@ namespace Metal {
             gBufferShadingDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 3);
             gBufferShadingDescriptor->create(vulkanContext);
             gBufferShadingDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[0]->vkImageSampler,
-                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[0]->vkImageView);
-            gBufferShadingDescriptor->addImageDescriptor(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[1]->vkImageSampler,
+                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->vkImageSampler,
                                                                 context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[1]->vkImageView);
-            gBufferShadingDescriptor->addImageDescriptor(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[2]->vkImageSampler,
+            gBufferShadingDescriptor->addImageDescriptor(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->vkImageSampler,
                                                                 context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[2]->vkImageView);
-            gBufferShadingDescriptor->addImageDescriptor(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[3]->vkImageSampler,
+            gBufferShadingDescriptor->addImageDescriptor(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->vkImageSampler,
                                                                 context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[3]->vkImageView);
+            gBufferShadingDescriptor->addImageDescriptor(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->vkImageSampler,
+                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[4]->vkImageView);
             gBufferShadingDescriptor->write(vulkanContext);
         }
 
@@ -49,7 +49,7 @@ namespace Metal {
             postProcessingDescriptor->addBufferDescriptor(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                                                           vulkanContext.coreBuffers.postProcessingSettings);
             postProcessingDescriptor->addImageDescriptor(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                                context.vulkanContext.coreFrameBuffers.auxFBO->attachments[0]->vkImageSampler,
+                                                                context.vulkanContext.coreFrameBuffers.auxFBO->vkImageSampler,
                                                                 context.vulkanContext.coreFrameBuffers.auxFBO->attachments[0]->vkImageView);
             postProcessingDescriptor->write(vulkanContext);
         }

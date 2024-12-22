@@ -2,7 +2,7 @@
 
 #include "../context/ApplicationContext.h"
 #include "../context/runtime/BufferInstance.h"
-#include "../context/runtime/RenderPass.h"
+#include "../context/runtime/CommandBufferRecorder.h"
 #include "render-pass/impl/GBufferShadingPass.h"
 #include "render-pass/impl/OpaqueRenderPass.h"
 #include "render-pass/impl/PostProcessingPass.h"
