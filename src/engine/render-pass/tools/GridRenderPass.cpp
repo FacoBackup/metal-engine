@@ -10,7 +10,7 @@ namespace Metal {
     }
 
     bool GridRenderPass::shouldRun() {
-        return context.editorContext.editorRepository.showGrid;
+        return context.isDebugMode() && context.editorContext.editorRepository.showGrid;
     }
 
     void GridRenderPass::onSync() {

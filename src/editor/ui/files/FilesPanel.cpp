@@ -248,7 +248,7 @@ namespace Metal {
     }
 
     void FilesPanel::deleteSelected() const {
-        FilesService::DeleteFiles(filesContext.selected);
+        context->editorContext.filesService.deleteFiles(filesContext.selected);
         FilesService::GetEntries(filesContext.currentDirectory);
     }
 

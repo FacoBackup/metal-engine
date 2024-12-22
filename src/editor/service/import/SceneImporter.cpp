@@ -50,7 +50,7 @@ namespace Metal {
                 VertexData vertexData{};
                 vertexData.vertex = glm::vec3(
                     assimpMesh->mVertices[j].x,
-                    -assimpMesh->mVertices[j].y,
+                    assimpMesh->mVertices[j].y,
                     assimpMesh->mVertices[j].z
                 );
                 if (assimpMesh->HasNormals()) {
@@ -187,12 +187,6 @@ namespace Metal {
                                     const std::unordered_map<unsigned int, std::string> &materialsMap) {
         auto &currentNode = scene.entities.emplace_back();
 
-        aiVector3D translation, scale;
-        aiQuaternion rotation;
-        node->mTransformation.Decompose(scale, rotation, translation);
-        currentNode.scale = {scale.x, scale.y, scale.z};
-        currentNode.position = {translation.x, translation.y, translation.z};
-        currentNode.rotation = {rotation.x, rotation.y, rotation.z, rotation.w};
         currentNode.name = node->mName.data;
         currentNode.id = increment;
         increment++;

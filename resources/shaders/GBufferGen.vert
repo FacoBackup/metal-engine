@@ -17,5 +17,5 @@ void main(){
     outPosition = inPosition;
     outNormal = inNormal;
     outUV = inUV;
-    gl_Position =  globalData.projView * push.model * vec4(inPosition, 1.0);
+    gl_Position =  globalData.projView * push.model * vec4(outPosition, 1.0);
 }

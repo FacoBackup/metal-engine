@@ -17,8 +17,6 @@ namespace Metal {
             : filesContext(files_context), actionLabel(actionLabel), action(std::move(action)) {
         }
 
-        void renderOptions() const;
-
         void onSync() override;
     };
 }

@@ -11,8 +11,8 @@ namespace Metal {
     void CorePipelines::onInitialize() {
         PipelineBuilder gBufferPipelineBuilder = PipelineBuilder::Of(
                     context.vulkanContext.coreFrameBuffers.gBufferFBO,
-                    "DEBUG.vert",
-                    "DEBUG.frag"
+                    "GBufferGen.vert",
+                    "GBufferGen.frag"
                 )
                 .addDescriptorSet(context.vulkanContext.coreDescriptorSets.globalDataDescriptor.get())
                 .setPrepareForMesh()
@@ -24,7 +24,7 @@ namespace Metal {
         PipelineBuilder gridPipelineBuilder = PipelineBuilder::Of(
                     context.vulkanContext.coreFrameBuffers.auxFBO,
                     "QUAD.vert",
-                    "GRID.frag"
+                    "Grid.frag"
                 )
                 .setBlendEnabled()
                 .addDescriptorSet(context.vulkanContext.coreDescriptorSets.globalDataDescriptor.get());
@@ -33,7 +33,7 @@ namespace Metal {
         PipelineBuilder ppPipelineBuilder = PipelineBuilder::Of(
                     context.vulkanContext.coreFrameBuffers.postProcessingFBO,
                     "QUAD.vert",
-                    "LENS_POST_PROCESSING.frag"
+                    "PostProcessing.frag"
                 )
                 .addDescriptorSet(context.vulkanContext.coreDescriptorSets.postProcessingDescriptor.get());
         postProcessingPipeline = pipelineService.createRenderingPipeline(ppPipelineBuilder);

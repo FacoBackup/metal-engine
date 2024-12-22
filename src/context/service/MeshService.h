@@ -16,7 +16,7 @@ namespace Metal {
 
         MeshInstance *create(const std::string &id, const LevelOfDetail &levelOfDetail);
 
-        EntityID loadMesh(const std::string &name, const std::string &meshId) const;
+        [[nodiscard]] EntityID loadMesh(const std::string &name, const std::string &meshId) const;
 
         void loadScene(const std::string &id) const;
     };

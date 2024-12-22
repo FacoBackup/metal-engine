@@ -16,14 +16,14 @@ namespace fs = std::filesystem;
 
 #define DELETE_F(F)\
 std::filesystem::remove_all(entry.second->absolutePath);\
-std::filesystem::remove_all(F(entry.second->getId(), LevelOfDetail::LOD_0));\
-std::filesystem::remove_all(F(entry.second->getId(), LevelOfDetail::LOD_1));\
-std::filesystem::remove_all(F(entry.second->getId(), LevelOfDetail::LOD_2));\
-std::filesystem::remove_all(F(entry.second->getId(), LevelOfDetail::LOD_3));
+std::filesystem::remove_all(context.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_0));\
+std::filesystem::remove_all(context.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_1));\
+std::filesystem::remove_all(context.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_2));\
+std::filesystem::remove_all(context.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_3));
 
 #define DELETE_S(F)\
 std::filesystem::remove_all(entry.second->absolutePath);\
-std::filesystem::remove_all(F(entry.second->getId()));
+std::filesystem::remove_all(context.getAssetDirectory() + F(entry.second->getId()));
 
 #define DATA \
         auto fileSizeInBytes = fs::file_size(entry.path());\
@@ -70,7 +70,7 @@ namespace Metal {
         return nullptr;
     }
 
-    void FilesService::DeleteFiles(const std::unordered_map<std::string, FileEntry *> &selected) {
+    void FilesService::deleteFiles(const std::unordered_map<std::string, FileEntry *> &selected) {
         for (auto &entry: selected) {
             switch (entry.second->type) {
                 case EntryType::DIRECTORY: {
@@ -79,7 +79,7 @@ namespace Metal {
                     for (auto *f: entry.second->children) {
                         files.insert({f->getId(), f});
                     }
-                    DeleteFiles(files);
+                    deleteFiles(files);
                     std::filesystem::remove_all(entry.second->absolutePath);
                     break;
                 }
