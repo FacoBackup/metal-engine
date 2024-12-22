@@ -14,7 +14,7 @@ namespace Metal {
         std::optional<float> maxF;
         std::optional<float> minF;
         bool disabled = false;
-        EntryType resourceType = EntryType::NONE;
+        EntryType::EntryType resourceType = EntryType::NONE;
 
         explicit InspectedField(T *field) : field(field) {}
 

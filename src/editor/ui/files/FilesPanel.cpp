@@ -82,25 +82,28 @@ namespace Metal {
             }
             contextMenu();
             handleDrag();
+            hotkeys();
 
-            float size = std::round(ImGui::GetWindowSize().x / CARD_SIZE) * CARD_SIZE - CARD_SIZE;
+            float size = std::floor(ImGui::GetWindowSize().x / CARD_SIZE) * CARD_SIZE - CARD_SIZE;
             int rowIndex = 1;
             for (auto &child: filesContext.currentDirectory->children) {
-                const bool isSelected = filesContext.selected.contains(child->getId()) || child->isHovered && onDrag !=
-                                        nullptr;
-                ImGui::PushStyleColor(ImGuiCol_ChildBg, isSelected
-                                                            ? context->getEditorContext().editorRepository.accent
-                                                            : context->getEditorContext().themeService.palette0);
-                renderItem(child);
-                ImGui::PopStyleColor();
+                if (filesContext.filterType == EntryType::NONE || child->type == filesContext.filterType) {
 
-                if (rowIndex * CARD_SIZE < size) {
-                    ImGui::SameLine();
-                    rowIndex++;
-                } else {
-                    rowIndex = 0;
+                    const bool isSelected = filesContext.selected.contains(child->getId()) || child->isHovered && onDrag !=
+                                            nullptr;
+                    ImGui::PushStyleColor(ImGuiCol_ChildBg, isSelected
+                                                                ? context->getEditorContext().editorRepository.accent
+                                                                : context->getEditorContext().themeService.palette0);
+                    renderItem(child);
+                    ImGui::PopStyleColor();
+
+                    if (rowIndex * CARD_SIZE < size) {
+                        ImGui::SameLine();
+                        rowIndex++;
+                    } else {
+                        rowIndex = 0;
+                    }
                 }
-                hotkeys();
             }
             trackDrag();
         }

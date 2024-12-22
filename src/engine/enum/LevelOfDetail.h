@@ -2,9 +2,8 @@
 #define LEVELOFDETAIL_H
 #include <string>
 #define LOD_COUNT 4
-namespace Metal {
-    enum class EntryType;
 
+namespace Metal {
     struct LevelOfDetail {
         static LevelOfDetail LOD_0;
         static LevelOfDetail LOD_1;

@@ -87,10 +87,10 @@ namespace Metal {
 
     void SceneImporter::persistAllMaterials(const std::string &targetDir, const aiScene *scene,
                                             std::unordered_map<unsigned int, std::string> &materialMap,
-                                            const std::string& rootDirectory) const {
+                                            const std::string &rootDirectory) const {
         for (unsigned int i = 0; i < scene->mNumMaterials; ++i) {
             const aiMaterial *material = scene->mMaterials[i];
-            auto materialMetadata = FileMetadata{};
+            FileMetadata materialMetadata{};
             materialMetadata.type = EntryType::MATERIAL;
             materialMetadata.name = "Material " + i;
             FilesUtil::WriteFile((targetDir + '/' + FORMAT_FILE_METADATA(materialMetadata.getId())).c_str(),

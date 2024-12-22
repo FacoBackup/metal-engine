@@ -123,7 +123,8 @@ namespace Metal {
         fields.push_back(std::move(field));
     }
 
-    void Inspectable::registerResourceSelection(std::string &v, std::string group, std::string name, EntryType type,
+    void Inspectable::registerResourceSelection(std::string &v, std::string group, std::string name,
+                                                EntryType::EntryType type,
                                                 bool disabled) {
         if (type == EntryType::DIRECTORY) {
             throw std::runtime_error("Cannot register directories on this object");

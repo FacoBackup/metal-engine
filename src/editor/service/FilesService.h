@@ -6,8 +6,6 @@
 #include "../../common/util/files/FileEntry.h"
 
 namespace Metal {
-    enum class EntryType;
-
     class FilesService final : public AbstractRuntimeComponent {
         FileEntry *root = nullptr;
 

@@ -1,10 +1,10 @@
 #ifndef METAL_ENGINE_UIUTIL_H
 #define METAL_ENGINE_UIUTIL_H
 
-#include "../../../cmake-build-debug/vcpkg_installed/arm64-osx/include/imgui.h"
+#include "imgui.h"
 #include <string>
-
 #include "files/EntryType.h"
+
 #include "../interface/Icons.h"
 
 namespace Metal::UIUtil {
@@ -72,7 +72,7 @@ namespace Metal::UIUtil {
         ImGui::SameLine();
     }
 
-    static std::string GetFileIcon(const EntryType type) {
+    static std::string GetFileIcon(const EntryType::EntryType type) {
         switch (type) {
             case EntryType::MESH:
                 return Icons::view_in_ar;
