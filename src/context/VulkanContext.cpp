@@ -218,6 +218,7 @@ namespace Metal {
         // ------- REPOSITORY INITIALIZATION
         coreBuffers.onInitialize();
         coreFrameBuffers.onInitialize();
+        coreTextures.onInitialize();
         coreDescriptorSets.onInitialize();
         corePipelines.onInitialize();
         coreRenderPasses.onInitialize();

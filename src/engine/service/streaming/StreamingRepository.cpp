@@ -11,7 +11,7 @@
 #define MAX_TRIES 5
 #define DISPOSAL(R)\
 for (auto it = R.begin(); it != R.end();) {\
-    if ((it->second->lastUse - context.engineContext.currentTimeMs) >= MAX_TIMEOUT) {\
+    if (!it->second->isNoDisposal() && (it->second->lastUse - context.engineContext.currentTimeMs) >= MAX_TIMEOUT) {\
         std::cout << "Disposing of " << it->first << " Since last use: " << (it->second->lastUse - context.engineContext.currentTimeMs) <<std::endl;\
         it->second->dispose(context.vulkanContext);\
         auto newIt = R.erase(it);\

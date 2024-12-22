@@ -59,6 +59,11 @@ namespace Metal {
                 if (ImGui::MenuItem("Paste", "Ctrl+V")) {
                     // Action for "Paste"
                 }
+                ImGui::Separator();
+                if (ImGui::MenuItem("Compile shaders")) {
+                    context->vulkanContext.corePipelines.dispose();
+                    context->vulkanContext.corePipelines.onInitialize();
+                }
                 ImGui::EndMenu();
             }
 

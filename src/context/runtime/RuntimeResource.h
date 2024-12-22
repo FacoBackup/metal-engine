@@ -11,6 +11,7 @@ namespace Metal {
 
     class RuntimeResource {
         const std::string id;
+        bool noDisposal = false;
 
     public:
         virtual ~RuntimeResource() = default;
@@ -26,6 +27,14 @@ namespace Metal {
 
         virtual void dispose(VulkanContext &context) {
             throw std::runtime_error("Not implemented");
+        }
+
+        void setAsNoDisposal() {
+            noDisposal = true;
+        }
+
+        bool isNoDisposal() const {
+            return noDisposal;
         }
 
         virtual ResourceType resourceType() {

@@ -5,10 +5,19 @@
 #include "../runtime/DescriptorInstance.h"
 #include "../runtime/FrameBufferInstance.h"
 #include "../runtime/FrameBufferAttachment.h"
+#include "../runtime/TextureInstance.h"
+
+#define GBUFFER_D(P, N)\
+P = std::make_unique<DescriptorInstance>();\
+P->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);\
+P->create(vulkanContext);\
+P->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,\
+                                              context.vulkanContext.coreFrameBuffers.gBufferFBO->vkImageSampler,\
+                                              context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[N]->vkImageView);\
+P->write(vulkanContext);
 
 namespace Metal {
-    void CoreDescriptorSets::onInitialize() {
-        {
+    void CoreDescriptorSets::onInitialize() { {
             globalDataDescriptor = std::make_unique<DescriptorInstance>();
             globalDataDescriptor->addLayoutBinding(static_cast<VkShaderStageFlagBits>(
                                                        VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT),
@@ -19,56 +28,31 @@ namespace Metal {
             globalDataDescriptor->write(vulkanContext);
         }
 
-        {
-            gBufferShadingDescriptor = std::make_unique<DescriptorInstance>();
-            gBufferShadingDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-            gBufferShadingDescriptor->create(vulkanContext);
-            gBufferShadingDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[0]->vkImageView);
-            gBufferShadingDescriptor->write(vulkanContext);
-        }
-
-         {
-            gBufferShadingDescriptor1 = std::make_unique<DescriptorInstance>();
-            gBufferShadingDescriptor1->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-            gBufferShadingDescriptor1->create(vulkanContext);
-            gBufferShadingDescriptor1->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[1]->vkImageView);
-            gBufferShadingDescriptor1->write(vulkanContext);
-        }
-
-         {
-            gBufferShadingDescriptor2 = std::make_unique<DescriptorInstance>();
-            gBufferShadingDescriptor2->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-            gBufferShadingDescriptor2->create(vulkanContext);
-            gBufferShadingDescriptor2->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                                                context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[2]->vkImageView);
-            gBufferShadingDescriptor2->write(vulkanContext);
-        }
-
-         {
-            gBufferShadingDescriptor3 = std::make_unique<DescriptorInstance>();
-            gBufferShadingDescriptor3->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-            gBufferShadingDescriptor3->create(vulkanContext);
-            gBufferShadingDescriptor3->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                          context.vulkanContext.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                                          context.vulkanContext.coreFrameBuffers.gBufferFBO->attachments[3]->vkImageView);
-            gBufferShadingDescriptor3->write(vulkanContext);
-        }
-
-        {
+        GBUFFER_D(gBufferShadingDescriptor, 0)
+        GBUFFER_D(gBufferShadingDescriptor1, 1)
+        GBUFFER_D(gBufferShadingDescriptor2, 2)
+        GBUFFER_D(gBufferShadingDescriptor3, 3) {
+            brdfDescriptor = std::make_unique<DescriptorInstance>();
+            brdfDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                             0);
+            brdfDescriptor->create(vulkanContext);
+            brdfDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                               context.vulkanContext.coreFrameBuffers.gBufferFBO->vkImageSampler,
+                                               context.vulkanContext.coreTextures.brdf->vkImageView);
+            brdfDescriptor->write(vulkanContext);
+        } {
             postProcessingDescriptor = std::make_unique<DescriptorInstance>();
-            postProcessingDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0);
-            postProcessingDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1);
+            postProcessingDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                                                       0);
+            postProcessingDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
+                                                       VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1);
             postProcessingDescriptor->create(vulkanContext);
             postProcessingDescriptor->addBufferDescriptor(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                                                           vulkanContext.coreBuffers.postProcessingSettings);
             postProcessingDescriptor->addImageDescriptor(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                                context.vulkanContext.coreFrameBuffers.auxFBO->vkImageSampler,
-                                                                context.vulkanContext.coreFrameBuffers.auxFBO->attachments[0]->vkImageView);
+                                                         context.vulkanContext.coreFrameBuffers.auxFBO->vkImageSampler,
+                                                         context.vulkanContext.coreFrameBuffers.auxFBO->attachments[0]->
+                                                         vkImageView);
             postProcessingDescriptor->write(vulkanContext);
         }
     }

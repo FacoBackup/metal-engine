@@ -49,7 +49,8 @@ namespace Metal {
                 .addDescriptorSet(context.vulkanContext.coreDescriptorSets.gBufferShadingDescriptor.get())
                 .addDescriptorSet(context.vulkanContext.coreDescriptorSets.gBufferShadingDescriptor1.get())
                 .addDescriptorSet(context.vulkanContext.coreDescriptorSets.gBufferShadingDescriptor2.get())
-                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.gBufferShadingDescriptor3.get());
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.gBufferShadingDescriptor3.get())
+                .addDescriptorSet(context.vulkanContext.coreDescriptorSets.brdfDescriptor.get());
         gBufferShadingPipeline = pipelineService.createRenderingPipeline(gBufferShadingPipelineBuilder);
     }
 

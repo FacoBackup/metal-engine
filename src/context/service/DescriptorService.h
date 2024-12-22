@@ -14,9 +14,9 @@ namespace Metal {
     public:
         explicit DescriptorService(ApplicationContext &context);
 
-        void updateImageSamplerDescriptor(const FrameBufferInstance *framebuffer, unsigned int attachmentIndex) const;
+        void setImageDescriptor(const FrameBufferInstance *framebuffer, unsigned int attachmentIndex) const;
 
-        void updateImageSamplerDescriptor(TextureInstance *texture) const;
+        void setImageDescriptor(TextureInstance *texture) const;
     };
 } // Metal
 

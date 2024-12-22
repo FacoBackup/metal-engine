@@ -234,6 +234,8 @@ add_executable(
         src/context/runtime/FrameBufferAttachment.cpp
         src/engine/service/AtmosphereRepository.cpp
         src/engine/service/AtmosphereRepository.h
+        src/context/repository/CoreTextures.cpp
+        src/context/repository/CoreTextures.h
 )
 
 

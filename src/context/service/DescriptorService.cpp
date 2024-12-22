@@ -12,7 +12,7 @@ namespace Metal {
         : AbstractRuntimeComponent(context) {
     }
 
-    void DescriptorService::updateImageSamplerDescriptor(const FrameBufferInstance *framebuffer, unsigned int attachmentIndex) const {
+    void DescriptorService::setImageDescriptor(const FrameBufferInstance *framebuffer, unsigned int attachmentIndex) const {
         auto attachment = framebuffer->attachments[attachmentIndex];
         if (attachment->imageDescriptor == nullptr) {
             attachment->imageDescriptor = std::make_unique<DescriptorInstance>();
@@ -26,7 +26,7 @@ namespace Metal {
         }
     }
 
-    void DescriptorService::updateImageSamplerDescriptor(TextureInstance *texture) const {
+    void DescriptorService::setImageDescriptor(TextureInstance *texture) const {
         if (texture->imageDescriptor == nullptr) {
             texture->imageDescriptor = std::make_unique<DescriptorInstance>();
             texture->imageDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,

@@ -13,6 +13,7 @@
 #include "repository/CoreDescriptorSets.h"
 #include "../common/interface/AbstractRuntimeComponent.h"
 #include "repository/CoreRenderPasses.h"
+#include "repository/CoreTextures.h"
 #include "service/DescriptorService.h"
 #include "service/TextureService.h"
 #include "service/FrameBufferService.h"
@@ -85,6 +86,7 @@ namespace Metal {
         CoreBuffers coreBuffers{context};
         CoreDescriptorSets coreDescriptorSets{context};
         CoreRenderPasses coreRenderPasses{context};
+        CoreTextures coreTextures{context};
         // ----------- CORE REPOSITORIES
 
         // ----------- Services

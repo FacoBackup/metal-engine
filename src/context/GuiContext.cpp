@@ -15,7 +15,7 @@ namespace Metal {
     }
 
     void GuiContext::renderImage(TextureInstance *texture, const float sizeX, const float sizeY) const {
-        context.vulkanContext.descriptorService.updateImageSamplerDescriptor(texture);
+        context.vulkanContext.descriptorService.setImageDescriptor(texture);
         ImGui::Image(reinterpret_cast<ImTextureID>(texture->imageDescriptor->vkDescriptorSet), ImVec2{sizeX, sizeY});
     }
 
