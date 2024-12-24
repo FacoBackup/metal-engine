@@ -6,12 +6,9 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include "context/ApplicationContext.h"
-#include "editor/EditorPanel.h"
 
 int main(int, char **) {
-    auto editorPanel = Metal::EditorPanel{};
-    Metal::ApplicationContext context{editorPanel, true};
-    editorPanel.setContext(&context);
+    Metal::ApplicationContext context{ true};
 
     if (!context.isValidContext()) {
         printf("GLFW: Vulkan Not Supported\n");

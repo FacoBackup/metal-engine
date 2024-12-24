@@ -1,7 +1,7 @@
 #ifndef METAL_ENGINE_INSPECTABLEMEMBER_H
 #define METAL_ENGINE_INSPECTABLEMEMBER_H
 
-#include "FieldType.h"
+#include "../../enum/FieldType.h"
 
 namespace Metal {
     struct InspectableMember {

@@ -2,10 +2,10 @@
 
 #include <imgui_impl_glfw.h>
 #include <nfd.h>
-#include "../common/util/files/FilesUtil.h"
-#include "../common/util/VulkanUtils.h"
+#include "../util/FilesUtil.h"
+#include "../util/VulkanUtils.h"
 
-#include "../common/util/files/FileDialogUtil.h"
+#include "../util/FileDialogUtil.h"
 
 namespace Metal {
     void ApplicationContext::updateRootPath(bool forceSelection) {
@@ -52,14 +52,14 @@ namespace Metal {
         }
         vulkanContext.onInitialize();
         guiContext.onInitialize();
-        editorContext.onInitialize();
-        rootPanel.onInitialize();
+        filesService.onInitialize();
+        editorPanel.onInitialize();
 
         GLFWwindow *window = glfwContext.getWindow();
         while (!glfwWindowShouldClose(window)) {
             if (glfwContext.beginFrame()) {
                 GuiContext::BeginFrame();
-                rootPanel.onSync();
+                editorPanel.onSync();
                 ImGui::Render();
                 auto *drawData = ImGui::GetDrawData();
                 const bool main_is_minimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
@@ -71,7 +71,7 @@ namespace Metal {
                                                          imageAcquiredSemaphore, VK_NULL_HANDLE,
                                                          &wd.FrameIndex);
                     if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR) {
-                        getGLFWContext().setSwapChainRebuild(true);
+                        glfwContext.setSwapChainRebuild(true);
                         return;
                     }
 
@@ -80,11 +80,12 @@ namespace Metal {
                     VulkanUtils::CheckVKResult(vkWaitForFences(vulkanContext.device.device, 1, &fd->Fence, VK_TRUE,
                                                                UINT64_MAX));
                     VulkanUtils::CheckVKResult(vkResetFences(vulkanContext.device.device, 1, &fd->Fence));
-                    VulkanUtils::CheckVKResult(vkResetCommandPool(vulkanContext.device.device, fd->CommandPool, VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT));
+                    VulkanUtils::CheckVKResult(vkResetCommandPool(vulkanContext.device.device, fd->CommandPool,
+                                                                  VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT));
                     engineContext.onSync();
                     GuiContext::RecordImguiCommandBuffer(drawData, err, wd, fd);
                     vulkanContext.submitFrame(imageAcquiredSemaphore, wd.FrameSemaphores[wd.SemaphoreIndex].
-                            RenderCompleteSemaphore, fd);
+                                              RenderCompleteSemaphore, fd);
                 }
                 if (!main_is_minimized)
                     glfwContext.presentFrame();
@@ -94,9 +95,5 @@ namespace Metal {
         guiContext.dispose();
         vulkanContext.dispose();
         glfwContext.dispose();
-    }
-
-    ApplicationContext::ApplicationContext(IPanel &root_panel, bool debugMode) : vulkanContext(*this, debugMode),
-        rootPanel(root_panel), debugMode(debugMode) {
     }
 }

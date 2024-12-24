@@ -1,6 +1,8 @@
 #ifndef J_SERIALIZABLE_H
 #define J_SERIALIZABLE_H
 
+#include <string>
+
 namespace Metal {
     struct Serializable {
         virtual ~Serializable() = default;

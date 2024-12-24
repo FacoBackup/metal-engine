@@ -2,7 +2,7 @@
 #define INSPECTEDFIELD_H
 
 #include "InspectableMember.h"
-#include "../util/files/EntryType.h"
+#include "../../enum/EntryType.h"
 
 namespace Metal {
     template<typename T>
