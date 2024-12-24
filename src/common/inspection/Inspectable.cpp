@@ -7,8 +7,8 @@
 
 #include "InspectedField.h"
 #include "InspectedMethod.h"
-#include "../util/Util.h"
-#include "../util/files/EntryType.h"
+#include "../../util/Util.h"
+#include "../../enum/EntryType.h"
 
 #define  DECLARATION(T, V) \
         std::unique_ptr<InspectedField<T>> field = std::make_unique<InspectedField<T>>(&v);\

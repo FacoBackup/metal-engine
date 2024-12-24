@@ -7,8 +7,8 @@
 #include <glm/fwd.hpp>
 
 #include "InspectableMember.h"
-#include "../util/Util.h"
-#include "../util/files/EntryType.h"
+#include "../../util/Util.h"
+#include "../../enum/EntryType.h"
 
 namespace Metal {
     class Inspectable {
@@ -16,7 +16,7 @@ namespace Metal {
         std::vector<std::unique_ptr<InspectableMember> > fields;
         bool fieldsRegistered = false;
         unsigned long changes = 0;
-        unsigned long frozenVersion = -1;
+        unsigned long frozenVersion = 99999;
 
     protected:
         virtual void registerFields() {
