@@ -6,19 +6,19 @@
 
 #include "BoundingBox.h"
 #include "../../../enum/engine-definitions.h"
-#include "../../../service/voxel/impl/SparseVoxelOctree.h"
+#include "../../../service/voxel/impl/SparseVoxelOctreeBuilder.h"
+#include "../../../util/serialization-definitions.h"
 #define TILE_SIZE 32
 
 namespace Metal {
     struct WorldTile final {
-        std::array<std::string, 8> adjacentTiles;
+        std::array<std::string, 8> adjacentTiles{};
         int x;
         int z;
         std::string id;
         bool loaded = false;
-        SparseVoxelOctree svo{this};
         std::vector<EntityID> entities{};
-        BoundingBox boundingBox;
+        BoundingBox boundingBox{};
         int normalizedDistance = 0;
 
         void updateTiles(const WorldTile *adjacentWorldTile, const std::string &key) {
@@ -50,6 +50,9 @@ namespace Metal {
             boundingBox.min = boundingBox.center - glm::vec3(TILE_SIZE / 2.0f, TILE_SIZE / 2.0f, TILE_SIZE / 2.0f);
         }
 
+        explicit WorldTile(): x(0), z(0) {
+        }
+
         void putAdjacentTile(const WorldTile *adjacentWorldTile) {
             updateTiles(adjacentWorldTile, adjacentWorldTile->id);
         }
@@ -58,9 +61,20 @@ namespace Metal {
             updateTiles(adjacentWorldTile, "");
         }
 
-        static std::string GetId(const int x, const int z) {
+        static std::string GetId(int x, int z) {
             return x + "_" + z;
         }
+
+        SERIALIZE_TEMPLATE(
+            adjacentTiles,
+            x,
+            z,
+            id,
+            loaded,
+            entities,
+            boundingBox,
+            normalizedDistance
+        )
     };
 } // Metal
 

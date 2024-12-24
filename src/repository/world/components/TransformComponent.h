@@ -6,6 +6,7 @@
 #include <glm/ext/matrix_transform.hpp>
 
 #include "../impl/AbstractComponent.h"
+#include "../../../util/serialization-definitions.h"
 
 namespace Metal {
     struct TransformComponent final : AbstractComponent {
@@ -16,15 +17,19 @@ namespace Metal {
         bool forceTransform = false;
         bool isStatic = false;
 
-        explicit TransformComponent(const EntityID &entityId)
-            : AbstractComponent(entityId) {
-        }
-
-        const char *getIcon() override;
-
-        const char *getTitle() override;
-
         void registerFields() override;
+
+        ComponentTypes::ComponentType getType() override;
+
+        SERIALIZE_TEMPLATE(
+            model[0][0], model[0][1], model[0][2], model[0][3],
+            model[1][0], model[1][1], model[1][2], model[1][3],
+            model[2][0], model[2][1], model[2][2], model[2][3],
+            model[3][0], model[3][1], model[3][2], model[3][3],
+            translation.x, translation.y, translation.z,
+            rotation.x, rotation.y, rotation.z, rotation.w,
+            scale.x, scale.y, scale.z
+        )
     };
 }
 

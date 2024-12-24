@@ -7,6 +7,8 @@
 #include "../../../enum/ComponentType.h"
 #include "../../../common/inspection/Inspectable.h"
 
+#include "../../../util/serialization-definitions.h"
+
 namespace Metal {
     struct AbstractComponent;
 
@@ -14,15 +16,19 @@ namespace Metal {
         EntityID id;
 
     public:
-        const char *onTile = nullptr;
+        std::string onTile;
         std::string name = "New entity";
         glm::vec3 color{};
         bool isContainer = false;
-        std::unordered_map<ComponentTypes::ComponentType, AbstractComponent *> components{};
+        std::vector<ComponentTypes::ComponentType> components{};
         std::vector<EntityID> children{};
         EntityID parent = EMPTY_ENTITY;
 
-        explicit Entity(EntityID id, bool container);
+        SERIALIZE_TEMPLATE(id, parent, onTile, name, color.x, color.y, color.z, isContainer, components, children)
+
+        Entity() = default;
+
+        void initialize(EntityID id, bool container);
 
         [[nodiscard]] EntityID getId() const {
             return id;

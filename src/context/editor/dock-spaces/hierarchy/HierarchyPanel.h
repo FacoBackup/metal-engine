@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #include "../../../../enum/engine-definitions.h"
+#include "../../../../enum/ComponentType.h"
 #include "../docks/AbstractDockPanel.h"
 
 namespace Metal {
@@ -47,7 +48,7 @@ namespace Metal {
 
         void renderComponents(const Entity *node) const;
 
-        static void addComponent(AbstractComponent *component);
+        static void addComponent(ComponentTypes::ComponentType component);
 
         int getFlags(const Entity *node);
 

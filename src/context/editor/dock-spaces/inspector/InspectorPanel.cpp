@@ -64,8 +64,8 @@ namespace Metal {
                 selectedEntity = context->worldRepository.getEntity(selectedId);
                 if (selectedEntity != nullptr) {
                     additionalInspection.push_back(selectedEntity);
-                    for (auto &comp: context->worldRepository.getEntity(selectedId)->components) {
-                        additionalInspection.push_back(comp.second);
+                    for (const auto &comp: context->worldRepository.getEntity(selectedId)->components) {
+                        additionalInspection.push_back(context->worldRepository.getComponent(comp, selectedId));
                     }
                     currentInspection = additionalInspection[0];
                 }

@@ -13,7 +13,7 @@
 namespace Metal {
     class Inspectable {
         const std::string uniqueIdentifier = Util::uuidV4();
-        std::vector<std::unique_ptr<InspectableMember> > fields;
+        std::vector<std::shared_ptr<InspectableMember> > fields{};
         bool fieldsRegistered = false;
         unsigned long changes = 0;
         unsigned long frozenVersion = 99999;
@@ -63,7 +63,7 @@ namespace Metal {
                            std::string group, std::string name, bool disabled = false);
 
     public:
-        std::vector<std::unique_ptr<InspectableMember> > &getFields();
+        std::vector<std::shared_ptr<InspectableMember> > &getFields();
 
         [[nodiscard]] unsigned long getChangeId() const;
 
@@ -72,6 +72,8 @@ namespace Metal {
         [[nodiscard]] bool isNotFrozen() const;
 
         void freezeVersion();
+
+        Inspectable() = default;
 
         virtual ~Inspectable() = default;
 

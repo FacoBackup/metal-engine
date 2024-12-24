@@ -3,7 +3,9 @@
 #include "../../../util/UIUtil.h"
 
 namespace Metal {
-    Entity::Entity(const EntityID id, const bool container): id(id) {
+    void Entity::initialize(EntityID id, bool container) {
+        this->id = id;
+        this->isContainer = container;
         if (container) {
             color = glm::vec3(UIUtil::DIRECTORY_COLOR.x, UIUtil::DIRECTORY_COLOR.y, UIUtil::DIRECTORY_COLOR.z);
         } else {

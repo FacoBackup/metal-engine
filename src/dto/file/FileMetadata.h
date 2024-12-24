@@ -2,13 +2,12 @@
 #define FILEMETADATA_H
 
 #include <string>
-#include <nlohmann/json.hpp>
 #include "../../util/Util.h"
 #include "../../enum/EntryType.h"
-#include "../../common/interface/Serializable.h"
+#include  "../../util/serialization-definitions.h"
 
 namespace Metal {
-    struct FileMetadata : Serializable {
+    struct FileMetadata {
     protected:
         std::string id = Util::uuidV4();
 
@@ -20,21 +19,7 @@ namespace Metal {
             return id;
         }
 
-        std::string serialize() override {
-            const nlohmann::json jsonData = *this;
-            return jsonData.dump(0);
-        }
-
-        void deserialize(const std::string &j) override {
-            const nlohmann::json jsonData = nlohmann::json::parse(j);
-            const FileMetadata parsedData = jsonData.get<FileMetadata>();
-            this->name = parsedData.name;
-            this->id = parsedData.id;
-            this->type = parsedData.type;
-        }
-
-        NLOHMANN_DEFINE_TYPE_INTRUSIVE(FileMetadata, name, type, id)
+        SAVE_TEMPLATE(name, id, type)
     };
-
 }
 #endif //FILEMETADATA_H

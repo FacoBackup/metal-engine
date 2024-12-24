@@ -207,8 +207,8 @@ add_executable(
         src/repository/world/impl/WorldGridRepository.h
         src/repository/world/impl/WorldTile.h
         src/repository/world/impl/BoundingBox.h
-        src/service/voxel/impl/SparseVoxelOctree.cpp
-        src/service/voxel/impl/SparseVoxelOctree.h
+        src/service/voxel/impl/SparseVoxelOctreeBuilder.cpp
+        src/service/voxel/impl/SparseVoxelOctreeBuilder.h
         src/service/voxel/impl/OctreeNode.cpp
         src/service/voxel/impl/OctreeNode.h
         src/service/voxel/impl/VoxelData.h
@@ -229,6 +229,11 @@ add_executable(
         src/repository/atmosphere/AtmosphereRepository.h
         src/repository/texture/CoreTextures.cpp
         src/repository/texture/CoreTextures.h
+        src/util/serialization-definitions.h
+        src/service/notification/NotificationService.cpp
+        src/service/notification/NotificationService.h
+        src/dto/Notification.h
+        src/enum/NotificationSeverity.h
 )
 
 

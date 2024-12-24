@@ -1,28 +1,25 @@
-#include "SparseVoxelOctree.h"
+#include "SparseVoxelOctreeBuilder.h"
 #include "../../../repository/world/impl/WorldTile.h"
 
 namespace Metal {
-    SparseVoxelOctree::SparseVoxelOctree(WorldTile *tile): tile(tile) {
-    }
-
-    void SparseVoxelOctree::setMaxDepth(const unsigned int depth) {
+    void SparseVoxelOctreeBuilder::setMaxDepth(const unsigned int depth) {
         this->maxDepth = depth;
         this->voxelSize = static_cast<float>(TILE_SIZE / std::pow(2, maxDepth));
     }
 
-    void SparseVoxelOctree::insert(glm::vec3 &point, VoxelData &data) {
+    void SparseVoxelOctreeBuilder::insert(const WorldTile *tile, glm::vec3 &point, VoxelData &data) {
         if (maxDepth < 1) {
             throw std::runtime_error("Depth is not set");
         }
 
         if (tile->boundingBox.intersects(point)) {
-            worldToChunkLocal(point);
+            WorldToChunkLocal(tile, point);
             auto pos = glm::ivec3{0, 0, 0};
             insertInternal(&root, point, data, pos, 0);
         }
     }
 
-    void SparseVoxelOctree::insertInternal(OctreeNode *node, glm::vec3 &point, VoxelData &data, glm::ivec3 &position,
+    void SparseVoxelOctreeBuilder::insertInternal(OctreeNode *node, glm::vec3 &point, VoxelData &data, glm::ivec3 &position,
                                            const int depth) {
         node->data = data;
         if (depth == maxDepth) {
@@ -55,7 +52,7 @@ namespace Metal {
         }
     }
 
-    void SparseVoxelOctree::worldToChunkLocal(glm::vec3 &worldCoordinate) const {
+    void SparseVoxelOctreeBuilder::WorldToChunkLocal(const WorldTile *tile, glm::vec3 &worldCoordinate) {
         const float minX = tile->boundingBox.center.x - TILE_SIZE / 2.f;
         const float minY = tile->boundingBox.center.y - TILE_SIZE / 2.f;
         const float minZ = tile->boundingBox.center.z - TILE_SIZE / 2.f;

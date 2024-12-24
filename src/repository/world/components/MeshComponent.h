@@ -1,21 +1,17 @@
 #ifndef MESHCOMPONENT_H
 #define MESHCOMPONENT_H
 #include "../impl/AbstractComponent.h"
+#include "../../../util/serialization-definitions.h"
 
 namespace Metal {
     struct MeshComponent final : AbstractComponent {
         std::string meshId;
 
-        explicit MeshComponent(const EntityID &entityId)
-            : AbstractComponent(entityId) {
-        }
-
-        const char *getIcon() override;
-
-        const char *getTitle() override;
-
         void registerFields() override;
 
+        ComponentTypes::ComponentType getType() override;
+
+        SERIALIZE_TEMPLATE(meshId)
     };
 }
 #endif //MESHCOMPONENT_H
