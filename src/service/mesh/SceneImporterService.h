@@ -37,8 +37,6 @@ namespace Metal {
         }
 
         void importScene(const std::string &targetDir, const std::string &pathToFile) const;
-
-        static void serializeMesh(const MeshData &simplifiedMesh, const std::string &newPath);
     };
 } // Metal
 

@@ -9,6 +9,7 @@
 #include <format>
 #include <fstream>
 #include <iostream>
+#include <cereal/archives/binary.hpp>
 
 #include "../../enum/LevelOfDetail.h"
 
@@ -58,9 +59,7 @@ namespace Metal {
                         absolute(entry.path()).string(),
                         std::format("{}", ftime),
                         fileSize);
-                    std::string json;
-                    FilesUtil::ReadFile(child->absolutePath.c_str(), json);
-                    child->deserialize(json);
+                    PARSE_TEMPLATE(child->load, child->absolutePath.c_str())
                     return child;
                 }
             }
@@ -136,9 +135,7 @@ namespace Metal {
                         fs::absolute(entry.path()).string(),
                         std::format("{}", ftime),
                         fileSize));
-                    std::string json;
-                    FilesUtil::ReadFile(child->absolutePath.c_str(), json);
-                    child->deserialize(json);
+                    PARSE_TEMPLATE(child->load, child->absolutePath.c_str())
                 }
             } else {
                 auto &child = root->children.emplace_back(new FileEntry(

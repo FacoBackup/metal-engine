@@ -1,8 +1,7 @@
 #ifndef SCENEDESCRIPTION_H
 #define SCENEDESCRIPTION_H
 #include <vector>
-#include <cereal/types/string.hpp>
-#include <cereal/types/vector.hpp>
+#include "../../util/serialization-definitions.h"
 
 namespace Metal {
     struct EntityAssetData;
@@ -11,15 +10,7 @@ namespace Metal {
         std::vector<EntityAssetData> entities;
         std::string name;
 
-        template<class Archive>
-        void save(Archive &ar) const {
-            ar(name, entities);
-        }
-
-        template<class Archive>
-        void load(Archive &ar) {
-            ar(name, entities);
-        }
+        SAVE_TEMPLATE(name, entities)
     };
 }
 

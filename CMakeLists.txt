@@ -229,6 +229,7 @@ add_executable(
         src/repository/atmosphere/AtmosphereRepository.h
         src/repository/texture/CoreTextures.cpp
         src/repository/texture/CoreTextures.h
+        src/util/serialization-definitions.h
 )
 
 

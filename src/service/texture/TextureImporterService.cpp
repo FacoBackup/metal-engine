@@ -3,6 +3,7 @@
 #include "../../../dependencies/stb/stb_image.h"
 #include "../../../dependencies/stb/stb_image_write.h"
 #include <filesystem>
+#include <cereal/archives/binary.hpp>
 
 #include "../../dto/file/FileMetadata.h"
 #include "../../enum/EntryType.h"
@@ -26,8 +27,7 @@ namespace Metal {
             throw std::runtime_error("Failed to load image: " + pathToFile);
         }
         const auto textureData = TextureData{width, height, channels, data};
-        FilesUtil::WriteFile((targetDir + '/' + FORMAT_FILE_METADATA(metadata.getId())).c_str(),
-                             metadata.serialize().c_str());
+        DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(metadata.getId()), metadata)
 
         reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_0);
         reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_1);

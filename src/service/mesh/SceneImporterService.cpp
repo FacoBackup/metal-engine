@@ -17,7 +17,6 @@
 #include <meshoptimizer.h>
 #include <../../dependencies/stb/stb_image_write.h>
 #include <cereal/archives/binary.hpp>
-#include <utility>
 
 #include "../../context/ApplicationContext.h"
 #include "MaterialData.h"
@@ -30,10 +29,8 @@ namespace Metal {
         metadata.type = EntryType::MESH;
         metadata.name = mesh.name;
         metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.'));
-        FilesUtil::WriteFile((targetDir + '/' + metadata.getId() + FILE_METADATA).c_str(),
-                             metadata.serialize().c_str());
-
-        serializeMesh(mesh, context.getAssetDirectory() + FORMAT_FILE_MESH(metadata.getId(), LevelOfDetail::LOD_0));
+        DUMP_TEMPLATE(targetDir + '/' + metadata.getId() + FILE_METADATA, metadata)
+        DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_MESH(metadata.getId(), LevelOfDetail::LOD_0), mesh)
         simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_1);
         simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_2);
         simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_3);
@@ -41,8 +38,8 @@ namespace Metal {
     }
 
     void SceneImporterService::persistAllMeshes(const std::string &targetDir, const aiScene *scene,
-                                         std::unordered_map<unsigned int, std::string> &meshMap,
-                                         std::unordered_map<std::string, unsigned int> &meshMaterialMap) const {
+                                                std::unordered_map<unsigned int, std::string> &meshMap,
+                                                std::unordered_map<std::string, unsigned int> &meshMaterialMap) const {
         for (unsigned int i = 0; i < scene->mNumMeshes; ++i) {
             aiMesh *assimpMesh = scene->mMeshes[i];
             MeshData meshData{assimpMesh->mName.data, {}, {}};
@@ -86,15 +83,14 @@ namespace Metal {
     }
 
     void SceneImporterService::persistAllMaterials(const std::string &targetDir, const aiScene *scene,
-                                            std::unordered_map<unsigned int, std::string> &materialMap,
-                                            const std::string &rootDirectory) const {
+                                                   std::unordered_map<unsigned int, std::string> &materialMap,
+                                                   const std::string &rootDirectory) const {
         for (unsigned int i = 0; i < scene->mNumMaterials; ++i) {
             const aiMaterial *material = scene->mMaterials[i];
             FileMetadata materialMetadata{};
             materialMetadata.type = EntryType::MATERIAL;
             materialMetadata.name = "Material " + i;
-            FilesUtil::WriteFile((targetDir + '/' + FORMAT_FILE_METADATA(materialMetadata.getId())).c_str(),
-                                 materialMetadata.serialize().c_str());
+            DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(materialMetadata.getId()), materialMetadata)
             materialMap.insert({i, materialMetadata.getId()});
 
             auto materialData = MaterialData{};
@@ -136,11 +132,7 @@ namespace Metal {
                     }
                 }
             }
-
-            std::ofstream os(context.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialMetadata.getId()),
-                             std::ios::binary);
-            cereal::BinaryOutputArchive archive(os);
-            archive(materialData);
+            DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialMetadata.getId()), materialData)
         }
     }
 
@@ -161,8 +153,7 @@ namespace Metal {
         sceneMetadata.type = EntryType::SCENE;
         sceneMetadata.name = sceneData.name =
                              scene->mName.length > 0 ? scene->mName.data : scene->mRootNode->mName.data;
-        FilesUtil::WriteFile((targetDir + '/' + FORMAT_FILE_METADATA(sceneMetadata.getId())).c_str(),
-                             sceneMetadata.serialize().c_str());
+        DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(sceneMetadata.getId()), sceneMetadata)
 
         std::unordered_map<unsigned int, std::string> meshMap{};
         std::unordered_map<std::string, unsigned int> meshMaterialMap{};
@@ -176,15 +167,13 @@ namespace Metal {
         int increment = 0;
         ProcessNode(increment, sceneData, scene->mRootNode, -1, meshMap, meshMaterialMap, materialsMap);
 
-        std::ofstream os(context.getAssetDirectory() + FORMAT_FILE_SCENE(sceneMetadata.getId()), std::ios::binary);
-        cereal::BinaryOutputArchive archive(os);
-        archive(sceneData);
+        DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_SCENE(sceneMetadata.getId()), sceneData)
     }
 
     void SceneImporterService::ProcessNode(int &increment, SceneData &scene, const aiNode *node, int parentId,
-                                    const std::unordered_map<unsigned int, std::string> &meshMap,
-                                    const std::unordered_map<std::string, unsigned int> &meshMaterialMap,
-                                    const std::unordered_map<unsigned int, std::string> &materialsMap) {
+                                           const std::unordered_map<unsigned int, std::string> &meshMap,
+                                           const std::unordered_map<std::string, unsigned int> &meshMaterialMap,
+                                           const std::unordered_map<unsigned int, std::string> &materialsMap) {
         auto &currentNode = scene.entities.emplace_back();
 
         currentNode.name = node->mName.data;
@@ -214,14 +203,8 @@ namespace Metal {
         }
     }
 
-    void SceneImporterService::serializeMesh(const MeshData &simplifiedMesh, const std::string &newPath) {
-        std::ofstream os(newPath, std::ios::binary);
-        cereal::BinaryOutputArchive archive(os);
-        archive(simplifiedMesh);
-    }
-
     void SceneImporterService::simplifyMesh(const std::string &fileId, const MeshData &mesh,
-                                     const LevelOfDetail &levelOfDetail) const {
+                                            const LevelOfDetail &levelOfDetail) const {
         size_t vertexCount = mesh.data.size();
         size_t indexCount = mesh.indices.size();
         size_t targetIndexCount = indexCount / levelOfDetail.level;
@@ -251,7 +234,7 @@ namespace Metal {
         simplifiedMesh.data = mesh.data; // Keep the same vertices (positions, normals, UVs)
         simplifiedMesh.indices = std::move(simplifiedIndices);
 
-        serializeMesh(simplifiedMesh, context.getAssetDirectory() + FORMAT_FILE_MESH(fileId, levelOfDetail));
+        DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_MESH(fileId, levelOfDetail), simplifiedMesh)
     }
 
     std::vector<std::string> SceneImporterService::getSupportedTypes() {

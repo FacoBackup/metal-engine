@@ -2,9 +2,7 @@
 #define MESHDATA_H
 #include <vector>
 #include "VertexData.h"
-#include <cereal/types/string.hpp>
-#include <cereal/types/array.hpp>
-#include <cereal/types/vector.hpp>
+#include "../../util/serialization-definitions.h"
 
 namespace Metal {
     struct LevelOfDetail;
@@ -21,15 +19,7 @@ namespace Metal {
               indices(indices) {
         }
 
-        template<class Archive>
-        void save(Archive &ar) const {
-            ar(name, indices, data);
-        }
-
-        template<class Archive>
-        void load(Archive &ar) {
-            ar(name, indices, data);
-        }
+        SAVE_TEMPLATE(name, indices, data)
     };
 } // Metal
 

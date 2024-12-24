@@ -1,8 +1,6 @@
 #ifndef FILETYPE_H
 #define FILETYPE_H
 
-#include <nlohmann/json.hpp>
-
 namespace Metal::EntryType {
     enum EntryType {
         SCENE,
@@ -55,13 +53,5 @@ namespace Metal::EntryType {
         }
         return 0;
     }
-
-    NLOHMANN_JSON_SERIALIZE_ENUM(EntryType, {
-                                 {EntryType::SCENE, "SCENE"},
-                                 {EntryType::MESH, "MESH"},
-                                 {EntryType::TEXTURE, "TEXTURE"},
-                                 {EntryType::MATERIAL, "MATERIAL"},
-                                 {EntryType::DIRECTORY, "DIRECTORY"}
-                                 })
 }
 #endif

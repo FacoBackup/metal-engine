@@ -16,14 +16,9 @@
 
 namespace Metal {
     MeshInstance *MeshService::create(const std::string &id, const LevelOfDetail &levelOfDetail) {
-        MeshData data;
         auto pathToFile = context.getAssetDirectory() + FORMAT_FILE_MESH(id, levelOfDetail);
-        std::cout << id << " Loading " << pathToFile << std::endl;
-        std::ifstream os(
-            pathToFile,
-            std::ios::binary);
-        cereal::BinaryInputArchive archive(os);
-        data.load(archive);
+        MeshData data;
+        PARSE_TEMPLATE(data.load, pathToFile)
 
         auto *instance = new MeshInstance(id);
         registerResource(instance);

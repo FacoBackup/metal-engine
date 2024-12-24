@@ -4,6 +4,8 @@
 #include <glm/vec3.hpp>
 #include <vulkan/vulkan.h>
 
+#include "../../util/serialization-definitions.h"
+
 namespace Metal {
     struct VertexData final {
         glm::vec3 vertex;
@@ -31,12 +33,9 @@ namespace Metal {
             return attributeDescriptions;
         }
 
-        template<class Archive>
-        void serialize(Archive &ar) {
-            ar(vertex.x, vertex.y, vertex.z,
+        SERIALIZE_TEMPLATE(vertex.x, vertex.y, vertex.z,
                normal.x, normal.y, normal.z,
-               uv.x, uv.y);
-        }
+               uv.x, uv.y)
     };
 }
 
