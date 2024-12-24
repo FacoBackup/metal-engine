@@ -12,15 +12,17 @@ namespace Metal {
     }
 
     void TransformService::traverse(const EntityID entityId, bool parentHasChanged) {
-        if (TransformComponent *st = context.worldRepository.transforms.at(entityId);
-            st != nullptr && (st->isNotFrozen() || parentHasChanged)) {
+        TransformComponent *st = context.worldRepository.transforms.contains(entityId)
+                                     ? &context.worldRepository.transforms.at(entityId)
+                                     : nullptr;
+        if (st != nullptr && (st->isNotFrozen() || parentHasChanged)) {
             TransformComponent *parentTransform = findParent(st->getEntityId());
             transform(st, parentTransform);
             st->freezeVersion();
             parentHasChanged = true;
         }
 
-        for (auto child: context.worldRepository.entities.at(entityId)->children) {
+        for (auto child: context.worldRepository.getEntity(entityId)->children) {
             traverse(child, parentHasChanged);
         }
     }
@@ -58,7 +60,10 @@ namespace Metal {
     TransformComponent *TransformService::findParent(EntityID id) const {
         while (id != EMPTY_ENTITY && id != WorldRepository::ROOT_ID) {
             id = context.worldRepository.getEntity(id)->parent;
-            if (auto *t = context.worldRepository.transforms.at(id); t != nullptr) {
+            TransformComponent *t = context.worldRepository.transforms.contains(id)
+                          ? &context.worldRepository.transforms.at(id)
+                          : nullptr;
+            if (t != nullptr) {
                 return t;
             }
         }

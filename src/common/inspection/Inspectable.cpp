@@ -11,7 +11,7 @@
 #include "../../enum/EntryType.h"
 
 #define  DECLARATION(T, V) \
-        std::unique_ptr<InspectedField<T>> field = std::make_unique<InspectedField<T>>(&v);\
+        std::shared_ptr<InspectedField<T>> field = std::make_shared<InspectedField<T>>(&v);\
         field->name = std::move(name);\
         field->id = "##" + Util::uuidV4();\
         field->nameWithId = field->name + field->id;\
@@ -37,7 +37,7 @@ namespace Metal {
         fields.push_back(std::move(field));
     }
 
-    std::vector<std::unique_ptr<InspectableMember> > &Inspectable::getFields() {
+    std::vector<std::shared_ptr<InspectableMember> > &Inspectable::getFields() {
         if (!fieldsRegistered) {
             fieldsRegistered = true;
             registerFields();

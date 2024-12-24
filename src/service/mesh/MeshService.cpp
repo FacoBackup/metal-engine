@@ -41,7 +41,7 @@ namespace Metal {
     EntityID MeshService::loadMesh(const std::string &name, const std::string &meshId) const {
         const auto id = context.worldRepository.createEntity();
         context.worldRepository.createComponent(id, ComponentTypes::ComponentType::MESH);
-        context.worldRepository.meshes[id]->meshId = meshId;
+        context.worldRepository.meshes[id].meshId = meshId;
         context.worldRepository.getEntity(id)->name = name;
         return id;
     }

@@ -36,10 +36,13 @@ namespace Metal {
 
     void SelectionService::updatePrimitiveSelected() const {
         auto &comp = world.getEntity(editorRepository.mainSelection)->components;
-        editorRepository.primitiveSelected = comp.contains(ComponentTypes::ComponentType::TRANSFORM)
-                                                 ? static_cast<TransformComponent *>(comp.find(
-                                                     ComponentTypes::ComponentType::TRANSFORM)->second)
-                                                 : nullptr;
+        for (auto a: comp) {
+            if (a == ComponentTypes::TRANSFORM) {
+                editorRepository.primitiveSelected = static_cast<TransformComponent *>(context.worldRepository.getComponent(ComponentTypes::TRANSFORM, editorRepository.mainSelection));
+                break;
+            }
+        }
+
     }
 
     SelectionService::SelectionService(ApplicationContext &context)

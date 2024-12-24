@@ -6,7 +6,7 @@
 #include <glm/vec3.hpp>
 
 #include "../../common/inspection/Inspectable.h"
-#include "../../util/Util.h"
+#include "../../util/serialization-definitions.h"
 
 namespace Metal {
     struct Camera final : Inspectable {
@@ -69,6 +69,46 @@ namespace Metal {
         void registerFields() override;
 
         explicit Camera(float pitch, float yaw, glm::vec3 position);
+
+        SERIALIZE_TEMPLATE(
+            rotationSensitivity,
+            movementSensitivity,
+            zoomSensitivity,
+            motionBlurEnabled,
+            motionBlurVelocityScale,
+            motionBlurMaxSamples,
+            cameraMotionBlur,
+            bloomEnabled,
+            filmGrain,
+            vignetteEnabled,
+            chromaticAberrationEnabled,
+            distortionEnabled,
+            DOF,
+            focusDistanceDOF,
+            apertureDOF,
+            focalLengthDOF,
+            samplesDOF,
+            filmGrainStrength,
+            vignetteStrength,
+            bloomThreshold,
+            bloomQuality,
+            bloomOffset,
+            chromaticAberrationIntensity,
+            distortionIntensity,
+            position.x, position.y, position.z,
+            isOrthographic,
+            zFar,
+            zNear,
+            fov,
+            aspectRatio,
+            orthographicProjectionSize,
+            pitch,
+            yaw,
+            lastMouseX,
+            lastMouseY,
+            deltaX,
+            deltaY
+        )
 
     private:
         static void extractPlane(const glm::mat4 &matrix, int index, glm::vec4 &plane);

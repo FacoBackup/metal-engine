@@ -11,6 +11,8 @@ namespace Metal {
         std::string group;
         FieldType type = BOOLEAN;
 
+        InspectableMember() = default;
+
         virtual ~InspectableMember() = default;
     };
 }

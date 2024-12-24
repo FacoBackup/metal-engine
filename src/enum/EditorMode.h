@@ -3,7 +3,7 @@
 #include <array>
 
 namespace Metal::EditorMode {
-    enum class EditorMode {
+    enum EditorMode {
         TRANSFORM,
         PAINT
     };

@@ -1,6 +1,7 @@
 #ifndef BOUNDINGBOX_H
 #define BOUNDINGBOX_H
 #include <glm/vec3.hpp>
+#include "../../../util/serialization-definitions.h"
 
 namespace Metal {
     struct BoundingBox final {
@@ -19,6 +20,12 @@ namespace Metal {
                     min.y <= point.y && max.y >= point.y &&
                     min.z <= point.z && max.z >= point.z);
         }
+
+        SERIALIZE_TEMPLATE(
+          min.x, min.y, min.z,
+          max.x, max.y, max.z,
+          center.x, center.y, center.z
+        )
     };
 } // Metal
 

@@ -2,6 +2,7 @@
 #define ATMOSPHEREREPOSITORY_H
 #include "../../common/inspection/Inspectable.h"
 #include <glm/vec3.hpp>
+#include "../../util/serialization-definitions.h"
 
 namespace Metal {
     struct AtmosphereRepository final : Inspectable {
@@ -20,6 +21,18 @@ namespace Metal {
         const char *getIcon() override;
 
         const char *getTitle() override;
+
+        SAVE_TEMPLATE(
+            elapsedTime,
+            incrementTime,
+            elapsedTimeSpeed,
+            sunDistance,
+            sunLightIntensity,
+            dawnColor.x, dawnColor.y, dawnColor.z,
+            nightColor.x, nightColor.y, nightColor.z,
+            middayColor.x, middayColor.y, middayColor.z,
+            screenSpaceShadows
+        )
     };
 } // Metal
 

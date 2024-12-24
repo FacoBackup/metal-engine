@@ -1,6 +1,6 @@
 #ifndef METAL_ENGINE_APPLICATIONCONTEXT_H
 #define METAL_ENGINE_APPLICATIONCONTEXT_H
-#define PROJECT_METADATA_FILE "metal-project.txt"
+#define CACHED_PATH "/metal-engine-cached.txt"
 #include <string>
 
 #include "engine/EngineContext.h"
@@ -34,6 +34,7 @@
 #include "../repository/atmosphere/AtmosphereRepository.h"
 #include "../repository/dock/DockRepository.h"
 #include "../repository/editor/EditorRepository.h"
+#include "../service/notification/NotificationService.h"
 #include "editor/EditorPanel.h"
 #include "gui/GuiContext.h"
 
@@ -42,7 +43,6 @@ namespace Metal {
         bool debugMode;
         EditorPanel editorPanel;
         std::string rootDirectory;
-        std::string projectName;
 
     public:
         EngineContext engineContext{*this};
@@ -60,6 +60,7 @@ namespace Metal {
         // ----------- CORE REPOSITORIES
 
         // ----------- Services
+        NotificationService notificationService;
         MeshService meshService{*this};
         TextureService textureService{*this};
         FrameBufferService framebufferService{*this};
@@ -89,14 +90,8 @@ namespace Metal {
 
         void updateRootPath(bool forceSelection);
 
-        void updateProjectName(const std::string &projectName);
-
         [[nodiscard]] bool isValidContext() const {
             return glfwContext.isValidContext();
-        }
-
-        const std::string &getProjectName() {
-            return projectName;
         }
 
         [[nodiscard]] const std::string &getRootDirectory() const {
@@ -118,6 +113,8 @@ namespace Metal {
         [[nodiscard]] uint32_t getFrameIndex() const;
 
         void start();
+
+        void save();
 
         explicit ApplicationContext(const bool debugMode): debugMode(debugMode) {
             editorPanel.setContext(this);

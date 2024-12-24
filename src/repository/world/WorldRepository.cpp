@@ -6,19 +6,17 @@
 
 namespace Metal {
     EntityID WorldRepository::createEntity(std::string name, const bool container) {
-        lastId = entities.empty() ? ROOT_ID : lastId + 1;
-        entities.insert({lastId, std::make_unique<Entity>(lastId, container)});
+        lastId++;
+        entities.emplace(lastId, Entity{});
         auto *emplace = getEntity(lastId);
-        emplace->isContainer = container;
+        emplace->initialize(lastId, container);
         emplace->name = std::move(name);
-        emplace->parent = lastId == ROOT_ID ? EMPTY_ENTITY : ROOT_ID;
-        if (emplace->parent != EMPTY_ENTITY) {
-            getEntity(emplace->parent)->children.push_back(emplace->getId());
-        }
+        emplace->parent = ROOT_ID;
+        getEntity(emplace->parent)->children.push_back(emplace->getId());
         return lastId;
     }
 
-    void WorldRepository::linkEntities(const Entity *parentEntity, Entity *child) const {
+    void WorldRepository::linkEntities(const Entity *parentEntity, Entity *child) {
         auto *parent = getEntity(child->parent);
         parent->children.erase(
             std::ranges::remove(parent->children, child->getId()).begin(),
@@ -29,34 +27,45 @@ namespace Metal {
         child->parent = id;
     }
 
-    Entity *WorldRepository::getEntity(const EntityID node) const {
+    Entity *WorldRepository::getEntity(const EntityID node) {
         if (entities.contains(node)) {
-            return entities.find(node)->second.get();
+            return &entities.find(node)->second;
         }
         return nullptr;
     }
 
-    WorldRepository::WorldRepository() {
-        createEntity("Scene", true);
+    Inspectable *WorldRepository::getComponent(ComponentTypes::ComponentType comp, EntityID entity) {
+        switch (comp) {
+            case ComponentTypes::MESH:
+                return meshes.contains(entity) ? &meshes.find(entity)->second : nullptr;
+            case ComponentTypes::TRANSFORM:
+                return transforms.contains(entity) ? &transforms.find(entity)->second : nullptr;
+            default:
+                return nullptr;
+        }
     }
 
-    void WorldRepository::createComponent(const EntityID entity, ComponentTypes::ComponentType type)  {
+    WorldRepository::WorldRepository() {
+        entities.emplace(ROOT_ID, Entity{});
+        entities.at(ROOT_ID).initialize(lastId, true);
+
+        auto *emplace = getEntity(lastId);
+        emplace->name = std::move("Scene");
+    }
+
+    void WorldRepository::createComponent(const EntityID entity, ComponentTypes::ComponentType type) {
         if (!entities.contains(entity)) {
             return;
         }
         switch (type) {
             case ComponentTypes::ComponentType::MESH: {
-                auto *m = new MeshComponent(entity);
-                getEntity(entity)->components.insert({
-                    ComponentTypes::ComponentType::MESH, m
-                });
-                meshes[entity] = m;
+                meshes.emplace(entity, MeshComponent{});
+                meshes.at(entity).setEntityId(entity);
+                getEntity(entity)->components.push_back(ComponentTypes::ComponentType::MESH);
 
-                auto *t = new TransformComponent(entity);
-                getEntity(entity)->components.insert({
-                    ComponentTypes::ComponentType::TRANSFORM, t
-                });
-                transforms[entity] = t;
+                transforms.emplace(entity, TransformComponent{});
+                transforms.at(entity).setEntityId(entity);
+                getEntity(entity)->components.push_back(ComponentTypes::ComponentType::TRANSFORM);
                 break;
             }
             default:

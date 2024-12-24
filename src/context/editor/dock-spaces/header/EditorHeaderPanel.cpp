@@ -21,7 +21,7 @@ namespace Metal {
     void EditorHeaderPanel::renderFileTab() {
         if (ImGui::BeginMainMenuBar()) {
             if (UIUtil::ButtonSimple(Icons::save, UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-                // Action for save
+                context->save();
             }
             ImGui::SameLine();
             if (ImGui::BeginMenu("File")) {
@@ -32,7 +32,7 @@ namespace Metal {
                     context->updateRootPath(true); // TODO - CLEAN STATE
                 }
                 if (ImGui::MenuItem("Save", "Ctrl+S")) {
-                    // Action for "Save"
+                    context->save();
                 }
                 ImGui::Separator(); // Adds a separator line
                 if (ImGui::MenuItem("Exit")) {
@@ -71,12 +71,12 @@ namespace Metal {
             ImGui::Text(Icons::inventory_2.c_str());
             ImGui::SameLine();
 
-            if (strcmp(projectName, context->getProjectName().c_str()) != 0) {
-                strcpy(projectName, context->getProjectName().c_str());
+            if (strcmp(projectName, context->editorRepository.projectName.c_str()) != 0) {
+                strcpy(projectName, context->editorRepository.projectName.c_str());
             }
             ImGui::SetNextItemWidth(150.0f);
             if (ImGui::InputText(id.c_str(), projectName, 128)) {
-                context->updateProjectName(projectName);
+                context->editorRepository.projectName = projectName;
             }
 
             UIUtil::DynamicSpacing(150);

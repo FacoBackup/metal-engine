@@ -26,6 +26,7 @@
 #include <cereal/types/utility.hpp>
 #include <cereal/types/valarray.hpp>
 #include <cereal/types/variant.hpp>
+#include <filesystem>
 
 #define SAVE_TEMPLATE(...) \
 template<class Archive> \
@@ -49,10 +50,14 @@ archive(DATA);\
 }
 
 #define PARSE_TEMPLATE(D, P) { \
-    std::cout << "Loading " << P << std::endl;\
-    std::ifstream os(P, std::ios::binary);\
-    cereal::BinaryInputArchive archive(os);\
-    D(archive);\
+    if (std::filesystem::exists(P)) {\
+        std::cout << "Loading " << P << std::endl;\
+        std::ifstream os(P, std::ios::binary);\
+        cereal::BinaryInputArchive archive(os);\
+        D(archive);\
+    }\
 }
+
+#define HASH_OF_CLASS_NAME(D) std::to_string(std::hash<std::string>{}(typeid(D).name()))
 
 #endif //SERIALIZATION_DEFINITIONS_H

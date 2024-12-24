@@ -2,6 +2,8 @@
 
 #include <imgui_impl_glfw.h>
 #include <nfd.h>
+#include <cereal/archives/binary.hpp>
+
 #include "../util/FilesUtil.h"
 #include "../util/VulkanUtils.h"
 
@@ -10,31 +12,29 @@
 namespace Metal {
     void ApplicationContext::updateRootPath(bool forceSelection) {
         std::string cachedPath;
-        std::string cachePathFile = std::filesystem::current_path().string() + "/metal-engine-cached.txt";
+        std::string cachePathFile = std::filesystem::current_path().string() + CACHED_PATH;
         FilesUtil::ReadFile(cachePathFile.c_str(), cachedPath);
-
-        if (cachedPath.empty() || forceSelection) {
+        cachedPath.erase(std::ranges::remove(cachedPath, '\n').begin(), cachedPath.cend());
+        if (cachedPath.empty() || forceSelection || !fs::exists(cachedPath)) {
             rootDirectory = FileDialogUtil::SelectDirectory();
+            rootDirectory.erase(std::ranges::remove(rootDirectory, '\n').begin(), rootDirectory.cend());
             if (rootDirectory.empty()) {
                 throw std::runtime_error("No directory selected.");
             }
+            save();
             FilesUtil::WriteFile(cachePathFile.c_str(), rootDirectory.c_str());
         } else {
             rootDirectory = cachedPath;
         }
-        rootDirectory.erase(std::ranges::remove(rootDirectory, '\n').begin(), rootDirectory.cend());
-        FilesUtil::ReadFile((rootDirectory + "/" + PROJECT_METADATA_FILE).c_str(), projectName);
-        if (projectName.empty()) {
-            updateProjectName("New project");
-        }
+        PARSE_TEMPLATE(editorRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(EditorRepository))
+        PARSE_TEMPLATE(atmosphereRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(AtmosphereRepository))
+        PARSE_TEMPLATE(worldGridRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldGridRepository))
+        PARSE_TEMPLATE(worldRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository))
+
+
         FilesUtil::MkDir(getShadersDirectory());
         FilesUtil::MkDir(getAssetRefDirectory());
         FilesUtil::MkDir(getAssetDirectory());
-    }
-
-    void ApplicationContext::updateProjectName(const std::string &projectName) {
-        FilesUtil::WriteFile((rootDirectory + "/" + PROJECT_METADATA_FILE).c_str(), projectName.c_str());
-        this->projectName = projectName;
     }
 
     uint32_t ApplicationContext::getFrameIndex() const {
@@ -95,5 +95,17 @@ namespace Metal {
         guiContext.dispose();
         vulkanContext.dispose();
         glfwContext.dispose();
+    }
+
+    void ApplicationContext::save() {
+        try {
+            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(EditorRepository), editorRepository)
+            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(AtmosphereRepository), atmosphereRepository)
+            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldGridRepository), worldGridRepository)
+            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository), worldRepository)
+            notificationService.pushMessage("Project saved", NotificationSeverities::SUCCESS);
+        }catch (const std::exception &e) {
+            notificationService.pushMessage("Could not save project", NotificationSeverities::ERROR);
+        }
     }
 }

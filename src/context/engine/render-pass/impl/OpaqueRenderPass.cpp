@@ -11,9 +11,9 @@ namespace Metal {
     void OpaqueRenderPass::onSync() {
         unsigned int renderIndex = 0;
         for (const auto &pair: worldRepository.meshes) {
-            if (const auto *mesh = pair.second; !mesh->meshId.empty()) {
-                if (const auto *r = streamingRepository.streamMesh(mesh->meshId, LevelOfDetail::LOD_0); r != nullptr) {
-                    mPushConstant.model = worldRepository.transforms[mesh->getEntityId()]->model;
+            if (const auto &mesh = pair.second; !mesh.meshId.empty()) {
+                if (const auto *r = streamingRepository.streamMesh(mesh.meshId, LevelOfDetail::LOD_0); r != nullptr) {
+                    mPushConstant.model = worldRepository.transforms[mesh.getEntityId()].model;
                     mPushConstant.renderIndex = renderIndex;
                     renderIndex++;
                     recordPushConstant(&mPushConstant);

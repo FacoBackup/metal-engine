@@ -8,7 +8,7 @@
 
 namespace Metal {
     class WorldGridRepository final : public AbstractRuntimeComponent {
-        std::unordered_map<std::string, WorldTile *> tiles{};
+        std::unordered_map<std::string, WorldTile> tiles{};
         std::array<WorldTile *, 9> loadedWorldTiles{};
         WorldTile *currentTile = nullptr;
 
@@ -35,17 +35,15 @@ namespace Metal {
 
         void addTile(const glm::vec3 &point);
 
-        void updateAdjacentTiles(WorldTile *newTile) const;
+        void updateAdjacentTiles(WorldTile *newTile);
 
-        void putAdjacentTile(const std::array<int, 2> &tileLocation, WorldTile *newTile) const;
-
-        std::unordered_map<std::string, WorldTile *> &getTiles() {
-            return tiles;
-        }
+        void putAdjacentTile(const std::array<int, 2> &tileLocation, WorldTile *newTile);
 
         void removeTile(const std::string &id);
 
         void moveBetweenTiles(EntityID entityId, WorldTile *previousWorldTile, WorldTile *newWorldTile) const;
+
+        SAVE_TEMPLATE(tiles)
     };
 } // Metal
 

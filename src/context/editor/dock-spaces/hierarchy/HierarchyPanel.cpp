@@ -5,7 +5,7 @@
 #include "../../../../util/UIUtil.h"
 #include "../../../../context/ApplicationContext.h"
 #include "../../../../repository/world/impl/Entity.h"
-#include "../../../../repository/world/impl/AbstractComponent.h"
+#include "../../../../enum/ComponentType.h"
 
 namespace Metal {
     void HierarchyPanel::onInitialize() {
@@ -144,15 +144,15 @@ namespace Metal {
     void HierarchyPanel::renderComponents(const Entity *node) const {
         if (!editorRepository->showOnlyEntitiesHierarchy) {
             for (auto &val: node->components) {
-                addComponent(val.second);
+                addComponent(val);
             }
         }
     }
 
-    void HierarchyPanel::addComponent(AbstractComponent *component) {
+    void HierarchyPanel::addComponent(const ComponentTypes::ComponentType component) {
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
-        ImGui::TextDisabled("%s%s", component->getIcon(), component->getTitle());
+        ImGui::TextDisabled("%s%s", ComponentTypes::IconOf(component), ComponentTypes::NameOf(component));
         ImGui::TableNextColumn();
         ImGui::TextDisabled("--");
         ImGui::TableNextColumn();
