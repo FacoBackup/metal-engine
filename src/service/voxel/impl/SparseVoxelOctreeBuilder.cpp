@@ -38,7 +38,7 @@ namespace Metal {
         if (node->children[childIndex] != nullptr) {
             insertInternal(node->children[childIndex].get(), point, data, position, depth + 1);
         } else {
-            auto child = std::make_unique<OctreeNode>();
+            auto child = std::make_shared<OctreeNode>();
             node->addChild(child, childIndex);
             insertInternal(child.get(), point, data, position, depth + 1);
             // Leaf nodes don't need to be included on the tree

@@ -1,8 +1,8 @@
 #include "OctreeNode.h"
 
 namespace Metal {
-    void OctreeNode::addChild(std::unique_ptr<OctreeNode> &child, int index) {
-        children[index] = std::move(child);
+    void OctreeNode::addChild(const std::shared_ptr<OctreeNode> &child, int index) {
+        children[index] = child;
     }
 
     void OctreeNode::prepareData() {

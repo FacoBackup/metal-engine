@@ -1,15 +1,17 @@
 #include "./GlobalData.glsl"
 #include "./CreateRay.glsl"
 
+#define TILE_SIZE 32
 #define MAX_VOXEL_SIZE 2000000
+#define COUNT 32.
 layout(location = 0) in vec2 texCoords;
 layout(location = 0) out vec4 finalColor;
 
 layout(std430, set = 1, binding = 0) readonly buffer OctreeBuffer {
-// NON LEAF NODES - First 16 bits are the index pointing to the position of this voxel's children | 8 bits are the child mask | 8 bits indicate if the node is a leaf
-// LEAF NODES - Compressed RGB value 10 bits for red 10 bits for green and 10 bits for blue
+    // NON LEAF NODES - First 16 bits are the index pointing to the position of this voxel's children | 8 bits are the child mask | 8 bits indicate if the node is a leaf
+    // LEAF NODES - Compressed RGB value 10 bits for red 10 bits for green and 10 bits for blue
     uint voxels[MAX_VOXEL_SIZE];
-    vec4 centerScale;
+    vec3 tileCenter;
 } voxelBuffer;
 
 layout(push_constant) uniform Push {
@@ -17,8 +19,6 @@ layout(push_constant) uniform Push {
     bool showRaySearchCount;
     bool showRayTestCount;
 } settings;
-
-#define COUNT 64.
 
 const vec3 NNN = vec3(-1, -1, -1);
 const vec3 PNN = vec3(1, -1, -1);
@@ -107,13 +107,12 @@ bool randomColors,
 bool showRaySearchCount,
 bool showRayTestCount
 ) {
-    vec3 center = voxelBuffer.centerScale.xyz;
-    float scale = voxelBuffer.centerScale.w;
+    vec3 center = voxelBuffer.tileCenter;
+    float scale = TILE_SIZE;
     vec3 minBox = center - scale;
     vec3 maxBox = center + scale;
     float minDistance = 1e10;// Large initial value
     if (!intersect(minBox, maxBox, ray)) return vec4(0);
-
     Stack stack[10];
     scale *= 0.5f;
     stack[0] = Stack(0u, center, scale);

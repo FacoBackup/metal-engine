@@ -6,7 +6,7 @@
 
 namespace Metal {
     struct OctreeNode final {
-        std::array<std::unique_ptr<OctreeNode>, 8> children;
+        std::array<std::shared_ptr<OctreeNode>, 8> children;
         std::shared_ptr<VoxelData> data = nullptr;
         bool isLeaf = false;
 
@@ -24,7 +24,7 @@ namespace Metal {
          */
         int childMask = 0;
 
-        void addChild(std::unique_ptr<OctreeNode> &child, int index);
+        void addChild(const std::shared_ptr<OctreeNode> &child, int index);
 
         void prepareData();
 

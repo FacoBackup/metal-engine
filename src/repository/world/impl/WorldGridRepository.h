@@ -27,7 +27,7 @@ namespace Metal {
         }
 
         static int getTileLocation(const float v) {
-            return static_cast<int>(std::floor(v / TILE_SIZE));
+            return static_cast<int>(std::floor((v + TILE_SIZE / 2.f) / TILE_SIZE));
         }
 
         /**
@@ -39,6 +39,8 @@ namespace Metal {
         WorldTile *getOrCreateTile(const glm::vec3 &point);
 
         WorldTile *getCurrentTile() const;
+
+        WorldTile *getTile(const glm::vec3 &point);
 
         void createIfAbsent(int x, int z);
 

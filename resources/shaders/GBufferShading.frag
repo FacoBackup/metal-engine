@@ -58,7 +58,7 @@ void main() {
         } else if (push.mode == AO){
             finalColor = vec4(vec3(texture(gBufferRoughnessMetallicAO, texCoords).b), 1);
         } else if (push.mode == DEPTH){
-            finalColor = vec4(vec3(texture(gBufferDepthIdUV, texCoords).r), 1);
+            finalColor = vec4(vec3(depthData), 1);
         } else if (push.mode == UV){
             finalColor = vec4(texture(gBufferDepthIdUV, texCoords).zw, 0, 1);
         }else if (push.mode == RANDOM){
@@ -68,7 +68,7 @@ void main() {
             vec3 worldSpacePosition = vec3(globalData.invView * vec4(viewSpacePosition, 1));
             finalColor = vec4(worldSpacePosition, 1);
         } else {
-            finalColor = vec4(1, 0, 1, 1);
+             discard;
         }
         return;
     }

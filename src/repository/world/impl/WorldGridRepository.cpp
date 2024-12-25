@@ -33,6 +33,16 @@ namespace Metal {
         return &tiles.at(id);
     }
 
+    WorldTile *WorldGridRepository::getTile(const glm::vec3 &point) {
+        const int tileX = getTileLocation(point.x);
+        const int tileZ = getTileLocation(point.z);
+        const std::string id = TILE_ID(tileX, tileZ);
+        if (!tiles.contains(id)) {
+            return nullptr;
+        }
+        return &tiles.at(id);
+    }
+
     WorldTile *WorldGridRepository::getCurrentTile() const {
         return currentTile;
     }
