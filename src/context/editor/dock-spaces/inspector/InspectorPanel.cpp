@@ -14,6 +14,7 @@ namespace Metal {
         repositories.push_back(&context->editorRepository);
         repositories.push_back(&context->atmosphereRepository);
         repositories.push_back(&context->worldRepository.camera);
+        repositories.push_back(&context->voxelizationRepository);
     }
 
     void InspectorPanel::onSync() {

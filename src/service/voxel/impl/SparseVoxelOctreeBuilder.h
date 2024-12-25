@@ -9,25 +9,33 @@ namespace Metal {
     struct WorldTile;
 
     class SparseVoxelOctreeBuilder {
-        int maxDepth = 0;
-        float voxelSize = 0;
-        int bufferIndex = 0;
+        unsigned int maxDepth = 0;
         OctreeNode root{};
-        int nodeQuantity = 1;
-        std::unordered_map<EntityID, unsigned long> entitiesTracked{};
+        unsigned int nodeQuantity = 1;
+        WorldTile *tile = nullptr;
 
-        void insertInternal(OctreeNode *node, glm::vec3 &point, VoxelData &data, glm::ivec3 &position, int depth);
+        void insertInternal(OctreeNode *node, glm::vec3 &point, const std::shared_ptr<VoxelData> &data,
+                            glm::ivec3 &position, int depth);
 
         static void WorldToChunkLocal(const WorldTile *tile, glm::vec3 &worldCoordinate);
 
     public:
-        std::unordered_map<EntityID, unsigned long> &getEntitiesTracked() {
-            return entitiesTracked;
+        explicit SparseVoxelOctreeBuilder(unsigned int maxDepth, WorldTile *tile): maxDepth(maxDepth), tile(tile) {
         }
 
-        void setMaxDepth(unsigned int depth);
+        [[nodiscard]] unsigned int getVoxelQuantity() const {
+            return nodeQuantity;
+        }
 
-        void insert(const WorldTile *tile, glm::vec3 &point, VoxelData &data);
+        OctreeNode &getRoot() {
+            return root;
+        }
+
+        WorldTile *getTile() {
+            return tile;
+        }
+
+        void insert(glm::vec3 &point, const std::shared_ptr<VoxelData> &data);
     };
 } // Metal
 

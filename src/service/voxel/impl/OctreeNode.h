@@ -7,13 +7,13 @@
 namespace Metal {
     struct OctreeNode final {
         std::array<std::unique_ptr<OctreeNode>, 8> children;
-        VoxelData data{{0, 0, 0}};
+        std::shared_ptr<VoxelData> data = nullptr;
         bool isLeaf = false;
 
         /**
          * Target location of this node's data inside the SSBO buffer
          */
-        int dataIndex;
+        unsigned int dataIndex;
         /**
          * Indicates whether the child on the index of the bit is a leaf node or not (1 bit for leaf 0 otherwise)
          */
@@ -35,7 +35,7 @@ namespace Metal {
          * @param childGroupIndex
          * @return
          */
-        int packVoxelData(int childGroupIndex);
+        unsigned int packVoxelData(unsigned int childGroupIndex);
     };
 } // Metal
 

@@ -2,12 +2,7 @@
 #include "../../../repository/world/impl/WorldTile.h"
 
 namespace Metal {
-    void SparseVoxelOctreeBuilder::setMaxDepth(const unsigned int depth) {
-        this->maxDepth = depth;
-        this->voxelSize = static_cast<float>(TILE_SIZE / std::pow(2, maxDepth));
-    }
-
-    void SparseVoxelOctreeBuilder::insert(const WorldTile *tile, glm::vec3 &point, VoxelData &data) {
+    void SparseVoxelOctreeBuilder::insert(glm::vec3 &point, const std::shared_ptr<VoxelData> &data) {
         if (maxDepth < 1) {
             throw std::runtime_error("Depth is not set");
         }
@@ -19,15 +14,16 @@ namespace Metal {
         }
     }
 
-    void SparseVoxelOctreeBuilder::insertInternal(OctreeNode *node, glm::vec3 &point, VoxelData &data, glm::ivec3 &position,
-                                           const int depth) {
+    void SparseVoxelOctreeBuilder::insertInternal(OctreeNode *node, glm::vec3 &point,
+                                                  const std::shared_ptr<VoxelData> &data, glm::ivec3 &position,
+                                                  const int depth) {
         node->data = data;
         if (depth == maxDepth) {
             node->isLeaf = true;
             return;
         }
 
-        const float size = static_cast<float>(TILE_SIZE / std::pow(2, depth));
+        const auto size = static_cast<float>(TILE_SIZE / std::pow(2, depth));
         const auto childPos = glm::ivec3{
             point.x >= ((size * position.x) + (size / 2)) ? 1 : 0,
             point.y >= ((size * position.y) + (size / 2)) ? 1 : 0,

@@ -43,6 +43,10 @@ namespace Metal {
 
         void moveBetweenTiles(EntityID entityId, WorldTile *previousWorldTile, WorldTile *newWorldTile) const;
 
+        std::unordered_map<std::string, WorldTile> &getTiles() {
+            return tiles;
+        }
+
         SAVE_TEMPLATE(tiles)
     };
 } // Metal

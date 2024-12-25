@@ -269,11 +269,11 @@ namespace Metal {
     void FilesPanel::openResource(FileEntry *root) {
         switch (root->type) {
             case EntryType::MESH: {
-                context->meshService.loadMesh(root->name, root->getId());
+                context->meshService.createMeshEntity(root->name, root->getId());
                 break;
             }
             case EntryType::SCENE: {
-                context->meshService.loadScene(root->getId());
+                context->meshService.createSceneEntities(root->getId());
                 break;
             }
             case EntryType::DIRECTORY: {

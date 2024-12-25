@@ -212,8 +212,8 @@ add_executable(
         src/service/voxel/impl/OctreeNode.cpp
         src/service/voxel/impl/OctreeNode.h
         src/service/voxel/impl/VoxelData.h
-        src/service/voxel/VoxelizerService.cpp
-        src/service/voxel/VoxelizerService.h
+        src/service/voxel/VoxelizationService.cpp
+        src/service/voxel/VoxelizationService.h
         src/service/mesh/SceneData.h
         src/service/mesh/EntityAssetData.h
         src/service/mesh/MaterialData.h
@@ -234,6 +234,10 @@ add_executable(
         src/service/notification/NotificationService.h
         src/dto/Notification.h
         src/enum/NotificationSeverity.h
+        src/service/voxel/impl/Triangle.h
+        src/repository/voxel/VoxelizationRepository.cpp
+        src/repository/voxel/VoxelizationRepository.h
+        src/service/voxel/impl/SparseVoxelOctreeData.h
 )
 
 

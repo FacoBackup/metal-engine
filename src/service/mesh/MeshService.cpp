@@ -16,29 +16,38 @@
 
 namespace Metal {
     MeshInstance *MeshService::create(const std::string &id, const LevelOfDetail &levelOfDetail) {
-        auto pathToFile = context.getAssetDirectory() + FORMAT_FILE_MESH(id, levelOfDetail);
-        MeshData data;
-        PARSE_TEMPLATE(data.load, pathToFile)
-
+        MeshData *data = stream(id, levelOfDetail);
         auto *instance = new MeshInstance(id);
         registerResource(instance);
 
-        instance->indexCount = data.indices.size();
+        instance->indexCount = data->indices.size();
 
         instance->dataBuffer = context.bufferService.createBuffer(
-            sizeof(VertexData) * data.data.size(),
+            sizeof(VertexData) * data->data.size(),
             VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-            data.data.data());
+            data->data.data());
 
         instance->indexBuffer = context.bufferService.createBuffer(
-            sizeof(uint32_t) * data.indices.size(),
+            sizeof(uint32_t) * data->indices.size(),
             VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-            data.indices.data());
+            data->indices.data());
+
+        delete data;
 
         return instance;
     }
 
-    EntityID MeshService::loadMesh(const std::string &name, const std::string &meshId) const {
+    MeshData *MeshService::stream(const std::string &id, const LevelOfDetail &levelOfDetail) const {
+        auto pathToFile = context.getAssetDirectory() + FORMAT_FILE_MESH(id, levelOfDetail);
+        if (std::filesystem::exists(pathToFile)) {
+            MeshData *data = new MeshData;
+            PARSE_TEMPLATE(data->load, pathToFile)
+            return data;
+        }
+        return nullptr;
+    }
+
+    EntityID MeshService::createMeshEntity(const std::string &name, const std::string &meshId) const {
         const auto id = context.worldRepository.createEntity();
         context.worldRepository.createComponent(id, ComponentTypes::ComponentType::MESH);
         context.worldRepository.meshes[id].meshId = meshId;
@@ -46,7 +55,7 @@ namespace Metal {
         return id;
     }
 
-    void MeshService::loadScene(const std::string &id) const {
+    void MeshService::createSceneEntities(const std::string &id) const {
         auto &repo = context.worldRepository;
         SceneData data;
         auto pathToFile = context.getAssetDirectory() + FORMAT_FILE_SCENE(id);
@@ -58,7 +67,7 @@ namespace Metal {
 
         for (auto &entity: data.entities) {
             if (!entity.meshId.empty()) {
-                entities.insert({entity.id, loadMesh(entity.name, entity.meshId)});
+                entities.insert({entity.id, createMeshEntity(entity.name, entity.meshId)});
             } else {
                 const auto entityId = repo.createEntity();
                 entities.insert({entity.id, entityId});

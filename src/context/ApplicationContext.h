@@ -12,6 +12,7 @@
 #include "../repository/descriptors/CoreDescriptorSets.h"
 #include "../repository/render-pass/CoreRenderPasses.h"
 #include "../repository/texture/CoreTextures.h"
+#include "../repository/voxel/VoxelizationRepository.h"
 
 #include "../service/mesh/MeshService.h"
 #include "../service/texture/TextureService.h"
@@ -84,6 +85,7 @@ namespace Metal {
         AtmosphereRepository atmosphereRepository{};
         DockRepository dockRepository{*this};
         EditorRepository editorRepository{};
+        VoxelizationRepository voxelizationRepository{};
         // ----------- Repository
 
         [[nodiscard]] bool isDebugMode() const { return debugMode; }
