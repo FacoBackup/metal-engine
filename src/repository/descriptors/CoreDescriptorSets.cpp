@@ -16,8 +16,25 @@ P->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,\
                                               context.coreFrameBuffers.gBufferFBO->attachments[N]->vkImageView);\
 P->write(vulkanContext);
 
+
 namespace Metal {
     void CoreDescriptorSets::onInitialize() { {
+            svoData = std::make_unique<DescriptorInstance>();
+            // ONE FOR EACH ADJACENT TILE AND ONE FOR THE CENTER TILE
+            svoData->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0);
+            svoData->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1);
+            svoData->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 2);
+            svoData->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 3);
+            svoData->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 4);
+            svoData->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 5);
+            svoData->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 6);
+            svoData->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 7);
+            svoData->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 8);
+            svoData->create(vulkanContext);
+        }
+
+        // GLOBAL DATA UBO
+        {
             globalDataDescriptor = std::make_unique<DescriptorInstance>();
             globalDataDescriptor->addLayoutBinding(static_cast<VkShaderStageFlagBits>(
                                                        VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT),
@@ -28,10 +45,14 @@ namespace Metal {
             globalDataDescriptor->write(vulkanContext);
         }
 
+        // G-BUFFER
         GBUFFER_D(gBufferShadingDescriptor, 0)
         GBUFFER_D(gBufferShadingDescriptor1, 1)
         GBUFFER_D(gBufferShadingDescriptor2, 2)
-        GBUFFER_D(gBufferShadingDescriptor3, 3) {
+        GBUFFER_D(gBufferShadingDescriptor3, 3)
+
+        // BRDF TEXTURE
+        {
             brdfDescriptor = std::make_unique<DescriptorInstance>();
             brdfDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                              0);
@@ -40,7 +61,10 @@ namespace Metal {
                                                context.coreFrameBuffers.gBufferFBO->vkImageSampler,
                                                context.coreTextures.brdf->vkImageView);
             brdfDescriptor->write(vulkanContext);
-        } {
+        }
+
+        // POST PROCESSING
+        {
             postProcessingDescriptor = std::make_unique<DescriptorInstance>();
             postProcessingDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                                                        0);

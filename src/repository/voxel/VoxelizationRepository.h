@@ -5,6 +5,9 @@
 namespace Metal {
     struct VoxelizationRepository final : Inspectable {
         int maxDepth = 6;
+        bool randomColors = true;
+        bool showRaySearchCount = true;
+        bool showRayTestCount = true;
 
         const char *getTitle() override;
 

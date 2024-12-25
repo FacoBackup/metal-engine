@@ -11,6 +11,7 @@
 #define RANDOM 6
 #define DEPTH 7
 #define UV 8
+#define POSITION 9
 
 layout(location = 0) in vec2 texCoords;
 
@@ -24,6 +25,16 @@ layout(set = 5, binding = 0) uniform sampler2D brdfSampler;
 layout(push_constant) uniform Push {
     int mode;
 } push;
+
+vec3 randomColor(int seed) {
+    float hash = fract(sin(float(seed)) * 43758.5453);
+
+    float r = fract(hash * 13.756);
+    float g = fract(hash * 15.734);
+    float b = fract(hash * 17.652);
+
+    return vec3(r, g, b);
+}
 #endif
 
 layout(location = 0) out vec4 finalColor;
@@ -50,6 +61,12 @@ void main() {
             finalColor = vec4(vec3(texture(gBufferDepthIdUV, texCoords).r), 1);
         } else if (push.mode == UV){
             finalColor = vec4(texture(gBufferDepthIdUV, texCoords).zw, 0, 1);
+        }else if (push.mode == RANDOM){
+            finalColor = vec4(randomColor(int(texture(gBufferDepthIdUV, texCoords).g)), 1);
+        }else if (push.mode == POSITION){
+            vec3 viewSpacePosition = viewSpacePositionFromDepth(depthData, texCoords, globalData.invProj);
+            vec3 worldSpacePosition = vec3(globalData.invView * vec4(viewSpacePosition, 1));
+            finalColor = vec4(worldSpacePosition, 1);
         } else {
             finalColor = vec4(1, 0, 1, 1);
         }
@@ -69,11 +86,11 @@ void main() {
     shaderData.metallic = valueRMAOSampler.g;
     shaderData.ambientOcclusion = valueRMAOSampler.b;
     shaderData.viewSpacePosition = viewSpacePositionFromDepth(depthData, texCoords, globalData.invProj);
-    shaderData.worldSpacePosition = vec3(globalData.invView * vec4(shaderData.viewSpacePosition, 1.));
-    shaderData.V = normalize(globalData.cameraWorldPosition.xyz - shaderData.worldSpacePosition);
+    shaderData.worldSpacePosition = vec3(globalData.invView * vec4(shaderData.viewSpacePosition, 1));
+    shaderData.V = normalize(globalData.cameraWorldPosition - shaderData.worldSpacePosition);
     shaderData.distanceFromCamera = length(shaderData.V);
     shaderData.albedo = albedoEmissive.rgb;
-    shaderData.VrN = reflect(-shaderData.V, shaderData.N);
+    shaderData.VrN = reflect(shaderData.V, shaderData.N);
     shaderData.albedoOverPI = shaderData.albedo / PI;
     shaderData.NdotV = clamp(dot(shaderData.N, shaderData.V), 0., 1.);
     shaderData.brdf = texture(brdfSampler, vec2(shaderData.NdotV, shaderData.roughness)).rg;

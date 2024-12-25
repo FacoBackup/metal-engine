@@ -8,10 +8,13 @@ namespace Metal {
     }
 
     const char *VoxelizationRepository::getIcon() {
-        return Icons::block.c_str();
+        return Icons::apps.c_str();
     }
 
     void VoxelizationRepository::registerFields() {
         registerInt(maxDepth, "", "Max depth", 2, 15);
+        registerBool(randomColors, "Debug", "Random colors");
+        registerBool(showRaySearchCount, "Debug", "Show ray search count");
+        registerBool(showRayTestCount, "Debug", "Show ray test count");
     }
 } // Metal

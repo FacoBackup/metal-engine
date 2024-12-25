@@ -4,15 +4,24 @@
 
 #include "WorldTile.h"
 #include "../../../common/AbstractRuntimeComponent.h"
+#include "../../../common/inspection/Inspectable.h"
 #include "../../../enum/engine-definitions.h"
 
 namespace Metal {
-    class WorldGridRepository final : public AbstractRuntimeComponent {
+    class WorldGridRepository final : public AbstractRuntimeComponent, public Inspectable {
+        int numberOfTiles = 10;
         std::unordered_map<std::string, WorldTile> tiles{};
         std::array<WorldTile *, 9> loadedWorldTiles{};
         WorldTile *currentTile = nullptr;
+        unsigned int prevSize = 0;
 
     public:
+        [[nodiscard]] int getNumberOfTiles() const {
+            return numberOfTiles;
+        }
+
+        bool updateLoadedTiles();
+
         explicit WorldGridRepository(ApplicationContext &context)
             : AbstractRuntimeComponent(context) {
         }
@@ -47,7 +56,13 @@ namespace Metal {
             return tiles;
         }
 
-        SAVE_TEMPLATE(tiles)
+        const char *getIcon() override;
+
+        const char *getTitle() override;
+
+        void registerFields() override;
+
+        SAVE_TEMPLATE(tiles, numberOfTiles)
     };
 } // Metal
 

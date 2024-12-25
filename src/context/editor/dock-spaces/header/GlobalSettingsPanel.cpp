@@ -6,9 +6,13 @@
 #include "../../../../service/camera/Camera.h"
 
 namespace Metal {
-
     void GlobalSettingsPanel::onSync() {
         auto &editorRepository = context->editorRepository;
+
+        if (ImGui::Button((Icons::apps + "Voxelize scene" + id + "voxelize").c_str())) {
+            context->voxelizationService.voxelizeScene();
+        }
+        ImGui::SameLine();
 
         ImGui::SetNextItemWidth(150);
         editorMode = EditorMode::IndexOfValue(editorRepository.editorMode);

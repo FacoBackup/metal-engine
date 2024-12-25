@@ -20,6 +20,9 @@ namespace Metal {
         std::unique_ptr<DescriptorInstance> gBufferShadingDescriptor1 = nullptr;
         std::unique_ptr<DescriptorInstance> gBufferShadingDescriptor2 = nullptr;
         std::unique_ptr<DescriptorInstance> gBufferShadingDescriptor3 = nullptr;
+
+        std::unique_ptr<DescriptorInstance> svoData = nullptr;
+
         std::unique_ptr<DescriptorInstance> brdfDescriptor = nullptr;
 
         void onInitialize() override;

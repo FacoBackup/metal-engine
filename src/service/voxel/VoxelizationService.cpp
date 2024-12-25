@@ -122,6 +122,7 @@ namespace Metal {
     }
 
     void VoxelizationService::voxelizeScene() const {
+        std::cout << "Starting scene voxelization" << std::endl;
         std::unordered_map<std::string, SparseVoxelOctreeBuilder> builders;
         for (auto &t: context.worldGridRepository.getTiles()) {
             for (auto entity: t.second.entities) {

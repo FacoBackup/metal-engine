@@ -238,6 +238,15 @@ add_executable(
         src/repository/voxel/VoxelizationRepository.cpp
         src/repository/voxel/VoxelizationRepository.h
         src/service/voxel/impl/SparseVoxelOctreeData.h
+        src/context/engine/render-pass/impl/VoxelVisualizerPass.cpp
+        src/context/engine/render-pass/impl/VoxelVisualizerPass.h
+        src/service/voxel/SVOService.cpp
+        src/service/voxel/SVOService.h
+        src/service/voxel/SVOInstance.cpp
+        src/service/voxel/SVOInstance.h
+        src/dto/push-constant/VoxelDebugSettingsPushConstant.h
+        src/service/world/WorldGridService.cpp
+        src/service/world/WorldGridService.h
 )
 
 

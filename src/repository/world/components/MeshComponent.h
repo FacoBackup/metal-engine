@@ -11,7 +11,7 @@ namespace Metal {
 
         ComponentTypes::ComponentType getType() override;
 
-        SERIALIZE_TEMPLATE(meshId)
+        SERIALIZE_TEMPLATE(meshId, entityId)
     };
 }
 #endif //MESHCOMPONENT_H

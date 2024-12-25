@@ -88,7 +88,8 @@ namespace Metal {
 
     void FormPanel::onSync() {
         if (inspection == nullptr) return;
-
+        ImGui::Text("%s%s", inspection->getIcon(), inspection->getTitle());
+        ImGui::Separator();
         onSyncChildren();
     }
 }

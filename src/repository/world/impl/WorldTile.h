@@ -2,6 +2,7 @@
 #define WORLDTILE_H
 #include <array>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "BoundingBox.h"
@@ -9,6 +10,8 @@
 #include "../../../service/voxel/impl/SparseVoxelOctreeBuilder.h"
 #include "../../../util/serialization-definitions.h"
 #define TILE_SIZE 32
+
+#define TILE_ID(x, z) (std::to_string(x) + "_" + std::to_string(z))
 
 namespace Metal {
     struct WorldTile final {
@@ -42,8 +45,8 @@ namespace Metal {
             if (isNorthEast) adjacentTiles[7] = key;
         }
 
-        explicit WorldTile(int x, int z, const std::string &id)
-            : x(x), z(z), id(id) {
+        explicit WorldTile(int x, int z, std::string id)
+            : x(x), z(z), id(std::move(id)) {
             boundingBox.center.x = x * TILE_SIZE;
             boundingBox.center.z = z * TILE_SIZE;
             boundingBox.max = boundingBox.center + glm::vec3(TILE_SIZE / 2.0f, TILE_SIZE / 2.0f, TILE_SIZE / 2.0f);
@@ -59,10 +62,6 @@ namespace Metal {
 
         void removeAdjacentTile(const WorldTile *adjacentWorldTile) {
             updateTiles(adjacentWorldTile, "");
-        }
-
-        static std::string GetId(int x, int z) {
-            return x + "_" + z;
         }
 
         SERIALIZE_TEMPLATE(
