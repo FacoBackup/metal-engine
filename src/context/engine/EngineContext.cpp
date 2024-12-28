@@ -46,7 +46,7 @@ namespace Metal {
                     const auto *svo = context.streamingRepository.streamSVO(
                         tile->id, LevelOfDetail::OfNumber(context.voxelizationRepository.levelOfDetail));
                     if (svo != nullptr) {
-                        context.coreDescriptorSets.svoData->addBufferDescriptor(i, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                        context.coreDescriptorSets.svoData->addBufferDescriptor(i + 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                             svo->buffer);
                         tileInfoUBO.tileCenterValid[i] = glm::vec4(tile->x, 0,
                                                        tile->z, 1);

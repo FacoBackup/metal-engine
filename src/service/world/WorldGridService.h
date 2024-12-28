@@ -6,17 +6,19 @@ namespace Metal {
     struct WorldTile;
 
     class WorldGridService final : public AbstractRuntimeComponent {
-        WorldTile * prevTile = nullptr;
+        WorldTile *prevTile = nullptr;
+        bool changed = false;
+
     public:
         explicit WorldGridService(ApplicationContext &context)
             : AbstractRuntimeComponent(context) {
         }
 
-        void addMissingTiles() const;
+        void addMissingTiles();
 
         static bool IsTileOutsideBounds(WorldTile *tile, int half, int min);
 
-        void removeExtraTiles() const;
+        void removeExtraTiles();
 
         void onSync() override;
     };
