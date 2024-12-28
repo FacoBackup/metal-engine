@@ -1,4 +1,4 @@
-#include "./GlobalData.glsl"
+#include "./GlobalDataBuffer.glsl"
 #include "./CreateRay.glsl"
 #define DEBUG_VOXELS
 #include "./VoxelRaytracing.glsl"

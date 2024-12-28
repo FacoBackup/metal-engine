@@ -1,5 +1,10 @@
-#include "./GlobalData.glsl"
+#include "./GlobalDataBuffer.glsl"
 #include "./DepthUtils.glsl"
+
+
+#define LIGHTS_SET 6
+#define LIGHTS_BINDING 0
+
 #include "./Shading.glsl"
 
 #define LIT 0
@@ -88,7 +93,7 @@ void main() {
     shaderData.V = normalize(globalData.cameraWorldPosition - shaderData.worldSpacePosition);
     shaderData.distanceFromCamera = length(shaderData.V);
     shaderData.albedo = albedoEmissive.rgb;
-    shaderData.VrN = reflect(shaderData.V, shaderData.N);
+    shaderData.VrN = reflect(-shaderData.V, shaderData.N);
     shaderData.albedoOverPI = shaderData.albedo / PI;
     shaderData.NdotV = clamp(dot(shaderData.N, shaderData.V), 0., 1.);
     shaderData.brdf = texture(brdfSampler, vec2(shaderData.NdotV, shaderData.roughness)).rg;
@@ -96,6 +101,7 @@ void main() {
     shaderData.F0 = mix(shaderData.F0, shaderData.albedo, shaderData.metallic);
     shaderData.sunDirection = globalData.sunPosition;
     shaderData.sunColor = globalData.sunColor;
+    shaderData.lightsQuantity = globalData.lightsQuantity;
 
     finalColor = vec4(physicallyBasedShadePixel(shaderData), 1.);
 }

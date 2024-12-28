@@ -92,12 +92,12 @@ namespace Metal {
             }
             ImGui::SetNextWindowPos(ImVec2(5, ImGui::GetMainViewport()->Size.y - 40 * (usedIndices + 1)));
             ImGui::SetNextWindowSize(ImVec2(ImGui::CalcTextSize(notification->message.c_str()).x + 45, 35));
-            ImGui::PushStyleColor(ImGuiCol_WindowBg, NotificationSeverities::GetColor(notification->severity));
+            ImGui::PushStyleColor(ImGuiCol_WindowBg, GetColor(notification->severity));
 
             ImGui::Begin("##toaster" + usedIndices, &UIUtil::OPEN,
                          ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
             ImGui::PopStyleColor();
-            ImGui::TextColored(ImColor(255, 255, 255, 255), NotificationSeverities::GetIcon(notification->severity));
+            ImGui::TextColored(ImColor(255, 255, 255, 255), GetIcon(notification->severity));
             ImGui::SameLine();
             ImGui::TextColored(ImColor(255, 255, 255, 255), notification->message.c_str());
             ImGui::End();

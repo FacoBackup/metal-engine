@@ -17,11 +17,14 @@
         field->nameWithId = field->name + field->id;\
         field->group = std::move(group);\
         field->disabled = disabled;\
-        field->type = V;
+        field->type = V;\
+        field->instance = this;
+
 
 #define  NUMERIC_DECLARATION \
         field->minF = min;\
         field->maxF = max;\
+        field->incrementF = increment;\
         fields.push_back(std::move(field));
 
 namespace Metal {
@@ -29,6 +32,7 @@ namespace Metal {
         auto field = std::make_unique<InspectedMethod>();
         field->group = std::move(group);
         field->name = std::move(name);
+        field->instance = this;
         field->nameWithId = field->name + Util::uuidV4();
 
 
@@ -78,35 +82,35 @@ namespace Metal {
 
     void Inspectable::registerFloat(float &v,
                                     std::string group, std::string name,
-                                    float min, float max, bool disabled) {
+                                    float min, float max, bool disabled, float increment) {
         DECLARATION(float, FLOAT)
         NUMERIC_DECLARATION
     }
 
     void Inspectable::registerVec2(glm::vec2 &v,
                                    std::string group, std::string name,
-                                   float min, float max, bool disabled) {
+                                   float min, float max, bool disabled, float increment) {
         DECLARATION(glm::vec2, VECTOR2)
         NUMERIC_DECLARATION
     }
 
     void Inspectable::registerVec3(glm::vec3 &v,
                                    std::string group, std::string name,
-                                   float min, float max, bool disabled) {
+                                   float min, float max, bool disabled, float increment) {
         DECLARATION(glm::vec3, VECTOR3)
         NUMERIC_DECLARATION
     }
 
     void Inspectable::registerVec4(glm::vec4 &v,
                                    std::string group, std::string name,
-                                   float min, float max, bool disabled) {
+                                   float min, float max, bool disabled, float increment) {
         DECLARATION(glm::vec4, VECTOR4)
         NUMERIC_DECLARATION
     }
 
     void Inspectable::registerQuat(glm::quat &v,
                                    std::string group, std::string name,
-                                   float min, float max, bool disabled) {
+                                   float min, float max, bool disabled, float increment) {
         DECLARATION(glm::quat, QUAT)
         NUMERIC_DECLARATION
     }

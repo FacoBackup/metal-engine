@@ -21,6 +21,8 @@ namespace Metal {
 
         ComponentTypes::ComponentType getType() override;
 
+        void onUpdate(InspectableMember *member, ApplicationContext &context) override;
+
         SERIALIZE_TEMPLATE(
             model[0][0], model[0][1], model[0][2], model[0][3],
             model[1][0], model[1][1], model[1][2], model[1][3],

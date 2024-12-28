@@ -36,8 +36,14 @@ namespace Metal {
             svoData->addBufferDescriptor(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                                          context.coreBuffers.tileInfo);
             svoData->write(vulkanContext);
+        } {
+            lightsData = std::make_unique<DescriptorInstance>();
+            lightsData->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0);
+            lightsData->create(vulkanContext);
+            lightsData->addBufferDescriptor(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                                            context.coreBuffers.lights);
+            lightsData->write(vulkanContext);
         }
-
         // GLOBAL DATA UBO
         {
             globalDataDescriptor = std::make_unique<DescriptorInstance>();
@@ -66,6 +72,18 @@ namespace Metal {
                                                context.coreFrameBuffers.gBufferFBO->vkImageSampler,
                                                context.coreTextures.brdf->vkImageView);
             brdfDescriptor->write(vulkanContext);
+        }
+
+        if (context.isDebugMode()) {
+            iconsDescriptor = std::make_unique<DescriptorInstance>();
+            iconsDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                             0);
+            iconsDescriptor->create(vulkanContext);
+            iconsDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                               context.coreFrameBuffers.gBufferFBO->vkImageSampler,
+                                               context.coreTextures.icons->vkImageView);
+            iconsDescriptor->write(vulkanContext);
+
         }
 
         // POST PROCESSING

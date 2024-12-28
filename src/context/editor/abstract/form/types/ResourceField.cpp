@@ -8,6 +8,7 @@
 #include "../../../../../util/UIUtil.h"
 #include "../../../../../dto/file/FileEntry.h"
 #include "../../../../../context/ApplicationContext.h"
+#include "../../../../../common/inspection/Inspectable.h"
 
 namespace Metal {
     ResourceField::ResourceField(InspectedField<std::string> &field) : field(field) {
@@ -21,6 +22,8 @@ namespace Metal {
             }
             if (file->type == field.resourceType) {
                 *field.field = file->getId();
+                field.instance->registerChange();
+                field.instance->onUpdate(&field, *context);
                 open = false;
             }
         }));
@@ -40,6 +43,8 @@ namespace Metal {
                 UIUtil::ONLY_ICON_BUTTON_SIZE)) {
             entry = nullptr;
             *field.field = "";
+            field.instance->registerChange();
+            field.instance->onUpdate(&field, *context);
         }
         ImGui::SameLine();
         if (entry != nullptr) {

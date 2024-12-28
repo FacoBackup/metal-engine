@@ -4,6 +4,7 @@
 #include "../../dto/push-constant/MeshPushConstant.h"
 #include "../../dto/push-constant/GBufferShadingPushConstant.h"
 #include "../../dto/push-constant/VoxelDebugSettingsPushConstant.h"
+#include "../../dto/push-constant/IconPushConstant.h"
 #include "../../service/pipeline/PipelineInstance.h"
 #include "../../service/pipeline/PipelineService.h"
 #include "../../service/pipeline/PipelineBuilder.h"
@@ -22,14 +23,27 @@ namespace Metal {
                 .setPushConstantsSize(sizeof(MeshPushConstant));
         gBufferPipeline = pipelineService.createRenderingPipeline(gBufferPipelineBuilder);
 
-        PipelineBuilder gridPipelineBuilder = PipelineBuilder::Of(
-                    context.coreFrameBuffers.auxFBO,
-                    "QUAD.vert",
-                    "Grid.frag"
-                )
-                .setBlendEnabled()
-                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get());
-        gridPipeline = pipelineService.createRenderingPipeline(gridPipelineBuilder);
+        if (context.isDebugMode()) {
+            PipelineBuilder gridPipelineBuilder = PipelineBuilder::Of(
+                        context.coreFrameBuffers.auxFBO,
+                        "QUAD.vert",
+                        "tools/Grid.frag"
+                    )
+                    .setBlendEnabled()
+                    .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get());
+            gridPipeline = pipelineService.createRenderingPipeline(gridPipelineBuilder);
+
+            PipelineBuilder iconPipelineBuilder = PipelineBuilder::Of(
+                        context.coreFrameBuffers.auxFBO,
+                        "tools/Icon.vert",
+                        "tools/Icon.frag"
+                    )
+                    .useTriangleStrip()
+                    .setPushConstantsSize(sizeof(IconPushConstant))
+                    .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
+                    .addDescriptorSet(context.coreDescriptorSets.iconsDescriptor.get());
+            iconPipeline = pipelineService.createRenderingPipeline(iconPipelineBuilder);
+        }
 
         PipelineBuilder ppPipelineBuilder = PipelineBuilder::Of(
                     context.coreFrameBuffers.postProcessingFBO,
@@ -51,7 +65,8 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.gBufferShadingDescriptor1.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferShadingDescriptor2.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferShadingDescriptor3.get())
-                .addDescriptorSet(context.coreDescriptorSets.brdfDescriptor.get());
+                .addDescriptorSet(context.coreDescriptorSets.brdfDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.lightsData.get());
         gBufferShadingPipeline = pipelineService.createRenderingPipeline(gBufferShadingPipelineBuilder);
 
         PipelineBuilder voxelVisualizerPipelineBuilder = PipelineBuilder::Of(

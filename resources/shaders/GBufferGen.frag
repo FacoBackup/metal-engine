@@ -1,4 +1,4 @@
-#include "./GlobalData.glsl"
+#include "./GlobalDataBuffer.glsl"
 
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inNormal;

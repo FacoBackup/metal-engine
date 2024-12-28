@@ -1,5 +1,6 @@
 #ifndef MESHCOMPONENT_H
 #define MESHCOMPONENT_H
+
 #include "../impl/AbstractComponent.h"
 #include "../../../util/serialization-definitions.h"
 

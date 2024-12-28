@@ -248,6 +248,12 @@ add_executable(
         src/service/world/WorldGridService.cpp
         src/service/world/WorldGridService.h
         src/dto/ubo/TileInfoUBO.h
+        src/dto/ubo/LightData.h
+        src/repository/world/components/LightComponent.cpp
+        src/repository/world/components/LightComponent.h
+        src/context/engine/render-pass/tools/IconsPass.cpp
+        src/context/engine/render-pass/tools/IconsPass.h
+        src/dto/push-constant/IconPushConstant.h
 )
 
 

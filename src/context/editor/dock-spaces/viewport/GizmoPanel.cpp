@@ -28,7 +28,8 @@ namespace Metal {
         }
 
         if (editorRepository->primitiveSelected != localSelected || localSelected->getChangeId() != localChangeId) {
-            cacheMatrix = glm::value_ptr(editorRepository->primitiveSelected->model);
+            cacheMatrixMat4 = glm::mat4(editorRepository->primitiveSelected->model);
+            cacheMatrix = glm::value_ptr(cacheMatrixMat4);
             localSelected = editorRepository->primitiveSelected;
             localChangeId = localSelected->getChangeId();
         }
@@ -93,6 +94,7 @@ namespace Metal {
         localSelected->registerChange();
         localChangeId = localSelected->getChangeId();
         localSelected->forceTransform = true;
+        localSelected->onUpdate(nullptr, *context);
     }
 
     void GizmoPanel::recomposeMatrix() {

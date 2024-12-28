@@ -1,5 +1,5 @@
-#include "./GlobalData.glsl"
-#include "./CreateRay.glsl"
+#include "../GlobalDataBuffer.glsl"
+#include "../CreateRay.glsl"
 
 const vec4 settings = vec4(0, 1, 100, .02);
 

@@ -48,7 +48,6 @@ vec3 computeLightContribution(vec4 baseContribution, LightSharedInfo info, vec3 
     if (distanceFromFrag > info.cutoff) {
         intensity = clamp(mix(1., 0., (distanceFromFrag - info.cutoff) / (info.outerCutoff - info.cutoff)), 0., 1.);
     }
-
     if(intensity < .01){
         return vec3(0);
     }

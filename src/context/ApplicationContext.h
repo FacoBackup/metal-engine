@@ -87,7 +87,7 @@ namespace Metal {
 
         // ----------- Repository
         WorldGridRepository worldGridRepository{*this};
-        WorldRepository worldRepository{};
+        WorldRepository worldRepository{*this};
         RuntimeRepository runtimeRepository{};
         StreamingRepository streamingRepository{*this};
         AtmosphereRepository atmosphereRepository{};

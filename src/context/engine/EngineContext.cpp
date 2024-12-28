@@ -11,6 +11,7 @@
 #include "render-pass/tools/GridRenderPass.h"
 #include "../../service/camera/Camera.h"
 #include "render-pass/impl/VoxelVisualizerPass.h"
+#include "render-pass/tools/IconsPass.h"
 
 namespace Metal {
     void EngineContext::onInitialize() {
@@ -21,6 +22,7 @@ namespace Metal {
         fullScreenRenderPasses.push_back(std::make_unique<GBufferShadingPass>(context));
         if (context.isDebugMode()) {
             fullScreenRenderPasses.push_back(std::make_unique<VoxelVisualizerPass>(context));
+            fullScreenRenderPasses.push_back(std::make_unique<IconsPass>(context));
         }
         postProcessingPasses.push_back(std::make_unique<PostProcessingPass>(context));
         gBufferPasses.push_back(std::make_unique<OpaqueRenderPass>(context));
@@ -46,10 +48,11 @@ namespace Metal {
                     const auto *svo = context.streamingRepository.streamSVO(
                         tile->id, LevelOfDetail::OfNumber(context.voxelizationRepository.levelOfDetail));
                     if (svo != nullptr) {
-                        context.coreDescriptorSets.svoData->addBufferDescriptor(i + 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                        context.coreDescriptorSets.svoData->addBufferDescriptor(
+                            i + 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                             svo->buffer);
                         tileInfoUBO.tileCenterValid[i] = glm::vec4(tile->x, 0,
-                                                       tile->z, 1);
+                                                                   tile->z, 1);
                         i++;
                     }
                 }
@@ -87,21 +90,43 @@ namespace Metal {
         updateGlobalData();
         updatePostProcessingData();
         updateVoxelData();
+        updateLights();
 
         context.coreRenderPasses.gBufferPass->recordCommands(gBufferPasses);
         context.coreRenderPasses.fullScreenPass->recordCommands(fullScreenRenderPasses);
         context.coreRenderPasses.postProcessingPass->recordCommands(postProcessingPasses);
     }
 
+    void EngineContext::updateLights() {
+        if (hasToUpdateLights) {
+            hasToUpdateLights = false;
+            int index = 0;
+            for (auto &entry: context.worldRepository.lights) {
+                auto l = entry.second;
+                lights[index] = LightData(
+                    l.color * l.intensity,
+                    context.worldRepository.transforms.at(entry.first).translation,
+                    l.innerRadius,
+                    l.outerRadius,
+                    l.radius
+                );
+                index++;
+            }
+            context.coreBuffers.lights->update(lights.data());
+            lightsCount = index;
+        }
+    }
+
     void EngineContext::updateGlobalData() {
         auto &camera = context.worldRepository.camera;
-        globalDataUBO.proj = camera.projectionMatrix;
-        globalDataUBO.view = camera.viewMatrix;
+        globalDataUBO.viewMatrix = camera.viewMatrix;
+        globalDataUBO.projectionMatrix = camera.projectionMatrix;
         globalDataUBO.projView = camera.projViewMatrix;
         globalDataUBO.invProj = camera.invProjectionMatrix;
         globalDataUBO.invView = camera.invViewMatrix;
         globalDataUBO.cameraWorldPosition = camera.position;
         globalDataUBO.logDepthFC = 2.0f / (std::log(camera.projectionMatrix[0][0] + 1) / std::log(2));
+        globalDataUBO.lightsQuantity = lightsCount;
 
         if (context.atmosphereRepository.incrementTime) {
             context.atmosphereRepository.elapsedTime += .0005f * context.atmosphereRepository.elapsedTimeSpeed;
