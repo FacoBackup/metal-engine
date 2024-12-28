@@ -2,7 +2,9 @@
 
 #include "../../context/ApplicationContext.h"
 #include "../../service/buffer/BufferInstance.h"
+#include "../../service/voxel/SVOInstance.h"
 #include "CommandBufferRecorder.h"
+#include "../../enum/LevelOfDetail.h"
 #include "render-pass/impl/GBufferShadingPass.h"
 #include "render-pass/impl/OpaqueRenderPass.h"
 #include "render-pass/impl/PostProcessingPass.h"
@@ -24,6 +26,47 @@ namespace Metal {
         gBufferPasses.push_back(std::make_unique<OpaqueRenderPass>(context));
     }
 
+    void EngineContext::updatePostProcessingData() {
+        auto &camera = context.worldRepository.camera;
+        postProcessingUBO.distortionIntensity = camera.distortionIntensity;
+        postProcessingUBO.chromaticAberrationIntensity = camera.chromaticAberrationIntensity;
+        postProcessingUBO.distortionEnabled = camera.distortionEnabled;
+        postProcessingUBO.chromaticAberrationEnabled = camera.chromaticAberrationEnabled;
+        postProcessingUBO.vignetteEnabled = camera.vignetteEnabled;
+        postProcessingUBO.vignetteStrength = camera.vignetteStrength;
+
+        context.coreBuffers.postProcessingSettings->update(&postProcessingUBO);
+    }
+
+    void EngineContext::updateVoxelData() {
+        if (context.worldGridRepository.hasMainTileChanged) {
+            unsigned int i = 0;
+            for (auto *tile: context.worldGridRepository.getLoadedTiles()) {
+                if (tile != nullptr) {
+                    const auto *svo = context.streamingRepository.streamSVO(
+                        tile->id, LevelOfDetail::OfNumber(context.voxelizationRepository.levelOfDetail));
+                    if (svo != nullptr) {
+                        context.coreDescriptorSets.svoData->addBufferDescriptor(i + 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                            svo->buffer);
+                        tileInfoUBO.tileCenterValid[i] = glm::vec4(tile->x, 0,
+                                                       tile->z, 1);
+                        i++;
+                    }
+                }
+            }
+
+            for (unsigned int j = i; j < 9; j++) {
+                tileInfoUBO.tileCenterValid[i].w = 0;
+            }
+
+            if (i > 0) {
+                context.coreDescriptorSets.svoData->write(context.vulkanContext);
+                context.coreBuffers.tileInfo->update(tileInfoUBO.tileCenterValid.data());
+            }
+            context.worldGridRepository.hasMainTileChanged = false;
+        }
+    }
+
     void EngineContext::onSync() {
         currentTime = Clock::now();
         std::chrono::duration<float> delta = currentTime - previousTime;
@@ -41,26 +84,9 @@ namespace Metal {
         context.streamingRepository.onSync();
         context.cameraService.onSync();
 
-        auto &camera = context.worldRepository.camera;
         updateGlobalData();
-        context.coreBuffers.globalData->update(&globalDataUBO);
-        postProcessingUBO.distortionIntensity = camera.distortionIntensity;
-        postProcessingUBO.chromaticAberrationIntensity = camera.chromaticAberrationIntensity;
-        postProcessingUBO.distortionEnabled = camera.distortionEnabled;
-        postProcessingUBO.chromaticAberrationEnabled = camera.chromaticAberrationEnabled;
-        postProcessingUBO.vignetteEnabled = camera.vignetteEnabled;
-        postProcessingUBO.vignetteStrength = camera.vignetteStrength;
-
-        context.coreBuffers.postProcessingSettings->update(&postProcessingUBO);
-
-        // UPDATE BASED ON CENTRAL TILE (UPDATE ONLY IF CURRENT TILE HAS CHANGED)
-        if (context.worldGridRepository.hasMainTileChanged) {
-            tileInfoUBO.tileCenter = glm::vec3(context.worldGridRepository.getCurrentTile()->x, 0,
-                                               context.worldGridRepository.getCurrentTile()->z);
-            context.coreBuffers.tileInfo->update(&tileInfoUBO);
-            context.worldGridRepository.hasMainTileChanged = false;
-        }
-
+        updatePostProcessingData();
+        updateVoxelData();
 
         context.coreRenderPasses.gBufferPass->recordCommands(gBufferPasses);
         context.coreRenderPasses.fullScreenPass->recordCommands(fullScreenRenderPasses);
@@ -87,6 +113,7 @@ namespace Metal {
             globalDataUBO.sunPosition.y / context.atmosphereRepository.sunDistance,
             context.atmosphereRepository.nightColor, context.atmosphereRepository.dawnColor,
             context.atmosphereRepository.middayColor);
+        context.coreBuffers.globalData->update(&globalDataUBO);
     }
 
 

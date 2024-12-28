@@ -1,10 +1,11 @@
 #ifndef TILEINFOUBO_H
 #define TILEINFOUBO_H
 #include <glm/vec3.hpp>
+#include <array>
 
 namespace Metal {
-    struct TileInfoUBO {
-        alignas(16) glm::vec3 tileCenter;
+    struct TileInfoUBO final {
+        std::array<glm::vec4, 9> tileCenterValid{};
     };
 }
 

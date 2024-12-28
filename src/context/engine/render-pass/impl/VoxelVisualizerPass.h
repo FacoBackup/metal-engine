@@ -8,8 +8,7 @@
 namespace Metal {
     class VoxelVisualizerPass final : public AbstractRenderPass{
         std::string currentTile;
-        VoxelDebugSettingsPushConstant settings;
-        bool hasData = false;
+        VoxelDebugSettingsPushConstant settings{};
 
     public:
         explicit VoxelVisualizerPass(ApplicationContext &context)
