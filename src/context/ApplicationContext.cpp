@@ -54,6 +54,7 @@ namespace Metal {
         guiContext.onInitialize();
         filesService.onInitialize();
         editorPanel.onInitialize();
+        engineContext.onInitialize();
 
         GLFWwindow *window = glfwContext.getWindow();
         while (!glfwWindowShouldClose(window)) {

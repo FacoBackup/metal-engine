@@ -4,21 +4,32 @@
 
 #include "WorldTile.h"
 #include "../../../common/AbstractRuntimeComponent.h"
+#include "../../../common/inspection/Inspectable.h"
 #include "../../../enum/engine-definitions.h"
 
 namespace Metal {
-    class WorldGridRepository final : public AbstractRuntimeComponent {
+    class WorldGridRepository final : public AbstractRuntimeComponent, public Inspectable {
+        int numberOfTiles = 10;
         std::unordered_map<std::string, WorldTile> tiles{};
         std::array<WorldTile *, 9> loadedWorldTiles{};
         WorldTile *currentTile = nullptr;
+        unsigned int prevSize = 0;
 
     public:
+        bool hasMainTileChanged = false;
+
+        [[nodiscard]] int getNumberOfTiles() const {
+            return numberOfTiles;
+        }
+
+        bool updateLoadedTiles();
+
         explicit WorldGridRepository(ApplicationContext &context)
             : AbstractRuntimeComponent(context) {
         }
 
         static int getTileLocation(const float v) {
-            return static_cast<int>(std::floor(v / TILE_SIZE));
+            return static_cast<int>(std::floor((v + TILE_SIZE / 2.f) / TILE_SIZE));
         }
 
         /**
@@ -30,6 +41,8 @@ namespace Metal {
         WorldTile *getOrCreateTile(const glm::vec3 &point);
 
         WorldTile *getCurrentTile() const;
+
+        WorldTile *getTile(const glm::vec3 &point);
 
         void createIfAbsent(int x, int z);
 
@@ -43,7 +56,17 @@ namespace Metal {
 
         void moveBetweenTiles(EntityID entityId, WorldTile *previousWorldTile, WorldTile *newWorldTile) const;
 
-        SAVE_TEMPLATE(tiles)
+        std::unordered_map<std::string, WorldTile> &getTiles() {
+            return tiles;
+        }
+
+        const char *getIcon() override;
+
+        const char *getTitle() override;
+
+        void registerFields() override;
+
+        SAVE_TEMPLATE(tiles, numberOfTiles)
     };
 } // Metal
 

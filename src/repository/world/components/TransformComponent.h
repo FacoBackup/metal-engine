@@ -28,7 +28,8 @@ namespace Metal {
             model[3][0], model[3][1], model[3][2], model[3][3],
             translation.x, translation.y, translation.z,
             rotation.x, rotation.y, rotation.z, rotation.w,
-            scale.x, scale.y, scale.z
+            scale.x, scale.y, scale.z,
+            entityId
         )
     };
 }

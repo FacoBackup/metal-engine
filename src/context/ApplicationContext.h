@@ -12,8 +12,10 @@
 #include "../repository/descriptors/CoreDescriptorSets.h"
 #include "../repository/render-pass/CoreRenderPasses.h"
 #include "../repository/texture/CoreTextures.h"
+#include "../repository/voxel/VoxelizationRepository.h"
 
 #include "../service/mesh/MeshService.h"
+#include "../service/world/WorldGridService.h"
 #include "../service/texture/TextureService.h"
 #include "../service/framebuffer/FrameBufferService.h"
 #include "../service/pipeline/PipelineService.h"
@@ -35,6 +37,9 @@
 #include "../repository/dock/DockRepository.h"
 #include "../repository/editor/EditorRepository.h"
 #include "../service/notification/NotificationService.h"
+#include "../service/transform/TransformService.h"
+#include "../service/voxel/SVOService.h"
+#include "../service/voxel/VoxelizationService.h"
 #include "editor/EditorPanel.h"
 #include "gui/GuiContext.h"
 
@@ -74,6 +79,10 @@ namespace Metal {
         TextureImporterService textureImporter{*this};
         FilesService filesService{*this};
         CameraService cameraService{*this};
+        VoxelizationService voxelizationService{*this};
+        SVOService svoService{*this};
+        WorldGridService worldGridService{*this};
+        TransformService transformService{*this};
         // ----------- Services
 
         // ----------- Repository
@@ -84,6 +93,7 @@ namespace Metal {
         AtmosphereRepository atmosphereRepository{};
         DockRepository dockRepository{*this};
         EditorRepository editorRepository{};
+        VoxelizationRepository voxelizationRepository{};
         // ----------- Repository
 
         [[nodiscard]] bool isDebugMode() const { return debugMode; }

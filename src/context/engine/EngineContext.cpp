@@ -8,11 +8,18 @@
 #include "render-pass/impl/PostProcessingPass.h"
 #include "render-pass/tools/GridRenderPass.h"
 #include "../../service/camera/Camera.h"
+#include "render-pass/impl/VoxelVisualizerPass.h"
 
 namespace Metal {
-    EngineContext::EngineContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {
-        fullScreenRenderPasses.push_back(std::make_unique<GridRenderPass>(context));
+    void EngineContext::onInitialize() {
+        context.worldGridService.onSync();
+        if (context.isDebugMode()) {
+            fullScreenRenderPasses.push_back(std::make_unique<GridRenderPass>(context));
+        }
         fullScreenRenderPasses.push_back(std::make_unique<GBufferShadingPass>(context));
+        if (context.isDebugMode()) {
+            fullScreenRenderPasses.push_back(std::make_unique<VoxelVisualizerPass>(context));
+        }
         postProcessingPasses.push_back(std::make_unique<PostProcessingPass>(context));
         gBufferPasses.push_back(std::make_unique<OpaqueRenderPass>(context));
     }
@@ -29,6 +36,8 @@ namespace Metal {
         if (start == -1) {
             start = currentTimeMs;
         }
+        context.transformService.onSync();
+        context.worldGridService.onSync();
         context.streamingRepository.onSync();
         context.cameraService.onSync();
 
@@ -41,7 +50,17 @@ namespace Metal {
         postProcessingUBO.chromaticAberrationEnabled = camera.chromaticAberrationEnabled;
         postProcessingUBO.vignetteEnabled = camera.vignetteEnabled;
         postProcessingUBO.vignetteStrength = camera.vignetteStrength;
+
         context.coreBuffers.postProcessingSettings->update(&postProcessingUBO);
+
+        // UPDATE BASED ON CENTRAL TILE (UPDATE ONLY IF CURRENT TILE HAS CHANGED)
+        if (context.worldGridRepository.hasMainTileChanged) {
+            tileInfoUBO.tileCenter = glm::vec3(context.worldGridRepository.getCurrentTile()->x, 0,
+                                               context.worldGridRepository.getCurrentTile()->z);
+            context.coreBuffers.tileInfo->update(&tileInfoUBO);
+            context.worldGridRepository.hasMainTileChanged = false;
+        }
+
 
         context.coreRenderPasses.gBufferPass->recordCommands(gBufferPasses);
         context.coreRenderPasses.fullScreenPass->recordCommands(fullScreenRenderPasses);

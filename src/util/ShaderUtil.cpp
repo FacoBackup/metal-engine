@@ -30,7 +30,7 @@ namespace Metal {
             .language = GLSLANG_SOURCE_GLSL,
             .stage = stage,
             .client = GLSLANG_CLIENT_VULKAN,
-            .client_version = GLSLANG_TARGET_VULKAN_1_3,
+            .client_version = GLSLANG_TARGET_VULKAN_1_1,
             .target_language = GLSLANG_TARGET_SPV,
             .target_language_version = GLSLANG_TARGET_SPV_1_6,
             .code = pShaderCode,
@@ -38,8 +38,7 @@ namespace Metal {
             .default_profile = GLSLANG_NO_PROFILE,
             .force_default_version_and_profile = false,
             .forward_compatible = false,
-            .messages = static_cast<glslang_messages_t>(
-                GLSLANG_MSG_DEFAULT_BIT | GLSLANG_MSG_VULKAN_RULES_BIT | GLSLANG_MSG_SPV_RULES_BIT),
+            .messages = GLSLANG_MSG_DEFAULT_BIT,
             .resource = glslang_default_resource()
         };
 

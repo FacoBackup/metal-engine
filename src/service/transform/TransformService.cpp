@@ -46,9 +46,7 @@ namespace Metal {
         auxMat42 *= glm::mat4_cast(st->rotation);
         auxMat42 = glm::scale(auxMat42, st->scale); // Scale
 
-        glm::mat4 auxMat4 = auxMat4 * auxMat42;
-
-        st->model = auxMat42;
+        st->model = auxMat4 * auxMat42;
         st->freezeVersion();
 
         translation = glm::vec3(st->model[3]);

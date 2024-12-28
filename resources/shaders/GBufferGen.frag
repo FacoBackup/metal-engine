@@ -11,9 +11,7 @@ layout (location = 2) out vec4 outNormal;
 layout (location = 3) out vec4 outDepthIdUV;
 
 float encode(float depthFunc, float val) {
-    float half_co = depthFunc * 0.5;
-    float clamp_z = max(0.000001, val);
-    return log2(clamp_z) * half_co;
+    return log2(max(0.000001, val)) * depthFunc * 0.5;
 }
 
 mat3 computeTBN(vec3 worldPosition, vec2 initialUV, vec3 normalVec, bool isDecalPass) {
@@ -75,13 +73,11 @@ void main () {
     bool useParallax = false; // TODO - MOVE TO MATERIAL PUSH CONSTANT
     vec2 UV = inUV;
     vec3 W = inPosition;
-    vec3 N = inNormal;
-    float depth = encode(globalData.logDepthFC, gl_FragCoord.z);
-
-    vec3 V = globalData.cameraWorldPosition.xyz - W;
-    float distanceFromCamera = length(V);
+    vec3 N = normalize(inNormal);
     mat3 TBN = computeTBN(W, UV, N, isDecalPass);
     if (useParallax){
+        vec3 V = globalData.cameraWorldPosition.xyz - W;
+        float distanceFromCamera = length(V);
 //        UV = parallaxOcclusionMapping(UV, W, heightMap, parallaxHeightScale, parallaxLayers, distanceFromCamera, TBN);
     }
 
@@ -89,6 +85,6 @@ void main () {
     float checkerValue = mod(checkerPos.x + checkerPos.y + checkerPos.z, 2.0);
     outAlbedoEmissive = vec4(mix(vec3(1), vec3(.1), checkerValue), 0);
     outRoughnessMetallicAO = vec4(.5, .5, 1, 0);
-    outNormal = vec4(inNormal, 1);
-    outDepthIdUV = vec4(depth, inRenderingIndex + 1, inUV);
+    outNormal = vec4(N, 1);
+    outDepthIdUV = vec4(encode(globalData.logDepthFC, gl_FragCoord.z), inRenderingIndex + 1, inUV);
 }

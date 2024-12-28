@@ -3,6 +3,7 @@
 
 #include "../../dto/push-constant/MeshPushConstant.h"
 #include "../../dto/push-constant/GBufferShadingPushConstant.h"
+#include "../../dto/push-constant/VoxelDebugSettingsPushConstant.h"
 #include "../../service/pipeline/PipelineInstance.h"
 #include "../../service/pipeline/PipelineService.h"
 #include "../../service/pipeline/PipelineBuilder.h"
@@ -52,12 +53,24 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.gBufferShadingDescriptor3.get())
                 .addDescriptorSet(context.coreDescriptorSets.brdfDescriptor.get());
         gBufferShadingPipeline = pipelineService.createRenderingPipeline(gBufferShadingPipelineBuilder);
+
+        PipelineBuilder voxelVisualizerPipelineBuilder = PipelineBuilder::Of(
+                    context.coreFrameBuffers.auxFBO,
+                    "QUAD.vert",
+                    "VoxelDebugVisualizer.frag"
+                )
+                .setPushConstantsSize(sizeof(VoxelDebugSettingsPushConstant))
+                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.svoData.get());
+        voxelDebugVisualizerPipeline = pipelineService.createRenderingPipeline(voxelVisualizerPipelineBuilder);
     }
 
     void CorePipelines::dispose() const {
         // TODO - Add button to UI to re-create pipelines and reload shaders
         gBufferPipeline->dispose(vulkanContext);
         gridPipeline->dispose(vulkanContext);
+        gBufferShadingPipeline->dispose(vulkanContext);
         postProcessingPipeline->dispose(vulkanContext);
+        voxelDebugVisualizerPipeline->dispose(vulkanContext);
     }
 } // Metal

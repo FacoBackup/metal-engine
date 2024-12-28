@@ -22,7 +22,7 @@ for (auto it = R.begin(); it != R.end();) {\
 }
 
 #define STREAM(T, V)\
-if (T.getResources().contains(id)) {\
+if (!id.empty() && T.getResources().contains(id)) {\
     auto *e = T.getResources().at(id);\
     e->lastUse = context.engineContext.currentTimeMs;\
     return dynamic_cast<V*>(e);\

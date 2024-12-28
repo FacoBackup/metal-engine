@@ -3,24 +3,43 @@
 #include "../../../context/ApplicationContext.h"
 
 namespace Metal {
-    std::array<WorldTile *, 9> &WorldGridRepository::getLoadedTiles() {
+    bool WorldGridRepository::updateLoadedTiles() {
         if (auto *center = getOrCreateTile(context.worldRepository.camera.position);
-            currentTile != center) {
+            currentTile != center || prevSize != tiles.size()) {
+            hasMainTileChanged = true;
             currentTile = center;
+            prevSize = tiles.size();
             loadedWorldTiles[0] = center;
             for (int i = 0; i < 8; i++) {
-                loadedWorldTiles[i + 1] = &tiles.at(center->adjacentTiles[i]);
+                if (!center->adjacentTiles[i].empty() && tiles.contains(center->adjacentTiles[i])) {
+                    loadedWorldTiles[i + 1] = &tiles.at(center->adjacentTiles[i]);
+                }
             }
+            return true;
         }
+        return false;
+    }
+
+    std::array<WorldTile *, 9> &WorldGridRepository::getLoadedTiles() {
         return loadedWorldTiles;
     }
 
     WorldTile *WorldGridRepository::getOrCreateTile(const glm::vec3 &point) {
         const int tileX = getTileLocation(point.x);
         const int tileZ = getTileLocation(point.z);
-        const std::string id = WorldTile::GetId(tileX, tileZ);
+        const std::string id = TILE_ID(tileX, tileZ);
         if (!tiles.contains(id)) {
             addTile(point);
+        }
+        return &tiles.at(id);
+    }
+
+    WorldTile *WorldGridRepository::getTile(const glm::vec3 &point) {
+        const int tileX = getTileLocation(point.x);
+        const int tileZ = getTileLocation(point.z);
+        const std::string id = TILE_ID(tileX, tileZ);
+        if (!tiles.contains(id)) {
+            return nullptr;
         }
         return &tiles.at(id);
     }
@@ -30,15 +49,16 @@ namespace Metal {
     }
 
     void WorldGridRepository::createIfAbsent(const int x, const int z) {
-        if (std::string id = WorldTile::GetId(x, z); !tiles.contains(id)) {
+        if (std::string id = TILE_ID(x, z); !tiles.contains(id)) {
+            std::cout << "Creating tile " << x << " " << z << " " << id << std::endl;
             tiles.insert({id, WorldTile(x, z, id)});
         }
     }
 
     void WorldGridRepository::addTile(const glm::vec3 &point) {
-        int x = getTileLocation(point.x);
-        int z = getTileLocation(point.z);
-        std::string id = WorldTile::GetId(x, z);
+        const int x = getTileLocation(point.x);
+        const int z = getTileLocation(point.z);
+        std::string id = TILE_ID(x, z);
         if (tiles.contains(id)) {
             return;
         }
@@ -47,7 +67,7 @@ namespace Metal {
         updateAdjacentTiles(&tiles.at(id));
     }
 
-    void WorldGridRepository::updateAdjacentTiles(WorldTile *newTile)  {
+    void WorldGridRepository::updateAdjacentTiles(WorldTile *newTile) {
         const int x = newTile->x;
         const int z = newTile->z;
         const std::array westTile{x, z - 1};
@@ -69,8 +89,8 @@ namespace Metal {
         putAdjacentTile(southWestTile, newTile);
     }
 
-    void WorldGridRepository::putAdjacentTile(const std::array<int, 2> &tileLocation, WorldTile *newTile)  {
-        if (const std::string tileId = WorldTile::GetId(tileLocation[0], tileLocation[1]); tiles.contains(tileId)) {
+    void WorldGridRepository::putAdjacentTile(const std::array<int, 2> &tileLocation, WorldTile *newTile) {
+        if (const std::string tileId = TILE_ID(tileLocation[0], tileLocation[1]); tiles.contains(tileId)) {
             auto &tile = tiles.at(tileId);
             tile.putAdjacentTile(newTile);
             newTile->putAdjacentTile(&tile);
@@ -98,6 +118,18 @@ namespace Metal {
         } else {
             newWorldTile->entities.push_back(entityId);
         }
-        entity->onTile = newWorldTile->id.c_str();
+        entity->onTile = newWorldTile->id;
+    }
+
+    const char *WorldGridRepository::getIcon() {
+        return Icons::grid_view.c_str();
+    }
+
+    const char *WorldGridRepository::getTitle() {
+        return "World grid";
+    }
+
+    void WorldGridRepository::registerFields() {
+        registerInt(numberOfTiles, "", "Number of tiles", 2, 100);
     }
 } // Metal

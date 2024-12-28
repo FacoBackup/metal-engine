@@ -8,7 +8,7 @@ namespace Metal {
     struct AbstractComponent : Inspectable {
         AbstractComponent() = default;
 
-        EntityID getEntityId() const {
+        [[nodiscard]] EntityID getEntityId() const {
             return entityId;
         }
 
@@ -28,7 +28,7 @@ namespace Metal {
             throw std::runtime_error("Not implemented");
         }
 
-    private:
+    protected:
         EntityID entityId{};
     };
 } // Metal

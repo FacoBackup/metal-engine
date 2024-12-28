@@ -1,4 +1,5 @@
 #include "./GlobalData.glsl"
+#include "./CreateRay.glsl"
 
 const vec4 settings = vec4(0, 1, 100, .02);
 
@@ -13,20 +14,6 @@ const vec4 settings = vec4(0, 1, 100, .02);
 layout(location = 0) in vec2 texCoords;
 layout(location = 0) out vec4 finalColor;
 
-vec3 createRay() {
-    // Adjust texCoords for Vulkan's coordinate system
-    vec2 pxNDS = vec2(texCoords.x, texCoords.y) * 2.0 - 1.0;
-    vec3 pointNDS = vec3(pxNDS, -1.0);
-    vec4 pointNDSH = vec4(pointNDS, 1.0);
-
-    // Transform from NDC to eye space
-    vec4 dirEye = globalData.invProj * pointNDSH;
-    dirEye.w = 0.0;
-
-    // Transform from eye space to world space
-    vec3 dirWorld = (globalData.invView * dirEye).xyz;
-    return normalize(dirWorld);
-}
 
 vec3 p = vec3(0);
 bool rayMarch(vec3 ro, vec3 rd, float width) {
@@ -59,7 +46,7 @@ void main() {
     //        vec3 viewSpacePosition = viewSpacePositionFromDepth(depthData, texCoords);
     //        p = vec3(invViewMatrix * vec4(viewSpacePosition, 1.));
     //    } else {
-    vec3 rayDir = createRay();
+    vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
     hasData = rayMarch(globalData.cameraWorldPosition.xyz, rayDir, 1);
     //    }
 

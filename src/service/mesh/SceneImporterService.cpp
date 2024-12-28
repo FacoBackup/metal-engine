@@ -47,7 +47,7 @@ namespace Metal {
                 VertexData vertexData{};
                 vertexData.vertex = glm::vec3(
                     assimpMesh->mVertices[j].x,
-                    assimpMesh->mVertices[j].y,
+                    -assimpMesh->mVertices[j].y,
                     assimpMesh->mVertices[j].z
                 );
                 if (assimpMesh->HasNormals()) {
@@ -140,7 +140,7 @@ namespace Metal {
         Assimp::Importer importer;
         const aiScene *scene = importer.ReadFile(
             pathToFile,
-            aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GlobalScale | aiProcess_FindInstances |
+            aiProcess_FlipWindingOrder | aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GlobalScale | aiProcess_FindInstances |
             aiProcess_PreTransformVertices | aiProcess_GenSmoothNormals);
 
         if (!scene || !scene->HasMeshes()) {
