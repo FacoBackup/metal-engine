@@ -17,7 +17,7 @@
 namespace Metal {
     MeshInstance *MeshService::create(const std::string &id, const LevelOfDetail &levelOfDetail) {
         MeshData *data = stream(id, levelOfDetail);
-        auto *instance = new MeshInstance(id);
+        auto *instance = new MeshInstance(id + levelOfDetail.suffix);
         registerResource(instance);
 
         instance->indexCount = data->indices.size();

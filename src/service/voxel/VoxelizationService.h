@@ -2,6 +2,7 @@
 #define VOXELIZERSERVICE_H
 #include <string>
 #include <unordered_map>
+#include <glm/mat4x4.hpp>
 
 #include "../../common/AbstractRuntimeComponent.h"
 #include "impl/OctreeNode.h"
@@ -16,9 +17,9 @@ namespace Metal {
         void iterateTriangle(const Triangle &triangle,
                              std::unordered_map<std::string, SparseVoxelOctreeBuilder> &builders) const;
 
-        void voxelize(const MeshData *mesh, std::unordered_map<std::string, SparseVoxelOctreeBuilder> &builders) const;
+        void voxelize(const glm::mat4x4 &modelMatrix, const MeshData *mesh, std::unordered_map<std::string, SparseVoxelOctreeBuilder> &builders) const;
 
-        static void FillStorage(unsigned int &bufferIndex, SparseVoxelOctreeData &voxels, OctreeNode *node);
+        static void FillStorage(unsigned int targetDepth, unsigned int &bufferIndex, SparseVoxelOctreeData &voxels, OctreeNode *node);
 
         static void PutData(unsigned int &bufferIndex, OctreeNode *node);
 

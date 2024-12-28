@@ -4,7 +4,7 @@
 
 namespace Metal {
     const char *VoxelizationRepository::getTitle() {
-        return "Voxelization";
+        return "Debug Voxelization";
     }
 
     const char *VoxelizationRepository::getIcon() {
@@ -12,9 +12,9 @@ namespace Metal {
     }
 
     void VoxelizationRepository::registerFields() {
-        registerInt(maxDepth, "", "Max depth", 2, 15);
-        registerBool(randomColors, "Debug", "Random colors");
-        registerBool(showRaySearchCount, "Debug", "Show ray search count");
-        registerBool(showRayTestCount, "Debug", "Show ray test count");
+        registerInt(levelOfDetail, "", "Level of detail", 2, 15);
+        registerBool(randomColors, "", "Random colors");
+        registerBool(showRaySearchCount, "", "Show ray search count");
+        registerBool(showRayTestCount, "", "Show ray test count");
     }
 } // Metal

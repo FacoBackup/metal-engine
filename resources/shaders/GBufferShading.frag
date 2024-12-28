@@ -47,9 +47,7 @@ void main() {
 
     #ifdef DEBUG
     if (push.mode != LIT){
-        if (push.mode == ALBEDO){
-            finalColor = vec4(texture(gBufferAlbedoEmissive, texCoords).rgb, 1);
-        } else if (push.mode == NORMAL){
+        if (push.mode == NORMAL){
             finalColor = vec4(texture(gBufferNormal, texCoords).rgb, 1);
         } else if (push.mode == ROUGHNESS){
             finalColor = vec4(vec3(texture(gBufferRoughnessMetallicAO, texCoords).r), 1);
@@ -61,14 +59,14 @@ void main() {
             finalColor = vec4(vec3(depthData), 1);
         } else if (push.mode == UV){
             finalColor = vec4(texture(gBufferDepthIdUV, texCoords).zw, 0, 1);
-        }else if (push.mode == RANDOM){
+        } else if (push.mode == RANDOM){
             finalColor = vec4(randomColor(int(texture(gBufferDepthIdUV, texCoords).g)), 1);
-        }else if (push.mode == POSITION){
+        } else if (push.mode == POSITION){
             vec3 viewSpacePosition = viewSpacePositionFromDepth(depthData, texCoords, globalData.invProj);
             vec3 worldSpacePosition = vec3(globalData.invView * vec4(viewSpacePosition, 1));
             finalColor = vec4(worldSpacePosition, 1);
         } else {
-             discard;
+            finalColor = vec4(texture(gBufferAlbedoEmissive, texCoords).rgb, 1);
         }
         return;
     }

@@ -1,20 +1,29 @@
 #include "./GlobalData.glsl"
 #include "./CreateRay.glsl"
 
-#define TILE_SIZE 32
+#define HALF_TILE_SIZE 16
 #define MAX_VOXEL_SIZE 2000000
 #define COUNT 32.
 layout(location = 0) in vec2 texCoords;
 layout(location = 0) out vec4 finalColor;
 
-layout(std430, set = 1, binding = 0) readonly buffer OctreeBuffer {
-    // NON LEAF NODES - First 16 bits are the index pointing to the position of this voxel's children | 8 bits are the child mask | 8 bits indicate if the node is a leaf
-    // LEAF NODES - Compressed RGB value 10 bits for red 10 bits for green and 10 bits for blue
-    uint voxels[MAX_VOXEL_SIZE];
-} voxelBuffer;
+#define DEFINE_OCTREE_BUFFER(B, M, N) \
+layout(std430, set = 1, binding = B) readonly buffer M { \
+    uint voxels[MAX_VOXEL_SIZE]; \
+ } N;
 
-layout(set = 1, binding = 1) uniform TileInfo {
-    vec3 tileCenter;
+DEFINE_OCTREE_BUFFER(0, V1, voxelBuffer1)
+DEFINE_OCTREE_BUFFER(1, V2, voxelBuffer2)
+DEFINE_OCTREE_BUFFER(2, V3, voxelBuffer3)
+DEFINE_OCTREE_BUFFER(3, V4, voxelBuffer4)
+DEFINE_OCTREE_BUFFER(4, V5, voxelBuffer5)
+DEFINE_OCTREE_BUFFER(5, V6, voxelBuffer6)
+DEFINE_OCTREE_BUFFER(6, V7, voxelBuffer7)
+DEFINE_OCTREE_BUFFER(7, V8, voxelBuffer8)
+DEFINE_OCTREE_BUFFER(8, V9, voxelBuffer9)
+
+layout(set = 1, binding = 9) uniform TileInfo {
+    vec4 tileCenterValid[9];
 } tileInfo;
 
 layout(push_constant) uniform Push {
@@ -22,16 +31,6 @@ layout(push_constant) uniform Push {
     bool showRaySearchCount;
     bool showRayTestCount;
 } settings;
-
-const vec3 NNN = vec3(-1, -1, -1);
-const vec3 PNN = vec3(1, -1, -1);
-const vec3 NPN = vec3(-1, 1, -1);
-const vec3 PPN = vec3(1, 1, -1);
-const vec3 NNP = vec3(-1, -1, 1);
-const vec3 PNP = vec3(1, -1, 1);
-const vec3 NPP = vec3(-1, 1, 1);
-const vec3 PPP = vec3(1, 1, 1);
-const vec3 POS[8] = vec3[8](NNN, PNN, NPN, PPN, NNP, PNP, NPP, PPP);
 
 float rand(vec3 co) {
     return fract(sin(dot(co, vec3(12.9898, 71.9898, 78.233))) * 43758.5453);
@@ -105,13 +104,13 @@ uint countSetBitsBefore(inout uint mask, inout uint childIndex) {
 
 // Based on https://www.shadertoy.com/view/MlBfRV
 vec4 trace(
+vec3 center,
 Ray ray,
 bool randomColors,
 bool showRaySearchCount,
 bool showRayTestCount
 ) {
-    vec3 center = tileInfo.tileCenter;
-    float scale = TILE_SIZE;
+    float scale = HALF_TILE_SIZE;
     vec3 minBox = center - scale;
     vec3 maxBox = center + scale;
     float minDistance = 1e10;// Large initial value
@@ -123,9 +122,8 @@ bool showRayTestCount
     uint index = 0u;
     int rayTestCount = 0;
     int searchCount = 0;
-    vec4 finalColor = vec4(0);
+    vec3 finalColor = vec3(0);
     int stackPos = 1;
-
     while (stackPos-- > 0) {
         if (showRaySearchCount){
             searchCount ++;
@@ -135,7 +133,7 @@ bool showRayTestCount
         index = stack[stackPos].index;
         scale = stack[stackPos].scale;
 
-        uint voxel_node = voxelBuffer.voxels[index];
+        uint voxel_node = voxelBuffer1.voxels[index];
         uint childGroupIndex = (voxel_node >> 9) & 0x7FFFFFu;
         uint childMask =  (voxel_node & 0xFFu);
         bool isLeafGroup = ((voxel_node >> 8) & 0x1u) == 1u;
@@ -144,7 +142,12 @@ bool showRayTestCount
             if ((childMask & (1u << i)) == 0u){
                 continue;
             }
-            vec3 newCenter = center + scale * POS[i];
+            vec3 offset = vec3(
+            (i & 1u) != 0u ? 1.0 : -1.0,
+            (i & 2u) != 0u ? 1.0 : -1.0,
+            (i & 4u) != 0u ? 1.0 : -1.0
+            );
+            vec3 newCenter = center + scale * offset;
             vec3 minBox = newCenter - scale;
             vec3 maxBox = newCenter + scale;
 
@@ -160,11 +163,9 @@ bool showRayTestCount
             if (entryDist < minDistance) {
                 if (isLeafGroup) {
                     if (randomColors){
-                        finalColor.rgb = randomColor(rand(newCenter.xyz));
-                        finalColor.a = 1;
+                        finalColor = randomColor(rand(newCenter.xyz));
                     } else {
-                        finalColor.rgb = vec3(newCenter.y);
-                        finalColor.a = 1;
+                        finalColor = vec3(newCenter.y);
                     }
                     minDistance = entryDist;
                 } else {
@@ -173,18 +174,18 @@ bool showRayTestCount
             }
         }
     }
-    finalColor.a = showRayTestCount || showRaySearchCount ? 1 : finalColor;
-    return finalColor;
+    return vec4(finalColor, showRaySearchCount || showRayTestCount);
 }
 
 void main() {
     vec3 rayOrigin = globalData.cameraWorldPosition.xyz;
     vec3 rayDirection = createRay(texCoords, globalData.invProj, globalData.invView);
     vec4 outColor = trace(
-    Ray(rayOrigin, rayDirection, 1./rayDirection),
-    settings.randomColors,
-    settings.showRaySearchCount,
-    settings.showRayTestCount
+        tileInfo.tileCenterValid[1].rgb * HALF_TILE_SIZE * 2,
+        Ray(rayOrigin, rayDirection, 1./rayDirection),
+        settings.randomColors,
+        settings.showRaySearchCount,
+        settings.showRayTestCount
     );
 
     if (length(outColor) > 0){

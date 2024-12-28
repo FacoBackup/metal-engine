@@ -25,20 +25,17 @@ namespace Metal {
             }
             ImGui::SameLine();
             if (ImGui::BeginMenu("File")) {
-                if (ImGui::MenuItem("New")) {
-                    // Action for "New"
-                }
                 if (ImGui::MenuItem("Open", "Ctrl+O")) {
-                    context->updateRootPath(true); // TODO - CLEAN STATE
+                    context->updateRootPath(true); // TODO - CLEAR APPLICATION STATE
                 }
                 if (ImGui::MenuItem("Save", "Ctrl+S")) {
                     context->save();
                 }
-                ImGui::Separator(); // Adds a separator line
+                ImGui::Separator();
                 if (ImGui::MenuItem("Exit")) {
                     exit(0);
                 }
-                ImGui::EndMenu(); // End "File" menu
+                ImGui::EndMenu();
             }
 
             // Create an "Edit" menu

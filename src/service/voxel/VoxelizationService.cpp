@@ -10,6 +10,8 @@
 #include "impl/SparseVoxelOctreeData.h"
 #include "impl/Triangle.h"
 
+#define MAX_DEPTH 12
+
 namespace Metal {
     void VoxelizationService::iterateTriangle(const Triangle &triangle,
                                               std::unordered_map<std::string, SparseVoxelOctreeBuilder> &builders)
@@ -19,7 +21,7 @@ namespace Metal {
         const float edgeLength3 = glm::distance(triangle.v2, triangle.v0);
 
         const float maxEdgeLength = std::max(edgeLength1, std::max(edgeLength2, edgeLength3));
-        const auto voxelSize = static_cast<float>(TILE_SIZE / std::pow(2, context.voxelizationRepository.maxDepth));
+        const auto voxelSize = static_cast<float>(TILE_SIZE / std::pow(2, MAX_DEPTH));
         float stepSize = voxelSize / maxEdgeLength;
         if (stepSize < .001f) {
             stepSize = .01f;
@@ -39,7 +41,7 @@ namespace Metal {
                 if (voxelTile != nullptr) {
                     if (!builders.contains(voxelTile->id)) {
                         builders.emplace(voxelTile->id,
-                                         SparseVoxelOctreeBuilder(context.voxelizationRepository.maxDepth, voxelTile));
+                                         SparseVoxelOctreeBuilder(MAX_DEPTH, voxelTile));
                     }
                     builders.at(voxelTile->id).insert(point, std::make_shared<VoxelData>(glm::vec3{255, 255, 255}));
                 }
@@ -47,7 +49,7 @@ namespace Metal {
         }
     }
 
-    void VoxelizationService::voxelize(const MeshData *mesh,
+    void VoxelizationService::voxelize(const glm::mat4x4 &modelMatrix, const MeshData *mesh,
                                        std::unordered_map<std::string, SparseVoxelOctreeBuilder> &builders) const {
         auto &indices = mesh->indices;
         auto &data = mesh->data;
@@ -57,9 +59,9 @@ namespace Metal {
             const auto index1 = indices[i + 1];
             const auto index2 = indices[i + 2];
             auto triangle = Triangle(
-                glm::vec3(data[index].vertex),
-                glm::vec3(data[index1].vertex),
-                glm::vec3(data[index2].vertex)
+                modelMatrix * glm::vec4(data[index].vertex, 1),
+                modelMatrix * glm::vec4(data[index1].vertex, 1),
+                modelMatrix * glm::vec4(data[index2].vertex, 1)
             );
 
             triangle.uv0 = glm::vec2(data[index].uv);
@@ -70,15 +72,16 @@ namespace Metal {
         }
     }
 
-    void VoxelizationService::FillStorage(unsigned int &bufferIndex, SparseVoxelOctreeData &voxels, OctreeNode *node) {
-        if (node->isLeaf) {
+    void VoxelizationService::FillStorage(unsigned int targetDepth, unsigned int &bufferIndex,
+                                          SparseVoxelOctreeData &voxels, OctreeNode *node) {
+        if (node->depth == targetDepth) {
             return;
         }
 
-        voxels.data[node->dataIndex] = node->packVoxelData(bufferIndex);
+        voxels.data[node->dataIndex] = node->packVoxelData(bufferIndex, targetDepth);
         bool isParentOfLeaf = true;
         for (auto &child: node->children) {
-            if (child != nullptr && !child->isLeaf) {
+            if (child != nullptr && child->depth != targetDepth) {
                 PutData(bufferIndex, child.get());
                 isParentOfLeaf = false;
             }
@@ -86,11 +89,11 @@ namespace Metal {
 
         for (auto &child: node->children) {
             if (child != nullptr) {
-                FillStorage(bufferIndex, voxels, child.get());
+                FillStorage(targetDepth, bufferIndex, voxels, child.get());
             }
         }
         if (isParentOfLeaf && node->data != nullptr) {
-            voxels.data[node->dataIndex] = node->packVoxelData(node->data->compress());
+            voxels.data[node->dataIndex] = node->packVoxelData(node->data->compress(), targetDepth);
         }
     }
 
@@ -105,26 +108,18 @@ namespace Metal {
     }
 
     void VoxelizationService::serialize(SparseVoxelOctreeBuilder &builder) const {
-        auto currentTime = Clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime.time_since_epoch());
-        const auto start = duration.count();
+        for (LevelOfDetail &lod: LevelOfDetail::LODs) {
+            unsigned int desiredMaxDepth = MAX_DEPTH - (lod.level - 1);
+            SparseVoxelOctreeData data{};
+            data.data.resize(builder.getVoxelQuantity());
 
-        SparseVoxelOctreeData data{};
-        std::cout << "Serializing voxel data for " << builder.getTile()->id << std::endl;
-        std::cout << "Voxel quantity: " << builder.getVoxelQuantity() << std::endl;
-        data.data.resize(builder.getVoxelQuantity());
+            unsigned int bufferIndex = 0;
+            PutData(bufferIndex, &builder.getRoot());
+            FillStorage(desiredMaxDepth, bufferIndex, data, &builder.getRoot());
 
-        unsigned int bufferIndex = 0;
-        PutData(bufferIndex, &builder.getRoot());
-        FillStorage(bufferIndex, data, &builder.getRoot());
-        std::cout << "Voxel quantity 2: " << data.data.size() << std::endl;
-
-        DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_SVO(builder.getTile()->id), data)
-        std::cout << "Serializing voxel data for " << FORMAT_FILE_SVO(builder.getTile()->id) << std::endl;
-
-        currentTime = Clock::now();
-        duration = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime.time_since_epoch());
-        std::cout << "Serialization took: " << duration.count() - start << "ms" << std::endl;
+            std::string filePath = context.getAssetDirectory() + FORMAT_FILE_SVO(builder.getTile()->id, lod);
+            DUMP_TEMPLATE(filePath, data)
+        }
     }
 
     void VoxelizationService::voxelizeScene() const {
@@ -136,6 +131,8 @@ namespace Metal {
                     auto &meshComponent = context.worldRepository.meshes.at(entity);
                     auto *mesh = context.meshService.stream(meshComponent.meshId, LevelOfDetail::LOD_0);
                     if (mesh != nullptr) {
+                        auto &transformComponent = context.worldRepository.transforms.at(entity);
+
                         auto currentTime = Clock::now();
                         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
                             currentTime.time_since_epoch());
@@ -143,7 +140,7 @@ namespace Metal {
 
 
                         std::cout << "Voxelizing mesh " << meshComponent.getEntityId() << std::endl;
-                        voxelize(mesh, builders);
+                        voxelize(transformComponent.model, mesh, builders);
 
                         currentTime = Clock::now();
                         duration = std::chrono::duration_cast<
@@ -158,5 +155,7 @@ namespace Metal {
         for (auto &t: builders) {
             serialize(t.second);
         }
+
+        context.svoService.disposeAll();
     }
 } // Metal

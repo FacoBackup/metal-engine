@@ -5,21 +5,25 @@
 
 #include "SVOInstance.h"
 #include "../../enum/engine-definitions.h"
+#include "../../enum/LevelOfDetail.h"
 #include "../../context/ApplicationContext.h"
 #include "../../util/serialization-definitions.h"
 #include "impl/SparseVoxelOctreeData.h"
 
 namespace Metal {
-    SVOInstance *SVOService::create(const std::string &id) {
-        if (std::filesystem::exists(context.getAssetDirectory() + FORMAT_FILE_SVO(id))) {
+    SVOInstance *SVOService::create(const std::string &id, const LevelOfDetail &levelOfDetail) {
+        if (std::string fileName = context.getAssetDirectory() + FORMAT_FILE_SVO(id, levelOfDetail);
+            std::filesystem::exists(fileName)) {
+            std::cout << "Streaming SVO " << fileName << std::endl;
             auto data = SparseVoxelOctreeData();
-            PARSE_TEMPLATE(data.load, context.getAssetDirectory() + FORMAT_FILE_SVO(id))
+            PARSE_TEMPLATE(data.load, fileName)
 
-            auto *instance = new SVOInstance(id);
+            auto *instance = new SVOInstance(id + levelOfDetail.suffix);
             registerResource(instance);
             instance->buffer = context.bufferService.createBuffer(data.data.size() * sizeof(uint32_t),
-                                                    VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                                                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+                                                                  VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                                                                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                                                  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
             instance->buffer->update(data.data.data());
             return instance;
         }

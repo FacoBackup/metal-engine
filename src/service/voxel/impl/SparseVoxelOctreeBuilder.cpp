@@ -18,8 +18,8 @@ namespace Metal {
                                                   const std::shared_ptr<VoxelData> &data, glm::ivec3 &position,
                                                   const int depth) {
         node->data = data;
+        node->depth = depth;
         if (depth == maxDepth) {
-            node->isLeaf = true;
             return;
         }
 
@@ -42,7 +42,7 @@ namespace Metal {
             node->addChild(child, childIndex);
             insertInternal(child.get(), point, data, position, depth + 1);
             // Leaf nodes don't need to be included on the tree
-            if (!child->isLeaf) {
+            if (child->depth != maxDepth) {
                 nodeQuantity++;
             }
         }

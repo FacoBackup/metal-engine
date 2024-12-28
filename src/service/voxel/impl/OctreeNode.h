@@ -8,7 +8,7 @@ namespace Metal {
     struct OctreeNode final {
         std::array<std::shared_ptr<OctreeNode>, 8> children;
         std::shared_ptr<VoxelData> data = nullptr;
-        bool isLeaf = false;
+        unsigned int depth = 0;
 
         /**
          * Target location of this node's data inside the SSBO buffer
@@ -26,16 +26,17 @@ namespace Metal {
 
         void addChild(const std::shared_ptr<OctreeNode> &child, int index);
 
-        void prepareData();
+        void prepareData(unsigned int targetDepth);
 
         /**
          * 23 bits for group index
          * 1 bit for is leaf group mask
          * 8 bits for child mask, which indicates if a child is preset at that octant
          * @param childGroupIndex
+         * @param targetDepth max depth used to define if the node is a leaf or not
          * @return
          */
-        unsigned int packVoxelData(unsigned int childGroupIndex);
+        unsigned int packVoxelData(unsigned int childGroupIndex, unsigned int targetDepth);
     };
 } // Metal
 

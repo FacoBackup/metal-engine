@@ -27,6 +27,10 @@ namespace Metal {
     public:
         void onInitialize() override;
 
+        void updatePostProcessingData();
+
+        void updateVoxelData();
+
         explicit EngineContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {
         }
 

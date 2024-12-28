@@ -3,17 +3,16 @@
 #include "../abstract/AbstractResourceService.h"
 
 namespace Metal {
+    struct LevelOfDetail;
     struct SVOInstance;
-}
 
-namespace Metal {
-    class SVOService final : public AbstractResourceService{
+    class SVOService final : public AbstractResourceService {
     public:
         explicit SVOService(ApplicationContext &context)
             : AbstractResourceService(context) {
         }
 
-        SVOInstance *create(const std::string &id);
+        SVOInstance *create(const std::string &id, const LevelOfDetail &levelOfDetail);
     };
 } // Metal
 

@@ -1,6 +1,8 @@
 #include "StreamingRepository.h"
 
 #include "../../context/ApplicationContext.h"
+#include "../../service/voxel/SVOInstance.h"
+#include "../../enum/LevelOfDetail.h"
 #include "../../service/mesh/MeshInstance.h"
 #include "../../service/texture/TextureInstance.h"
 #include <iostream>
@@ -22,8 +24,8 @@ for (auto it = R.begin(); it != R.end();) {\
 }
 
 #define STREAM(T, V)\
-if (!id.empty() && T.getResources().contains(id)) {\
-    auto *e = T.getResources().at(id);\
+if (!id.empty() && T.getResources().contains(id + lod.suffix)) {\
+    auto *e = T.getResources().at(id + lod.suffix);\
     e->lastUse = context.engineContext.currentTimeMs;\
     return dynamic_cast<V*>(e);\
 }\
@@ -46,6 +48,10 @@ namespace Metal {
         STREAM(context.meshService, MeshInstance)
     }
 
+    SVOInstance *StreamingRepository::streamSVO(const std::string &id, const LevelOfDetail &lod) {
+        STREAM(context.svoService, SVOInstance)
+    }
+
     TextureInstance *StreamingRepository::streamTexture(const std::string &id, const LevelOfDetail &lod) {
         STREAM(context.textureService, TextureInstance)
     }
@@ -55,6 +61,7 @@ namespace Metal {
             sinceLastCleanup = context.engineContext.currentTime;
             DISPOSAL(context.meshService.getResources())
             DISPOSAL(context.textureService.getResources())
+            DISPOSAL(context.svoService.getResources())
         }
     }
 }
