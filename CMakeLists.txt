@@ -247,6 +247,7 @@ add_executable(
         src/dto/push-constant/VoxelDebugSettingsPushConstant.h
         src/service/world/WorldGridService.cpp
         src/service/world/WorldGridService.h
+        src/dto/ubo/TileInfoUBO.h
 )
 
 

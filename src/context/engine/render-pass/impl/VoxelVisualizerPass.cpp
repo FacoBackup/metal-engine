@@ -25,9 +25,9 @@ namespace Metal {
         if (hasData) {
             currentTile = context.worldGridRepository.getCurrentTile()->id;
 
-            settings.showRaySearchCount = context.voxelizationRepository.randomColors;
+            settings.randomColors = context.voxelizationRepository.randomColors;
             settings.showRaySearchCount = context.voxelizationRepository.showRaySearchCount;
-            settings.showRaySearchCount = context.voxelizationRepository.showRayTestCount;
+            settings.showRayTestCount = context.voxelizationRepository.showRayTestCount;
             recordPushConstant(&settings);
             recordDrawSimpleInstanced(3, 1);
         }

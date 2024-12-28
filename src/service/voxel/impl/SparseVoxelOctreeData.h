@@ -7,8 +7,7 @@
 
 namespace Metal {
     struct SparseVoxelOctreeData final {
-        std::vector<unsigned int> data{};
-        glm::vec3 tileCenter{};
+        std::vector<uint32_t> data{};
 
         SAVE_TEMPLATE(data)
     };

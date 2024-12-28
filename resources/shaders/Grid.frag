@@ -46,7 +46,7 @@ void main() {
     //        vec3 viewSpacePosition = viewSpacePositionFromDepth(depthData, texCoords);
     //        p = vec3(invViewMatrix * vec4(viewSpacePosition, 1.));
     //    } else {
-    vec3 rayDir = createRay(texCoords);
+    vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
     hasData = rayMarch(globalData.cameraWorldPosition.xyz, rayDir, 1);
     //    }
 

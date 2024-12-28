@@ -7,6 +7,7 @@
 #include "../../dto/ubo/GlobalDataUBO.h"
 #include "../../dto/ubo/PPSettingsUBO.h"
 #include "../../common/AbstractRuntimeComponent.h"
+#include "../../dto/ubo/TileInfoUBO.h"
 #include "render-pass/AbstractRenderPass.h"
 
 using Clock = std::chrono::high_resolution_clock;
@@ -16,6 +17,7 @@ namespace Metal {
     class EngineContext final : public AbstractRuntimeComponent {
         GlobalDataUBO globalDataUBO{};
         PPSettingsUBO postProcessingUBO{};
+        TileInfoUBO tileInfoUBO{};
         long long start = -1;
 
         std::vector<std::unique_ptr<AbstractRenderPass> > fullScreenRenderPasses;

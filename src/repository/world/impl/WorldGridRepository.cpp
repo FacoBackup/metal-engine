@@ -6,6 +6,7 @@ namespace Metal {
     bool WorldGridRepository::updateLoadedTiles() {
         if (auto *center = getOrCreateTile(context.worldRepository.camera.position);
             currentTile != center || prevSize != tiles.size()) {
+            hasMainTileChanged = true;
             currentTile = center;
             prevSize = tiles.size();
             loadedWorldTiles[0] = center;

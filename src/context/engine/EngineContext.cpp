@@ -50,7 +50,17 @@ namespace Metal {
         postProcessingUBO.chromaticAberrationEnabled = camera.chromaticAberrationEnabled;
         postProcessingUBO.vignetteEnabled = camera.vignetteEnabled;
         postProcessingUBO.vignetteStrength = camera.vignetteStrength;
+
         context.coreBuffers.postProcessingSettings->update(&postProcessingUBO);
+
+        // UPDATE BASED ON CENTRAL TILE (UPDATE ONLY IF CURRENT TILE HAS CHANGED)
+        if (context.worldGridRepository.hasMainTileChanged) {
+            tileInfoUBO.tileCenter = glm::vec3(context.worldGridRepository.getCurrentTile()->x, 0,
+                                               context.worldGridRepository.getCurrentTile()->z);
+            context.coreBuffers.tileInfo->update(&tileInfoUBO);
+            context.worldGridRepository.hasMainTileChanged = false;
+        }
+
 
         context.coreRenderPasses.gBufferPass->recordCommands(gBufferPasses);
         context.coreRenderPasses.fullScreenPass->recordCommands(fullScreenRenderPasses);

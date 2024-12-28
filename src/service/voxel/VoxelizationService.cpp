@@ -117,7 +117,6 @@ namespace Metal {
         unsigned int bufferIndex = 0;
         PutData(bufferIndex, &builder.getRoot());
         FillStorage(bufferIndex, data, &builder.getRoot());
-        data.tileCenter = glm::vec3(builder.getTile()->x, 0, builder.getTile()->z);
         std::cout << "Voxel quantity 2: " << data.data.size() << std::endl;
 
         DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_SVO(builder.getTile()->id), data)

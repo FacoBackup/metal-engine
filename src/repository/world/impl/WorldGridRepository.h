@@ -16,6 +16,8 @@ namespace Metal {
         unsigned int prevSize = 0;
 
     public:
+        bool hasMainTileChanged = false;
+
         [[nodiscard]] int getNumberOfTiles() const {
             return numberOfTiles;
         }

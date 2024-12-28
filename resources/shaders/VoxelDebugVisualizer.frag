@@ -11,8 +11,11 @@ layout(std430, set = 1, binding = 0) readonly buffer OctreeBuffer {
     // NON LEAF NODES - First 16 bits are the index pointing to the position of this voxel's children | 8 bits are the child mask | 8 bits indicate if the node is a leaf
     // LEAF NODES - Compressed RGB value 10 bits for red 10 bits for green and 10 bits for blue
     uint voxels[MAX_VOXEL_SIZE];
-    vec3 tileCenter;
 } voxelBuffer;
+
+layout(set = 1, binding = 1) uniform TileInfo {
+    vec3 tileCenter;
+} tileInfo;
 
 layout(push_constant) uniform Push {
     bool randomColors;
@@ -107,7 +110,7 @@ bool randomColors,
 bool showRaySearchCount,
 bool showRayTestCount
 ) {
-    vec3 center = voxelBuffer.tileCenter;
+    vec3 center = tileInfo.tileCenter;
     float scale = TILE_SIZE;
     vec3 minBox = center - scale;
     vec3 maxBox = center + scale;
@@ -170,13 +173,13 @@ bool showRayTestCount
             }
         }
     }
-    finalColor.a = showRayTestCount || showRaySearchCount ? 1 : finalColor.a;
+    finalColor.a = showRayTestCount || showRaySearchCount ? 1 : finalColor;
     return finalColor;
 }
 
 void main() {
     vec3 rayOrigin = globalData.cameraWorldPosition.xyz;
-    vec3 rayDirection = createRay(texCoords);
+    vec3 rayDirection = createRay(texCoords, globalData.invProj, globalData.invView);
     vec4 outColor = trace(
     Ray(rayOrigin, rayDirection, 1./rayDirection),
     settings.randomColors,
