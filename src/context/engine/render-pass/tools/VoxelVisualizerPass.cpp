@@ -13,7 +13,7 @@ namespace Metal {
     }
 
     void VoxelVisualizerPass::onSync() {
-        settings.randomColors = context.editorRepository.randomColorsVoxels;
+        settings.voxelDebugFlag = context.editorRepository.voxelDebugFlag;
         settings.showRaySearchCount = context.editorRepository.showRaySearchCountVoxels;
         settings.showRayTestCount = context.editorRepository.showRayTestCountVoxels;
         recordPushConstant(&settings);

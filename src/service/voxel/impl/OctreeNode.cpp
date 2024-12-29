@@ -7,12 +7,12 @@ namespace Metal {
 
     void OctreeNode::prepareData(unsigned int targetDepth) {
         childMask = 0;
-        leafMask = 0;
+        isLeafMask = 0;
         for (unsigned int i = 0; i < 8; i++) {
             if (auto &child = children[i]; child != nullptr) {
                 childMask |= (1 << i);
                 if (child->depth == targetDepth) {
-                    leafMask = 1;
+                    isLeafMask = 1;
                 }
             }
         }
@@ -20,6 +20,6 @@ namespace Metal {
 
     unsigned int OctreeNode::packVoxelData(unsigned int childGroupIndex, unsigned int targetDepth) {
         prepareData(targetDepth);
-        return (childGroupIndex << 9) | (leafMask << 8) | (childMask);
+        return (childGroupIndex << 9) | childMask << 1 | isLeafMask;
     }
 } // Metal

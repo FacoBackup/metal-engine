@@ -10,6 +10,9 @@ namespace Metal {
         std::shared_ptr<VoxelData> data = nullptr;
         unsigned int depth = 0;
 
+        bool isLeaf(unsigned int maxDepth) const {
+            return maxDepth == depth;
+        }
         /**
          * Target location of this node's data inside the SSBO buffer
          */
@@ -17,7 +20,7 @@ namespace Metal {
         /**
          * Indicates whether the child on the index of the bit is a leaf node or not (1 bit for leaf 0 otherwise)
          */
-        int leafMask = 0;
+        int isLeafMask = 0;
 
         /**
          * Indicates whether a child is present at the index represented by the bit set to 1

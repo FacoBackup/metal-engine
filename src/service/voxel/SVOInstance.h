@@ -10,7 +10,8 @@ namespace Metal {
      * Stores reference to vulkan descriptor set
      */
     struct SVOInstance final : RuntimeResource {
-        std::shared_ptr<BufferInstance> buffer = nullptr;
+        std::shared_ptr<BufferInstance> voxelsBuffer = nullptr;
+        std::shared_ptr<BufferInstance> voxelMaterialBuffer = nullptr;
 
         explicit SVOInstance(const std::string &id) : RuntimeResource(id) {
         }

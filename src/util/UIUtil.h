@@ -78,8 +78,6 @@ namespace Metal::UIUtil {
                 return Icons::view_in_ar;
             case EntryType::TEXTURE:
                 return Icons::texture;
-            case EntryType::MATERIAL:
-                return Icons::format_paint;
             case EntryType::DIRECTORY:
                 return Icons::folder;
             case EntryType::SCENE:

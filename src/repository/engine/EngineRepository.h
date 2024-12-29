@@ -6,6 +6,7 @@
 
 namespace Metal {
     struct EngineRepository final : Inspectable {
+        bool voxelEnabled = false;
         int voxelLevelOfDetail = 0;
         float voxelRaytracingBias = 2;
         int numberOfTiles = 10;

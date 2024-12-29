@@ -20,11 +20,17 @@ namespace Metal {
 
             auto *instance = new SVOInstance(id + levelOfDetail.suffix);
             registerResource(instance);
-            instance->buffer = context.bufferService.createBuffer(data.data.size() * sizeof(uint32_t),
+            instance->voxelsBuffer = context.bufferService.createBuffer(data.data.size() * sizeof(uint32_t),
                                                                   VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                                                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                                   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-            instance->buffer->update(data.data.data());
+            instance->voxelsBuffer->update(data.data.data());
+
+            instance->voxelMaterialBuffer = context.bufferService.createBuffer(data.materialData.size() * sizeof(uint32_t),
+                                                                  VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                                                                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                                                  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+            instance->voxelMaterialBuffer->update(data.materialData.data());
             return instance;
         }
         return nullptr;

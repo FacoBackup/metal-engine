@@ -12,6 +12,7 @@ namespace Metal {
         unsigned int maxDepth = 0;
         OctreeNode root{};
         unsigned int nodeQuantity = 1;
+        unsigned int leafVoxelQuantity = 0;
         WorldTile *tile = nullptr;
 
         void insertInternal(OctreeNode *node, glm::vec3 &point, const std::shared_ptr<VoxelData> &data,
@@ -25,6 +26,10 @@ namespace Metal {
 
         [[nodiscard]] unsigned int getVoxelQuantity() const {
             return nodeQuantity;
+        }
+
+        [[nodiscard]] unsigned int getLeafVoxelQuantity() const {
+            return leafVoxelQuantity;
         }
 
         OctreeNode &getRoot() {

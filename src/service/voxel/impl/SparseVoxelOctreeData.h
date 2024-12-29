@@ -8,8 +8,9 @@
 namespace Metal {
     struct SparseVoxelOctreeData final {
         std::vector<uint32_t> data{};
+        std::vector<uint32_t> materialData{};
 
-        SAVE_TEMPLATE(data)
+        SAVE_TEMPLATE(data, materialData)
     };
 }
 

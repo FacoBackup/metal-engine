@@ -7,6 +7,7 @@
 
 namespace Metal {
     void EngineRepository::registerFields() {
+        registerBool(voxelEnabled, "Global illumination", "Enabled?");
         registerInt(voxelLevelOfDetail, "Global illumination", LEVEL_OF_DETAIL, 0, 4);
         registerFloat(voxelRaytracingBias, "Global illumination", "Raytracing bias", 0, 5, false, .001);
         registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);

@@ -26,7 +26,9 @@ struct Hit {
     vec3 hitPosition;
     float voxelSize;
     uint voxel;
+    uint voxelData;
     uint voxelBufferIndex;
+    uint bufferIndex;
 };
 struct Ray { vec3 o, d, invDir; };
 struct Stack { uint index;vec3 center;float scale; };
@@ -80,6 +82,31 @@ uint countSetBitsBefore(inout uint mask, inout uint childIndex) {
     return bitCount(maskBefore);
 }
 
+uint getVoxel(uint index, uint bufferIndex){
+    switch (bufferIndex){
+        case 1:
+        return voxelBuffer1.voxels[index];
+        case 2:
+        return voxelBuffer2.voxels[index];
+        case 3:
+        return voxelBuffer3.voxels[index];
+        case 4:
+        return voxelBuffer4.voxels[index];
+        case 5:
+        return voxelBuffer5.voxels[index];
+        case 6:
+        return voxelBuffer6.voxels[index];
+        case 7:
+        return voxelBuffer7.voxels[index];
+        case 8:
+        return voxelBuffer8.voxels[index];
+        case 9:
+        return voxelBuffer9.voxels[index];
+        default :
+        return 0;
+    }
+}
+
 Hit trace(
 in Ray ray,
 uint bufferIndex
@@ -90,7 +117,7 @@ inout vec3 finalColor
 #endif
 ) {
     vec4 localTileInfo = tileInfo.tileCenterValid[bufferIndex - 1];
-    if (localTileInfo.w == 0) { return Hit(false, vec3(0), 0, 0, 0); }
+    if (localTileInfo.w == 0) { return Hit(false, vec3(0), 0, 0, 0, 0, bufferIndex); }
 
     vec3 center = localTileInfo.xyz * HALF_TILE_SIZE * 2;
     float scale = HALF_TILE_SIZE;
@@ -98,8 +125,8 @@ inout vec3 finalColor
     vec3 maxBox = center + scale;
     float minDistance = 1e10;// Large initial value
 
-    if (!intersect(minBox, maxBox, ray)) return Hit(false, vec3(0), 0, 0, 0);
-    Stack stack[10];
+    if (!intersect(minBox, maxBox, ray)) return Hit(false, vec3(0), 0, 0, 0, 0, bufferIndex);
+    Stack stack[6];
     scale *= 0.5f;
     stack[0] = Stack(0u, center, scale);
 
@@ -109,7 +136,7 @@ inout vec3 finalColor
     int searchCount = 0;
     #endif
     int stackPos = 1;
-    Hit hitData = Hit(false, vec3(0), 0, 0, 0);
+    Hit hitData = Hit(false, vec3(0), 0, 0, 0, 0, bufferIndex);
     while (stackPos-- > 0) {
         #ifdef DEBUG_VOXELS
         if (showRaySearchCount){
@@ -120,41 +147,11 @@ inout vec3 finalColor
         center = stack[stackPos].center;
         index = stack[stackPos].index;
         scale = stack[stackPos].scale;
-        uint voxel_node;
-        switch (bufferIndex){
-            case 1:
-            voxel_node = voxelBuffer1.voxels[index];
-            break;
-            case 2:
-            voxel_node = voxelBuffer2.voxels[index];
-            break;
-            case 3:
-            voxel_node = voxelBuffer3.voxels[index];
-            break;
-            case 4:
-            voxel_node = voxelBuffer4.voxels[index];
-            break;
-            case 5:
-            voxel_node = voxelBuffer5.voxels[index];
-            break;
-            case 6:
-            voxel_node = voxelBuffer6.voxels[index];
-            break;
-            case 7:
-            voxel_node = voxelBuffer7.voxels[index];
-            break;
-            case 8:
-            voxel_node = voxelBuffer8.voxels[index];
-            break;
-            case 9:
-            voxel_node = voxelBuffer9.voxels[index];
-            break;
-            default :
-            return hitData;
-        }
+        uint voxel_node = getVoxel(index, bufferIndex);
+
+        bool isLeafGroup = ((voxel_node & 0x1u) == 1u);
+        uint childMask = (voxel_node >> 1) & 0xFFu;
         uint childGroupIndex = (voxel_node >> 9) & 0x7FFFFFu;
-        uint childMask =  (voxel_node & 0xFFu);
-        bool isLeafGroup = ((voxel_node >> 8) & 0x1u) == 1u;
 
         for (uint i = 0u; i < 8u; ++i) {
             if ((childMask & (1u << i)) == 0u){
@@ -187,6 +184,8 @@ inout vec3 finalColor
                     hitData.voxel = voxel_node;
                     hitData.voxelBufferIndex = index;
                     hitData.voxelSize = scale;
+                    hitData.voxelData = getVoxel(index + 1, bufferIndex);
+                    index++;
                     minDistance = entryDist;
                 } else {
                     stack[stackPos++] = Stack(childGroupIndex + countSetBitsBefore(childMask, i), newCenter, scale * 0.5f);

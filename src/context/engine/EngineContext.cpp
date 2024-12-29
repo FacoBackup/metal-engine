@@ -52,7 +52,7 @@ namespace Metal {
                     if (svo != nullptr) {
                         context.coreDescriptorSets.svoData->addBufferDescriptor(
                             i + 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                            svo->buffer);
+                            svo->voxelsBuffer);
                         tileInfoUBO.tileCenterValid[i] = glm::vec4(tile->x, 0,
                                                                    tile->z, 1);
                         i++;

@@ -41,6 +41,10 @@ namespace Metal {
             auto child = std::make_shared<OctreeNode>();
             node->addChild(child, childIndex);
             insertInternal(child.get(), point, data, position, depth + 1);
+
+            if (child->depth == maxDepth - 1) {
+                leafVoxelQuantity++;
+            }
             // Leaf nodes don't need to be included on the tree
             if (child->depth != maxDepth) {
                 nodeQuantity++;

@@ -15,6 +15,8 @@ namespace Metal {
 
         PipelineInstance *getPipeline() override;
 
+        bool shouldRun() override;
+
         void onSync() override;
     };
 } // Metal

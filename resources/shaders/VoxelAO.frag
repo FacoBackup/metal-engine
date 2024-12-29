@@ -21,8 +21,9 @@ void main() {
     if (hitData.anyHit){
         if (globalData.lightsQuantity > 0){
             Light l = lightsBuffer.lights[0];
-            vec3 firstHitPos = hitData.hitPosition;
-            ray = Ray(firstHitPos * push.bias, l.position, 1./l.position);
+            vec3 firstHitPos = hitData.hitPosition * push.bias;
+            rayDirection = normalize(l.position - firstHitPos);
+            ray = Ray(firstHitPos, rayDirection, 1./rayDirection);
             hitData = traceAllTiles(ray);
             if (hitData.anyHit) {
                 finalColor = 1 - 1/length(firstHitPos - hitData.hitPosition);

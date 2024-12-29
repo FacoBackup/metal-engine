@@ -16,7 +16,7 @@ namespace Metal {
     struct TransformComponent;
 
     struct EditorRepository final : Inspectable {
-        bool randomColorsVoxels = true;
+        int voxelDebugFlag = 0;
         bool showRaySearchCountVoxels = true;
         bool showRayTestCountVoxels = true;
 
@@ -93,7 +93,10 @@ namespace Metal {
             shadingMode,
             brushModeAdd,
             brushRadius,
-            brushDensity
+            brushDensity,
+            voxelDebugFlag,
+            showRaySearchCountVoxels,
+            showRayTestCountVoxels
         )
     };
 } // Metal

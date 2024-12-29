@@ -6,6 +6,10 @@ namespace Metal {
         return context.corePipelines.voxelAOPipeline;
     }
 
+    bool VoxelAOPass::shouldRun() {
+        return context.engineRepository.voxelEnabled;
+    }
+
     void VoxelAOPass::onSync() {
         pushConstant.bias = context.engineRepository.voxelRaytracingBias;
         recordPushConstant(&pushConstant);
