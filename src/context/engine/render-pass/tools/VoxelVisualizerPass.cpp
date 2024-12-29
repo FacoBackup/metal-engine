@@ -1,5 +1,5 @@
 #include "VoxelVisualizerPass.h"
-#include "../../../../context/ApplicationContext.h"
+#include "../../../ApplicationContext.h"
 #include "../../../../enum/LevelOfDetail.h"
 #include "../../../../service/voxel/SVOInstance.h"
 
@@ -13,9 +13,9 @@ namespace Metal {
     }
 
     void VoxelVisualizerPass::onSync() {
-        settings.randomColors = context.voxelizationRepository.randomColors;
-        settings.showRaySearchCount = context.voxelizationRepository.showRaySearchCount;
-        settings.showRayTestCount = context.voxelizationRepository.showRayTestCount;
+        settings.randomColors = context.editorRepository.randomColorsVoxels;
+        settings.showRaySearchCount = context.editorRepository.showRaySearchCountVoxels;
+        settings.showRayTestCount = context.editorRepository.showRayTestCountVoxels;
         recordPushConstant(&settings);
         recordDrawSimpleInstanced(3, 1);
     }

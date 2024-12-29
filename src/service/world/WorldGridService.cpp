@@ -4,7 +4,7 @@
 
 namespace Metal {
     void WorldGridService::addMissingTiles() {
-        const int numberOfTiles = context.worldGridRepository.getNumberOfTiles();
+        const int numberOfTiles = context.engineRepository.numberOfTiles;
         if (const int squared = numberOfTiles * numberOfTiles;
             squared > context.worldGridRepository.getTiles().size()) {
             std::cout << "Adding missing tiles " << squared << " " << context.worldGridRepository.getTiles().size() <<
@@ -24,7 +24,7 @@ namespace Metal {
     }
 
     void WorldGridService::removeExtraTiles() {
-        const int numberOfTiles = context.worldGridRepository.getNumberOfTiles();
+        const int numberOfTiles = context.engineRepository.numberOfTiles;
         if (const int squared = numberOfTiles * numberOfTiles;
             squared < context.worldGridRepository.getTiles().size()) {
             std::cout << "Removing extra tiles " << context.worldGridRepository.getTiles().size() << " " << squared <<

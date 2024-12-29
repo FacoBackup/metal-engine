@@ -16,6 +16,7 @@ namespace Metal {
         CommandBufferRecorder *gBufferPass = nullptr;
         CommandBufferRecorder *fullScreenPass = nullptr;
         CommandBufferRecorder *postProcessingPass = nullptr;
+        CommandBufferRecorder *aoPass = nullptr;
     };
 } // Metal
 

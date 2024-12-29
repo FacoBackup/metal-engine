@@ -7,7 +7,6 @@
 
 namespace Metal {
     class VoxelVisualizerPass final : public AbstractRenderPass{
-        std::string currentTile;
         VoxelDebugSettingsPushConstant settings{};
 
     public:

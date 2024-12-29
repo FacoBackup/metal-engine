@@ -25,9 +25,10 @@ namespace Metal {
         long long start = -1;
         bool hasToUpdateLights = true;
 
+        std::vector<std::unique_ptr<AbstractRenderPass>> aoPass;
         std::vector<std::unique_ptr<AbstractRenderPass> > fullScreenRenderPasses;
         std::vector<std::unique_ptr<AbstractRenderPass> > gBufferPasses;
-        std::vector<std::unique_ptr<AbstractRenderPass> > postProcessingPasses;
+        std::vector<std::unique_ptr<AbstractRenderPass>> postProcessingPasses;
 
     public:
 

@@ -2,7 +2,7 @@
 #include "./DepthUtils.glsl"
 
 
-#define LIGHTS_SET 6
+#define LIGHTS_SET 7
 #define LIGHTS_BINDING 0
 
 #include "./Shading.glsl"
@@ -25,6 +25,7 @@ layout(set = 2, binding = 0) uniform sampler2D gBufferRoughnessMetallicAO;
 layout(set = 3, binding = 0) uniform sampler2D gBufferNormal;
 layout(set = 4, binding = 0) uniform sampler2D gBufferDepthIdUV;
 layout(set = 5, binding = 0) uniform sampler2D brdfSampler;
+layout(set = 6, binding = 0) uniform sampler2D aoSampler;
 
 #ifdef DEBUG
 layout(push_constant) uniform Push {
@@ -59,7 +60,7 @@ void main() {
         } else if (push.mode == METALLIC){
             finalColor = vec4(vec3(texture(gBufferRoughnessMetallicAO, texCoords).g), 1);
         } else if (push.mode == AO){
-            finalColor = vec4(vec3(texture(gBufferRoughnessMetallicAO, texCoords).b), 1);
+            finalColor = vec4(vec3(texture(gBufferRoughnessMetallicAO, texCoords).b * texture(aoSampler, texCoords).r), 1);
         } else if (push.mode == DEPTH){
             finalColor = vec4(vec3(depthData), 1);
         } else if (push.mode == UV){
@@ -87,7 +88,7 @@ void main() {
     vec3 valueRMAOSampler = texture(gBufferRoughnessMetallicAO, texCoords).rgb;
     shaderData.roughness = valueRMAOSampler.r;
     shaderData.metallic = valueRMAOSampler.g;
-    shaderData.ambientOcclusion = valueRMAOSampler.b;
+    shaderData.ambientOcclusion = valueRMAOSampler.b * texture(aoSampler, texCoords).r;
     shaderData.viewSpacePosition = viewSpacePositionFromDepth(depthData, texCoords, globalData.invProj);
     shaderData.worldSpacePosition = vec3(globalData.invView * vec4(shaderData.viewSpacePosition, 1));
     shaderData.V = normalize(globalData.cameraWorldPosition - shaderData.worldSpacePosition);

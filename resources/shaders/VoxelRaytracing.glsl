@@ -22,8 +22,9 @@ DEFINE_OCTREE_BUFFER(8, V8, voxelBuffer8)
 DEFINE_OCTREE_BUFFER(9, V9, voxelBuffer9)
 
 struct Hit {
-    bool hasAny;
+    bool anyHit;
     vec3 hitPosition;
+    float voxelSize;
     uint voxel;
     uint voxelBufferIndex;
 };
@@ -89,7 +90,7 @@ inout vec3 finalColor
 #endif
 ) {
     vec4 localTileInfo = tileInfo.tileCenterValid[bufferIndex - 1];
-    if (localTileInfo.w == 0) { return Hit(false, vec3(0), 0, 0); }
+    if (localTileInfo.w == 0) { return Hit(false, vec3(0), 0, 0, 0); }
 
     vec3 center = localTileInfo.xyz * HALF_TILE_SIZE * 2;
     float scale = HALF_TILE_SIZE;
@@ -97,7 +98,7 @@ inout vec3 finalColor
     vec3 maxBox = center + scale;
     float minDistance = 1e10;// Large initial value
 
-    if (!intersect(minBox, maxBox, ray)) return Hit(false, vec3(0), 0, 0);
+    if (!intersect(minBox, maxBox, ray)) return Hit(false, vec3(0), 0, 0, 0);
     Stack stack[10];
     scale *= 0.5f;
     stack[0] = Stack(0u, center, scale);
@@ -108,7 +109,7 @@ inout vec3 finalColor
     int searchCount = 0;
     #endif
     int stackPos = 1;
-    Hit hitData = Hit(false, vec3(0), 0, 0);
+    Hit hitData = Hit(false, vec3(0), 0, 0, 0);
     while (stackPos-- > 0) {
         #ifdef DEBUG_VOXELS
         if (showRaySearchCount){
@@ -181,10 +182,11 @@ inout vec3 finalColor
             }
             if (entryDist < minDistance) {
                 if (isLeafGroup) {
-                    hitData.hasAny = true;
+                    hitData.anyHit = true;
                     hitData.hitPosition = newCenter;
                     hitData.voxel = voxel_node;
                     hitData.voxelBufferIndex = index;
+                    hitData.voxelSize = scale;
                     minDistance = entryDist;
                 } else {
                     stack[stackPos++] = Stack(childGroupIndex + countSetBitsBefore(childMask, i), newCenter, scale * 0.5f);
@@ -208,56 +210,56 @@ inout vec3 colorData
     , showRaySearchCount, showRayTestCount, colorData
     #endif
     );
-    if (!hitData.hasAny){
+    if (!hitData.anyHit){
         hitData = trace(ray, 2
         #ifdef DEBUG_VOXELS
         , showRaySearchCount, showRayTestCount, colorData
         #endif
         );
     }
-    if (!hitData.hasAny){
+    if (!hitData.anyHit){
         hitData = trace(ray, 3
         #ifdef DEBUG_VOXELS
         , showRaySearchCount, showRayTestCount, colorData
         #endif
         );
     }
-    if (!hitData.hasAny){
+    if (!hitData.anyHit){
         hitData = trace(ray, 4
         #ifdef DEBUG_VOXELS
         , showRaySearchCount, showRayTestCount, colorData
         #endif
         );
     }
-    if (!hitData.hasAny){
+    if (!hitData.anyHit){
         hitData = trace(ray, 5
         #ifdef DEBUG_VOXELS
         , showRaySearchCount, showRayTestCount, colorData
         #endif
         );
     }
-    if (!hitData.hasAny){
+    if (!hitData.anyHit){
         hitData = trace(ray, 6
         #ifdef DEBUG_VOXELS
         , showRaySearchCount, showRayTestCount, colorData
         #endif
         );
     }
-    if (!hitData.hasAny){
+    if (!hitData.anyHit){
         hitData = trace(ray, 7
         #ifdef DEBUG_VOXELS
         , showRaySearchCount, showRayTestCount, colorData
         #endif
         );
     }
-    if (!hitData.hasAny){
+    if (!hitData.anyHit){
         hitData = trace(ray, 8
         #ifdef DEBUG_VOXELS
         , showRaySearchCount, showRayTestCount, colorData
         #endif
         );
     }
-    if (!hitData.hasAny){
+    if (!hitData.anyHit){
         hitData = trace(ray, 9
         #ifdef DEBUG_VOXELS
         , showRaySearchCount, showRayTestCount, colorData

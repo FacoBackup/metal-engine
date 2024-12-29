@@ -120,16 +120,4 @@ namespace Metal {
         }
         entity->onTile = newWorldTile->id;
     }
-
-    const char *WorldGridRepository::getIcon() {
-        return Icons::grid_view.c_str();
-    }
-
-    const char *WorldGridRepository::getTitle() {
-        return "World grid";
-    }
-
-    void WorldGridRepository::registerFields() {
-        registerInt(numberOfTiles, "", "Number of tiles", 2, 100);
-    }
 } // Metal

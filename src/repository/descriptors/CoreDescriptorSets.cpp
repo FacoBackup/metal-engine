@@ -61,6 +61,13 @@ namespace Metal {
         GBUFFER_D(gBufferShadingDescriptor1, 1)
         GBUFFER_D(gBufferShadingDescriptor2, 2)
         GBUFFER_D(gBufferShadingDescriptor3, 3)
+        aoDescriptor = std::make_unique<DescriptorInstance>();
+        aoDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
+        aoDescriptor->create(vulkanContext);
+        aoDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                                      context.coreFrameBuffers.gBufferFBO->vkImageSampler,
+                                                      context.coreFrameBuffers.aoFBO->attachments[0]->vkImageView);
+        aoDescriptor->write(vulkanContext);
 
         // BRDF TEXTURE
         {

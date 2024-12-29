@@ -10,7 +10,8 @@
 #include "render-pass/impl/PostProcessingPass.h"
 #include "render-pass/tools/GridRenderPass.h"
 #include "../../service/camera/Camera.h"
-#include "render-pass/impl/VoxelVisualizerPass.h"
+#include "render-pass/impl/VoxelAOPass.h"
+#include "render-pass/tools/VoxelVisualizerPass.h"
 #include "render-pass/tools/IconsPass.h"
 
 namespace Metal {
@@ -24,6 +25,7 @@ namespace Metal {
             fullScreenRenderPasses.push_back(std::make_unique<VoxelVisualizerPass>(context));
             fullScreenRenderPasses.push_back(std::make_unique<IconsPass>(context));
         }
+        aoPass.push_back(std::make_unique<VoxelAOPass>(context));
         postProcessingPasses.push_back(std::make_unique<PostProcessingPass>(context));
         gBufferPasses.push_back(std::make_unique<OpaqueRenderPass>(context));
     }
@@ -46,7 +48,7 @@ namespace Metal {
             for (auto *tile: context.worldGridRepository.getLoadedTiles()) {
                 if (tile != nullptr) {
                     const auto *svo = context.streamingRepository.streamSVO(
-                        tile->id, LevelOfDetail::OfNumber(context.voxelizationRepository.levelOfDetail));
+                        tile->id, LevelOfDetail::OfNumber(context.engineRepository.voxelLevelOfDetail));
                     if (svo != nullptr) {
                         context.coreDescriptorSets.svoData->addBufferDescriptor(
                             i + 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -92,6 +94,7 @@ namespace Metal {
         updateVoxelData();
         updateLights();
 
+        context.coreRenderPasses.aoPass->recordCommands(aoPass);
         context.coreRenderPasses.gBufferPass->recordCommands(gBufferPasses);
         context.coreRenderPasses.fullScreenPass->recordCommands(fullScreenRenderPasses);
         context.coreRenderPasses.postProcessingPass->recordCommands(postProcessingPasses);
@@ -128,16 +131,16 @@ namespace Metal {
         globalDataUBO.logDepthFC = 2.0f / (std::log(camera.projectionMatrix[0][0] + 1) / std::log(2));
         globalDataUBO.lightsQuantity = lightsCount;
 
-        if (context.atmosphereRepository.incrementTime) {
-            context.atmosphereRepository.elapsedTime += .0005f * context.atmosphereRepository.elapsedTimeSpeed;
+        if (context.engineRepository.incrementTime) {
+            context.engineRepository.elapsedTime += .0005f * context.engineRepository.elapsedTimeSpeed;
         }
-        globalDataUBO.sunPosition = glm::vec3(std::sin(context.atmosphereRepository.elapsedTime),
-                                              std::cos(context.atmosphereRepository.elapsedTime),
-                                              0) * context.atmosphereRepository.sunDistance;
+        globalDataUBO.sunPosition = glm::vec3(std::sin(context.engineRepository.elapsedTime),
+                                              std::cos(context.engineRepository.elapsedTime),
+                                              0) * context.engineRepository.sunDistance;
         globalDataUBO.sunColor = CalculateSunColor(
-            globalDataUBO.sunPosition.y / context.atmosphereRepository.sunDistance,
-            context.atmosphereRepository.nightColor, context.atmosphereRepository.dawnColor,
-            context.atmosphereRepository.middayColor);
+            globalDataUBO.sunPosition.y / context.engineRepository.sunDistance,
+            context.engineRepository.nightColor, context.engineRepository.dawnColor,
+            context.engineRepository.middayColor);
         context.coreBuffers.globalData->update(&globalDataUBO);
     }
 

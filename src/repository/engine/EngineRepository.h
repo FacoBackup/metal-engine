@@ -1,11 +1,14 @@
-#ifndef ATMOSPHEREREPOSITORY_H
-#define ATMOSPHEREREPOSITORY_H
+#ifndef ENGINEREPO_H
+#define ENGINEREPO_H
 #include "../../common/inspection/Inspectable.h"
 #include <glm/vec3.hpp>
 #include "../../util/serialization-definitions.h"
 
 namespace Metal {
-    struct AtmosphereRepository final : Inspectable {
+    struct EngineRepository final : Inspectable {
+        int voxelLevelOfDetail = 0;
+        float voxelRaytracingBias = 2;
+        int numberOfTiles = 10;
         float elapsedTime = .5f;
         bool incrementTime = false;
         float elapsedTimeSpeed = 1;
@@ -22,6 +25,8 @@ namespace Metal {
 
         const char *getTitle() override;
 
+        void onUpdate(InspectableMember *member, ApplicationContext &context) override;
+
         SAVE_TEMPLATE(
             elapsedTime,
             incrementTime,
@@ -36,4 +41,4 @@ namespace Metal {
     };
 } // Metal
 
-#endif //ATMOSPHEREREPOSITORY_H
+#endif //ENGINEREPO_H

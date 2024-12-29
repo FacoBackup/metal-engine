@@ -28,11 +28,7 @@ void main() {
     Ray ray = Ray(rayOrigin, rayDirection, 1./rayDirection);
     Hit hitData = traceAllTiles(ray, settings.showRaySearchCount, settings.showRayTestCount, colorData);
     if (length(colorData) > 0){
-        if (hitData.hasAny){
             finalColor = vec4(randomColor(rand(hitData.hitPosition.xyz)), 1);
-        } else {
-            finalColor = vec4(colorData.rgb, 1);
-        }
     } else {
         discard;
     }

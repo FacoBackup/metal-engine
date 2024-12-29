@@ -12,7 +12,6 @@
 #include "../repository/descriptors/CoreDescriptorSets.h"
 #include "../repository/render-pass/CoreRenderPasses.h"
 #include "../repository/texture/CoreTextures.h"
-#include "../repository/voxel/VoxelizationRepository.h"
 
 #include "../service/mesh/MeshService.h"
 #include "../service/world/WorldGridService.h"
@@ -33,7 +32,7 @@
 #include "../repository/world/WorldRepository.h"
 #include "../repository/runtime/RuntimeRepository.h"
 #include "../repository/streaming/StreamingRepository.h"
-#include "../repository/atmosphere/AtmosphereRepository.h"
+#include "../repository/engine/EngineRepository.h"
 #include "../repository/dock/DockRepository.h"
 #include "../repository/editor/EditorRepository.h"
 #include "../service/notification/NotificationService.h"
@@ -90,10 +89,9 @@ namespace Metal {
         WorldRepository worldRepository{*this};
         RuntimeRepository runtimeRepository{};
         StreamingRepository streamingRepository{*this};
-        AtmosphereRepository atmosphereRepository{};
+        EngineRepository engineRepository{};
         DockRepository dockRepository{*this};
         EditorRepository editorRepository{};
-        VoxelizationRepository voxelizationRepository{};
         // ----------- Repository
 
         [[nodiscard]] bool isDebugMode() const { return debugMode; }

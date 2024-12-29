@@ -4,6 +4,7 @@
 #include "../../dto/push-constant/MeshPushConstant.h"
 #include "../../dto/push-constant/GBufferShadingPushConstant.h"
 #include "../../dto/push-constant/VoxelDebugSettingsPushConstant.h"
+#include "../../dto/push-constant/GIPushConstant.h"
 #include "../../dto/push-constant/IconPushConstant.h"
 #include "../../service/pipeline/PipelineInstance.h"
 #include "../../service/pipeline/PipelineService.h"
@@ -43,6 +44,17 @@ namespace Metal {
                     .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
                     .addDescriptorSet(context.coreDescriptorSets.iconsDescriptor.get());
             iconPipeline = pipelineService.createRenderingPipeline(iconPipelineBuilder);
+
+
+            PipelineBuilder voxelVisualizerPipelineBuilder = PipelineBuilder::Of(
+                        context.coreFrameBuffers.auxFBO,
+                        "QUAD.vert",
+                        "tools/VoxelDebugVisualizer.frag"
+                    )
+                    .setPushConstantsSize(sizeof(VoxelDebugSettingsPushConstant))
+                    .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
+                    .addDescriptorSet(context.coreDescriptorSets.svoData.get());
+            voxelDebugVisualizerPipeline = pipelineService.createRenderingPipeline(voxelVisualizerPipelineBuilder);
         }
 
         PipelineBuilder ppPipelineBuilder = PipelineBuilder::Of(
@@ -66,26 +78,30 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.gBufferShadingDescriptor2.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferShadingDescriptor3.get())
                 .addDescriptorSet(context.coreDescriptorSets.brdfDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.aoDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.lightsData.get());
         gBufferShadingPipeline = pipelineService.createRenderingPipeline(gBufferShadingPipelineBuilder);
 
-        PipelineBuilder voxelVisualizerPipelineBuilder = PipelineBuilder::Of(
-                    context.coreFrameBuffers.auxFBO,
+        PipelineBuilder voxelAOBuilder = PipelineBuilder::Of(
+                    context.coreFrameBuffers.aoFBO,
                     "QUAD.vert",
-                    "VoxelDebugVisualizer.frag"
+                    "VoxelAO.frag"
                 )
-                .setPushConstantsSize(sizeof(VoxelDebugSettingsPushConstant))
+                .setPushConstantsSize(sizeof(GIPushConstant))
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.svoData.get());
-        voxelDebugVisualizerPipeline = pipelineService.createRenderingPipeline(voxelVisualizerPipelineBuilder);
+                .addDescriptorSet(context.coreDescriptorSets.svoData.get())
+                .addDescriptorSet(context.coreDescriptorSets.lightsData.get());
+        voxelAOPipeline = pipelineService.createRenderingPipeline(voxelAOBuilder);
     }
 
     void CorePipelines::dispose() const {
-        // TODO - Add button to UI to re-create pipelines and reload shaders
         gBufferPipeline->dispose(vulkanContext);
-        gridPipeline->dispose(vulkanContext);
         gBufferShadingPipeline->dispose(vulkanContext);
         postProcessingPipeline->dispose(vulkanContext);
-        voxelDebugVisualizerPipeline->dispose(vulkanContext);
+        if (context.isDebugMode()) {
+            gridPipeline->dispose(vulkanContext);
+            iconPipeline->dispose(vulkanContext);
+            voxelDebugVisualizerPipeline->dispose(vulkanContext);
+        }
     }
 } // Metal

@@ -12,10 +12,8 @@ namespace Metal {
         formPanel = new FormPanel();
         appendChild(formPanel);
         repositories.push_back(&context->editorRepository);
-        repositories.push_back(&context->atmosphereRepository);
+        repositories.push_back(&context->engineRepository);
         repositories.push_back(&context->worldRepository.camera);
-        repositories.push_back(&context->voxelizationRepository);
-        repositories.push_back(&context->worldGridRepository);
     }
 
     void InspectorPanel::onSync() {

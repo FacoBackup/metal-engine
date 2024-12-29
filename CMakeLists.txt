@@ -225,8 +225,8 @@ add_executable(
         src/dto/push-constant/GBufferShadingPushConstant.h
         src/service/pipeline/PipelineBuilder.h
         src/service/framebuffer/FrameBufferAttachment.cpp
-        src/repository/atmosphere/AtmosphereRepository.cpp
-        src/repository/atmosphere/AtmosphereRepository.h
+        src/repository/engine/EngineRepository.cpp
+        src/repository/engine/EngineRepository.h
         src/repository/texture/CoreTextures.cpp
         src/repository/texture/CoreTextures.h
         src/util/serialization-definitions.h
@@ -235,11 +235,9 @@ add_executable(
         src/dto/Notification.h
         src/enum/NotificationSeverity.h
         src/service/voxel/impl/Triangle.h
-        src/repository/voxel/VoxelizationRepository.cpp
-        src/repository/voxel/VoxelizationRepository.h
         src/service/voxel/impl/SparseVoxelOctreeData.h
-        src/context/engine/render-pass/impl/VoxelVisualizerPass.cpp
-        src/context/engine/render-pass/impl/VoxelVisualizerPass.h
+        src/context/engine/render-pass/tools/VoxelVisualizerPass.cpp
+        src/context/engine/render-pass/tools/VoxelVisualizerPass.h
         src/service/voxel/SVOService.cpp
         src/service/voxel/SVOService.h
         src/service/voxel/SVOInstance.cpp
@@ -254,6 +252,10 @@ add_executable(
         src/context/engine/render-pass/tools/IconsPass.cpp
         src/context/engine/render-pass/tools/IconsPass.h
         src/dto/push-constant/IconPushConstant.h
+        src/context/engine/render-pass/impl/VoxelAOPass.cpp
+        src/context/engine/render-pass/impl/VoxelAOPass.h
+        src/repository/editor/EditorRepository.cpp
+        src/dto/push-constant/GIPushConstant.h
 )
 
 

@@ -23,7 +23,7 @@ namespace Metal {
         const float maxEdgeLength = std::max(edgeLength1, std::max(edgeLength2, edgeLength3));
         const auto voxelSize = static_cast<float>(TILE_SIZE / std::pow(2, MAX_DEPTH));
         float stepSize = voxelSize / maxEdgeLength;
-        if (stepSize < .001f) {
+        if (edgeLength1 == INFINITY || edgeLength2 == INFINITY || edgeLength3 == INFINITY) {
             stepSize = .01f;
         }
         for (float lambda1 = 0; lambda1 <= 1; lambda1 += stepSize) {
