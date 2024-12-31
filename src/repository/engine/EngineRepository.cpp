@@ -7,11 +7,11 @@
 
 namespace Metal {
     void EngineRepository::registerFields() {
-        registerBool(voxelEnabled, "Global illumination", "Enabled?");
-        registerFloat(voxelRaytracingBias, "Global illumination", "Raytracing bias", 0, 5, false, .001);
+        registerBool(voxelGIEnabled, "Global illumination", "Enabled?");
+        registerFloat(voxelRaytracingBias, "Global illumination", "Ray tracing bias", 0, 5, false, .001);
+        registerFloat(voxelHitBias, "Global illumination", "Ray tracing hit bias", 0, 10, false, .0001);
+        registerFloat(shadowsBaseColor, "Global illumination", "Shadow base color", 0, 1, false, .001);
         registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);
-        registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);
-        registerFloat(elapsedTime, "Time", "Elapsed time");
         registerFloat(elapsedTime, "Time", "Elapsed time");
         registerBool(incrementTime, "Time", "Increment time");
         registerFloat(elapsedTimeSpeed, "Time", "Time of day speed");

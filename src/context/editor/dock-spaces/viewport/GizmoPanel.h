@@ -15,6 +15,7 @@ namespace Metal {
     struct TransformComponent;
 
     class GizmoPanel final : public AbstractPanel {
+        std::array<float, 3> translationSnap;
         glm::mat4x4 auxMat4{};
         glm::mat4x4 cacheProjection{};
         glm::mat4x4 cacheMatrixMat4{};
@@ -39,7 +40,7 @@ namespace Metal {
 
         void onSync() override;
 
-        float getSnapValues() const;
+        float *getSnapValues();
 
         void decomposeMatrix();
 

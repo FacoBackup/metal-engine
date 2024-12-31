@@ -54,7 +54,7 @@ namespace Metal {
                         builders.emplace(voxelTile->id,
                                          SparseVoxelOctreeBuilder(voxelTile));
                     }
-                    glm::vec3 albedo(component->albedoColor);
+                    glm::vec3 albedo = component->albedoColor * 255.f;
                     glm::vec2 roughnessMetallic(component->roughnessFactor, component->metallicFactor);
                     builders.at(voxelTile->id).insert(
                         localMaxDepth,
@@ -150,12 +150,20 @@ namespace Metal {
         FillStorage(bufferIndex, materialBufferIndex, data, &builder.getRoot());
 
         std::string filePath = context.getAssetDirectory() + FORMAT_FILE_SVO(builder.getTile()->id);
+        context.engineRepository.svoFilePaths.push_back(filePath);
         DUMP_TEMPLATE(filePath, data)
         METRIC_END("Ending serialization ")
     }
 
     void VoxelizationService::voxelizeScene() const {
         METRIC_START("Starting Voxelization ")
+        for (auto path : context.engineRepository.svoFilePaths) {
+            if (std::filesystem::exists(path)) {
+                std::filesystem::remove(path);
+            }
+        }
+        context.engineRepository.svoFilePaths.clear();
+
         std::unordered_map<std::string, SparseVoxelOctreeBuilder> builders;
         for (auto &t: context.worldGridRepository.getTiles()) {
             for (auto entity: t.second.entities) {
@@ -180,6 +188,7 @@ namespace Metal {
             t.second.dispose();
         }
         context.svoService.disposeAll();
+        context.worldGridRepository.hasMainTileChanged = true;
         METRIC_END("Ending Voxelization ")
     }
 } // Metal

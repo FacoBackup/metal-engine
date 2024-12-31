@@ -8,6 +8,8 @@
 
 layout(push_constant) uniform Push {
     float bias;
+    float biasHit;
+    float shadowsBaseColor;
 } push;
 
 layout(location = 0) in vec2 texCoords;
@@ -16,7 +18,7 @@ layout(location = 0) out float finalColor;
 void main() {
     vec3 rayOrigin = globalData.cameraWorldPosition.xyz;
     vec3 rayDirection = createRay(texCoords, globalData.invProj, globalData.invView);
-    Ray ray = Ray(rayOrigin/push.bias, rayDirection, 1./rayDirection);
+    Ray ray = Ray(rayOrigin, rayDirection, 1./rayDirection);
     Hit hitData = traceAllTiles(ray);
     if (hitData.anyHit){
         if (globalData.lightsQuantity > 0){
@@ -25,8 +27,10 @@ void main() {
             rayDirection = normalize(l.position - firstHitPos);
             ray = Ray(firstHitPos, rayDirection, 1./rayDirection);
             hitData = traceAllTiles(ray);
-            if (hitData.anyHit) {
-                finalColor = 1 - 1/length(firstHitPos - hitData.hitPosition);
+            float lightDistance = length(l.position - firstHitPos);
+            float hitDistance = length(hitData.hitPosition - firstHitPos);
+            if (hitData.anyHit && hitDistance < lightDistance && hitDistance > push.biasHit) {
+                finalColor = 1.0 - push.shadowsBaseColor / lightDistance;
             } else {
                 finalColor = 1;
             }

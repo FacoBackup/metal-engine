@@ -22,7 +22,7 @@ namespace Metal {
         std::string height;
         bool useHeightTexture = false;
 
-        glm::vec3 albedoColor{};
+        glm::vec3 albedoColor{1, 1, 1};
         bool emissiveSurface = false;
         float roughnessFactor = 1;
         float metallicFactor = .5;

@@ -24,7 +24,7 @@ namespace Metal {
         }
 
         static int getTileLocation(const float v) {
-            return static_cast<int>(std::floor((v + TILE_SIZE / 2.f) / TILE_SIZE));
+            return static_cast<int>(std::floor(v / TILE_SIZE) + 0.5);
         }
 
         /**

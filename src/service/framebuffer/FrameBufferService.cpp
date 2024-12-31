@@ -1,16 +1,18 @@
 #include "FrameBufferService.h"
 
 #include <iostream>
+#include <glm/vec3.hpp>
 
 #include "FrameBufferInstance.h"
 #include "../../util/VulkanUtils.h"
 #include "FrameBufferAttachment.h"
 
 namespace Metal {
-    FrameBufferInstance *FrameBufferService::createFrameBuffer(const uint32_t w, const uint32_t h) {
+    FrameBufferInstance *FrameBufferService::createFrameBuffer(const uint32_t w, const uint32_t h, glm::vec4 clearColor) {
         auto *framebuffer = new FrameBufferInstance();
         framebuffer->bufferWidth = w;
         framebuffer->bufferHeight = h;
+        framebuffer->clearColor = clearColor;
         registerResource(framebuffer);
 
         VkSamplerCreateInfo samplerCreateInfo{};

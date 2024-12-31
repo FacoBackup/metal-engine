@@ -35,7 +35,6 @@ namespace Metal {
         }
 
         recomposeMatrix();
-        const float snap = getSnapValues();
         ImGuizmo::SetOrthographic(context->worldRepository.camera.isOrthographic);
         ImGuizmo::SetDrawlist();
         ImGuizmo::SetRect(position->x, position->y, size->x, size->y);
@@ -46,32 +45,33 @@ namespace Metal {
             editorRepository->gizmoMode,
             cacheMatrix,
             nullptr,
-            &snap);
+            getSnapValues());
         if (ImGuizmo::IsUsing()) {
             decomposeMatrix();
         }
         isGizmoOver = ImGuizmo::IsOver();
     }
 
-    float GizmoPanel::getSnapValues() const {
+    float *GizmoPanel::getSnapValues() {
         switch (editorRepository->gizmoType) {
             case ImGuizmo::OPERATION::TRANSLATE: {
                 if (editorRepository->gizmoUseSnapTranslate) {
-                    return editorRepository->gizmoSnapTranslate;
+                    translationSnap[0] = translationSnap[1] = translationSnap[2] = editorRepository->gizmoSnapTranslate;
+                    return translationSnap.data();
                 }
             }
             case ImGuizmo::OPERATION::ROTATE: {
                 if (editorRepository->gizmoUseSnapRotate) {
-                    return editorRepository->gizmoSnapRotate;
+                    return &editorRepository->gizmoSnapRotate;
                 }
             }
             case ImGuizmo::OPERATION::SCALE: {
                 if (editorRepository->gizmoUseSnapScale) {
-                    return editorRepository->gizmoSnapScale;
+                    return &editorRepository->gizmoSnapScale;
                 }
             }
             default:
-                return 0.0f;
+                return nullptr;
         }
     }
 
@@ -87,9 +87,11 @@ namespace Metal {
         auxScale = auxScale - localSelected->scale;
         auxRot = auxRot - localSelected->rotation;
 
+
         localSelected->translation += auxTranslation;
         localSelected->scale += auxScale;
         localSelected->rotation += auxRot;
+        localSelected->rotationEuler = glm::eulerAngles(localSelected->rotation);
 
         localSelected->registerChange();
         localChangeId = localSelected->getChangeId();

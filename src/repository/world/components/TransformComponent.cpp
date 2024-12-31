@@ -2,11 +2,13 @@
 #include "../../../common/interface/Icons.h"
 #include "../../../context/ApplicationContext.h"
 
+#define ROTATION "Rotation"
+
 namespace Metal {
     void TransformComponent::registerFields() {
         registerVec3(translation, "", "Translation");
         registerVec3(scale, "", "Scale", 1);
-        registerQuat(rotation, "", "Rotation (Quaternion)");
+        registerVec3(rotationEuler, "", ROTATION);
         registerBool(isStatic, "", "Static?");
     }
 
@@ -18,5 +20,9 @@ namespace Metal {
         if (context.worldRepository.lights.contains(entityId)) {
             context.worldRepository.lights.at(entityId).onUpdate(member, context);
         }
+        if (member != nullptr && member->name == ROTATION) {
+            rotation = glm::quat(rotationEuler);
+        }
+        forceTransform = true;
     }
 }

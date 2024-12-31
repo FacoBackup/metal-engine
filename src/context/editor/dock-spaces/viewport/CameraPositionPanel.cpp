@@ -16,7 +16,8 @@ namespace Metal {
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, UIUtil::DEFAULT_PADDING);
         ImGui::SetNextWindowBgAlpha(.4f);
-        if (ImGui::Begin(id.c_str(), &UIUtil::OPEN, UIUtil::FIXED_WINDOW_FLAGS)) {
+        if (ImGui::Begin(id.c_str(), &UIUtil::OPEN, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar |
+            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse)) {
             const auto &positionCamera = context->worldRepository.camera.position;
             ImGui::Text("Current tile: %i %i | N of tiles: %i",
                         context->worldGridRepository.getCurrentTile()->x,

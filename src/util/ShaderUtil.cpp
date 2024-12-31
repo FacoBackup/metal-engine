@@ -149,6 +149,7 @@ namespace Metal {
         if (debugMode) {
             source = "#define DEBUG\n" + source;
         }
+        source = "#define TILE_SIZE " + std::to_string(TILE_SIZE) + std::string("\n") + source;
         source = "#define MAX_LIGHTS " + std::to_string(MAX_LIGHTS) + std::string("\n") + source;
         const glslang_stage_t shaderStage = ShaderStageFromFilename(pFilename.c_str());
 

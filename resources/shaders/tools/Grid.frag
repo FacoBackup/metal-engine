@@ -3,12 +3,9 @@
 
 const vec4 settings = vec4(0, 1, 100, .02);
 
-//uniform sampler2D sceneDepth;
-//
-//#include "../util/SCENE_DEPTH_UTILS.glsl"
 #define OVERLAY_OBJECTS settings.x == 1.
 #define SCALE settings.y
-#define THREASHOLD settings.z
+#define THRESHOLD settings.z
 #define THICKNESS settings.w
 
 layout(location = 0) in vec2 texCoords;
@@ -22,8 +19,8 @@ bool rayMarch(vec3 ro, vec3 rd, float width) {
         p = ro + t * rd;
         float d = p.y;
         if (d < 0.001) return true;
-        if (t > THREASHOLD) break;
-        t += d;
+        if (t > THRESHOLD || d < 0.0) break;
+        t += max(d, 0.001);
     }
     return false;
 }
@@ -53,10 +50,10 @@ void main() {
     if (hasData){
         float distanceFromCamera = length(globalData.cameraWorldPosition.xyz - p.xyz);
         float alpha = 1;
-        if (distanceFromCamera >= THREASHOLD){
+        if (distanceFromCamera >= THRESHOLD){
             alpha = 0;
         } else {
-            float opacity = abs(distanceFromCamera - THREASHOLD) / ((distanceFromCamera + THREASHOLD) / 2.);
+            float opacity = abs(distanceFromCamera - THRESHOLD) / ((distanceFromCamera + THRESHOLD) / 2.);
             alpha = min(1, opacity);
         }
 

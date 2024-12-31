@@ -7,11 +7,13 @@ namespace Metal {
     }
 
     bool VoxelAOPass::shouldRun() {
-        return context.engineRepository.voxelEnabled;
+        return context.engineRepository.voxelGIEnabled;
     }
 
     void VoxelAOPass::onSync() {
         pushConstant.bias = context.engineRepository.voxelRaytracingBias;
+        pushConstant.shadowsBaseColor = context.engineRepository.shadowsBaseColor;
+        pushConstant.biasHit = context.engineRepository.voxelHitBias;
         recordPushConstant(&pushConstant);
         recordDrawSimpleInstanced(3, 1);
     }

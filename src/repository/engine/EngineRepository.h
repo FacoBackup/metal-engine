@@ -6,8 +6,10 @@
 
 namespace Metal {
     struct EngineRepository final : Inspectable {
-        bool voxelEnabled = false;
-        float voxelRaytracingBias = 2;
+        bool voxelGIEnabled = false;
+        float voxelRaytracingBias = 1.01;
+        float shadowsBaseColor = 2;
+        float voxelHitBias = .05;
         int numberOfTiles = 10;
         float elapsedTime = .5f;
         bool incrementTime = false;
@@ -18,6 +20,7 @@ namespace Metal {
         glm::vec3 nightColor{.1f, .1f, .1f};
         glm::vec3 middayColor{.9f, .9f, .9f};
         bool screenSpaceShadows = false;
+        std::vector<std::string> svoFilePaths{};
 
         void registerFields() override;
 
@@ -36,7 +39,12 @@ namespace Metal {
             dawnColor.x, dawnColor.y, dawnColor.z,
             nightColor.x, nightColor.y, nightColor.z,
             middayColor.x, middayColor.y, middayColor.z,
-            screenSpaceShadows
+            screenSpaceShadows,
+            svoFilePaths,
+            voxelRaytracingBias,
+            voxelHitBias,
+            shadowsBaseColor,
+            voxelGIEnabled
         )
     };
 } // Metal

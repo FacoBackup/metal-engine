@@ -1,6 +1,5 @@
 #include "./VoxelInfo.glsl"
 
-#define HALF_TILE_SIZE 16
 #define MAX_VOXEL_SIZE 10000000
 #define COUNT 32.
 
@@ -118,8 +117,8 @@ inout vec3 finalColor
     uint matrialBufferOffset = tileInfo.voxelBufferOffset[bufferIndex - 1];
     if (localTileInfo.w == 0) { return Hit(vec3(0), vec3(0), false, 0, 0, 0, bufferIndex, 0, 0); }
 
-    vec3 center = localTileInfo.xyz * HALF_TILE_SIZE * 2;
-    float scale = HALF_TILE_SIZE;
+    vec3 center = localTileInfo.xyz * TILE_SIZE ;
+    float scale = TILE_SIZE / 2;
     vec3 minBox = center - scale;
     vec3 maxBox = center + scale;
     float minDistance = 1e10;// Large initial value
