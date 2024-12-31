@@ -116,9 +116,9 @@ namespace Metal {
         if (isParentOfLeaf && node->data != nullptr) {
             std::array<unsigned int, 2> compressed = node->data->compress();
             voxels.data[node->dataIndex] = node->packVoxelData(materialBufferIndex, targetDepth);
-            voxels.materialData[materialBufferIndex] = compressed[0];
+            voxels.data[materialBufferIndex + voxels.voxelBufferOffset] = compressed[0];
             materialBufferIndex++;
-            voxels.materialData[materialBufferIndex] = compressed[1];
+            voxels.data[materialBufferIndex + voxels.voxelBufferOffset] = compressed[1];
             materialBufferIndex++;
         }
     }
@@ -135,12 +135,12 @@ namespace Metal {
 
     void VoxelizationService::serialize(SparseVoxelOctreeBuilder &builder) const {
         for (LevelOfDetail &lod: LevelOfDetail::LODs) {
-            METRIC_START(std::string("Starting serialization " + builder.getTile()->id))
+            METRIC_START(std::format("Starting serialization {}", builder.getTile()->id))
 
             const unsigned int desiredMaxDepth = MAX_DEPTH - (lod.level - 1);
             SparseVoxelOctreeData data{};
-            data.data.resize(builder.getVoxelQuantity());
-            data.materialData.resize(builder.getLeafVoxelQuantity() * 2);
+            data.data.resize(builder.getVoxelQuantity() + builder.getLeafVoxelQuantity() * 2);
+            data.voxelBufferOffset = builder.getVoxelQuantity();
 
             unsigned int bufferIndex = 0;
             unsigned int materialBufferIndex = 0;
@@ -163,7 +163,7 @@ namespace Metal {
                     auto *mesh = context.meshService.stream(meshComponent.meshId, LevelOfDetail::LOD_0);
                     if (mesh != nullptr) {
                         auto &transformComponent = context.worldRepository.transforms.at(entity);
-                        METRIC_START(std::string("Voxelizing mesh " + meshComponent.getEntityId()))
+                        METRIC_START(std::format("Voxelizing mesh {}", meshComponent.getEntityId()))
                         voxelize(&meshComponent, transformComponent.model, mesh, builders);
                         METRIC_END("Voxelization took: ")
                     }

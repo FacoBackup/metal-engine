@@ -34,18 +34,19 @@ void main() {
     Ray ray = Ray(rayOrigin, rayDirection, 1./rayDirection);
     Hit hitData = traceAllTiles(ray, settings.showRaySearchCount, settings.showRayTestCount, colorData);
     if (length(colorData) > 0){
+        VoxelMaterialData matData = unpackVoxel(hitData);
         switch (settings.voxelDebugFlag){
             case ALBEDO:
-            finalColor = vec4(randomColor(rand(hitData.hitPosition.xyz)), 1);
+            finalColor = vec4(matData.albedo, 1);
             break;
             case NORMAL:
-            finalColor = vec4(randomColor(rand(hitData.hitPosition.xyz)), 1);
+            finalColor = vec4(matData.normal, 1);
             break;
             case ROUGHNESS:
-            finalColor = vec4(randomColor(rand(hitData.hitPosition.xyz)), 1);
+            finalColor = vec4(vec3(matData.roughness), 1);
             break;
             case METALLIC:
-            finalColor = vec4(randomColor(rand(hitData.hitPosition.xyz)), 1);
+            finalColor = vec4(vec3(matData.metallic), 1);
             break;
             default :
             finalColor = vec4(randomColor(rand(hitData.hitPosition.xyz)), 1);

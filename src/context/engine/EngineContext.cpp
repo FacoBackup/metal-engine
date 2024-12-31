@@ -55,6 +55,7 @@ namespace Metal {
                             svo->voxelsBuffer);
                         tileInfoUBO.tileCenterValid[i] = glm::vec4(tile->x, 0,
                                                                    tile->z, 1);
+                        tileInfoUBO.voxelBufferOffset[i] = svo->voxelBufferOffset;
                         i++;
                     }
                 }

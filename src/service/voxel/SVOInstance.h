@@ -11,7 +11,7 @@ namespace Metal {
      */
     struct SVOInstance final : RuntimeResource {
         std::shared_ptr<BufferInstance> voxelsBuffer = nullptr;
-        std::shared_ptr<BufferInstance> voxelMaterialBuffer = nullptr;
+        unsigned int voxelBufferOffset = 0;
 
         explicit SVOInstance(const std::string &id) : RuntimeResource(id) {
         }

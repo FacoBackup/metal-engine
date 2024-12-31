@@ -11,8 +11,7 @@ namespace Metal {
     }
 
     void EditorRepository::registerFields() {
-        // RANDOM - ALBEDO - NORMAL - ROUGHNESS - METALLIC
-        registerInt(voxelDebugFlag, "Voxels", "Random colors", 0, 4);
+        registerInt(voxelDebugFlag, "Voxels", "Debug channel (RANDOM; ALBEDO; NORMAL; ROUGHNESS; METALLIC)", 0, 4);
         registerBool(showRaySearchCountVoxels, "Voxels", "Show ray search count");
         registerBool(showRayTestCountVoxels, "Voxels", "Show ray test count");
 

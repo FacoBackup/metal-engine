@@ -6,6 +6,5 @@
 namespace Metal {
     void SVOInstance::dispose(VulkanContext &context) {
         voxelsBuffer->dispose(context);
-        voxelMaterialBuffer->dispose(context);
     }
 } // Metal

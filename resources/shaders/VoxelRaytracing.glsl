@@ -1,5 +1,7 @@
+#include "./VoxelInfo.glsl"
+
 #define HALF_TILE_SIZE 16
-#define MAX_VOXEL_SIZE 2000000
+#define MAX_VOXEL_SIZE 10000000
 #define COUNT 32.
 
 #define DEFINE_OCTREE_BUFFER(B, M, N) \
@@ -9,6 +11,7 @@ layout(std430, set = 1, binding = B) readonly buffer M { \
 
 layout(set = 1, binding = 0) uniform TileInfo {
     vec4 tileCenterValid[9];
+    uint voxelBufferOffset[9];
 } tileInfo;
 
 DEFINE_OCTREE_BUFFER(1, V1, voxelBuffer1)
@@ -21,15 +24,6 @@ DEFINE_OCTREE_BUFFER(7, V7, voxelBuffer7)
 DEFINE_OCTREE_BUFFER(8, V8, voxelBuffer8)
 DEFINE_OCTREE_BUFFER(9, V9, voxelBuffer9)
 
-struct Hit {
-    bool anyHit;
-    vec3 hitPosition;
-    float voxelSize;
-    uint voxel;
-    uint voxelData;
-    uint voxelBufferIndex;
-    uint bufferIndex;
-};
 struct Ray { vec3 o, d, invDir; };
 struct Stack { uint index;vec3 center;float scale; };
 
@@ -57,24 +51,6 @@ bool intersectWithDistance(inout vec3 boxMin, inout vec3 boxMax, inout Ray r, ou
     float exitDist = min(min(tMax.x, tMax.y), tMax.z);// Furthest exit point along the ray
 
     return entryDist <= exitDist && exitDist > 0.0;// Ensure valid intersection and that exit is in front of the ray origin
-}
-
-vec3 unpackColor(int color) {
-    int rInt = (color >> 20) & 0x3FF;// 10 bits for r (mask: 0x3FF is 1023 in binary)
-    int gInt = (color >> 10) & 0x3FF;// 10 bits for g
-    int bInt = color & 0x3FF;// 10 bits for b
-
-    // Convert the quantized integers back to floats in the range [0, 1]
-    float r = rInt / 1023.0f;
-    float g = gInt / 1023.0f;
-    float b = bInt / 1023.0f;
-
-    // Scale back to the original [-1, 1] range
-    r = r * 2.0f - 1.0f;
-    g = g * 2.0f - 1.0f;
-    b = b * 2.0f - 1.0f;
-
-    return vec3(r, g, b);
 }
 
 uint countSetBitsBefore(inout uint mask, inout uint childIndex) {
@@ -117,7 +93,8 @@ inout vec3 finalColor
 #endif
 ) {
     vec4 localTileInfo = tileInfo.tileCenterValid[bufferIndex - 1];
-    if (localTileInfo.w == 0) { return Hit(false, vec3(0), 0, 0, 0, 0, bufferIndex); }
+    uint matrialBufferOffset = tileInfo.voxelBufferOffset[bufferIndex - 1];
+    if (localTileInfo.w == 0) { return Hit(false, vec3(0), 0, 0, 0, bufferIndex, 0, 0); }
 
     vec3 center = localTileInfo.xyz * HALF_TILE_SIZE * 2;
     float scale = HALF_TILE_SIZE;
@@ -125,7 +102,7 @@ inout vec3 finalColor
     vec3 maxBox = center + scale;
     float minDistance = 1e10;// Large initial value
 
-    if (!intersect(minBox, maxBox, ray)) return Hit(false, vec3(0), 0, 0, 0, 0, bufferIndex);
+    if (!intersect(minBox, maxBox, ray)) return Hit(false, vec3(0), 0, 0, 0, bufferIndex, 0, 0);
     Stack stack[6];
     scale *= 0.5f;
     stack[0] = Stack(0u, center, scale);
@@ -136,7 +113,7 @@ inout vec3 finalColor
     int searchCount = 0;
     #endif
     int stackPos = 1;
-    Hit hitData = Hit(false, vec3(0), 0, 0, 0, 0, bufferIndex);
+    Hit hitData = Hit(false, vec3(0), 0, 0, 0, bufferIndex, 0, 0);
     while (stackPos-- > 0) {
         #ifdef DEBUG_VOXELS
         if (showRaySearchCount){
@@ -184,7 +161,8 @@ inout vec3 finalColor
                     hitData.voxel = voxel_node;
                     hitData.voxelBufferIndex = index;
                     hitData.voxelSize = scale;
-                    hitData.voxelData = getVoxel(index + 1, bufferIndex);
+                    hitData.matData1 = getVoxel(childGroupIndex + matrialBufferOffset, bufferIndex);
+                    hitData.matData2 = getVoxel(childGroupIndex + matrialBufferOffset + 1, bufferIndex);
                     index++;
                     minDistance = entryDist;
                 } else {
