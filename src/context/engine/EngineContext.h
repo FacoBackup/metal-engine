@@ -7,8 +7,10 @@
 #include "../../dto/ubo/GlobalDataUBO.h"
 #include "../../dto/ubo/PPSettingsUBO.h"
 #include "../../common/AbstractRuntimeComponent.h"
+#include "../../dto/ubo/LightData.h"
 #include "../../dto/ubo/TileInfoUBO.h"
 #include "render-pass/AbstractRenderPass.h"
+#include "../../enum/engine-definitions.h"
 
 using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
@@ -18,13 +20,22 @@ namespace Metal {
         GlobalDataUBO globalDataUBO{};
         PPSettingsUBO postProcessingUBO{};
         TileInfoUBO tileInfoUBO{};
+        std::array<LightData, MAX_LIGHTS> lights{};
+        unsigned int lightsCount = 0;
         long long start = -1;
+        bool hasToUpdateLights = true;
 
+        std::vector<std::unique_ptr<AbstractRenderPass>> aoPass;
         std::vector<std::unique_ptr<AbstractRenderPass> > fullScreenRenderPasses;
         std::vector<std::unique_ptr<AbstractRenderPass> > gBufferPasses;
-        std::vector<std::unique_ptr<AbstractRenderPass> > postProcessingPasses;
+        std::vector<std::unique_ptr<AbstractRenderPass>> postProcessingPasses;
 
     public:
+
+        void setUpdateLights() {
+            hasToUpdateLights = true;
+        }
+
         void onInitialize() override;
 
         void updatePostProcessingData();
@@ -42,6 +53,8 @@ namespace Metal {
         void updateGlobalData();
 
         void onSync() override;
+
+        void updateLights();
 
         static glm::vec3 CalculateSunColor(float elevation, glm::vec3 &nightColor, glm::vec3 &dawnColor,
                                            glm::vec3 &middayColor);

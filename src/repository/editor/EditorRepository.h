@@ -11,12 +11,15 @@
 #include "../../enum/EditorMode.h"
 #include "../../enum/ShadingMode.h"
 #include "../../common/inspection/Inspectable.h"
-#include "../../common/interface/Icons.h"
 
 namespace Metal {
     struct TransformComponent;
 
     struct EditorRepository final : Inspectable {
+        int voxelDebugFlag = 0;
+        bool showRaySearchCountVoxels = true;
+        bool showRayTestCountVoxels = true;
+
         ImVec4 accent{};
         ImU32 accentU32 = 0;
 
@@ -54,18 +57,16 @@ namespace Metal {
         float brushRadius = 10;
         float brushDensity = .5f;
 
-        const char *getIcon() {
-            return Icons::settings.c_str();
-        }
+        void registerFields() override;
 
-        const char *getTitle() {
-            return "Editor";
-        }
+        const char *getTitle() override;
+
+        const char *getIcon() override;
 
         SAVE_TEMPLATE(
             iconColor.x, iconColor.y, iconColor.z,
             accentColor.x, accentColor.y, accentColor.z,
-            projectName,showIcons,iconScale,
+            projectName, showIcons, iconScale,
             isDarkMode,
             showGrid,
             gridOverlayObjects,
@@ -92,7 +93,10 @@ namespace Metal {
             shadingMode,
             brushModeAdd,
             brushRadius,
-            brushDensity
+            brushDensity,
+            voxelDebugFlag,
+            showRaySearchCountVoxels,
+            showRayTestCountVoxels
         )
     };
 } // Metal

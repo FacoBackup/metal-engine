@@ -1,6 +1,7 @@
 #include "IntField.h"
 
 #include <imgui.h>
+#include "../../../../../common/inspection/Inspectable.h"
 
 namespace Metal {
     void IntField::onSync() {
@@ -9,11 +10,13 @@ namespace Metal {
             ImGui::TextDisabled("%i", field.field);
         } else {
             ImGui::Text("%s", field.name.c_str());
-            ImGui::DragInt(id.c_str(), field.field, .01f, field.min.value(), field.max.value());
+            if (ImGui::DragInt(id.c_str(), field.field, .01f, field.min.value(), field.max.value())) {
+                field.instance->registerChange();
+                field.instance->onUpdate(&field, *context);
+            }
         }
     }
 
     IntField::IntField(InspectedField<int> &field) : field(field) {
-
     }
 } // Metal

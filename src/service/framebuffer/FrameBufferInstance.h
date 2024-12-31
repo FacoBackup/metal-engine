@@ -5,7 +5,7 @@
 #include "../../repository/abstract/RuntimeResource.h"
 #include <vector>
 #include <iostream>
-
+#include <glm/vec4.hpp>
 #include "FrameBufferAttachment.h"
 
 namespace Metal {
@@ -15,6 +15,7 @@ namespace Metal {
     struct FrameBufferInstance final : RuntimeResource {
         uint32_t bufferWidth{};
         uint32_t bufferHeight{};
+        glm::vec4 clearColor;
         VkRenderPass vkRenderPass = VK_NULL_HANDLE;
         VkFramebuffer vkFramebuffer = VK_NULL_HANDLE;
         VkSampler vkImageSampler = VK_NULL_HANDLE;

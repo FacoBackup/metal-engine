@@ -1,6 +1,7 @@
 #include "ColorField.h"
 
 #include <imgui.h>
+#include "../../../../../common/inspection/Inspectable.h"
 
 namespace Metal {
     ColorField::ColorField(InspectedField<glm::vec3> &field) : field(field) {
@@ -16,6 +17,8 @@ namespace Metal {
                 field.field->x = values[0];
                 field.field->y = values[1];
                 field.field->z = values[2];
+                field.instance->registerChange();
+                field.instance->onUpdate(&field, *context);
             }
         } else {
             ImGui::ColorButton("%s", ImVec4(field.field->x, field.field->y, field.field->z, 1.));

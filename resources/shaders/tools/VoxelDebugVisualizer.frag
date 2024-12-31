@@ -1,4 +1,4 @@
-#include "./GlobalData.glsl"
+#include "./GlobalDataBuffer.glsl"
 #include "./CreateRay.glsl"
 #define DEBUG_VOXELS
 #include "./VoxelRaytracing.glsl"
@@ -6,8 +6,14 @@
 layout(location = 0) in vec2 texCoords;
 layout(location = 0) out vec4 finalColor;
 
+#define RANDOM 0
+#define ALBEDO 1
+#define NORMAL 2
+#define ROUGHNESS 3
+#define METALLIC 4
+
 layout(push_constant) uniform Push {
-    bool randomColors;
+    int voxelDebugFlag;
     bool showRaySearchCount;
     bool showRayTestCount;
 } settings;
@@ -28,10 +34,23 @@ void main() {
     Ray ray = Ray(rayOrigin, rayDirection, 1./rayDirection);
     Hit hitData = traceAllTiles(ray, settings.showRaySearchCount, settings.showRayTestCount, colorData);
     if (length(colorData) > 0){
-        if (hitData.hasAny){
-            finalColor = vec4(randomColor(rand(hitData.hitPosition.xyz)), 1);
-        } else {
-            finalColor = vec4(colorData.rgb, 1);
+        VoxelMaterialData matData = unpackVoxel(hitData);
+        switch (settings.voxelDebugFlag){
+            case ALBEDO:
+            finalColor = vec4(matData.albedo, 1);
+            break;
+            case NORMAL:
+            finalColor = vec4(matData.normal, 1);
+            break;
+            case ROUGHNESS:
+            finalColor = vec4(vec3(matData.roughness), 1);
+            break;
+            case METALLIC:
+            finalColor = vec4(vec3(matData.metallic), 1);
+            break;
+            default :
+            finalColor = vec4(randomColor(rand(hitData.voxelPosition.xyz)), 1);
+            break;
         }
     } else {
         discard;

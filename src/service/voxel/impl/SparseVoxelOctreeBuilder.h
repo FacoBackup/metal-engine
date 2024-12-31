@@ -1,41 +1,47 @@
 #ifndef SPARSEVOXELOCTREE_H
 #define SPARSEVOXELOCTREE_H
-#include <unordered_map>
+#include <vector>
 
 #include "OctreeNode.h"
-#include "../../../enum/engine-definitions.h"
 
 namespace Metal {
     struct WorldTile;
 
     class SparseVoxelOctreeBuilder {
-        unsigned int maxDepth = 0;
         OctreeNode root{};
         unsigned int nodeQuantity = 1;
+        unsigned int leafVoxelQuantity = 0;
         WorldTile *tile = nullptr;
+        std::vector<VoxelData *> data{};
 
-        void insertInternal(OctreeNode *node, glm::vec3 &point, const std::shared_ptr<VoxelData> &data,
-                            glm::ivec3 &position, int depth);
+        void insertInternal(OctreeNode *node, glm::vec3 &point, VoxelData *data,
+                            glm::ivec3 &position, int depth, int maxDepth);
 
         static void WorldToChunkLocal(const WorldTile *tile, glm::vec3 &worldCoordinate);
 
     public:
-        explicit SparseVoxelOctreeBuilder(unsigned int maxDepth, WorldTile *tile): maxDepth(maxDepth), tile(tile) {
+        explicit SparseVoxelOctreeBuilder(WorldTile *tile): tile(tile) {
         }
 
         [[nodiscard]] unsigned int getVoxelQuantity() const {
             return nodeQuantity;
         }
 
+        [[nodiscard]] unsigned int getLeafVoxelQuantity() const {
+            return leafVoxelQuantity;
+        }
+
         OctreeNode &getRoot() {
             return root;
         }
 
-        WorldTile *getTile() {
+        WorldTile *getTile() const {
             return tile;
         }
 
-        void insert(glm::vec3 &point, const std::shared_ptr<VoxelData> &data);
+        void insert(int maxDepth, glm::vec3 &point, VoxelData *data);
+
+        void dispose() const;
     };
 } // Metal
 

@@ -48,7 +48,8 @@ namespace Metal {
         STREAM(context.meshService, MeshInstance)
     }
 
-    SVOInstance *StreamingRepository::streamSVO(const std::string &id, const LevelOfDetail &lod) {
+    SVOInstance *StreamingRepository::streamSVO(const std::string &id) {
+        const LevelOfDetail &lod = LevelOfDetail::LOD_0;
         STREAM(context.svoService, SVOInstance)
     }
 

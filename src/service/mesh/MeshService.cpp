@@ -77,7 +77,7 @@ namespace Metal {
         }
 
         for (auto &entity: data.entities) {
-            if (entity.parentEntity < 0) {
+            if (entity.parentEntity < 0 || !entities.contains(entity.parentEntity)) {
                 continue;
             }
             repo.linkEntities(repo.getEntity(entities.at(entity.parentEntity)), repo.getEntity(entities.at(entity.id)));

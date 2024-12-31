@@ -8,8 +8,7 @@
 #include "../../../enum/engine-definitions.h"
 
 namespace Metal {
-    class WorldGridRepository final : public AbstractRuntimeComponent, public Inspectable {
-        int numberOfTiles = 10;
+    class WorldGridRepository final : public AbstractRuntimeComponent {
         std::unordered_map<std::string, WorldTile> tiles{};
         std::array<WorldTile *, 9> loadedWorldTiles{};
         WorldTile *currentTile = nullptr;
@@ -18,10 +17,6 @@ namespace Metal {
     public:
         bool hasMainTileChanged = false;
 
-        [[nodiscard]] int getNumberOfTiles() const {
-            return numberOfTiles;
-        }
-
         bool updateLoadedTiles();
 
         explicit WorldGridRepository(ApplicationContext &context)
@@ -29,7 +24,7 @@ namespace Metal {
         }
 
         static int getTileLocation(const float v) {
-            return static_cast<int>(std::floor((v + TILE_SIZE / 2.f) / TILE_SIZE));
+            return static_cast<int>(std::floor(v / TILE_SIZE) + 0.5);
         }
 
         /**
@@ -60,13 +55,7 @@ namespace Metal {
             return tiles;
         }
 
-        const char *getIcon() override;
-
-        const char *getTitle() override;
-
-        void registerFields() override;
-
-        SAVE_TEMPLATE(tiles, numberOfTiles)
+        SAVE_TEMPLATE(tiles)
     };
 } // Metal
 

@@ -9,7 +9,7 @@
 #include "../../../enum/engine-definitions.h"
 #include "../../../service/voxel/impl/SparseVoxelOctreeBuilder.h"
 #include "../../../util/serialization-definitions.h"
-#define TILE_SIZE 32
+#define TILE_SIZE 64
 
 #define TILE_ID(x, z) (std::to_string(x) + "_" + std::to_string(z))
 

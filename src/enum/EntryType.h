@@ -6,12 +6,11 @@ namespace Metal::EntryType {
         SCENE,
         MESH,
         TEXTURE,
-        MATERIAL,
         DIRECTORY,
         NONE
     };
 
-    static const char *Names = "Scene\0Mesh\0Texture\0Material\0Directory\0None\0";
+    static const char *Names = "Scene\0Mesh\0Texture\0Directory\0None\0";
 
     static EntryType ValueOfIndex(const int option) {
         if (option == 0) {
@@ -24,9 +23,6 @@ namespace Metal::EntryType {
             return EntryType::TEXTURE;
         }
         if (option == 3) {
-            return EntryType::MATERIAL;
-        }
-        if (option == 4) {
             return EntryType::DIRECTORY;
         }
         return EntryType::NONE;
@@ -42,14 +38,11 @@ namespace Metal::EntryType {
         if (mode == TEXTURE) {
             return 2;
         }
-        if (mode == MATERIAL) {
+        if (mode == DIRECTORY) {
             return 3;
         }
-        if (mode == DIRECTORY) {
-            return 4;
-        }
         if (mode == NONE) {
-            return 5;
+            return 4;
         }
         return 0;
     }

@@ -6,6 +6,7 @@
 namespace Metal {
     struct TileInfoUBO final {
         std::array<glm::vec4, 9> tileCenterValid{};
+        std::array<unsigned int, 9> voxelBufferOffset{};
     };
 }
 

@@ -19,13 +19,16 @@ namespace Metal {
             frameBuffer->bufferWidth, frameBuffer->bufferHeight
         };
         if (clearBuffer) {
-            for (const auto & attachment : frameBuffer->attachments) {
+            for (const auto &attachment: frameBuffer->attachments) {
                 VkClearValue &clearValue = clearColors.emplace_back();
                 if (attachment->depth) {
                     clearValue.depthStencil.depth = 1.0f;
                     clearValue.depthStencil.stencil = 0;
                 } else {
-                    clearValue.color = {0.0f, 0.0f, 0.0f, 0.0f};
+                    clearValue.color = {
+                        frameBuffer->clearColor.r, frameBuffer->clearColor.g, frameBuffer->clearColor.b,
+                        frameBuffer->clearColor.a
+                    };
                 }
             }
         }

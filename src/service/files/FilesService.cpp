@@ -86,10 +86,6 @@ namespace Metal {
                     DELETE_F(FORMAT_FILE_MESH)
                     break;
                 }
-                case EntryType::MATERIAL: {
-                    DELETE_S(FORMAT_FILE_MATERIAL)
-                    break;
-                }
                 case EntryType::TEXTURE: {
                     DELETE_F(FORMAT_FILE_TEXTURE)
                     break;

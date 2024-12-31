@@ -15,6 +15,7 @@ namespace Metal {
         void onInitialize() override;
 
         TextureInstance *brdf = nullptr;
+        TextureInstance *icons = nullptr;
     };
 } // Metal
 

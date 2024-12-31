@@ -13,6 +13,7 @@ namespace Metal {
         std::optional<int> min;
         std::optional<float> maxF;
         std::optional<float> minF;
+        std::optional<float> incrementF;
         bool disabled = false;
         EntryType::EntryType resourceType = EntryType::NONE;
 

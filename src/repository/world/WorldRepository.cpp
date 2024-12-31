@@ -1,10 +1,17 @@
 #include "WorldRepository.h"
 
+#include "../../context/ApplicationContext.h"
 #include "../../enum/ComponentType.h"
-#include "components/MeshComponent.h"
-#include "components/TransformComponent.h"
 
 namespace Metal {
+    WorldRepository::WorldRepository(ApplicationContext &context): AbstractRuntimeComponent(context) {
+        entities.emplace(ROOT_ID, Entity{});
+        entities.at(ROOT_ID).initialize(lastId, true);
+
+        auto *emplace = getEntity(lastId);
+        emplace->name = "Scene";
+    }
+
     EntityID WorldRepository::createEntity(std::string name, const bool container) {
         lastId++;
         entities.emplace(lastId, Entity{});
@@ -40,17 +47,11 @@ namespace Metal {
                 return meshes.contains(entity) ? &meshes.find(entity)->second : nullptr;
             case ComponentTypes::TRANSFORM:
                 return transforms.contains(entity) ? &transforms.find(entity)->second : nullptr;
+            case ComponentTypes::LIGHT:
+                return lights.contains(entity) ? &lights.find(entity)->second : nullptr;
             default:
                 return nullptr;
         }
-    }
-
-    WorldRepository::WorldRepository() {
-        entities.emplace(ROOT_ID, Entity{});
-        entities.at(ROOT_ID).initialize(lastId, true);
-
-        auto *emplace = getEntity(lastId);
-        emplace->name = std::move("Scene");
     }
 
     void WorldRepository::createComponent(const EntityID entity, ComponentTypes::ComponentType type) {
@@ -58,14 +59,27 @@ namespace Metal {
             return;
         }
         switch (type) {
-            case ComponentTypes::ComponentType::MESH: {
+            case ComponentTypes::MESH: {
                 meshes.emplace(entity, MeshComponent{});
                 meshes.at(entity).setEntityId(entity);
-                getEntity(entity)->components.push_back(ComponentTypes::ComponentType::MESH);
-
+                getEntity(entity)->components.push_back(ComponentTypes::MESH);
+                createComponent(entity, ComponentTypes::TRANSFORM);
+                break;
+            }
+            case ComponentTypes::LIGHT: {
+                lights.emplace(entity, LightComponent{});
+                lights.at(entity).setEntityId(entity);
+                getEntity(entity)->components.push_back(ComponentTypes::LIGHT);
+                createComponent(entity, ComponentTypes::TRANSFORM);
+                context.engineContext.setUpdateLights();
+                break;
+            }
+            case ComponentTypes::TRANSFORM: {
                 transforms.emplace(entity, TransformComponent{});
                 transforms.at(entity).setEntityId(entity);
-                getEntity(entity)->components.push_back(ComponentTypes::ComponentType::TRANSFORM);
+                getEntity(entity)->components.push_back(ComponentTypes::TRANSFORM);
+                context.worldGridRepository.getCurrentTile()->entities.push_back(entity);
+                entities.at(entity).onTile = context.worldGridRepository.getCurrentTile()->id;
                 break;
             }
             default:

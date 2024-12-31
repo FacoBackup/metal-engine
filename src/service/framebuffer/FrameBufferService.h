@@ -1,6 +1,7 @@
 #ifndef RENDERPASSSERVICE_H
 #define RENDERPASSSERVICE_H
 
+#include <glm/vec4.hpp>
 #include <vulkan/vulkan_core.h>
 
 #include "../abstract/AbstractResourceService.h"
@@ -29,7 +30,7 @@ namespace Metal {
             : AbstractResourceService(context) {
         }
 
-        FrameBufferInstance *createFrameBuffer(uint32_t w, uint32_t h);
+        FrameBufferInstance *createFrameBuffer(uint32_t w, uint32_t h, glm::vec4 clearColor = glm::vec4(0.0f));
 
         void createDepthAttachment(FrameBufferInstance *framebuffer) const;
 

@@ -47,12 +47,12 @@ namespace Metal {
                 VertexData vertexData{};
                 vertexData.vertex = glm::vec3(
                     assimpMesh->mVertices[j].x,
-                    -assimpMesh->mVertices[j].y,
+                    assimpMesh->mVertices[j].y,
                     assimpMesh->mVertices[j].z
                 );
                 if (assimpMesh->HasNormals()) {
                     vertexData.normal = glm::vec3(
-                        assimpMesh->mNormals[j].x,
+                        -assimpMesh->mNormals[j].x,
                         assimpMesh->mNormals[j].y,
                         assimpMesh->mNormals[j].z
                     );
@@ -82,18 +82,13 @@ namespace Metal {
         }
     }
 
-    void SceneImporterService::persistAllMaterials(const std::string &targetDir, const aiScene *scene,
-                                                   std::unordered_map<unsigned int, std::string> &materialMap,
-                                                   const std::string &rootDirectory) const {
+    void SceneImporterService::collectMaterials(const std::string &targetDir, const aiScene *scene,
+                                                std::unordered_map<unsigned int, MaterialData> &materials,
+                                                const std::string &rootDirectory) const {
         for (unsigned int i = 0; i < scene->mNumMaterials; ++i) {
             const aiMaterial *material = scene->mMaterials[i];
-            FileMetadata materialMetadata{};
-            materialMetadata.type = EntryType::MATERIAL;
-            materialMetadata.name = "Material " + i;
-            DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(materialMetadata.getId()), materialMetadata)
-            materialMap.insert({i, materialMetadata.getId()});
-
-            auto materialData = MaterialData{};
+            materials.insert({i, MaterialData{}});
+            auto &materialData = materials.at(i);
             for (int textureType = aiTextureType_NONE + 1; textureType <= aiTextureType_UNKNOWN; ++textureType) {
                 const auto type = static_cast<aiTextureType>(textureType);
 
@@ -132,7 +127,6 @@ namespace Metal {
                     }
                 }
             }
-            DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialMetadata.getId()), materialData)
         }
     }
 
@@ -140,7 +134,8 @@ namespace Metal {
         Assimp::Importer importer;
         const aiScene *scene = importer.ReadFile(
             pathToFile,
-            aiProcess_FlipWindingOrder | aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GlobalScale | aiProcess_FindInstances |
+            aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GlobalScale |
+            aiProcess_FindInstances |
             aiProcess_PreTransformVertices | aiProcess_GenSmoothNormals);
 
         if (!scene || !scene->HasMeshes()) {
@@ -158,11 +153,11 @@ namespace Metal {
         std::unordered_map<unsigned int, std::string> meshMap{};
         std::unordered_map<std::string, unsigned int> meshMaterialMap{};
         persistAllMeshes(targetDir, scene, meshMap, meshMaterialMap);
-        std::unordered_map<unsigned int, std::string> materialsMap{};
+        std::unordered_map<unsigned int, MaterialData> materialsMap{};
         fs::path absolutePath = fs::absolute(pathToFile);
         fs::path directoryPath = absolutePath.parent_path(); // Get the directory
 
-        persistAllMaterials(targetDir, scene, materialsMap, directoryPath.string());
+        collectMaterials(targetDir, scene, materialsMap, directoryPath.string());
 
         int increment = 0;
         ProcessNode(increment, sceneData, scene->mRootNode, -1, meshMap, meshMaterialMap, materialsMap);
@@ -173,7 +168,7 @@ namespace Metal {
     void SceneImporterService::ProcessNode(int &increment, SceneData &scene, const aiNode *node, int parentId,
                                            const std::unordered_map<unsigned int, std::string> &meshMap,
                                            const std::unordered_map<std::string, unsigned int> &meshMaterialMap,
-                                           const std::unordered_map<unsigned int, std::string> &materialsMap) {
+                                           const std::unordered_map<unsigned int, MaterialData> &materialsMap) {
         auto &currentNode = scene.entities.emplace_back();
 
         currentNode.name = node->mName.data;
@@ -191,7 +186,7 @@ namespace Metal {
             if (meshMaterialMap.contains(childMeshNode.meshId)) {
                 unsigned int matIndex = meshMaterialMap.at(childMeshNode.meshId);
                 if (materialsMap.contains(matIndex)) {
-                    childMeshNode.materialId = materialsMap.at(matIndex);
+                    childMeshNode.material = materialsMap.at(matIndex);
                 }
             }
             increment++;

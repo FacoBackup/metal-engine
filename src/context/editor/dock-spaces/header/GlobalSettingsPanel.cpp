@@ -24,9 +24,9 @@ namespace Metal {
         ImGui::SetNextItemWidth(150);
         int option = 0;
 
-        if (ImGui::Combo((id + "##entities").c_str(), &option, options)) {
+        if (ImGui::Combo((id + "##entities").c_str(), &option, ComponentTypes::NAMES)) {
             auto id = context->worldRepository.createEntity();
-            context->worldRepository.createComponent(id, ComponentTypes::ValueOfIndex(option - 1));
+            context->worldRepository.createComponent(id, ComponentTypes::ValueOfIndex(option));
             context->selectionService.clearSelection();
             context->selectionService.addSelected(id);
         }

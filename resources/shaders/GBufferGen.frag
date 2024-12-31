@@ -1,4 +1,4 @@
-#include "./GlobalData.glsl"
+#include "./GlobalDataBuffer.glsl"
 
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inNormal;
@@ -83,8 +83,8 @@ void main () {
 
     vec3 checkerPos = floor(inPosition.xyz / .5);
     float checkerValue = mod(checkerPos.x + checkerPos.y + checkerPos.z, 2.0);
-    outAlbedoEmissive = vec4(mix(vec3(1), vec3(.1), checkerValue), 0);
-    outRoughnessMetallicAO = vec4(.5, .5, 1, 0);
+    outAlbedoEmissive = vec4(mix(vec3(1), vec3(.7), checkerValue), 0);
+    outRoughnessMetallicAO = vec4(outAlbedoEmissive.r, .5, 1, 0);
     outNormal = vec4(N, 1);
     outDepthIdUV = vec4(encode(globalData.logDepthFC, gl_FragCoord.z), inRenderingIndex + 1, inUV);
 }

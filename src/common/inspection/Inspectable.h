@@ -11,6 +11,10 @@
 #include "../../enum/EntryType.h"
 
 namespace Metal {
+    class ApplicationContext;
+}
+
+namespace Metal {
     class Inspectable {
         const std::string uniqueIdentifier = Util::uuidV4();
         std::vector<std::shared_ptr<InspectableMember> > fields{};
@@ -24,7 +28,7 @@ namespace Metal {
 
         void registerFloat(float &v, std::string group, std::string name, float min = std::numeric_limits<float>::min(),
                            float max = std::numeric_limits<float>::max(),
-                           bool disabled = false);
+                           bool disabled = false, float increment = .1);
 
         void registerInt(int &v, std::string group, std::string name,
                          int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max(),
@@ -42,22 +46,22 @@ namespace Metal {
         void registerVec2(glm::vec2 &v,
                           std::string group, std::string name,
                           float min = std::numeric_limits<float>::min(), float max = std::numeric_limits<float>::max(),
-                          bool disabled = false);
+                          bool disabled = false, float increment = .1);
 
         void registerVec3(glm::vec3 &v,
                           std::string group, std::string name,
                           float min = std::numeric_limits<float>::min(), float max = std::numeric_limits<float>::max(),
-                          bool disabled = false);
+                          bool disabled = false, float increment = .1);
 
         void registerVec4(glm::vec4 &v,
                           std::string group, std::string name,
                           float min = std::numeric_limits<float>::min(), float max = std::numeric_limits<float>::max(),
-                          bool disabled = false);
+                          bool disabled = false, float increment = .1);
 
         void registerQuat(glm::quat &v,
                           std::string group, std::string name,
                           float min = std::numeric_limits<float>::min(), float max = std::numeric_limits<float>::max(),
-                          bool disabled = false);
+                          bool disabled = false, float increment = .1);
 
         void registerColor(glm::vec3 &v,
                            std::string group, std::string name, bool disabled = false);
@@ -87,6 +91,9 @@ namespace Metal {
 
         virtual const char *getTitle() {
             throw std::logic_error("Not implemented");
+        }
+
+        virtual void onUpdate(InspectableMember *member, ApplicationContext &context) {
         }
     };
 }

@@ -17,6 +17,7 @@ namespace Metal {
         bool blendEnabled = false;
         bool prepareForMesh = false;
         bool depthTest = false;
+        bool useStrip = false;
 
         static PipelineBuilder Of(FrameBufferInstance *frameBuffer, const char *vertexShader,
                                   const char *fragmentShader) {
@@ -39,6 +40,11 @@ namespace Metal {
 
         PipelineBuilder &setDepthTest() {
             depthTest = true;
+            return *this;
+        }
+
+        PipelineBuilder &useTriangleStrip() {
+            useStrip = true;
             return *this;
         }
 

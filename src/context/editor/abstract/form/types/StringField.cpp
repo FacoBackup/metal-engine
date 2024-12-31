@@ -1,6 +1,7 @@
 #include "StringField.h"
 
 #include <imgui.h>
+#include "../../../../../common/inspection/Inspectable.h"
 
 namespace Metal {
     StringField::StringField(InspectedField<std::string> &field) : field(field) {
@@ -12,6 +13,8 @@ namespace Metal {
             ImGui::Text(field.name.c_str());
             if (ImGui::InputText(field.id.c_str(), buffer, sizeof(buffer))) {
                 *field.field = buffer;
+                field.instance->registerChange();
+field.instance->onUpdate(&field, *context);
             }
         } else {
             ImGui::Text("%s: %s", field.name.c_str(), field.field->c_str());

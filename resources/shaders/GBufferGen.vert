@@ -1,4 +1,4 @@
-#include "./GlobalData.glsl"
+#include "./GlobalDataBuffer.glsl"
 
 layout(push_constant) uniform Push {
     mat4 model;

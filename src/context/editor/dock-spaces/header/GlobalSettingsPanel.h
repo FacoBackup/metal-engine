@@ -11,7 +11,6 @@ namespace Metal {
 
         int editorMode = 0;
         int shadingModelOption = 0;
-        const char *options = "Add Entity\0Mesh\0";
 
     public:
         void onSync() override;

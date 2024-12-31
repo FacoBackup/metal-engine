@@ -23,7 +23,7 @@ namespace Metal::NotificationSeverities {
         return nullptr;
     }
 
-    static ImVec4 GetColor(NotificationSeverities::NotificationSeverity severity) {
+    static ImVec4 GetColor(NotificationSeverity severity) {
         switch (severity) {
             case WARNING:
                 return ImColor(180, 180, 0, 255);

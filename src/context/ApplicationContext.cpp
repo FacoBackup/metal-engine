@@ -27,7 +27,7 @@ namespace Metal {
             rootDirectory = cachedPath;
         }
         PARSE_TEMPLATE(editorRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(EditorRepository))
-        PARSE_TEMPLATE(atmosphereRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(AtmosphereRepository))
+        PARSE_TEMPLATE(engineRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(EngineRepository))
         PARSE_TEMPLATE(worldGridRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldGridRepository))
         PARSE_TEMPLATE(worldRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository))
 
@@ -101,7 +101,7 @@ namespace Metal {
     void ApplicationContext::save() {
         try {
             DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(EditorRepository), editorRepository)
-            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(AtmosphereRepository), atmosphereRepository)
+            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(EngineRepository), engineRepository)
             DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldGridRepository), worldGridRepository)
             DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository), worldRepository)
             notificationService.pushMessage("Project saved", NotificationSeverities::SUCCESS);

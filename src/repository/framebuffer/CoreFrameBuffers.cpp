@@ -26,6 +26,12 @@ namespace Metal {
                                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, auxFBO);
             framebufferService.createRenderPass(auxFBO);
         } {
+            aoFBO = framebufferService.createFrameBuffer(vulkanContext.getWindowWidth() / 2,
+                                                         vulkanContext.getWindowHeight() / 2, glm::vec4(1));
+            framebufferService.createAttachment("Ambient occlusion", VK_FORMAT_R16_SFLOAT,
+                                                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, aoFBO);
+            framebufferService.createRenderPass(aoFBO);
+        } {
             // POST PROCESSING
             postProcessingFBO = framebufferService.createFrameBuffer(vulkanContext.getWindowWidth(),
                                                                      vulkanContext.getWindowHeight());
