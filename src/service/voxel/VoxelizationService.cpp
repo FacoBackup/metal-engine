@@ -21,16 +21,17 @@ namespace Metal {
         const float edgeLength3 = glm::distance(triangle.v2, triangle.v0);
 
         const float maxEdgeLength = std::max(edgeLength1, std::max(edgeLength2, edgeLength3));
-        const auto voxelSize = static_cast<float>(TILE_SIZE / std::pow(2, MAX_DEPTH));
-        float stepSize = voxelSize / maxEdgeLength;
+        int localMaxDepth = MAX_DEPTH + 1;
+        float stepSize = 0;
         if (edgeLength1 == INFINITY || edgeLength2 == INFINITY || edgeLength3 == INFINITY) {
             stepSize = .01f;
         }
-
-        if (stepSize < 0.001) {
-            std::cout << "Step size: " << stepSize << " " << edgeLength1 << " " << edgeLength2 << " " << edgeLength3 <<
-                    std::endl;
+        while (stepSize < .01) {
+            localMaxDepth--;
+            const auto voxelSize = static_cast<float>(TILE_SIZE / std::pow(2, localMaxDepth));
+            stepSize = voxelSize / maxEdgeLength;
         }
+
         for (float lambda1 = 0; lambda1 <= 1; lambda1 += stepSize) {
             for (float lambda2 = 0; lambda2 <= 1 - lambda1; lambda2 += stepSize) {
                 float lambda0 = 1 - lambda1 - lambda2;
@@ -51,13 +52,16 @@ namespace Metal {
                 if (voxelTile != nullptr) {
                     if (!builders.contains(voxelTile->id)) {
                         builders.emplace(voxelTile->id,
-                                         SparseVoxelOctreeBuilder(MAX_DEPTH, voxelTile));
+                                         SparseVoxelOctreeBuilder(voxelTile));
                     }
                     glm::vec3 albedo(component->albedoColor);
                     glm::vec2 roughnessMetallic(component->roughnessFactor, component->metallicFactor);
                     builders.at(voxelTile->id).insert(
-                        point, std::make_shared<VoxelData>(albedo, normal, roughnessMetallic,
-                                                           component->emissiveSurface));
+                        localMaxDepth,
+                        point,
+                        new VoxelData(
+                            albedo, normal, roughnessMetallic,
+                            component->emissiveSurface));
                 }
             }
         }
@@ -91,31 +95,31 @@ namespace Metal {
         }
     }
 
-    void VoxelizationService::FillStorage(unsigned int targetDepth, unsigned int &bufferIndex,
+    void VoxelizationService::FillStorage(unsigned int &bufferIndex,
                                           unsigned int &materialBufferIndex,
                                           SparseVoxelOctreeData &voxels, OctreeNode *node) {
-        if (node->isLeaf(targetDepth)) {
+        if (node->isLeaf) {
             return;
         }
 
-        voxels.data[node->dataIndex] = node->packVoxelData(bufferIndex, targetDepth);
+        voxels.data[node->dataIndex] = node->packVoxelData(bufferIndex);
         bool isParentOfLeaf = true;
         for (auto &child: node->children) {
-            if (child != nullptr && !child->isLeaf(targetDepth)) {
-                PutData(bufferIndex, child.get());
+            if (child != nullptr && !child->isLeaf) {
+                PutData(bufferIndex, child);
                 isParentOfLeaf = false;
             }
         }
 
         for (auto &child: node->children) {
             if (child != nullptr) {
-                FillStorage(targetDepth, bufferIndex, materialBufferIndex, voxels, child.get());
+                FillStorage(bufferIndex, materialBufferIndex, voxels, child);
             }
         }
 
         if (isParentOfLeaf && node->data != nullptr) {
             std::array<unsigned int, 2> compressed = node->data->compress();
-            voxels.data[node->dataIndex] = node->packVoxelData(materialBufferIndex, targetDepth);
+            voxels.data[node->dataIndex] = node->packVoxelData(materialBufferIndex);
             voxels.data[materialBufferIndex + voxels.voxelBufferOffset] = compressed[0];
             materialBufferIndex++;
             voxels.data[materialBufferIndex + voxels.voxelBufferOffset] = compressed[1];
@@ -134,23 +138,20 @@ namespace Metal {
     }
 
     void VoxelizationService::serialize(SparseVoxelOctreeBuilder &builder) const {
-        for (LevelOfDetail &lod: LevelOfDetail::LODs) {
-            METRIC_START(std::format("Starting serialization {}", builder.getTile()->id))
+        METRIC_START(std::format("Starting serialization {}", builder.getTile()->id))
 
-            const unsigned int desiredMaxDepth = MAX_DEPTH - (lod.level - 1);
-            SparseVoxelOctreeData data{};
-            data.data.resize(builder.getVoxelQuantity() + builder.getLeafVoxelQuantity() * 2);
-            data.voxelBufferOffset = builder.getVoxelQuantity();
+        SparseVoxelOctreeData data{};
+        data.data.resize(builder.getVoxelQuantity() + builder.getLeafVoxelQuantity() * 2);
+        data.voxelBufferOffset = builder.getVoxelQuantity();
 
-            unsigned int bufferIndex = 0;
-            unsigned int materialBufferIndex = 0;
-            PutData(bufferIndex, &builder.getRoot());
-            FillStorage(desiredMaxDepth, bufferIndex, materialBufferIndex, data, &builder.getRoot());
+        unsigned int bufferIndex = 0;
+        unsigned int materialBufferIndex = 0;
+        PutData(bufferIndex, &builder.getRoot());
+        FillStorage(bufferIndex, materialBufferIndex, data, &builder.getRoot());
 
-            std::string filePath = context.getAssetDirectory() + FORMAT_FILE_SVO(builder.getTile()->id, lod);
-            DUMP_TEMPLATE(filePath, data)
-            METRIC_END("Ending serialization ")
-        }
+        std::string filePath = context.getAssetDirectory() + FORMAT_FILE_SVO(builder.getTile()->id);
+        DUMP_TEMPLATE(filePath, data)
+        METRIC_END("Ending serialization ")
     }
 
     void VoxelizationService::voxelizeScene() const {
@@ -160,20 +161,23 @@ namespace Metal {
             for (auto entity: t.second.entities) {
                 if (context.worldRepository.meshes.contains(entity)) {
                     auto &meshComponent = context.worldRepository.meshes.at(entity);
-                    auto *mesh = context.meshService.stream(meshComponent.meshId, LevelOfDetail::LOD_0);
-                    if (mesh != nullptr) {
-                        auto &transformComponent = context.worldRepository.transforms.at(entity);
-                        METRIC_START(std::format("Voxelizing mesh {}", meshComponent.getEntityId()))
-                        voxelize(&meshComponent, transformComponent.model, mesh, builders);
-                        METRIC_END("Voxelization took: ")
+                    auto &transformComponent = context.worldRepository.transforms.at(entity);
+                    if (transformComponent.isStatic) {
+                        auto *mesh = context.meshService.stream(meshComponent.meshId, LevelOfDetail::LOD_0);
+                        if (mesh != nullptr) {
+                            METRIC_START(std::format("Voxelizing mesh {}", meshComponent.getEntityId()))
+                            voxelize(&meshComponent, transformComponent.model, mesh, builders);
+                            METRIC_END("Voxelization took: ")
+                        }
+                        delete mesh;
                     }
-                    delete mesh;
                 }
             }
         }
 
         for (auto &t: builders) {
             serialize(t.second);
+            t.second.dispose();
         }
         context.svoService.disposeAll();
         METRIC_END("Ending Voxelization ")

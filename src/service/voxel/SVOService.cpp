@@ -12,13 +12,13 @@
 
 namespace Metal {
     SVOInstance *SVOService::create(const std::string &id, const LevelOfDetail &levelOfDetail) {
-        if (std::string fileName = context.getAssetDirectory() + FORMAT_FILE_SVO(id, levelOfDetail);
+        if (std::string fileName = context.getAssetDirectory() + FORMAT_FILE_SVO(id);
             std::filesystem::exists(fileName)) {
             std::cout << "Streaming SVO " << fileName << std::endl;
             auto data = SparseVoxelOctreeData();
             PARSE_TEMPLATE(data.load, fileName)
 
-            auto *instance = new SVOInstance(id + levelOfDetail.suffix);
+            auto *instance = new SVOInstance(id);
             registerResource(instance);
             instance->voxelsBuffer = context.bufferService.createBuffer(
                 data.data.size() * sizeof(uint32_t),

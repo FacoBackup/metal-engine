@@ -47,8 +47,7 @@ namespace Metal {
             unsigned int i = 0;
             for (auto *tile: context.worldGridRepository.getLoadedTiles()) {
                 if (tile != nullptr) {
-                    const auto *svo = context.streamingRepository.streamSVO(
-                        tile->id, LevelOfDetail::OfNumber(context.engineRepository.voxelLevelOfDetail));
+                    const auto *svo = context.streamingRepository.streamSVO(tile->id);
                     if (svo != nullptr) {
                         context.coreDescriptorSets.svoData->addBufferDescriptor(
                             i + 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,

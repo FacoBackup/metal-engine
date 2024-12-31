@@ -47,7 +47,7 @@ namespace Metal {
                 VertexData vertexData{};
                 vertexData.vertex = glm::vec3(
                     assimpMesh->mVertices[j].x,
-                    -assimpMesh->mVertices[j].y,
+                    assimpMesh->mVertices[j].y,
                     assimpMesh->mVertices[j].z
                 );
                 if (assimpMesh->HasNormals()) {
@@ -83,8 +83,8 @@ namespace Metal {
     }
 
     void SceneImporterService::collectMaterials(const std::string &targetDir, const aiScene *scene,
-                                                   std::unordered_map<unsigned int, MaterialData> &materials,
-                                                   const std::string &rootDirectory) const {
+                                                std::unordered_map<unsigned int, MaterialData> &materials,
+                                                const std::string &rootDirectory) const {
         for (unsigned int i = 0; i < scene->mNumMaterials; ++i) {
             const aiMaterial *material = scene->mMaterials[i];
             materials.insert({i, MaterialData{}});
@@ -134,7 +134,7 @@ namespace Metal {
         Assimp::Importer importer;
         const aiScene *scene = importer.ReadFile(
             pathToFile,
-            aiProcess_FlipWindingOrder | aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GlobalScale |
+            aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GlobalScale |
             aiProcess_FindInstances |
             aiProcess_PreTransformVertices | aiProcess_GenSmoothNormals);
 

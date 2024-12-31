@@ -78,6 +78,8 @@ namespace Metal {
                 transforms.emplace(entity, TransformComponent{});
                 transforms.at(entity).setEntityId(entity);
                 getEntity(entity)->components.push_back(ComponentTypes::TRANSFORM);
+                context.worldGridRepository.getCurrentTile()->entities.push_back(entity);
+                entities.at(entity).onTile = context.worldGridRepository.getCurrentTile()->id;
                 break;
             }
             default:

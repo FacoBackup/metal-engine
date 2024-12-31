@@ -29,7 +29,7 @@ namespace Metal {
 
         MeshInstance *streamMesh(const std::string &id, const LevelOfDetail &lod);
 
-        SVOInstance *streamSVO(const std::string &id, const LevelOfDetail &lod);
+        SVOInstance *streamSVO(const std::string &id);
 
         TextureInstance *streamTexture(const std::string &id, const LevelOfDetail &lod);
 

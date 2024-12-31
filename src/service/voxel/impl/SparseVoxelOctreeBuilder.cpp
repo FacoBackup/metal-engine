@@ -2,7 +2,8 @@
 #include "../../../repository/world/impl/WorldTile.h"
 
 namespace Metal {
-    void SparseVoxelOctreeBuilder::insert(glm::vec3 &point, const std::shared_ptr<VoxelData> &data) {
+    void SparseVoxelOctreeBuilder::insert(int maxDepth, glm::vec3 &point, VoxelData *data) {
+        this->data.push_back(data);
         if (maxDepth < 1) {
             throw std::runtime_error("Depth is not set");
         }
@@ -10,16 +11,25 @@ namespace Metal {
         if (tile->boundingBox.intersects(point)) {
             WorldToChunkLocal(tile, point);
             auto pos = glm::ivec3{0, 0, 0};
-            insertInternal(&root, point, data, pos, 0);
+            insertInternal(&root, point, data, pos, 0, maxDepth);
         }
     }
 
+    void SparseVoxelOctreeBuilder::dispose() const {
+        for (const auto *data: this->data) {
+            delete data;
+        }
+        root.dispose();
+    }
+
     void SparseVoxelOctreeBuilder::insertInternal(OctreeNode *node, glm::vec3 &point,
-                                                  const std::shared_ptr<VoxelData> &data, glm::ivec3 &position,
-                                                  const int depth) {
+                                                  VoxelData *data, glm::ivec3 &position,
+                                                  const int depth,
+                                                  const int maxDepth) {
         node->data = data;
         node->depth = depth;
         if (depth == maxDepth) {
+            node->isLeaf = true;
             return;
         }
 
@@ -36,17 +46,17 @@ namespace Metal {
         position.z = (position.z << 1) | childPos.z;
 
         if (node->children[childIndex] != nullptr) {
-            insertInternal(node->children[childIndex].get(), point, data, position, depth + 1);
+            insertInternal(node->children[childIndex], point, data, position, depth + 1, maxDepth);
         } else {
-            auto child = std::make_shared<OctreeNode>();
+            auto *child = new OctreeNode;
             node->addChild(child, childIndex);
-            insertInternal(child.get(), point, data, position, depth + 1);
+            insertInternal(child, point, data, position, depth + 1, maxDepth);
 
             if (child->depth == maxDepth - 1) {
                 leafVoxelQuantity++;
             }
             // Leaf nodes don't need to be included on the tree
-            if (child->depth != maxDepth) {
+            if (!child->isLeaf) {
                 nodeQuantity++;
             }
         }

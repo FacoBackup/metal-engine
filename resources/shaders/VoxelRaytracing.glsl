@@ -83,6 +83,28 @@ uint getVoxel(uint index, uint bufferIndex){
     }
 }
 
+vec4 intersectRayAABB(in Ray ray, vec3 boxMin, vec3 boxMax) {
+    vec3 tMin = (boxMin - ray.o) * ray.invDir;
+    vec3 tMax = (boxMax - ray.o) * ray.invDir;
+
+    // Swap tMin and tMax for negative directions
+    vec3 t1 = min(tMin, tMax);
+    vec3 t2 = max(tMin, tMax);
+
+    // Find the largest t1 and the smallest t2
+    float tNear = max(max(t1.x, t1.y), t1.z);
+    float tFar = min(min(t2.x, t2.y), t2.z);
+
+    // Check if the ray intersects the AABB
+    if (tNear > tFar || tFar < 0.0) {
+        return vec4(0);// No intersection
+    }
+
+    // Compute intersection point
+    float t = tNear > 0.0 ? tNear : tFar;// Use tNear if it's in front
+    return vec4(ray.o + t * ray.d, 1);
+}
+
 Hit trace(
 in Ray ray,
 uint bufferIndex
@@ -94,7 +116,7 @@ inout vec3 finalColor
 ) {
     vec4 localTileInfo = tileInfo.tileCenterValid[bufferIndex - 1];
     uint matrialBufferOffset = tileInfo.voxelBufferOffset[bufferIndex - 1];
-    if (localTileInfo.w == 0) { return Hit(false, vec3(0), 0, 0, 0, bufferIndex, 0, 0); }
+    if (localTileInfo.w == 0) { return Hit(vec3(0), vec3(0), false, 0, 0, 0, bufferIndex, 0, 0); }
 
     vec3 center = localTileInfo.xyz * HALF_TILE_SIZE * 2;
     float scale = HALF_TILE_SIZE;
@@ -102,7 +124,7 @@ inout vec3 finalColor
     vec3 maxBox = center + scale;
     float minDistance = 1e10;// Large initial value
 
-    if (!intersect(minBox, maxBox, ray)) return Hit(false, vec3(0), 0, 0, 0, bufferIndex, 0, 0);
+    if (!intersect(minBox, maxBox, ray)) return Hit(vec3(0), vec3(0), false, 0, 0, 0, bufferIndex, 0, 0);
     Stack stack[6];
     scale *= 0.5f;
     stack[0] = Stack(0u, center, scale);
@@ -113,7 +135,8 @@ inout vec3 finalColor
     int searchCount = 0;
     #endif
     int stackPos = 1;
-    Hit hitData = Hit(false, vec3(0), 0, 0, 0, bufferIndex, 0, 0);
+    Hit hitData = Hit(vec3(0), vec3(0), false, 0, 0, 0, bufferIndex, 0, 0);
+    uint hitIndex;
     while (stackPos-- > 0) {
         #ifdef DEBUG_VOXELS
         if (showRaySearchCount){
@@ -157,12 +180,12 @@ inout vec3 finalColor
             if (entryDist < minDistance) {
                 if (isLeafGroup) {
                     hitData.anyHit = true;
-                    hitData.hitPosition = newCenter;
+                    hitData.voxelPosition = newCenter;
                     hitData.voxel = voxel_node;
                     hitData.voxelBufferIndex = index;
                     hitData.voxelSize = scale;
-                    hitData.matData1 = getVoxel(childGroupIndex + matrialBufferOffset, bufferIndex);
-                    hitData.matData2 = getVoxel(childGroupIndex + matrialBufferOffset + 1, bufferIndex);
+                    hitIndex = childGroupIndex;
+
                     index++;
                     minDistance = entryDist;
                 } else {
@@ -171,6 +194,14 @@ inout vec3 finalColor
             }
         }
     }
+
+    if (hitData.anyHit){
+        vec3 vSize = vec3(hitData.voxelSize);
+        hitData.hitPosition = intersectRayAABB(ray, hitData.voxelPosition - vSize, hitData.voxelPosition + vSize).rgb;
+        hitData.matData1 = getVoxel(hitIndex + matrialBufferOffset, bufferIndex);
+        hitData.matData2 = getVoxel(hitIndex + matrialBufferOffset + 1, bufferIndex);
+    }
+
     return hitData;
 }
 

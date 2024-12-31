@@ -49,7 +49,7 @@ void main() {
             finalColor = vec4(vec3(matData.metallic), 1);
             break;
             default :
-            finalColor = vec4(randomColor(rand(hitData.hitPosition.xyz)), 1);
+            finalColor = vec4(randomColor(rand(hitData.voxelPosition.xyz)), 1);
             break;
         }
     } else {

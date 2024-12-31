@@ -1,6 +1,7 @@
 struct Hit {
-    bool anyHit;
     vec3 hitPosition;
+    vec3 voxelPosition;
+    bool anyHit;
     float voxelSize;
     uint voxel;
     uint voxelBufferIndex;

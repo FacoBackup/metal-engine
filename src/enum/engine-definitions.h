@@ -18,7 +18,7 @@ typedef unsigned long long EntityID;
 #define FORMAT_FILE_TEXTURE(baseName, lod) (baseName + FILE_NAME_SEPARATOR + lod.suffix + FILE_TEXTURE + METAL_FILE_EXTENSION)
 #define FORMAT_FILE_SCENE(baseName) (baseName + FILE_NAME_SEPARATOR + FILE_SCENE + METAL_FILE_EXTENSION)
 #define FORMAT_FILE_METADATA(baseName) (baseName + FILE_METADATA)
-#define FORMAT_FILE_SVO(baseName, lod) (baseName + FILE_NAME_SEPARATOR + lod.suffix + FILE_SVO + METAL_FILE_EXTENSION)
+#define FORMAT_FILE_SVO(baseName) (baseName + FILE_SVO + METAL_FILE_EXTENSION)
 
 #define METRIC_START(M) \
 auto currentTime = Clock::now(); \

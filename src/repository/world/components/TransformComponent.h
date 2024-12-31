@@ -15,7 +15,7 @@ namespace Metal {
         glm::quat rotation = {0, 0, 0, 1};
         glm::vec3 scale{1, 1, 1};
         bool forceTransform = false;
-        bool isStatic = false;
+        bool isStatic = true;
 
         void registerFields() override;
 
