@@ -10,3 +10,4 @@
 #define POSITION 9
 #define BRDF 10
 #define EMISSIVE 11
+#define GI 12

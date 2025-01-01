@@ -16,7 +16,7 @@ layout(set = 2, binding = 0) uniform sampler2D gBufferRoughnessMetallicAO;
 layout(set = 3, binding = 0) uniform sampler2D gBufferNormal;
 layout(set = 4, binding = 0) uniform sampler2D gBufferDepthIdUV;
 layout(set = 5, binding = 0) uniform sampler2D brdfSampler;
-layout(set = 6, binding = 0) uniform sampler2D aoSampler;
+layout(set = 6, binding = 0) uniform sampler2D giSampler;
 
 #ifdef DEBUG
 layout(push_constant) uniform Push {
@@ -43,12 +43,13 @@ void main() {
     }
 
     vec4 albedoEmissive = texture(gBufferAlbedoEmissive, texCoords);
+    vec4 globalIllumination = texture(giSampler, texCoords);
     ShaderData shaderData;
     shaderData.N = normalize(texture(gBufferNormal, texCoords).rgb);
     vec3 valueRMAOSampler = texture(gBufferRoughnessMetallicAO, texCoords).rgb;
     shaderData.roughness = valueRMAOSampler.r;
     shaderData.metallic = valueRMAOSampler.g;
-    shaderData.ambientOcclusion = valueRMAOSampler.b * texture(aoSampler, texCoords).r;
+    shaderData.ambientOcclusion = valueRMAOSampler.b * globalIllumination.a;
     shaderData.viewSpacePosition = viewSpacePositionFromDepth(depthData, texCoords, globalData.invProj);
     shaderData.worldSpacePosition = vec3(globalData.invView * vec4(shaderData.viewSpacePosition, 1));
     shaderData.V = normalize(globalData.cameraWorldPosition - shaderData.worldSpacePosition);
@@ -87,6 +88,8 @@ void main() {
             finalColor = vec4(shaderData.worldSpacePosition, 1);
         } else if (push.mode == EMISSIVE){
             finalColor = vec4(albedoEmissive.a > 0 ? vec3(1) : vec3(0), 1);
+        } else if (push.mode == GI){
+            finalColor = vec4(globalIllumination.rgb, 1);
         } else {
             finalColor = vec4(shaderData.albedo, 1);
         }
@@ -98,5 +101,5 @@ void main() {
         finalColor = vec4(albedoEmissive.rgb, 1.);
         return;
     }
-    finalColor = vec4(physicallyBasedShadePixel(shaderData), 1.);
+    finalColor = vec4(physicallyBasedShadePixel(shaderData) + globalIllumination.rgb, 1.);
 }

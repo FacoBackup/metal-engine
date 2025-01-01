@@ -11,6 +11,8 @@ namespace Metal {
     }
 
     void GlobalIlluminationPass::onSync() {
+        pushConstant.giSamplesPerPixel = context.engineRepository.giSamplesPerPixel;
+        pushConstant.giBounces = context.engineRepository.giBounces;
         pushConstant.shadowsBaseColor = context.engineRepository.shadowsBaseColor;
         pushConstant.ditheringIntensity = context.engineRepository.ditheringIntensity;
         pushConstant.biasHit = context.engineRepository.voxelHitBias;

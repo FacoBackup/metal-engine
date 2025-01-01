@@ -9,6 +9,8 @@ namespace Metal {
         bool voxelGIEnabled = false;
         float ditheringIntensity = 0;
         float shadowsBaseColor = 2;
+        int giBounces = 1;
+        int giSamplesPerPixel = 1;
         float voxelHitBias = .05;
         int numberOfTiles = 10;
         float elapsedTime = .5f;
@@ -32,6 +34,7 @@ namespace Metal {
         void onUpdate(InspectableMember *member, ApplicationContext &context) override;
 
         SAVE_TEMPLATE(
+            giBounces,
             atmosphereEnabled,
             elapsedTime,
             incrementTime,
@@ -46,7 +49,8 @@ namespace Metal {
             voxelHitBias,
             shadowsBaseColor,
             voxelGIEnabled,
-            ditheringIntensity
+            ditheringIntensity,
+            giSamplesPerPixel
         )
     };
 } // Metal
