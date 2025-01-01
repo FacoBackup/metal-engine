@@ -39,18 +39,15 @@ namespace Metal {
             for (float lambda2 = 0; lambda2 <= 1 - lambda1; lambda2 += stepSize) {
                 float lambda0 = 1 - lambda1 - lambda2;
 
-                float u = lambda0 * triangle.uv0.x + lambda1 * triangle.uv1.x + lambda2 * triangle.uv2.x;
-                float v = lambda0 * triangle.uv0.y + lambda1 * triangle.uv1.y + lambda2 * triangle.uv2.y;
-                glm::vec3 point{
-                    lambda0 * triangle.v0.x + lambda1 * triangle.v1.x + lambda2 * triangle.v2.x,
-                    lambda0 * triangle.v0.y + lambda1 * triangle.v1.y + lambda2 * triangle.v2.y,
-                    lambda0 * triangle.v0.z + lambda1 * triangle.v1.z + lambda2 * triangle.v2.z
-                };
-                glm::vec3 normal{
-                    lambda0 * triangle.n0.x + lambda1 * triangle.n1.x + lambda2 * triangle.n2.x,
-                    lambda0 * triangle.n0.y + lambda1 * triangle.n1.y + lambda2 * triangle.n2.y,
-                    lambda0 * triangle.n0.z + lambda1 * triangle.n1.z + lambda2 * triangle.n2.z
-                };
+                glm::vec2 uv = lambda0 * triangle.uv0 + lambda1 * triangle.uv1 + lambda2 * triangle.uv2;
+                glm::vec3 point = lambda0 * triangle.v0 +
+                                  lambda1 * triangle.v1 +
+                                  lambda2 * triangle.v2;
+                glm::vec3 normal = glm::normalize(
+                    lambda0 * triangle.n0 +
+                    lambda1 * triangle.n1 +
+                    lambda2 * triangle.n2
+                );
                 auto *voxelTile = context.worldGridRepository.getTile(point);
                 if (voxelTile != nullptr) {
                     if (!builders.contains(voxelTile->id)) {

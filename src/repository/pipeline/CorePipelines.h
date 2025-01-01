@@ -22,7 +22,7 @@ namespace Metal {
         PipelineInstance *postProcessingPipeline = nullptr;
         PipelineInstance *gBufferShadingPipeline = nullptr;
         PipelineInstance *atmospherePipeline = nullptr;
-        PipelineInstance *voxelAOPipeline = nullptr;
+        PipelineInstance *globalIlluminationPipeline = nullptr;
         PipelineInstance *voxelDebugVisualizerPipeline = nullptr;
     };
 } // Metal

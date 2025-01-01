@@ -219,7 +219,7 @@ add_executable(
         src/service/mesh/MaterialData.h
         src/context/engine/render-pass/impl/PostProcessingPass.cpp
         src/context/engine/render-pass/impl/PostProcessingPass.h
-        src/dto/ubo/PPSettingsUBO.h
+        src/dto/push-constant/PostProcessingPushConstant.h
         src/context/engine/render-pass/impl/GBufferShadingPass.cpp
         src/context/engine/render-pass/impl/GBufferShadingPass.h
         src/dto/push-constant/GBufferShadingPushConstant.h
@@ -252,8 +252,8 @@ add_executable(
         src/context/engine/render-pass/tools/IconsPass.cpp
         src/context/engine/render-pass/tools/IconsPass.h
         src/dto/push-constant/IconPushConstant.h
-        src/context/engine/render-pass/impl/VoxelAOPass.cpp
-        src/context/engine/render-pass/impl/VoxelAOPass.h
+        src/context/engine/render-pass/impl/GlobalIlluminationPass.cpp
+        src/context/engine/render-pass/impl/GlobalIlluminationPass.h
         src/repository/editor/EditorRepository.cpp
         src/dto/push-constant/GIPushConstant.h
         src/dto/push-constant/GridPushConstant.h

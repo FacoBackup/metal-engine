@@ -10,7 +10,6 @@ namespace Metal {
         registerBool(atmosphereEnabled, "Atmosphere", "Enabled?");
 
         registerBool(voxelGIEnabled, "Global illumination", "Enabled?");
-        registerFloat(voxelRaytracingBias, "Global illumination", "Ray tracing bias", 0, 5, false, .001);
         registerFloat(voxelHitBias, "Global illumination", "Ray tracing hit bias", 0, 10, false, .0001);
         registerFloat(shadowsBaseColor, "Global illumination", "Shadow base color", 0, 1, false, .001);
         registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);

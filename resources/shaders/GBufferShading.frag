@@ -63,6 +63,7 @@ void main() {
     shaderData.sunDirection = globalData.sunPosition;
     shaderData.sunColor = globalData.sunColor;
     shaderData.lightsQuantity = globalData.lightsQuantity;
+    shaderData.enabledSun = globalData.enabledSun;
 
     #ifdef DEBUG
     if (push.mode != LIT){
@@ -84,6 +85,8 @@ void main() {
             finalColor = vec4(shaderData.brdf, 0, 1);
         } else if (push.mode == POSITION){
             finalColor = vec4(shaderData.worldSpacePosition, 1);
+        } else if (push.mode == EMISSIVE){
+            finalColor = vec4(albedoEmissive.a > 0 ? vec3(1) : vec3(0), 1);
         } else {
             finalColor = vec4(shaderData.albedo, 1);
         }

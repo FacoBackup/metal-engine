@@ -43,11 +43,11 @@ void main() {
         case METALLIC:
         finalColor = vec4(vec3(matData.metallic), 1);
         break;
-        case RANDOM:
-        finalColor = vec4(randomColor(rand(hitData.voxelPosition.xyz)), 1);
+        case EMISSIVE:
+        finalColor = vec4(vec3(matData.isEmissive ? 1 : 0), 1);
         break;
         default :
-        finalColor = vec4(0);
+        finalColor = vec4(randomColor(rand(hitData.voxelPosition.xyz)), 1);
         break;
     }
     if (length(finalColor.rgb) == 0){

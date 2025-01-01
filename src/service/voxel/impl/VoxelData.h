@@ -20,25 +20,23 @@ namespace Metal {
         }
 
         std::array<unsigned int, 2> compress() {
-            const unsigned int roughness = static_cast<unsigned int>(std::round(roughnessMetallic.r * 100)); // 0 to 100
-            const unsigned int metallic = static_cast<unsigned int>(std::round(roughnessMetallic.g * 100));
+            const auto roughness = static_cast<unsigned int>(std::round(roughnessMetallic.r * 100)); // 0 to 100
+            const auto metallic = static_cast<unsigned int>(std::round(roughnessMetallic.g * 100));
             const unsigned int normalMetallic = CompressNormal(normal) << 7 | metallic;
 
-            int red = (color.r / 2) & 0x7F;
+            int red = (color.r / 2) & 0xFF;
             int green = color.g & 0xFF;
-            int blue = (color.b / 2) & 0x7F;
-
-            int albedo =  (red << 16) | (green << 8) | blue;
+            int blue = (color.b / 2) & 0xFF;
+            unsigned int albedo =  (red << 16) | (green << 8) | blue;
 
             return std::array{
-                albedo << 9 | isEmissive << 8 | roughness,
+                isEmissive << 31 | roughness << 24 | albedo,
                 normalMetallic
             };
         }
 
     private:
         static unsigned int CompressNormal(glm::vec3 &normal) {
-            normal = glm::normalize(normal);
             // Octahedral mapping
             glm::vec2 oct = glm::vec2(normal.x, normal.y) / (
                                 std::abs(normal.x) + std::abs(normal.y) + std::abs(normal.z));

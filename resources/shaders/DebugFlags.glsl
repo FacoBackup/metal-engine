@@ -9,3 +9,4 @@
 #define UV 8
 #define POSITION 9
 #define BRDF 10
+#define EMISSIVE 11

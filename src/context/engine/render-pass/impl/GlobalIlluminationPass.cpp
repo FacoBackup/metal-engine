@@ -1,17 +1,16 @@
-#include "VoxelAOPass.h"
+#include "GlobalIlluminationPass.h"
 #include "../../../ApplicationContext.h"
 
 namespace Metal {
-    PipelineInstance *VoxelAOPass::getPipeline() {
-        return context.corePipelines.voxelAOPipeline;
+    PipelineInstance *GlobalIlluminationPass::getPipeline() {
+        return context.corePipelines.globalIlluminationPipeline;
     }
 
-    bool VoxelAOPass::shouldRun() {
+    bool GlobalIlluminationPass::shouldRun() {
         return context.engineRepository.voxelGIEnabled;
     }
 
-    void VoxelAOPass::onSync() {
-        pushConstant.bias = context.engineRepository.voxelRaytracingBias;
+    void GlobalIlluminationPass::onSync() {
         pushConstant.shadowsBaseColor = context.engineRepository.shadowsBaseColor;
         pushConstant.biasHit = context.engineRepository.voxelHitBias;
         recordPushConstant(&pushConstant);

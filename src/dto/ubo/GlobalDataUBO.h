@@ -14,6 +14,7 @@ namespace Metal {
         alignas(16) glm::vec3 sunPosition{};
         alignas(4) float logDepthFC;
         alignas(4) unsigned int lightsQuantity = 0;
+        alignas(4) bool enabledSun;
     };
 }
 

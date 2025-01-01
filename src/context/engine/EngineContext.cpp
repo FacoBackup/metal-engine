@@ -11,7 +11,7 @@
 #include "render-pass/tools/GridPass.h"
 #include "../../service/camera/Camera.h"
 #include "render-pass/impl/AtmospherePass.h"
-#include "render-pass/impl/VoxelAOPass.h"
+#include "render-pass/impl/GlobalIlluminationPass.h"
 #include "render-pass/tools/VoxelVisualizerPass.h"
 #include "render-pass/tools/IconsPass.h"
 
@@ -25,7 +25,7 @@ namespace Metal {
             fullScreenRenderPasses.push_back(std::make_unique<VoxelVisualizerPass>(context));
             fullScreenRenderPasses.push_back(std::make_unique<IconsPass>(context));
         }
-        aoPass.push_back(std::make_unique<VoxelAOPass>(context));
+        aoPass.push_back(std::make_unique<GlobalIlluminationPass>(context));
         postProcessingPasses.push_back(std::make_unique<PostProcessingPass>(context));
         gBufferPasses.push_back(std::make_unique<OpaqueRenderPass>(context));
     }
@@ -117,6 +117,7 @@ namespace Metal {
         globalDataUBO.cameraWorldPosition = camera.position;
         globalDataUBO.logDepthFC = 2.0f / (std::log(camera.projectionMatrix[0][0] + 1) / std::log(2));
         globalDataUBO.lightsQuantity = lightsCount;
+        globalDataUBO.enabledSun = context.engineRepository.atmosphereEnabled;
 
         if (context.engineRepository.incrementTime) {
             context.engineRepository.elapsedTime += .0005f * context.engineRepository.elapsedTimeSpeed;
@@ -125,9 +126,9 @@ namespace Metal {
                                               std::cos(context.engineRepository.elapsedTime),
                                               0) * context.engineRepository.sunDistance;
         globalDataUBO.sunColor = CalculateSunColor(
-            globalDataUBO.sunPosition.y / context.engineRepository.sunDistance,
-            context.engineRepository.nightColor, context.engineRepository.dawnColor,
-            context.engineRepository.middayColor);
+                                     globalDataUBO.sunPosition.y / context.engineRepository.sunDistance,
+                                     context.engineRepository.nightColor, context.engineRepository.dawnColor,
+                                     context.engineRepository.middayColor) * context.engineRepository.sunLightIntensity;
         context.coreBuffers.globalData->update(&globalDataUBO);
     }
 

@@ -94,23 +94,25 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.gBufferDepthIDUV.get());
         atmospherePipeline = pipelineService.createRenderingPipeline(atmosphereBuilder);
 
-        PipelineBuilder voxelAOBuilder = PipelineBuilder::Of(
+        PipelineBuilder globalIlluminationPipelineBuilder = PipelineBuilder::Of(
                     context.coreFrameBuffers.aoFBO,
                     "QUAD.vert",
-                    "VoxelAO.frag"
+                    "GlobalIllumination.frag"
                 )
                 .setPushConstantsSize(sizeof(GIPushConstant))
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.svoData.get())
-                .addDescriptorSet(context.coreDescriptorSets.lightsData.get());
-        voxelAOPipeline = pipelineService.createRenderingPipeline(voxelAOBuilder);
+                .addDescriptorSet(context.coreDescriptorSets.lightsData.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferNormal.get());
+
+        globalIlluminationPipeline = pipelineService.createRenderingPipeline(globalIlluminationPipelineBuilder);
     }
 
     void CorePipelines::dispose() const {
         gBufferPipeline->dispose(vulkanContext);
         gBufferShadingPipeline->dispose(vulkanContext);
         atmospherePipeline->dispose(vulkanContext);
-        voxelAOPipeline->dispose(vulkanContext);
+        globalIlluminationPipeline->dispose(vulkanContext);
         postProcessingPipeline->dispose(vulkanContext);
         if (context.isDebugMode()) {
             gridPipeline->dispose(vulkanContext);

@@ -25,19 +25,19 @@ VoxelMaterialData unpackVoxel(in Hit hit) {
     uint second = hit.matData2;
 
     {
-        voxel.roughness = (first & 0xFFu)/100.;
+        voxel.roughness = ((first & 0x7FFFFFFFu) >> 24)/100.;
         voxel.metallic = (second & 0x7Fu) / 100.;
     }
 
     {
-        int r = (int(first) >> 16) & 0x7F;
+        int r = (int(first) >> 16) & 0xFF;
         int g = (int(first) >> 8) & 0xFF;
-        int b = int(first) & 0x7F;
+        int b = int(first) & 0xFF;
 
         r = r * 2;
         b = b * 2;
 
-        voxel.isEmissive = ((first >> 8u) & 0x1u) == 1;
+        voxel.isEmissive = (first >> 31u) == 1;
         voxel.albedo = vec3(r/255., g/255., b/255.);
     }
 

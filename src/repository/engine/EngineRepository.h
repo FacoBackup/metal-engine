@@ -7,7 +7,6 @@
 namespace Metal {
     struct EngineRepository final : Inspectable {
         bool voxelGIEnabled = false;
-        float voxelRaytracingBias = 1.01;
         float shadowsBaseColor = 2;
         float voxelHitBias = .05;
         int numberOfTiles = 10;
@@ -43,7 +42,6 @@ namespace Metal {
             middayColor.x, middayColor.y, middayColor.z,
             screenSpaceShadows,
             svoFilePaths,
-            voxelRaytracingBias,
             voxelHitBias,
             shadowsBaseColor,
             voxelGIEnabled
