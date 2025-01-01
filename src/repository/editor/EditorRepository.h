@@ -33,7 +33,7 @@ namespace Metal {
         bool gridOverlayObjects = true;
         float gridScale = 1.f;
         int gridThreshold = 100;
-        float gridThickness = 2;
+        float gridThickness = .1;
         ImGuizmo::OPERATION gizmoType = ImGuizmo::OPERATION::TRANSLATE;
         ImGuizmo::MODE gizmoMode = ImGuizmo::MODE::WORLD;
         float gizmoSnapRotate = 0.f;

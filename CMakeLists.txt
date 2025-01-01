@@ -151,8 +151,8 @@ add_executable(
         src/service/mesh/VertexData.h
         src/context/editor/dock-spaces/viewport/CameraPositionPanel.cpp
         src/context/editor/dock-spaces/viewport/CameraPositionPanel.h
-        src/context/engine/render-pass/tools/GridRenderPass.cpp
-        src/context/engine/render-pass/tools/GridRenderPass.h
+        src/context/engine/render-pass/tools/GridPass.cpp
+        src/context/engine/render-pass/tools/GridPass.h
         src/context/engine/CommandBufferRecorder.cpp
         src/context/engine/CommandBufferRecorder.h
         src/repository/render-pass/CoreRenderPasses.cpp
@@ -256,6 +256,7 @@ add_executable(
         src/context/engine/render-pass/impl/VoxelAOPass.h
         src/repository/editor/EditorRepository.cpp
         src/dto/push-constant/GIPushConstant.h
+        src/dto/push-constant/GridPushConstant.h
 )
 
 

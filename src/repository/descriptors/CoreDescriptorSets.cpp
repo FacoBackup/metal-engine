@@ -57,10 +57,10 @@ namespace Metal {
         }
 
         // G-BUFFER
-        GBUFFER_D(gBufferShadingDescriptor, 0)
-        GBUFFER_D(gBufferShadingDescriptor1, 1)
-        GBUFFER_D(gBufferShadingDescriptor2, 2)
-        GBUFFER_D(gBufferShadingDescriptor3, 3)
+        GBUFFER_D(gBufferAlbedo, 0)
+        GBUFFER_D(gBufferShadingRMAO, 1)
+        GBUFFER_D(gBufferNormal, 2)
+        GBUFFER_D(gBufferDepthIDUV, 3)
         aoDescriptor = std::make_unique<DescriptorInstance>();
         aoDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
         aoDescriptor->create(vulkanContext);

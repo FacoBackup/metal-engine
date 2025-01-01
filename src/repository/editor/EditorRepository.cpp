@@ -17,5 +17,11 @@ namespace Metal {
 
         registerFloat(iconScale, "Icons", "Size");
         registerColor(iconColor, "Icons", "Base color");
+
+        registerBool(showGrid, "Grid", "Enabled?");
+        registerBool(gridOverlayObjects, "Grid", "Overlay objects?");
+        registerFloat(gridScale, "Grid", "Scale");
+        registerInt(gridThreshold, "Grid", "Threshold");
+        registerFloat(gridThickness, "Grid", "Thickness");
     }
 }

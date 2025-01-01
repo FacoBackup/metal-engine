@@ -8,7 +8,7 @@
 #include "render-pass/impl/GBufferShadingPass.h"
 #include "render-pass/impl/OpaqueRenderPass.h"
 #include "render-pass/impl/PostProcessingPass.h"
-#include "render-pass/tools/GridRenderPass.h"
+#include "render-pass/tools/GridPass.h"
 #include "../../service/camera/Camera.h"
 #include "render-pass/impl/VoxelAOPass.h"
 #include "render-pass/tools/VoxelVisualizerPass.h"
@@ -17,11 +17,9 @@
 namespace Metal {
     void EngineContext::onInitialize() {
         context.worldGridService.onSync();
-        if (context.isDebugMode()) {
-            fullScreenRenderPasses.push_back(std::make_unique<GridRenderPass>(context));
-        }
         fullScreenRenderPasses.push_back(std::make_unique<GBufferShadingPass>(context));
         if (context.isDebugMode()) {
+            fullScreenRenderPasses.push_back(std::make_unique<GridPass>(context));
             fullScreenRenderPasses.push_back(std::make_unique<VoxelVisualizerPass>(context));
             fullScreenRenderPasses.push_back(std::make_unique<IconsPass>(context));
         }

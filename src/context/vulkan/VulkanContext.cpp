@@ -185,7 +185,7 @@ namespace Metal {
         imguiVulkanWindow.ClearValue.color.float32[0] = 0;
         imguiVulkanWindow.ClearValue.color.float32[1] = 0;
         imguiVulkanWindow.ClearValue.color.float32[2] = 0;
-        imguiVulkanWindow.ClearValue.color.float32[3] = 0;
+        imguiVulkanWindow.ClearValue.color.float32[3] = 1;
 
         this->window = context.glfwContext.getWindow();
         vkb::InstanceBuilder instanceBuilder;

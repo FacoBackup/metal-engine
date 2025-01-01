@@ -32,6 +32,9 @@ namespace Metal {
             stepSize = voxelSize / maxEdgeLength;
         }
 
+        glm::vec3 albedo = component->albedoColor * 255.f;
+        glm::vec2 roughnessMetallic(component->roughnessFactor, component->metallicFactor);
+
         for (float lambda1 = 0; lambda1 <= 1; lambda1 += stepSize) {
             for (float lambda2 = 0; lambda2 <= 1 - lambda1; lambda2 += stepSize) {
                 float lambda0 = 1 - lambda1 - lambda2;
@@ -54,8 +57,6 @@ namespace Metal {
                         builders.emplace(voxelTile->id,
                                          SparseVoxelOctreeBuilder(voxelTile));
                     }
-                    glm::vec3 albedo = component->albedoColor * 255.f;
-                    glm::vec2 roughnessMetallic(component->roughnessFactor, component->metallicFactor);
                     builders.at(voxelTile->id).insert(
                         localMaxDepth,
                         point,
@@ -157,7 +158,7 @@ namespace Metal {
 
     void VoxelizationService::voxelizeScene() const {
         METRIC_START("Starting Voxelization ")
-        for (auto path : context.engineRepository.svoFilePaths) {
+        for (auto path: context.engineRepository.svoFilePaths) {
             if (std::filesystem::exists(path)) {
                 std::filesystem::remove(path);
             }

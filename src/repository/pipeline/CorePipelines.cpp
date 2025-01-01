@@ -2,6 +2,7 @@
 #include "../../context/ApplicationContext.h"
 
 #include "../../dto/push-constant/MeshPushConstant.h"
+#include "../../dto/push-constant/GridPushConstant.h"
 #include "../../dto/push-constant/GBufferShadingPushConstant.h"
 #include "../../dto/push-constant/VoxelDebugSettingsPushConstant.h"
 #include "../../dto/push-constant/GIPushConstant.h"
@@ -31,7 +32,9 @@ namespace Metal {
                         "tools/Grid.frag"
                     )
                     .setBlendEnabled()
-                    .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get());
+                    .setPushConstantsSize(sizeof(GridPushConstant))
+                    .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
+                    .addDescriptorSet(context.coreDescriptorSets.gBufferDepthIDUV.get());
             gridPipeline = pipelineService.createRenderingPipeline(gridPipelineBuilder);
 
             PipelineBuilder iconPipelineBuilder = PipelineBuilder::Of(
@@ -73,10 +76,10 @@ namespace Metal {
                 )
                 .setPushConstantsSize(sizeof(GBufferShadingPushConstant))
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferShadingDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferShadingDescriptor1.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferShadingDescriptor2.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferShadingDescriptor3.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferAlbedo.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferShadingRMAO.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferNormal.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferDepthIDUV.get())
                 .addDescriptorSet(context.coreDescriptorSets.brdfDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.aoDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.lightsData.get());

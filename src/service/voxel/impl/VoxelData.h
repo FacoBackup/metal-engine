@@ -1,5 +1,6 @@
 #ifndef VOXELDATA_H
 #define VOXELDATA_H
+#include <iostream>
 #include <glm/glm.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
@@ -19,15 +20,18 @@ namespace Metal {
         }
 
         std::array<unsigned int, 2> compress() {
-            const int red = (color.r / 2) & 0x7F; // Scale down and mask to 7 bits
-            const int green = color.g & 0xFF; // No change, 8 bits
-            const int blue = (color.b / 2) & 0x7F; // Scale down and mask to 7 bits
-            const unsigned int albedo = (red << 16) | (green << 8) | blue;
             const unsigned int roughness = static_cast<unsigned int>(std::round(roughnessMetallic.r * 100)); // 0 to 100
             const unsigned int metallic = static_cast<unsigned int>(std::round(roughnessMetallic.g * 100));
             const unsigned int normalMetallic = CompressNormal(normal) << 7 | metallic;
+
+            int red = (color.r / 2) & 0x7F;
+            int green = color.g & 0xFF;
+            int blue = (color.b / 2) & 0x7F;
+
+            int albedo =  (red << 16) | (green << 8) | blue;
+
             return std::array{
-                (albedo << 9) | (isEmissive << 8) | roughness,
+                albedo << 9 | isEmissive << 8 | roughness,
                 normalMetallic
             };
         }

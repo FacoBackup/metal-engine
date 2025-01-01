@@ -1,11 +1,13 @@
 #ifndef GRIDRENDERPASS_H
 #define GRIDRENDERPASS_H
 #include "../AbstractRenderPass.h"
+#include "../../../../dto/push-constant/GridPushConstant.h"
 
 namespace Metal {
-    class GridRenderPass final : public AbstractRenderPass {
+    class GridPass final : public AbstractRenderPass {
+        GridPushConstant pushConstant{};
     public:
-        explicit GridRenderPass(ApplicationContext &context)
+        explicit GridPass(ApplicationContext &context)
             : AbstractRenderPass(context) {
         }
 

@@ -19,8 +19,8 @@ namespace Metal {
         registerBool(useHeightTexture, "Textures", "Use Height Texture?");
         registerColor(albedoColor, "", "Albedo Color");
         registerBool(emissiveSurface, "", "Is emissive surface?");
-        registerFloat(roughnessFactor, "", "Roughness Factor", 0, 1);
-        registerFloat(metallicFactor, "", "Metallic Factor", 0, 1);
+        registerFloat(roughnessFactor, "", "Roughness Factor", 0, 1, false, .001);
+        registerFloat(metallicFactor, "", "Metallic Factor", 0, 1, false, .001);
     }
 
     ComponentTypes::ComponentType MeshComponent::getType() {

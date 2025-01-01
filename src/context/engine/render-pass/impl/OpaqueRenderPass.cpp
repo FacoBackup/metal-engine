@@ -14,6 +14,9 @@ namespace Metal {
             if (const auto &mesh = pair.second; !mesh.meshId.empty()) {
                 if (const auto *r = streamingRepository.streamMesh(mesh.meshId, LevelOfDetail::LOD_0); r != nullptr) {
                     mPushConstant.model = worldRepository.transforms[mesh.getEntityId()].model;
+                    mPushConstant.albedoEmissive = glm::vec4(mesh.albedoColor, mesh.emissiveSurface);
+                    mPushConstant.roughnessFactor = mesh.roughnessFactor;
+                    mPushConstant.metallicFactor = mesh.metallicFactor;
                     mPushConstant.renderIndex = renderIndex;
                     renderIndex++;
                     recordPushConstant(&mPushConstant);
