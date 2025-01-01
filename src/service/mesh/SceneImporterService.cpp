@@ -52,7 +52,7 @@ namespace Metal {
                 );
                 if (assimpMesh->HasNormals()) {
                     vertexData.normal = glm::vec3(
-                        -assimpMesh->mNormals[j].x,
+                        assimpMesh->mNormals[j].x,
                         assimpMesh->mNormals[j].y,
                         assimpMesh->mNormals[j].z
                     );

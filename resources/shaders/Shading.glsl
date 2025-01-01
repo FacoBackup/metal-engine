@@ -94,8 +94,9 @@ vec3 computeSphereLight(in ShaderData shaderData, in Light info){
 
     float distanceFromFrag =  length(L);
     float intensity = 1.;
-    if (distanceFromFrag > info.innerRadius) {
-        intensity = clamp(mix(1., 0., (distanceFromFrag - info.innerRadius) / (info.outerRadius - info.innerRadius)), 0., 1.);
+    float innerRadius = min(info.outerRadius, info.innerRadius);
+    if (distanceFromFrag > innerRadius) {
+        intensity = clamp(mix(1., 0., (distanceFromFrag - innerRadius) / (info.outerRadius - innerRadius)), 0., 1.);
     }
     if (intensity < .01){
         return vec3(0);

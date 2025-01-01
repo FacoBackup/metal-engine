@@ -57,7 +57,7 @@ void main() {
     shaderData.VrN = reflect(-shaderData.V, shaderData.N);
     shaderData.albedoOverPI = shaderData.albedo / PI;
     shaderData.NdotV = clamp(dot(shaderData.N, shaderData.V), 0., 1.);
-    shaderData.brdf = texture(brdfSampler, vec2(shaderData.NdotV, shaderData.roughness)).rg;
+    shaderData.brdf = texture(brdfSampler, vec2(shaderData.NdotV, 1-shaderData.roughness)).rg;
     shaderData.F0 = vec3(0.04);
     shaderData.F0 = mix(shaderData.F0, shaderData.albedo, shaderData.metallic);
     shaderData.sunDirection = globalData.sunPosition;

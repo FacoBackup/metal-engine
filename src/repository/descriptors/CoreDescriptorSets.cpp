@@ -66,7 +66,7 @@ namespace Metal {
         aoDescriptor->create(vulkanContext);
         aoDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                          context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                         context.coreFrameBuffers.aoFBO->attachments[0]->vkImageView);
+                                         context.coreFrameBuffers.globalIlluminationFBO->attachments[0]->vkImageView);
         aoDescriptor->write(vulkanContext);
 
         // BRDF TEXTURE

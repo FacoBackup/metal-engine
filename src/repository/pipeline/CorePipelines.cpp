@@ -95,7 +95,7 @@ namespace Metal {
         atmospherePipeline = pipelineService.createRenderingPipeline(atmosphereBuilder);
 
         PipelineBuilder globalIlluminationPipelineBuilder = PipelineBuilder::Of(
-                    context.coreFrameBuffers.aoFBO,
+                    context.coreFrameBuffers.globalIlluminationFBO,
                     "QUAD.vert",
                     "GlobalIllumination.frag"
                 )

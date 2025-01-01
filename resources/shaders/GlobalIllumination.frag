@@ -1,6 +1,7 @@
 #include "./GlobalDataBuffer.glsl"
 #include "./CreateRay.glsl"
 #include "./VoxelRaytracing.glsl"
+#include "./Dithering.glsl"
 
 #define LIGHTS_SET 2
 #define LIGHTS_BINDING 0
@@ -11,6 +12,7 @@ layout(set = 3, binding = 0) uniform sampler2D gBufferNormal;
 layout(push_constant) uniform Push {
     float biasHit;
     float shadowsBaseColor;
+    float ditheringIntensity;
 } push;
 
 layout(location = 0) in vec2 texCoords;
@@ -29,6 +31,9 @@ float testLight(vec3 lightPosition, Hit hitData, in vec3 firstHitPos){
 }
 
 void main() {
+    if (push.ditheringIntensity > 0 && isDitherDiscard(1. - push.ditheringIntensity)){
+        discard;
+    }
     vec3 rayOrigin = globalData.cameraWorldPosition.xyz;
     vec3 rayDirection = createRay(texCoords, globalData.invProj, globalData.invView);
     Ray ray = Ray(rayOrigin, rayDirection, 1./rayDirection);
@@ -38,12 +43,14 @@ void main() {
         vec3 firstHitPos = hitData.hitPosition + texture(gBufferNormal, texCoords).rgb;
         if (globalData.lightsQuantity > 0){
             Light l = lightsBuffer.lights[0];
-            finalColor = testLight(l.position, hitData, firstHitPos);
+            if (length(l.position - hitData.hitPosition) < l.outerRadius) {
+                finalColor = testLight(l.position, hitData, firstHitPos);
+            }
         }
-        if(globalData.enabledSun){
+        if (globalData.enabledSun){
             finalColor *= testLight(normalize(globalData.sunPosition) * 20, hitData, firstHitPos);
         }
-    } else{
+    } else {
         finalColor = 1;
     }
 }

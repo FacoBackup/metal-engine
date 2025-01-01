@@ -7,6 +7,7 @@
 namespace Metal {
     struct EngineRepository final : Inspectable {
         bool voxelGIEnabled = false;
+        float ditheringIntensity = 0;
         float shadowsBaseColor = 2;
         float voxelHitBias = .05;
         int numberOfTiles = 10;
@@ -44,7 +45,8 @@ namespace Metal {
             svoFilePaths,
             voxelHitBias,
             shadowsBaseColor,
-            voxelGIEnabled
+            voxelGIEnabled,
+            ditheringIntensity
         )
     };
 } // Metal

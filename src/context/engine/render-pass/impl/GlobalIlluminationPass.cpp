@@ -12,6 +12,7 @@ namespace Metal {
 
     void GlobalIlluminationPass::onSync() {
         pushConstant.shadowsBaseColor = context.engineRepository.shadowsBaseColor;
+        pushConstant.ditheringIntensity = context.engineRepository.ditheringIntensity;
         pushConstant.biasHit = context.engineRepository.voxelHitBias;
         recordPushConstant(&pushConstant);
         recordDrawSimpleInstanced(3, 1);
