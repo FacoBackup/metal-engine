@@ -6,17 +6,8 @@
 #define LIGHTS_BINDING 0
 
 #include "./Shading.glsl"
+#include "./DebugFlags.glsl"
 
-#define LIT 0
-#define ALBEDO 1
-#define NORMAL 2
-#define ROUGHNESS 3
-#define METALLIC 4
-#define AO 5
-#define RANDOM 6
-#define DEPTH 7
-#define UV 8
-#define POSITION 9
 
 layout(location = 0) in vec2 texCoords;
 
@@ -51,38 +42,7 @@ void main() {
         discard;
     }
 
-    #ifdef DEBUG
-    if (push.mode != LIT){
-        if (push.mode == NORMAL){
-            finalColor = vec4(texture(gBufferNormal, texCoords).rgb, 1);
-        } else if (push.mode == ROUGHNESS){
-            finalColor = vec4(vec3(texture(gBufferRoughnessMetallicAO, texCoords).r), 1);
-        } else if (push.mode == METALLIC){
-            finalColor = vec4(vec3(texture(gBufferRoughnessMetallicAO, texCoords).g), 1);
-        } else if (push.mode == AO){
-            finalColor = vec4(vec3(texture(gBufferRoughnessMetallicAO, texCoords).b * texture(aoSampler, texCoords).r), 1);
-        } else if (push.mode == DEPTH){
-            finalColor = vec4(vec3(depthData), 1);
-        } else if (push.mode == UV){
-            finalColor = vec4(texture(gBufferDepthIdUV, texCoords).zw, 0, 1);
-        } else if (push.mode == RANDOM){
-            finalColor = vec4(randomColor(int(texture(gBufferDepthIdUV, texCoords).g)), 1);
-        } else if (push.mode == POSITION){
-            vec3 viewSpacePosition = viewSpacePositionFromDepth(depthData, texCoords, globalData.invProj);
-            vec3 worldSpacePosition = vec3(globalData.invView * vec4(viewSpacePosition, 1));
-            finalColor = vec4(worldSpacePosition, 1);
-        } else {
-            finalColor = vec4(texture(gBufferAlbedoEmissive, texCoords).rgb, 1);
-        }
-        return;
-    }
-    #endif
-
     vec4 albedoEmissive = texture(gBufferAlbedoEmissive, texCoords);
-    if (albedoEmissive.a > 0) { // EMISSION
-        finalColor = vec4(albedoEmissive.rgb, 1.);
-        return;
-    }
     ShaderData shaderData;
     shaderData.N = normalize(texture(gBufferNormal, texCoords).rgb);
     vec3 valueRMAOSampler = texture(gBufferRoughnessMetallicAO, texCoords).rgb;
@@ -104,5 +64,36 @@ void main() {
     shaderData.sunColor = globalData.sunColor;
     shaderData.lightsQuantity = globalData.lightsQuantity;
 
+    #ifdef DEBUG
+    if (push.mode != LIT){
+        if (push.mode == NORMAL){
+            finalColor = vec4(shaderData.N, 1);
+        } else if (push.mode == ROUGHNESS){
+            finalColor = vec4(vec3(shaderData.roughness), 1);
+        } else if (push.mode == METALLIC){
+            finalColor = vec4(vec3(shaderData.metallic), 1);
+        } else if (push.mode == AO){
+            finalColor = vec4(vec3(shaderData.ambientOcclusion), 1);
+        } else if (push.mode == DEPTH){
+            finalColor = vec4(vec3(depthData), 1);
+        } else if (push.mode == UV){
+            finalColor = vec4(texture(gBufferDepthIdUV, texCoords).zw, 0, 1);
+        } else if (push.mode == RANDOM){
+            finalColor = vec4(randomColor(int(texture(gBufferDepthIdUV, texCoords).g)), 1);
+        } else if (push.mode == BRDF){
+            finalColor = vec4(shaderData.brdf, 0, 1);
+        } else if (push.mode == POSITION){
+            finalColor = vec4(shaderData.worldSpacePosition, 1);
+        } else {
+            finalColor = vec4(shaderData.albedo, 1);
+        }
+        return;
+    }
+    #endif
+
+    if (albedoEmissive.a > 0) { // EMISSION
+        finalColor = vec4(albedoEmissive.rgb, 1.);
+        return;
+    }
     finalColor = vec4(physicallyBasedShadePixel(shaderData), 1.);
 }

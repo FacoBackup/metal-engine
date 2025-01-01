@@ -1,7 +1,6 @@
 #include "./VoxelInfo.glsl"
 
 #define MAX_VOXEL_SIZE 10000000
-#define COUNT 32.
 
 #define DEFINE_OCTREE_BUFFER(B, M, N) \
 layout(std430, set = 1, binding = B) readonly buffer M { \
@@ -110,7 +109,7 @@ uint bufferIndex
 #ifdef DEBUG_VOXELS
 , bool showRaySearchCount,
 bool showRayTestCount,
-inout vec3 finalColor
+inout ivec2 debugColor
 #endif
 ) {
     vec4 localTileInfo = tileInfo.tileCenterValid[bufferIndex - 1];
@@ -129,18 +128,13 @@ inout vec3 finalColor
     stack[0] = Stack(0u, center, scale);
 
     uint index = 0u;
-    int rayTestCount = 0;
-    #ifdef DEBUG_VOXELS
-    int searchCount = 0;
-    #endif
     int stackPos = 1;
     Hit hitData = Hit(vec3(0), vec3(0), false, 0, 0, 0, bufferIndex, 0, 0);
     uint hitIndex;
     while (stackPos-- > 0) {
         #ifdef DEBUG_VOXELS
         if (showRaySearchCount){
-            searchCount ++;
-            finalColor.r = searchCount/COUNT;
+            debugColor.r++;
         }
         #endif
         center = stack[stackPos].center;
@@ -167,8 +161,7 @@ inout vec3 finalColor
 
             #ifdef DEBUG_VOXELS
             if (showRayTestCount){
-                rayTestCount++;
-                finalColor.g = rayTestCount/COUNT;
+                debugColor.g++;
             }
             #endif
 
@@ -209,7 +202,7 @@ in Ray ray
 #ifdef DEBUG_VOXELS
 , bool showRaySearchCount,
 bool showRayTestCount,
-inout vec3 colorData
+inout ivec2 colorData
 #endif
 ){
     Hit hitData = trace(ray, 1

@@ -1,7 +1,7 @@
 #include "CoreBuffers.h"
 
 #include "../../dto/ubo/GlobalDataUBO.h"
-#include "../../dto/ubo/PPSettingsUBO.h"
+#include "../../dto/push-constant/PostProcessingPushConstant.h"
 #include "../../dto/ubo/TileInfoUBO.h"
 #include "../../dto/ubo/LightData.h"
 #include "../../enum/engine-definitions.h"
@@ -10,10 +10,6 @@
 namespace Metal {
     void CoreBuffers::onInitialize() {
         globalData = bufferService.createBuffer(sizeof(GlobalDataUBO),
-                                                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                                                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-        postProcessingSettings = bufferService.createBuffer(sizeof(PPSettingsUBO),
                                                 VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 

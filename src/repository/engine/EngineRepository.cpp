@@ -7,6 +7,8 @@
 
 namespace Metal {
     void EngineRepository::registerFields() {
+        registerBool(atmosphereEnabled, "Atmosphere", "Enabled?");
+
         registerBool(voxelGIEnabled, "Global illumination", "Enabled?");
         registerFloat(voxelRaytracingBias, "Global illumination", "Ray tracing bias", 0, 5, false, .001);
         registerFloat(voxelHitBias, "Global illumination", "Ray tracing hit bias", 0, 10, false, .0001);
@@ -20,7 +22,8 @@ namespace Metal {
         registerColor(dawnColor, "Sun", "Dawn color");
         registerColor(nightColor, "Sun", "Night color");
         registerColor(middayColor, "Sun", "Midday color");
-        registerBool(screenSpaceShadows, "", "Screen space shadows");
+        registerBool(screenSpaceShadows, "Sun", "Screen space shadows");
+
     }
 
     void EngineRepository::onUpdate(InspectableMember *member, ApplicationContext &context) {

@@ -12,6 +12,7 @@ namespace Metal {
         float voxelHitBias = .05;
         int numberOfTiles = 10;
         float elapsedTime = .5f;
+        bool atmosphereEnabled = false;
         bool incrementTime = false;
         float elapsedTimeSpeed = 1;
         float sunDistance = 100000;
@@ -31,6 +32,7 @@ namespace Metal {
         void onUpdate(InspectableMember *member, ApplicationContext &context) override;
 
         SAVE_TEMPLATE(
+            atmosphereEnabled,
             elapsedTime,
             incrementTime,
             elapsedTimeSpeed,

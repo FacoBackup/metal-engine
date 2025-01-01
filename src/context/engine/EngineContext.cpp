@@ -10,6 +10,7 @@
 #include "render-pass/impl/PostProcessingPass.h"
 #include "render-pass/tools/GridPass.h"
 #include "../../service/camera/Camera.h"
+#include "render-pass/impl/AtmospherePass.h"
 #include "render-pass/impl/VoxelAOPass.h"
 #include "render-pass/tools/VoxelVisualizerPass.h"
 #include "render-pass/tools/IconsPass.h"
@@ -18,6 +19,7 @@ namespace Metal {
     void EngineContext::onInitialize() {
         context.worldGridService.onSync();
         fullScreenRenderPasses.push_back(std::make_unique<GBufferShadingPass>(context));
+        fullScreenRenderPasses.push_back(std::make_unique<AtmospherePass>(context));
         if (context.isDebugMode()) {
             fullScreenRenderPasses.push_back(std::make_unique<GridPass>(context));
             fullScreenRenderPasses.push_back(std::make_unique<VoxelVisualizerPass>(context));
@@ -26,18 +28,6 @@ namespace Metal {
         aoPass.push_back(std::make_unique<VoxelAOPass>(context));
         postProcessingPasses.push_back(std::make_unique<PostProcessingPass>(context));
         gBufferPasses.push_back(std::make_unique<OpaqueRenderPass>(context));
-    }
-
-    void EngineContext::updatePostProcessingData() {
-        auto &camera = context.worldRepository.camera;
-        postProcessingUBO.distortionIntensity = camera.distortionIntensity;
-        postProcessingUBO.chromaticAberrationIntensity = camera.chromaticAberrationIntensity;
-        postProcessingUBO.distortionEnabled = camera.distortionEnabled;
-        postProcessingUBO.chromaticAberrationEnabled = camera.chromaticAberrationEnabled;
-        postProcessingUBO.vignetteEnabled = camera.vignetteEnabled;
-        postProcessingUBO.vignetteStrength = camera.vignetteStrength;
-
-        context.coreBuffers.postProcessingSettings->update(&postProcessingUBO);
     }
 
     void EngineContext::updateVoxelData() {
@@ -88,7 +78,6 @@ namespace Metal {
         context.cameraService.onSync();
 
         updateGlobalData();
-        updatePostProcessingData();
         updateVoxelData();
         updateLights();
 

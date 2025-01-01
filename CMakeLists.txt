@@ -257,6 +257,8 @@ add_executable(
         src/repository/editor/EditorRepository.cpp
         src/dto/push-constant/GIPushConstant.h
         src/dto/push-constant/GridPushConstant.h
+        src/context/engine/render-pass/impl/AtmospherePass.cpp
+        src/context/engine/render-pass/impl/AtmospherePass.h
 )
 
 

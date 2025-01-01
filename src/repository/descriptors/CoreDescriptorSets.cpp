@@ -65,8 +65,8 @@ namespace Metal {
         aoDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
         aoDescriptor->create(vulkanContext);
         aoDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                      context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                                      context.coreFrameBuffers.aoFBO->attachments[0]->vkImageView);
+                                         context.coreFrameBuffers.gBufferFBO->vkImageSampler,
+                                         context.coreFrameBuffers.aoFBO->attachments[0]->vkImageView);
         aoDescriptor->write(vulkanContext);
 
         // BRDF TEXTURE
@@ -84,26 +84,21 @@ namespace Metal {
         if (context.isDebugMode()) {
             iconsDescriptor = std::make_unique<DescriptorInstance>();
             iconsDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                             0);
+                                              0);
             iconsDescriptor->create(vulkanContext);
             iconsDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                               context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                               context.coreTextures.icons->vkImageView);
+                                                context.coreFrameBuffers.gBufferFBO->vkImageSampler,
+                                                context.coreTextures.icons->vkImageView);
             iconsDescriptor->write(vulkanContext);
-
         }
 
         // POST PROCESSING
         {
             postProcessingDescriptor = std::make_unique<DescriptorInstance>();
-            postProcessingDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                                       0);
             postProcessingDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                       VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1);
+                                                       VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
             postProcessingDescriptor->create(vulkanContext);
-            postProcessingDescriptor->addBufferDescriptor(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                                          context.coreBuffers.postProcessingSettings);
-            postProcessingDescriptor->addImageDescriptor(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            postProcessingDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                          context.coreFrameBuffers.auxFBO->vkImageSampler,
                                                          context.coreFrameBuffers.auxFBO->attachments[0]->
                                                          vkImageView);

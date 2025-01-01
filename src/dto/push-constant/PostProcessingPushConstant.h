@@ -2,7 +2,7 @@
 #define PPSETTINGS_H
 
 namespace Metal {
-    struct PPSettingsUBO {
+    struct PostProcessingPushConstant {
         alignas(4) float distortionIntensity;
         alignas(4) float chromaticAberrationIntensity;
         alignas(4) bool distortionEnabled;

@@ -49,6 +49,14 @@ namespace Metal::UIUtil {
         return RenderOption(label, selected, size, size, accent);
     }
 
+    static void RenderTooltip(const std::string &text) {
+        if (ImGui::IsItemHovered()) {
+            ImGui::BeginTooltip();
+            ImGui::Text(text.c_str());
+            ImGui::EndTooltip();
+        }
+    }
+
     static void LargeSpacing() {
         ImGui::SameLine();
         ImGui::Dummy(LARGE_SPACING);

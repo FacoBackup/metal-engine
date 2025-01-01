@@ -10,7 +10,7 @@ namespace Metal {
 
     void BooleanField::onSync() {
         if (!field.disabled) {
-            if(ImGui::Checkbox(field.name.c_str(), field.field)){
+            if(ImGui::Checkbox(field.nameWithId.c_str(), field.field)){
                 field.instance->registerChange();
                 field.instance->onUpdate(&field, *context);
             }

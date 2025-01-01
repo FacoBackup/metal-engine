@@ -26,6 +26,7 @@ namespace Metal {
                                      editorRepository.accent)) {
                 currentInspection = repo;
             }
+            UIUtil::RenderTooltip(repo->getTitle());
         }
 
         ImGui::Spacing();
@@ -39,6 +40,7 @@ namespace Metal {
                     editorRepository.accent)) {
                     currentInspection = additional;
                 }
+                UIUtil::RenderTooltip(additional->getTitle());
             }
         }
 

@@ -7,7 +7,7 @@ layout(location = 0) in vec2 texCoords;
 #define F  0.30
 #define W  11.2
 
-layout(set = 0, binding = 0) uniform PPSettings {
+layout(push_constant) uniform Push {
     float   distortionIntensity;
     float   chromaticAberrationIntensity;
     bool    distortionEnabled;
@@ -15,7 +15,8 @@ layout(set = 0, binding = 0) uniform PPSettings {
     bool    vignetteEnabled;
     float   vignetteStrength;
 } postProcessing;
-layout(set = 0, binding = 1) uniform sampler2D sceneColor;
+
+layout(set = 0, binding = 0) uniform sampler2D sceneColor;
 
 layout(location = 0) out vec4 finalColor;
 
@@ -72,7 +73,7 @@ void main(void) {
 
     vec2 texCoords = postProcessing.distortionEnabled ? lensDistortion(texCoords, postProcessing.distortionIntensity * .5) : texCoords;
     vec3 color = postProcessing.chromaticAberrationEnabled ? chromaticAberration(texCoords) : texture(sceneColor, texCoords).rgb;
-    finalColor = vec4(aces(color), 1.);
+    finalColor = vec4(PBRNeutralToneMapping(color), 1.);
 
     if (postProcessing.vignetteEnabled) {
         vec2 uv = texCoords;

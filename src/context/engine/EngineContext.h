@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "../../dto/ubo/GlobalDataUBO.h"
-#include "../../dto/ubo/PPSettingsUBO.h"
+#include "../../dto/push-constant/PostProcessingPushConstant.h"
 #include "../../common/AbstractRuntimeComponent.h"
 #include "../../dto/ubo/LightData.h"
 #include "../../dto/ubo/TileInfoUBO.h"
@@ -18,27 +18,23 @@ using TimePoint = std::chrono::time_point<Clock>;
 namespace Metal {
     class EngineContext final : public AbstractRuntimeComponent {
         GlobalDataUBO globalDataUBO{};
-        PPSettingsUBO postProcessingUBO{};
         TileInfoUBO tileInfoUBO{};
         std::array<LightData, MAX_LIGHTS> lights{};
         unsigned int lightsCount = 0;
         long long start = -1;
         bool hasToUpdateLights = true;
 
-        std::vector<std::unique_ptr<AbstractRenderPass>> aoPass;
+        std::vector<std::unique_ptr<AbstractRenderPass> > aoPass;
         std::vector<std::unique_ptr<AbstractRenderPass> > fullScreenRenderPasses;
         std::vector<std::unique_ptr<AbstractRenderPass> > gBufferPasses;
-        std::vector<std::unique_ptr<AbstractRenderPass>> postProcessingPasses;
+        std::vector<std::unique_ptr<AbstractRenderPass> > postProcessingPasses;
 
     public:
-
         void setUpdateLights() {
             hasToUpdateLights = true;
         }
 
         void onInitialize() override;
-
-        void updatePostProcessingData();
 
         void updateVoxelData();
 

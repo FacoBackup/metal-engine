@@ -45,6 +45,7 @@ namespace Metal {
             context->worldRepository.camera.position = {0, 0, 0};
             context->worldRepository.camera.registerChange();
         }
+        UIUtil::RenderTooltip("Center camera?");
 
         ImGui::SameLine();
         ImGui::SetNextItemWidth(75);
@@ -57,13 +58,16 @@ namespace Metal {
 
         UIUtil::DynamicSpacing(405);
 
+        ImGui::SameLine();
+        if (UIUtil::RenderOption(Icons::grid_on + "##voxels", editorRepository.showVoxels, true,
+                                 editorRepository.accent)) {
+            editorRepository.showVoxels = !editorRepository.showVoxels;
+        }
+
+        UIUtil::RenderTooltip("Show voxels?");
+        UIUtil::Spacing();
         ImGui::Text("Shading");
 
-        ImGui::SameLine();
-        if (UIUtil::RenderOption(Icons::grid_on + "##world", editorRepository.gridOverlayObjects, true,
-                                 editorRepository.accent)) {
-            editorRepository.gridOverlayObjects = !editorRepository.gridOverlayObjects;
-        }
 
         ImGui::SameLine();
         if (UIUtil::RenderOption(Icons::circle + "Lit##litShading",

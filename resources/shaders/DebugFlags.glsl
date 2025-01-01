@@ -1,0 +1,11 @@
+#define LIT 0
+#define ALBEDO 1
+#define NORMAL 2
+#define ROUGHNESS 3
+#define METALLIC 4
+#define AO 5
+#define RANDOM 6
+#define DEPTH 7
+#define UV 8
+#define POSITION 9
+#define BRDF 10

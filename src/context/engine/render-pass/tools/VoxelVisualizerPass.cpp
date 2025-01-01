@@ -5,7 +5,7 @@
 
 namespace Metal {
     bool VoxelVisualizerPass::shouldRun() {
-        return context.editorRepository.shadingMode == ShadingMode::VOXELS;
+        return context.editorRepository.showVoxels;
     }
 
     PipelineInstance *VoxelVisualizerPass::getPipeline() {
@@ -13,7 +13,8 @@ namespace Metal {
     }
 
     void VoxelVisualizerPass::onSync() {
-        settings.voxelDebugFlag = context.editorRepository.voxelDebugFlag;
+        settings.voxelDebugFlag = context.editorRepository.shadingMode;
+        settings.searchCountDivisor = context.editorRepository.voxelSearchCount;
         settings.showRaySearchCount = context.editorRepository.showRaySearchCountVoxels;
         settings.showRayTestCount = context.editorRepository.showRayTestCountVoxels;
         recordPushConstant(&settings);

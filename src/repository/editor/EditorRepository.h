@@ -16,9 +16,10 @@ namespace Metal {
     struct TransformComponent;
 
     struct EditorRepository final : Inspectable {
-        int voxelDebugFlag = 0;
+        bool showVoxels = false;
         bool showRaySearchCountVoxels = true;
         bool showRayTestCountVoxels = true;
+        int voxelSearchCount = 32;
 
         ImVec4 accent{};
         ImU32 accentU32 = 0;
@@ -30,7 +31,7 @@ namespace Metal {
         float iconScale = 1;
         bool isDarkMode = true;
         bool showGrid = true;
-        bool gridOverlayObjects = true;
+        bool gridOverlayObjects = false;
         float gridScale = 1.f;
         int gridThreshold = 100;
         float gridThickness = .1;
@@ -94,7 +95,6 @@ namespace Metal {
             brushModeAdd,
             brushRadius,
             brushDensity,
-            voxelDebugFlag,
             showRaySearchCountVoxels,
             showRayTestCountVoxels
         )

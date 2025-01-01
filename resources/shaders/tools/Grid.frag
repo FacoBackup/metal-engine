@@ -18,6 +18,12 @@ layout(location = 0) in vec2 texCoords;
 layout(location = 0) out vec4 finalColor;
 layout(set = 1, binding = 0) uniform sampler2D gBufferDepthIdUV;
 
+#define DITHER_MATRIX mat4(\
+     0.0, 0.5, 0.125, 0.625, \
+     0.75, 0.25, 0.875, 0.375, \
+     0.1875, 0.6875, 0.0625, 0.5625, \
+     0.9375, 0.4375, 0.8125, 0.312\
+)
 
 vec3 p = vec3(0);
 bool rayMarch(vec3 ro, vec3 rd, float width) {
@@ -79,7 +85,12 @@ void main() {
             finalColor = mix(gridColor, centerLineColor, max(isXAxis, isZAxis));
         }
         finalColor.a = min(alpha, finalColor.a);
-        if(finalColor.a < .001){
+        if (finalColor.a == 0){
+            discard;
+        }
+        ivec2 coords = ivec2(mod(gl_FragCoord.xy, 4.0));
+        float threshold = DITHER_MATRIX[coords.y][coords.x];
+        if (finalColor.a <= threshold) {
             discard;
         }
     } else {
