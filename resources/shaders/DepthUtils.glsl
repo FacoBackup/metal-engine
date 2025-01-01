@@ -15,6 +15,11 @@ vec3 viewSpacePositionFromDepth(float depth, vec2 texCoords, in mat4 invProjecti
     return viewSpacePosition.rgb;
 }
 
+vec3 worldSpacePositionFromDepth(float depth, vec2 texCoords, in mat4 invProjectionMatrix, in mat4 invView) {
+    vec3 viewSpacePosition = viewSpacePositionFromDepth(depth, texCoords, invProjectionMatrix);
+    return vec3(invView * vec4(viewSpacePosition, 1.));
+}
+
 vec3 normalFromDepth(sampler2D depthSampler, float depth, vec2 texCoords, vec2 bufferResolution, in mat4 invProjectionMatrix, float logDepthFC) {
     vec2 texelSize = 1. / bufferResolution;
     vec2 texCoords1 = texCoords + vec2(0., 1.) * texelSize;

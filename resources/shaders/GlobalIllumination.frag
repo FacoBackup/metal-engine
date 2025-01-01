@@ -2,7 +2,7 @@
 #include "./CreateRay.glsl"
 #include "./VoxelRaytracing.glsl"
 #include "./Dithering.glsl"
-
+#include "./Atmosphere.glsl"
 #define LIGHTS_SET 2
 #define LIGHTS_BINDING 0
 #include "./LightsBuffer.glsl"
@@ -25,8 +25,8 @@ float rand(vec3 co) {
     return fract(sin(dot(co, vec3(12.9898, 71.9898, 78.233))) * 43758.5453);
 }
 vec3 sampleHemisphere(vec3 normal, uint i) {
-    float xi1 = fract(sin(float(i) * 12.9898) * 43758.5453);
-    float xi2 = fract(sin(float(i) * 78.233) * 43758.5453);
+    float xi1 = fract(sin(normal.x + float(i) * 12.9898) * 43758.5453);
+    float xi2 = fract(sin(normal.y + normal.z+ float(i) * 78.233) * 43758.5453);
     float theta = acos(sqrt(1.0 - xi1));
     float phi = 2.0 * 3.141592 * xi2;
     vec3 tangent = normalize(cross(normal, vec3(0.0, 1.0, 0.0)));
@@ -71,7 +71,7 @@ float testLight(vec3 lightPosition, Hit hitData, in vec3 firstHitPos){
     hitData = traceAllTiles(ray);
     float lightDistance = length(lightPosition - firstHitPos);
     float hitDistance = length(hitData.hitPosition - firstHitPos);
-    if (hitData.anyHit && hitDistance < lightDistance && hitDistance > push.biasHit) {
+    if (hitData.anyHit && hitDistance < lightDistance) {
         return 1.0 - push.shadowsBaseColor / lightDistance;
     }
     return 1;
@@ -89,8 +89,9 @@ void main() {
     if (hitData.anyHit){
         discard;
     }
-
-    vec3 firstHitPos = hitData.hitPosition + texture(gBufferNormal, texCoords).rgb;
+    float bias = max(push.biasHit, 1e-4 * length(hitData.hitPosition));
+    vec3 normal =texture(gBufferNormal, texCoords).rgb;
+    vec3 firstHitPos = hitData.hitPosition + normal * bias;
     // TODO - ADD CONTRIBUTION TO EVERY LIGHT WITH SHADOWS ENABLED
     if (globalData.lightsQuantity > 0){
         Light l = lightsBuffer.lights[0];
@@ -104,15 +105,20 @@ void main() {
     if(push.giBounces > 0) {
         VoxelMaterialData matData = unpackVoxel(hitData);
         for (uint i = 0; i < push.giSamplesPerPixel; i++) {
-            vec3 randomDir = sampleHemisphere(matData.normal, i);
+            vec3 randomDir = sampleHemisphere(normal, i);
             ray = Ray(firstHitPos, randomDir, 1.0 / randomDir);
-
-//            Hit aoHitData = traceAllTiles(ray);
-//            if (aoHitData.anyHit) {
-//                float distance = length(aoHitData.hitPosition - firstHitPos);
-//                finalColor.a *= exp(-distance * AO_FALLOFF);
-                finalColor.rgb += computeDiffuseIndirectLight(ray, push.giBounces, push.biasHit);
-//            }
+            float NdotL = max(dot(normal, randomDir), 0.0);
+//
+//            //            Hit aoHitData = traceAllTiles(ray);
+//            //            if (aoHitData.anyHit) {
+//            //                float distance = length(aoHitData.hitPosition - firstHitPos);
+//            //                finalColor.a *= exp(-distance * AO_FALLOFF);
+            vec3 indirectColor = computeDiffuseIndirectLight(ray, push.giBounces, push.biasHit);
+            if (length(indirectColor) == 0 && globalData.enabledSun){
+                indirectColor = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), ray.d, 2.0f) * 0.05f * NdotL;
+            }
+            finalColor.rgb +=indirectColor;
+            //            }
         }
     }
 }

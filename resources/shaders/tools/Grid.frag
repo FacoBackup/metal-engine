@@ -46,8 +46,7 @@ void main() {
     if (depthData != 1){
         hasData = OVERLAY_OBJECTS;
         isOverlay = true;
-        vec3 viewSpacePosition = viewSpacePositionFromDepth(depthData, texCoords, globalData.invProj);
-        p = vec3(globalData.invView * vec4(viewSpacePosition, 1.));
+        p = worldSpacePositionFromDepth(depthData, texCoords, globalData.invProj, globalData.invView);
     } else {
         vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
         hasData = rayMarch(globalData.cameraWorldPosition.xyz, rayDir, 1);

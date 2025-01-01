@@ -85,7 +85,7 @@ void main() {
         } else if (push.mode == BRDF){
             finalColor = vec4(shaderData.brdf, 0, 1);
         } else if (push.mode == POSITION){
-            finalColor = vec4(shaderData.worldSpacePosition, 1);
+            finalColor = vec4(normalize(shaderData.worldSpacePosition), 1);
         } else if (push.mode == EMISSIVE){
             finalColor = vec4(albedoEmissive.a > 0 ? vec3(1) : vec3(0), 1);
         } else if (push.mode == GI){
