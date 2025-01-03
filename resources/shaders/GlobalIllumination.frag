@@ -67,12 +67,12 @@ vec3 computeDiffuseIndirectLight(Ray initialRay, uint maxBounces, float bias) {
 
 float testLight(vec3 lightPosition, Hit hitData, in vec3 firstHitPos){
     vec3 rayDirection = normalize(lightPosition - firstHitPos);
-    Ray ray = Ray(firstHitPos, rayDirection, 1./rayDirection);
+    Ray ray = Ray(firstHitPos, rayDirection, 1./rayDirection, globalData.cameraWorldPosition, true);
     hitData = traceAllTiles(ray);
     float lightDistance = length(lightPosition - firstHitPos);
     float hitDistance = length(hitData.hitPosition - firstHitPos);
     if (hitData.anyHit && hitDistance < lightDistance) {
-        return 1.0 - push.shadowsBaseColor / lightDistance;
+        return clamp(push.shadowsBaseColor / lightDistance, 0, 1);
     }
     return 1;
 }
@@ -81,9 +81,8 @@ void main() {
     if (push.ditheringIntensity > 0 && isDitherDiscard(1. - push.ditheringIntensity)){
         discard;
     }
-    vec3 rayOrigin = globalData.cameraWorldPosition.xyz;
     vec3 rayDirection = createRay(texCoords, globalData.invProj, globalData.invView);
-    Ray ray = Ray(rayOrigin, rayDirection, 1./rayDirection);
+    Ray ray = Ray(globalData.cameraWorldPosition, rayDirection, 1./rayDirection, globalData.cameraWorldPosition, true);
     Hit hitData = traceAllTiles(ray);
     finalColor = vec4(0, 0, 0, 1);
     if (hitData.anyHit){
@@ -106,7 +105,7 @@ void main() {
         VoxelMaterialData matData = unpackVoxel(hitData);
         for (uint i = 0; i < push.giSamplesPerPixel; i++) {
             vec3 randomDir = sampleHemisphere(normal, i);
-            ray = Ray(firstHitPos, randomDir, 1.0 / randomDir);
+            ray = Ray(firstHitPos, randomDir, 1.0 / randomDir, globalData.cameraWorldPosition, false);
             float NdotL = max(dot(normal, randomDir), 0.0);
 //
 //            //            Hit aoHitData = traceAllTiles(ray);

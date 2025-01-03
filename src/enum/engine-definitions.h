@@ -20,16 +20,14 @@ typedef unsigned long long EntityID;
 #define FORMAT_FILE_METADATA(baseName) (baseName + FILE_METADATA)
 #define FORMAT_FILE_SVO(baseName) (baseName + FILE_SVO + METAL_FILE_EXTENSION)
 
-#define METRIC_START(M) \
+#define METRIC_START \
 auto currentTime = Clock::now(); \
 auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime.time_since_epoch());\
-const auto start = duration.count(); \
-std::cout << M << std::endl;
-
+const auto start = duration.count();
 
 #define METRIC_END(M) \
 currentTime = Clock::now();\
 duration = std::chrono::duration_cast< std::chrono::milliseconds>(currentTime.time_since_epoch());\
-std::cout << M << duration.count() - start << "ms" << std::endl;
+std::cout << M << " " << duration.count() - start << "ms" << std::endl;
 
 #endif //ENGINEID_H

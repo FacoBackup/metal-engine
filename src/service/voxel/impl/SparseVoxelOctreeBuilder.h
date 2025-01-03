@@ -20,6 +20,8 @@ namespace Metal {
         static void WorldToChunkLocal(const WorldTile *tile, glm::vec3 &worldCoordinate);
 
     public:
+        std::unordered_map<std::string, OctreeNode *> repeatedStructures;
+
         explicit SparseVoxelOctreeBuilder(WorldTile *tile): tile(tile) {
         }
 
@@ -42,6 +44,8 @@ namespace Metal {
         void insert(int maxDepth, glm::vec3 &point, VoxelData *data);
 
         void dispose() const;
+
+        void findRepeatedStructures();
     };
 } // Metal
 

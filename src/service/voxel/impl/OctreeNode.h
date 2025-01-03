@@ -10,6 +10,8 @@ namespace Metal {
         VoxelData *data = nullptr;
         bool isLeaf = false;
         unsigned int depth;
+        bool isStructureStart = false;
+        std::string treeHashId;
 
         /**
          * Target location of this node's data inside the SSBO buffer
@@ -39,6 +41,10 @@ namespace Metal {
         unsigned int packVoxelData(unsigned int childGroupIndex);
 
         void dispose() const;
+
+        std::string getId();
+
+        void repeatedStructures(std::unordered_map<std::string, OctreeNode*> &repeated, int targetDepth);
     };
 } // Metal
 

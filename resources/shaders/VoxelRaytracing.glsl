@@ -22,8 +22,8 @@ DEFINE_OCTREE_BUFFER(7, V7, voxelBuffer7)
 DEFINE_OCTREE_BUFFER(8, V8, voxelBuffer8)
 DEFINE_OCTREE_BUFFER(9, V9, voxelBuffer9)
 
-struct Ray { vec3 o, d, invDir; };
-struct Stack { uint index;vec3 center;float scale; };
+struct Ray { vec3 o, d, invDir, observerOrigin; bool dynamicLevelOfDetail; };
+struct Stack { uint index;vec3 center;float scale; uint currentDepth; };
 
 bool intersect(inout vec3 boxMin, inout vec3 boxMax, inout Ray r) {
     vec3 t1 = (boxMin - r.o) * r.invDir;
@@ -103,6 +103,22 @@ vec4 intersectRayAABB(in Ray ray, vec3 boxMin, vec3 boxMax) {
     return vec4(ray.o + t * ray.d, 1);
 }
 
+uint getLevelOfDetail(float distanceFromRayOrigin){
+    if (distanceFromRayOrigin < 3){
+        return 12;
+    }
+    if (distanceFromRayOrigin < 5){
+        return 11;
+    }
+    if (distanceFromRayOrigin < 10){
+        return 10;
+    }
+    return 9;
+}
+
+#define CHILD_MASK(V) (V >> 1) & 0xFFu
+#define CHILD_GROUP_INDEX(V) (V >> 9) & 0x7FFFFFu
+
 Hit trace(
 in Ray ray,
 uint bufferIndex
@@ -116,7 +132,7 @@ inout ivec2 debugColor
     uint matrialBufferOffset = tileInfo.voxelBufferOffset[bufferIndex - 1];
     if (localTileInfo.w == 0) { return Hit(vec3(0), vec3(0), false, 0, 0, 0, bufferIndex, 0, 0); }
 
-    vec3 center = localTileInfo.xyz * TILE_SIZE ;
+    vec3 center = localTileInfo.xyz * TILE_SIZE;
     float scale = TILE_SIZE / 2;
     vec3 minBox = center - scale;
     vec3 maxBox = center + scale;
@@ -125,12 +141,14 @@ inout ivec2 debugColor
     if (!intersect(minBox, maxBox, ray)) return Hit(vec3(0), vec3(0), false, 0, 0, 0, bufferIndex, 0, 0);
     Stack stack[6];
     scale *= 0.5f;
-    stack[0] = Stack(0u, center, scale);
+    stack[0] = Stack(0u, center, scale, 1);
 
     uint index = 0u;
     int stackPos = 1;
     Hit hitData = Hit(vec3(0), vec3(0), false, 0, 0, 0, bufferIndex, 0, 0);
     uint hitIndex;
+    uint currentDepth = 1;
+    bool isEarlyExit = false;
     while (stackPos-- > 0) {
         #ifdef DEBUG_VOXELS
         if (showRaySearchCount){
@@ -138,13 +156,16 @@ inout ivec2 debugColor
         }
         #endif
         center = stack[stackPos].center;
+        uint targetMaxDepth = getLevelOfDetail(length(center - ray.observerOrigin));
         index = stack[stackPos].index;
         scale = stack[stackPos].scale;
+        currentDepth = stack[stackPos].currentDepth;
         uint voxel_node = getVoxel(index, bufferIndex);
 
-        bool isLeafGroup = ((voxel_node & 0x1u) == 1u);
-        uint childMask = (voxel_node >> 1) & 0xFFu;
-        uint childGroupIndex = (voxel_node >> 9) & 0x7FFFFFu;
+        bool earlyExit = ray.dynamicLevelOfDetail ? currentDepth > targetMaxDepth : false;
+        bool isLeafGroup = ((voxel_node & 0x1u) == 1u) || earlyExit;
+        uint childMask = CHILD_MASK(voxel_node);
+        uint childGroupIndex = CHILD_GROUP_INDEX(voxel_node);
 
         for (uint i = 0u; i < 8u; ++i) {
             if ((childMask & (1u << i)) == 0u){
@@ -171,6 +192,7 @@ inout ivec2 debugColor
             }
             if (entryDist < minDistance) {
                 if (isLeafGroup) {
+                    isEarlyExit = earlyExit;
                     hitData.anyHit = true;
                     hitData.voxelPosition = newCenter;
                     hitData.voxel = voxel_node;
@@ -181,7 +203,7 @@ inout ivec2 debugColor
                     index++;
                     minDistance = entryDist;
                 } else {
-                    stack[stackPos++] = Stack(childGroupIndex + countSetBitsBefore(childMask, i), newCenter, scale * 0.5f);
+                    stack[stackPos++] = Stack(childGroupIndex + countSetBitsBefore(childMask, i), newCenter, scale * 0.5f, currentDepth + 1);
                 }
             }
         }
@@ -190,8 +212,10 @@ inout ivec2 debugColor
     if (hitData.anyHit){
         vec3 vSize = vec3(hitData.voxelSize);
         hitData.hitPosition = intersectRayAABB(ray, hitData.voxelPosition - vSize, hitData.voxelPosition + vSize).rgb;
-        hitData.matData1 = getVoxel(hitIndex + matrialBufferOffset, bufferIndex);
-        hitData.matData2 = getVoxel(hitIndex + matrialBufferOffset + 1, bufferIndex);
+        if (!isEarlyExit){
+            hitData.matData1 = getVoxel(hitIndex + matrialBufferOffset, bufferIndex);
+            hitData.matData2 = getVoxel(hitIndex + matrialBufferOffset + 1, bufferIndex);
+        }
     }
 
     return hitData;
