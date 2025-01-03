@@ -2,7 +2,7 @@
 
 #include "../../context/ApplicationContext.h"
 #include "../../repository/framebuffer/CoreFrameBuffers.h"
-#include "../../context/engine/CommandBufferRecorder.h"
+#include "../../context/engine/passes/CommandBufferRecorder.h"
 
 namespace Metal {
     void CoreRenderPasses::onInitialize() {

@@ -3,31 +3,13 @@
 #include "../../context/ApplicationContext.h"
 #include "../../service/buffer/BufferInstance.h"
 #include "../../service/voxel/SVOInstance.h"
-#include "CommandBufferRecorder.h"
 #include "../../enum/LevelOfDetail.h"
-#include "render-pass/impl/GBufferShadingPass.h"
-#include "render-pass/impl/OpaqueRenderPass.h"
-#include "render-pass/impl/PostProcessingPass.h"
-#include "render-pass/tools/GridPass.h"
 #include "../../service/camera/Camera.h"
-#include "render-pass/impl/AtmospherePass.h"
-#include "render-pass/impl/GlobalIlluminationPass.h"
-#include "render-pass/tools/VoxelVisualizerPass.h"
-#include "render-pass/tools/IconsPass.h"
 
 namespace Metal {
     void EngineContext::onInitialize() {
         context.worldGridService.onSync();
-        fullScreenRenderPasses.push_back(std::make_unique<GBufferShadingPass>(context));
-        fullScreenRenderPasses.push_back(std::make_unique<AtmospherePass>(context));
-        if (context.isDebugMode()) {
-            fullScreenRenderPasses.push_back(std::make_unique<GridPass>(context));
-            fullScreenRenderPasses.push_back(std::make_unique<VoxelVisualizerPass>(context));
-            fullScreenRenderPasses.push_back(std::make_unique<IconsPass>(context));
-        }
-        aoPass.push_back(std::make_unique<GlobalIlluminationPass>(context));
-        postProcessingPasses.push_back(std::make_unique<PostProcessingPass>(context));
-        gBufferPasses.push_back(std::make_unique<OpaqueRenderPass>(context));
+        passesService.onInitialize();
     }
 
     void EngineContext::updateVoxelData() {
@@ -60,7 +42,7 @@ namespace Metal {
         }
     }
 
-    void EngineContext::onSync() {
+    void EngineContext::updateCurrentTime() {
         currentTime = Clock::now();
         std::chrono::duration<float> delta = currentTime - previousTime;
         deltaTime = delta.count();
@@ -72,6 +54,11 @@ namespace Metal {
         if (start == -1) {
             start = currentTimeMs;
         }
+    }
+
+    void EngineContext::onSync() {
+        updateCurrentTime();
+
         context.transformService.onSync();
         context.worldGridService.onSync();
         context.streamingRepository.onSync();
@@ -81,10 +68,7 @@ namespace Metal {
         updateVoxelData();
         updateLights();
 
-        context.coreRenderPasses.aoPass->recordCommands(aoPass);
-        context.coreRenderPasses.gBufferPass->recordCommands(gBufferPasses);
-        context.coreRenderPasses.fullScreenPass->recordCommands(fullScreenRenderPasses);
-        context.coreRenderPasses.postProcessingPass->recordCommands(postProcessingPasses);
+        passesService.onSync();
     }
 
     void EngineContext::updateLights() {

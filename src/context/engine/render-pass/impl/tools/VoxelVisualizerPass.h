@@ -1,12 +1,11 @@
 #ifndef VOXELVISUALIZERPASS_H
 #define VOXELVISUALIZERPASS_H
-#include <string>
 
-#include "../AbstractRenderPass.h"
-#include "../../../../dto/push-constant/VoxelDebugSettingsPushConstant.h"
+#include "../../AbstractRenderPass.h"
+#include "../../../../../dto/push-constant/VoxelDebugSettingsPushConstant.h"
 
 namespace Metal {
-    class VoxelVisualizerPass final : public AbstractRenderPass{
+    class VoxelVisualizerPass final : public AbstractRenderPass {
         VoxelDebugSettingsPushConstant settings{};
 
     public:

@@ -23,6 +23,12 @@ vec3 randomColor(float seed) {
     return vec3(r, g, rand(vec3(seed + g)));
 }
 
+vec2 hashWorldSpaceCoord(vec3 world){
+    ivec3 intPart = ivec3(floor(world / .1)) ;
+    vec3 decimapPart = abs(intPart - world);
+    return vec2(rand(intPart), rand(decimapPart));
+}
+
 void main() {
     vec3 rayOrigin = globalData.cameraWorldPosition.xyz;
     vec3 rayDirection = createRay(texCoords, globalData.invProj, globalData.invView);
@@ -46,8 +52,11 @@ void main() {
         case EMISSIVE:
         finalColor = vec4(vec3(matData.isEmissive ? 1 : 0), 1);
         break;
-        default :
+        case RANDOM:
         finalColor = vec4(randomColor(rand(hitData.voxelPosition.xyz)), 1);
+        break;
+        default:
+        finalColor = vec4(hashWorldSpaceCoord(hitData.hitPosition.xyz), 0, 1);
         break;
     }
     if (length(finalColor.rgb) == 0){

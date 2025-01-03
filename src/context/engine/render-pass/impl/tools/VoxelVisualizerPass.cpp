@@ -1,7 +1,5 @@
 #include "VoxelVisualizerPass.h"
-#include "../../../ApplicationContext.h"
-#include "../../../../enum/LevelOfDetail.h"
-#include "../../../../service/voxel/SVOInstance.h"
+#include "../../../../ApplicationContext.h"
 
 namespace Metal {
     bool VoxelVisualizerPass::shouldRun() {

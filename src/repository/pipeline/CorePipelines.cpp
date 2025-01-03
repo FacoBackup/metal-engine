@@ -23,7 +23,7 @@ namespace Metal {
                 .setDepthTest()
                 .setCullMode(VK_CULL_MODE_BACK_BIT)
                 .setPushConstantsSize(sizeof(MeshPushConstant));
-        gBufferPipeline = pipelineService.createRenderingPipeline(gBufferPipelineBuilder);
+        gBufferPipeline = pipelineService.createPipeline(gBufferPipelineBuilder);
 
         if (context.isDebugMode()) {
             PipelineBuilder gridPipelineBuilder = PipelineBuilder::Of(
@@ -35,7 +35,7 @@ namespace Metal {
                     .setPushConstantsSize(sizeof(GridPushConstant))
                     .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
                     .addDescriptorSet(context.coreDescriptorSets.gBufferDepthIDUV.get());
-            gridPipeline = pipelineService.createRenderingPipeline(gridPipelineBuilder);
+            gridPipeline = pipelineService.createPipeline(gridPipelineBuilder);
 
             PipelineBuilder iconPipelineBuilder = PipelineBuilder::Of(
                         context.coreFrameBuffers.auxFBO,
@@ -46,7 +46,7 @@ namespace Metal {
                     .setPushConstantsSize(sizeof(IconPushConstant))
                     .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
                     .addDescriptorSet(context.coreDescriptorSets.iconsDescriptor.get());
-            iconPipeline = pipelineService.createRenderingPipeline(iconPipelineBuilder);
+            iconPipeline = pipelineService.createPipeline(iconPipelineBuilder);
 
 
             PipelineBuilder voxelVisualizerPipelineBuilder = PipelineBuilder::Of(
@@ -57,7 +57,7 @@ namespace Metal {
                     .setPushConstantsSize(sizeof(VoxelDebugSettingsPushConstant))
                     .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
                     .addDescriptorSet(context.coreDescriptorSets.svoData.get());
-            voxelDebugVisualizerPipeline = pipelineService.createRenderingPipeline(voxelVisualizerPipelineBuilder);
+            voxelDebugVisualizerPipeline = pipelineService.createPipeline(voxelVisualizerPipelineBuilder);
         }
 
         PipelineBuilder ppPipelineBuilder = PipelineBuilder::Of(
@@ -66,7 +66,7 @@ namespace Metal {
                     "PostProcessing.frag"
                 )
                 .addDescriptorSet(context.coreDescriptorSets.postProcessingDescriptor.get());
-        postProcessingPipeline = pipelineService.createRenderingPipeline(ppPipelineBuilder);
+        postProcessingPipeline = pipelineService.createPipeline(ppPipelineBuilder);
 
 
         PipelineBuilder gBufferShadingPipelineBuilder = PipelineBuilder::Of(
@@ -83,7 +83,7 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.brdfDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.aoDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.lightsData.get());
-        gBufferShadingPipeline = pipelineService.createRenderingPipeline(gBufferShadingPipelineBuilder);
+        gBufferShadingPipeline = pipelineService.createPipeline(gBufferShadingPipelineBuilder);
 
         PipelineBuilder atmosphereBuilder = PipelineBuilder::Of(
                     context.coreFrameBuffers.auxFBO,
@@ -92,7 +92,7 @@ namespace Metal {
                 )
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferDepthIDUV.get());
-        atmospherePipeline = pipelineService.createRenderingPipeline(atmosphereBuilder);
+        atmospherePipeline = pipelineService.createPipeline(atmosphereBuilder);
 
         PipelineBuilder globalIlluminationPipelineBuilder = PipelineBuilder::Of(
                     context.coreFrameBuffers.globalIlluminationFBO,
@@ -105,7 +105,7 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.lightsData.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferNormal.get());
 
-        globalIlluminationPipeline = pipelineService.createRenderingPipeline(globalIlluminationPipelineBuilder);
+        globalIlluminationPipeline = pipelineService.createPipeline(globalIlluminationPipelineBuilder);
     }
 
     void CorePipelines::dispose() const {

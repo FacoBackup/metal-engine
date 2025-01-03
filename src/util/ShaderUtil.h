@@ -21,7 +21,7 @@ namespace Metal {
         static std::string ProcessShader(const std::string &file);
 
     public:
-        static VkShaderModule CreateShaderModule(const ApplicationContext &context, const std::string &pFilename, bool debugMode);
+        static VkShaderModule CreateShaderModule(const ApplicationContext &context, const std::string &pFilename);
     };
 } // Metal
 

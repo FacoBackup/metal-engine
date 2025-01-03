@@ -1,11 +1,11 @@
 #ifndef RENDERPASS_H
 #define RENDERPASS_H
 #include <vector>
-#include "../../service/pipeline/PipelineInstance.h"
-#include "../../util/VulkanUtils.h"
+#include "../../../service/pipeline/PipelineInstance.h"
+#include "../../../util/VulkanUtils.h"
 
 namespace Metal {
-    class AbstractRenderPass;
+    class AbstractPass;
     class ApplicationContext;
     struct FrameBufferInstance;
 
@@ -16,14 +16,20 @@ namespace Metal {
         VkRect2D scissor{};
         VkRenderPassBeginInfo renderPassInfo{};
         std::vector<VkClearValue> clearColors{};
+        bool computePassMode;
 
-    public:
+        static void RecordCommandsInternal(VkPipelineBindPoint binding, const std::vector<std::unique_ptr<AbstractPass> > &passes,
+                                           VkCommandBuffer vkCommandBuffer);
+
         void createRenderPassInfo(FrameBufferInstance *frameBuffer, bool clearBuffer);
 
+    public:
         explicit CommandBufferRecorder(FrameBufferInstance *frameBuffer, ApplicationContext &applicationContext,
                                        bool clearBuffer = true);
 
-        void recordCommands(const std::vector<std::unique_ptr<AbstractRenderPass> > &renderPasses) const;
+        explicit CommandBufferRecorder(ApplicationContext &applicationContext);
+
+        void recordCommands(const std::vector<std::unique_ptr<AbstractPass> > &passes) const;
     };
 } // Metal
 

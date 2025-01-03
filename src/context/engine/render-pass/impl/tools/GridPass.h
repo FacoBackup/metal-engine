@@ -1,7 +1,7 @@
 #ifndef GRIDRENDERPASS_H
 #define GRIDRENDERPASS_H
-#include "../AbstractRenderPass.h"
-#include "../../../../dto/push-constant/GridPushConstant.h"
+#include "../../AbstractRenderPass.h"
+#include "../../../../../dto/push-constant/GridPushConstant.h"
 
 namespace Metal {
     class GridPass final : public AbstractRenderPass {

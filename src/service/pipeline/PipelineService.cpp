@@ -37,16 +37,46 @@ namespace Metal {
                                                           &pipeline->vkPipelineLayout));
     }
 
+    PipelineInstance *PipelineService::createPipeline(PipelineBuilder &pipelineBuilder) {
+        if (pipelineBuilder.computeShader != nullptr) {
+            return createComputePipeline(pipelineBuilder);
+        }
+        return createRenderingPipeline(pipelineBuilder);
+    }
+
+    PipelineInstance *PipelineService::createComputePipeline(const PipelineBuilder &pipelineBuilder) {
+        auto *pipeline = new PipelineInstance();
+        pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
+        VkShaderModule computeShaderModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.computeShader);
+        VkPipelineShaderStageCreateInfo computeShaderStageInfo{};
+        computeShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        computeShaderStageInfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
+        computeShaderStageInfo.module = computeShaderModule;
+        computeShaderStageInfo.pName = "main";
+
+        createPipelineLayout(pipelineBuilder.descriptorSetsToBind, pipelineBuilder.pushConstantsSize, pipeline);
+
+        VkComputePipelineCreateInfo pipelineInfo{};
+        pipelineInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+        pipelineInfo.layout = pipeline->vkPipelineLayout;
+        pipelineInfo.stage = computeShaderStageInfo;
+
+        if (vkCreateComputePipelines(vulkanContext.device.device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline->vkPipeline) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create compute pipeline!");
+        }
+
+        vkDestroyShaderModule(vulkanContext.device.device, computeShaderModule, nullptr);
+        return pipeline;
+    }
+
     PipelineInstance *PipelineService::createRenderingPipeline(PipelineBuilder &pipelineBuilder) {
         VkVertexInputBindingDescription *meshBindingDescription = nullptr;
         auto meshDescriptions = VertexData::GetAttributeDescriptions();
 
         auto *pipeline = new PipelineInstance();
         pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
-        auto fragmentShaderModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.fragmentShader,
-                                                                   context.isDebugMode());
-        auto vertexShaderModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.vertexShader,
-                                                                 context.isDebugMode());
+        auto fragmentShaderModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.fragmentShader);
+        auto vertexShaderModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.vertexShader);
         registerResource(pipeline);
         createPipelineLayout(pipelineBuilder.descriptorSetsToBind, pipelineBuilder.pushConstantsSize, pipeline);
 
@@ -78,7 +108,9 @@ namespace Metal {
 
         VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
         inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-        inputAssembly.topology = pipelineBuilder.useStrip ? VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP : VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+        inputAssembly.topology = pipelineBuilder.useStrip
+                                     ? VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP
+                                     : VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
         inputAssembly.primitiveRestartEnable = VK_FALSE;
 
         VkPipelineViewportStateCreateInfo viewportState{};

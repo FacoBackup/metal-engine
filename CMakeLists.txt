@@ -151,10 +151,10 @@ add_executable(
         src/service/mesh/VertexData.h
         src/context/editor/dock-spaces/viewport/CameraPositionPanel.cpp
         src/context/editor/dock-spaces/viewport/CameraPositionPanel.h
-        src/context/engine/render-pass/tools/GridPass.cpp
-        src/context/engine/render-pass/tools/GridPass.h
-        src/context/engine/CommandBufferRecorder.cpp
-        src/context/engine/CommandBufferRecorder.h
+        src/context/engine/render-pass/impl/tools/GridPass.cpp
+        src/context/engine/render-pass/impl/tools/GridPass.h
+        src/context/engine/passes/CommandBufferRecorder.cpp
+        src/context/engine/passes/CommandBufferRecorder.h
         src/repository/render-pass/CoreRenderPasses.cpp
         src/repository/render-pass/CoreRenderPasses.h
         src/service/camera/Camera.cpp
@@ -236,8 +236,8 @@ add_executable(
         src/enum/NotificationSeverity.h
         src/service/voxel/impl/Triangle.h
         src/service/voxel/impl/SparseVoxelOctreeData.h
-        src/context/engine/render-pass/tools/VoxelVisualizerPass.cpp
-        src/context/engine/render-pass/tools/VoxelVisualizerPass.h
+        src/context/engine/render-pass/impl/tools/VoxelVisualizerPass.cpp
+        src/context/engine/render-pass/impl/tools/VoxelVisualizerPass.h
         src/service/voxel/SVOService.cpp
         src/service/voxel/SVOService.h
         src/service/voxel/SVOInstance.cpp
@@ -249,8 +249,8 @@ add_executable(
         src/dto/ubo/LightData.h
         src/repository/world/components/LightComponent.cpp
         src/repository/world/components/LightComponent.h
-        src/context/engine/render-pass/tools/IconsPass.cpp
-        src/context/engine/render-pass/tools/IconsPass.h
+        src/context/engine/render-pass/impl/tools/IconsPass.cpp
+        src/context/engine/render-pass/impl/tools/IconsPass.h
         src/dto/push-constant/IconPushConstant.h
         src/context/engine/render-pass/impl/GlobalIlluminationPass.cpp
         src/context/engine/render-pass/impl/GlobalIlluminationPass.h
@@ -259,6 +259,12 @@ add_executable(
         src/dto/push-constant/GridPushConstant.h
         src/context/engine/render-pass/impl/AtmospherePass.cpp
         src/context/engine/render-pass/impl/AtmospherePass.h
+        src/context/engine/compute-pass/AbstractComputePass.cpp
+        src/context/engine/compute-pass/AbstractComputePass.h
+        src/context/engine/passes/AbstractPass.cpp
+        src/context/engine/passes/AbstractPass.h
+        src/context/engine/passes/PassesService.cpp
+        src/context/engine/passes/PassesService.h
 )
 
 

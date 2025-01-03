@@ -1,8 +1,7 @@
 #include "IconsPass.h"
 
-#include "../../../../context/ApplicationContext.h"
-#include "../../../../repository/pipeline/CorePipelines.h"
-#include "../../../../service/pipeline/PipelineInstance.h"
+#include "../../../../../context/ApplicationContext.h"
+#include "../../../../../repository/pipeline/CorePipelines.h"
 
 namespace Metal {
     PipelineInstance *IconsPass::getPipeline() {
