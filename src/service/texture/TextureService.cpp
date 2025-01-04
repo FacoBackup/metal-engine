@@ -294,8 +294,7 @@ namespace Metal {
         return loadTexture(id + lod.suffix, pathToFile, true);
     }
 
-    TextureInstance *TextureService::createForCompute(const unsigned int width, const unsigned int height,
-                                                      bool isSource, bool isSampled) {
+    TextureInstance *TextureService::createForCompute(const unsigned int width, const unsigned int height) {
         auto *image = new TextureInstance(Util::uuidV4());
         registerResource(image);
         image->width = width;
@@ -311,17 +310,8 @@ namespace Metal {
         imageCreateInfo.arrayLayers = 1;
         imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT; // No multisampling
         imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-        unsigned int usageFlags = VK_IMAGE_USAGE_STORAGE_BIT;
-        if (isSampled) {
-            usageFlags |= VK_IMAGE_USAGE_SAMPLED_BIT;
-        }
-        if (isSource) {
-            usageFlags |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-        } else {
-            usageFlags |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-        }
-        imageCreateInfo.usage = usageFlags;
-        imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        imageCreateInfo.usage = VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+        imageCreateInfo.sharingMode = VK_SHARING_MODE_CONCURRENT;
         imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
         createImageWithInfo(imageCreateInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image);

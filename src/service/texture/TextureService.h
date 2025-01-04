@@ -38,8 +38,7 @@ namespace Metal {
 
         TextureInstance *create(const std::string &id, const LevelOfDetail &lod);
 
-        TextureInstance *createForCompute(unsigned int width, unsigned int height, bool isSource = false,
-                                          bool isSampled = false);
+        TextureInstance *createForCompute(unsigned int width, unsigned int height);
     };
 } // Metal
 

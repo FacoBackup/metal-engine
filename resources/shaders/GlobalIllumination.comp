@@ -4,11 +4,5 @@ layout(set = 1, binding = 0, rgba32f) uniform image2D outputImage;
 
 void main() {
     ivec2 coords = ivec2(gl_GlobalInvocationID.xy);
-//    vec4 outP = imageLoad(outputImage, coords);
-//    if (length(outP) == 0){
-//        for (int i = 0; i< 10000; i++){
-//            imageStore(outputImage, coords, vec4(1));
-//        }
-//    }
     imageStore(outputImage, coords, vec4(1));
 }

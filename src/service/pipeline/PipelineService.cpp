@@ -69,6 +69,11 @@ namespace Metal {
             throw std::runtime_error("failed to create compute pipeline!");
         }
 
+        pipeline->descriptorSets.resize(pipelineBuilder.descriptorSetsToBind.size());
+        for (int i = 0; i < pipelineBuilder.descriptorSetsToBind.size(); i++) {
+            pipeline->descriptorSets[i] = pipelineBuilder.descriptorSetsToBind[i]->vkDescriptorSet;
+        }
+
         vkDestroyShaderModule(vulkanContext.device.device, computeShaderModule, nullptr);
         return pipeline;
     }
