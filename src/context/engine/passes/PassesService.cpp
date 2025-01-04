@@ -18,7 +18,6 @@ namespace Metal {
         gBuffer = new CommandBufferRecorder(context.coreFrameBuffers.gBufferFBO, context);
         fullScreen = new CommandBufferRecorder(context.coreFrameBuffers.auxFBO, context);
         postProcessing = new CommandBufferRecorder(context.coreFrameBuffers.postProcessingFBO, context);
-        compute = new CommandBufferRecorder(context);
 
         context.worldGridService.onSync();
         fullScreenRenderPasses.push_back(std::make_unique<GBufferShadingPass>(context));
@@ -34,9 +33,8 @@ namespace Metal {
     }
 
     void PassesService::onSync() {
-        compute->recordCommands(computePasses);
         gBuffer->recordCommands(gBufferPasses);
-        fullScreen->recordCommands(fullScreenRenderPasses);
+        fullScreen->recordCommands(fullScreenRenderPasses, computePasses);
         postProcessing->recordCommands(postProcessingPasses);
     }
 } // Metal

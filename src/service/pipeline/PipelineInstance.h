@@ -14,6 +14,7 @@ namespace Metal {
         VkPipelineLayout vkPipelineLayout = VK_NULL_HANDLE;
         VkPipeline vkPipeline = VK_NULL_HANDLE;
         std::vector<VkDescriptorSet> descriptorSets{};
+        bool isCompute = false;
         uint32_t pushConstantsSize = 0;
 
         void dispose(VulkanContext &context) override;

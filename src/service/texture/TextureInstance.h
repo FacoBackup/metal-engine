@@ -13,7 +13,7 @@ namespace Metal {
         VkImageView vkImageView = VK_NULL_HANDLE;
         VkSampler vkSampler = VK_NULL_HANDLE;
         uint32_t mipLevels = 1;
-        int width{}, height{}, channels{};
+        uint32_t width{}, height{}, channels{};
         VkFormat vkFormat{};
         std::unique_ptr<DescriptorInstance> imageDescriptor = nullptr;
 

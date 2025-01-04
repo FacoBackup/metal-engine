@@ -26,7 +26,9 @@ namespace Metal {
 
         if (pushConstantsSize > 0) {
             VkPushConstantRange pushConstantRange{};
-            pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+            pushConstantRange.stageFlags = pipeline->isCompute
+                                               ? VK_SHADER_STAGE_COMPUTE_BIT
+                                               : VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
             pushConstantRange.offset = 0;
             pushConstantRange.size = pushConstantsSize;
             layoutInfo.pushConstantRangeCount = 1;
@@ -44,8 +46,9 @@ namespace Metal {
         return createRenderingPipeline(pipelineBuilder);
     }
 
-    PipelineInstance *PipelineService::createComputePipeline(const PipelineBuilder &pipelineBuilder) {
+    PipelineInstance *PipelineService::createComputePipeline(const PipelineBuilder &pipelineBuilder) const {
         auto *pipeline = new PipelineInstance();
+        pipeline->isCompute = true;
         pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
         VkShaderModule computeShaderModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.computeShader);
         VkPipelineShaderStageCreateInfo computeShaderStageInfo{};
@@ -61,7 +64,8 @@ namespace Metal {
         pipelineInfo.layout = pipeline->vkPipelineLayout;
         pipelineInfo.stage = computeShaderStageInfo;
 
-        if (vkCreateComputePipelines(vulkanContext.device.device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline->vkPipeline) != VK_SUCCESS) {
+        if (vkCreateComputePipelines(vulkanContext.device.device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr,
+                                     &pipeline->vkPipeline) != VK_SUCCESS) {
             throw std::runtime_error("failed to create compute pipeline!");
         }
 

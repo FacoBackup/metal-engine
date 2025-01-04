@@ -11,7 +11,7 @@ namespace Metal {
     struct DescriptorInstance;
 
     class PipelineService final : public AbstractResourceService {
-        PipelineInstance *createComputePipeline(const PipelineBuilder &pipelineBuilder);
+        PipelineInstance *createComputePipeline(const PipelineBuilder &pipelineBuilder) const;
 
         PipelineInstance *createRenderingPipeline(PipelineBuilder &pipelineBuilder);
 

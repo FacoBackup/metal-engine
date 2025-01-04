@@ -110,7 +110,6 @@ namespace Metal {
 
         PipelineBuilder giBuilder = PipelineBuilder::Of("GlobalIllumination.comp")
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.giAccumulationDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.giComputeDescriptor.get());
         giComputePipeline = pipelineService.createPipeline(giBuilder);
     }

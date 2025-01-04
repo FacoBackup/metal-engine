@@ -70,14 +70,14 @@ namespace Metal {
     }
 
     void DescriptorInstance::addImageDescriptor(const uint32_t bindingPoint, VkDescriptorType type, VkSampler sampler,
-                                                VkImageView view) {
+                                                VkImageView view, VkImageLayout layout) {
         if (!ready) {
             throw std::runtime_error("Descriptor instance is not ready");
         }
 
         auto &imageInfo = imageInfos.emplace_back();;
         imageInfo.imageView = view;
-        imageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+        imageInfo.imageLayout = layout;
         imageInfo.sampler = sampler;
 
         auto &descriptorWrite = writeDescriptorSets.emplace_back();

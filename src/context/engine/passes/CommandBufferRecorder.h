@@ -18,18 +18,19 @@ namespace Metal {
         std::vector<VkClearValue> clearColors{};
         bool computePassMode;
 
-        static void RecordCommandsInternal(VkPipelineBindPoint binding, const std::vector<std::unique_ptr<AbstractPass> > &passes,
+        static void RecordCommandsInternal(VkPipelineBindPoint binding,
+                                           const std::vector<std::unique_ptr<AbstractPass> > &passes,
                                            VkCommandBuffer vkCommandBuffer);
 
-        void createRenderPassInfo(FrameBufferInstance *frameBuffer, bool clearBuffer);
+        void createRenderPassInfo(const FrameBufferInstance *frameBuffer, bool clearBuffer);
 
     public:
         explicit CommandBufferRecorder(FrameBufferInstance *frameBuffer, ApplicationContext &applicationContext,
                                        bool clearBuffer = true);
 
-        explicit CommandBufferRecorder(ApplicationContext &applicationContext);
-
-        void recordCommands(const std::vector<std::unique_ptr<AbstractPass> > &passes) const;
+        void recordCommands(
+            const std::vector<std::unique_ptr<AbstractPass> > &passes,
+            const std::vector<std::unique_ptr<AbstractPass> > &computePasses = {}) const;
     };
 } // Metal
 

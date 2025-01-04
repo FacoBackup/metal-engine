@@ -13,8 +13,6 @@ namespace Metal {
 
     void AbstractComputePass::recordImageDispatch(const TextureInstance *image, const unsigned int threadCountX,
                                                   const unsigned int threadCountY) const {
-        unsigned int groupX = (image->width + threadCountX - 1) / threadCountX;
-        unsigned int groupY = (image->height + threadCountY - 1) / threadCountY;
-        vkCmdDispatch(vkCommandBuffer, groupX, groupY, 1);
+        vkCmdDispatch(vkCommandBuffer, image->width / threadCountX, image->height / threadCountY, 1);
     }
 }

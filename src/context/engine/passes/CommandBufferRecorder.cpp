@@ -35,18 +35,7 @@ namespace Metal {
         computePassMode = false;
     }
 
-    CommandBufferRecorder::CommandBufferRecorder(ApplicationContext &applicationContext): context(applicationContext) {
-        VkCommandBufferAllocateInfo allocInfo{};
-        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo.commandPool = context.vulkanContext.commandPool;
-        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandBufferCount = MAX_FRAMES_IN_FLIGHT;
-        VulkanUtils::CheckVKResult(
-            vkAllocateCommandBuffers(context.vulkanContext.device.device, &allocInfo, _commandBuffers.data()));
-        computePassMode = true;
-    }
-
-    void CommandBufferRecorder::createRenderPassInfo(FrameBufferInstance *frameBuffer, const bool clearBuffer) {
+    void CommandBufferRecorder::createRenderPassInfo(const FrameBufferInstance *frameBuffer, const bool clearBuffer) {
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderPassInfo.renderPass = frameBuffer->vkRenderPass;
         renderPassInfo.framebuffer = frameBuffer->vkFramebuffer;
@@ -73,23 +62,22 @@ namespace Metal {
     }
 
     void CommandBufferRecorder::recordCommands(
-        const std::vector<std::unique_ptr<AbstractPass> > &passes) const {
+        const std::vector<std::unique_ptr<AbstractPass> > &passes,
+        const std::vector<std::unique_ptr<AbstractPass> > &computePasses) const {
         auto vkCommandBuffer = _commandBuffers[context.getFrameIndex()];
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         vkBeginCommandBuffer(vkCommandBuffer, &beginInfo);
 
-        if (computePassMode) {
-            RecordCommandsInternal(VK_PIPELINE_BIND_POINT_COMPUTE, passes, vkCommandBuffer);
-        } else {
-            vkCmdBeginRenderPass(vkCommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-            vkCmdSetViewport(vkCommandBuffer, 0, 1, &viewport);
-            vkCmdSetScissor(vkCommandBuffer, 0, 1, &scissor);
-            RecordCommandsInternal(VK_PIPELINE_BIND_POINT_GRAPHICS, passes, vkCommandBuffer);
-            vkCmdEndRenderPass(vkCommandBuffer);
-        }
-        vkEndCommandBuffer(vkCommandBuffer);
+        RecordCommandsInternal(VK_PIPELINE_BIND_POINT_COMPUTE, computePasses, vkCommandBuffer);
 
+        vkCmdBeginRenderPass(vkCommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdSetViewport(vkCommandBuffer, 0, 1, &viewport);
+        vkCmdSetScissor(vkCommandBuffer, 0, 1, &scissor);
+        RecordCommandsInternal(VK_PIPELINE_BIND_POINT_GRAPHICS, passes, vkCommandBuffer);
+        vkCmdEndRenderPass(vkCommandBuffer);
+
+        vkEndCommandBuffer(vkCommandBuffer);
         context.vulkanContext.pushCommandBuffer(vkCommandBuffer);
     }
 

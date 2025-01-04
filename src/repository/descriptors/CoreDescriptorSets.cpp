@@ -61,30 +61,24 @@ namespace Metal {
         GBUFFER_D(gBufferShadingRMAO, 1)
         GBUFFER_D(gBufferNormal, 2)
         GBUFFER_D(gBufferDepthIDUV, 3)
-        giDescriptor = std::make_unique<DescriptorInstance>();
-        giDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-        giDescriptor->create(vulkanContext);
-        giDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                         context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                         context.coreTextures.globalIllumination->vkImageView);
-        giDescriptor->write(vulkanContext);
-
 
         giComputeDescriptor = std::make_unique<DescriptorInstance>();
         giComputeDescriptor->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
         giComputeDescriptor->create(vulkanContext);
-        giComputeDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-                                         VK_NULL_HANDLE,
-                                         context.coreTextures.globalIllumination->vkImageView);
+        giComputeDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
+                                                context.coreTextures.globalIllumination->vkImageView);
         giComputeDescriptor->write(vulkanContext);
 
-        giAccumulationDescriptor = std::make_unique<DescriptorInstance>();
-        giAccumulationDescriptor->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
-        giAccumulationDescriptor->create(vulkanContext);
-        giAccumulationDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-                                         VK_NULL_HANDLE,
-                                         context.coreTextures.giAccumulation->vkImageView);
-        giAccumulationDescriptor->write(vulkanContext);
+        {
+
+            giDescriptor = std::make_unique<DescriptorInstance>();
+            giDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
+            giDescriptor->create(vulkanContext);
+            giDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                             context.coreFrameBuffers.gBufferFBO->vkImageSampler,
+                                             context.coreTextures.globalIllumination->vkImageView);
+            giDescriptor->write(vulkanContext);
+        }
 
         // BRDF TEXTURE
         {
@@ -116,7 +110,7 @@ namespace Metal {
                                                        VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
             postProcessingDescriptor->create(vulkanContext);
             postProcessingDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                         context.coreFrameBuffers.auxFBO->vkImageSampler,
+                                                         context.coreFrameBuffers.gBufferFBO->vkImageSampler,
                                                          context.coreFrameBuffers.auxFBO->attachments[0]->
                                                          vkImageView);
             postProcessingDescriptor->write(vulkanContext);
