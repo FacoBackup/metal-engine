@@ -8,6 +8,12 @@ namespace Metal {
         brdf = context.textureService.loadTexture(Util::uuidV4(), "resources/textures/brdf.png", false);
         brdf->setAsNoDisposal();
 
+        globalIllumination = context.textureService.createForCompute(1280, 720);
+        globalIllumination->setAsNoDisposal();
+
+        giAccumulation = context.textureService.createForCompute(1280, 720);
+        giAccumulation->setAsNoDisposal();
+
         if (context.isDebugMode()) {
             icons = context.textureService.loadTexture(Util::uuidV4(), "resources/textures/icons.png", false);
             icons->setAsNoDisposal();

@@ -10,7 +10,6 @@
 #include "../repository/pipeline/CorePipelines.h"
 #include "../repository/buffers/CoreBuffers.h"
 #include "../repository/descriptors/CoreDescriptorSets.h"
-#include "../repository/render-pass/CoreRenderPasses.h"
 #include "../repository/texture/CoreTextures.h"
 
 #include "../service/mesh/MeshService.h"
@@ -59,7 +58,6 @@ namespace Metal {
         CorePipelines corePipelines{*this};
         CoreBuffers coreBuffers{*this};
         CoreDescriptorSets coreDescriptorSets{*this};
-        CoreRenderPasses coreRenderPasses{*this};
         CoreTextures coreTextures{*this};
         // ----------- CORE REPOSITORIES
 

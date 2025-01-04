@@ -10,12 +10,16 @@ namespace Metal {
     struct CorePipelines;
     struct PipelineInstance;
     struct CoreBuffers;
+    struct TextureInstance;
 
     class AbstractComputePass : public AbstractPass {
     public:
         explicit AbstractComputePass(ApplicationContext &context);
 
         void recordDispatch(unsigned int groupX, unsigned int groupY, unsigned int groupZ) const;
+
+        void recordImageDispatch(const TextureInstance *image, unsigned int threadCountX,
+                                                      unsigned int threadCountY) const;
     };
 }
 

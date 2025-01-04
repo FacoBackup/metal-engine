@@ -6,12 +6,10 @@
 
 namespace Metal {
     struct EngineRepository final : Inspectable {
-        bool voxelGIEnabled = false;
-        float ditheringIntensity = 0;
-        float shadowsBaseColor = 2;
+        bool giEnabled = false;
+        float giDitheringIntensity = 0;
         int giBounces = 1;
         int giSamplesPerPixel = 1;
-        float voxelHitBias = .05;
         int numberOfTiles = 10;
         float elapsedTime = .5f;
         bool atmosphereEnabled = false;
@@ -46,10 +44,8 @@ namespace Metal {
             middayColor.x, middayColor.y, middayColor.z,
             screenSpaceShadows,
             svoFilePaths,
-            voxelHitBias,
-            shadowsBaseColor,
-            voxelGIEnabled,
-            ditheringIntensity,
+            giEnabled,
+            giDitheringIntensity,
             giSamplesPerPixel
         )
     };

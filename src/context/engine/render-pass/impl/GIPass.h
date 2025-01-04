@@ -5,11 +5,11 @@
 #include "../../../../dto/push-constant/GIPushConstant.h"
 
 namespace Metal {
-    class GlobalIlluminationPass final : public AbstractRenderPass {
+    class GIPass final : public AbstractRenderPass {
         GIPushConstant pushConstant{};
 
     public:
-        explicit GlobalIlluminationPass(ApplicationContext &context)
+        explicit GIPass(ApplicationContext &context)
             : AbstractRenderPass(context) {
         }
 

@@ -10,8 +10,6 @@
 layout(set = 3, binding = 0) uniform sampler2D gBufferNormal;
 
 layout(push_constant) uniform Push {
-    float biasHit;
-    float shadowsBaseColor;
     float ditheringIntensity;
     uint giBounces;
     uint giSamplesPerPixel;
@@ -72,7 +70,7 @@ float testLight(vec3 lightPosition, Hit hitData, in vec3 firstHitPos){
     float lightDistance = length(lightPosition - firstHitPos);
     float hitDistance = length(hitData.hitPosition - firstHitPos);
     if (hitData.anyHit && hitDistance < lightDistance) {
-        return clamp(push.shadowsBaseColor / lightDistance, 0, 1);
+        return clamp(1 / lightDistance, 0, 1);
     }
     return 1;
 }
@@ -88,7 +86,7 @@ void main() {
     if (hitData.anyHit){
         discard;
     }
-    float bias = max(push.biasHit, 1e-4 * length(hitData.hitPosition));
+    float bias = max(.05, 1e-4 * length(hitData.hitPosition));
     vec3 normal =texture(gBufferNormal, texCoords).rgb;
     vec3 firstHitPos = hitData.hitPosition + normal * bias;
     // TODO - ADD CONTRIBUTION TO EVERY LIGHT WITH SHADOWS ENABLED
@@ -112,7 +110,7 @@ void main() {
 //            //            if (aoHitData.anyHit) {
 //            //                float distance = length(aoHitData.hitPosition - firstHitPos);
 //            //                finalColor.a *= exp(-distance * AO_FALLOFF);
-            vec3 indirectColor = computeDiffuseIndirectLight(ray, push.giBounces, push.biasHit);
+            vec3 indirectColor = computeDiffuseIndirectLight(ray, push.giBounces, bias);
             if (length(indirectColor) == 0 && globalData.enabledSun){
                 indirectColor = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), ray.d, 2.0f) * 0.05f * NdotL;
             }

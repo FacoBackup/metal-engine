@@ -37,6 +37,8 @@ namespace Metal {
                                      VkFormat imageFormat = VK_FORMAT_R8G8B8A8_SRGB);
 
         TextureInstance *create(const std::string &id, const LevelOfDetail &lod);
+
+        TextureInstance *createForCompute(unsigned int width, unsigned int height);
     };
 } // Metal
 

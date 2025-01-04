@@ -6,7 +6,7 @@
 #include "../render-pass/impl/PostProcessingPass.h"
 #include "../render-pass/impl/tools/GridPass.h"
 #include "../render-pass/impl/AtmospherePass.h"
-#include "../render-pass/impl/GlobalIlluminationPass.h"
+#include "../compute-pass/impl/GlobalIlluminationPass.h"
 #include "../render-pass/impl/tools/VoxelVisualizerPass.h"
 #include "../render-pass/impl/tools/IconsPass.h"
 
@@ -15,6 +15,11 @@ namespace Metal {
     }
 
     void PassesService::onInitialize() {
+        gBuffer = new CommandBufferRecorder(context.coreFrameBuffers.gBufferFBO, context);
+        fullScreen = new CommandBufferRecorder(context.coreFrameBuffers.auxFBO, context);
+        postProcessing = new CommandBufferRecorder(context.coreFrameBuffers.postProcessingFBO, context);
+        compute = new CommandBufferRecorder(context);
+
         context.worldGridService.onSync();
         fullScreenRenderPasses.push_back(std::make_unique<GBufferShadingPass>(context));
         fullScreenRenderPasses.push_back(std::make_unique<AtmospherePass>(context));
@@ -23,15 +28,15 @@ namespace Metal {
             fullScreenRenderPasses.push_back(std::make_unique<VoxelVisualizerPass>(context));
             fullScreenRenderPasses.push_back(std::make_unique<IconsPass>(context));
         }
-        aoPass.push_back(std::make_unique<GlobalIlluminationPass>(context));
+        computePasses.push_back(std::make_unique<GlobalIlluminationPass>(context));
         postProcessingPasses.push_back(std::make_unique<PostProcessingPass>(context));
         gBufferPasses.push_back(std::make_unique<OpaqueRenderPass>(context));
     }
 
     void PassesService::onSync() {
-        context.coreRenderPasses.aoPass->recordCommands(aoPass);
-        context.coreRenderPasses.gBufferPass->recordCommands(gBufferPasses);
-        context.coreRenderPasses.fullScreenPass->recordCommands(fullScreenRenderPasses);
-        context.coreRenderPasses.postProcessingPass->recordCommands(postProcessingPasses);
+        compute->recordCommands(computePasses);
+        gBuffer->recordCommands(gBufferPasses);
+        fullScreen->recordCommands(fullScreenRenderPasses);
+        postProcessing->recordCommands(postProcessingPasses);
     }
 } // Metal

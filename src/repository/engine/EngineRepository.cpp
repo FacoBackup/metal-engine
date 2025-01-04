@@ -9,12 +9,10 @@ namespace Metal {
     void EngineRepository::registerFields() {
         registerBool(atmosphereEnabled, "Atmosphere", "Enabled?");
 
-        registerBool(voxelGIEnabled, "Global illumination", "Enabled?");
-        registerFloat(voxelHitBias, "Global illumination", "Ray tracing hit bias", 0, 10, false, .0001);
-        registerFloat(shadowsBaseColor, "Global illumination", "Shadow base color", 0, 100, false, .001);
+        registerBool(giEnabled, "Global illumination", "Enabled?");
         registerInt(giBounces, "Global illumination", "Max bounces", 0, 5);
         registerInt(giSamplesPerPixel, "Global illumination", "Samples per pixel", 0, 25);
-        registerFloat(ditheringIntensity, "Global illumination", "Dithering intensity", 0, 1, false, .001);
+        registerFloat(giDitheringIntensity, "Global illumination", "Dithering intensity", 0, 1, false, .001);
         registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);
         registerFloat(elapsedTime, "Time", "Elapsed time");
         registerBool(incrementTime, "Time", "Increment time");

@@ -275,4 +275,30 @@ namespace Metal {
         auto pathToFile = context.getAssetDirectory() + FORMAT_FILE_TEXTURE(id, lod);
         return loadTexture(id + lod.suffix, pathToFile, true);
     }
+
+    TextureInstance *TextureService::createForCompute(const unsigned int width, const unsigned int height) {
+        auto *image = new TextureInstance(Util::uuidV4());
+        registerResource(image);
+        image->width = width;
+        image->height = height;
+        VkImageCreateInfo imageCreateInfo = {};
+        imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+        imageCreateInfo.format = VK_FORMAT_R32G32B32A32_SFLOAT;
+        imageCreateInfo.extent.width = width;
+        imageCreateInfo.extent.height = height;
+        imageCreateInfo.extent.depth = 1;
+        imageCreateInfo.mipLevels = 1;
+        imageCreateInfo.arrayLayers = 1;
+        imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT; // No multisampling
+        imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+        imageCreateInfo.usage = VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
+                                VK_IMAGE_USAGE_SAMPLED_BIT;
+        imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+        createImageWithInfo(imageCreateInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image);
+        createImageView(VK_FORMAT_R32G32B32A32_SFLOAT, image);
+        return image;
+    }
 } // Metal

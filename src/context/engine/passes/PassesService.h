@@ -8,12 +8,19 @@
 
 
 namespace Metal {
+    class CommandBufferRecorder;
+
     class PassesService final : public AbstractRuntimeComponent {
-        std::vector<std::unique_ptr<AbstractPass> > aoPass;
+        std::vector<std::unique_ptr<AbstractPass> > computePasses;
+        std::vector<std::unique_ptr<AbstractPass> > giPasses;
         std::vector<std::unique_ptr<AbstractPass> > fullScreenRenderPasses;
         std::vector<std::unique_ptr<AbstractPass> > gBufferPasses;
         std::vector<std::unique_ptr<AbstractPass> > postProcessingPasses;
 
+        CommandBufferRecorder *gBuffer = nullptr;
+        CommandBufferRecorder *fullScreen = nullptr;
+        CommandBufferRecorder *postProcessing = nullptr;
+        CommandBufferRecorder *compute = nullptr;
     public:
         explicit PassesService(ApplicationContext &context);
 

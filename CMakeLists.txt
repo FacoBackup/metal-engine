@@ -155,8 +155,6 @@ add_executable(
         src/context/engine/render-pass/impl/tools/GridPass.h
         src/context/engine/passes/CommandBufferRecorder.cpp
         src/context/engine/passes/CommandBufferRecorder.h
-        src/repository/render-pass/CoreRenderPasses.cpp
-        src/repository/render-pass/CoreRenderPasses.h
         src/service/camera/Camera.cpp
         src/repository/world/WorldRepository.cpp
         src/repository/world/WorldRepository.h
@@ -252,8 +250,8 @@ add_executable(
         src/context/engine/render-pass/impl/tools/IconsPass.cpp
         src/context/engine/render-pass/impl/tools/IconsPass.h
         src/dto/push-constant/IconPushConstant.h
-        src/context/engine/render-pass/impl/GlobalIlluminationPass.cpp
-        src/context/engine/render-pass/impl/GlobalIlluminationPass.h
+        src/context/engine/render-pass/impl/GIpass.cpp
+        src/context/engine/render-pass/impl/GIpass.h
         src/repository/editor/EditorRepository.cpp
         src/dto/push-constant/GIPushConstant.h
         src/dto/push-constant/GridPushConstant.h
@@ -265,6 +263,9 @@ add_executable(
         src/context/engine/passes/AbstractPass.h
         src/context/engine/passes/PassesService.cpp
         src/context/engine/passes/PassesService.h
+        src/context/engine/compute-pass/impl/GlobalIlluminationPass.cpp
+        src/context/engine/compute-pass/impl/GlobalIlluminationPass.h
+        src/util/ImageUtils.h
 )
 
 

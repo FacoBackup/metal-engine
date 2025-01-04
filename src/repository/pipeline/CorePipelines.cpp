@@ -81,7 +81,7 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.gBufferNormal.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferDepthIDUV.get())
                 .addDescriptorSet(context.coreDescriptorSets.brdfDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.aoDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.giDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.lightsData.get());
         gBufferShadingPipeline = pipelineService.createPipeline(gBufferShadingPipelineBuilder);
 
@@ -106,6 +106,13 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.gBufferNormal.get());
 
         globalIlluminationPipeline = pipelineService.createPipeline(globalIlluminationPipelineBuilder);
+
+
+        PipelineBuilder giBuilder = PipelineBuilder::Of("GlobalIllumination.comp")
+                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.giAccumulationDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.giComputeDescriptor.get());
+        giComputePipeline = pipelineService.createPipeline(giBuilder);
     }
 
     void CorePipelines::dispose() const {
@@ -114,6 +121,7 @@ namespace Metal {
         atmospherePipeline->dispose(vulkanContext);
         globalIlluminationPipeline->dispose(vulkanContext);
         postProcessingPipeline->dispose(vulkanContext);
+        giComputePipeline->dispose(vulkanContext);
         if (context.isDebugMode()) {
             gridPipeline->dispose(vulkanContext);
             iconPipeline->dispose(vulkanContext);
