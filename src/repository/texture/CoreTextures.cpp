@@ -8,7 +8,7 @@ namespace Metal {
         brdf = context.textureService.loadTexture(Util::uuidV4(), "resources/textures/brdf.png", false);
         brdf->setAsNoDisposal();
 
-        globalIllumination = context.textureService.createForCompute(1280, 720);
+        globalIllumination = context.textureService.createForCompute(vulkanContext.getWindowWidth(), vulkanContext.getWindowHeight());
         globalIllumination->setAsNoDisposal();
 
         if (context.isDebugMode()) {

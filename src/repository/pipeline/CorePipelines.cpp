@@ -3,9 +3,7 @@
 
 #include "../../dto/push-constant/MeshPushConstant.h"
 #include "../../dto/push-constant/GridPushConstant.h"
-#include "../../dto/push-constant/GBufferShadingPushConstant.h"
 #include "../../dto/push-constant/VoxelDebugSettingsPushConstant.h"
-#include "../../dto/push-constant/GIPushConstant.h"
 #include "../../dto/push-constant/IconPushConstant.h"
 #include "../../service/pipeline/PipelineInstance.h"
 #include "../../service/pipeline/PipelineService.h"
@@ -65,6 +63,7 @@ namespace Metal {
                     "QUAD.vert",
                     "PostProcessing.frag"
                 )
+                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.postProcessingDescriptor.get());
         postProcessingPipeline = pipelineService.createPipeline(ppPipelineBuilder);
 
@@ -74,7 +73,6 @@ namespace Metal {
                     "QUAD.vert",
                     "GBufferShading.frag"
                 )
-                .setPushConstantsSize(sizeof(GBufferShadingPushConstant))
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferAlbedo.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferShadingRMAO.get())
@@ -94,22 +92,11 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.gBufferDepthIDUV.get());
         atmospherePipeline = pipelineService.createPipeline(atmosphereBuilder);
 
-        PipelineBuilder globalIlluminationPipelineBuilder = PipelineBuilder::Of(
-                    context.coreFrameBuffers.globalIlluminationFBO,
-                    "QUAD.vert",
-                    "GlobalIllumination.frag"
-                )
-                .setPushConstantsSize(sizeof(GIPushConstant))
+        PipelineBuilder giBuilder = PipelineBuilder::Of("GlobalIllumination.comp")
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.svoData.get())
                 .addDescriptorSet(context.coreDescriptorSets.lightsData.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferNormal.get());
-
-        globalIlluminationPipeline = pipelineService.createPipeline(globalIlluminationPipelineBuilder);
-
-
-        PipelineBuilder giBuilder = PipelineBuilder::Of("GlobalIllumination.comp")
-                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferNormal.get())
                 .addDescriptorSet(context.coreDescriptorSets.giComputeDescriptor.get());
         giComputePipeline = pipelineService.createPipeline(giBuilder);
     }
@@ -118,7 +105,6 @@ namespace Metal {
         gBufferPipeline->dispose(vulkanContext);
         gBufferShadingPipeline->dispose(vulkanContext);
         atmospherePipeline->dispose(vulkanContext);
-        globalIlluminationPipeline->dispose(vulkanContext);
         postProcessingPipeline->dispose(vulkanContext);
         giComputePipeline->dispose(vulkanContext);
         if (context.isDebugMode()) {

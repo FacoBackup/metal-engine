@@ -10,4 +10,18 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     float logDepthFC;
     uint lightsQuantity;
     bool enabledSun;
+
+// POST PROCESSING
+    float distortionIntensity;
+    float chromaticAberrationIntensity;
+    bool distortionEnabled;
+    bool chromaticAberrationEnabled;
+    bool vignetteEnabled;
+    float vignetteStrength;
+
+// GI
+    uint giBounces;
+    uint giSamplesPerPixel;
+
+    uint debugFlag;
 } globalData;

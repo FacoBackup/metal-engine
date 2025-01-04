@@ -6,7 +6,11 @@
 )
 
 bool isDitherDiscard(float alpha){
+    #ifdef IS_COMPUTE
+    ivec2 coords = ivec2(mod(gl_GlobalInvocationID.xy, 4.0));
+    #else
     ivec2 coords = ivec2(mod(gl_FragCoord.xy, 4.0));
+    #endif
     float threshold = DITHER_MATRIX[coords.y][coords.x];
     return alpha <= threshold;
 }

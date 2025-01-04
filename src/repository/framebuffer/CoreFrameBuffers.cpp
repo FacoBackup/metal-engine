@@ -26,13 +26,6 @@ namespace Metal {
                                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, auxFBO);
             framebufferService.createRenderPass(auxFBO);
         } {
-            globalIlluminationFBO = framebufferService.createFrameBuffer(vulkanContext.getWindowWidth() / 2,
-                                                                         vulkanContext.getWindowHeight() / 2,
-                                                                         glm::vec4(0, 0, 0, 1));
-            framebufferService.createAttachment("Global illumination", VK_FORMAT_R16G16B16A16_SFLOAT,
-                                                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, globalIlluminationFBO);
-            framebufferService.createRenderPass(globalIlluminationFBO);
-        } {
             // POST PROCESSING
             postProcessingFBO = framebufferService.createFrameBuffer(vulkanContext.getWindowWidth(),
                                                                      vulkanContext.getWindowHeight());
