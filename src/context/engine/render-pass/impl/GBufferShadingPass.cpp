@@ -3,10 +3,6 @@
 
 namespace Metal {
     void GBufferShadingPass::onSync() {
-        if (context.isDebugMode()) {
-            pushConstant.mode = context.editorRepository.shadingMode;
-            recordPushConstant(&pushConstant);
-        }
         recordDrawSimpleInstanced(3, 1);
     }
 

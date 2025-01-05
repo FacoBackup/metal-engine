@@ -5,6 +5,7 @@
 #include "../render-pass/impl/OpaqueRenderPass.h"
 #include "../render-pass/impl/PostProcessingPass.h"
 #include "../render-pass/impl/tools/GridPass.h"
+#include "../render-pass/impl/RayGenPass.h"
 #include "../render-pass/impl/AtmospherePass.h"
 #include "../compute-pass/impl/GlobalIlluminationPass.h"
 #include "../render-pass/impl/tools/VoxelVisualizerPass.h"
@@ -16,8 +17,11 @@ namespace Metal {
 
     void PassesService::onInitialize() {
         gBuffer = new CommandBufferRecorder(context.coreFrameBuffers.gBufferFBO, context);
+        rayGen = new CommandBufferRecorder(context.coreFrameBuffers.rayGenFBO, context);
         fullScreen = new CommandBufferRecorder(context.coreFrameBuffers.auxFBO, context);
         postProcessing = new CommandBufferRecorder(context.coreFrameBuffers.postProcessingFBO, context);
+
+        rayGenPass.push_back(std::make_unique<RayGenPass>(context));
 
         context.worldGridService.onSync();
         fullScreenRenderPasses.push_back(std::make_unique<GBufferShadingPass>(context));
@@ -33,6 +37,9 @@ namespace Metal {
     }
 
     void PassesService::onSync() {
+        if (context.engineRepository.giEnabled) {
+            rayGen->recordCommands(rayGenPass);
+        }
         gBuffer->recordCommands(gBufferPasses);
         fullScreen->recordCommands(fullScreenRenderPasses, computePasses);
         postProcessing->recordCommands(postProcessingPasses);

@@ -2,10 +2,8 @@ float getLogDepth(vec2 uv, sampler2D sceneDepth, float logDepthFC) {
     return pow(2.0, texture(sceneDepth, uv).r / (logDepthFC * .5));
 }
 
-float getLogDepthFromSampler(vec4 data, float logDepthFC) {
-    float half_co = logDepthFC * .5;
-    float exponent = data.r / half_co;
-    return pow(2.0, exponent);
+float getLogDepthFromData(float data, float logDepthFC) {
+    return pow(2.0, data / (logDepthFC * .5));
 }
 
 vec3 viewSpacePositionFromDepth(float depth, vec2 texCoords, in mat4 invProjectionMatrix) {

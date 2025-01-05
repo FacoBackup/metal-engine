@@ -4,6 +4,7 @@
 
 namespace Metal {
     class GlobalIlluminationPass final : public AbstractComputePass {
+        bool isFirstRun = true;
     public:
         explicit GlobalIlluminationPass(ApplicationContext &context)
             : AbstractComputePass(context) {
@@ -14,6 +15,7 @@ namespace Metal {
         bool shouldRun() override;
 
         PipelineInstance *getPipeline() override;
+
     };
 } // Metal
 

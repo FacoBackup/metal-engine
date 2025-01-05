@@ -103,6 +103,17 @@ namespace Metal {
         globalDataUBO.lightsQuantity = lightsCount;
         globalDataUBO.enabledSun = context.engineRepository.atmosphereEnabled;
 
+        globalDataUBO.distortionIntensity = camera.distortionIntensity;
+        globalDataUBO.chromaticAberrationIntensity = camera.chromaticAberrationIntensity;
+        globalDataUBO.distortionEnabled = camera.distortionEnabled;
+        globalDataUBO.chromaticAberrationEnabled = camera.chromaticAberrationEnabled;
+        globalDataUBO.vignetteEnabled = camera.vignetteEnabled;
+        globalDataUBO.vignetteStrength = camera.vignetteStrength;
+        globalDataUBO.giBounces = context.engineRepository.giBounces;
+        globalDataUBO.giSamplesPerPixel = context.engineRepository.giSamplesPerPixel;
+
+        globalDataUBO.debugFlag = ShadingMode::IndexOfValue(context.editorRepository.shadingMode);
+
         if (context.engineRepository.incrementTime) {
             context.engineRepository.elapsedTime += .0005f * context.engineRepository.elapsedTimeSpeed;
         }

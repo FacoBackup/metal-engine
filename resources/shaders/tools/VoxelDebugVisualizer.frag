@@ -14,19 +14,10 @@ layout(push_constant) uniform Push {
     uint searchCountDivisor;
 } settings;
 
-float rand(vec3 co) {
-    return fract(sin(dot(co, vec3(12.9898, 71.9898, 78.233))) * 43758.5453);
-}
 vec3 randomColor(float seed) {
     float r = rand(vec3(seed));
     float g = rand(vec3(seed + r));
     return vec3(r, g, rand(vec3(seed + g)));
-}
-
-vec2 hashWorldSpaceCoord(vec3 world){
-    ivec3 intPart = ivec3(floor(world / .1)) ;
-    vec3 decimapPart = abs(intPart - world);
-    return vec2(rand(intPart), rand(decimapPart));
 }
 
 void main() {
@@ -55,8 +46,8 @@ void main() {
         case RANDOM:
         finalColor = vec4(randomColor(rand(hitData.voxelPosition.xyz)), 1);
         break;
-        default:
-        finalColor = vec4(hashWorldSpaceCoord(hitData.hitPosition.xyz), 0, 1);
+        default :
+        finalColor = vec4(normalize(hitData.voxelPosition), 1);
         break;
     }
     if (length(finalColor.rgb) == 0){

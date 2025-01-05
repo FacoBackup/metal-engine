@@ -10,7 +10,7 @@
 #include "impl/SparseVoxelOctreeData.h"
 #include "impl/Triangle.h"
 
-#define MAX_DEPTH 12
+#define MAX_DEPTH 10
 
 namespace Metal {
     void VoxelizationService::iterateTriangle(const MeshComponent *component, const Triangle &triangle,
@@ -21,15 +21,10 @@ namespace Metal {
         const float edgeLength3 = glm::distance(triangle.v2, triangle.v0);
 
         const float maxEdgeLength = std::max(edgeLength1, std::max(edgeLength2, edgeLength3));
-        int localMaxDepth = MAX_DEPTH + 1;
-        float stepSize = 0;
+        const auto voxelSize = static_cast<float>(TILE_SIZE / std::pow(2, MAX_DEPTH));
+        float stepSize = voxelSize / maxEdgeLength;
         if (edgeLength1 == INFINITY || edgeLength2 == INFINITY || edgeLength3 == INFINITY) {
             stepSize = .01f;
-        }
-        while (stepSize < .01) {
-            localMaxDepth--;
-            const auto voxelSize = static_cast<float>(TILE_SIZE / std::pow(2, localMaxDepth));
-            stepSize = voxelSize / maxEdgeLength;
         }
 
         glm::vec3 albedo = component->albedoColor * 255.f;
@@ -55,7 +50,7 @@ namespace Metal {
                                          SparseVoxelOctreeBuilder(voxelTile));
                     }
                     builders.at(voxelTile->id).insert(
-                        localMaxDepth,
+                        MAX_DEPTH,
                         point,
                         new VoxelData(
                             albedo, normal, roughnessMetallic,

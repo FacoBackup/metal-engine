@@ -1,4 +1,5 @@
 #include "./GlobalDataBuffer.glsl"
+#include "./GBufferUtil.glsl"
 
 layout(push_constant) uniform Push {
     mat4 model;
@@ -12,10 +13,9 @@ layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inNormal;
 layout(location = 2) in vec2 inUV;
 
-layout (location = 0) out vec4 outAlbedoEmissive;
-layout (location = 1) out vec4 outRoughnessMetallicAO;
-layout (location = 2) out vec4 outNormal;
-layout (location = 3) out vec4 outDepthIdUV;
+layout (location = 0) out vec4 outMaterialA;
+layout (location = 1) out vec4 outMaterialB;
+layout (location = 2) out vec4 outMaterialC;
 
 float encode(float depthFunc, float val) {
     return log2(max(0.000001, val)) * depthFunc * 0.5;
@@ -88,8 +88,8 @@ void main () {
         //        UV = parallaxOcclusionMapping(UV, W, heightMap, parallaxHeightScale, parallaxLayers, distanceFromCamera, TBN);
     }
 
-    outAlbedoEmissive = push.albedoEmissive;
-    outRoughnessMetallicAO = vec4(push.roughnessFactor, push.metallicFactor, 1, 0);
-    outNormal = vec4(N, 1);
-    outDepthIdUV = vec4(encode(globalData.logDepthFC, gl_FragCoord.z), push.renderIndex + 1, inUV);
+    float ambientOcclusion = 1;
+    outMaterialA = vec4(push.albedoEmissive);
+    outMaterialB = vec4(N, ambientOcclusion);
+    outMaterialC = vec4(encode(globalData.logDepthFC, gl_FragCoord.z), push.renderIndex + 1, push.roughnessFactor, push.metallicFactor);
 }

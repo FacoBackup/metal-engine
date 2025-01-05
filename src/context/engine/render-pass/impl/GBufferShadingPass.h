@@ -6,7 +6,6 @@
 namespace Metal {
 
     class GBufferShadingPass final : public AbstractRenderPass {
-        GBufferShadingPushConstant pushConstant{};
     public:
         explicit GBufferShadingPass(ApplicationContext &context)
             : AbstractRenderPass(context) {

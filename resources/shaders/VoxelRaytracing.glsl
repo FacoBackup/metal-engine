@@ -291,4 +291,4 @@ inout ivec2 colorData
         );
     }
     return hitData;
-} 
+}

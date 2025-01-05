@@ -16,7 +16,9 @@ namespace Metal {
         std::vector<std::unique_ptr<AbstractPass> > fullScreenRenderPasses;
         std::vector<std::unique_ptr<AbstractPass> > gBufferPasses;
         std::vector<std::unique_ptr<AbstractPass> > postProcessingPasses;
+        std::vector<std::unique_ptr<AbstractPass> > rayGenPass;
 
+        CommandBufferRecorder *rayGen = nullptr;
         CommandBufferRecorder *gBuffer = nullptr;
         CommandBufferRecorder *fullScreen = nullptr;
         CommandBufferRecorder *postProcessing = nullptr;

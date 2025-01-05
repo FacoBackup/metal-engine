@@ -6,7 +6,7 @@ namespace Metal::ImageUtils {
     inline VkImageMemoryBarrier ReadOnlyToGeneralBarrier(const VkImage &image) {
         VkImageMemoryBarrier memoryBarrier = {};
         memoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        memoryBarrier.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        memoryBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
         memoryBarrier.newLayout = VK_IMAGE_LAYOUT_GENERAL;
         memoryBarrier.image = image;
         memoryBarrier.subresourceRange = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1};

@@ -261,6 +261,8 @@ add_executable(
         src/context/engine/compute-pass/impl/GlobalIlluminationPass.cpp
         src/context/engine/compute-pass/impl/GlobalIlluminationPass.h
         src/util/ImageUtils.h
+        src/context/engine/render-pass/impl/RayGenPass.cpp
+        src/context/engine/render-pass/impl/RayGenPass.h
 )
 
 
