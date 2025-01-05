@@ -1,7 +1,7 @@
 #include "../GlobalDataBuffer.glsl"
 #include "../CreateRay.glsl"
 #define DEBUG_VOXELS
-#include "../VoxelRaytracing.glsl"
+#include "../RayTracer.glsl"
 #include "../DebugFlags.glsl"
 
 layout(location = 0) in vec2 texCoords;

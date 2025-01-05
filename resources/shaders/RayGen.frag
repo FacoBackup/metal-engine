@@ -1,6 +1,6 @@
 #include "./GlobalDataBuffer.glsl"
 #include "./CreateRay.glsl"
-#include "./VoxelRaytracing.glsl"
+#include "./RayTracer.glsl"
 
 layout(location = 0) in vec2 texCoords;
 layout(location = 0) out vec4 voxelPosition;

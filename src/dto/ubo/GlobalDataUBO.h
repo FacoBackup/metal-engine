@@ -34,6 +34,7 @@ namespace Metal {
 
         alignas(4) unsigned int giBufferWidth;
         alignas(4) unsigned int giBufferHeight;
+        alignas(4) unsigned int frameCount;
     };
 }
 

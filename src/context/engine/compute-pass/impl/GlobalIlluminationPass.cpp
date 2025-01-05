@@ -42,6 +42,7 @@ namespace Metal {
             VkImageSubresourceRange imageSubresourceRange{VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1};
             vkCmdClearColorImage(vkCommandBuffer, context.coreTextures.globalIllumination->vkImage, layout, &color, 1,
                                  &imageSubresourceRange);
+            context.engineContext.resetFrameCount();
             isFirstRun = false;
         }
     }

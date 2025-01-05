@@ -75,8 +75,10 @@ namespace Metal {
         }
     }
 
-    bool EngineContext::shouldClearGIBuffer() const {
-        return hasToUpdateLights || giSettingsChanged;
+    bool EngineContext::shouldClearGIBuffer() {
+        bool prev = hasToUpdateLights || giSettingsChanged;
+        giSettingsChanged = false;
+        return prev;
     }
 
     void EngineContext::updateLights() {
@@ -124,6 +126,7 @@ namespace Metal {
         globalDataUBO.debugFlag = ShadingMode::IndexOfValue(context.editorRepository.shadingMode);
         globalDataUBO.giBufferWidth = context.coreTextures.globalIllumination->width;
         globalDataUBO.giBufferHeight = context.coreTextures.globalIllumination->height;
+        globalDataUBO.frameCount = frameCount++;
 
         if (context.engineRepository.incrementTime) {
             context.engineRepository.elapsedTime += .0005f * context.engineRepository.elapsedTimeSpeed;

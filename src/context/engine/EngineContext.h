@@ -23,8 +23,13 @@ namespace Metal {
         long long start = -1;
         bool hasToUpdateLights = true;
         bool giSettingsChanged = true;
+        unsigned int frameCount = 0;
 
     public:
+        void resetFrameCount() {
+            frameCount = 0;
+        }
+
         void setUpdateLights() {
             hasToUpdateLights = true;
         }
@@ -51,7 +56,7 @@ namespace Metal {
 
         void onSync() override;
 
-        bool shouldClearGIBuffer() const;
+        bool shouldClearGIBuffer();
 
         void updateLights();
 
