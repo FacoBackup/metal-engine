@@ -7,7 +7,7 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     vec3 cameraWorldPosition;
     vec3 sunColor;
     vec3 sunPosition;
-    float logDepthFC;
+    float giStrength;
     uint lightsQuantity;
     bool enabledSun;
 
@@ -39,39 +39,26 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
 float rand(vec3 co) {
     return fract(sin(dot(co, vec3(12.9898, 71.9898, 78.233))) * 43758.5453);
 }
-vec2 spatialHashToUV(int x, int y, int z, int width, int height, int p1, int p2, int p3) {
-    int signedX = x >= 0 ? x * 2 : (-x * 2 - 1);
-    int signedY = y >= 0 ? y * 2 : (-y * 2 - 1);
-    int signedZ = z >= 0 ? z * 2 : (-z * 2 - 1);
+vec2 spatialHashToUV(ivec3 coord, uint width, uint height) {
+    const int p1 = 19937;
+    const int p2 = 37199;
+    const int p3 = 39119;
+    int signedX =coord.x >= 0 ? coord.x * 2 : (-coord.x * 2 - 1);
+    int signedY =coord.y >= 0 ? coord.y * 2 : (-coord.y * 2 - 1);
+    int signedZ =coord.z >= 0 ? coord.z * 2 : (-coord.z * 2 - 1);
 
     // Compute the spatial hash
-    int hashValue = ((signedX * p1) ^ (signedY * p2) ^ (signedZ * p3)) % (width * height);
+    uint hashValue = ((signedX * p1) ^ (signedY * p2) ^ (signedZ * p3)) % (width * height);
 
     // Compute UV coordinates
     float u = float(hashValue % width) / float(width);
     float v = float((hashValue / width) % height) / float(height);
-
     return vec2(u, v);
 }
 
-//float getLevelOfDetailTile(float distanceFromRayOrigin){
-//    if (distanceFromRayOrigin < 10){
-//        return 10;
-//    }
-//    if (distanceFromRayOrigin < 20){
-//        return 7;
-//    }
-//    if (distanceFromRayOrigin < 30){
-//        return 5;
-//    }
-//    return 3;
-//}
-
 vec2 hashWorldSpaceCoord(vec3 world){
-    int p1 = 10007;
-    int p2 = 10009;
-    int p3 = 10037;
-    //    const float  GRID_SIZE = getLevelOfDetailTile(length(globalData.cameraWorldPosition - world));
-    float S = float(globalData.giTileSubdivision);
-    return spatialHashToUV(int(round(world.x * S)), int(round(world.y * S)), int(round(world.z * S)), int(globalData.giBufferWidth), int(globalData.giBufferHeight), p1, p2, p3);
+    float gridSize = float(globalData.giTileSubdivision);
+
+    ivec3 coord = ivec3(int(round(world.x * gridSize)), int(round(world.y * gridSize)), int(round(world.z * gridSize)));
+    return spatialHashToUV(coord, globalData.giBufferWidth, globalData.giBufferHeight);
 }

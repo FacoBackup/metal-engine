@@ -1,6 +1,5 @@
 #include "../GlobalDataBuffer.glsl"
 #include "../CreateRay.glsl"
-#include "../DepthUtils.glsl"
 #include "../Dithering.glsl"
 
 layout(push_constant) uniform Push {
@@ -17,7 +16,7 @@ layout(push_constant) uniform Push {
 
 layout(location = 0) in vec2 texCoords;
 layout(location = 0) out vec4 finalColor;
-layout(set = 1, binding = 0) uniform sampler2D gBufferDepthIdUV;
+layout(set = 1, binding = 0) uniform sampler2D gBufferMaterialD;
 
 vec3 p = vec3(0);
 bool rayMarch(vec3 ro, vec3 rd, float width) {
@@ -40,13 +39,13 @@ float getGridLine(float gridScale){
 }
 
 void main() {
-    float depthData = getLogDepth(texCoords, gBufferDepthIdUV, globalData.logDepthFC);
+    vec4 worldPos = texture(gBufferMaterialD, texCoords);
     bool hasData = false;
     bool isOverlay = false;
-    if (depthData != 1){
+    if (worldPos.a == 1){
         hasData = OVERLAY_OBJECTS;
         isOverlay = true;
-        p = worldSpacePositionFromDepth(depthData, texCoords, globalData.invProj, globalData.invView);
+        p = worldPos.rgb;
     } else {
         vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
         hasData = rayMarch(globalData.cameraWorldPosition.xyz, rayDir, 1);

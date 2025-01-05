@@ -10,6 +10,7 @@ namespace Metal {
         int giTileSubdivision = 20;
         int giBounces = 1;
         int giSamplesPerPixel = 1;
+        float giStrength = 1;
         int numberOfTiles = 10;
         float elapsedTime = .5f;
         bool atmosphereEnabled = false;
@@ -46,7 +47,8 @@ namespace Metal {
             svoFilePaths,
             giEnabled,
             giTileSubdivision,
-            giSamplesPerPixel
+            giSamplesPerPixel,
+            giStrength
         )
     };
 } // Metal

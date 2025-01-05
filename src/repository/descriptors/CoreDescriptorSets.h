@@ -22,6 +22,7 @@ namespace Metal {
         std::unique_ptr<DescriptorInstance> gBufferMaterialA = nullptr;
         std::unique_ptr<DescriptorInstance> gBufferMaterialB = nullptr;
         std::unique_ptr<DescriptorInstance> gBufferMaterialC = nullptr;
+        std::unique_ptr<DescriptorInstance> gBufferMaterialD = nullptr;
         std::unique_ptr<DescriptorInstance> giComputeDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> svoData = nullptr;
         std::unique_ptr<DescriptorInstance> lightsData = nullptr;

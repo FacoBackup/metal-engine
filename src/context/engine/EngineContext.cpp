@@ -108,7 +108,7 @@ namespace Metal {
         globalDataUBO.invProj = camera.invProjectionMatrix;
         globalDataUBO.invView = camera.invViewMatrix;
         globalDataUBO.cameraWorldPosition = camera.position;
-        globalDataUBO.logDepthFC = 2.0f / (std::log(camera.projectionMatrix[0][0] + 1) / std::log(2));
+        globalDataUBO.giStrength = context.engineRepository.giStrength;
         globalDataUBO.lightsQuantity = lightsCount;
         globalDataUBO.enabledSun = context.engineRepository.atmosphereEnabled;
 

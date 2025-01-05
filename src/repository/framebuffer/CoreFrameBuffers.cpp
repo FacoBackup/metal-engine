@@ -11,18 +11,12 @@ namespace Metal {
                                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, gBufferFBO);
             framebufferService.createAttachment("Normal; AO", VK_FORMAT_R16G16B16A16_SFLOAT,
                                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, gBufferFBO);
-            framebufferService.createAttachment("Depth; ID; Roughness; Metallic", VK_FORMAT_R32G32B32A32_SFLOAT,
+            framebufferService.createAttachment("ID; Roughness; Metallic", VK_FORMAT_R16G16B16A16_SFLOAT,
+                                                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, gBufferFBO);
+            framebufferService.createAttachment("Position", VK_FORMAT_R32G32B32A32_SFLOAT,
                                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, gBufferFBO);
             framebufferService.createDepthAttachment(gBufferFBO);
             framebufferService.createRenderPass(gBufferFBO);
-        } {
-            rayGenFBO = framebufferService.createFrameBuffer(vulkanContext.getWindowWidth(),
-                                                             vulkanContext.getWindowHeight(), glm::vec4(0, 0, 0, 0));
-            framebufferService.createAttachment("Voxel Positions", VK_FORMAT_R32G32B32A32_SFLOAT,
-                                                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, rayGenFBO);
-            framebufferService.createAttachment("Hit positions", VK_FORMAT_R32G32B32A32_SFLOAT,
-                                                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, rayGenFBO);
-            framebufferService.createRenderPass(rayGenFBO);
         } {
             // AUX FRAME BUFFER
             auxFBO = framebufferService.createFrameBuffer(vulkanContext.getWindowWidth(),

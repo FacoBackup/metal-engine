@@ -11,6 +11,7 @@ namespace Metal {
         registerBool(atmosphereEnabled, "Atmosphere", "Enabled?");
 
         registerBool(giEnabled, "Global illumination", "Enabled?");
+        registerFloat(giStrength, "Global illumination", "Strength");
         registerInt(giBounces, "Global illumination", "Max bounces", 0, 5);
         registerInt(giSamplesPerPixel, "Global illumination", "Samples per pixel", 0, 25);
         registerInt(giTileSubdivision, "Global illumination", GI_SUBDIVISION, 1);

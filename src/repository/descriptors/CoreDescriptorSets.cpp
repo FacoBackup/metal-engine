@@ -64,6 +64,7 @@ namespace Metal {
         GBUFFER_D(gBufferMaterialA, 0)
         GBUFFER_D(gBufferMaterialB, 1)
         GBUFFER_D(gBufferMaterialC, 2)
+        GBUFFER_D(gBufferMaterialD, 3)
 
         giComputeDescriptor = std::make_unique<DescriptorInstance>();
         giComputeDescriptor->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
@@ -101,26 +102,6 @@ namespace Metal {
                                                 context.coreFrameBuffers.gBufferFBO->vkImageSampler,
                                                 context.coreTextures.icons->vkImageView);
             iconsDescriptor->write(vulkanContext);
-        } {
-            voxelPositionDescriptor = std::make_unique<DescriptorInstance>();
-            voxelPositionDescriptor->addLayoutBinding(COMPUTE_FRAGMENT_STAGES,
-                                                      VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-            voxelPositionDescriptor->create(vulkanContext);
-            voxelPositionDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                        context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                                        context.coreFrameBuffers.rayGenFBO->attachments[0]->
-                                                        vkImageView);
-            voxelPositionDescriptor->write(vulkanContext);
-        } {
-            voxelHitPositionDescriptor = std::make_unique<DescriptorInstance>();
-            voxelHitPositionDescriptor->addLayoutBinding(COMPUTE_FRAGMENT_STAGES,
-                                                         VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-            voxelHitPositionDescriptor->create(vulkanContext);
-            voxelHitPositionDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                           context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                                           context.coreFrameBuffers.rayGenFBO->attachments[1]->
-                                                           vkImageView);
-            voxelHitPositionDescriptor->write(vulkanContext);
         }
         // POST PROCESSING
         {

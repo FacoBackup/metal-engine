@@ -33,7 +33,7 @@ namespace Metal {
                     .setBlendEnabled()
                     .setPushConstantsSize(sizeof(GridPushConstant))
                     .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                    .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialC.get());
+                    .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialD.get());
             gridPipeline = pipelineService.createPipeline(gridPipelineBuilder);
 
             PipelineBuilder iconPipelineBuilder = PipelineBuilder::Of(
@@ -58,14 +58,6 @@ namespace Metal {
             voxelDebugVisualizerPipeline = pipelineService.createPipeline(voxelVisualizerPipelineBuilder);
         }
 
-        PipelineBuilder rayGenBuilder = PipelineBuilder::Of(
-                    context.coreFrameBuffers.rayGenFBO,
-                    "QUAD.vert",
-                    "RayGen.frag"
-                )
-                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.svoData.get());
-        rayGenPipeline = pipelineService.createPipeline(rayGenBuilder);
 
         PipelineBuilder ppPipelineBuilder = PipelineBuilder::Of(
                     context.coreFrameBuffers.postProcessingFBO,
@@ -85,8 +77,8 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialA.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialB.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialC.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialD.get())
                 .addDescriptorSet(context.coreDescriptorSets.brdfDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.voxelPositionDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.lightsData.get())
                 .addDescriptorSet(context.coreDescriptorSets.giDescriptor.get());
         gBufferShadingPipeline = pipelineService.createPipeline(gBufferShadingPipelineBuilder);
@@ -97,7 +89,7 @@ namespace Metal {
                     "Atmosphere.frag"
                 )
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialC.get());
+                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialD.get());
         atmospherePipeline = pipelineService.createPipeline(atmosphereBuilder);
 
 
@@ -106,9 +98,9 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.svoData.get())
                 .addDescriptorSet(context.coreDescriptorSets.lightsData.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialB.get())
-                .addDescriptorSet(context.coreDescriptorSets.voxelPositionDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.voxelHitPositionDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.giComputeDescriptor.get());
+                .addDescriptorSet(context.coreDescriptorSets.giComputeDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialD.get());
+
         giComputePipeline = pipelineService.createPipeline(giBuilder);
     }
 
