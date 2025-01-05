@@ -10,7 +10,7 @@
 #include "impl/SparseVoxelOctreeData.h"
 #include "impl/Triangle.h"
 
-#define MAX_DEPTH 10
+#define MAX_DEPTH 12
 
 namespace Metal {
     void VoxelizationService::iterateTriangle(const MeshComponent *component, const Triangle &triangle,

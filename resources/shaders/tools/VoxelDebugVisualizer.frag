@@ -24,7 +24,7 @@ void main() {
     vec3 rayOrigin = globalData.cameraWorldPosition.xyz;
     vec3 rayDirection = createRay(texCoords, globalData.invProj, globalData.invView);
     ivec2 colorData = ivec2(0);
-    Ray ray = Ray(rayOrigin, rayDirection, 1./rayDirection, rayOrigin, true);
+    Ray ray = Ray(rayOrigin, rayDirection, 1./rayDirection, rayOrigin, false);
     Hit hitData = traceAllTiles(ray, settings.showRaySearchCount, settings.showRayTestCount, colorData);
     VoxelMaterialData matData = unpackVoxel(hitData);
     switch (settings.voxelDebugFlag){
@@ -46,8 +46,12 @@ void main() {
         case RANDOM:
         finalColor = vec4(randomColor(rand(hitData.voxelPosition.xyz)), 1);
         break;
+        case GI:
+        //        float GRID_SIZE = getLevelOfDetailTile(length(globalData.cameraWorldPosition - hitData.voxelPosition));
+        finalColor = vec4(hashWorldSpaceCoord(hitData.voxelPosition.xyz), 0, 1);
+        break;
         default :
-        finalColor = vec4(normalize(hitData.voxelPosition), 1);
+        finalColor = vec4(normalize(hitData.voxelPosition.xyz), 1);
         break;
     }
     if (length(finalColor.rgb) == 0){

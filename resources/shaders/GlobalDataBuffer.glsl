@@ -11,6 +11,7 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     uint lightsQuantity;
     bool enabledSun;
 
+    bool giEnabled;
 // POST PROCESSING
     float distortionIntensity;
     float chromaticAberrationIntensity;
@@ -22,8 +23,12 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
 // GI
     uint giBounces;
     uint giSamplesPerPixel;
+    uint giTileSubdivision;
 
     uint debugFlag;
+
+    uint giBufferWidth;
+    uint giBufferHeight;
 } globalData;
 
 
@@ -47,25 +52,25 @@ vec2 spatialHashToUV(int x, int y, int z, int width, int height, int p1, int p2,
 
     return vec2(u, v);
 }
+
+//float getLevelOfDetailTile(float distanceFromRayOrigin){
+//    if (distanceFromRayOrigin < 10){
+//        return 10;
+//    }
+//    if (distanceFromRayOrigin < 20){
+//        return 7;
+//    }
+//    if (distanceFromRayOrigin < 30){
+//        return 5;
+//    }
+//    return 3;
+//}
+
 vec2 hashWorldSpaceCoord(vec3 world){
-//    vec3 minBounds = vec3(-100);
-//    vec3 maxBounds = vec3(100);
-//    vec3 normalizedPos = (world - minBounds) / (maxBounds - minBounds);
-//    vec2 uv = vec2(normalizedPos.x  +   .5  *normalizedPos.z, normalizedPos.y  + .5 * normalizedPos.z);
-//    return uv;
-//        return vec2(rand(world * MAGIC_NUMER_1), rand(world * MAGIC_NUMBER_2));
-
-    // Texture dimensions
-    int width = 1280;
-    int height = 720;
-
-    // Prime numbers for hashing
     int p1 = 10007;
     int p2 = 10009;
     int p3 = 10037;
-    const float  GRID_SIZE = 7;
-    // Compute UV coordinates
-    vec2 uv = spatialHashToUV(int(round(world.x * GRID_SIZE)), int(round(world.y * GRID_SIZE)), int(round(world.z * GRID_SIZE)), width, height, p1, p2, p3);
-
-    return uv;
+    //    const float  GRID_SIZE = getLevelOfDetailTile(length(globalData.cameraWorldPosition - world));
+    float S = float(globalData.giTileSubdivision);
+    return spatialHashToUV(int(round(world.x * S)), int(round(world.y * S)), int(round(world.z * S)), int(globalData.giBufferWidth), int(globalData.giBufferHeight), p1, p2, p3);
 }

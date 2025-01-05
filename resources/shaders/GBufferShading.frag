@@ -49,8 +49,8 @@ void main() {
     shaderData.metallic = materialC.a;
     shaderData.viewSpacePosition = viewSpacePositionFromDepth(depthData, texCoords, globalData.invProj);
     shaderData.worldSpacePosition = vec3(globalData.invView * vec4(shaderData.viewSpacePosition, 1));
-    vec4 globalIllumination = texture(giSampler, hashWorldSpaceCoord(texture(voxelPositionSampler, texCoords).rgb));
-    shaderData.ambientOcclusion = materialB.a * globalIllumination.a;
+    vec4 globalIllumination = globalData.giEnabled ? texture(giSampler, hashWorldSpaceCoord(texture(voxelPositionSampler, texCoords).rgb)) :  vec4(0, 0, 0, 1);
+    shaderData.ambientOcclusion = materialB.a * (globalIllumination.a < 1 ? 0 : 1);
     shaderData.V = normalize(globalData.cameraWorldPosition - shaderData.worldSpacePosition);
     shaderData.distanceFromCamera = length(shaderData.V);
     shaderData.albedo = albedoEmissive.rgb;

@@ -22,10 +22,15 @@ namespace Metal {
         unsigned int lightsCount = 0;
         long long start = -1;
         bool hasToUpdateLights = true;
+        bool giSettingsChanged = true;
 
     public:
         void setUpdateLights() {
             hasToUpdateLights = true;
+        }
+
+        void setGiSettingsChanged() {
+            giSettingsChanged = true;
         }
 
         void onInitialize() override;
@@ -45,6 +50,8 @@ namespace Metal {
         void updateGlobalData();
 
         void onSync() override;
+
+        bool shouldClearGIBuffer() const;
 
         void updateLights();
 

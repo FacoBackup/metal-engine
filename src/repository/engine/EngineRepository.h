@@ -7,7 +7,7 @@
 namespace Metal {
     struct EngineRepository final : Inspectable {
         bool giEnabled = false;
-        float giDitheringIntensity = 0;
+        int giTileSubdivision = 20;
         int giBounces = 1;
         int giSamplesPerPixel = 1;
         int numberOfTiles = 10;
@@ -45,7 +45,7 @@ namespace Metal {
             screenSpaceShadows,
             svoFilePaths,
             giEnabled,
-            giDitheringIntensity,
+            giTileSubdivision,
             giSamplesPerPixel
         )
     };

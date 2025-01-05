@@ -15,6 +15,7 @@ namespace Metal {
         alignas(4) float logDepthFC;
         alignas(4) unsigned int lightsQuantity = 0;
         alignas(4) bool enabledSun;
+        alignas(4) bool giEnabled;
 
         // POST PROCESSING
         alignas(4) float distortionIntensity;
@@ -27,8 +28,12 @@ namespace Metal {
         // GI
         alignas(4) unsigned int giBounces;
         alignas(4) unsigned int giSamplesPerPixel;
+        alignas(4) unsigned int giTileSubdivision;
 
         alignas(4) unsigned int debugFlag;
+
+        alignas(4) unsigned int giBufferWidth;
+        alignas(4) unsigned int giBufferHeight;
     };
 }
 

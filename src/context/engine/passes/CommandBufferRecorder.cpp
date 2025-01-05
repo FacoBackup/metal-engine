@@ -85,10 +85,10 @@ namespace Metal {
                                                        const std::vector<std::unique_ptr<AbstractPass> > &passes,
                                                        VkCommandBuffer vkCommandBuffer) {
         for (auto &pass: passes) {
+            pass->setCommandBuffer(vkCommandBuffer);
             if (!pass->shouldRun()) {
                 continue;
             }
-            pass->setCommandBuffer(vkCommandBuffer);
             if (pass->getPipeline() != nullptr) {
                 vkCmdBindPipeline(vkCommandBuffer, binding, pass->getPipeline()->vkPipeline);
                 if (!pass->getPipeline()->descriptorSets.empty()) {

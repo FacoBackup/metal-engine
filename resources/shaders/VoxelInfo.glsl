@@ -18,6 +18,22 @@ struct VoxelMaterialData {
     vec3 normal;
 };
 
+// THANKS TO https://www.shadertoy.com/view/llfcRl
+vec3 unpackNormal(uint data) {
+    uvec2 iuv = uvec2(data, data>>15u) & uvec2(32767u, 16383u);
+    vec2 uv = vec2(iuv)*2.0/vec2(32767.0, 16383.0) - 1.0;
+
+    uint is = (data>>31u)&1u;
+    vec3 nor = vec3((is==0u)?1.0:-1.0, uv.xy);
+
+    uint id = (data>>29u)&3u;
+    if (id==0u) nor = nor.xyz;
+    else if (id==1u) nor = nor.zxy;
+    else nor = nor.yzx;
+
+    return normalize(nor);
+}
+
 VoxelMaterialData unpackVoxel(in Hit hit) {
     VoxelMaterialData voxel;
 
@@ -26,7 +42,7 @@ VoxelMaterialData unpackVoxel(in Hit hit) {
 
     {
         voxel.roughness = ((first & 0x7FFFFFFFu) >> 24)/100.;
-        voxel.metallic = (second & 0x7Fu) / 100.;
+        voxel.metallic = .5;
     }
 
     {
@@ -42,17 +58,7 @@ VoxelMaterialData unpackVoxel(in Hit hit) {
     }
 
     {
-        uint compressedNormal = second >> 7;
-        int quantX = int((compressedNormal >> 13u) & 0x1FFFu);
-        int quantY = int(compressedNormal & 0x1FFFu);
-        float octX = (quantX - 2048.0f) / 2047.0f;
-        float octY = (quantY - 2048.0f) / 2047.0f;
-        float z = 1.0f - abs(octX) - abs(octY);
-        if (z < 0.0f) {
-            octX = (octX + sign(octX)) * 0.5f;
-            octY = (octY + sign(octY)) * 0.5f;
-        }
-        voxel.normal = normalize(vec3(octX, octY, z));
+        voxel.normal = unpackNormal(second);
     }
     return voxel;
 }

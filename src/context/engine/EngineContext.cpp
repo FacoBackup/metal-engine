@@ -5,6 +5,7 @@
 #include "../../service/voxel/SVOInstance.h"
 #include "../../enum/LevelOfDetail.h"
 #include "../../service/camera/Camera.h"
+#include "../../service/texture/TextureInstance.h"
 
 namespace Metal {
     void EngineContext::onInitialize() {
@@ -69,11 +70,17 @@ namespace Metal {
         updateLights();
 
         passesService.onSync();
+        if (hasToUpdateLights) {
+            hasToUpdateLights = false;
+        }
+    }
+
+    bool EngineContext::shouldClearGIBuffer() const {
+        return hasToUpdateLights || giSettingsChanged;
     }
 
     void EngineContext::updateLights() {
         if (hasToUpdateLights) {
-            hasToUpdateLights = false;
             int index = 0;
             for (auto &entry: context.worldRepository.lights) {
                 auto l = entry.second;
@@ -111,8 +118,12 @@ namespace Metal {
         globalDataUBO.vignetteStrength = camera.vignetteStrength;
         globalDataUBO.giBounces = context.engineRepository.giBounces;
         globalDataUBO.giSamplesPerPixel = context.engineRepository.giSamplesPerPixel;
+        globalDataUBO.giEnabled = context.engineRepository.giEnabled;
+        globalDataUBO.giTileSubdivision = context.engineRepository.giTileSubdivision;
 
         globalDataUBO.debugFlag = ShadingMode::IndexOfValue(context.editorRepository.shadingMode);
+        globalDataUBO.giBufferWidth = context.coreTextures.globalIllumination->width;
+        globalDataUBO.giBufferHeight = context.coreTextures.globalIllumination->height;
 
         if (context.engineRepository.incrementTime) {
             context.engineRepository.elapsedTime += .0005f * context.engineRepository.elapsedTimeSpeed;

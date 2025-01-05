@@ -16,6 +16,7 @@ namespace Metal {
 
         PipelineInstance *getPipeline() override;
 
+        void clearBuffer();
     };
 } // Metal
 

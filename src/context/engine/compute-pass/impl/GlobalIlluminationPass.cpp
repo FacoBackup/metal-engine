@@ -12,8 +12,8 @@ namespace Metal {
         return context.corePipelines.giComputePipeline;
     }
 
-    void GlobalIlluminationPass::onSync() {
-        if (isFirstRun) {
+    void GlobalIlluminationPass::clearBuffer() {
+        if (isFirstRun || context.engineContext.shouldClearGIBuffer()) {
             VkImageMemoryBarrier barrier{};
             barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
             barrier.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -44,6 +44,10 @@ namespace Metal {
                                  &imageSubresourceRange);
             isFirstRun = false;
         }
+    }
+
+    void GlobalIlluminationPass::onSync() {
+        clearBuffer();
 
         // Convert image layout to GENERAL before writing into it in compute shader.
         VkImageMemoryBarrier read2Gen = ImageUtils::ReadOnlyToGeneralBarrier(

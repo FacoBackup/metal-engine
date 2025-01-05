@@ -4,6 +4,7 @@
 #include "../../context/ApplicationContext.h"
 
 #define LEVEL_OF_DETAIL "Level of detail"
+#define GI_SUBDIVISION "Grid subdivision"
 
 namespace Metal {
     void EngineRepository::registerFields() {
@@ -12,7 +13,7 @@ namespace Metal {
         registerBool(giEnabled, "Global illumination", "Enabled?");
         registerInt(giBounces, "Global illumination", "Max bounces", 0, 5);
         registerInt(giSamplesPerPixel, "Global illumination", "Samples per pixel", 0, 25);
-        registerFloat(giDitheringIntensity, "Global illumination", "Dithering intensity", 0, 1, false, .001);
+        registerInt(giTileSubdivision, "Global illumination", GI_SUBDIVISION, 1);
         registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);
         registerFloat(elapsedTime, "Time", "Elapsed time");
         registerBool(incrementTime, "Time", "Increment time");
@@ -27,8 +28,11 @@ namespace Metal {
     }
 
     void EngineRepository::onUpdate(InspectableMember *member, ApplicationContext &context) {
-        if (member->name == LEVEL_OF_DETAIL) {
+        if (member != nullptr && member->name == LEVEL_OF_DETAIL) {
             context.worldGridRepository.hasMainTileChanged = true;
+        }
+        if (member != nullptr && member->name == GI_SUBDIVISION) {
+            context.engineContext.setGiSettingsChanged();
         }
     }
 
