@@ -23,11 +23,11 @@ namespace Metal {
         long long start = -1;
         bool hasToUpdateLights = true;
         bool giSettingsChanged = true;
-        unsigned int frameCount = 0;
+        unsigned int giFrameCount = 0;
 
     public:
         void resetFrameCount() {
-            frameCount = 0;
+            giFrameCount = 0;
         }
 
         void setUpdateLights() {

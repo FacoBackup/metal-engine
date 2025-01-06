@@ -5,6 +5,7 @@
 #include "../../service/voxel/SVOInstance.h"
 #include "../../enum/LevelOfDetail.h"
 #include "../../service/camera/Camera.h"
+#include "../../service/framebuffer/FrameBufferInstance.h"
 #include "../../service/texture/TextureInstance.h"
 
 namespace Metal {
@@ -126,7 +127,9 @@ namespace Metal {
         globalDataUBO.debugFlag = ShadingMode::IndexOfValue(context.editorRepository.shadingMode);
         globalDataUBO.giBufferWidth = context.coreTextures.globalIllumination->width;
         globalDataUBO.giBufferHeight = context.coreTextures.globalIllumination->height;
-        globalDataUBO.frameCount = frameCount++;
+        globalDataUBO.bufferWidth = context.coreFrameBuffers.auxFBO->bufferWidth;
+        globalDataUBO.bufferHeight = context.coreFrameBuffers.auxFBO->bufferHeight;
+        globalDataUBO.giFrameCount = giFrameCount++;
 
         if (context.engineRepository.incrementTime) {
             context.engineRepository.elapsedTime += .0005f * context.engineRepository.elapsedTimeSpeed;

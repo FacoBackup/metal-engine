@@ -63,8 +63,7 @@ namespace Metal {
             0, nullptr,
             1, &read2Gen);
 
-        // Bind compute pipeline and dispatch compute command.
-        recordImageDispatch(context.coreTextures.globalIllumination, 8, 8);
+        recordImageDispatch(context.coreFrameBuffers.auxFBO, 16, 16);
 
         // // Convert image layout to READ_ONLY_OPTIMAL before reading from it in fragment shader.
         VkImageMemoryBarrier write2ReadBarrier = ImageUtils::writeToReadOnlyBarrier(

@@ -24,7 +24,7 @@ void main() {
     vec3 rayOrigin = globalData.cameraWorldPosition.xyz;
     vec3 rayDirection = createRay(texCoords, globalData.invProj, globalData.invView);
     ivec2 colorData = ivec2(0);
-    Ray ray = Ray(rayOrigin, rayDirection, 1./rayDirection, rayOrigin, false);
+    Ray ray = Ray(rayOrigin, rayDirection, 1./rayDirection);
     Hit hitData = traceAllTiles(ray, settings.showRaySearchCount, settings.showRayTestCount, colorData);
     VoxelMaterialData matData = unpackVoxel(hitData);
     switch (settings.voxelDebugFlag){

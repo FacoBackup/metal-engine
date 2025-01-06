@@ -22,7 +22,7 @@ DEFINE_OCTREE_BUFFER(7, V7, voxelBuffer7)
 DEFINE_OCTREE_BUFFER(8, V8, voxelBuffer8)
 DEFINE_OCTREE_BUFFER(9, V9, voxelBuffer9)
 
-struct Ray { vec3 o, d, invDir, observerOrigin; bool dynamicLevelOfDetail; };
+struct Ray { vec3 o, d, invDir; };
 struct Stack { uint index;vec3 center;float scale; uint currentDepth; };
 
 bool intersect(inout vec3 boxMin, inout vec3 boxMax, inout Ray r) {
@@ -148,7 +148,6 @@ inout ivec2 debugColor
     Hit hitData = Hit(vec3(0), vec3(0), false, 0, 0, 0, bufferIndex, 0, 0);
     uint hitIndex;
     uint currentDepth = 1;
-    bool isEarlyExit = false;
     while (stackPos-- > 0) {
         #ifdef DEBUG_VOXELS
         if (showRaySearchCount){
@@ -156,14 +155,12 @@ inout ivec2 debugColor
         }
         #endif
         center = stack[stackPos].center;
-        uint targetMaxDepth = getLevelOfDetail(length(center - ray.observerOrigin));
         index = stack[stackPos].index;
         scale = stack[stackPos].scale;
         currentDepth = stack[stackPos].currentDepth;
         uint voxel_node = getVoxel(index, bufferIndex);
 
-        bool earlyExit = ray.dynamicLevelOfDetail ? currentDepth > targetMaxDepth : false;
-        bool isLeafGroup = ((voxel_node & 0x1u) == 1u) || earlyExit;
+        bool isLeafGroup = ((voxel_node & 0x1u) == 1u);
         uint childMask = CHILD_MASK(voxel_node);
         uint childGroupIndex = CHILD_GROUP_INDEX(voxel_node);
 
@@ -192,7 +189,6 @@ inout ivec2 debugColor
             }
             if (entryDist < minDistance) {
                 if (isLeafGroup) {
-                    isEarlyExit = earlyExit;
                     hitData.anyHit = true;
                     hitData.voxelPosition = newCenter;
                     hitData.voxel = voxel_node;
@@ -212,10 +208,8 @@ inout ivec2 debugColor
     if (hitData.anyHit){
         vec3 vSize = vec3(hitData.voxelSize);
         hitData.hitPosition = intersectRayAABB(ray, hitData.voxelPosition - vSize, hitData.voxelPosition + vSize).rgb;
-        if (!isEarlyExit){
-            hitData.matData1 = getVoxel(hitIndex + matrialBufferOffset, bufferIndex);
-            hitData.matData2 = getVoxel(hitIndex + matrialBufferOffset + 1, bufferIndex);
-        }
+        hitData.matData1 = getVoxel(hitIndex + matrialBufferOffset, bufferIndex);
+        hitData.matData2 = getVoxel(hitIndex + matrialBufferOffset + 1, bufferIndex);
     }
 
     return hitData;
@@ -296,7 +290,7 @@ inout ivec2 colorData
 #ifndef DEBUG_VOXELS
 float testLight(vec3 lightPosition, in vec3 rayOrigin){
     vec3 rayDirection = normalize(lightPosition - rayOrigin);
-    Ray ray = Ray(rayOrigin, rayDirection, 1./rayDirection, globalData.cameraWorldPosition, false);
+    Ray ray = Ray(rayOrigin, rayDirection, 1./rayDirection);
     Hit hitData = traceAllTiles(ray);
     float lightDistance = length(lightPosition - rayOrigin);
     float hitDistance = length(hitData.hitPosition - rayOrigin);

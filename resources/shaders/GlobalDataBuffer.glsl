@@ -29,7 +29,10 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
 
     uint giBufferWidth;
     uint giBufferHeight;
-    uint frameCount;
+    uint giFrameCount;
+
+    uint bufferWidth;
+    uint bufferHeight;
 } globalData;
 
 
@@ -40,7 +43,7 @@ float rand(vec3 co) {
     return fract(sin(dot(co, vec3(12.9898, 71.9898, 78.233))) * 43758.5453);
 }
 vec2 spatialHashToUV(ivec3 coord, uint width, uint height) {
-    const int p1 = 19937;
+    const int p1 = 39937;
     const int p2 = 37199;
     const int p3 = 39119;
     int signedX =coord.x >= 0 ? coord.x * 2 : (-coord.x * 2 - 1);
