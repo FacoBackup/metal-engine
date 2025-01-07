@@ -7,7 +7,8 @@
 namespace Metal {
     struct EngineRepository final : Inspectable {
         bool giEnabled = false;
-        int giTileSubdivision = 20;
+        int giResScale = 4;
+        int giTileSubdivision = 40;
         int giBounces = 1;
         int giSamplesPerPixel = 1;
         float giStrength = 1;
@@ -48,7 +49,8 @@ namespace Metal {
             giEnabled,
             giTileSubdivision,
             giSamplesPerPixel,
-            giStrength
+            giStrength,
+            giResScale
         )
     };
 } // Metal

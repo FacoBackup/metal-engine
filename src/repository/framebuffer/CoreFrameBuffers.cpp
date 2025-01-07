@@ -9,9 +9,9 @@ namespace Metal {
                                                               vulkanContext.getWindowHeight());
             framebufferService.createAttachment("Albedo; Emission flag", VK_FORMAT_R16G16B16A16_SFLOAT,
                                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, gBufferFBO);
-            framebufferService.createAttachment("Normal; AO", VK_FORMAT_R16G16B16A16_SFLOAT,
+            framebufferService.createAttachment("Normal; Roughness", VK_FORMAT_R16G16B16A16_SFLOAT,
                                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, gBufferFBO);
-            framebufferService.createAttachment("ID; Roughness; Metallic", VK_FORMAT_R16G16B16A16_SFLOAT,
+            framebufferService.createAttachment("ID; AO; Metallic", VK_FORMAT_R16G16B16A16_SFLOAT,
                                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, gBufferFBO);
             framebufferService.createAttachment("Position", VK_FORMAT_R32G32B32A32_SFLOAT,
                                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, gBufferFBO);

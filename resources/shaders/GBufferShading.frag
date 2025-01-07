@@ -1,11 +1,6 @@
 #include "./GlobalDataBuffer.glsl"
 
 
-#define LIGHTS_SET 6
-#define LIGHTS_BINDING 0
-
-#include "./Shading.glsl"
-
 layout(location = 0) in vec2 texCoords;
 
 layout(set = 1, binding = 0) uniform sampler2D gBufferMaterialA;
@@ -13,7 +8,10 @@ layout(set = 2, binding = 0) uniform sampler2D gBufferMaterialB;
 layout(set = 3, binding = 0) uniform sampler2D gBufferMaterialC;
 layout(set = 4, binding = 0) uniform sampler2D gBufferMaterialD;
 layout(set = 5, binding = 0) uniform sampler2D brdfSampler;
-layout(set = 7, binding = 0) uniform sampler2D giSampler;
+#define LIGHTS_SET 6
+layout(set = 7, binding = 0) uniform sampler2D globalIlluminationSampler;
+
+#include "./Shading.glsl"
 
 #ifdef DEBUG
 vec3 randomColor(int seed) {
@@ -44,15 +42,13 @@ void main() {
     vec4 albedoEmissive = materialA;
     ShaderData shaderData;
     shaderData.N = normalize(materialB.rgb);
-    shaderData.roughness = materialC.g;
+    shaderData.roughness = materialB.a;
     shaderData.metallic = materialC.b;
     shaderData.viewSpacePosition = vec3(globalData.viewMatrix * worldPos);
     shaderData.worldSpacePosition = worldPos.rgb;
 
-    float voxelSize = float(globalData.giTileSubdivision);
-    vec3 vPos = (round(shaderData.worldSpacePosition * voxelSize) / voxelSize);
-    vec4 globalIllumination = globalData.giEnabled ? texture(giSampler, hashWorldSpaceCoord(vPos)) :  vec4(0, 0, 0, 1);
-    shaderData.ambientOcclusion = materialB.a * (globalIllumination.a < 1 ? 0 : 1);
+    vec4 globalIllumination = globalData.giEnabled ? texture(globalIlluminationSampler, texCoords) :  vec4(0, 0, 0, 1);
+    shaderData.ambientOcclusion = materialC.g * globalIllumination.a;
     shaderData.V = normalize(globalData.cameraWorldPosition - shaderData.worldSpacePosition);
     shaderData.distanceFromCamera = length(shaderData.V);
     shaderData.albedo = albedoEmissive.rgb;
@@ -82,7 +78,7 @@ void main() {
         } else if (globalData.debugFlag == UV){
             finalColor = vec4(texture(gBufferMaterialC, texCoords).zw, 0, 1);
         } else if (globalData.debugFlag == RANDOM){
-            finalColor = vec4(randomColor(int(texture(gBufferMaterialC, texCoords).g)), 1);
+            finalColor = vec4(randomColor(int(texture(gBufferMaterialC, texCoords).r)), 1);
         } else if (globalData.debugFlag == BRDF){
             finalColor = vec4(shaderData.brdf, 0, 1);
         } else if (globalData.debugFlag == POSITION){

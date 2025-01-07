@@ -66,19 +66,28 @@ namespace Metal {
         GBUFFER_D(gBufferMaterialC, 2)
         GBUFFER_D(gBufferMaterialD, 3)
 
-        giComputeDescriptor = std::make_unique<DescriptorInstance>();
-        giComputeDescriptor->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
-        giComputeDescriptor->create(vulkanContext);
-        giComputeDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
+        giComputeDescriptorA = std::make_unique<DescriptorInstance>();
+        giComputeDescriptorA->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
+        giComputeDescriptorA->create(vulkanContext);
+        giComputeDescriptorA->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
+                                              context.coreTextures.giSurfaceCache->vkImageView);
+        giComputeDescriptorA->write(vulkanContext);
+
+        giComputeDescriptorB = std::make_unique<DescriptorInstance>();
+        giComputeDescriptorB->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
+        giComputeDescriptorB->create(vulkanContext);
+        giComputeDescriptorB->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
                                                 context.coreTextures.globalIllumination->vkImageView);
-        giComputeDescriptor->write(vulkanContext); {
-            giDescriptor = std::make_unique<DescriptorInstance>();
-            giDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-            giDescriptor->create(vulkanContext);
-            giDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+        giComputeDescriptorB->write(vulkanContext);
+
+        {
+            globalIlluminationDescriptor = std::make_unique<DescriptorInstance>();
+            globalIlluminationDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
+            globalIlluminationDescriptor->create(vulkanContext);
+            globalIlluminationDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                              context.coreFrameBuffers.gBufferFBO->vkImageSampler,
                                              context.coreTextures.globalIllumination->vkImageView);
-            giDescriptor->write(vulkanContext);
+            globalIlluminationDescriptor->write(vulkanContext);
         }
 
         // BRDF TEXTURE

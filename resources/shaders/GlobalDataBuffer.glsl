@@ -30,9 +30,6 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     uint giBufferWidth;
     uint giBufferHeight;
     uint giFrameCount;
-
-    uint bufferWidth;
-    uint bufferHeight;
 } globalData;
 
 
@@ -59,9 +56,19 @@ vec2 spatialHashToUV(ivec3 coord, uint width, uint height) {
     return vec2(u, v);
 }
 
-vec2 hashWorldSpaceCoord(vec3 world){
+vec2 genHashSurfaceCache(vec3 world){
     float gridSize = float(globalData.giTileSubdivision);
 
     ivec3 coord = ivec3(int(round(world.x * gridSize)), int(round(world.y * gridSize)), int(round(world.z * gridSize)));
     return spatialHashToUV(coord, globalData.giBufferWidth, globalData.giBufferHeight);
+}
+
+vec3 worldToCacheSpace(in vec3 worldSpacePos){
+    float voxelSize = float(globalData.giTileSubdivision);
+    return (round(worldSpacePos * voxelSize) / voxelSize);
+}
+
+vec2 worldToSurfaceCacheHash(in vec3 worldSpacePos){
+    vec3 cacheSpace = worldToCacheSpace(worldSpacePos);
+    return genHashSurfaceCache(cacheSpace);
 }

@@ -6,7 +6,7 @@ struct Light {
     float radius;
 };
 
-layout(set = LIGHTS_SET, binding = LIGHTS_BINDING) uniform Lights {
+layout(set = LIGHTS_SET, binding = 0) uniform Lights {
     Light lights[MAX_LIGHTS];
 } lightsBuffer;
 

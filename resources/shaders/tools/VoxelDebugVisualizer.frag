@@ -48,7 +48,7 @@ void main() {
         break;
         case GI:
         //        float GRID_SIZE = getLevelOfDetailTile(length(globalData.cameraWorldPosition - hitData.voxelPosition));
-        finalColor = vec4(hashWorldSpaceCoord(hitData.voxelPosition.xyz), 0, 1);
+        finalColor = vec4(genHashSurfaceCache(hitData.voxelPosition.xyz), 0, 1);
         break;
         default :
         finalColor = vec4(normalize(hitData.voxelPosition.xyz), 1);

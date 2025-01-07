@@ -3,7 +3,7 @@
 #include <vulkan/vulkan_core.h>
 
 namespace Metal::ImageUtils {
-    inline VkImageMemoryBarrier ReadOnlyToGeneralBarrier(const VkImage &image) {
+    inline VkImageMemoryBarrier TransferDstToGeneralBarrier(const VkImage &image) {
         VkImageMemoryBarrier memoryBarrier = {};
         memoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         memoryBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;

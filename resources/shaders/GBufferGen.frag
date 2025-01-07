@@ -90,7 +90,7 @@ void main () {
 
     float ambientOcclusion = 1;
     outMaterialA = vec4(push.albedoEmissive);
-    outMaterialB = vec4(N, ambientOcclusion);
-    outMaterialC = vec4(push.renderIndex + 1, push.roughnessFactor, push.metallicFactor, 1);
+    outMaterialB = vec4(N, push.roughnessFactor);
+    outMaterialC = vec4(push.renderIndex + 1, ambientOcclusion, push.metallicFactor, 1);
     outMaterialD = vec4(inPosition, 1);
 }

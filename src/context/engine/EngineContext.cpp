@@ -125,10 +125,8 @@ namespace Metal {
         globalDataUBO.giTileSubdivision = context.engineRepository.giTileSubdivision;
 
         globalDataUBO.debugFlag = ShadingMode::IndexOfValue(context.editorRepository.shadingMode);
-        globalDataUBO.giBufferWidth = context.coreTextures.globalIllumination->width;
-        globalDataUBO.giBufferHeight = context.coreTextures.globalIllumination->height;
-        globalDataUBO.bufferWidth = context.coreFrameBuffers.auxFBO->bufferWidth;
-        globalDataUBO.bufferHeight = context.coreFrameBuffers.auxFBO->bufferHeight;
+        globalDataUBO.giBufferWidth = context.coreTextures.giSurfaceCache->width;
+        globalDataUBO.giBufferHeight = context.coreTextures.giSurfaceCache->height;
         globalDataUBO.giFrameCount = giFrameCount++;
 
         if (context.engineRepository.incrementTime) {

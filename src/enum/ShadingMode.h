@@ -19,7 +19,7 @@ namespace Metal::ShadingMode {
     };
 
     static auto Names =
-            "Lit\0Albedo\0Normal\0Roughness\0Metallic\0AO\0Random\0Depth\0UV\0Position\0BRDF\0Emission\0Global Illumination\0";
+            "Lit\0Albedo\0Normal\0Roughness\0Metallic\0Occlusion\0Random\0Depth\0UV\0Position\0BRDF\0Emission\0Global Illumination\0";
 
     static ShadingMode ValueOfIndex(const int option) {
         if (option == 0) {
