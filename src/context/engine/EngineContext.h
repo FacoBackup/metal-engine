@@ -21,21 +21,38 @@ namespace Metal {
         std::array<LightData, MAX_LIGHTS> lights{};
         unsigned int lightsCount = 0;
         long long start = -1;
-        bool hasToUpdateLights = true;
-        bool giSettingsChanged = true;
+        bool cameraUpdated = true;
+        bool lightingDataUpdated = true;
+        bool giSettingsUpdated = true;
         unsigned int giFrameCount = 0;
 
     public:
-        void resetFrameCount() {
+        void resetGIFrameCount() {
             giFrameCount = 0;
         }
 
-        void setUpdateLights() {
-            hasToUpdateLights = true;
+        void setLightingDataUpdated(const bool val) {
+            lightingDataUpdated = val;
         }
 
-        void setGiSettingsChanged() {
-            giSettingsChanged = true;
+        bool isLightingDataUpdated() const {
+            return lightingDataUpdated;
+        }
+
+        void setCameraUpdated(const bool val) {
+            cameraUpdated = val;
+        }
+
+        bool isCameraUpdated() const {
+            return cameraUpdated;
+        }
+
+        void setGISettingsUpdated(const bool val) {
+            giSettingsUpdated = val;
+        }
+
+        bool isGISettingsUpdated() const {
+            return giSettingsUpdated;
         }
 
         void onInitialize() override;
@@ -55,8 +72,6 @@ namespace Metal {
         void updateGlobalData();
 
         void onSync() override;
-
-        bool shouldClearGIBuffer();
 
         void updateLights();
 

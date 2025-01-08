@@ -14,8 +14,6 @@ namespace Metal {
 
         PipelineInstance *getPipeline() override;
 
-        void clearBuffer();
-
         void clearTexture(const VkImage &image) const;
     };
 } // Metal

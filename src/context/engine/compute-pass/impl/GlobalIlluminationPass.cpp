@@ -8,14 +8,6 @@ namespace Metal {
         return context.corePipelines.giComputePipeline;
     }
 
-    void GlobalIlluminationPass::clearBuffer() {
-        if (isFirstRun || context.engineContext.shouldClearGIBuffer()) {
-            clearTexture(context.coreTextures.giSurfaceCache->vkImage);
-            context.engineContext.resetFrameCount();
-            isFirstRun = false;
-        }
-    }
-
     void GlobalIlluminationPass::clearTexture(const VkImage &image) const {
         VkImageMemoryBarrier barrier{};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -47,12 +39,21 @@ namespace Metal {
     }
 
     void GlobalIlluminationPass::onSync() {
-        clearBuffer();
+        const bool giReset = context.engineContext.isGISettingsUpdated() || context.engineContext.isLightingDataUpdated();
+        if (giReset) {
+            clearTexture(context.coreTextures.giSurfaceCache->vkImage);
+        }
+
+        if (isFirstRun || context.engineContext.isCameraUpdated() || giReset) {
+            clearTexture(context.coreTextures.globalIllumination->vkImage);
+            context.engineContext.resetGIFrameCount();
+            isFirstRun = false;
+        }
+
         if (!context.engineRepository.giEnabled) {
             return;
         }
 
-        clearTexture(context.coreTextures.globalIllumination->vkImage);
         VkImageMemoryBarrier transferToGeneral = ImageUtils::TransferDstToGeneralBarrier(
             context.coreTextures.globalIllumination->vkImage);
 

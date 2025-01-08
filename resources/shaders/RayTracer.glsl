@@ -287,20 +287,6 @@ inout ivec2 colorData
     return hitData;
 }
 
-#ifndef DEBUG_VOXELS
-float testLight(vec3 lightPosition, in vec3 rayOrigin){
-    vec3 rayDirection = normalize(lightPosition - rayOrigin);
-    Ray ray = Ray(rayOrigin, rayDirection, 1./rayDirection);
-    Hit hitData = traceAllTiles(ray);
-    float lightDistance = length(lightPosition - rayOrigin);
-    float hitDistance = length(hitData.hitPosition - rayOrigin);
-    if (hitData.anyHit && hitDistance < lightDistance) {
-        return clamp(1 / lightDistance, 0, 1);
-    }
-    return 1;
-}
-#endif
-
 // ----- UTIL -----
 uint wang_hash(inout uint seed)
 {

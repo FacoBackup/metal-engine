@@ -33,7 +33,7 @@ namespace Metal {
             context.worldGridRepository.hasMainTileChanged = true;
         }
         if (member != nullptr && member->group == GLOBAL_ILLUMINATION) {
-            context.engineContext.setGiSettingsChanged();
+            context.engineContext.setGISettingsUpdated(true);
         }
     }
 

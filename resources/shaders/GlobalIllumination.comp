@@ -54,8 +54,14 @@ void computeLightContribution(in Light l, in vec3 albedo, in vec3 hitNormal, in 
     }
 }
 
-void evaluateSurface(in Light sunLight, in vec3 albedo, in vec3 hitNormal, in vec3 currentPosition, inout vec3 throughput, inout vec3 indirectLight){
+void evaluateSurface(in Light sunLight, in vec3 albedo, bool isEmissive, in vec3 hitNormal, in vec3 currentPosition, inout vec3 throughput, inout vec3 indirectLight){
     ivec2 coord = ivec2(worldToSurfaceCacheHash(currentPosition) * vec2(globalData.giBufferWidth, globalData.giBufferHeight));
+    if (isEmissive){
+        indirectLight += throughput * albedo;
+        throughput *= albedo;
+        return;
+    }
+
     vec4 previousCacheData = imageLoad(surfaceCacheImage, coord);
     if (previousCacheData.a == 1 || length(previousCacheData.rgb) == 0) {
         if (globalData.lightsQuantity > 0){
@@ -86,10 +92,10 @@ vec3 computeDiffuseIndirectLight(vec3 firstHitNormal, vec3 firstHitPos) {
         randomDir = sampleHemisphere(hitNormal);
 
         // TODO - INTEGRATE THIS
-//        vec3 diffuseRayDir = normalize(hitInfo.normal + RandomUnitVector(rngState));
-//        vec3 specularRayDir = reflect(rayDir, hitInfo.normal);
-//        specularRayDir = normalize(mix(specularRayDir, diffuseRayDir, hitInfo.material.roughness * hitInfo.material.roughness));
-//        rayDir = mix(diffuseRayDir, specularRayDir, doSpecular);
+        //        vec3 diffuseRayDir = normalize(hitInfo.normal + RandomUnitVector(rngState));
+        //        vec3 specularRayDir = reflect(rayDir, hitInfo.normal);
+        //        specularRayDir = normalize(mix(specularRayDir, diffuseRayDir, hitInfo.material.roughness * hitInfo.material.roughness));
+        //        rayDir = mix(diffuseRayDir, specularRayDir, doSpecular);
 
         Ray ray = Ray(firstHitPos, randomDir, 1.0 / randomDir);
         Hit hitData = traceAllTiles(ray);
@@ -108,10 +114,22 @@ vec3 computeDiffuseIndirectLight(vec3 firstHitNormal, vec3 firstHitPos) {
         VoxelMaterialData matData = unpackVoxel(hitData);
         hitNormal = matData.normal;
         vec3 albedo = matData.albedo;
-        evaluateSurface(sunLight, albedo, hitNormal, currentPosition, throughput, indirectLight);
+        evaluateSurface(sunLight, albedo, matData.isEmissive, hitNormal, currentPosition, throughput, indirectLight);
     }
 
     return indirectLight * globalData.giStrength;
+}
+
+float testLight(vec3 lightPosition, in vec3 rayOrigin){
+    vec3 rayDirection = normalize(lightPosition - rayOrigin);
+    Ray ray = Ray(rayOrigin, rayDirection, 1./rayDirection);
+    Hit hitData = traceAllTiles(ray);
+    float lightDistance = length(lightPosition - rayOrigin);
+    float hitDistance = length(hitData.hitPosition - rayOrigin);
+    if (hitData.anyHit && hitDistance < lightDistance) {
+        return clamp(1 / lightDistance, 0, 1);
+    }
+    return 1;
 }
 
 void main() {
@@ -120,11 +138,14 @@ void main() {
     if (materialD.a != 1.){
         return;
     }
+    vec4 albedoEmissive = texture(gBufferMaterialA, texCoords);
+    if(albedoEmissive.a != 0){
+        return;
+    }
 
     vec3 hitPosition = materialD.rgb;
     vec4 finalColor = vec4(0, 0, 0, 1);
     rngState = uint(round(rand(worldToCacheSpace(hitPosition)) * 100) + globalData.giFrameCount);
-    vec3 albedo = texture(gBufferMaterialA, texCoords).rgb;
     float bias = max(.05, 1e-4 * length(hitPosition.xyz));
     vec3 normal = texture(gBufferMaterialB, texCoords).rgb;
     vec3 currentPosition = hitPosition.xyz + normal * bias;
@@ -147,5 +168,8 @@ void main() {
         }
     }
 
-    imageStore(globalIlluminationImage, ivec2(gl_GlobalInvocationID.xy), vec4(computeDiffuseIndirectLight(normal, currentPosition), shadows));
+    currentPosition = hitPosition.xyz + sampleHemisphere(normal) * bias;
+    vec4 previousFrame = imageLoad(globalIlluminationImage, ivec2(gl_GlobalInvocationID.xy));
+    vec4 accumulatedResult = previousFrame * (1. - 1./float(globalData.giFrameCount+1)) + vec4(computeDiffuseIndirectLight(normal, currentPosition), shadows) * 1./float(globalData.giFrameCount + 1);
+    imageStore(globalIlluminationImage, ivec2(gl_GlobalInvocationID.xy), accumulatedResult);
 }

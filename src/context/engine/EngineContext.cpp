@@ -71,19 +71,14 @@ namespace Metal {
         updateLights();
 
         passesService.onSync();
-        if (hasToUpdateLights) {
-            hasToUpdateLights = false;
-        }
-    }
 
-    bool EngineContext::shouldClearGIBuffer() {
-        bool prev = hasToUpdateLights || giSettingsChanged;
-        giSettingsChanged = false;
-        return prev;
+        setLightingDataUpdated(false);
+        setCameraUpdated(false);
+        setGISettingsUpdated(false);
     }
 
     void EngineContext::updateLights() {
-        if (hasToUpdateLights) {
+        if (lightingDataUpdated) {
             int index = 0;
             for (auto &entry: context.worldRepository.lights) {
                 auto l = entry.second;
