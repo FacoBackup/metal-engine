@@ -17,21 +17,6 @@ layout(set = 7, binding = 0, rgba32f) uniform image2D globalIlluminationImage;
 #include "./LightsBuffer.glsl"
 
 uint rngState;
-vec3 sampleHemisphere(vec3 normal) {
-    float u = RandomFloat01(rngState);// Replace with your random number generator
-    float v = RandomFloat01(rngState);
-    float theta = acos(sqrt(1.0 - u));
-    float phi = 2.0 * 3.14159265359 * v;
-
-    // Convert spherical coordinates to cartesian
-    vec3 localDir = vec3(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
-
-    // Transform local direction to world space using the normal
-    vec3 tangent = normalize(cross(vec3(0.0, 1.0, 0.0), normal));
-    vec3 bitangent = cross(normal, tangent);
-    return normalize(localDir.x * tangent + localDir.y * bitangent + localDir.z * normal);
-}
-
 void computeLightContribution(in Light l, in vec3 surfaceAlbedo, in vec3 surfaceNormal, in vec3 surfacePosition, inout vec3 throughput, inout vec3 indirectLight){
     float bias = max(.05, 1e-4 * length(surfacePosition.xyz));
     vec3 localHitPosition = surfacePosition.xyz + surfaceNormal * bias;
@@ -92,7 +77,7 @@ vec3 computeDiffuseIndirectLight(vec3 firstHitNormal, vec3 firstHitPos, float ro
     vec3 localRayDir = rayDir;
 
     for (uint j = 0; j < globalData.giBounces; j++){
-        vec3 diffuseRayDir = sampleHemisphere(localNormal);
+        vec3 diffuseRayDir = normalize(localNormal + RandomUnitVector(rngState));
         vec3 specularRayDir = reflect(localRayDir, localNormal);
 
         specularRayDir = normalize(mix(specularRayDir, diffuseRayDir, localRoughness * localRoughness));
