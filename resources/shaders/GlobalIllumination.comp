@@ -42,12 +42,12 @@ void computeLightContribution(in Light l, in vec3 surfaceAlbedo, in vec3 surface
     float hitDistance = length(hitData.hitPosition - localHitPosition);
     float localShadows = 1;
     if (hitData.anyHit && hitDistance < lightDistance) {
-        localShadows *= clamp(1 / lightDistance, 0, 1);
+        localShadows = 0;
     }
     if (localShadows > 0){
         float NdotL = max(dot(surfaceNormal, lightDir), 0.0);
         vec3 lightColorContribution = l.color * surfaceAlbedo / PI;
-        vec3 lightContribution = lightColorContribution * NdotL * localShadows / length(l.position - localHitPosition);
+        vec3 lightContribution = lightColorContribution * NdotL / length(l.position - localHitPosition);
         indirectLight += throughput * lightContribution;
         throughput *= lightColorContribution;
     }
@@ -166,7 +166,7 @@ void main() {
             }
         }
         if (globalData.enabledSun){
-            shadows *= testLight(normalize(globalData.sunPosition) * 20, shadowsPosition);
+            shadows *= testLight(globalData.sunPosition, shadowsPosition);
         }
     }
 

@@ -127,9 +127,9 @@ namespace Metal {
         if (context.engineRepository.incrementTime) {
             context.engineRepository.elapsedTime += .0005f * context.engineRepository.elapsedTimeSpeed;
         }
-        globalDataUBO.sunPosition = glm::vec3(std::sin(context.engineRepository.elapsedTime),
+        globalDataUBO.sunPosition = glm::vec3(0,
                                               std::cos(context.engineRepository.elapsedTime),
-                                              0) * context.engineRepository.sunDistance;
+                                              std::sin(context.engineRepository.elapsedTime)) * context.engineRepository.sunDistance;
         globalDataUBO.sunColor = CalculateSunColor(
                                      globalDataUBO.sunPosition.y / context.engineRepository.sunDistance,
                                      context.engineRepository.nightColor, context.engineRepository.dawnColor,
