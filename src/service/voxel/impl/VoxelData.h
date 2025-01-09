@@ -1,53 +1,51 @@
 #ifndef VOXELDATA_H
 #define VOXELDATA_H
+#include <iostream>
 #include <glm/glm.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
-#define IS_LEAF 1
 
 namespace Metal {
     struct VoxelData {
-        glm::ivec3 color;
-        glm::vec2 roughnessMetallic;
-        glm::vec3 normal;
-        bool isEmissive;
+        std::array<unsigned int, 2> data{};
 
-        explicit VoxelData(const glm::ivec3 color, const glm::vec3 normal,
-                           const glm::vec2 roughnessMetallic, bool isEmissive) : color(color),
-            roughnessMetallic(roughnessMetallic),
-            normal(normal), isEmissive(isEmissive) {
-        }
 
-        std::array<unsigned int, 2> compress() {
-            const int red = (color.r / 2) & 0x7F; // Scale down and mask to 7 bits
-            const int green = color.g & 0xFF; // No change, 8 bits
-            const int blue = (color.b / 2) & 0x7F; // Scale down and mask to 7 bits
-            const unsigned int albedo = (red << 16) | (green << 8) | blue;
-            const unsigned int roughness = static_cast<unsigned int>(std::round(roughnessMetallic.r * 100)); // 0 to 100
-            const unsigned int metallic = static_cast<unsigned int>(std::round(roughnessMetallic.g * 100));
-            const unsigned int normalMetallic = CompressNormal(normal) << 7 | metallic;
-            return std::array{
-                (albedo << 9) | (isEmissive << 8) | roughness,
-                normalMetallic
+        explicit VoxelData(const glm::ivec3 color, glm::vec3 normal,
+                           const glm::vec2 roughnessMetallic, bool isEmissive) {
+            const auto roughness = static_cast<unsigned int>(std::round(roughnessMetallic.r * 100)); // 0 to 100
+            const auto metallic = static_cast<unsigned int>(std::round(roughnessMetallic.g * 100));
+
+            int red = (color.r / 2) & 0xFF;
+            int green = color.g & 0xFF;
+            int blue = (color.b / 2) & 0xFF;
+            unsigned int albedo = (red << 16) | (green << 8) | blue;
+
+            data = std::array{
+                isEmissive << 31 | roughness << 24 | albedo,
+                CompressNormal(normal)
             };
         }
 
     private:
-        static unsigned int CompressNormal(glm::vec3 &normal) {
-            normal = glm::normalize(normal);
-            // Octahedral mapping
-            glm::vec2 oct = glm::vec2(normal.x, normal.y) / (
-                                std::abs(normal.x) + std::abs(normal.y) + std::abs(normal.z));
-            if (normal.z < 0) {
-                oct = (1.0f - glm::abs(oct)) * glm::sign(oct);
+        // THANKS TO https://www.shadertoy.com/view/llfcRl
+        static unsigned int CompressNormal(const glm::vec3 &nor) {
+            glm::vec3 mor = nor;
+            uint32_t id = 0;
+
+            if (std::abs(nor.y) > std::abs(mor.x)) {
+                mor = glm::vec3(nor.y, nor.z, nor.x);
+                id = 1u;
+            }
+            if (std::abs(nor.z) > std::abs(mor.x)) {
+                mor = glm::vec3(nor.z, nor.x, nor.y);
+                id = 2u;
             }
 
-            // Quantize to a 12-bit range for each component
-            int quantX = static_cast<int>((oct.x * 2047.0f) + 2048.0f);
-            int quantY = static_cast<int>((oct.y * 2047.0f) + 2048.0f);
+            uint32_t is = (mor.x < 0.0f) ? 1u : 0u;
+            glm::vec2 uv = 0.5f + 0.5f * glm::vec2(mor.y, mor.z) / std::abs(mor.x);
+            glm::uvec2 iuv = glm::uvec2(glm::round(uv * glm::vec2(32767.0f, 16383.0f)));
 
-            // Pack into a 25-bit integer
-            return (quantX << 13) | quantY;
+            return iuv.x | (iuv.y << 15u) | (id << 29u) | (is << 31u);
         }
     };
 }

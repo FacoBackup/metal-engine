@@ -151,12 +151,10 @@ add_executable(
         src/service/mesh/VertexData.h
         src/context/editor/dock-spaces/viewport/CameraPositionPanel.cpp
         src/context/editor/dock-spaces/viewport/CameraPositionPanel.h
-        src/context/engine/render-pass/tools/GridRenderPass.cpp
-        src/context/engine/render-pass/tools/GridRenderPass.h
-        src/context/engine/CommandBufferRecorder.cpp
-        src/context/engine/CommandBufferRecorder.h
-        src/repository/render-pass/CoreRenderPasses.cpp
-        src/repository/render-pass/CoreRenderPasses.h
+        src/context/engine/render-pass/impl/tools/GridPass.cpp
+        src/context/engine/render-pass/impl/tools/GridPass.h
+        src/context/engine/passes/CommandBufferRecorder.cpp
+        src/context/engine/passes/CommandBufferRecorder.h
         src/service/camera/Camera.cpp
         src/repository/world/WorldRepository.cpp
         src/repository/world/WorldRepository.h
@@ -219,10 +217,8 @@ add_executable(
         src/service/mesh/MaterialData.h
         src/context/engine/render-pass/impl/PostProcessingPass.cpp
         src/context/engine/render-pass/impl/PostProcessingPass.h
-        src/dto/ubo/PPSettingsUBO.h
         src/context/engine/render-pass/impl/GBufferShadingPass.cpp
         src/context/engine/render-pass/impl/GBufferShadingPass.h
-        src/dto/push-constant/GBufferShadingPushConstant.h
         src/service/pipeline/PipelineBuilder.h
         src/service/framebuffer/FrameBufferAttachment.cpp
         src/repository/engine/EngineRepository.cpp
@@ -236,8 +232,8 @@ add_executable(
         src/enum/NotificationSeverity.h
         src/service/voxel/impl/Triangle.h
         src/service/voxel/impl/SparseVoxelOctreeData.h
-        src/context/engine/render-pass/tools/VoxelVisualizerPass.cpp
-        src/context/engine/render-pass/tools/VoxelVisualizerPass.h
+        src/context/engine/render-pass/impl/tools/VoxelVisualizerPass.cpp
+        src/context/engine/render-pass/impl/tools/VoxelVisualizerPass.h
         src/service/voxel/SVOService.cpp
         src/service/voxel/SVOService.h
         src/service/voxel/SVOInstance.cpp
@@ -249,13 +245,22 @@ add_executable(
         src/dto/ubo/LightData.h
         src/repository/world/components/LightComponent.cpp
         src/repository/world/components/LightComponent.h
-        src/context/engine/render-pass/tools/IconsPass.cpp
-        src/context/engine/render-pass/tools/IconsPass.h
+        src/context/engine/render-pass/impl/tools/IconsPass.cpp
+        src/context/engine/render-pass/impl/tools/IconsPass.h
         src/dto/push-constant/IconPushConstant.h
-        src/context/engine/render-pass/impl/VoxelAOPass.cpp
-        src/context/engine/render-pass/impl/VoxelAOPass.h
         src/repository/editor/EditorRepository.cpp
-        src/dto/push-constant/GIPushConstant.h
+        src/dto/push-constant/GridPushConstant.h
+        src/context/engine/render-pass/impl/AtmospherePass.cpp
+        src/context/engine/render-pass/impl/AtmospherePass.h
+        src/context/engine/compute-pass/AbstractComputePass.cpp
+        src/context/engine/compute-pass/AbstractComputePass.h
+        src/context/engine/passes/AbstractPass.cpp
+        src/context/engine/passes/AbstractPass.h
+        src/context/engine/passes/PassesService.cpp
+        src/context/engine/passes/PassesService.h
+        src/context/engine/compute-pass/impl/GlobalIlluminationPass.cpp
+        src/context/engine/compute-pass/impl/GlobalIlluminationPass.h
+        src/util/ImageUtils.h
 )
 
 

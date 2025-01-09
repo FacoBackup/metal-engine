@@ -21,7 +21,7 @@ namespace Metal {
         void voxelize(const MeshComponent *component, const glm::mat4x4 &modelMatrix, const MeshData *mesh,
                       std::unordered_map<std::string, SparseVoxelOctreeBuilder> &builders) const;
 
-        static void FillStorage(unsigned int &bufferIndex,
+        static void FillStorage(SparseVoxelOctreeBuilder &builder, unsigned int &bufferIndex,
                                 unsigned int &materialBufferIndex,
                                 SparseVoxelOctreeData &voxels, OctreeNode *node);
 

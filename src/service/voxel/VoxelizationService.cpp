@@ -21,43 +21,36 @@ namespace Metal {
         const float edgeLength3 = glm::distance(triangle.v2, triangle.v0);
 
         const float maxEdgeLength = std::max(edgeLength1, std::max(edgeLength2, edgeLength3));
-        int localMaxDepth = MAX_DEPTH + 1;
-        float stepSize = 0;
+        const auto voxelSize = static_cast<float>(TILE_SIZE / std::pow(2, MAX_DEPTH));
+        float stepSize = voxelSize / maxEdgeLength;
         if (edgeLength1 == INFINITY || edgeLength2 == INFINITY || edgeLength3 == INFINITY) {
             stepSize = .01f;
         }
-        while (stepSize < .01) {
-            localMaxDepth--;
-            const auto voxelSize = static_cast<float>(TILE_SIZE / std::pow(2, localMaxDepth));
-            stepSize = voxelSize / maxEdgeLength;
-        }
+
+        glm::vec3 albedo = component->albedoColor * 255.f;
+        glm::vec2 roughnessMetallic(component->roughnessFactor, component->metallicFactor);
 
         for (float lambda1 = 0; lambda1 <= 1; lambda1 += stepSize) {
             for (float lambda2 = 0; lambda2 <= 1 - lambda1; lambda2 += stepSize) {
                 float lambda0 = 1 - lambda1 - lambda2;
 
-                float u = lambda0 * triangle.uv0.x + lambda1 * triangle.uv1.x + lambda2 * triangle.uv2.x;
-                float v = lambda0 * triangle.uv0.y + lambda1 * triangle.uv1.y + lambda2 * triangle.uv2.y;
-                glm::vec3 point{
-                    lambda0 * triangle.v0.x + lambda1 * triangle.v1.x + lambda2 * triangle.v2.x,
-                    lambda0 * triangle.v0.y + lambda1 * triangle.v1.y + lambda2 * triangle.v2.y,
-                    lambda0 * triangle.v0.z + lambda1 * triangle.v1.z + lambda2 * triangle.v2.z
-                };
-                glm::vec3 normal{
-                    lambda0 * triangle.n0.x + lambda1 * triangle.n1.x + lambda2 * triangle.n2.x,
-                    lambda0 * triangle.n0.y + lambda1 * triangle.n1.y + lambda2 * triangle.n2.y,
-                    lambda0 * triangle.n0.z + lambda1 * triangle.n1.z + lambda2 * triangle.n2.z
-                };
+                glm::vec2 uv = lambda0 * triangle.uv0 + lambda1 * triangle.uv1 + lambda2 * triangle.uv2;
+                glm::vec3 point = lambda0 * triangle.v0 +
+                                  lambda1 * triangle.v1 +
+                                  lambda2 * triangle.v2;
+                glm::vec3 normal = glm::normalize(
+                    lambda0 * triangle.n0 +
+                    lambda1 * triangle.n1 +
+                    lambda2 * triangle.n2
+                );
                 auto *voxelTile = context.worldGridRepository.getTile(point);
                 if (voxelTile != nullptr) {
                     if (!builders.contains(voxelTile->id)) {
                         builders.emplace(voxelTile->id,
                                          SparseVoxelOctreeBuilder(voxelTile));
                     }
-                    glm::vec3 albedo = component->albedoColor * 255.f;
-                    glm::vec2 roughnessMetallic(component->roughnessFactor, component->metallicFactor);
                     builders.at(voxelTile->id).insert(
-                        localMaxDepth,
+                        MAX_DEPTH,
                         point,
                         new VoxelData(
                             albedo, normal, roughnessMetallic,
@@ -95,12 +88,22 @@ namespace Metal {
         }
     }
 
-    void VoxelizationService::FillStorage(unsigned int &bufferIndex,
+    void VoxelizationService::FillStorage(SparseVoxelOctreeBuilder &builder, unsigned int &bufferIndex,
                                           unsigned int &materialBufferIndex,
                                           SparseVoxelOctreeData &voxels, OctreeNode *node) {
         if (node->isLeaf) {
             return;
         }
+
+        // if (node->isStructureStart) {
+        //     auto *newNode = builder.repeatedStructures.at(node->getId());
+        //     if (!newNode->processed) {
+        //         PutData(voxels, bufferIndex, newNode);
+        //         FillStorage(builder, bufferIndex, voxels, newNode);
+        //     }
+        //     voxels.data[node->dataIndex] = voxels.data[newNode->dataIndex]; // POINT THIS VOXEL TO THE BEGINNING OF THE STRUCTURE
+        //     return;
+        // }
 
         voxels.data[node->dataIndex] = node->packVoxelData(bufferIndex);
         bool isParentOfLeaf = true;
@@ -113,12 +116,12 @@ namespace Metal {
 
         for (auto &child: node->children) {
             if (child != nullptr) {
-                FillStorage(bufferIndex, materialBufferIndex, voxels, child);
+                FillStorage(builder, bufferIndex, materialBufferIndex, voxels, child);
             }
         }
 
         if (isParentOfLeaf && node->data != nullptr) {
-            std::array<unsigned int, 2> compressed = node->data->compress();
+            std::array<unsigned int, 2> &compressed = node->data->data;
             voxels.data[node->dataIndex] = node->packVoxelData(materialBufferIndex);
             voxels.data[materialBufferIndex + voxels.voxelBufferOffset] = compressed[0];
             materialBufferIndex++;
@@ -127,19 +130,15 @@ namespace Metal {
         }
     }
 
-    /**
-     * Non-leaf nodes store 16 bit pointer to child group + 8 bit child mask + 8 bit leaf mask
-     * @param bufferIndex current buffer index
-     * @param node
-     */
     void VoxelizationService::PutData(unsigned int &bufferIndex, OctreeNode *node) {
         node->dataIndex = bufferIndex;
         bufferIndex++;
     }
 
     void VoxelizationService::serialize(SparseVoxelOctreeBuilder &builder) const {
-        METRIC_START(std::format("Starting serialization {}", builder.getTile()->id))
+        // builder.findRepeatedStructures();
 
+        METRIC_START
         SparseVoxelOctreeData data{};
         data.data.resize(builder.getVoxelQuantity() + builder.getLeafVoxelQuantity() * 2);
         data.voxelBufferOffset = builder.getVoxelQuantity();
@@ -147,7 +146,7 @@ namespace Metal {
         unsigned int bufferIndex = 0;
         unsigned int materialBufferIndex = 0;
         PutData(bufferIndex, &builder.getRoot());
-        FillStorage(bufferIndex, materialBufferIndex, data, &builder.getRoot());
+        FillStorage(builder, bufferIndex, materialBufferIndex, data, &builder.getRoot());
 
         std::string filePath = context.getAssetDirectory() + FORMAT_FILE_SVO(builder.getTile()->id);
         context.engineRepository.svoFilePaths.push_back(filePath);
@@ -156,14 +155,13 @@ namespace Metal {
     }
 
     void VoxelizationService::voxelizeScene() const {
-        METRIC_START("Starting Voxelization ")
-        for (auto path : context.engineRepository.svoFilePaths) {
+        METRIC_START
+        for (auto path: context.engineRepository.svoFilePaths) {
             if (std::filesystem::exists(path)) {
                 std::filesystem::remove(path);
             }
         }
         context.engineRepository.svoFilePaths.clear();
-
         std::unordered_map<std::string, SparseVoxelOctreeBuilder> builders;
         for (auto &t: context.worldGridRepository.getTiles()) {
             for (auto entity: t.second.entities) {
@@ -173,9 +171,9 @@ namespace Metal {
                     if (transformComponent.isStatic) {
                         auto *mesh = context.meshService.stream(meshComponent.meshId, LevelOfDetail::LOD_0);
                         if (mesh != nullptr) {
-                            METRIC_START(std::format("Voxelizing mesh {}", meshComponent.getEntityId()))
+                            METRIC_START
                             voxelize(&meshComponent, transformComponent.model, mesh, builders);
-                            METRIC_END("Voxelization took: ")
+                            METRIC_END(std::format("Voxelization of mesh {}", meshComponent.getEntityId()))
                         }
                         delete mesh;
                     }
@@ -187,8 +185,10 @@ namespace Metal {
             serialize(t.second);
             t.second.dispose();
         }
+
         context.svoService.disposeAll();
         context.worldGridRepository.hasMainTileChanged = true;
+        context.engineContext.setGISettingsUpdated(true);
         METRIC_END("Ending Voxelization ")
     }
 } // Metal

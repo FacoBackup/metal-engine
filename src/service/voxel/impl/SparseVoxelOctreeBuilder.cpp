@@ -22,6 +22,10 @@ namespace Metal {
         root.dispose();
     }
 
+    void SparseVoxelOctreeBuilder::findRepeatedStructures() {
+        root.repeatedStructures(repeatedStructures, 8);
+    }
+
     void SparseVoxelOctreeBuilder::insertInternal(OctreeNode *node, glm::vec3 &point,
                                                   VoxelData *data, glm::ivec3 &position,
                                                   const int depth,

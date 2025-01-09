@@ -4,21 +4,21 @@
 struct ShaderData {
     vec3 albedo;
     vec3 N;
-    float roughness;
-    float metallic;
-    float ambientOcclusion;
     vec3 viewSpacePosition;
     vec3 worldSpacePosition;
     vec3 V;
-    float distanceFromCamera;
     vec3 VrN;
     vec3 albedoOverPI;
-    float NdotV;
-    vec2 brdf;
     vec3 F0;
     vec3 sunDirection;
     vec3 sunColor;
+    float NdotV;
+    float distanceFromCamera;
+    float roughness;
+    float metallic;
+    float ambientOcclusion;
     uint lightsQuantity;
+    bool enabledSun;
 };
 
 vec3 getDiffuse(vec3 KS, float metallic) {
@@ -93,19 +93,20 @@ vec3 computeSphereLight(in ShaderData shaderData, in Light info){
 
     float distanceFromFrag =  length(L);
     float intensity = 1.;
-    if (distanceFromFrag > info.innerRadius) {
-        intensity = clamp(mix(1., 0., (distanceFromFrag - info.innerRadius) / (info.outerRadius - info.innerRadius)), 0., 1.);
+    float innerRadius = min(info.outerRadius, info.innerRadius);
+    if (distanceFromFrag > innerRadius) {
+        intensity = clamp(mix(1., 0., (distanceFromFrag - innerRadius) / (info.outerRadius - innerRadius)), 0., 1.);
     }
-    if(intensity < .01){
+    if (intensity < .01){
         return vec3(0);
     }
     return computeBRDF(shaderData, baseContribution.rgb, baseContribution.a, info.color) * intensity;
 }
 
 vec3 physicallyBasedShadePixel(in ShaderData shaderData) {
-    vec3 finalColor = computeDirectionalLight(shaderData);
+    vec3 finalColor = shaderData.enabledSun ? computeDirectionalLight(shaderData) : vec3(0);
 
-    for(uint i = 0; i < shaderData.lightsQuantity; i++){
+    for (uint i = 0; i < shaderData.lightsQuantity; i++){
         finalColor += computeSphereLight(shaderData, lightsBuffer.lights[i]);
     }
 

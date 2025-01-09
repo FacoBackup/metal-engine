@@ -2,15 +2,13 @@
 #define METAL_ENGINE_ENGINECONTEXT_H
 
 #include <chrono>
-#include <vector>
 
 #include "../../dto/ubo/GlobalDataUBO.h"
-#include "../../dto/ubo/PPSettingsUBO.h"
 #include "../../common/AbstractRuntimeComponent.h"
 #include "../../dto/ubo/LightData.h"
 #include "../../dto/ubo/TileInfoUBO.h"
-#include "render-pass/AbstractRenderPass.h"
 #include "../../enum/engine-definitions.h"
+#include "passes/PassesService.h"
 
 using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
@@ -18,29 +16,51 @@ using TimePoint = std::chrono::time_point<Clock>;
 namespace Metal {
     class EngineContext final : public AbstractRuntimeComponent {
         GlobalDataUBO globalDataUBO{};
-        PPSettingsUBO postProcessingUBO{};
+        PassesService passesService{context};
         TileInfoUBO tileInfoUBO{};
         std::array<LightData, MAX_LIGHTS> lights{};
         unsigned int lightsCount = 0;
         long long start = -1;
-        bool hasToUpdateLights = true;
-
-        std::vector<std::unique_ptr<AbstractRenderPass>> aoPass;
-        std::vector<std::unique_ptr<AbstractRenderPass> > fullScreenRenderPasses;
-        std::vector<std::unique_ptr<AbstractRenderPass> > gBufferPasses;
-        std::vector<std::unique_ptr<AbstractRenderPass>> postProcessingPasses;
+        bool cameraUpdated = true;
+        bool lightingDataUpdated = true;
+        bool giSettingsUpdated = true;
+        unsigned int giFrameCount = 0;
+        unsigned int globalFrameCount = 0;
 
     public:
+        void resetGIFrameCount() {
+            giFrameCount = 0;
+        }
 
-        void setUpdateLights() {
-            hasToUpdateLights = true;
+        void setLightingDataUpdated(const bool val) {
+            lightingDataUpdated = val;
+        }
+
+        bool isLightingDataUpdated() const {
+            return lightingDataUpdated;
+        }
+
+        void setCameraUpdated(const bool val) {
+            cameraUpdated = val;
+        }
+
+        bool isCameraUpdated() const {
+            return cameraUpdated;
+        }
+
+        void setGISettingsUpdated(const bool val) {
+            giSettingsUpdated = val;
+        }
+
+        bool isGISettingsUpdated() const {
+            return giSettingsUpdated;
         }
 
         void onInitialize() override;
 
-        void updatePostProcessingData();
-
         void updateVoxelData();
+
+        void updateCurrentTime();
 
         explicit EngineContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {
         }

@@ -1,16 +1,22 @@
 #include "../GlobalDataBuffer.glsl"
 #include "../CreateRay.glsl"
+#include "../Dithering.glsl"
 
-const vec4 settings = vec4(0, 1, 100, .02);
+layout(push_constant) uniform Push {
+    bool overlayObjects;
+    float scale;
+    int threshold;
+    float thickness;
+} push;
 
-#define OVERLAY_OBJECTS settings.x == 1.
-#define SCALE settings.y
-#define THRESHOLD settings.z
-#define THICKNESS settings.w
+#define OVERLAY_OBJECTS push.overlayObjects
+#define SCALE push.scale
+#define THRESHOLD push.threshold
+#define THICKNESS push.thickness
 
 layout(location = 0) in vec2 texCoords;
 layout(location = 0) out vec4 finalColor;
-
+layout(set = 1, binding = 0) uniform sampler2D gBufferMaterialD;
 
 vec3 p = vec3(0);
 bool rayMarch(vec3 ro, vec3 rd, float width) {
@@ -33,19 +39,17 @@ float getGridLine(float gridScale){
 }
 
 void main() {
-    //    float depthData = getLogDepth(texCoords);
-
+    vec4 worldPos = texture(gBufferMaterialD, texCoords);
     bool hasData = false;
     bool isOverlay = false;
-    //    if (depthData != 1){
-    //        hasData = OVERLAY_OBJECTS;
-    //        isOverlay = true;
-    //        vec3 viewSpacePosition = viewSpacePositionFromDepth(depthData, texCoords);
-    //        p = vec3(invViewMatrix * vec4(viewSpacePosition, 1.));
-    //    } else {
-    vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
-    hasData = rayMarch(globalData.cameraWorldPosition.xyz, rayDir, 1);
-    //    }
+    if (worldPos.a == 1){
+        hasData = OVERLAY_OBJECTS;
+        isOverlay = true;
+        p = worldPos.rgb;
+    } else {
+        vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
+        hasData = rayMarch(globalData.cameraWorldPosition.xyz, rayDir, 1);
+    }
 
     if (hasData){
         float distanceFromCamera = length(globalData.cameraWorldPosition.xyz - p.xyz);
@@ -73,6 +77,12 @@ void main() {
             finalColor = mix(gridColor, centerLineColor, max(isXAxis, isZAxis));
         }
         finalColor.a = min(alpha, finalColor.a);
+        if (finalColor.a == 0){
+            discard;
+        }
+        if (isDitherDiscard(finalColor.a)) {
+            discard;
+        }
     } else {
         discard;
     }

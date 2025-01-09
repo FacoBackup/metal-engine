@@ -52,7 +52,7 @@ namespace Metal {
                 );
                 if (assimpMesh->HasNormals()) {
                     vertexData.normal = glm::vec3(
-                        -assimpMesh->mNormals[j].x,
+                        assimpMesh->mNormals[j].x,
                         assimpMesh->mNormals[j].y,
                         assimpMesh->mNormals[j].z
                     );
@@ -91,7 +91,6 @@ namespace Metal {
             auto &materialData = materials.at(i);
             for (int textureType = aiTextureType_NONE + 1; textureType <= aiTextureType_UNKNOWN; ++textureType) {
                 const auto type = static_cast<aiTextureType>(textureType);
-
                 if (unsigned int textureCount = material->GetTextureCount(type); textureCount > 0) {
                     for (unsigned int j = 0; j < textureCount; ++j) {
                         aiString texturePath;

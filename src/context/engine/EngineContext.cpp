@@ -3,43 +3,15 @@
 #include "../../context/ApplicationContext.h"
 #include "../../service/buffer/BufferInstance.h"
 #include "../../service/voxel/SVOInstance.h"
-#include "CommandBufferRecorder.h"
 #include "../../enum/LevelOfDetail.h"
-#include "render-pass/impl/GBufferShadingPass.h"
-#include "render-pass/impl/OpaqueRenderPass.h"
-#include "render-pass/impl/PostProcessingPass.h"
-#include "render-pass/tools/GridRenderPass.h"
 #include "../../service/camera/Camera.h"
-#include "render-pass/impl/VoxelAOPass.h"
-#include "render-pass/tools/VoxelVisualizerPass.h"
-#include "render-pass/tools/IconsPass.h"
+#include "../../service/framebuffer/FrameBufferInstance.h"
+#include "../../service/texture/TextureInstance.h"
 
 namespace Metal {
     void EngineContext::onInitialize() {
         context.worldGridService.onSync();
-        if (context.isDebugMode()) {
-            fullScreenRenderPasses.push_back(std::make_unique<GridRenderPass>(context));
-        }
-        fullScreenRenderPasses.push_back(std::make_unique<GBufferShadingPass>(context));
-        if (context.isDebugMode()) {
-            fullScreenRenderPasses.push_back(std::make_unique<VoxelVisualizerPass>(context));
-            fullScreenRenderPasses.push_back(std::make_unique<IconsPass>(context));
-        }
-        aoPass.push_back(std::make_unique<VoxelAOPass>(context));
-        postProcessingPasses.push_back(std::make_unique<PostProcessingPass>(context));
-        gBufferPasses.push_back(std::make_unique<OpaqueRenderPass>(context));
-    }
-
-    void EngineContext::updatePostProcessingData() {
-        auto &camera = context.worldRepository.camera;
-        postProcessingUBO.distortionIntensity = camera.distortionIntensity;
-        postProcessingUBO.chromaticAberrationIntensity = camera.chromaticAberrationIntensity;
-        postProcessingUBO.distortionEnabled = camera.distortionEnabled;
-        postProcessingUBO.chromaticAberrationEnabled = camera.chromaticAberrationEnabled;
-        postProcessingUBO.vignetteEnabled = camera.vignetteEnabled;
-        postProcessingUBO.vignetteStrength = camera.vignetteStrength;
-
-        context.coreBuffers.postProcessingSettings->update(&postProcessingUBO);
+        passesService.onInitialize();
     }
 
     void EngineContext::updateVoxelData() {
@@ -72,7 +44,7 @@ namespace Metal {
         }
     }
 
-    void EngineContext::onSync() {
+    void EngineContext::updateCurrentTime() {
         currentTime = Clock::now();
         std::chrono::duration<float> delta = currentTime - previousTime;
         deltaTime = delta.count();
@@ -84,25 +56,29 @@ namespace Metal {
         if (start == -1) {
             start = currentTimeMs;
         }
+    }
+
+    void EngineContext::onSync() {
+        updateCurrentTime();
+
         context.transformService.onSync();
         context.worldGridService.onSync();
         context.streamingRepository.onSync();
         context.cameraService.onSync();
 
         updateGlobalData();
-        updatePostProcessingData();
         updateVoxelData();
         updateLights();
 
-        context.coreRenderPasses.aoPass->recordCommands(aoPass);
-        context.coreRenderPasses.gBufferPass->recordCommands(gBufferPasses);
-        context.coreRenderPasses.fullScreenPass->recordCommands(fullScreenRenderPasses);
-        context.coreRenderPasses.postProcessingPass->recordCommands(postProcessingPasses);
+        passesService.onSync();
+
+        setLightingDataUpdated(false);
+        setCameraUpdated(false);
+        setGISettingsUpdated(false);
     }
 
     void EngineContext::updateLights() {
-        if (hasToUpdateLights) {
-            hasToUpdateLights = false;
+        if (lightingDataUpdated) {
             int index = 0;
             for (auto &entry: context.worldRepository.lights) {
                 auto l = entry.second;
@@ -128,8 +104,25 @@ namespace Metal {
         globalDataUBO.invProj = camera.invProjectionMatrix;
         globalDataUBO.invView = camera.invViewMatrix;
         globalDataUBO.cameraWorldPosition = camera.position;
-        globalDataUBO.logDepthFC = 2.0f / (std::log(camera.projectionMatrix[0][0] + 1) / std::log(2));
+        globalDataUBO.giStrength = context.engineRepository.giStrength;
         globalDataUBO.lightsQuantity = lightsCount;
+        globalDataUBO.enabledSun = context.engineRepository.atmosphereEnabled;
+
+        globalDataUBO.distortionIntensity = camera.distortionIntensity;
+        globalDataUBO.chromaticAberrationIntensity = camera.chromaticAberrationIntensity;
+        globalDataUBO.distortionEnabled = camera.distortionEnabled;
+        globalDataUBO.chromaticAberrationEnabled = camera.chromaticAberrationEnabled;
+        globalDataUBO.vignetteEnabled = camera.vignetteEnabled;
+        globalDataUBO.vignetteStrength = camera.vignetteStrength;
+        globalDataUBO.giBounces = context.engineRepository.giBounces;
+        globalDataUBO.giEnabled = context.engineRepository.giEnabled;
+        globalDataUBO.giTileSubdivision = context.engineRepository.giTileSubdivision;
+
+        globalDataUBO.debugFlag = ShadingMode::IndexOfValue(context.editorRepository.shadingMode);
+        globalDataUBO.giBufferWidth = context.coreTextures.giSurfaceCache->width;
+        globalDataUBO.giBufferHeight = context.coreTextures.giSurfaceCache->height;
+        globalDataUBO.giFrameCount = giFrameCount++;
+        globalDataUBO.globalFrameCount = globalFrameCount++;
 
         if (context.engineRepository.incrementTime) {
             context.engineRepository.elapsedTime += .0005f * context.engineRepository.elapsedTimeSpeed;
@@ -138,9 +131,9 @@ namespace Metal {
                                               std::cos(context.engineRepository.elapsedTime),
                                               0) * context.engineRepository.sunDistance;
         globalDataUBO.sunColor = CalculateSunColor(
-            globalDataUBO.sunPosition.y / context.engineRepository.sunDistance,
-            context.engineRepository.nightColor, context.engineRepository.dawnColor,
-            context.engineRepository.middayColor);
+                                     globalDataUBO.sunPosition.y / context.engineRepository.sunDistance,
+                                     context.engineRepository.nightColor, context.engineRepository.dawnColor,
+                                     context.engineRepository.middayColor) * context.engineRepository.sunLightIntensity;
         context.coreBuffers.globalData->update(&globalDataUBO);
     }
 

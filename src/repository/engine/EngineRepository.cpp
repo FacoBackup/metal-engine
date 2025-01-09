@@ -4,13 +4,17 @@
 #include "../../context/ApplicationContext.h"
 
 #define LEVEL_OF_DETAIL "Level of detail"
+#define GLOBAL_ILLUMINATION "Global illumination"
 
 namespace Metal {
     void EngineRepository::registerFields() {
-        registerBool(voxelGIEnabled, "Global illumination", "Enabled?");
-        registerFloat(voxelRaytracingBias, "Global illumination", "Ray tracing bias", 0, 5, false, .001);
-        registerFloat(voxelHitBias, "Global illumination", "Ray tracing hit bias", 0, 10, false, .0001);
-        registerFloat(shadowsBaseColor, "Global illumination", "Shadow base color", 0, 1, false, .001);
+        registerBool(atmosphereEnabled, "Atmosphere", "Enabled?");
+
+        registerBool(giEnabled, GLOBAL_ILLUMINATION, "Enabled?");
+        registerFloat(giStrength, GLOBAL_ILLUMINATION, "Strength");
+        registerInt(giResScale, GLOBAL_ILLUMINATION, "Inverted resolution scale (Restart required)", 1, 16);
+        registerInt(giBounces, GLOBAL_ILLUMINATION, "Max bounces", 0, 5);
+        registerInt(giTileSubdivision, GLOBAL_ILLUMINATION, "Grid subdivision", 1);
         registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);
         registerFloat(elapsedTime, "Time", "Elapsed time");
         registerBool(incrementTime, "Time", "Increment time");
@@ -20,12 +24,15 @@ namespace Metal {
         registerColor(dawnColor, "Sun", "Dawn color");
         registerColor(nightColor, "Sun", "Night color");
         registerColor(middayColor, "Sun", "Midday color");
-        registerBool(screenSpaceShadows, "", "Screen space shadows");
+        registerBool(screenSpaceShadows, "Sun", "Screen space shadows");
     }
 
     void EngineRepository::onUpdate(InspectableMember *member, ApplicationContext &context) {
-        if (member->name == LEVEL_OF_DETAIL) {
+        if (member != nullptr && member->name == LEVEL_OF_DETAIL) {
             context.worldGridRepository.hasMainTileChanged = true;
+        }
+        if (member != nullptr && member->group == GLOBAL_ILLUMINATION) {
+            context.engineContext.setGISettingsUpdated(true);
         }
     }
 

@@ -21,7 +21,7 @@ namespace Metal {
         updateCamera();
         updateInputs();
 
-        auto *framebuffer = context->coreFrameBuffers.auxFBO;
+        auto *framebuffer = context->coreFrameBuffers.postProcessingFBO;
         context->descriptorService.setImageDescriptor(framebuffer, 0);
         ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet), ImVec2{size->x, size->y});
 

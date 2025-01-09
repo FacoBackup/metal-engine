@@ -142,11 +142,10 @@ namespace Metal {
         return ProcessIncludes(source);
     }
 
-    VkShaderModule ShaderUtil::CreateShaderModule(const ApplicationContext &context, const std::string &pFilename,
-                                                  bool debugMode) {
+    VkShaderModule ShaderUtil::CreateShaderModule(const ApplicationContext &context, const std::string &pFilename) {
         const std::string basePath = context.getShadersDirectory();
         std::string source = ProcessShader(BASE_PATH + pFilename);
-        if (debugMode) {
+        if (context.isDebugMode()) {
             source = "#define DEBUG\n" + source;
         }
         source = "#define TILE_SIZE " + std::to_string(TILE_SIZE) + std::string("\n") + source;

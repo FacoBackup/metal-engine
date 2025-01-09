@@ -6,12 +6,14 @@
 
 namespace Metal {
     struct EngineRepository final : Inspectable {
-        bool voxelGIEnabled = false;
-        float voxelRaytracingBias = 1.01;
-        float shadowsBaseColor = 2;
-        float voxelHitBias = .05;
+        bool giEnabled = false;
+        int giResScale = 4;
+        int giTileSubdivision = 40;
+        int giBounces = 1;
+        float giStrength = 1;
         int numberOfTiles = 10;
         float elapsedTime = .5f;
+        bool atmosphereEnabled = false;
         bool incrementTime = false;
         float elapsedTimeSpeed = 1;
         float sunDistance = 100000;
@@ -31,6 +33,8 @@ namespace Metal {
         void onUpdate(InspectableMember *member, ApplicationContext &context) override;
 
         SAVE_TEMPLATE(
+            giBounces,
+            atmosphereEnabled,
             elapsedTime,
             incrementTime,
             elapsedTimeSpeed,
@@ -41,10 +45,10 @@ namespace Metal {
             middayColor.x, middayColor.y, middayColor.z,
             screenSpaceShadows,
             svoFilePaths,
-            voxelRaytracingBias,
-            voxelHitBias,
-            shadowsBaseColor,
-            voxelGIEnabled
+            giEnabled,
+            giTileSubdivision,
+            giStrength,
+            giResScale
         )
     };
 } // Metal

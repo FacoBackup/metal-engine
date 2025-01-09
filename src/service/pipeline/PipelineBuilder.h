@@ -12,6 +12,7 @@ namespace Metal {
         VkCullModeFlagBits cullMode = VK_CULL_MODE_NONE;
         const char *vertexShader = nullptr;
         const char *fragmentShader = nullptr;
+        const char *computeShader = nullptr;
         std::vector<DescriptorInstance *> descriptorSetsToBind{};
         uint32_t pushConstantsSize = 0;
         bool blendEnabled = false;
@@ -25,6 +26,12 @@ namespace Metal {
             d.frameBuffer = frameBuffer;
             d.vertexShader = vertexShader;
             d.fragmentShader = fragmentShader;
+            return d;
+        }
+
+        static PipelineBuilder Of(const char *computeShader) {
+            PipelineBuilder d{};
+            d.computeShader = computeShader;
             return d;
         }
 

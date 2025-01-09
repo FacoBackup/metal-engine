@@ -1,14 +1,22 @@
 #include "./GlobalDataBuffer.glsl"
+#include "./GBufferUtil.glsl"
+
+layout(push_constant) uniform Push {
+    mat4 model;
+    vec4 albedoEmissive;
+    uint renderIndex;
+    float roughnessFactor;
+    float metallicFactor;
+} push;
 
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inNormal;
 layout(location = 2) in vec2 inUV;
-layout(location = 3) in flat uint inRenderingIndex;
 
-layout (location = 0) out vec4 outAlbedoEmissive;
-layout (location = 1) out vec4 outRoughnessMetallicAO;
-layout (location = 2) out vec4 outNormal;
-layout (location = 3) out vec4 outDepthIdUV;
+layout (location = 0) out vec4 outMaterialA;
+layout (location = 1) out vec4 outMaterialB;
+layout (location = 2) out vec4 outMaterialC;
+layout (location = 3) out vec4 outMaterialD;
 
 float encode(float depthFunc, float val) {
     return log2(max(0.000001, val)) * depthFunc * 0.5;
@@ -69,22 +77,20 @@ vec2 parallaxOcclusionMapping(vec2 initialUV, vec3 worldSpacePosition, sampler2D
 }
 
 void main () {
-    bool isDecalPass = false; // TODO - MOVE TO PUSH CONSTANT
-    bool useParallax = false; // TODO - MOVE TO MATERIAL PUSH CONSTANT
+    bool isDecalPass = false;// TODO - MOVE TO PUSH CONSTANT
+    bool useParallax = false;// TODO - MOVE TO MATERIAL PUSH CONSTANT
     vec2 UV = inUV;
-    vec3 W = inPosition;
     vec3 N = normalize(inNormal);
-    mat3 TBN = computeTBN(W, UV, N, isDecalPass);
+    mat3 TBN = computeTBN(inPosition, UV, N, isDecalPass);
     if (useParallax){
-        vec3 V = globalData.cameraWorldPosition.xyz - W;
+        vec3 V = globalData.cameraWorldPosition.xyz - inPosition;
         float distanceFromCamera = length(V);
-//        UV = parallaxOcclusionMapping(UV, W, heightMap, parallaxHeightScale, parallaxLayers, distanceFromCamera, TBN);
+        //        UV = parallaxOcclusionMapping(UV, inPosition, heightMap, parallaxHeightScale, parallaxLayers, distanceFromCamera, TBN);
     }
 
-    vec3 checkerPos = floor(inPosition.xyz / .5);
-    float checkerValue = mod(checkerPos.x + checkerPos.y + checkerPos.z, 2.0);
-    outAlbedoEmissive = vec4(mix(vec3(1), vec3(.7), checkerValue), 0);
-    outRoughnessMetallicAO = vec4(outAlbedoEmissive.r, .5, 1, 0);
-    outNormal = vec4(N, 1);
-    outDepthIdUV = vec4(encode(globalData.logDepthFC, gl_FragCoord.z), inRenderingIndex + 1, inUV);
+    float ambientOcclusion = 1;
+    outMaterialA = vec4(push.albedoEmissive);
+    outMaterialB = vec4(N, push.roughnessFactor);
+    outMaterialC = vec4(push.renderIndex + 1, ambientOcclusion, push.metallicFactor, 1);
+    outMaterialD = vec4(inPosition, 1);
 }

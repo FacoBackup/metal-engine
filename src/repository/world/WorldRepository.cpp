@@ -71,7 +71,7 @@ namespace Metal {
                 lights.at(entity).setEntityId(entity);
                 getEntity(entity)->components.push_back(ComponentTypes::LIGHT);
                 createComponent(entity, ComponentTypes::TRANSFORM);
-                context.engineContext.setUpdateLights();
+                context.engineContext.setLightingDataUpdated(true);
                 break;
             }
             case ComponentTypes::TRANSFORM: {

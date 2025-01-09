@@ -13,10 +13,13 @@ namespace Metal::ShadingMode {
         DEPTH,
         UV,
         POSITION,
-        VOXELS
+        LIGHTING_ONLY,
+        EMISSIVE,
+        GI
     };
 
-    static auto Names = "Lit\0Albedo\0Normal\0Roughness\0Metallic\0AO\0Random\0Depth\0UV\0Position\0Voxels\0";
+    static auto Names =
+            "Lit\0Albedo\0Normal\0Roughness\0Metallic\0Occlusion\0Random\0Depth\0UV\0Position\0Lighting only\0Emission\0Global Illumination\0";
 
     static ShadingMode ValueOfIndex(const int option) {
         if (option == 0) {
@@ -49,7 +52,16 @@ namespace Metal::ShadingMode {
         if (option == 9) {
             return ShadingMode::POSITION;
         }
-        return ShadingMode::VOXELS;
+        if (option == 10) {
+            return ShadingMode::LIGHTING_ONLY;
+        }
+        if (option == 11) {
+            return ShadingMode::EMISSIVE;
+        }
+        if (option == 12) {
+            return ShadingMode::GI;
+        }
+        return ShadingMode::GI;
     }
 
     static int IndexOfValue(const ShadingMode mode) {
@@ -83,10 +95,16 @@ namespace Metal::ShadingMode {
         if (mode == ShadingMode::POSITION) {
             return 9;
         }
-        if (mode == ShadingMode::VOXELS) {
+        if (mode == ShadingMode::LIGHTING_ONLY) {
             return 10;
         }
-        return 10;
+        if (mode == ShadingMode::EMISSIVE) {
+            return 11;
+        }
+        if (mode == ShadingMode::GI) {
+            return 12;
+        }
+        return 12;
     }
 }
 

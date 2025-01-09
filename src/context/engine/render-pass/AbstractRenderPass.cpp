@@ -5,20 +5,7 @@
 #include "../../../service/buffer/BufferInstance.h"
 
 namespace Metal {
-    AbstractRenderPass::AbstractRenderPass(ApplicationContext &context) : AbstractRuntimeComponent(context),
-                                                                          worldRepository(context.worldRepository),
-                                                                          streamingRepository(
-                                                                              context.streamingRepository) {
-    }
-
-    void AbstractRenderPass::recordPushConstant(const void *data) {
-        vkCmdPushConstants(
-            vkCommandBuffer,
-            getPipeline()->vkPipelineLayout,
-            VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-            0,
-            getPipeline()->pushConstantsSize,
-            data);
+    AbstractRenderPass::AbstractRenderPass(ApplicationContext &context) : AbstractPass(context, false) {
     }
 
     void AbstractRenderPass::recordDrawSimpleInstanced(const uint32_t vertexCount, const uint32_t instanceCount) const {

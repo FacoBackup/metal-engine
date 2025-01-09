@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "../../enum/LevelOfDetail.h"
+#include "../../util/ImageUtils.h"
 
 #include <stb_image.h>
 #include <string>
@@ -128,8 +129,11 @@ namespace Metal {
                                                  VkFormat imageFormat) {
         auto *image = new TextureInstance(id);
         registerResource(image);
-
-        const auto data = stbi_load(pathToImage.c_str(), &image->width, &image->height, &image->channels, 4);
+        int width, height, channels;
+        const auto data = stbi_load(pathToImage.c_str(), &width, &height, &channels, 4);
+        image->width = width;
+        image->height = height;
+        image->channels = channels;
         image->mipLevels = generateMipMaps
                                ? static_cast<uint32_t>(std::floor(std::log2(std::max(image->width, image->height)))) + 1
                                : 1;
@@ -157,7 +161,6 @@ namespace Metal {
     void TextureService::transitionImageLayout(const TextureInstance *image, VkImageLayout oldLayout,
                                                VkImageLayout newLayout) const {
         VkCommandBuffer commandBuffer = context.vulkanContext.beginSingleTimeCommands();
-
         VkImageMemoryBarrier barrier{};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier.oldLayout = oldLayout;
@@ -184,14 +187,29 @@ namespace Metal {
                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
             barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
             barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
             sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
             destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+        } else if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+            barrier.srcAccessMask = 0;
+            barrier.dstAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
+            sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+            destinationStage = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+        } else if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_GENERAL) {
+            barrier.srcAccessMask = 0;
+            barrier.dstAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
+            sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+            destinationStage = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
         } else {
-            throw std::runtime_error("unsupported layout transition!");
+            throw std::invalid_argument("unsupported layout transition!");
         }
 
-        vkCmdPipelineBarrier(commandBuffer, sourceStage, destinationStage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
+        vkCmdPipelineBarrier(
+            commandBuffer,
+            sourceStage, destinationStage,
+            0,
+            0, nullptr,
+            0, nullptr,
+            1, &barrier);
 
         context.vulkanContext.endSingleTimeCommands(commandBuffer);
     }
@@ -274,5 +292,34 @@ namespace Metal {
     TextureInstance *TextureService::create(const std::string &id, const LevelOfDetail &lod) {
         auto pathToFile = context.getAssetDirectory() + FORMAT_FILE_TEXTURE(id, lod);
         return loadTexture(id + lod.suffix, pathToFile, true);
+    }
+
+    TextureInstance *TextureService::createForCompute(const unsigned int width, const unsigned int height) {
+        auto *image = new TextureInstance(Util::uuidV4());
+        registerResource(image);
+        image->width = width;
+        image->height = height;
+        VkImageCreateInfo imageCreateInfo = {};
+        imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+        imageCreateInfo.format = VK_FORMAT_R32G32B32A32_SFLOAT;
+        imageCreateInfo.extent.width = width;
+        imageCreateInfo.extent.height = height;
+        imageCreateInfo.extent.depth = 1;
+        imageCreateInfo.mipLevels = 1;
+        imageCreateInfo.arrayLayers = 1;
+        imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT; // No multisampling
+        imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+        imageCreateInfo.usage = VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+        imageCreateInfo.sharingMode = VK_SHARING_MODE_CONCURRENT;
+        imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+        createImageWithInfo(imageCreateInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image);
+        createImageView(VK_FORMAT_R32G32B32A32_SFLOAT, image);
+
+        transitionImageLayout(image, VK_IMAGE_LAYOUT_UNDEFINED,
+                              VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+        return image;
     }
 } // Metal

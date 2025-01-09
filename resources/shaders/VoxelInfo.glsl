@@ -18,6 +18,22 @@ struct VoxelMaterialData {
     vec3 normal;
 };
 
+// THANKS TO https://www.shadertoy.com/view/llfcRl
+vec3 unpackNormal(uint data) {
+    uvec2 iuv = uvec2(data, data>>15u) & uvec2(32767u, 16383u);
+    vec2 uv = vec2(iuv)*2.0/vec2(32767.0, 16383.0) - 1.0;
+
+    uint is = (data>>31u)&1u;
+    vec3 nor = vec3((is==0u)?1.0:-1.0, uv.xy);
+
+    uint id = (data>>29u)&3u;
+    if (id==0u) nor = nor.xyz;
+    else if (id==1u) nor = nor.zxy;
+    else nor = nor.yzx;
+
+    return normalize(nor);
+}
+
 VoxelMaterialData unpackVoxel(in Hit hit) {
     VoxelMaterialData voxel;
 
@@ -25,43 +41,24 @@ VoxelMaterialData unpackVoxel(in Hit hit) {
     uint second = hit.matData2;
 
     {
-        voxel.roughness = (first & 0xFFu)/100.;
-        voxel.metallic = (second & 0x7Fu) / 100.;
+        voxel.roughness = ((first & 0x7FFFFFFFu) >> 24)/100.;
+        voxel.metallic = .5;
     }
 
     {
-        uint rInt = (first >> 20u) & 0x3FFu;// 10 bits for r (mask: 0x3FF is 1023 in binary)
-        uint gInt = (first >> 10u) & 0x3FFu;// 10 bits for g
-        uint bInt = first & 0x3FFu;// 10 bits for b
+        int r = (int(first) >> 16) & 0xFF;
+        int g = (int(first) >> 8) & 0xFF;
+        int b = int(first) & 0xFF;
 
-        // Convert the quantized integers back to floats in the range [0, 1]
-        float r = rInt / 1023.0f;
-        float g = gInt / 1023.0f;
-        float b = bInt / 1023.0f;
+        r = r * 2;
+        b = b * 2;
 
-        // Scale back to the original [-1, 1] range
-        r = r * 2.0f - 1.0f;
-        g = g * 2.0f - 1.0f;
-        b = b * 2.0f - 1.0f;
-
-        voxel.isEmissive = ((first >> 8u) & 0x1u) == 1;
-        voxel.albedo.r = r;
-        voxel.albedo.g = g;
-        voxel.albedo.b = b;
+        voxel.isEmissive = (first >> 31u) == 1;
+        voxel.albedo = vec3(r/255., g/255., b/255.);
     }
 
     {
-        uint compressedNormal = second >> 7;
-        int quantX = int((compressedNormal >> 13u) & 0x1FFFu);
-        int quantY = int(compressedNormal & 0x1FFFu);
-        float octX = (quantX - 2048.0f) / 2047.0f;
-        float octY = (quantY - 2048.0f) / 2047.0f;
-        float z = 1.0f - abs(octX) - abs(octY);
-        if (z < 0.0f) {
-            octX = (octX + sign(octX)) * 0.5f;
-            octY = (octY + sign(octY)) * 0.5f;
-        }
-        voxel.normal = normalize(vec3(octX, octY, z));
+        voxel.normal = unpackNormal(second);
     }
     return voxel;
 }

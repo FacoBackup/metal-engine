@@ -185,7 +185,7 @@ namespace Metal {
         imguiVulkanWindow.ClearValue.color.float32[0] = 0;
         imguiVulkanWindow.ClearValue.color.float32[1] = 0;
         imguiVulkanWindow.ClearValue.color.float32[2] = 0;
-        imguiVulkanWindow.ClearValue.color.float32[3] = 0;
+        imguiVulkanWindow.ClearValue.color.float32[3] = 1;
 
         this->window = context.glfwContext.getWindow();
         vkb::InstanceBuilder instanceBuilder;
@@ -221,7 +221,6 @@ namespace Metal {
         context.coreTextures.onInitialize();
         context.coreDescriptorSets.onInitialize();
         context.corePipelines.onInitialize();
-        context.coreRenderPasses.onInitialize();
         // ------- REPOSITORY INITIALIZATION
     }
 
@@ -244,7 +243,8 @@ namespace Metal {
         const std::array sizes{
             VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 100}, // 1 for imgui
             VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1},
-            VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1}
+            VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 9},
+            VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1}
         };
 
         VkDescriptorPoolCreateInfo poolInfo{};
@@ -252,7 +252,7 @@ namespace Metal {
         poolInfo.poolSizeCount = sizes.size();
         poolInfo.pPoolSizes = sizes.data();
         poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-        poolInfo.maxSets = 101;
+        poolInfo.maxSets = 111;
 
         VulkanUtils::CheckVKResult(vkCreateDescriptorPool(device.device, &poolInfo,
                                                           nullptr, &context.vulkanContext.descriptorPool));

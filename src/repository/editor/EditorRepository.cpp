@@ -11,11 +11,18 @@ namespace Metal {
     }
 
     void EditorRepository::registerFields() {
-        registerInt(voxelDebugFlag, "Voxels", "Debug channel (RANDOM; ALBEDO; NORMAL; ROUGHNESS; METALLIC)", 0, 4);
+        registerBool(showVoxels, "Voxels", "Show?");
+        registerInt(voxelSearchCount, "Voxels", "Debug count divisor");
         registerBool(showRaySearchCountVoxels, "Voxels", "Show ray search count");
         registerBool(showRayTestCountVoxels, "Voxels", "Show ray test count");
 
         registerFloat(iconScale, "Icons", "Size");
         registerColor(iconColor, "Icons", "Base color");
+
+        registerBool(showGrid, "Grid", "Enabled?");
+        registerBool(gridOverlayObjects, "Grid", "Overlay objects?");
+        registerFloat(gridScale, "Grid", "Scale");
+        registerInt(gridThreshold, "Grid", "Threshold");
+        registerFloat(gridThickness, "Grid", "Thickness");
     }
 }

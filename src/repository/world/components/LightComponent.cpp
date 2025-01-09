@@ -16,6 +16,6 @@ namespace Metal {
     }
 
     void LightComponent::onUpdate(InspectableMember *member, ApplicationContext &context) {
-        context.engineContext.setUpdateLights();
+        context.engineContext.setLightingDataUpdated(true);
     }
 } // Metal

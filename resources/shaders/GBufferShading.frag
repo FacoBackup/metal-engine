@@ -1,37 +1,18 @@
 #include "./GlobalDataBuffer.glsl"
-#include "./DepthUtils.glsl"
 
-
-#define LIGHTS_SET 7
-#define LIGHTS_BINDING 0
-
-#include "./Shading.glsl"
-
-#define LIT 0
-#define ALBEDO 1
-#define NORMAL 2
-#define ROUGHNESS 3
-#define METALLIC 4
-#define AO 5
-#define RANDOM 6
-#define DEPTH 7
-#define UV 8
-#define POSITION 9
 
 layout(location = 0) in vec2 texCoords;
 
-layout(set = 1, binding = 0) uniform sampler2D gBufferAlbedoEmissive;
-layout(set = 2, binding = 0) uniform sampler2D gBufferRoughnessMetallicAO;
-layout(set = 3, binding = 0) uniform sampler2D gBufferNormal;
-layout(set = 4, binding = 0) uniform sampler2D gBufferDepthIdUV;
-layout(set = 5, binding = 0) uniform sampler2D brdfSampler;
-layout(set = 6, binding = 0) uniform sampler2D aoSampler;
+layout(set = 1, binding = 0) uniform sampler2D gBufferMaterialA;
+layout(set = 2, binding = 0) uniform sampler2D gBufferMaterialB;
+layout(set = 3, binding = 0) uniform sampler2D gBufferMaterialC;
+layout(set = 4, binding = 0) uniform sampler2D gBufferMaterialD;
+#define LIGHTS_SET 5
+layout(set = 6, binding = 0) uniform sampler2D globalIlluminationSampler;
+
+#include "./Shading.glsl"
 
 #ifdef DEBUG
-layout(push_constant) uniform Push {
-    int mode;
-} push;
-
 vec3 randomColor(int seed) {
     float hash = fract(sin(float(seed)) * 43758.5453);
 
@@ -41,68 +22,82 @@ vec3 randomColor(int seed) {
 
     return vec3(r, g, b);
 }
+
+#include "./DebugFlags.glsl"
+
 #endif
 
 layout(location = 0) out vec4 finalColor;
 
 void main() {
-    float depthData = getLogDepth(texCoords, gBufferDepthIdUV, globalData.logDepthFC);
-    if (depthData == 1.){
+    vec4 materialC = texture(gBufferMaterialC, texCoords);
+    vec4 worldPos = texture(gBufferMaterialD, texCoords);
+    if (worldPos.a != 1.){
         discard;
     }
+    vec4 materialA = texture(gBufferMaterialA, texCoords);
+    vec4 materialB = texture(gBufferMaterialB, texCoords);
 
-    #ifdef DEBUG
-    if (push.mode != LIT){
-        if (push.mode == NORMAL){
-            finalColor = vec4(texture(gBufferNormal, texCoords).rgb, 1);
-        } else if (push.mode == ROUGHNESS){
-            finalColor = vec4(vec3(texture(gBufferRoughnessMetallicAO, texCoords).r), 1);
-        } else if (push.mode == METALLIC){
-            finalColor = vec4(vec3(texture(gBufferRoughnessMetallicAO, texCoords).g), 1);
-        } else if (push.mode == AO){
-            finalColor = vec4(vec3(texture(gBufferRoughnessMetallicAO, texCoords).b * texture(aoSampler, texCoords).r), 1);
-        } else if (push.mode == DEPTH){
-            finalColor = vec4(vec3(depthData), 1);
-        } else if (push.mode == UV){
-            finalColor = vec4(texture(gBufferDepthIdUV, texCoords).zw, 0, 1);
-        } else if (push.mode == RANDOM){
-            finalColor = vec4(randomColor(int(texture(gBufferDepthIdUV, texCoords).g)), 1);
-        } else if (push.mode == POSITION){
-            vec3 viewSpacePosition = viewSpacePositionFromDepth(depthData, texCoords, globalData.invProj);
-            vec3 worldSpacePosition = vec3(globalData.invView * vec4(viewSpacePosition, 1));
-            finalColor = vec4(worldSpacePosition, 1);
-        } else {
-            finalColor = vec4(texture(gBufferAlbedoEmissive, texCoords).rgb, 1);
-        }
-        return;
-    }
-    #endif
-
-    vec4 albedoEmissive = texture(gBufferAlbedoEmissive, texCoords);
-    if (albedoEmissive.a > 0) { // EMISSION
-        finalColor = vec4(albedoEmissive.rgb, 1.);
-        return;
-    }
+    vec4 albedoEmissive = materialA;
     ShaderData shaderData;
-    shaderData.N = normalize(texture(gBufferNormal, texCoords).rgb);
-    vec3 valueRMAOSampler = texture(gBufferRoughnessMetallicAO, texCoords).rgb;
-    shaderData.roughness = valueRMAOSampler.r;
-    shaderData.metallic = valueRMAOSampler.g;
-    shaderData.ambientOcclusion = valueRMAOSampler.b * texture(aoSampler, texCoords).r;
-    shaderData.viewSpacePosition = viewSpacePositionFromDepth(depthData, texCoords, globalData.invProj);
-    shaderData.worldSpacePosition = vec3(globalData.invView * vec4(shaderData.viewSpacePosition, 1));
+    shaderData.N = normalize(materialB.rgb);
+    shaderData.roughness = max(materialB.a, .015);
+    shaderData.metallic = materialC.b;
+    shaderData.viewSpacePosition = vec3(globalData.viewMatrix * worldPos);
+    shaderData.worldSpacePosition = worldPos.rgb;
+
+    vec4 globalIllumination = globalData.giEnabled ? texture(globalIlluminationSampler, texCoords) :  vec4(0, 0, 0, 1);
+    shaderData.ambientOcclusion = materialC.g * globalIllumination.a;
     shaderData.V = normalize(globalData.cameraWorldPosition - shaderData.worldSpacePosition);
     shaderData.distanceFromCamera = length(shaderData.V);
     shaderData.albedo = albedoEmissive.rgb;
     shaderData.VrN = reflect(-shaderData.V, shaderData.N);
     shaderData.albedoOverPI = shaderData.albedo / PI;
     shaderData.NdotV = clamp(dot(shaderData.N, shaderData.V), 0., 1.);
-    shaderData.brdf = texture(brdfSampler, vec2(shaderData.NdotV, shaderData.roughness)).rg;
     shaderData.F0 = vec3(0.04);
     shaderData.F0 = mix(shaderData.F0, shaderData.albedo, shaderData.metallic);
     shaderData.sunDirection = globalData.sunPosition;
     shaderData.sunColor = globalData.sunColor;
     shaderData.lightsQuantity = globalData.lightsQuantity;
+    shaderData.enabledSun = globalData.enabledSun;
 
-    finalColor = vec4(physicallyBasedShadePixel(shaderData), 1.);
+    #ifdef DEBUG
+    if (globalData.debugFlag != LIT){
+        bool shouldReturn = true;
+        if (globalData.debugFlag == NORMAL){
+            finalColor = vec4(shaderData.N, 1);
+        } else if (globalData.debugFlag == ROUGHNESS){
+            finalColor = vec4(vec3(shaderData.roughness), 1);
+        } else if (globalData.debugFlag == METALLIC){
+            finalColor = vec4(vec3(shaderData.metallic), 1);
+        } else if (globalData.debugFlag == AO){
+            finalColor = vec4(vec3(shaderData.ambientOcclusion), 1);
+        } else if (globalData.debugFlag == DEPTH){
+            finalColor = vec4(worldPos.rgb, 1);
+        } else if (globalData.debugFlag == UV){
+            finalColor = vec4(texture(gBufferMaterialC, texCoords).zw, 0, 1);
+        } else if (globalData.debugFlag == RANDOM){
+            finalColor = vec4(randomColor(int(texture(gBufferMaterialC, texCoords).r)), 1);
+        } else if (globalData.debugFlag == LIGHTING_ONLY){
+            shaderData.albedo = vec3(1, 1, 1);
+            shouldReturn = false;
+        } else if (globalData.debugFlag == POSITION){
+            float voxelSize = float(globalData.giTileSubdivision);
+            finalColor = vec4(normalize(round(shaderData.worldSpacePosition * voxelSize) / voxelSize), 1);
+        } else if (globalData.debugFlag == EMISSIVE){
+            finalColor = vec4(albedoEmissive.a > 0 ? vec3(1) : vec3(0), 1);
+        } else if (globalData.debugFlag == GI){
+            finalColor = vec4(globalIllumination.rgb, 1);
+        } else {
+            finalColor = vec4(shaderData.albedo, 1);
+        }
+        if(shouldReturn) return;
+    }
+    #endif
+
+    if (albedoEmissive.a > 0) { // EMISSION
+        finalColor = vec4(albedoEmissive.rgb, 1.);
+        return;
+    }
+    finalColor = vec4(physicallyBasedShadePixel(shaderData) + shaderData.albedoOverPI * globalIllumination.rgb * globalData.giStrength, 1.);
 }

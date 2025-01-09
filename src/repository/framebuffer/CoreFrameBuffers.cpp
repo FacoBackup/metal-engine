@@ -7,14 +7,13 @@ namespace Metal {
             // G-BUFFER
             gBufferFBO = framebufferService.createFrameBuffer(vulkanContext.getWindowWidth(),
                                                               vulkanContext.getWindowHeight());
-            framebufferService.createAttachment("Albedo Emission", VK_FORMAT_R16G16B16A16_SFLOAT,
+            framebufferService.createAttachment("Albedo; Emission flag", VK_FORMAT_R16G16B16A16_SFLOAT,
                                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, gBufferFBO);
-            framebufferService.createAttachment("Roughness Metallic AO", VK_FORMAT_R16G16B16A16_SFLOAT,
+            framebufferService.createAttachment("Normal; Roughness", VK_FORMAT_R16G16B16A16_SFLOAT,
                                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, gBufferFBO);
-            framebufferService.createAttachment("Normal", VK_FORMAT_R16G16B16A16_SFLOAT,
-                                                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-                                                gBufferFBO);
-            framebufferService.createAttachment("Depth ID UV", VK_FORMAT_R32G32B32A32_SFLOAT,
+            framebufferService.createAttachment("ID; AO; Metallic", VK_FORMAT_R16G16B16A16_SFLOAT,
+                                                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, gBufferFBO);
+            framebufferService.createAttachment("Position", VK_FORMAT_R32G32B32A32_SFLOAT,
                                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, gBufferFBO);
             framebufferService.createDepthAttachment(gBufferFBO);
             framebufferService.createRenderPass(gBufferFBO);
@@ -22,15 +21,9 @@ namespace Metal {
             // AUX FRAME BUFFER
             auxFBO = framebufferService.createFrameBuffer(vulkanContext.getWindowWidth(),
                                                           vulkanContext.getWindowHeight());
-            framebufferService.createAttachment("Color", VK_FORMAT_R32G32B32A32_SFLOAT,
+            framebufferService.createAttachment("Color", VK_FORMAT_R16G16B16A16_SFLOAT,
                                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, auxFBO);
             framebufferService.createRenderPass(auxFBO);
-        } {
-            aoFBO = framebufferService.createFrameBuffer(vulkanContext.getWindowWidth() / 2,
-                                                         vulkanContext.getWindowHeight() / 2, glm::vec4(1));
-            framebufferService.createAttachment("Ambient occlusion", VK_FORMAT_R16_SFLOAT,
-                                                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, aoFBO);
-            framebufferService.createRenderPass(aoFBO);
         } {
             // POST PROCESSING
             postProcessingFBO = framebufferService.createFrameBuffer(vulkanContext.getWindowWidth(),

@@ -29,6 +29,8 @@ namespace Metal {
 
         void registerFields() override;
 
+        void onUpdate(InspectableMember *member, ApplicationContext &context) override;
+
         ComponentTypes::ComponentType getType() override;
 
         SERIALIZE_TEMPLATE(entityId,
