@@ -115,7 +115,6 @@ namespace Metal {
         globalDataUBO.vignetteEnabled = camera.vignetteEnabled;
         globalDataUBO.vignetteStrength = camera.vignetteStrength;
         globalDataUBO.giBounces = context.engineRepository.giBounces;
-        globalDataUBO.giSamplesPerPixel = context.engineRepository.giSamplesPerPixel;
         globalDataUBO.giEnabled = context.engineRepository.giEnabled;
         globalDataUBO.giTileSubdivision = context.engineRepository.giTileSubdivision;
 
@@ -123,6 +122,7 @@ namespace Metal {
         globalDataUBO.giBufferWidth = context.coreTextures.giSurfaceCache->width;
         globalDataUBO.giBufferHeight = context.coreTextures.giSurfaceCache->height;
         globalDataUBO.giFrameCount = giFrameCount++;
+        globalDataUBO.globalFrameCount = globalFrameCount++;
 
         if (context.engineRepository.incrementTime) {
             context.engineRepository.elapsedTime += .0005f * context.engineRepository.elapsedTimeSpeed;

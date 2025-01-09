@@ -12,7 +12,6 @@ struct ShaderData {
     vec3 F0;
     vec3 sunDirection;
     vec3 sunColor;
-    vec2 brdf;
     float NdotV;
     float distanceFromCamera;
     float roughness;

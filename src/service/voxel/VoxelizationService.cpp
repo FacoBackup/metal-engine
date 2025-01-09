@@ -188,6 +188,7 @@ namespace Metal {
 
         context.svoService.disposeAll();
         context.worldGridRepository.hasMainTileChanged = true;
+        context.engineContext.setGISettingsUpdated(true);
         METRIC_END("Ending Voxelization ")
     }
 } // Metal

@@ -78,7 +78,6 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialB.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialC.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialD.get())
-                .addDescriptorSet(context.coreDescriptorSets.brdfDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.lightsData.get())
                 .addDescriptorSet(context.coreDescriptorSets.globalIlluminationDescriptor.get());
         gBufferShadingPipeline = pipelineService.createPipeline(gBufferShadingPipelineBuilder);

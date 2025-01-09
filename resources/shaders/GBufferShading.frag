@@ -7,9 +7,8 @@ layout(set = 1, binding = 0) uniform sampler2D gBufferMaterialA;
 layout(set = 2, binding = 0) uniform sampler2D gBufferMaterialB;
 layout(set = 3, binding = 0) uniform sampler2D gBufferMaterialC;
 layout(set = 4, binding = 0) uniform sampler2D gBufferMaterialD;
-layout(set = 5, binding = 0) uniform sampler2D brdfSampler;
-#define LIGHTS_SET 6
-layout(set = 7, binding = 0) uniform sampler2D globalIlluminationSampler;
+#define LIGHTS_SET 5
+layout(set = 6, binding = 0) uniform sampler2D globalIlluminationSampler;
 
 #include "./Shading.glsl"
 
@@ -42,7 +41,7 @@ void main() {
     vec4 albedoEmissive = materialA;
     ShaderData shaderData;
     shaderData.N = normalize(materialB.rgb);
-    shaderData.roughness = materialB.a;
+    shaderData.roughness = max(materialB.a, .015);
     shaderData.metallic = materialC.b;
     shaderData.viewSpacePosition = vec3(globalData.viewMatrix * worldPos);
     shaderData.worldSpacePosition = worldPos.rgb;
@@ -55,7 +54,6 @@ void main() {
     shaderData.VrN = reflect(-shaderData.V, shaderData.N);
     shaderData.albedoOverPI = shaderData.albedo / PI;
     shaderData.NdotV = clamp(dot(shaderData.N, shaderData.V), 0., 1.);
-    shaderData.brdf = texture(brdfSampler, vec2(shaderData.NdotV, 1-shaderData.roughness)).rg;
     shaderData.F0 = vec3(0.04);
     shaderData.F0 = mix(shaderData.F0, shaderData.albedo, shaderData.metallic);
     shaderData.sunDirection = globalData.sunPosition;
@@ -65,6 +63,7 @@ void main() {
 
     #ifdef DEBUG
     if (globalData.debugFlag != LIT){
+        bool shouldReturn = true;
         if (globalData.debugFlag == NORMAL){
             finalColor = vec4(shaderData.N, 1);
         } else if (globalData.debugFlag == ROUGHNESS){
@@ -79,8 +78,9 @@ void main() {
             finalColor = vec4(texture(gBufferMaterialC, texCoords).zw, 0, 1);
         } else if (globalData.debugFlag == RANDOM){
             finalColor = vec4(randomColor(int(texture(gBufferMaterialC, texCoords).r)), 1);
-        } else if (globalData.debugFlag == BRDF){
-            finalColor = vec4(shaderData.brdf, 0, 1);
+        } else if (globalData.debugFlag == LIGHTING_ONLY){
+            shaderData.albedo = vec3(1, 1, 1);
+            shouldReturn = false;
         } else if (globalData.debugFlag == POSITION){
             float voxelSize = float(globalData.giTileSubdivision);
             finalColor = vec4(normalize(round(shaderData.worldSpacePosition * voxelSize) / voxelSize), 1);
@@ -91,7 +91,7 @@ void main() {
         } else {
             finalColor = vec4(shaderData.albedo, 1);
         }
-        return;
+        if(shouldReturn) return;
     }
     #endif
 
@@ -99,5 +99,5 @@ void main() {
         finalColor = vec4(albedoEmissive.rgb, 1.);
         return;
     }
-    finalColor = vec4(physicallyBasedShadePixel(shaderData) + globalIllumination.rgb, 1.);
+    finalColor = vec4(physicallyBasedShadePixel(shaderData) + shaderData.albedoOverPI * globalIllumination.rgb * globalData.giStrength, 1.);
 }

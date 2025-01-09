@@ -27,7 +27,6 @@ namespace Metal {
 
         // GI
         alignas(4) unsigned int giBounces;
-        alignas(4) unsigned int giSamplesPerPixel;
         alignas(4) unsigned int giTileSubdivision;
 
         alignas(4) unsigned int debugFlag;
@@ -35,6 +34,7 @@ namespace Metal {
         alignas(4) unsigned int giBufferWidth;
         alignas(4) unsigned int giBufferHeight;
         alignas(4) unsigned int giFrameCount;
+        alignas(4) unsigned int globalFrameCount;
     };
 }
 

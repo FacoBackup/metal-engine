@@ -32,23 +32,22 @@ vec3 sampleHemisphere(vec3 normal) {
     return normalize(localDir.x * tangent + localDir.y * bitangent + localDir.z * normal);
 }
 
-void computeLightContribution(in Light l, in vec3 albedo, in vec3 hitNormal, in vec3 currentPosition, inout vec3 throughput, inout vec3 indirectLight){
-    float bias = max(.05, 1e-4 * length(currentPosition.xyz));
-    vec3 firstHitPos = currentPosition.xyz + hitNormal * bias;
-    vec3 lightDir = normalize(l.position - firstHitPos);
-    vec3 rayDirection = normalize(l.position - firstHitPos);
-    Ray ray = Ray(firstHitPos, rayDirection, 1./rayDirection);
+void computeLightContribution(in Light l, in vec3 surfaceAlbedo, in vec3 surfaceNormal, in vec3 surfacePosition, inout vec3 throughput, inout vec3 indirectLight){
+    float bias = max(.05, 1e-4 * length(surfacePosition.xyz));
+    vec3 localHitPosition = surfacePosition.xyz + surfaceNormal * bias;
+    vec3 lightDir = normalize(l.position - localHitPosition);
+    Ray ray = Ray(localHitPosition, lightDir, 1./lightDir);
     Hit hitData = traceAllTiles(ray);
-    float lightDistance = length(l.position - firstHitPos);
-    float hitDistance = length(hitData.hitPosition - firstHitPos);
+    float lightDistance = length(l.position - localHitPosition);
+    float hitDistance = length(hitData.hitPosition - localHitPosition);
     float localShadows = 1;
     if (hitData.anyHit && hitDistance < lightDistance) {
         localShadows *= clamp(1 / lightDistance, 0, 1);
     }
     if (localShadows > 0){
-        float NdotL = max(dot(hitNormal, lightDir), 0.0);
-        vec3 lightColorContribution = l.color * albedo / PI;
-        vec3 lightContribution = lightColorContribution * NdotL * localShadows / length(l.position - firstHitPos);
+        float NdotL = max(dot(surfaceNormal, lightDir), 0.0);
+        vec3 lightColorContribution = l.color * surfaceAlbedo / PI;
+        vec3 lightContribution = lightColorContribution * NdotL * localShadows / length(l.position - localHitPosition);
         indirectLight += throughput * lightContribution;
         throughput *= lightColorContribution;
     }
@@ -80,28 +79,29 @@ void evaluateSurface(in Light sunLight, in vec3 albedo, bool isEmissive, in vec3
     indirectLight += previousCacheData.rgb;
 }
 
-vec3 computeDiffuseIndirectLight(vec3 firstHitNormal, vec3 firstHitPos) {
+vec3 computeDiffuseIndirectLight(vec3 firstHitNormal, vec3 firstHitPos, float roughness, vec3 rayDir) {
     Light sunLight = Light(globalData.sunColor, globalData.sunPosition, -1, -1, -1);
 
     vec3 indirectLight = vec3(0.0);// Accumulated indirect light
     vec3 throughput = vec3(1.0);// Tracks light contribution across bounces
-    vec3 hitNormal = firstHitNormal;
     vec3 randomDir;
 
-    for (uint i = 0; i < globalData.giSamplesPerPixel; i++) {
-        randomDir = sampleHemisphere(hitNormal);
+    vec3 localNormal = firstHitNormal;
+    vec3 localPosition = firstHitPos;
+    float localRoughness = roughness;
+    vec3 localRayDir = rayDir;
 
-        // TODO - INTEGRATE THIS
-        //        vec3 diffuseRayDir = normalize(hitInfo.normal + RandomUnitVector(rngState));
-        //        vec3 specularRayDir = reflect(rayDir, hitInfo.normal);
-        //        specularRayDir = normalize(mix(specularRayDir, diffuseRayDir, hitInfo.material.roughness * hitInfo.material.roughness));
-        //        rayDir = mix(diffuseRayDir, specularRayDir, doSpecular);
+    for (uint j = 0; j < globalData.giBounces; j++){
+        vec3 diffuseRayDir = sampleHemisphere(localNormal);
+        vec3 specularRayDir = reflect(localRayDir, localNormal);
 
-        Ray ray = Ray(firstHitPos, randomDir, 1.0 / randomDir);
+        specularRayDir = normalize(mix(specularRayDir, diffuseRayDir, localRoughness * localRoughness));
+        localRayDir = mix(diffuseRayDir, specularRayDir, 1. - localRoughness);
+        Ray ray = Ray(localPosition, localRayDir, 1.0 / localRayDir);
         Hit hitData = traceAllTiles(ray);
         if (!hitData.anyHit) {
             if (globalData.enabledSun){
-                float NdotL = max(dot(hitNormal, randomDir), 0.0);
+                float NdotL = max(dot(localNormal, randomDir), 0.0);
                 vec3 albedo = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), ray.d, 2.0f) * 0.05f;
                 vec3 bounceLight = albedo * NdotL;
                 indirectLight += throughput * bounceLight;
@@ -110,14 +110,14 @@ vec3 computeDiffuseIndirectLight(vec3 firstHitNormal, vec3 firstHitPos) {
             break;
         }
 
-        vec3 currentPosition = hitData.hitPosition;
         VoxelMaterialData matData = unpackVoxel(hitData);
-        hitNormal = matData.normal;
-        vec3 albedo = matData.albedo;
-        evaluateSurface(sunLight, albedo, matData.isEmissive, hitNormal, currentPosition, throughput, indirectLight);
+        localNormal = matData.normal;
+        localRoughness = matData.roughness;
+        localPosition = hitData.hitPosition;
+        evaluateSurface(sunLight, matData.albedo, matData.isEmissive, localNormal, localPosition, throughput, indirectLight);
     }
 
-    return indirectLight * globalData.giStrength;
+    return indirectLight / globalData.giBounces;
 }
 
 float testLight(vec3 lightPosition, in vec3 rayOrigin){
@@ -139,15 +139,16 @@ void main() {
         return;
     }
     vec4 albedoEmissive = texture(gBufferMaterialA, texCoords);
-    if(albedoEmissive.a != 0){
+    if (albedoEmissive.a != 0){
         return;
     }
 
     vec3 hitPosition = materialD.rgb;
     vec4 finalColor = vec4(0, 0, 0, 1);
-    rngState = uint(round(rand(hitPosition) * 100) + globalData.giFrameCount);
+    rngState = uint(round(rand(hitPosition) * 100) + globalData.globalFrameCount);
     float bias = max(.05, 1e-4 * length(hitPosition.xyz));
-    vec3 normal = texture(gBufferMaterialB, texCoords).rgb;
+    vec4 normalRoughness = texture(gBufferMaterialB, texCoords);
+    vec3 normal = normalRoughness.rgb;
     vec3 currentPosition = hitPosition.xyz + normal * bias;
 
     vec3 throughput = vec3(1);
@@ -155,21 +156,23 @@ void main() {
     float shadows = 1;
 
     { // ------ SHADOWS
+        vec3 shadowsPosition = currentPosition + RandomUnitVector(rngState)/16; // Adds small offset to sample position in order to enable accumulation
         if (globalData.lightsQuantity > 0){
             for (int i = 0; i < globalData.lightsQuantity; ++i) {
                 Light l = lightsBuffer.lights[i];
                 if (length(l.position - hitPosition.xyz) < l.outerRadius) {
-                    shadows *= testLight(l.position, currentPosition);
+                    shadows *= testLight(l.position, shadowsPosition);
                 }
             }
         }
         if (globalData.enabledSun){
-            shadows *= testLight(normalize(globalData.sunPosition) * 20, currentPosition);
+            shadows *= testLight(normalize(globalData.sunPosition) * 20, shadowsPosition);
         }
     }
 
-    currentPosition = hitPosition.xyz + sampleHemisphere(normal) * bias;
     vec4 previousFrame = imageLoad(globalIlluminationImage, ivec2(gl_GlobalInvocationID.xy));
-    vec4 accumulatedResult = previousFrame * (1. - 1./float(globalData.giFrameCount+1)) + vec4(computeDiffuseIndirectLight(normal, currentPosition), shadows) * 1./float(globalData.giFrameCount + 1);
+    vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
+    vec4 currentFrame = vec4(computeDiffuseIndirectLight(normal, currentPosition, normalRoughness.a, rayDir), shadows);
+    vec4 accumulatedResult = previousFrame * (1. - 1./float(globalData.giFrameCount+1)) + currentFrame * 1./float(globalData.giFrameCount + 1);
     imageStore(globalIlluminationImage, ivec2(gl_GlobalInvocationID.xy), accumulatedResult);
 }

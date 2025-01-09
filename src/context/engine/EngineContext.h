@@ -25,6 +25,7 @@ namespace Metal {
         bool lightingDataUpdated = true;
         bool giSettingsUpdated = true;
         unsigned int giFrameCount = 0;
+        unsigned int globalFrameCount = 0;
 
     public:
         void resetGIFrameCount() {

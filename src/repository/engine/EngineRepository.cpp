@@ -14,7 +14,6 @@ namespace Metal {
         registerFloat(giStrength, GLOBAL_ILLUMINATION, "Strength");
         registerInt(giResScale, GLOBAL_ILLUMINATION, "Inverted resolution scale (Restart required)", 1, 16);
         registerInt(giBounces, GLOBAL_ILLUMINATION, "Max bounces", 0, 5);
-        registerInt(giSamplesPerPixel, GLOBAL_ILLUMINATION, "Samples per pixel", 0, 25);
         registerInt(giTileSubdivision, GLOBAL_ILLUMINATION, "Grid subdivision", 1);
         registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);
         registerFloat(elapsedTime, "Time", "Elapsed time");

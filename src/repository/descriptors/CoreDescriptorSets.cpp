@@ -90,18 +90,6 @@ namespace Metal {
             globalIlluminationDescriptor->write(vulkanContext);
         }
 
-        // BRDF TEXTURE
-        {
-            brdfDescriptor = std::make_unique<DescriptorInstance>();
-            brdfDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                             0);
-            brdfDescriptor->create(vulkanContext);
-            brdfDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                               context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                               context.coreTextures.brdf->vkImageView);
-            brdfDescriptor->write(vulkanContext);
-        }
-
         if (context.isDebugMode()) {
             iconsDescriptor = std::make_unique<DescriptorInstance>();
             iconsDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,

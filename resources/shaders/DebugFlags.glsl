@@ -8,6 +8,6 @@
 #define DEPTH 7
 #define UV 8
 #define POSITION 9
-#define BRDF 10
+#define LIGHTING_ONLY 10
 #define EMISSIVE 11
 #define GI 12

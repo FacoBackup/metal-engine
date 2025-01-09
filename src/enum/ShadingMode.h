@@ -13,13 +13,13 @@ namespace Metal::ShadingMode {
         DEPTH,
         UV,
         POSITION,
-        BRDF,
+        LIGHTING_ONLY,
         EMISSIVE,
         GI
     };
 
     static auto Names =
-            "Lit\0Albedo\0Normal\0Roughness\0Metallic\0Occlusion\0Random\0Depth\0UV\0Position\0BRDF\0Emission\0Global Illumination\0";
+            "Lit\0Albedo\0Normal\0Roughness\0Metallic\0Occlusion\0Random\0Depth\0UV\0Position\0Lighting only\0Emission\0Global Illumination\0";
 
     static ShadingMode ValueOfIndex(const int option) {
         if (option == 0) {
@@ -53,7 +53,7 @@ namespace Metal::ShadingMode {
             return ShadingMode::POSITION;
         }
         if (option == 10) {
-            return ShadingMode::BRDF;
+            return ShadingMode::LIGHTING_ONLY;
         }
         if (option == 11) {
             return ShadingMode::EMISSIVE;
@@ -95,7 +95,7 @@ namespace Metal::ShadingMode {
         if (mode == ShadingMode::POSITION) {
             return 9;
         }
-        if (mode == ShadingMode::BRDF) {
+        if (mode == ShadingMode::LIGHTING_ONLY) {
             return 10;
         }
         if (mode == ShadingMode::EMISSIVE) {

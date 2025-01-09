@@ -6,8 +6,6 @@
 
 namespace Metal {
     void CoreTextures::onInitialize() {
-        brdf = context.textureService.loadTexture(Util::uuidV4(), "resources/textures/brdf.png", false);
-        brdf->setAsNoDisposal();
 
         giSurfaceCache = context.textureService.createForCompute(2000, 2000);
         giSurfaceCache->setAsNoDisposal();
