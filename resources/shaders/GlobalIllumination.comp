@@ -145,7 +145,7 @@ void main() {
 
     vec3 hitPosition = materialD.rgb;
     vec4 finalColor = vec4(0, 0, 0, 1);
-    rngState = uint(round(rand(worldToCacheSpace(hitPosition)) * 100) + globalData.giFrameCount);
+    rngState = uint(round(rand(hitPosition) * 100) + globalData.giFrameCount);
     float bias = max(.05, 1e-4 * length(hitPosition.xyz));
     vec3 normal = texture(gBufferMaterialB, texCoords).rgb;
     vec3 currentPosition = hitPosition.xyz + normal * bias;
