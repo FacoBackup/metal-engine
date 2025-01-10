@@ -59,6 +59,7 @@ namespace Metal {
     void InspectorPanel::tick() {
         if (auto &editorRepository = context->editorRepository;
             editorRepository.mainSelection != selectedId) {
+            currentInspection = nullptr;
             additionalInspection.clear();
             selectedId = editorRepository.mainSelection;
 

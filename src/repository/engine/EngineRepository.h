@@ -9,6 +9,7 @@ namespace Metal {
         bool giEnabled = false;
         int giResScale = 4;
         int giTileSubdivision = 40;
+        float giEmissiveFactor = 2;
         int giBounces = 1;
         float giStrength = 1;
         int numberOfTiles = 10;
@@ -47,6 +48,7 @@ namespace Metal {
             svoFilePaths,
             giEnabled,
             giTileSubdivision,
+            giEmissiveFactor,
             giStrength,
             giResScale
         )

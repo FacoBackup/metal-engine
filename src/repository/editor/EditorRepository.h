@@ -47,7 +47,6 @@ namespace Metal {
         bool gizmoUseSnapRotate = false;
         bool gizmoUseSnapScale = false;
         bool showOnlyEntitiesHierarchy = false;
-        std::unordered_map<EntityID, bool> pinnedEntities{};
         TransformComponent *primitiveSelected = nullptr;
         EntityID mainSelection = EMPTY_ENTITY;
         std::unordered_map<EntityID, bool> selected{};
@@ -86,7 +85,6 @@ namespace Metal {
             gizmoUseSnapRotate,
             gizmoUseSnapScale,
             showOnlyEntitiesHierarchy,
-            pinnedEntities,
             mainSelection,
             selected,
             copied,

@@ -81,6 +81,10 @@ namespace Metal {
         if (lightingDataUpdated) {
             int index = 0;
             for (auto &entry: context.worldRepository.lights) {
+                if (context.worldRepository.hiddenEntities.contains(entry.first)) {
+                    continue;
+                }
+
                 auto l = entry.second;
                 lights[index] = LightData(
                     l.color * l.intensity,
@@ -117,6 +121,7 @@ namespace Metal {
         globalDataUBO.giBounces = context.engineRepository.giBounces;
         globalDataUBO.giEnabled = context.engineRepository.giEnabled;
         globalDataUBO.giTileSubdivision = context.engineRepository.giTileSubdivision;
+        globalDataUBO.giEmissiveFactor = context.engineRepository.giEmissiveFactor;
 
         globalDataUBO.debugFlag = ShadingMode::IndexOfValue(context.editorRepository.shadingMode);
         globalDataUBO.giBufferWidth = context.coreTextures.giSurfaceCache->width;
@@ -129,7 +134,8 @@ namespace Metal {
         }
         globalDataUBO.sunPosition = glm::vec3(0,
                                               std::cos(context.engineRepository.elapsedTime),
-                                              std::sin(context.engineRepository.elapsedTime)) * context.engineRepository.sunDistance;
+                                              std::sin(context.engineRepository.elapsedTime)) * context.engineRepository
+                                    .sunDistance;
         globalDataUBO.sunColor = CalculateSunColor(
                                      globalDataUBO.sunPosition.y / context.engineRepository.sunDistance,
                                      context.engineRepository.nightColor, context.engineRepository.dawnColor,

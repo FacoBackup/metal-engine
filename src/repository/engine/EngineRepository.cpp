@@ -15,6 +15,7 @@ namespace Metal {
         registerInt(giResScale, GLOBAL_ILLUMINATION, "Inverted resolution scale (Restart required)", 1, 16);
         registerInt(giBounces, GLOBAL_ILLUMINATION, "Max bounces", 0, 5);
         registerInt(giTileSubdivision, GLOBAL_ILLUMINATION, "Grid subdivision", 1);
+        registerFloat(giEmissiveFactor, GLOBAL_ILLUMINATION, "Emissive surface factor", 0);
         registerBool(atmosphereEnabled, ATMOSPHERE, "Enabled?");
         registerFloat(elapsedTime, ATMOSPHERE, "Elapsed time");
         registerBool(incrementTime, ATMOSPHERE, "Increment time");

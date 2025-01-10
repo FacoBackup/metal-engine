@@ -41,8 +41,8 @@ void computeLightContribution(in Light l, in vec3 surfaceAlbedo, in vec3 surface
 void evaluateSurface(in Light sunLight, in vec3 albedo, bool isEmissive, in vec3 hitNormal, in vec3 currentPosition, inout vec3 throughput, inout vec3 indirectLight){
     ivec2 coord = ivec2(worldToSurfaceCacheHash(currentPosition) * vec2(globalData.giBufferWidth, globalData.giBufferHeight));
     if (isEmissive){
-        indirectLight += throughput * albedo;
-        throughput *= albedo;
+        indirectLight += throughput * albedo * globalData.giEmissiveFactor;
+        throughput *= albedo * globalData.giEmissiveFactor;
         return;
     }
 
@@ -88,9 +88,9 @@ vec3 computeDiffuseIndirectLight(vec3 firstHitNormal, vec3 firstHitPos, float ro
             if (globalData.enabledSun){
                 float NdotL = max(dot(localNormal, randomDir), 0.0);
                 vec3 albedo = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), ray.d, 2.0f) * 0.05f;
-                vec3 bounceLight = albedo * NdotL;
+                vec3 bounceLight = albedo * globalData.giEmissiveFactor;
                 indirectLight += throughput * bounceLight;
-                throughput *= albedo;
+                throughput *= bounceLight;
             }
             break;
         }
@@ -103,18 +103,6 @@ vec3 computeDiffuseIndirectLight(vec3 firstHitNormal, vec3 firstHitPos, float ro
     }
 
     return indirectLight / globalData.giBounces;
-}
-
-float testLight(vec3 lightPosition, in vec3 rayOrigin){
-    vec3 rayDirection = normalize(lightPosition - rayOrigin);
-    Ray ray = Ray(rayOrigin, rayDirection, 1./rayDirection);
-    Hit hitData = traceAllTiles(ray);
-    float lightDistance = length(lightPosition - rayOrigin);
-    float hitDistance = length(hitData.hitPosition - rayOrigin);
-    if (hitData.anyHit && hitDistance < lightDistance) {
-        return clamp(1 / lightDistance, 0, 1);
-    }
-    return 1;
 }
 
 void main() {
@@ -138,26 +126,14 @@ void main() {
 
     vec3 throughput = vec3(1);
     vec3 indirectLight = vec3(0);
-    float shadows = 1;
 
-    { // ------ SHADOWS
-        vec3 shadowsPosition = currentPosition + RandomUnitVector(rngState)/16; // Adds small offset to sample position in order to enable accumulation
-        if (globalData.lightsQuantity > 0){
-            for (int i = 0; i < globalData.lightsQuantity; ++i) {
-                Light l = lightsBuffer.lights[i];
-                if (length(l.position - hitPosition.xyz) < l.outerRadius) {
-                    shadows *= testLight(l.position, shadowsPosition);
-                }
-            }
-        }
-        if (globalData.enabledSun){
-            shadows *= testLight(globalData.sunPosition, shadowsPosition);
-        }
-    }
-
-    vec4 previousFrame = imageLoad(globalIlluminationImage, ivec2(gl_GlobalInvocationID.xy));
+    vec3 previousFrame = imageLoad(globalIlluminationImage, ivec2(gl_GlobalInvocationID.xy)).rgb;
     vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
-    vec4 currentFrame = vec4(computeDiffuseIndirectLight(normal, currentPosition, normalRoughness.a, rayDir), shadows);
-    vec4 accumulatedResult = previousFrame * (1. - 1./float(globalData.giFrameCount+1)) + currentFrame * 1./float(globalData.giFrameCount + 1);
-    imageStore(globalIlluminationImage, ivec2(gl_GlobalInvocationID.xy), accumulatedResult);
+    vec3 currentFrame = computeDiffuseIndirectLight(normal, currentPosition, normalRoughness.a, rayDir);
+    vec3 accumulatedResult = previousFrame * (1. - 1./float(globalData.giFrameCount+1)) + currentFrame * 1./float(globalData.giFrameCount + 1);
+
+    float threshold = .1;
+    float luminance = dot(accumulatedResult.rgb, vec3(0.2126, 0.7152, 0.0722));
+    float shadows = clamp((luminance / threshold), 0, 1);
+    imageStore(globalIlluminationImage, ivec2(gl_GlobalInvocationID.xy), vec4(accumulatedResult, shadows));
 }

@@ -41,7 +41,13 @@ namespace Metal {
 
         Inspectable *getComponent(ComponentTypes::ComponentType comp, EntityID entity);
 
+        void deleteEntities(const std::vector<EntityID> & entities);
+
+        void changeVisibility(EntityID entity, bool isVisible);
+
     private:
+        void changeVisibilityRecursively(EntityID entity, bool isVisible);
+
         EntityID lastId = ROOT_ID;
     };
 } // Metal

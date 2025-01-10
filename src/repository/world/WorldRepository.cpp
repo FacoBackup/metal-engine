@@ -54,6 +54,58 @@ namespace Metal {
         }
     }
 
+    void WorldRepository::deleteEntities(const std::vector<EntityID> &entities) {
+        for (EntityID entity: entities) {
+            if (lights.contains(entity)) {
+                lights.erase(entity);
+            }
+            if (transforms.contains(entity)) {
+                transforms.erase(entity);
+            }
+            if (meshes.contains(entity)) {
+                meshes.erase(entity);
+            }
+            if (hiddenEntities.contains(entity)) {
+                hiddenEntities.erase(entity);
+            }
+            if (culled.contains(entity)) {
+                culled.erase(entity);
+            }
+            if (this->entities.contains(entity)) {
+                auto &currentEntity = this->entities.at(entity);
+                auto parentId = currentEntity.parent;
+                if (this->entities.contains(parentId)) {
+                    auto &parent = this->entities.at(this->entities.at(entity).parent);
+                    parent.children.erase(
+                        std::ranges::remove(parent.children, entity).begin(),
+                        parent.children.end());
+                }
+                if (currentEntity.children.size() > 0) {
+                    deleteEntities(currentEntity.children);
+                }
+                this->entities.erase(entity);
+            }
+        }
+        context.engineContext.setLightingDataUpdated(true);
+    }
+
+    void WorldRepository::changeVisibility(EntityID entity, bool isVisible) {
+        changeVisibilityRecursively(entity, isVisible);
+        context.engineContext.setLightingDataUpdated(true);
+    }
+
+    void WorldRepository::changeVisibilityRecursively(EntityID entity, const bool isVisible) {
+        if (isVisible) {
+            hiddenEntities.erase(entity);
+        } else {
+            hiddenEntities.insert({entity, true});
+        }
+
+        for (const auto child: getEntity(entity)->children) {
+            changeVisibilityRecursively(child, isVisible);
+        }
+    }
+
     void WorldRepository::createComponent(const EntityID entity, ComponentTypes::ComponentType type) {
         if (!entities.contains(entity)) {
             return;

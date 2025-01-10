@@ -14,36 +14,43 @@ namespace Metal {
         editorRepository = &context->editorRepository;
     }
 
-
-    void HierarchyPanel::onSync() {
-        isOnSearch = strlen(search) > 0;
-        // hotKeys();
-        onSyncChildren();
-        ImGui::Separator();
-        if (ImGui::BeginTable((id + "hierarchyTable").c_str(), 3, TABLE_FLAGS)) {
-            ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
-            ImGui::TableSetupColumn(Icons::visibility.c_str(), ImGuiTableColumnFlags_WidthFixed, 20.f);
-            ImGui::TableSetupColumn(Icons::lock.c_str(), ImGuiTableColumnFlags_WidthFixed, 20.f);
-            ImGui::TableHeadersRow();
-
-            for (const auto &key: editorRepository->pinnedEntities) {
-                renderNodePinned(world->getEntity(key.first));
+    void HierarchyPanel::contextMenu() const {
+        if (ImGui::BeginPopupContextItem((id + "contextMenu").c_str())) {
+            if (ImGui::MenuItem("Delete")) {
+                std::vector<EntityID> entities;
+                for (auto &entry: context->editorRepository.selected) {
+                    entities.push_back(entry.first);
+                }
+                context->worldRepository.deleteEntities(entities);
+                context->selectionService.clearSelection();
             }
-            renderNode(WorldRepository::ROOT_ID);
-            ImGui::EndTable();
+            ImGui::EndPopup();
+        }
+
+        if (isSomethingHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+            ImGui::OpenPopup((id + "contextMenu").c_str());
         }
     }
 
-    void HierarchyPanel::renderNodePinned(Entity *node) {
-        ImGui::TableNextRow();
-        ImGui::TableNextColumn();
-        if (editorRepository->selected.contains(node->getId())) {
-            ImGui::TextColored(editorRepository->accent, "%s", getNodeLabel(node, false).c_str());
-        } else {
-            ImGui::TextColored(ImVec4(node->color.x, node->color.y, node->color.z, 1), "%s",
-                               getNodeLabel(node, false).c_str());
+    void HierarchyPanel::onSync() {
+        isOnSearch = strlen(search) > 0;
+
+        isSomethingHovered = ImGui::IsItemHovered();
+
+        // hotKeys();
+        onSyncChildren();
+        ImGui::Separator();
+        if (ImGui::BeginTable((id + "hierarchyTable").c_str(), 2, TABLE_FLAGS)) {
+            isSomethingHovered = isSomethingHovered || ImGui::IsItemHovered();
+            ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
+            ImGui::TableSetupColumn(Icons::visibility.c_str(), ImGuiTableColumnFlags_WidthFixed, 20.f);
+            ImGui::TableHeadersRow();
+            renderNode(WorldRepository::ROOT_ID);
+            ImGui::EndTable();
         }
-        renderEntityColumns(node, true);
+        if (!context->editorRepository.selected.empty()) {
+            contextMenu();
+        }
     }
 
     bool HierarchyPanel::renderNode(const EntityID entityId) {
@@ -97,9 +104,22 @@ namespace Metal {
         return ImGui::TreeNodeEx(getNodeLabel(node, true).c_str(), flags);
     }
 
+    const char *HierarchyPanel::GetIcon(const Metal::Entity *node) {
+        for (const auto comp: node->components) {
+            if (comp == ComponentTypes::MESH) {
+                return Icons::view_in_ar.c_str();
+            }
+
+            if (comp == ComponentTypes::LIGHT) {
+                return Icons::lightbulb.c_str();
+            }
+        }
+        return Icons::inventory_2.c_str();
+    }
+
     std::string HierarchyPanel::getNodeLabel(Entity *node, const bool addId) const {
         return std::format("{}{}##{}{}",
-                           node->isContainer ? Icons::inventory_2 : Icons::view_in_ar,
+                           GetIcon(node),
                            node->name,
                            node->getId(),
                            addId ? id : "");
@@ -132,7 +152,6 @@ namespace Metal {
                 }
             }
         } else {
-            renderComponents(node);
             for (const auto child: node->children) {
                 renderNode(child);
             }
@@ -141,33 +160,19 @@ namespace Metal {
         ImGui::TreePop();
     }
 
-    void HierarchyPanel::renderComponents(const Entity *node) const {
-        if (!editorRepository->showOnlyEntitiesHierarchy) {
-            for (auto &val: node->components) {
-                addComponent(val);
-            }
-        }
-    }
-
-    void HierarchyPanel::addComponent(const ComponentTypes::ComponentType component) {
-        ImGui::TableNextRow();
-        ImGui::TableNextColumn();
-        ImGui::TextDisabled("%s%s", ComponentTypes::IconOf(component), ComponentTypes::NameOf(component));
-        ImGui::TableNextColumn();
-        ImGui::TextDisabled("--");
-        ImGui::TableNextColumn();
-        ImGui::TextDisabled("--");
-    }
-
     int HierarchyPanel::getFlags(const Entity *node) {
         int flags = ImGuiTreeNodeFlags_SpanFullWidth;
         if (isOnSearch) {
             flags |= ImGuiTreeNodeFlags_DefaultOpen;
         }
-        return flags | (opened.contains(node->getId()) ? opened[node->getId()] : ImGuiTreeNodeFlags_None);
+
+        if (opened.contains(node->getId())) {
+            flags |= opened[node->getId()];
+        }
+        return flags;
     }
 
-    void HierarchyPanel::renderEntityColumns(const Entity *node, const bool isPinned) {
+    void HierarchyPanel::renderEntityColumns(const Entity *node, const bool isPinned) const {
         const auto idString = std::to_string(node->getId());
         handleClick(node);
         ImGui::TableNextColumn();
@@ -180,33 +185,10 @@ namespace Metal {
         if (UIUtil::ButtonSimple(
             (isVisible ? Icons::visibility : Icons::visibility_off) + (isPinned ? "##vpinned" : "##v") + idString +
             id, 20, 15)) {
-            changeVisibilityRecursively(node->getId(), !isVisible);
-        }
-        ImGui::TableNextColumn();
-        bool isNodePinned = editorRepository->pinnedEntities.contains(node->getId());
-        if (UIUtil::ButtonSimple(
-            ((isNodePinned ? Icons::lock : Icons::lock_open) + (isPinned ? "##ppinned" : "##p") + idString) + id,
-            20, 15)) {
-            if (isNodePinned) {
-                editorRepository->pinnedEntities.erase(node->getId());
-            } else {
-                editorRepository->pinnedEntities.insert({node->getId(), true});
-            }
+            context->worldRepository.changeVisibility(node->getId(), !isVisible);
         }
         ImGui::PopStyleColor();
         ImGui::PopStyleVar(2);
-    }
-
-    void HierarchyPanel::changeVisibilityRecursively(EntityID node, const bool isVisible) {
-        if (isVisible) {
-            world->hiddenEntities.erase(node);
-        } else {
-            world->hiddenEntities.insert({node, true});
-        }
-
-        for (const auto child: world->getEntity(node)->children) {
-            changeVisibilityRecursively(child, isVisible);
-        }
     }
 
     void HierarchyPanel::handleClick(const Entity *node) const {
