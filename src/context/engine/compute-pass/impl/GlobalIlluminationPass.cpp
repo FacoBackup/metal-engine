@@ -46,7 +46,6 @@ namespace Metal {
 
         if (isFirstRun || context.engineContext.isCameraUpdated() || giReset) {
             clearTexture(context.coreTextures.globalIllumination->vkImage);
-            context.engineContext.resetGIFrameCount();
             isFirstRun = false;
         }
 

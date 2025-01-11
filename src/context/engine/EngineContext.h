@@ -24,13 +24,9 @@ namespace Metal {
         bool cameraUpdated = true;
         bool lightingDataUpdated = true;
         bool giSettingsUpdated = true;
-        unsigned int giFrameCount = 0;
         unsigned int globalFrameCount = 0;
 
     public:
-        void resetGIFrameCount() {
-            giFrameCount = 0;
-        }
 
         void setLightingDataUpdated(const bool val) {
             lightingDataUpdated = val;

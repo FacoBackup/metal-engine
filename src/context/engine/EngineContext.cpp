@@ -126,7 +126,6 @@ namespace Metal {
         globalDataUBO.debugFlag = ShadingMode::IndexOfValue(context.editorRepository.shadingMode);
         globalDataUBO.giBufferWidth = context.coreTextures.giSurfaceCache->width;
         globalDataUBO.giBufferHeight = context.coreTextures.giSurfaceCache->height;
-        globalDataUBO.giFrameCount = giFrameCount++;
         globalDataUBO.globalFrameCount = globalFrameCount++;
 
         if (context.engineRepository.incrementTime) {

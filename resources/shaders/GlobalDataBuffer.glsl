@@ -29,7 +29,6 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
 
     uint giBufferWidth;
     uint giBufferHeight;
-    uint giFrameCount;
 
     uint globalFrameCount;
 } globalData;

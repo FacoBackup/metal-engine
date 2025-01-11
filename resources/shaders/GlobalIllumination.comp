@@ -127,13 +127,12 @@ void main() {
     vec3 throughput = vec3(1);
     vec3 indirectLight = vec3(0);
 
-    vec3 previousFrame = imageLoad(globalIlluminationImage, ivec2(gl_GlobalInvocationID.xy)).rgb;
+    vec4 previousFrame = imageLoad(globalIlluminationImage, ivec2(gl_GlobalInvocationID.xy));
+    float accumulationCount = previousFrame.a;
+
     vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
     vec3 currentFrame = computeDiffuseIndirectLight(normal, currentPosition, normalRoughness.a, rayDir);
-    vec3 accumulatedResult = previousFrame * (1. - 1./float(globalData.giFrameCount+1)) + currentFrame * 1./float(globalData.giFrameCount + 1);
+    vec3 accumulatedResult = previousFrame.rgb * (1. - 1./accumulationCount) + currentFrame * 1./accumulationCount;
 
-    float threshold = .1;
-    float luminance = dot(accumulatedResult.rgb, vec3(0.2126, 0.7152, 0.0722));
-    float shadows = clamp((luminance / threshold), 0, 1);
-    imageStore(globalIlluminationImage, ivec2(gl_GlobalInvocationID.xy), vec4(accumulatedResult, shadows));
+    imageStore(globalIlluminationImage, ivec2(gl_GlobalInvocationID.xy), vec4(accumulatedResult, accumulationCount + 1));
 }
