@@ -8,6 +8,7 @@
 #include <stb_image.h>
 #include <string>
 
+#include "TextureData.h"
 #include "../../context/ApplicationContext.h"
 #include "../../service/texture/TextureInstance.h"
 #include "../../service/buffer/BufferInstance.h"
@@ -122,6 +123,20 @@ namespace Metal {
                           VK_IMAGE_USAGE_SAMPLED_BIT;
 
         createImageWithInfo(imageInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image);
+    }
+
+    TextureData *TextureService::stream(const std::string &id, const LevelOfDetail &lod) const {
+        auto pathToFile = context.getAssetDirectory() + FORMAT_FILE_TEXTURE(id, lod);
+        if (std::filesystem::exists(pathToFile)) {
+
+            int width, height, channels;
+            unsigned char *data = stbi_load(pathToFile.c_str(), &width, &height, &channels, 0);
+            if (!data) {
+                throw std::runtime_error("Failed to load image: " + pathToFile);
+            }
+            return new TextureData{width, height, channels, data};
+        }
+        return nullptr;
     }
 
     TextureInstance *TextureService::loadTexture(const std::string &id, const std::string &pathToImage,

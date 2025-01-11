@@ -116,7 +116,7 @@ void main () {
 
     #ifdef DEBUG
         if(globalData.debugFlag == UV) {
-            outMaterialA = vec4(localUV, 0, 1);
+            outMaterialA = vec4(normalize(localUV), 0, 1);
         }
     #endif
 }

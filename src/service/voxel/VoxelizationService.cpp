@@ -1,10 +1,12 @@
 #include "VoxelizationService.h"
 
+#include <stb_image.h>
 #include <cereal/archives/binary.hpp>
 
 #include "../../context/ApplicationContext.h"
 #include "../../enum/LevelOfDetail.h"
 #include "../../enum/engine-definitions.h"
+#include "../../service/texture/TextureData.h"
 #include "../../service/mesh/MeshData.h"
 #include "../../service/voxel/impl/SparseVoxelOctreeBuilder.h"
 #include "impl/SparseVoxelOctreeData.h"
@@ -27,8 +29,17 @@ namespace Metal {
             stepSize = .01f;
         }
 
-        glm::vec3 albedo{1, 1, 1}; //= component->albedoColor * 255.f;
-        float roughness = 1; //(component->roughnessFactor, component->metallicFactor);
+        glm::vec3 albedo = component->albedoColor * 255.f;
+        auto *mat = context.materialService.stream(component->materialId);
+        TextureData *albedoData = nullptr;
+
+        if (mat != nullptr) {
+            if (!textures.contains(mat->albedo)) {
+                albedoData = context.textureService.stream(mat->albedo, LevelOfDetail::LOD_0);
+            } else {
+                albedoData = textures.at(mat->albedo);
+            }
+        }
 
         for (float lambda1 = 0; lambda1 <= 1; lambda1 += stepSize) {
             for (float lambda2 = 0; lambda2 <= 1 - lambda1; lambda2 += stepSize) {
@@ -49,12 +60,14 @@ namespace Metal {
                         builders.emplace(voxelTile->id,
                                          SparseVoxelOctreeBuilder(voxelTile));
                     }
+
+                    if (albedoData != nullptr) {
+                        albedo = glm::vec3(albedoData->sampleAt(uv));
+                    }
                     builders.at(voxelTile->id).insert(
                         MAX_DEPTH,
                         point,
-                        new VoxelData(
-                            albedo, normal, roughness,
-                            false));
+                        new VoxelData(albedo, normal,component->emissiveSurface));
                 }
             }
         }
@@ -154,7 +167,7 @@ namespace Metal {
         METRIC_END("Ending serialization ")
     }
 
-    void VoxelizationService::voxelizeScene() const {
+    void VoxelizationService::voxelizeScene() {
         METRIC_START
         for (auto path: context.engineRepository.svoFilePaths) {
             if (std::filesystem::exists(path)) {
@@ -189,6 +202,12 @@ namespace Metal {
         context.svoService.disposeAll();
         context.worldGridRepository.hasMainTileChanged = true;
         context.engineContext.setGISettingsUpdated(true);
+        for (auto &entry: textures) {
+            stbi_image_free(entry.second->data);
+            delete entry.second;
+        }
+        textures.clear();
+
         METRIC_END("Ending Voxelization ")
     }
 } // Metal

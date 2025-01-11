@@ -13,8 +13,6 @@ struct Hit {
 struct VoxelMaterialData {
     vec3 albedo;
     bool isEmissive;
-    float roughness;
-    float metallic;
     vec3 normal;
 };
 
@@ -41,24 +39,13 @@ VoxelMaterialData unpackVoxel(in Hit hit) {
     uint second = hit.matData2;
 
     {
-        voxel.roughness = ((first & 0x7FFFFFFFu) >> 24)/100.;
-        voxel.metallic = .5;
+        voxel.albedo.r = ((first >> 16u) & 0xFFu) / 255.f;
+        voxel.albedo.g = ((first >> 8u) & 0xFFu) / 255.f;
+        voxel.albedo.b = (first & 0xFFu) / 255.f;
+        voxel.albedo *= 4;
+        voxel.isEmissive = ((first >> 24u) & 0x1u) == 1;
     }
 
-    {
-        int r = (int(first) >> 16) & 0xFF;
-        int g = (int(first) >> 8) & 0xFF;
-        int b = int(first) & 0xFF;
-
-        r = r * 2;
-        b = b * 2;
-
-        voxel.isEmissive = (first >> 31u) == 1;
-        voxel.albedo = vec3(r/255., g/255., b/255.);
-    }
-
-    {
-        voxel.normal = unpackNormal(second);
-    }
+    voxel.normal = unpackNormal(second);
     return voxel;
 }

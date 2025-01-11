@@ -97,7 +97,7 @@ vec3 computeDiffuseIndirectLight(vec3 firstHitNormal, vec3 firstHitPos, float ro
 
         VoxelMaterialData matData = unpackVoxel(hitData);
         localNormal = matData.normal;
-        localRoughness = matData.roughness;
+        localRoughness = .5;
         localPosition = hitData.hitPosition;
         evaluateSurface(sunLight, matData.albedo, matData.isEmissive, localNormal, localPosition, throughput, indirectLight);
     }
@@ -118,14 +118,11 @@ void main() {
 
     vec3 hitPosition = materialD.rgb;
     vec4 finalColor = vec4(0, 0, 0, 1);
-    rngState = uint(round(rand(hitPosition) * 100) + globalData.globalFrameCount);
-    float bias = max(.05, 1e-4 * length(hitPosition.xyz));
+    rngState = uint(round(rand(hitPosition) * 100) + globalData.globalFrameCount * 1.51269341231);
+    float bias = max(.07, 1e-4 * length(hitPosition.xyz));
     vec4 normalRoughness = texture(gBufferMaterialB, texCoords);
     vec3 normal = normalRoughness.rgb;
     vec3 currentPosition = hitPosition.xyz + normal * bias;
-
-    vec3 throughput = vec3(1);
-    vec3 indirectLight = vec3(0);
 
     vec4 previousFrame = imageLoad(globalIlluminationImage, ivec2(gl_GlobalInvocationID.xy));
     float accumulationCount = previousFrame.a;

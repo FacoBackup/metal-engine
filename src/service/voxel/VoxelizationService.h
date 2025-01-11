@@ -10,11 +10,14 @@
 #include "impl/Triangle.h"
 
 namespace Metal {
+    struct TextureData;
     struct MeshComponent;
     class SparseVoxelOctreeBuilder;
     struct MeshData;
 
     class VoxelizationService final : public AbstractRuntimeComponent {
+        std::unordered_map<std::string, TextureData *> textures{};
+
         void iterateTriangle(const MeshComponent *component, const Triangle &triangle,
                              std::unordered_map<std::string, SparseVoxelOctreeBuilder> &builders) const;
 
@@ -34,7 +37,7 @@ namespace Metal {
             : AbstractRuntimeComponent(context) {
         }
 
-        void voxelizeScene() const;
+        void voxelizeScene();
     };
 } // Metal
 

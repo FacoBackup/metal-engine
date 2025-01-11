@@ -83,7 +83,7 @@ void main() {
         } else if (globalData.debugFlag == DEPTH){
             finalColor = vec4(worldPos.rgb, 1);
         } else if (globalData.debugFlag == UV){
-            finalColor = vec4(texture(gBufferMaterialC, texCoords).zw, 0, 1);
+            finalColor = vec4(texture(gBufferMaterialA, texCoords).rgb, 1);
         } else if (globalData.debugFlag == RANDOM){
             finalColor = vec4(randomColor(int(texture(gBufferMaterialC, texCoords).r)), 1);
         } else if (globalData.debugFlag == LIGHTING_ONLY){
