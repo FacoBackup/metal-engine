@@ -86,6 +86,7 @@ namespace Metal {
 
         physDevice = physicalDeviceResult.value();
         vkGetPhysicalDeviceProperties(physDevice.physical_device, &physicalDeviceProperties);
+        std::cout << "MAX SAMPLERS " << physicalDeviceProperties.limits.maxDescriptorSetSamplers << " " << physicalDeviceProperties.limits.maxPerStageDescriptorSampledImages << std::endl;
         vkGetPhysicalDeviceMemoryProperties(physDevice.physical_device, &physicalDeviceMemoryProperties);
         if (!physDevice.enable_extension_if_present("VK_KHR_timeline_semaphore")) {
             throw std::runtime_error("Failed to enable core extension");

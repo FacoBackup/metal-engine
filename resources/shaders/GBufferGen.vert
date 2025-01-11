@@ -1,12 +1,5 @@
 #include "./GlobalDataBuffer.glsl"
-
-layout(push_constant) uniform Push {
-    mat4 model;
-    vec4 albedoEmissive;
-    uint renderIndex;
-    float roughnessFactor;
-    float metallicFactor;
-} push;
+#include "./GBufferGenPushConstant.glsl"
 
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inNormal;

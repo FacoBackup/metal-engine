@@ -99,6 +99,15 @@ namespace Metal {
         }
     }
 
+    void FilesService::createMaterial(std::string targetDir) const {
+        FileMetadata materialMetadata{};
+        materialMetadata.type = EntryType::MATERIAL;
+        materialMetadata.name = "New Material";
+        DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(materialMetadata.getId()), materialMetadata)
+        MaterialData data{};
+        DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialMetadata.getId()), data)
+    }
+
     void FilesService::Move(FileEntry *toMove,
                             FileEntry *targetDir) {
         fs::rename(toMove->absolutePath,

@@ -18,9 +18,9 @@ namespace Metal {
         std::vector<VkClearValue> clearColors{};
         bool computePassMode;
 
-        static void RecordCommandsInternal(VkPipelineBindPoint binding,
-                                           const std::vector<std::unique_ptr<AbstractPass> > &passes,
-                                           VkCommandBuffer vkCommandBuffer);
+        static void RecordCommandsInternal(
+            const std::vector<std::unique_ptr<AbstractPass>> &passes,
+            VkCommandBuffer vkCommandBuffer);
 
         void createRenderPassInfo(const FrameBufferInstance *frameBuffer, bool clearBuffer);
 

@@ -16,7 +16,7 @@ namespace Metal {
             return {"png", "jpg", "jpeg"};
         }
 
-        [[nodiscard]] std::string importTexture(const std::string &targetDir, const std::string &pathToFile) const;
+        std::string importTexture(const std::string &targetDir, const std::string &pathToFile) const;
 
         void reduceImage(const std::string &fileId,
                          const TextureData &textureData, const LevelOfDetail &levelOfDetail) const;

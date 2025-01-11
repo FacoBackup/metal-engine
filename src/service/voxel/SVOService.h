@@ -12,7 +12,7 @@ namespace Metal {
             : AbstractResourceService(context) {
         }
 
-        SVOInstance *create(const std::string &id, const LevelOfDetail &levelOfDetail);
+        SVOInstance *create(const std::string &id);
     };
 } // Metal
 

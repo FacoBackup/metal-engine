@@ -214,7 +214,7 @@ add_executable(
         src/service/voxel/VoxelizationService.h
         src/service/mesh/SceneData.h
         src/service/mesh/EntityAssetData.h
-        src/service/mesh/MaterialData.h
+        src/service/material/MaterialData.h
         src/context/engine/render-pass/impl/PostProcessingPass.cpp
         src/context/engine/render-pass/impl/PostProcessingPass.h
         src/context/engine/render-pass/impl/GBufferShadingPass.cpp
@@ -261,6 +261,15 @@ add_executable(
         src/context/engine/compute-pass/impl/GlobalIlluminationPass.cpp
         src/context/engine/compute-pass/impl/GlobalIlluminationPass.h
         src/util/ImageUtils.h
+        src/service/material/MaterialInstance.cpp
+        src/service/material/MaterialInstance.h
+        src/service/material/MaterialService.cpp
+        src/service/material/MaterialService.h
+        src/service/material/MaterialData.cpp
+        src/repository/inspection/FileInspectionRepository.cpp
+        src/repository/inspection/FileInspectionRepository.h
+        src/context/editor/dock-spaces/inspector/MaterialInspection.cpp
+        src/context/editor/dock-spaces/inspector/MaterialInspection.h
 )
 
 

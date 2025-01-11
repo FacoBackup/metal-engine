@@ -12,14 +12,12 @@ namespace Metal {
     class RuntimeResource {
         const std::string id;
         bool noDisposal = false;
-
+        std::vector<std::string> empty{};
     public:
         virtual ~RuntimeResource() = default;
 
         explicit RuntimeResource(const std::string &id = Util::uuidV4()): id(std::move(id)) {
         }
-
-        long long lastUse = 0;
 
         [[nodiscard]] std::string getId() const {
             return id;
@@ -39,6 +37,10 @@ namespace Metal {
 
         virtual ResourceType resourceType() {
             throw std::runtime_error("Not implemented");
+        }
+
+        virtual std::vector<std::string> &getDependencies() {
+            return empty;
         }
     };
 }

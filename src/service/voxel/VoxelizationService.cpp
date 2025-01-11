@@ -27,8 +27,8 @@ namespace Metal {
             stepSize = .01f;
         }
 
-        glm::vec3 albedo = component->albedoColor * 255.f;
-        glm::vec2 roughnessMetallic(component->roughnessFactor, component->metallicFactor);
+        glm::vec3 albedo{1, 1, 1}; //= component->albedoColor * 255.f;
+        float roughness = 1; //(component->roughnessFactor, component->metallicFactor);
 
         for (float lambda1 = 0; lambda1 <= 1; lambda1 += stepSize) {
             for (float lambda2 = 0; lambda2 <= 1 - lambda1; lambda2 += stepSize) {
@@ -53,8 +53,8 @@ namespace Metal {
                         MAX_DEPTH,
                         point,
                         new VoxelData(
-                            albedo, normal, roughnessMetallic,
-                            component->emissiveSurface));
+                            albedo, normal, roughness,
+                            false));
                 }
             }
         }

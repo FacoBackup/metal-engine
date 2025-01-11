@@ -90,8 +90,7 @@ void main() {
             shaderData.albedo = vec3(1, 1, 1);
             shouldReturn = false;
         } else if (globalData.debugFlag == POSITION){
-            float voxelSize = float(globalData.giTileSubdivision);
-            finalColor = vec4(normalize(round(shaderData.worldSpacePosition * voxelSize) / voxelSize), 1);
+            finalColor = vec4(shaderData.worldSpacePosition, 1);
         } else if (globalData.debugFlag == EMISSIVE){
             finalColor = vec4(albedoEmissive.a > 0 ? vec3(1) : vec3(0), 1);
         } else if (globalData.debugFlag == GI){

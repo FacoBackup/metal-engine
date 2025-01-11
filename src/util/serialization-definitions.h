@@ -37,6 +37,7 @@ template<class Archive>\
 void load(Archive &ar) {\
 ar(__VA_ARGS__);\
 }
+
 #define SERIALIZE_TEMPLATE(...) \
 template<class Archive>\
 void serialize(Archive &ar) {\

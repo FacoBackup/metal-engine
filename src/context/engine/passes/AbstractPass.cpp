@@ -18,4 +18,41 @@ namespace Metal {
             getPipeline()->pushConstantsSize,
             data);
     }
-} // Metal
+
+    void AbstractPass::bindStaticDescriptorSets() {
+        bindDescriptorSets(getPipeline()->descriptorSets);
+    }
+
+    void AbstractPass::bindDescriptorSets(const std::vector<VkDescriptorSet> &descriptors) {
+        if (!descriptors.empty()) {
+            vkCmdBindDescriptorSets(vkCommandBuffer,
+                                    getBindingPoint(),
+                                    getPipeline()->vkPipelineLayout,
+                                    0,
+                                    descriptors.size(),
+                                    descriptors.data(),
+                                    0,
+                                    nullptr);
+        }
+    }
+
+    void AbstractPass::bindSingleDescriptorSet(const unsigned int descriptorSetIndex, const VkDescriptorSet &descriptorSet) {
+        vkCmdBindDescriptorSets(
+            vkCommandBuffer,
+            getBindingPoint(),
+            getPipeline()->vkPipelineLayout,
+            descriptorSetIndex,
+            1,
+            &descriptorSet,
+            0,
+            nullptr
+        );
+    }
+
+    VkPipelineBindPoint AbstractPass::getBindingPoint() const {
+        if (isComputePass) {
+            return VK_PIPELINE_BIND_POINT_COMPUTE;
+        }
+        return VK_PIPELINE_BIND_POINT_GRAPHICS;
+    }
+}

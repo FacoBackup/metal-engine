@@ -1,5 +1,6 @@
 #ifndef ABSTRACTPASS_H
 #define ABSTRACTPASS_H
+#include <vector>
 #include <vulkan/vulkan.h>
 #include "../../../common/AbstractRuntimeComponent.h"
 
@@ -14,6 +15,7 @@ namespace Metal {
 
     class AbstractPass : public AbstractRuntimeComponent {
         bool isComputePass;
+
     public:
         VkCommandBuffer vkCommandBuffer = VK_NULL_HANDLE;
         WorldRepository &worldRepository;
@@ -34,6 +36,14 @@ namespace Metal {
         virtual PipelineInstance *getPipeline() {
             return nullptr;
         }
+
+        virtual void bindStaticDescriptorSets();
+
+        void bindDescriptorSets(const std::vector<VkDescriptorSet> &descriptors);
+
+        void bindSingleDescriptorSet(unsigned int descriptorSetIndex, const VkDescriptorSet &descriptorSet);
+
+        VkPipelineBindPoint getBindingPoint() const;
     };
 } // Metal
 

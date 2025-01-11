@@ -3,7 +3,6 @@
 
 #include "../../dto/push-constant/MeshPushConstant.h"
 #include "../../dto/push-constant/GridPushConstant.h"
-#include "../../dto/push-constant/GBufferShadingPushConstant.h"
 #include "../../dto/push-constant/VoxelDebugSettingsPushConstant.h"
 #include "../../dto/push-constant/IconPushConstant.h"
 #include "../../service/pipeline/PipelineInstance.h"
@@ -18,6 +17,12 @@ namespace Metal {
                     "GBufferGen.frag"
                 )
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialDataAlbedo.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialDataNormal.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialDataRoughness.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialDataMetallic.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialDataAO.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialDataHeight.get())
                 .setPrepareForMesh()
                 .setDepthTest()
                 .setCullMode(VK_CULL_MODE_BACK_BIT)

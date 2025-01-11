@@ -291,7 +291,10 @@ namespace Metal {
 
     TextureInstance *TextureService::create(const std::string &id, const LevelOfDetail &lod) {
         auto pathToFile = context.getAssetDirectory() + FORMAT_FILE_TEXTURE(id, lod);
-        return loadTexture(id + lod.suffix, pathToFile, true);
+        if (std::filesystem::exists(pathToFile)) {
+            return loadTexture(id + lod.suffix, pathToFile, true);
+        }
+        return nullptr;
     }
 
     TextureInstance *TextureService::createForCompute(const unsigned int width, const unsigned int height) {

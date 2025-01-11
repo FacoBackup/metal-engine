@@ -60,6 +60,33 @@ namespace Metal {
             globalDataDescriptor->write(vulkanContext);
         }
 
+        gBufferMaterialDataAlbedo = std::make_unique<DescriptorInstance>();
+        gBufferMaterialDataNormal = std::make_unique<DescriptorInstance>();
+        gBufferMaterialDataRoughness = std::make_unique<DescriptorInstance>();
+        gBufferMaterialDataMetallic = std::make_unique<DescriptorInstance>();
+        gBufferMaterialDataAO = std::make_unique<DescriptorInstance>();
+        gBufferMaterialDataHeight = std::make_unique<DescriptorInstance>();
+
+        gBufferMaterialDataAlbedo->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
+                                                    VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
+        gBufferMaterialDataNormal->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
+                                                    VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
+        gBufferMaterialDataRoughness->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
+                                                       VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
+        gBufferMaterialDataMetallic->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
+                                                      VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
+        gBufferMaterialDataAO->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                                0);
+        gBufferMaterialDataHeight->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
+                                                    VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
+
+        gBufferMaterialDataAlbedo->create(vulkanContext);
+        gBufferMaterialDataNormal->create(vulkanContext);
+        gBufferMaterialDataRoughness->create(vulkanContext);
+        gBufferMaterialDataMetallic->create(vulkanContext);
+        gBufferMaterialDataAO->create(vulkanContext);
+        gBufferMaterialDataHeight->create(vulkanContext);
+
         // G-BUFFER
         GBUFFER_D(gBufferMaterialA, 0)
         GBUFFER_D(gBufferMaterialB, 1)
@@ -70,23 +97,22 @@ namespace Metal {
         giComputeDescriptorA->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
         giComputeDescriptorA->create(vulkanContext);
         giComputeDescriptorA->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
-                                              context.coreTextures.giSurfaceCache->vkImageView);
+                                                 context.coreTextures.giSurfaceCache->vkImageView);
         giComputeDescriptorA->write(vulkanContext);
 
         giComputeDescriptorB = std::make_unique<DescriptorInstance>();
         giComputeDescriptorB->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
         giComputeDescriptorB->create(vulkanContext);
         giComputeDescriptorB->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
-                                                context.coreTextures.globalIllumination->vkImageView);
-        giComputeDescriptorB->write(vulkanContext);
-
-        {
+                                                 context.coreTextures.globalIllumination->vkImageView);
+        giComputeDescriptorB->write(vulkanContext); {
             globalIlluminationDescriptor = std::make_unique<DescriptorInstance>();
-            globalIlluminationDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
+            globalIlluminationDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
+                                                           VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
             globalIlluminationDescriptor->create(vulkanContext);
             globalIlluminationDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                             context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                             context.coreTextures.globalIllumination->vkImageView);
+                                                             context.coreFrameBuffers.gBufferFBO->vkImageSampler,
+                                                             context.coreTextures.globalIllumination->vkImageView);
             globalIlluminationDescriptor->write(vulkanContext);
         }
 

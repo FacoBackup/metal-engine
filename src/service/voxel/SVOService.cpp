@@ -11,7 +11,7 @@
 #include "impl/SparseVoxelOctreeData.h"
 
 namespace Metal {
-    SVOInstance *SVOService::create(const std::string &id, const LevelOfDetail &levelOfDetail) {
+    SVOInstance *SVOService::create(const std::string &id) {
         if (std::string fileName = context.getAssetDirectory() + FORMAT_FILE_SVO(id);
             std::filesystem::exists(fileName)) {
             std::cout << "Streaming SVO " << fileName << std::endl;

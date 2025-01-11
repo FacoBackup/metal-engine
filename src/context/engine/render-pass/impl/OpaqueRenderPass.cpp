@@ -12,15 +12,57 @@ namespace Metal {
         unsigned int renderIndex = 0;
         for (const auto &pair: worldRepository.meshes) {
             if (const auto &mesh = pair.second; !mesh.meshId.empty()) {
-                if (const auto *r = streamingRepository.streamMesh(mesh.meshId, LevelOfDetail::LOD_0); r != nullptr) {
+                const auto *meshInstance = streamingRepository.streamMesh(mesh.meshId, LevelOfDetail::LOD_0);
+                if (meshInstance != nullptr) {
+                    const auto *materialInstance = streamingRepository.streamMaterial(mesh.materialId);
+
                     mPushConstant.model = worldRepository.transforms[mesh.getEntityId()].model;
-                    mPushConstant.albedoEmissive = glm::vec4(mesh.albedoColor, mesh.emissiveSurface);
+                    mPushConstant.renderIndex = renderIndex;
+
+                    mPushConstant.albedoEmissive = glm::vec4(mesh.albedoColor,
+                                                             mesh.emissiveSurface);
                     mPushConstant.roughnessFactor = mesh.roughnessFactor;
                     mPushConstant.metallicFactor = mesh.metallicFactor;
-                    mPushConstant.renderIndex = renderIndex;
+                    mPushConstant.parallaxLayers = mesh.parallaxLayers;
+                    mPushConstant.parallaxHeightScale = mesh.parallaxHeightScale;
+
+                    if (materialInstance != nullptr) {
+                        mPushConstant.useAlbedoTexture = materialInstance->useAlbedoTexture;
+                        if (mPushConstant.useAlbedoTexture) {
+                            bindSingleDescriptorSet(1, materialInstance->descriptorAlbedoTexture->vkDescriptorSet);
+                        }
+                        mPushConstant.useNormalTexture = materialInstance->useNormalTexture;
+                        if (mPushConstant.useNormalTexture) {
+                            bindSingleDescriptorSet(2, materialInstance->descriptorNormalTexture->vkDescriptorSet);
+                        }
+                        mPushConstant.useRoughnessTexture = materialInstance->useRoughnessTexture;
+                        if (mPushConstant.useRoughnessTexture) {
+                            bindSingleDescriptorSet(3, materialInstance->descriptorRoughnessTexture->vkDescriptorSet);
+                        }
+                        mPushConstant.useMetallicTexture = materialInstance->useMetallicTexture;
+                        if (mPushConstant.useMetallicTexture) {
+                            bindSingleDescriptorSet(4, materialInstance->descriptorMetallicTexture->vkDescriptorSet);
+                        }
+                        mPushConstant.useAOTexture = materialInstance->useAOTexture;
+                        if (mPushConstant.useAOTexture) {
+                            bindSingleDescriptorSet(5, materialInstance->descriptorAOTexture->vkDescriptorSet);
+                        }
+                        mPushConstant.useHeightTexture = materialInstance->useHeightTexture;
+                        if (mPushConstant.useHeightTexture) {
+                            bindSingleDescriptorSet(6, materialInstance->descriptorHeightTexture->vkDescriptorSet);
+                        }
+                    } else {
+                        mPushConstant.useAlbedoTexture = false;
+                        mPushConstant.useNormalTexture = false;
+                        mPushConstant.useRoughnessTexture = false;
+                        mPushConstant.useMetallicTexture = false;
+                        mPushConstant.useAOTexture = false;
+                        mPushConstant.useHeightTexture = false;
+                    }
+
                     renderIndex++;
                     recordPushConstant(&mPushConstant);
-                    recordDrawMesh(r);
+                    recordDrawMesh(meshInstance);
                 }
             }
         }
