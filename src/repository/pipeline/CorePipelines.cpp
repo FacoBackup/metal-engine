@@ -59,7 +59,8 @@ namespace Metal {
                     )
                     .setPushConstantsSize(sizeof(VoxelDebugSettingsPushConstant))
                     .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                    .addDescriptorSet(context.coreDescriptorSets.svoData.get());
+                    .addDescriptorSet(context.coreDescriptorSets.svoData.get())
+                    .addDescriptorSet(context.coreDescriptorSets.surfaceCacheFragment.get());
             voxelDebugVisualizerPipeline = pipelineService.createPipeline(voxelVisualizerPipelineBuilder);
         }
 
@@ -104,8 +105,8 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialA.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialB.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialD.get())
-                .addDescriptorSet(context.coreDescriptorSets.giComputeDescriptorA.get())
-                .addDescriptorSet(context.coreDescriptorSets.giComputeDescriptorB.get());
+                .addDescriptorSet(context.coreDescriptorSets.surfaceCacheCompute.get())
+                .addDescriptorSet(context.coreDescriptorSets.giCompute.get());
         giComputePipeline = pipelineService.createPipeline(giBuilder);
     }
 

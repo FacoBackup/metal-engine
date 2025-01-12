@@ -58,6 +58,10 @@ namespace Metal {
         }
     }
 
+    void EngineContext::dispatchSceneVoxelization() {
+        voxelizationRequestId = Util::uuidV4();
+    }
+
     void EngineContext::onSync() {
         updateCurrentTime();
 
@@ -65,6 +69,7 @@ namespace Metal {
         context.worldGridService.onSync();
         context.streamingRepository.onSync();
         context.cameraService.onSync();
+        context.voxelizationService.onSync();
 
         updateGlobalData();
         updateVoxelData();

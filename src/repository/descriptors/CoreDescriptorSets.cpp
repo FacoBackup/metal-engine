@@ -93,19 +93,21 @@ namespace Metal {
         GBUFFER_D(gBufferMaterialC, 2)
         GBUFFER_D(gBufferMaterialD, 3)
 
-        giComputeDescriptorA = std::make_unique<DescriptorInstance>();
-        giComputeDescriptorA->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
-        giComputeDescriptorA->create(vulkanContext);
-        giComputeDescriptorA->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
+        surfaceCacheCompute = std::make_unique<DescriptorInstance>();
+        surfaceCacheCompute->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
+        surfaceCacheCompute->create(vulkanContext);
+        surfaceCacheCompute->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
                                                  context.coreTextures.giSurfaceCache->vkImageView);
-        giComputeDescriptorA->write(vulkanContext);
+        surfaceCacheCompute->write(vulkanContext);
 
-        giComputeDescriptorB = std::make_unique<DescriptorInstance>();
-        giComputeDescriptorB->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
-        giComputeDescriptorB->create(vulkanContext);
-        giComputeDescriptorB->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
+        giCompute = std::make_unique<DescriptorInstance>();
+        giCompute->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
+        giCompute->create(vulkanContext);
+        giCompute->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
                                                  context.coreTextures.globalIllumination->vkImageView);
-        giComputeDescriptorB->write(vulkanContext); {
+        giCompute->write(vulkanContext);
+
+        {
             globalIlluminationDescriptor = std::make_unique<DescriptorInstance>();
             globalIlluminationDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
                                                            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
@@ -114,6 +116,17 @@ namespace Metal {
                                                              context.coreFrameBuffers.gBufferFBO->vkImageSampler,
                                                              context.coreTextures.globalIllumination->vkImageView);
             globalIlluminationDescriptor->write(vulkanContext);
+        }
+
+        if (context.isDebugMode()){
+            surfaceCacheFragment = std::make_unique<DescriptorInstance>();
+            surfaceCacheFragment->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
+                                                           VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
+            surfaceCacheFragment->create(vulkanContext);
+            surfaceCacheFragment->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                                             context.coreFrameBuffers.gBufferFBO->vkImageSampler,
+                                                             context.coreTextures.giSurfaceCache->vkImageView);
+            surfaceCacheFragment->write(vulkanContext);
         }
 
         if (context.isDebugMode()) {

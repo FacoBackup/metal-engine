@@ -1,6 +1,7 @@
 #include "VoxelizationService.h"
 
 #include <stb_image.h>
+#include <thread>
 #include <cereal/archives/binary.hpp>
 
 #include "../../context/ApplicationContext.h"
@@ -67,7 +68,7 @@ namespace Metal {
                     builders.at(voxelTile->id).insert(
                         MAX_DEPTH,
                         point,
-                        new VoxelData(albedo, normal,component->emissiveSurface));
+                        new VoxelData(albedo, normal, component->emissiveSurface));
                 }
             }
         }
@@ -167,7 +168,7 @@ namespace Metal {
         METRIC_END("Ending serialization ")
     }
 
-    void VoxelizationService::voxelizeScene() {
+    void VoxelizationService::voxelize() {
         METRIC_START
         for (auto path: context.engineRepository.svoFilePaths) {
             if (std::filesystem::exists(path)) {
@@ -178,6 +179,9 @@ namespace Metal {
         std::unordered_map<std::string, SparseVoxelOctreeBuilder> builders;
         for (auto &t: context.worldGridRepository.getTiles()) {
             for (auto entity: t.second.entities) {
+                if (isVoxelizationCancelled) {
+                    return;
+                }
                 if (context.worldRepository.meshes.contains(entity)) {
                     auto &meshComponent = context.worldRepository.meshes.at(entity);
                     auto &transformComponent = context.worldRepository.transforms.at(entity);
@@ -199,15 +203,46 @@ namespace Metal {
             t.second.dispose();
         }
 
-        context.svoService.disposeAll();
-        context.worldGridRepository.hasMainTileChanged = true;
-        context.engineContext.setGISettingsUpdated(true);
         for (auto &entry: textures) {
             stbi_image_free(entry.second->data);
             delete entry.second;
         }
         textures.clear();
-
         METRIC_END("Ending Voxelization ")
+
+        isVoxelizationDone = true;
+    }
+
+    void VoxelizationService::onSync() {
+        if (isVoxelizationDone) {
+            std::cout << "Voxelization was finished; Clearing all resources affected" << std::endl;
+            context.worldGridRepository.hasMainTileChanged = true;
+            context.svoService.disposeAll();
+            context.engineContext.setGISettingsUpdated(true);
+            isVoxelizationDone = false;
+            isExecutingThread = false;
+        }
+        if (localVoxelizationRequestId == context.engineContext.getVoxelizationRequestId()) {
+            return;
+        }
+        localVoxelizationRequestId = context.engineContext.getVoxelizationRequestId();
+
+        // New voxelization request; Cancels the previous one and starts all over again
+        cancelRequest();
+
+        std::cout << "Dispatching new voxelization request" << std::endl;
+        isExecutingThread = true;
+        thread = std::thread([this]() {
+            voxelize();
+        });
+    }
+
+    void VoxelizationService::cancelRequest() {
+        if (isExecutingThread) {
+            std::cout << "Cancelling previous voxelization request" << std::endl;
+            isVoxelizationCancelled = true;
+            thread.join();
+            isVoxelizationCancelled = false;
+        }
     }
 } // Metal

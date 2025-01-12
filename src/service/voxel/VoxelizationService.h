@@ -1,6 +1,7 @@
 #ifndef VOXELIZERSERVICE_H
 #define VOXELIZERSERVICE_H
 #include <string>
+#include <thread>
 #include <unordered_map>
 #include <glm/mat4x4.hpp>
 
@@ -17,6 +18,11 @@ namespace Metal {
 
     class VoxelizationService final : public AbstractRuntimeComponent {
         std::unordered_map<std::string, TextureData *> textures{};
+        std::string localVoxelizationRequestId;
+        bool isVoxelizationDone = false;
+        bool isVoxelizationCancelled = false;
+        bool isExecutingThread = false;
+        std::thread thread;
 
         void iterateTriangle(const MeshComponent *component, const Triangle &triangle,
                              std::unordered_map<std::string, SparseVoxelOctreeBuilder> &builders) const;
@@ -32,12 +38,20 @@ namespace Metal {
 
         void serialize(SparseVoxelOctreeBuilder &builder) const;
 
+        void voxelize();
+
     public:
         explicit VoxelizationService(ApplicationContext &context)
             : AbstractRuntimeComponent(context) {
         }
 
-        void voxelizeScene();
+        bool isExecutingVoxelization() {
+            return isExecutingThread;
+        }
+
+        void onSync() override;
+
+        void cancelRequest();
     };
 } // Metal
 

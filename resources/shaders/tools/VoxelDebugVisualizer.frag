@@ -6,6 +6,7 @@
 
 layout(location = 0) in vec2 texCoords;
 layout(location = 0) out vec4 finalColor;
+layout(set = 2, binding = 0) uniform sampler2D surfaceCache;
 
 layout(push_constant) uniform Push {
     int voxelDebugFlag;
@@ -26,31 +27,28 @@ void main() {
     ivec2 colorData = ivec2(0);
     Ray ray = Ray(rayOrigin, rayDirection, 1./rayDirection);
     Hit hitData = traceAllTiles(ray, settings.showRaySearchCount, settings.showRayTestCount, colorData);
-    if (hitData.anyHit || length(colorData) != 0){
-        VoxelMaterialData matData = unpackVoxel(hitData);
-        switch (settings.voxelDebugFlag){
-            case ALBEDO:
-            finalColor = vec4(matData.albedo, 1);
-            break;
-            case NORMAL:
-            finalColor = vec4(matData.normal, 1);
-            break;
-            case EMISSIVE:
-            finalColor = vec4(vec3(matData.isEmissive ? 1 : 0), 1);
-            break;
-            case RANDOM:
-            finalColor = vec4(randomColor(rand(hitData.voxelPosition.xyz)), 1);
-            break;
-            case GI:
-            finalColor = vec4(genHashSurfaceCache(hitData.voxelPosition.xyz), 0, 1);
-            break;
-            default :
-            finalColor = vec4(normalize(hitData.voxelPosition.xyz), 1);
-            break;
-        }
-    } else {
-        discard;
+    VoxelMaterialData matData = unpackVoxel(hitData);
+    switch (settings.voxelDebugFlag){
+        case ALBEDO:
+        finalColor = vec4(matData.albedo, 1);
+        break;
+        case NORMAL:
+        finalColor = vec4(matData.normal, 1);
+        break;
+        case EMISSIVE:
+        finalColor = vec4(vec3(matData.isEmissive ? 1 : 0), 1);
+        break;
+        case RANDOM:
+        finalColor = vec4(randomColor(rand(hitData.voxelPosition.xyz)), 1);
+        break;
+        case GI:
+        finalColor = vec4(texture(surfaceCache, genHashSurfaceCache(hitData.hitPosition.xyz)).rgb, 1);
+        break;
+        default:
+        finalColor = vec4(normalize(hitData.voxelPosition.xyz), 1);
+        break;
     }
+
     if (length(finalColor.rgb) == 0){
         finalColor.rg = colorData/float(settings.searchCountDivisor);
         finalColor.a = 1;

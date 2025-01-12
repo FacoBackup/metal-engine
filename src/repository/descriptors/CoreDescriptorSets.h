@@ -25,12 +25,13 @@ namespace Metal {
         std::unique_ptr<DescriptorInstance> voxelPositionDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> voxelHitPositionDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> globalIlluminationDescriptor = nullptr;
+        std::unique_ptr<DescriptorInstance> surfaceCacheFragment = nullptr;
         std::unique_ptr<DescriptorInstance> gBufferMaterialA = nullptr;
         std::unique_ptr<DescriptorInstance> gBufferMaterialB = nullptr;
         std::unique_ptr<DescriptorInstance> gBufferMaterialC = nullptr;
         std::unique_ptr<DescriptorInstance> gBufferMaterialD = nullptr;
-        std::unique_ptr<DescriptorInstance> giComputeDescriptorA = nullptr;
-        std::unique_ptr<DescriptorInstance> giComputeDescriptorB = nullptr;
+        std::unique_ptr<DescriptorInstance> surfaceCacheCompute = nullptr;
+        std::unique_ptr<DescriptorInstance> giCompute = nullptr;
         std::unique_ptr<DescriptorInstance> svoData = nullptr;
         std::unique_ptr<DescriptorInstance> lightsData = nullptr;
         std::unique_ptr<DescriptorInstance> iconsDescriptor = nullptr;

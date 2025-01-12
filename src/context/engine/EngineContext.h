@@ -24,10 +24,10 @@ namespace Metal {
         bool cameraUpdated = true;
         bool lightingDataUpdated = true;
         bool giSettingsUpdated = true;
+        std::string voxelizationRequestId;
         unsigned int globalFrameCount = 0;
 
     public:
-
         void setLightingDataUpdated(const bool val) {
             lightingDataUpdated = val;
         }
@@ -57,6 +57,12 @@ namespace Metal {
         void updateVoxelData();
 
         void updateCurrentTime();
+
+        void dispatchSceneVoxelization();
+
+        std::string getVoxelizationRequestId() {
+            return voxelizationRequestId;
+        }
 
         explicit EngineContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {
         }

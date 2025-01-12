@@ -39,13 +39,10 @@ namespace Metal {
     }
 
     void GlobalIlluminationPass::onSync() {
-        const bool giReset = context.engineContext.isGISettingsUpdated() || context.engineContext.isLightingDataUpdated();
-        if (giReset) {
-            clearTexture(context.coreTextures.giSurfaceCache->vkImage);
-        }
-
-        if (isFirstRun || context.engineContext.isCameraUpdated() || giReset) {
+        if (isFirstRun || context.engineContext.isCameraUpdated() || context.engineContext.isGISettingsUpdated() ||
+            context.engineContext.isLightingDataUpdated()) {
             clearTexture(context.coreTextures.globalIllumination->vkImage);
+            clearTexture(context.coreTextures.giSurfaceCache->vkImage);
             isFirstRun = false;
         }
 

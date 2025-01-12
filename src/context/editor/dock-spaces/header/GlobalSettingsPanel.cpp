@@ -10,7 +10,7 @@ namespace Metal {
         auto &editorRepository = context->editorRepository;
 
         if (ImGui::Button((Icons::apps + "Voxelize scene" + id + "voxelize").c_str())) {
-            context->voxelizationService.voxelizeScene();
+            context->engineContext.dispatchSceneVoxelization();
         }
         ImGui::SameLine();
 
