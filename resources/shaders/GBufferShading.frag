@@ -46,16 +46,12 @@ void main() {
     shaderData.viewSpacePosition = vec3(globalData.viewMatrix * worldPos);
     shaderData.worldSpacePosition = worldPos.rgb;
 
-    vec3 globalIllumination =vec3(0, 0, 0);
-    float shadows = 1;
+    vec4 globalIllumination =vec4(0, 0, 0, 1);
     if (globalData.giEnabled){
-        globalIllumination = texture(globalIlluminationSampler, texCoords).rgb;
-        float threshold = .1;
-        float luminance = dot(globalIllumination.rgb, vec3(0.2126, 0.7152, 0.0722));
-//        shadows = clamp((luminance / threshold), 0, 1);
+        globalIllumination = texture(globalIlluminationSampler, texCoords);
     }
 
-    shaderData.ambientOcclusion = materialC.g * shadows;
+    shaderData.ambientOcclusion = materialC.g * globalIllumination.a;
     shaderData.V = normalize(globalData.cameraWorldPosition - shaderData.worldSpacePosition);
     shaderData.distanceFromCamera = length(shaderData.V);
     shaderData.albedo = albedoEmissive.rgb;
@@ -94,7 +90,7 @@ void main() {
         } else if (globalData.debugFlag == EMISSIVE){
             finalColor = vec4(albedoEmissive.a > 0 ? vec3(1) : vec3(0), 1);
         } else if (globalData.debugFlag == GI){
-            finalColor = vec4(globalIllumination, 1);
+            finalColor = vec4(globalIllumination.rgb, 1);
         } else {
             finalColor = vec4(shaderData.albedo, 1);
         }
@@ -106,5 +102,5 @@ void main() {
         finalColor = vec4(albedoEmissive.rgb, 1.);
         return;
     }
-    finalColor = vec4(physicallyBasedShadePixel(shaderData) + shaderData.albedoOverPI * globalIllumination * globalData.giStrength, 1.);
+    finalColor = vec4(physicallyBasedShadePixel(shaderData) + shaderData.albedoOverPI * globalIllumination.rgb * globalData.giStrength, 1.);
 }

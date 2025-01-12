@@ -93,8 +93,7 @@ void evaluateSurface(in Light sunLight, inout BounceInfo bounceInfo){
 }
 
 vec3 pathTraceScene(vec3 surfaceAlbedo, vec3 firstHitNormal, vec3 firstHitPos, float roughness, vec3 rayDir) {
-    Light sunLight = Light(globalData.sunColor, globalData.sunPosition, -1, -1, -1);
-
+    Light sunLight = Light(globalData.sunColor, normalize(globalData.sunPosition) * 20, -1, -1, -1);
 
     BounceInfo bounceInfo;
     bounceInfo.throughput = vec3(1);
@@ -136,6 +135,18 @@ vec3 pathTraceScene(vec3 surfaceAlbedo, vec3 firstHitNormal, vec3 firstHitPos, f
     return bounceInfo.indirectLight / globalData.giBounces;
 }
 
+float testLight(vec3 lightPosition, in vec3 rayOrigin){
+    vec3 rayDirection = normalize(lightPosition - rayOrigin);
+    Ray ray = Ray(rayOrigin, rayDirection, 1./rayDirection);
+    Hit hitData = traceAllTiles(ray);
+    float lightDistance = length(lightPosition - rayOrigin);
+    float hitDistance = length(hitData.hitPosition - rayOrigin);
+    if (hitData.anyHit && hitDistance < lightDistance) {
+        return clamp(1 / lightDistance, 0, 1);
+    }
+    return 1;
+}
+
 void main() {
     vec2 texCoords = vec2(gl_GlobalInvocationID.xy) / imageSize(globalIlluminationImage);
     vec4 materialD = texture(gBufferMaterialD, texCoords);
@@ -157,12 +168,31 @@ void main() {
     vec3 currentPosition = hitPosition.xyz + normal * bias;
 
     vec4 previousFrame = imageLoad(globalIlluminationImage, ivec2(gl_GlobalInvocationID.xy));
-    float accumulationCount = previousFrame.a;
 
     vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
     vec3 currentFrame = pathTraceScene(albedoEmissive.rgb, normal, currentPosition, normalRoughness.a, rayDir);
-    vec3 accumulatedResult = previousFrame.rgb * (1. - 1./accumulationCount) + currentFrame * 1./accumulationCount;
 
+    float shadows = 0;
+    { // ------ SHADOWS
+        float total = 1;
+        vec3 shadowsPosition = currentPosition + RandomUnitVector(rngState)/32; // Adds small offset to sample position in order to enable accumulation
+        if (globalData.lightsQuantity > 0){
+            for (int i = 0; i < globalData.lightsQuantity; ++i) {
+                Light l = lightsBuffer.lights[i];
+                if (length(l.position - hitPosition.xyz) < l.outerRadius) {
+                    shadows += testLight(l.position, shadowsPosition);
+                    total++;
+                }
+            }
+        }
+        if (globalData.enabledSun){
+            shadows += testLight(globalData.sunPosition, shadowsPosition);
+            total++;
+        }
+        shadows /= total;
+    }
 
-    imageStore(globalIlluminationImage, ivec2(gl_GlobalInvocationID.xy), vec4(accumulatedResult, accumulationCount + 1));
+    float accumulationCount = float(globalData.giAccumulationCount);
+    vec4 accumulatedResult = previousFrame * (1. - 1./accumulationCount) + vec4(currentFrame, shadows) * 1./accumulationCount;
+    imageStore(globalIlluminationImage, ivec2(gl_GlobalInvocationID.xy), accumulatedResult);
 }

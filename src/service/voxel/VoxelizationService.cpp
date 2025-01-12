@@ -185,10 +185,11 @@ namespace Metal {
     }
 
     void VoxelizationService::collectRequests(WorldTile &t,
-                                              std::array<std::vector<VoxelizationRequest>, 3> &requests) const {
+                                              std::vector<std::vector<VoxelizationRequest>> &requests) const {
         unsigned int requestIndex = 0;
         for (auto entity: t.entities) {
-            if (context.worldRepository.meshes.contains(entity) && !context.worldRepository.hiddenEntities.contains(entity)) {
+            if (context.worldRepository.meshes.contains(entity) && !context.worldRepository.hiddenEntities.
+                contains(entity)) {
                 auto &meshComponent = context.worldRepository.meshes.at(entity);
                 auto &transformComponent = context.worldRepository.transforms.at(entity);
                 if (transformComponent.isStatic) {
@@ -211,7 +212,8 @@ namespace Metal {
         }
         context.engineRepository.svoFilePaths.clear();
         for (auto &t: context.worldGridRepository.getTiles()) {
-            std::array<std::vector<VoxelizationRequest>, 3> requests;
+            std::vector<std::vector<VoxelizationRequest>> requests;
+            requests.resize(1); // TODO - FIX FOR MULTIPLE THREADS
             collectRequests(t.second, requests);
 
             if (!isVoxelizationCancelled) {
@@ -286,7 +288,9 @@ namespace Metal {
         if (isExecutingThread) {
             std::cout << "Cancelling previous voxelization request" << std::endl;
             isVoxelizationCancelled = true;
-            thread.join();
+            if (thread.joinable()) {
+                thread.join(); // Wait for the thread to finish
+            }
             isVoxelizationCancelled = false;
             context.notificationService.pushMessage("Voxelization cancelled", NotificationSeverities::SUCCESS);
         }

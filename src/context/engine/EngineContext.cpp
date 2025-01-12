@@ -131,7 +131,8 @@ namespace Metal {
         globalDataUBO.debugFlag = ShadingMode::IndexOfValue(context.editorRepository.shadingMode);
         globalDataUBO.surfaceCacheWidth = context.coreTextures.giSurfaceCache->width;
         globalDataUBO.surfaceCacheHeight = context.coreTextures.giSurfaceCache->height;
-        globalDataUBO.globalFrameCount = globalFrameCount++;
+        globalDataUBO.giAccumulationCount++;
+        globalDataUBO.globalFrameCount++;
 
         if (context.engineRepository.incrementTime) {
             context.engineRepository.elapsedTime += .0005f * context.engineRepository.elapsedTimeSpeed;

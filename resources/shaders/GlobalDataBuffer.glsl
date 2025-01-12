@@ -30,6 +30,7 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     uint surfaceCacheWidth;
     uint surfaceCacheHeight;
 
+    uint giAccumulationCount;
     uint globalFrameCount;
 } globalData;
 

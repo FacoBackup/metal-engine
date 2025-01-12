@@ -43,7 +43,7 @@ namespace Metal {
 
         void voxelizeGroup(const std::vector<VoxelizationRequest> &request);
 
-        void collectRequests(WorldTile &t, std::array<std::vector<VoxelizationRequest>, 3> &requests) const;
+        void collectRequests(WorldTile &t, std::vector<std::vector<VoxelizationRequest>> &requests) const;
 
     public:
         explicit VoxelizationService(ApplicationContext &context)

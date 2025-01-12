@@ -34,7 +34,8 @@ namespace Metal {
 
         alignas(4) unsigned int surfaceCacheWidth;
         alignas(4) unsigned int surfaceCacheHeight;
-        alignas(4) unsigned int globalFrameCount;
+        alignas(4) unsigned int giAccumulationCount = 0;
+        alignas(4) unsigned int globalFrameCount = 0;
     };
 }
 

@@ -25,7 +25,7 @@ namespace Metal {
         bool lightingDataUpdated = true;
         bool giSettingsUpdated = true;
         std::string voxelizationRequestId;
-        unsigned int globalFrameCount = 0;
+        unsigned int giAccumulationCount = 0;
 
     public:
         void setLightingDataUpdated(const bool val) {
@@ -46,6 +46,10 @@ namespace Metal {
 
         void setGISettingsUpdated(const bool val) {
             giSettingsUpdated = val;
+        }
+
+        void resetGiAccumulationCount() {
+            globalDataUBO.giAccumulationCount = 0;
         }
 
         bool isGISettingsUpdated() const {
