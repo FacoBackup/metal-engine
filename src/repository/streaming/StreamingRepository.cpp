@@ -7,13 +7,14 @@
 #include "../../service/texture/TextureInstance.h"
 #include <iostream>
 #include "../../repository/abstract/RuntimeResource.h"
+#include "../../service/material/MaterialInstance.h"
 
 #define MAX_TIMEOUT 1000
 #define MAX_TRIES 5
 #define DISPOSAL(R)\
 for (auto it = R.begin(); it != R.end();) {\
-    if (!it->second->isNoDisposal() && (it->second->lastUse - context.engineContext.currentTimeMs) >= MAX_TIMEOUT) {\
-        std::cout << "Disposing of " << it->first << " Since last use: " << (it->second->lastUse - context.engineContext.currentTimeMs) <<std::endl;\
+    if (lastUse.contains(it->second->getId()) && !it->second->isNoDisposal() && (lastUse.at(it->second->getId()) - context.engineContext.currentTimeMs) >= MAX_TIMEOUT) {\
+        std::cout << "Disposing of " << it->first << " Since last use: " << (lastUse.at(it->second->getId()) - context.engineContext.currentTimeMs) <<std::endl;\
         it->second->dispose(context.vulkanContext);\
         auto newIt = R.erase(it);\
         delete it->second;\
@@ -26,7 +27,7 @@ for (auto it = R.begin(); it != R.end();) {\
 #define STREAM(T, V)\
 if (!id.empty() && T.getResources().contains(id + lod.suffix)) {\
     auto *e = T.getResources().at(id + lod.suffix);\
-    e->lastUse = context.engineContext.currentTimeMs;\
+    lastUse.emplace(e->getId(), context.engineContext.currentTimeMs);\
     return dynamic_cast<V*>(e);\
 }\
 if (!tries.contains(id)) {\
@@ -38,19 +39,54 @@ if (tries[id] < MAX_TRIES) {\
     auto *instance = T.create(id, lod);\
     if (instance != nullptr) {\
         tries[id] = 0;\
+        for(auto &dep : instance->getDependencies()){\
+            if (lastUse.contains(dep)) {\
+                lastUse[dep] = context.engineContext.currentTimeMs;\
+            }\
+        }\
     }\
     return instance;\
 }\
 return nullptr;
 
+
+
+#define STREAM_NO_LOD(T, V)\
+if (!id.empty() && T.getResources().contains(id)) {\
+auto *e = T.getResources().at(id);\
+lastUse.emplace(e->getId(), context.engineContext.currentTimeMs);\
+return dynamic_cast<V*>(e);\
+}\
+if (!tries.contains(id)) {\
+tries[id] = 0;\
+}\
+tries[id]++;\
+if (tries[id] < MAX_TRIES) {\
+std::cout << "Steaming " << id << std::endl;\
+auto *instance = T.create(id);\
+if (instance != nullptr) {\
+    tries[id] = 0;\
+    for(auto &dep : instance->getDependencies()){\
+        if (lastUse.contains(dep)) {\
+            lastUse[dep] = context.engineContext.currentTimeMs;\
+        }\
+    }\
+}\
+return instance;\
+}\
+return nullptr;
+
 namespace Metal {
-    MeshInstance *StreamingRepository::streamMesh(const std::string &id, const LevelOfDetail &lod) {
-        STREAM(context.meshService, MeshInstance)
+    MaterialInstance *StreamingRepository::streamMaterial(const std::string &id) {
+        STREAM_NO_LOD(context.materialService, MaterialInstance)
     }
 
     SVOInstance *StreamingRepository::streamSVO(const std::string &id) {
-        const LevelOfDetail &lod = LevelOfDetail::LOD_0;
-        STREAM(context.svoService, SVOInstance)
+        STREAM_NO_LOD(context.svoService, SVOInstance)
+    }
+
+    MeshInstance *StreamingRepository::streamMesh(const std::string &id, const LevelOfDetail &lod) {
+        STREAM(context.meshService, MeshInstance)
     }
 
     TextureInstance *StreamingRepository::streamTexture(const std::string &id, const LevelOfDetail &lod) {
@@ -63,6 +99,7 @@ namespace Metal {
             DISPOSAL(context.meshService.getResources())
             DISPOSAL(context.textureService.getResources())
             DISPOSAL(context.svoService.getResources())
+            DISPOSAL(context.materialService.getResources())
         }
     }
 }

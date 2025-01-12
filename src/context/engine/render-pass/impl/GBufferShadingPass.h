@@ -1,7 +1,6 @@
 #ifndef GBUFFERSHADINGPASS_H
 #define GBUFFERSHADINGPASS_H
 #include "../AbstractRenderPass.h"
-#include "../../../../dto/push-constant/GBufferShadingPushConstant.h"
 
 namespace Metal {
 

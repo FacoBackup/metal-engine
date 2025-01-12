@@ -1,6 +1,7 @@
 #ifndef VOXELIZERSERVICE_H
 #define VOXELIZERSERVICE_H
 #include <string>
+#include <thread>
 #include <unordered_map>
 #include <glm/mat4x4.hpp>
 
@@ -10,16 +11,25 @@
 #include "impl/Triangle.h"
 
 namespace Metal {
+    struct WorldTile;
+    struct VoxelizationRequest;
+    struct TextureData;
     struct MeshComponent;
     class SparseVoxelOctreeBuilder;
     struct MeshData;
 
     class VoxelizationService final : public AbstractRuntimeComponent {
-        void iterateTriangle(const MeshComponent *component, const Triangle &triangle,
-                             std::unordered_map<std::string, SparseVoxelOctreeBuilder> &builders) const;
+        std::unordered_map<std::string, TextureData *> textures{};
+        std::unordered_map<std::string, SparseVoxelOctreeBuilder> builders{};
+        std::string localVoxelizationRequestId;
+        bool isVoxelizationDone = false;
+        bool isVoxelizationCancelled = false;
+        bool isExecutingThread = false;
+        std::thread thread;
 
-        void voxelize(const MeshComponent *component, const glm::mat4x4 &modelMatrix, const MeshData *mesh,
-                      std::unordered_map<std::string, SparseVoxelOctreeBuilder> &builders) const;
+        void iterateTriangle(const MeshComponent *component, const Triangle &triangle);
+
+        void voxelize(const MeshComponent *component, const glm::mat4x4 &modelMatrix, const MeshData *mesh);
 
         static void FillStorage(SparseVoxelOctreeBuilder &builder, unsigned int &bufferIndex,
                                 unsigned int &materialBufferIndex,
@@ -29,12 +39,24 @@ namespace Metal {
 
         void serialize(SparseVoxelOctreeBuilder &builder) const;
 
+        void voxelize();
+
+        void voxelizeGroup(const std::vector<VoxelizationRequest> &request);
+
+        void collectRequests(WorldTile &t, std::vector<std::vector<VoxelizationRequest>> &requests) const;
+
     public:
         explicit VoxelizationService(ApplicationContext &context)
             : AbstractRuntimeComponent(context) {
         }
 
-        void voxelizeScene() const;
+        bool isExecutingVoxelization() const {
+            return isExecutingThread;
+        }
+
+        void onSync() override;
+
+        void cancelRequest();
     };
 } // Metal
 

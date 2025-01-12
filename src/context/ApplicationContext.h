@@ -28,12 +28,14 @@
 #include "../service/camera/CameraService.h"
 
 #include "../repository/world/impl/WorldGridRepository.h"
+#include "../repository/inspection/FileInspectionRepository.h"
 #include "../repository/world/WorldRepository.h"
 #include "../repository/runtime/RuntimeRepository.h"
 #include "../repository/streaming/StreamingRepository.h"
 #include "../repository/engine/EngineRepository.h"
 #include "../repository/dock/DockRepository.h"
 #include "../repository/editor/EditorRepository.h"
+#include "../service/material/MaterialService.h"
 #include "../service/notification/NotificationService.h"
 #include "../service/transform/TransformService.h"
 #include "../service/voxel/SVOService.h"
@@ -64,6 +66,7 @@ namespace Metal {
         // ----------- Services
         NotificationService notificationService;
         MeshService meshService{*this};
+        MaterialService materialService{*this};
         TextureService textureService{*this};
         FrameBufferService framebufferService{*this};
         PipelineService pipelineService{*this};
@@ -83,6 +86,7 @@ namespace Metal {
         // ----------- Services
 
         // ----------- Repository
+        FileInspectionRepository fileInspection{};
         WorldGridRepository worldGridRepository{*this};
         WorldRepository worldRepository{*this};
         RuntimeRepository runtimeRepository{};

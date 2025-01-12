@@ -17,6 +17,9 @@
 namespace Metal {
     MeshInstance *MeshService::create(const std::string &id, const LevelOfDetail &levelOfDetail) {
         MeshData *data = stream(id, levelOfDetail);
+        if (data == nullptr) {
+            return nullptr;
+        }
         auto *instance = new MeshInstance(id + levelOfDetail.suffix);
         registerResource(instance);
 
@@ -83,6 +86,6 @@ namespace Metal {
             repo.linkEntities(repo.getEntity(entities.at(entity.parentEntity)), repo.getEntity(entities.at(entity.id)));
         }
 
-        context.voxelizationService.voxelizeScene();
+        context.engineContext.dispatchSceneVoxelization();
     }
 } // Metal

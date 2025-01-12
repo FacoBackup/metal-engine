@@ -15,6 +15,7 @@ namespace Metal {
         Inspectable *selectedEntity = nullptr;
 
         FormPanel *formPanel = nullptr;
+        AbstractPanel *materialPanel = nullptr;
         EntityID selectedId = EMPTY_ENTITY;
 
     public:

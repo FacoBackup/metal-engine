@@ -46,7 +46,11 @@ void main() {
     shaderData.viewSpacePosition = vec3(globalData.viewMatrix * worldPos);
     shaderData.worldSpacePosition = worldPos.rgb;
 
-    vec4 globalIllumination = globalData.giEnabled ? texture(globalIlluminationSampler, texCoords) :  vec4(0, 0, 0, 1);
+    vec4 globalIllumination =vec4(0, 0, 0, 1);
+    if (globalData.giEnabled){
+        globalIllumination = texture(globalIlluminationSampler, texCoords);
+    }
+
     shaderData.ambientOcclusion = materialC.g * globalIllumination.a;
     shaderData.V = normalize(globalData.cameraWorldPosition - shaderData.worldSpacePosition);
     shaderData.distanceFromCamera = length(shaderData.V);
@@ -75,15 +79,14 @@ void main() {
         } else if (globalData.debugFlag == DEPTH){
             finalColor = vec4(worldPos.rgb, 1);
         } else if (globalData.debugFlag == UV){
-            finalColor = vec4(texture(gBufferMaterialC, texCoords).zw, 0, 1);
+            finalColor = vec4(texture(gBufferMaterialA, texCoords).rgb, 1);
         } else if (globalData.debugFlag == RANDOM){
             finalColor = vec4(randomColor(int(texture(gBufferMaterialC, texCoords).r)), 1);
         } else if (globalData.debugFlag == LIGHTING_ONLY){
             shaderData.albedo = vec3(1, 1, 1);
             shouldReturn = false;
         } else if (globalData.debugFlag == POSITION){
-            float voxelSize = float(globalData.giTileSubdivision);
-            finalColor = vec4(normalize(round(shaderData.worldSpacePosition * voxelSize) / voxelSize), 1);
+            finalColor = vec4(shaderData.worldSpacePosition, 1);
         } else if (globalData.debugFlag == EMISSIVE){
             finalColor = vec4(albedoEmissive.a > 0 ? vec3(1) : vec3(0), 1);
         } else if (globalData.debugFlag == GI){
@@ -91,7 +94,7 @@ void main() {
         } else {
             finalColor = vec4(shaderData.albedo, 1);
         }
-        if(shouldReturn) return;
+        if (shouldReturn) return;
     }
     #endif
 

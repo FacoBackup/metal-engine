@@ -23,10 +23,9 @@ namespace Metal {
             for (const std::string &file: files) {
                 if (context->meshImporter.isCompatible(file)) {
                     context->meshImporter.importScene(filesContext.currentDirectory->absolutePath,
-                                                                         file);
+                                                      file);
                 } else if (context->textureImporter.isCompatible(file)) {
-                    context->textureImporter.importTexture(
-                        filesContext.currentDirectory->absolutePath, file);
+                    context->textureImporter.importTexture(filesContext.currentDirectory->absolutePath, file);
                 }
             }
             FilesService::GetEntries(filesContext.currentDirectory);
@@ -82,7 +81,6 @@ namespace Metal {
             if (ImGui::IsWindowFocused()) {
                 filesContext.selected.clear();
             }
-            contextMenu();
             handleDrag();
             hotkeys();
 
@@ -107,6 +105,7 @@ namespace Metal {
                     }
                 }
             }
+            contextMenu();
             trackDrag();
         }
 
@@ -157,6 +156,7 @@ namespace Metal {
             }
         }
         ImGui::EndChild();
+        UIUtil::RenderTooltip(root->name);
     }
 
     void FilesPanel::trackDrag() {
@@ -241,7 +241,9 @@ namespace Metal {
 
     void FilesPanel::selectAll() {
         for (auto &entry: filesContext.currentDirectory->children) {
-            filesContext.selected.insert({entry->getId(), entry});
+            if (filesContext.filterType == EntryType::NONE || entry->type == filesContext.filterType) {
+                filesContext.selected.insert({entry->getId(), entry});
+            }
         }
     }
 

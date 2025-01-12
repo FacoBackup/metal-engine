@@ -28,13 +28,14 @@ namespace Metal {
         // GI
         alignas(4) unsigned int giBounces;
         alignas(4) unsigned int giTileSubdivision;
+        alignas(4) float giEmissiveFactor;
 
         alignas(4) unsigned int debugFlag;
 
-        alignas(4) unsigned int giBufferWidth;
-        alignas(4) unsigned int giBufferHeight;
-        alignas(4) unsigned int giFrameCount;
-        alignas(4) unsigned int globalFrameCount;
+        alignas(4) unsigned int surfaceCacheWidth;
+        alignas(4) unsigned int surfaceCacheHeight;
+        alignas(4) unsigned int giAccumulationCount = 0;
+        alignas(4) unsigned int globalFrameCount = 0;
     };
 }
 

@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <vulkan/vulkan_core.h>
 
+#include "TextureData.h"
 #include "../abstract/AbstractResourceService.h"
 
 namespace Metal {
@@ -28,6 +29,8 @@ namespace Metal {
         void generateMipmaps(const TextureInstance *image) const;
 
     public:
+        TextureData *stream(const std::string &id, const LevelOfDetail &lod) const;
+
         explicit TextureService(ApplicationContext &context)
             : AbstractResourceService(context) {
         }

@@ -7,8 +7,10 @@
 namespace Metal {
     struct EngineRepository final : Inspectable {
         bool giEnabled = false;
-        int giResScale = 4;
+        bool vsync = true;
+        int shadingResInvScale = 2;
         int giTileSubdivision = 40;
+        float giEmissiveFactor = 2;
         int giBounces = 1;
         float giStrength = 1;
         int numberOfTiles = 10;
@@ -33,6 +35,7 @@ namespace Metal {
         void onUpdate(InspectableMember *member, ApplicationContext &context) override;
 
         SAVE_TEMPLATE(
+            vsync,
             giBounces,
             atmosphereEnabled,
             elapsedTime,
@@ -47,10 +50,12 @@ namespace Metal {
             svoFilePaths,
             giEnabled,
             giTileSubdivision,
+            giEmissiveFactor,
             giStrength,
-            giResScale
+            shadingResInvScale
         )
     };
 } // Metal
+CEREAL_CLASS_VERSION(Metal::EngineRepository, 2)
 
 #endif //ENGINEREPO_H

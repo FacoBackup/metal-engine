@@ -16,6 +16,7 @@ typedef unsigned long long EntityID;
 
 #define FORMAT_FILE_MESH(baseName, lod) (baseName + FILE_NAME_SEPARATOR + lod.suffix + FILE_MESH + METAL_FILE_EXTENSION)
 #define FORMAT_FILE_TEXTURE(baseName, lod) (baseName + FILE_NAME_SEPARATOR + lod.suffix + FILE_TEXTURE + METAL_FILE_EXTENSION)
+#define FORMAT_FILE_MATERIAL(baseName) (baseName + FILE_NAME_SEPARATOR + FILE_MATERIAL + METAL_FILE_EXTENSION)
 #define FORMAT_FILE_SCENE(baseName) (baseName + FILE_NAME_SEPARATOR + FILE_SCENE + METAL_FILE_EXTENSION)
 #define FORMAT_FILE_METADATA(baseName) (baseName + FILE_METADATA)
 #define FORMAT_FILE_SVO(baseName) (baseName + FILE_SVO + METAL_FILE_EXTENSION)

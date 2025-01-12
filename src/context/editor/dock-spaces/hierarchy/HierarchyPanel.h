@@ -12,14 +12,14 @@ namespace Metal {
     struct WorldRepository;
     struct AbstractComponent;
     class Entity;
+    class HierarchyHeaderPanel;
 
     class HierarchyPanel final : public AbstractDockPanel {
         static constexpr auto TRANSPARENT = ImVec4(0, 0, 0, 0);
         static constexpr auto PADDING = ImVec2(0, 0);
         static constexpr auto TABLE_FLAGS = ImGuiTableFlags_ScrollY | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg
                                             | ImGuiTableFlags_NoBordersInBody;
-
-        char *search = "";
+        HierarchyHeaderPanel *headerPanel = nullptr;
         ImVec4 rowColor = ImVec4(0, 0, 0, 1);
         Entity *onDrag = nullptr;
         bool isOnSearch = false;
@@ -28,17 +28,20 @@ namespace Metal {
         std::unordered_map<EntityID, bool> opened{};
         WorldRepository *world = nullptr;
         EditorRepository *editorRepository = nullptr;
+        bool isSomethingHovered = false;
 
     public:
         void onInitialize() override;
 
-        void onSync() override;
+        void contextMenu() const;
 
-        void renderNodePinned(Entity *node);
+        void onSync() override;
 
         bool renderNode(EntityID entityId);
 
         bool isOpen(Entity *node, int flags) const;
+
+        static const char *GetIcon(const Metal::Entity *node);
 
         std::string getNodeLabel(Entity *node, bool addId) const;
 
@@ -46,15 +49,9 @@ namespace Metal {
 
         void renderEntityChildren(const Entity *node);
 
-        void renderComponents(const Entity *node) const;
-
-        static void addComponent(ComponentTypes::ComponentType component);
-
         int getFlags(const Entity *node);
 
-        void renderEntityColumns(const Entity *node, bool isPinned);
-
-        void changeVisibilityRecursively(EntityID node, bool isVisible);
+        void renderEntityColumns(const Entity *node, bool isPinned) const;
 
         void handleClick(const Entity *node) const;
 

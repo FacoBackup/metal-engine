@@ -58,6 +58,10 @@ namespace Metal {
         }
     }
 
+    void EngineContext::dispatchSceneVoxelization() {
+        voxelizationRequestId = Util::uuidV4();
+    }
+
     void EngineContext::onSync() {
         updateCurrentTime();
 
@@ -65,6 +69,7 @@ namespace Metal {
         context.worldGridService.onSync();
         context.streamingRepository.onSync();
         context.cameraService.onSync();
+        context.voxelizationService.onSync();
 
         updateGlobalData();
         updateVoxelData();
@@ -81,6 +86,10 @@ namespace Metal {
         if (lightingDataUpdated) {
             int index = 0;
             for (auto &entry: context.worldRepository.lights) {
+                if (context.worldRepository.hiddenEntities.contains(entry.first)) {
+                    continue;
+                }
+
                 auto l = entry.second;
                 lights[index] = LightData(
                     l.color * l.intensity,
@@ -117,19 +126,21 @@ namespace Metal {
         globalDataUBO.giBounces = context.engineRepository.giBounces;
         globalDataUBO.giEnabled = context.engineRepository.giEnabled;
         globalDataUBO.giTileSubdivision = context.engineRepository.giTileSubdivision;
+        globalDataUBO.giEmissiveFactor = context.engineRepository.giEmissiveFactor;
 
         globalDataUBO.debugFlag = ShadingMode::IndexOfValue(context.editorRepository.shadingMode);
-        globalDataUBO.giBufferWidth = context.coreTextures.giSurfaceCache->width;
-        globalDataUBO.giBufferHeight = context.coreTextures.giSurfaceCache->height;
-        globalDataUBO.giFrameCount = giFrameCount++;
-        globalDataUBO.globalFrameCount = globalFrameCount++;
+        globalDataUBO.surfaceCacheWidth = context.coreTextures.giSurfaceCache->width;
+        globalDataUBO.surfaceCacheHeight = context.coreTextures.giSurfaceCache->height;
+        globalDataUBO.giAccumulationCount++;
+        globalDataUBO.globalFrameCount++;
 
         if (context.engineRepository.incrementTime) {
             context.engineRepository.elapsedTime += .0005f * context.engineRepository.elapsedTimeSpeed;
         }
-        globalDataUBO.sunPosition = glm::vec3(std::sin(context.engineRepository.elapsedTime),
+        globalDataUBO.sunPosition = glm::vec3(0,
                                               std::cos(context.engineRepository.elapsedTime),
-                                              0) * context.engineRepository.sunDistance;
+                                              std::sin(context.engineRepository.elapsedTime)) * context.engineRepository
+                                    .sunDistance;
         globalDataUBO.sunColor = CalculateSunColor(
                                      globalDataUBO.sunPosition.y / context.engineRepository.sunDistance,
                                      context.engineRepository.nightColor, context.engineRepository.dawnColor,

@@ -17,9 +17,11 @@ namespace Metal {
     struct LevelOfDetail;
     struct MeshInstance;
     struct TextureInstance;
+    struct MaterialInstance;
 
     class StreamingRepository final : public AbstractRuntimeComponent {
         std::unordered_map<std::string, unsigned int> tries{};
+        std::unordered_map<std::string, long long> lastUse{};
         TimePoint sinceLastCleanup;
 
     public:
@@ -28,6 +30,8 @@ namespace Metal {
         }
 
         MeshInstance *streamMesh(const std::string &id, const LevelOfDetail &lod);
+
+        MaterialInstance *streamMaterial(const std::string &id);
 
         SVOInstance *streamSVO(const std::string &id);
 

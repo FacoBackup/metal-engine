@@ -7,6 +7,6 @@ namespace Metal {
     }
 
     PipelineInstance *GBufferShadingPass::getPipeline() {
-        return context.corePipelines.gBufferShadingPipeline;
+        return context.corePipelines.shadingPipeline;
     }
 } // Metal

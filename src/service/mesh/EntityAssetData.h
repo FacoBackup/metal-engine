@@ -2,14 +2,14 @@
 #define ENTITYASSETDATA_H
 #include <string>
 
-#include "MaterialData.h"
+#include "../material/MaterialData.h"
 #include "../../util/serialization-definitions.h"
 
 namespace Metal {
     struct EntityAssetData final {
         std::string name{};
         std::string meshId{};
-        MaterialData material;
+        std::string materialId{};
         int parentEntity = -1;
         int id;
 

@@ -8,24 +8,15 @@
 namespace Metal {
     struct MeshComponent final : AbstractComponent {
         std::string meshId;
+        std::string materialId;
 
-        std::string albedo;
-        bool useAlbedoTexture = false;
-        std::string normal;
-        bool useNormalTexture = false;
-        std::string roughness;
-        bool useRoughnessTexture = false;
-        std::string metallic;
-        bool useMetallicTexture = false;
-        std::string ao;
-        bool useAOTexture = false;
-        std::string height;
-        bool useHeightTexture = false;
 
         glm::vec3 albedoColor{1, 1, 1};
         bool emissiveSurface = false;
         float roughnessFactor = 1;
         float metallicFactor = .5;
+        int parallaxLayers = 16;
+        float parallaxHeightScale = 1;
 
         void registerFields() override;
 
@@ -33,25 +24,12 @@ namespace Metal {
 
         ComponentTypes::ComponentType getType() override;
 
-        SERIALIZE_TEMPLATE(entityId,
+        SERIALIZE_TEMPLATE(entityId, meshId, materialId,
+                           parallaxHeightScale, parallaxLayers,
                            emissiveSurface,
-                           meshId,
-                           albedo,
-                           useAlbedoTexture,
-                           normal,
-                           useNormalTexture,
-                           roughness,
-                           useRoughnessTexture,
-                           metallic,
-                           useMetallicTexture,
-                           ao,
-                           useAOTexture,
-                           height,
-                           useHeightTexture,
                            albedoColor.x, albedoColor.y, albedoColor.z,
                            roughnessFactor,
-                           metallicFactor
-        )
+                           metallicFactor)
     };
 }
 #endif //MESHCOMPONENT_H

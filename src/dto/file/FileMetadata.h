@@ -12,7 +12,7 @@ namespace Metal {
         std::string id = Util::uuidV4();
 
     public:
-        std::string name{};
+        std::string name;
         EntryType::EntryType type = EntryType::NONE;
 
         std::string getId() {

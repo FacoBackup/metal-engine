@@ -5,8 +5,8 @@
 namespace Metal {
     void CoreFrameBuffers::onInitialize() { {
             // G-BUFFER
-            gBufferFBO = framebufferService.createFrameBuffer(vulkanContext.getWindowWidth(),
-                                                              vulkanContext.getWindowHeight());
+            gBufferFBO = framebufferService.createFrameBuffer(vulkanContext.getWindowWidth()/context.engineRepository.shadingResInvScale,
+                                                              vulkanContext.getWindowHeight()/context.engineRepository.shadingResInvScale);
             framebufferService.createAttachment("Albedo; Emission flag", VK_FORMAT_R16G16B16A16_SFLOAT,
                                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, gBufferFBO);
             framebufferService.createAttachment("Normal; Roughness", VK_FORMAT_R16G16B16A16_SFLOAT,
@@ -17,13 +17,14 @@ namespace Metal {
                                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, gBufferFBO);
             framebufferService.createDepthAttachment(gBufferFBO);
             framebufferService.createRenderPass(gBufferFBO);
-        } {
-            // AUX FRAME BUFFER
-            auxFBO = framebufferService.createFrameBuffer(vulkanContext.getWindowWidth(),
-                                                          vulkanContext.getWindowHeight());
+        }  {
+            // SHADING BUFFER
+            shadingBuffer = framebufferService.createFrameBuffer(
+                vulkanContext.getWindowWidth() / context.engineRepository.shadingResInvScale,
+                vulkanContext.getWindowHeight() / context.engineRepository.shadingResInvScale);
             framebufferService.createAttachment("Color", VK_FORMAT_R16G16B16A16_SFLOAT,
-                                                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, auxFBO);
-            framebufferService.createRenderPass(auxFBO);
+                                                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, shadingBuffer);
+            framebufferService.createRenderPass(shadingBuffer);
         } {
             // POST PROCESSING
             postProcessingFBO = framebufferService.createFrameBuffer(vulkanContext.getWindowWidth(),

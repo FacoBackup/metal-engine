@@ -53,6 +53,62 @@ namespace Metal {
                 return nullptr;
         }
     }
+    void WorldRepository::deleteRecursively(const std::vector<EntityID> &entities) {
+        for (EntityID entity: entities) {
+            if (lights.contains(entity)) {
+                lights.erase(entity);
+            }
+            if (transforms.contains(entity)) {
+                transforms.erase(entity);
+            }
+            if (meshes.contains(entity)) {
+                meshes.erase(entity);
+            }
+            if (hiddenEntities.contains(entity)) {
+                hiddenEntities.erase(entity);
+            }
+            if (culled.contains(entity)) {
+                culled.erase(entity);
+            }
+            if (this->entities.contains(entity)) {
+                auto &currentEntity = this->entities.at(entity);
+                if (currentEntity.children.size() > 0) {
+                    std::vector<EntityID> newEntities = currentEntity.children;
+                    deleteRecursively(newEntities);
+                }
+
+                auto parentId = currentEntity.parent;
+                if (this->entities.contains(parentId)) {
+                    auto &parent = this->entities.at(parentId);
+                    parent.children.erase(
+                        std::ranges::remove(parent.children, entity).begin(),
+                        parent.children.end());
+                }
+                this->entities.erase(entity);
+            }
+        }
+    }
+    void WorldRepository::deleteEntities(const std::vector<EntityID> &entities) {
+        deleteRecursively(entities);
+        context.engineContext.setLightingDataUpdated(true);
+    }
+
+    void WorldRepository::changeVisibility(EntityID entity, bool isVisible) {
+        changeVisibilityRecursively(entity, isVisible);
+        context.engineContext.setLightingDataUpdated(true);
+    }
+
+    void WorldRepository::changeVisibilityRecursively(EntityID entity, const bool isVisible) {
+        if (isVisible) {
+            hiddenEntities.erase(entity);
+        } else {
+            hiddenEntities.insert({entity, true});
+        }
+
+        for (const auto child: getEntity(entity)->children) {
+            changeVisibilityRecursively(child, isVisible);
+        }
+    }
 
     void WorldRepository::createComponent(const EntityID entity, ComponentTypes::ComponentType type) {
         if (!entities.contains(entity)) {

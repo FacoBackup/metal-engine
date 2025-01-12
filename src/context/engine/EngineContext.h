@@ -24,14 +24,10 @@ namespace Metal {
         bool cameraUpdated = true;
         bool lightingDataUpdated = true;
         bool giSettingsUpdated = true;
-        unsigned int giFrameCount = 0;
-        unsigned int globalFrameCount = 0;
+        std::string voxelizationRequestId;
+        unsigned int giAccumulationCount = 0;
 
     public:
-        void resetGIFrameCount() {
-            giFrameCount = 0;
-        }
-
         void setLightingDataUpdated(const bool val) {
             lightingDataUpdated = val;
         }
@@ -52,6 +48,10 @@ namespace Metal {
             giSettingsUpdated = val;
         }
 
+        void resetGiAccumulationCount() {
+            globalDataUBO.giAccumulationCount = 0;
+        }
+
         bool isGISettingsUpdated() const {
             return giSettingsUpdated;
         }
@@ -61,6 +61,12 @@ namespace Metal {
         void updateVoxelData();
 
         void updateCurrentTime();
+
+        void dispatchSceneVoxelization();
+
+        std::string getVoxelizationRequestId() {
+            return voxelizationRequestId;
+        }
 
         explicit EngineContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {
         }

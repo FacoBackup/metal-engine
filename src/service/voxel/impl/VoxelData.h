@@ -9,19 +9,15 @@ namespace Metal {
     struct VoxelData {
         std::array<unsigned int, 2> data{};
 
-
-        explicit VoxelData(const glm::ivec3 color, glm::vec3 normal,
-                           const glm::vec2 roughnessMetallic, bool isEmissive) {
-            const auto roughness = static_cast<unsigned int>(std::round(roughnessMetallic.r * 100)); // 0 to 100
-            const auto metallic = static_cast<unsigned int>(std::round(roughnessMetallic.g * 100));
-
-            int red = (color.r / 2) & 0xFF;
-            int green = color.g & 0xFF;
-            int blue = (color.b / 2) & 0xFF;
-            unsigned int albedo = (red << 16) | (green << 8) | blue;
+        explicit VoxelData(const glm::vec3 &albedo, const glm::vec3 &normal, bool isEmissive) {
+            glm::ivec3 albedoLocal = glm::ivec3(albedo);
+            unsigned int r = static_cast<unsigned int>(albedoLocal.r & 0xFF);
+            unsigned int g = static_cast<unsigned int>(albedoLocal.g & 0xFF);
+            unsigned int b = static_cast<unsigned int>(albedoLocal.b & 0xFF);
+            unsigned int f = static_cast<unsigned int>(isEmissive ? 1 : 0);
 
             data = std::array{
-                isEmissive << 31 | roughness << 24 | albedo,
+                (r << 16) | (g << 8) | (b) | (f << 24),
                 CompressNormal(normal)
             };
         }

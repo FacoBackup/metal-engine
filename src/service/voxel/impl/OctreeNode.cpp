@@ -39,8 +39,8 @@ namespace Metal {
             std::string id;
             id += charData;
             if (isLeaf) {
-                id += std::to_string(data->data[0]);
-                id += std::to_string(data->data[1]);
+                id += std::to_string(data[0]);
+                id += std::to_string(data[1]);
             } else {
                 for (int i = 0; i < 8; i++) {
                     if (auto &child = children[i]; child != nullptr) {

@@ -1,22 +1,25 @@
 #include "./GlobalDataBuffer.glsl"
-#include "./GBufferUtil.glsl"
-
-layout(push_constant) uniform Push {
-    mat4 model;
-    vec4 albedoEmissive;
-    uint renderIndex;
-    float roughnessFactor;
-    float metallicFactor;
-} push;
+#include "./GBufferGenPushConstant.glsl"
 
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inNormal;
 layout(location = 2) in vec2 inUV;
 
+layout(set = 1, binding = 0) uniform sampler2D albedoEmissive;
+layout(set = 2, binding = 0) uniform sampler2D normal;
+layout(set = 3, binding = 0) uniform sampler2D roughness;
+layout(set = 4, binding = 0) uniform sampler2D metallic;
+layout(set = 5, binding = 0) uniform sampler2D ao;
+layout(set = 6, binding = 0) uniform sampler2D heightMap;
+
 layout (location = 0) out vec4 outMaterialA;
 layout (location = 1) out vec4 outMaterialB;
 layout (location = 2) out vec4 outMaterialC;
 layout (location = 3) out vec4 outMaterialD;
+
+#ifdef DEBUG
+#include "./DebugFlags.glsl"
+#endif
 
 float encode(float depthFunc, float val) {
     return log2(max(0.000001, val)) * depthFunc * 0.5;
@@ -71,26 +74,49 @@ vec2 parallaxOcclusionMapping(vec2 initialUV, vec3 worldSpacePosition, sampler2D
     float afterDepth = currentDepthMapValue - currentLayerDepth;
     float beforeDepth = texture(heightMap, prevTexCoords).r - currentLayerDepth + layerDepth;
 
-
     float weight = afterDepth / (afterDepth - beforeDepth);
     return prevTexCoords * weight + currentUVs * (1.0 - weight);
 }
 
 void main () {
     bool isDecalPass = false;// TODO - MOVE TO PUSH CONSTANT
-    bool useParallax = false;// TODO - MOVE TO MATERIAL PUSH CONSTANT
-    vec2 UV = inUV;
+    vec2 localUV = inUV;
     vec3 N = normalize(inNormal);
-    mat3 TBN = computeTBN(inPosition, UV, N, isDecalPass);
-    if (useParallax){
+    mat3 TBN = computeTBN(inPosition, localUV, N, isDecalPass);
+    vec3 W = inPosition;
+    if (push.useHeightTexture){
         vec3 V = globalData.cameraWorldPosition.xyz - inPosition;
         float distanceFromCamera = length(V);
-        //        UV = parallaxOcclusionMapping(UV, inPosition, heightMap, parallaxHeightScale, parallaxLayers, distanceFromCamera, TBN);
-    }
+        localUV = parallaxOcclusionMapping(localUV, W, heightMap, push.parallaxHeightScale, push.parallaxLayers, distanceFromCamera, TBN);
 
-    float ambientOcclusion = 1;
+    }
     outMaterialA = vec4(push.albedoEmissive);
     outMaterialB = vec4(N, push.roughnessFactor);
-    outMaterialC = vec4(push.renderIndex + 1, ambientOcclusion, push.metallicFactor, 1);
+    outMaterialC = vec4(push.renderIndex + 1, 1, push.metallicFactor, 1);
     outMaterialD = vec4(inPosition, 1);
+    if (push.useAlbedoTexture){
+        outMaterialA.rgb = texture(albedoEmissive, localUV).rgb;
+    }
+
+    if (push.useNormalTexture){
+        outMaterialB.rgb = vec3(normalize(TBN * (texture(normal, localUV).rgb * 2 - 1)));
+    }
+
+    if (push.useRoughnessTexture){
+        outMaterialB.a = texture(roughness, localUV).r;
+    }
+
+    if (push.useMetallicTexture){
+        outMaterialC.b = texture(metallic, localUV).r;
+    }
+
+    if (push.useAOTexture){
+        outMaterialC.g = texture(ao, localUV).r;
+    }
+
+    #ifdef DEBUG
+        if(globalData.debugFlag == UV) {
+            outMaterialA = vec4(normalize(localUV), 0, 1);
+        }
+    #endif
 }

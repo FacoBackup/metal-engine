@@ -95,7 +95,7 @@ namespace Metal {
             throw std::runtime_error("Descriptor instance is not ready");
         }
         if (writeDescriptorSets.empty()) {
-            throw std::runtime_error("No write descriptor sets were created");
+            return;
         }
 
         vkUpdateDescriptorSets(context.device.device,

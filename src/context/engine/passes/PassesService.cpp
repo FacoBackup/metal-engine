@@ -16,7 +16,7 @@ namespace Metal {
 
     void PassesService::onInitialize() {
         gBuffer = new CommandBufferRecorder(context.coreFrameBuffers.gBufferFBO, context);
-        fullScreen = new CommandBufferRecorder(context.coreFrameBuffers.auxFBO, context);
+        fullScreen = new CommandBufferRecorder(context.coreFrameBuffers.shadingBuffer, context);
         postProcessing = new CommandBufferRecorder(context.coreFrameBuffers.postProcessingFBO, context);
 
         context.worldGridService.onSync();

@@ -69,39 +69,30 @@ namespace Metal {
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         vkBeginCommandBuffer(vkCommandBuffer, &beginInfo);
 
-        RecordCommandsInternal(VK_PIPELINE_BIND_POINT_COMPUTE, computePasses, vkCommandBuffer);
+        RecordCommandsInternal(computePasses, vkCommandBuffer);
 
         vkCmdBeginRenderPass(vkCommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
         vkCmdSetViewport(vkCommandBuffer, 0, 1, &viewport);
         vkCmdSetScissor(vkCommandBuffer, 0, 1, &scissor);
-        RecordCommandsInternal(VK_PIPELINE_BIND_POINT_GRAPHICS, passes, vkCommandBuffer);
+        RecordCommandsInternal(passes, vkCommandBuffer);
         vkCmdEndRenderPass(vkCommandBuffer);
 
         vkEndCommandBuffer(vkCommandBuffer);
         context.vulkanContext.pushCommandBuffer(vkCommandBuffer);
     }
 
-    void CommandBufferRecorder::RecordCommandsInternal(VkPipelineBindPoint binding,
-                                                       const std::vector<std::unique_ptr<AbstractPass> > &passes,
-                                                       VkCommandBuffer vkCommandBuffer) {
+    void CommandBufferRecorder::RecordCommandsInternal(
+        const std::vector<std::unique_ptr<AbstractPass>> &passes,
+        VkCommandBuffer vkCommandBuffer) {
         for (auto &pass: passes) {
             pass->setCommandBuffer(vkCommandBuffer);
             if (!pass->shouldRun()) {
                 continue;
             }
             if (pass->getPipeline() != nullptr) {
-                vkCmdBindPipeline(vkCommandBuffer, binding, pass->getPipeline()->vkPipeline);
-                if (!pass->getPipeline()->descriptorSets.empty()) {
-                    vkCmdBindDescriptorSets(vkCommandBuffer,
-                                            binding,
-                                            pass->getPipeline()->vkPipelineLayout,
-                                            0,
-                                            pass->getPipeline()->descriptorSets.size(),
-                                            pass->getPipeline()->descriptorSets.data(),
-                                            0,
-                                            nullptr);
-                }
+                vkCmdBindPipeline(vkCommandBuffer, pass->getBindingPoint(), pass->getPipeline()->vkPipeline);
             }
+            pass->bindStaticDescriptorSets();
             pass->onSync();
         }
     }

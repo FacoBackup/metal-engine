@@ -86,6 +86,7 @@ namespace Metal {
 
         physDevice = physicalDeviceResult.value();
         vkGetPhysicalDeviceProperties(physDevice.physical_device, &physicalDeviceProperties);
+        std::cout << "MAX SAMPLERS " << physicalDeviceProperties.limits.maxDescriptorSetSamplers << " " << physicalDeviceProperties.limits.maxPerStageDescriptorSampledImages << std::endl;
         vkGetPhysicalDeviceMemoryProperties(physDevice.physical_device, &physicalDeviceMemoryProperties);
         if (!physDevice.enable_extension_if_present("VK_KHR_timeline_semaphore")) {
             throw std::runtime_error("Failed to enable core extension");
@@ -95,14 +96,11 @@ namespace Metal {
     }
 
     void VulkanContext::createPresentMode() {
-        constexpr VkPresentModeKHR present_modes[] = {
-            VK_PRESENT_MODE_MAILBOX_KHR, VK_PRESENT_MODE_IMMEDIATE_KHR,
-            VK_PRESENT_MODE_FIFO_KHR
-        };
+         VkPresentModeKHR presentModes = !context.engineRepository.vsync ? VK_PRESENT_MODE_IMMEDIATE_KHR : VK_PRESENT_MODE_FIFO_KHR;
         imguiVulkanWindow.PresentMode = ImGui_ImplVulkanH_SelectPresentMode(
             physDevice.physical_device, imguiVulkanWindow.Surface,
-            &present_modes[0],
-            IM_ARRAYSIZE(present_modes));
+            &presentModes,
+            1);
     }
 
     void VulkanContext::createSurfaceFormat() {
