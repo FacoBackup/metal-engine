@@ -57,6 +57,23 @@ vec2 spatialHashToUV(ivec3 coord, uint width, uint height) {
     return vec2(u, v);
 }
 
+//float getGridSize(in vec3 world){
+//    float dist = length(globalData.cameraWorldPosition - world);
+//
+//    if(dist <= 2){
+//        return globalData.giTileSubdivision;
+//    }
+//    if(dist <= 8){
+//        return round(globalData.giTileSubdivision / 2);
+//    }
+//    if(dist <= 16){
+//        return round(globalData.giTileSubdivision / 3);
+//    }
+//
+//    return round(globalData.giTileSubdivision / 4);
+//
+//}
+
 vec2 genHashSurfaceCache(vec3 world){
     float gridSize = float(globalData.giTileSubdivision);
 

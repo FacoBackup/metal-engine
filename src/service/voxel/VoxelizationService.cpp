@@ -188,7 +188,7 @@ namespace Metal {
                                               std::array<std::vector<VoxelizationRequest>, 3> &requests) const {
         unsigned int requestIndex = 0;
         for (auto entity: t.entities) {
-            if (context.worldRepository.meshes.contains(entity)) {
+            if (context.worldRepository.meshes.contains(entity) && !context.worldRepository.hiddenEntities.contains(entity)) {
                 auto &meshComponent = context.worldRepository.meshes.at(entity);
                 auto &transformComponent = context.worldRepository.transforms.at(entity);
                 if (transformComponent.isStatic) {
@@ -259,6 +259,10 @@ namespace Metal {
             isVoxelizationDone = false;
             isExecutingThread = false;
             context.notificationService.pushMessage("Voxelization done", NotificationSeverities::SUCCESS);
+
+            if (thread.joinable()) {
+                thread.join();
+            }
         }
         if (localVoxelizationRequestId == context.engineContext.getVoxelizationRequestId()) {
             return;

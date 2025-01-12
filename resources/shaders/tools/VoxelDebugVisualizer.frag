@@ -42,7 +42,7 @@ void main() {
         finalColor = vec4(randomColor(rand(hitData.voxelPosition.xyz)), 1);
         break;
         case GI:
-        finalColor = vec4(texture(surfaceCache, genHashSurfaceCache(hitData.hitPosition.xyz)).rgb, 1);
+        finalColor = vec4(texture(surfaceCache, genHashSurfaceCache(hitData.hitPosition.xyz)).rgb * globalData.giStrength, 1);
         break;
         default:
         finalColor = vec4(normalize(hitData.voxelPosition.xyz), 1);
