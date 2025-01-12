@@ -35,6 +35,7 @@ namespace Metal {
         void onUpdate(InspectableMember *member, ApplicationContext &context) override;
 
         SAVE_TEMPLATE(
+            vsync,
             giBounces,
             atmosphereEnabled,
             elapsedTime,
@@ -55,5 +56,6 @@ namespace Metal {
         )
     };
 } // Metal
+CEREAL_CLASS_VERSION(Metal::EngineRepository, 2)
 
 #endif //ENGINEREPO_H

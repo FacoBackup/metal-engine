@@ -14,6 +14,9 @@ namespace Metal {
 
     void IconsPass::onSync() {
         for (auto &light: context.worldRepository.lights) {
+            if (worldRepository.hiddenEntities.contains(light.second.getEntityId())) {
+                continue;
+            }
             pushConstant.translation = worldRepository.transforms.at(light.first).translation;
             pushConstant.iconColor = context.editorRepository.iconColor;
             pushConstant.imageIndex = 2;
