@@ -270,6 +270,7 @@ add_executable(
         src/repository/inspection/FileInspectionRepository.h
         src/context/editor/dock-spaces/inspector/MaterialInspection.cpp
         src/context/editor/dock-spaces/inspector/MaterialInspection.h
+        src/service/voxel/VoxelizationRequest.h
 )
 
 

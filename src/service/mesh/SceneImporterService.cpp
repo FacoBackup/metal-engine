@@ -87,11 +87,14 @@ namespace Metal {
                                                    const std::string &rootDirectory) const {
         for (unsigned int i = 0; i < scene->mNumMaterials; ++i) {
             const aiMaterial *material = scene->mMaterials[i];
-            FileMetadata materialMetadata{};
-            materialMetadata.type = EntryType::MATERIAL;
-            materialMetadata.name = "Material " + i;
-            DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(materialMetadata.getId()), materialMetadata)
-            materialMap.insert({i, materialMetadata.getId()});
+            std::string materialId; {
+                FileMetadata materialMetadata{};
+                materialMetadata.type = EntryType::MATERIAL;
+                materialMetadata.name = "Material " + i;
+                DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(materialMetadata.getId()), materialMetadata)
+                materialId = materialMetadata.getId();
+            }
+            materialMap.insert({i, materialId});
 
             auto materialData = MaterialData{};
             for (int textureType = aiTextureType_NONE + 1; textureType <= aiTextureType_UNKNOWN; ++textureType) {
@@ -132,7 +135,7 @@ namespace Metal {
                     }
                 }
             }
-            DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialMetadata.getId()), materialData)
+            DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialId), materialData)
         }
     }
 
@@ -140,8 +143,8 @@ namespace Metal {
         Assimp::Importer importer;
         const aiScene *scene = importer.ReadFile(
             pathToFile,
-            aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GlobalScale |
-            aiProcess_FindInstances |
+            aiProcess_Triangulate | aiProcess_GlobalScale |
+            aiProcess_FindInstances | aiProcess_FlipUVs | aiProcess_TransformUVCoords | aiProcess_GenUVCoords |
             aiProcess_PreTransformVertices | aiProcess_GenSmoothNormals);
 
         if (!scene || !scene->HasMeshes()) {

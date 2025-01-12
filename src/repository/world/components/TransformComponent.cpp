@@ -21,7 +21,7 @@ namespace Metal {
             context.worldRepository.lights.at(entityId).onUpdate(member, context);
         }
         if (member != nullptr && member->name == ROTATION) {
-            rotation = glm::quat(rotationEuler);
+            rotation = glm::quat(rotationEuler * (glm::pi<float>()/180.f));
         }
         forceTransform = true;
     }

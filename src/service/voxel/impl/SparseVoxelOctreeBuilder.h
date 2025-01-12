@@ -12,9 +12,8 @@ namespace Metal {
         unsigned int nodeQuantity = 1;
         unsigned int leafVoxelQuantity = 0;
         WorldTile *tile = nullptr;
-        std::vector<VoxelData *> data{};
 
-        void insertInternal(OctreeNode *node, glm::vec3 &point, VoxelData *data,
+        void insertInternal(OctreeNode *node, glm::vec3 &point, VoxelData &data,
                             glm::ivec3 &position, int depth, int maxDepth);
 
         static void WorldToChunkLocal(const WorldTile *tile, glm::vec3 &worldCoordinate);
@@ -41,7 +40,7 @@ namespace Metal {
             return tile;
         }
 
-        void insert(int maxDepth, glm::vec3 &point, VoxelData *data);
+        void insert(int maxDepth, glm::vec3 &point, VoxelData &data);
 
         void dispose() const;
 

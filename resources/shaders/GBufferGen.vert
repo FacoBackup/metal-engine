@@ -11,7 +11,7 @@ layout(location = 2) out vec2 outUV;
 
 void main(){
     outPosition = inPosition;
-    outNormal = inNormal;
+    outNormal =  mat3(transpose(inverse(push.model))) * inNormal;
     outUV = inUV;
     gl_Position =  globalData.projView * push.model * vec4(outPosition, 1.0);
 }

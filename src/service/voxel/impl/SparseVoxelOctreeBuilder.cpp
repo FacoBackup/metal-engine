@@ -2,8 +2,7 @@
 #include "../../../repository/world/impl/WorldTile.h"
 
 namespace Metal {
-    void SparseVoxelOctreeBuilder::insert(int maxDepth, glm::vec3 &point, VoxelData *data) {
-        this->data.push_back(data);
+    void SparseVoxelOctreeBuilder::insert(int maxDepth, glm::vec3 &point, VoxelData &data) {
         if (maxDepth < 1) {
             throw std::runtime_error("Depth is not set");
         }
@@ -16,9 +15,6 @@ namespace Metal {
     }
 
     void SparseVoxelOctreeBuilder::dispose() const {
-        for (const auto *data: this->data) {
-            delete data;
-        }
         root.dispose();
     }
 
@@ -27,10 +23,13 @@ namespace Metal {
     }
 
     void SparseVoxelOctreeBuilder::insertInternal(OctreeNode *node, glm::vec3 &point,
-                                                  VoxelData *data, glm::ivec3 &position,
+                                                  VoxelData &data, glm::ivec3 &position,
                                                   const int depth,
                                                   const int maxDepth) {
-        node->data = data;
+        node->data[0] = data.data[0];
+        node->data[1] = data.data[1];
+
+
         node->depth = depth;
         if (depth == maxDepth) {
             node->isLeaf = true;

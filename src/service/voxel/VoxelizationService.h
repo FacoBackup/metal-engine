@@ -11,6 +11,8 @@
 #include "impl/Triangle.h"
 
 namespace Metal {
+    struct WorldTile;
+    struct VoxelizationRequest;
     struct TextureData;
     struct MeshComponent;
     class SparseVoxelOctreeBuilder;
@@ -18,17 +20,16 @@ namespace Metal {
 
     class VoxelizationService final : public AbstractRuntimeComponent {
         std::unordered_map<std::string, TextureData *> textures{};
+        std::unordered_map<std::string, SparseVoxelOctreeBuilder> builders{};
         std::string localVoxelizationRequestId;
         bool isVoxelizationDone = false;
         bool isVoxelizationCancelled = false;
         bool isExecutingThread = false;
         std::thread thread;
 
-        void iterateTriangle(const MeshComponent *component, const Triangle &triangle,
-                             std::unordered_map<std::string, SparseVoxelOctreeBuilder> &builders) const;
+        void iterateTriangle(const MeshComponent *component, const Triangle &triangle);
 
-        void voxelize(const MeshComponent *component, const glm::mat4x4 &modelMatrix, const MeshData *mesh,
-                      std::unordered_map<std::string, SparseVoxelOctreeBuilder> &builders) const;
+        void voxelize(const MeshComponent *component, const glm::mat4x4 &modelMatrix, const MeshData *mesh);
 
         static void FillStorage(SparseVoxelOctreeBuilder &builder, unsigned int &bufferIndex,
                                 unsigned int &materialBufferIndex,
@@ -40,12 +41,16 @@ namespace Metal {
 
         void voxelize();
 
+        void voxelizeGroup(const std::vector<VoxelizationRequest> &request);
+
+        void collectRequests(WorldTile &t, std::array<std::vector<VoxelizationRequest>, 3> &requests) const;
+
     public:
         explicit VoxelizationService(ApplicationContext &context)
             : AbstractRuntimeComponent(context) {
         }
 
-        bool isExecutingVoxelization() {
+        bool isExecutingVoxelization() const {
             return isExecutingThread;
         }
 

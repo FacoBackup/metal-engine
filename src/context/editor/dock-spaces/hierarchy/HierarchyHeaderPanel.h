@@ -4,12 +4,10 @@
 
 namespace Metal {
     class HierarchyHeaderPanel final : public AbstractPanel {
-        char *&search;
-
     public:
-        explicit HierarchyHeaderPanel(char * &search);
-
         void onSync() override;
+
+        char search[512];
     };
 } // Metal
 

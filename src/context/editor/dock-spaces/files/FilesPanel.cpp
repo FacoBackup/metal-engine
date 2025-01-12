@@ -241,7 +241,9 @@ namespace Metal {
 
     void FilesPanel::selectAll() {
         for (auto &entry: filesContext.currentDirectory->children) {
-            filesContext.selected.insert({entry->getId(), entry});
+            if (filesContext.filterType == EntryType::NONE || entry->type == filesContext.filterType) {
+                filesContext.selected.insert({entry->getId(), entry});
+            }
         }
     }
 

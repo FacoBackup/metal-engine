@@ -42,7 +42,7 @@ VoxelMaterialData unpackVoxel(in Hit hit) {
         voxel.albedo.r = ((first >> 16u) & 0xFFu) / 255.f;
         voxel.albedo.g = ((first >> 8u) & 0xFFu) / 255.f;
         voxel.albedo.b = (first & 0xFFu) / 255.f;
-        voxel.albedo *= 4;
+        voxel.albedo *= 2;
         voxel.isEmissive = ((first >> 24u) & 0x1u) == 1;
     }
 

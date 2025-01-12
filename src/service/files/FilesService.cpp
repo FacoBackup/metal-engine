@@ -94,6 +94,10 @@ namespace Metal {
                     DELETE_S(FORMAT_FILE_SCENE)
                     break;
                 }
+                case EntryType::MATERIAL: {
+                    DELETE_S(FORMAT_FILE_MATERIAL)
+                    break;
+                }
                 default: break;;
             }
         }

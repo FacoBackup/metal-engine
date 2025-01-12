@@ -53,8 +53,7 @@ namespace Metal {
                 return nullptr;
         }
     }
-
-    void WorldRepository::deleteEntities(const std::vector<EntityID> &entities) {
+    void WorldRepository::deleteRecursively(const std::vector<EntityID> &entities) {
         for (EntityID entity: entities) {
             if (lights.contains(entity)) {
                 lights.erase(entity);
@@ -73,19 +72,24 @@ namespace Metal {
             }
             if (this->entities.contains(entity)) {
                 auto &currentEntity = this->entities.at(entity);
+                if (currentEntity.children.size() > 0) {
+                    std::vector<EntityID> newEntities = currentEntity.children;
+                    deleteRecursively(newEntities);
+                }
+
                 auto parentId = currentEntity.parent;
                 if (this->entities.contains(parentId)) {
-                    auto &parent = this->entities.at(this->entities.at(entity).parent);
+                    auto &parent = this->entities.at(parentId);
                     parent.children.erase(
                         std::ranges::remove(parent.children, entity).begin(),
                         parent.children.end());
                 }
-                if (currentEntity.children.size() > 0) {
-                    deleteEntities(currentEntity.children);
-                }
                 this->entities.erase(entity);
             }
         }
+    }
+    void WorldRepository::deleteEntities(const std::vector<EntityID> &entities) {
+        deleteRecursively(entities);
         context.engineContext.setLightingDataUpdated(true);
     }
 

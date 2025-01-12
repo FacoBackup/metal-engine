@@ -32,8 +32,8 @@ namespace Metal {
 
         alignas(4) unsigned int debugFlag;
 
-        alignas(4) unsigned int giBufferWidth;
-        alignas(4) unsigned int giBufferHeight;
+        alignas(4) unsigned int surfaceCacheWidth;
+        alignas(4) unsigned int surfaceCacheHeight;
         alignas(4) unsigned int globalFrameCount;
     };
 }

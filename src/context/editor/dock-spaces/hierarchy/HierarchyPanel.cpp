@@ -9,7 +9,7 @@
 
 namespace Metal {
     void HierarchyPanel::onInitialize() {
-        appendChild(new HierarchyHeaderPanel(search));
+        appendChild(headerPanel = new HierarchyHeaderPanel());
         world = &context->worldRepository;
         editorRepository = &context->editorRepository;
     }
@@ -33,7 +33,7 @@ namespace Metal {
     }
 
     void HierarchyPanel::onSync() {
-        isOnSearch = strlen(search) > 0;
+        isOnSearch = strlen(headerPanel->search) > 0;
 
         isSomethingHovered = ImGui::IsItemHovered();
 
@@ -58,7 +58,7 @@ namespace Metal {
         if (node == nullptr || (isOnSearch &&
                                 searchMatch.contains(node->getId()) &&
                                 searchMatchWith.contains(node->getId()) &&
-                                strcmp(searchMatchWith[node->getId()].c_str(), search))) {
+                                strcmp(searchMatchWith[node->getId()].c_str(), headerPanel->search))) {
             return false;
         }
 
@@ -128,13 +128,13 @@ namespace Metal {
     bool HierarchyPanel::matchSearch(const Entity *node) {
         bool isSearchMatch = false;
         if (isOnSearch) {
-            isSearchMatch = node->name.find(search) != std::string::npos;
+            isSearchMatch = node->name.find(headerPanel->search) != std::string::npos;
             if (isSearchMatch) {
                 searchMatch.insert({node->getId(), true});
             } else {
                 searchMatch.erase(node->getId());
             }
-            searchMatchWith.insert({node->getId(), search});
+            searchMatchWith.insert({node->getId(), headerPanel->search});
         } else {
             searchMatch.erase(node->getId());
             searchMatchWith.erase(node->getId());

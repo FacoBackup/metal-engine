@@ -99,11 +99,11 @@ void main () {
     }
 
     if (push.useNormalTexture){
-        outMaterialB.rgb = vec3(normalize(TBN * (texture(normal, localUV).rgb)));;
+        outMaterialB.rgb = vec3(normalize(TBN * (texture(normal, localUV).rgb * 2 - 1)));;
     }
 
     if (push.useRoughnessTexture){
-        outMaterialB.a = texture(roughness, localUV).r;
+        outMaterialB.a = 1. - texture(roughness, localUV).r;
     }
 
     if (push.useMetallicTexture){

@@ -147,7 +147,7 @@ namespace Metal {
             postProcessingDescriptor->create(vulkanContext);
             postProcessingDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                          context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                                         context.coreFrameBuffers.auxFBO->attachments[0]->
+                                                         context.coreFrameBuffers.shadingBuffer->attachments[0]->
                                                          vkImageView);
             postProcessingDescriptor->write(vulkanContext);
         }

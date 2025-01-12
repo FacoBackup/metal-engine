@@ -38,32 +38,7 @@ namespace Metal {
                              &imageSubresourceRange);
     }
 
-    void GlobalIlluminationPass::onSync() {
-        if (isFirstRun || context.engineContext.isCameraUpdated() || context.engineContext.isGISettingsUpdated() ||
-            context.engineContext.isLightingDataUpdated()) {
-            clearTexture(context.coreTextures.globalIllumination->vkImage);
-            clearTexture(context.coreTextures.giSurfaceCache->vkImage);
-            isFirstRun = false;
-        }
-
-        if (!context.engineRepository.giEnabled) {
-            return;
-        }
-
-        VkImageMemoryBarrier transferToGeneral = ImageUtils::TransferDstToGeneralBarrier(
-            context.coreTextures.globalIllumination->vkImage);
-
-        vkCmdPipelineBarrier(
-            vkCommandBuffer,
-            VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-            VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-            0,
-            0, nullptr,
-            0, nullptr,
-            1, &transferToGeneral);
-
-        recordImageDispatch(context.coreTextures.globalIllumination, 8, 8);
-
+    void GlobalIlluminationPass::changeTextureModeEnd() const {
         // // Convert image layout to READ_ONLY_OPTIMAL before reading from it in fragment shader.
         VkImageMemoryBarrier write2ReadBarrier = ImageUtils::writeToReadOnlyBarrier(
             context.coreTextures.globalIllumination->vkImage);
@@ -76,5 +51,42 @@ namespace Metal {
             0, nullptr,
             0, nullptr,
             1, &write2ReadBarrier);
+    }
+
+    void GlobalIlluminationPass::changeTextureModeBegin() const {
+        VkImageMemoryBarrier transferToGeneral = ImageUtils::TransferDstToGeneralBarrier(
+            context.coreTextures.globalIllumination->vkImage);
+
+        vkCmdPipelineBarrier(
+            vkCommandBuffer,
+            VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+            VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+            0,
+            0, nullptr,
+            0, nullptr,
+            1, &transferToGeneral);
+    }
+
+    void GlobalIlluminationPass::onSync() {
+        if (context.engineContext.isGISettingsUpdated() ||
+            context.engineContext.isLightingDataUpdated()) {
+
+        }
+        if (isFirstRun || context.engineContext.isCameraUpdated() || context.engineContext.isGISettingsUpdated() ||
+            context.engineContext.isLightingDataUpdated()) {
+            clearTexture(context.coreTextures.globalIllumination->vkImage);
+            clearTexture(context.coreTextures.giSurfaceCache->vkImage);
+            isFirstRun = false;
+        }
+
+        if (!context.engineRepository.giEnabled) {
+            return;
+        }
+
+        changeTextureModeBegin();
+
+        recordImageDispatch(context.coreTextures.globalIllumination, 8, 8);
+
+        changeTextureModeEnd();
     }
 } // Metal

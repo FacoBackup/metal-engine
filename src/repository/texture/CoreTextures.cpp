@@ -10,7 +10,7 @@ namespace Metal {
         giSurfaceCache = context.textureService.createForCompute(2000, 2000);
         giSurfaceCache->setAsNoDisposal();
 
-        globalIllumination = context.textureService.createForCompute(context.coreFrameBuffers.auxFBO->bufferWidth / context.engineRepository.giResScale, context.coreFrameBuffers.auxFBO->bufferHeight / context.engineRepository.giResScale);
+        globalIllumination = context.textureService.createForCompute(context.vulkanContext.getWindowWidth() / context.engineRepository.shadingResInvScale, context.vulkanContext.getWindowHeight() / context.engineRepository.shadingResInvScale);
         globalIllumination->setAsNoDisposal();
 
         if (context.isDebugMode()) {

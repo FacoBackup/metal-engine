@@ -4,6 +4,7 @@
 #include <thread>
 #include <cereal/archives/binary.hpp>
 
+#include "VoxelizationRequest.h"
 #include "../../context/ApplicationContext.h"
 #include "../../enum/LevelOfDetail.h"
 #include "../../enum/engine-definitions.h"
@@ -16,9 +17,7 @@
 #define MAX_DEPTH 12
 
 namespace Metal {
-    void VoxelizationService::iterateTriangle(const MeshComponent *component, const Triangle &triangle,
-                                              std::unordered_map<std::string, SparseVoxelOctreeBuilder> &builders)
-    const {
+    void VoxelizationService::iterateTriangle(const MeshComponent *component, const Triangle &triangle) {
         const float edgeLength1 = glm::distance(triangle.v0, triangle.v1);
         const float edgeLength2 = glm::distance(triangle.v1, triangle.v2);
         const float edgeLength3 = glm::distance(triangle.v2, triangle.v0);
@@ -45,7 +44,9 @@ namespace Metal {
         for (float lambda1 = 0; lambda1 <= 1; lambda1 += stepSize) {
             for (float lambda2 = 0; lambda2 <= 1 - lambda1; lambda2 += stepSize) {
                 float lambda0 = 1 - lambda1 - lambda2;
-
+                if (isVoxelizationCancelled) {
+                    return;
+                }
                 glm::vec2 uv = lambda0 * triangle.uv0 + lambda1 * triangle.uv1 + lambda2 * triangle.uv2;
                 glm::vec3 point = lambda0 * triangle.v0 +
                                   lambda1 * triangle.v1 +
@@ -65,22 +66,25 @@ namespace Metal {
                     if (albedoData != nullptr) {
                         albedo = glm::vec3(albedoData->sampleAt(uv));
                     }
+                    auto ptr = VoxelData(albedo, normal, component->emissiveSurface);
                     builders.at(voxelTile->id).insert(
                         MAX_DEPTH,
                         point,
-                        new VoxelData(albedo, normal, component->emissiveSurface));
+                        ptr);
                 }
             }
         }
     }
 
     void VoxelizationService::voxelize(const MeshComponent *component, const glm::mat4x4 &modelMatrix,
-                                       const MeshData *mesh,
-                                       std::unordered_map<std::string, SparseVoxelOctreeBuilder> &builders) const {
+                                       const MeshData *mesh) {
         auto &indices = mesh->indices;
         auto &data = mesh->data;
-
+        glm::mat3x3 transposeModel = glm::mat3x3(transpose(glm::inverse(modelMatrix)));
         for (int i = 0; i < indices.size(); i += 3) {
+            if (isVoxelizationCancelled) {
+                return;
+            }
             const auto index = indices[i];
             const auto index1 = indices[i + 1];
             const auto index2 = indices[i + 2];
@@ -89,16 +93,16 @@ namespace Metal {
                 modelMatrix * glm::vec4(data[index1].vertex, 1),
                 modelMatrix * glm::vec4(data[index2].vertex, 1),
 
-                data[index].normal,
-                data[index1].normal,
-                data[index2].normal,
+                transposeModel * data[index].normal,
+                transposeModel * data[index1].normal,
+                transposeModel * data[index2].normal,
 
                 data[index].uv,
                 data[index1].uv,
                 data[index2].uv
             );
 
-            iterateTriangle(component, triangle, builders);
+            iterateTriangle(component, triangle);
         }
     }
 
@@ -134,8 +138,8 @@ namespace Metal {
             }
         }
 
-        if (isParentOfLeaf && node->data != nullptr) {
-            std::array<unsigned int, 2> &compressed = node->data->data;
+        if (isParentOfLeaf) {
+            std::array<unsigned int, 2> &compressed = node->data;
             voxels.data[node->dataIndex] = node->packVoxelData(materialBufferIndex);
             voxels.data[materialBufferIndex + voxels.voxelBufferOffset] = compressed[0];
             materialBufferIndex++;
@@ -168,6 +172,36 @@ namespace Metal {
         METRIC_END("Ending serialization ")
     }
 
+    void VoxelizationService::voxelizeGroup(const std::vector<VoxelizationRequest> &request) {
+        for (auto &localRequest: request) {
+            METRIC_START
+            auto *mesh = context.meshService.stream(localRequest.meshComponent.meshId, LevelOfDetail::LOD_0);
+            if (mesh != nullptr) {
+                voxelize(&localRequest.meshComponent, localRequest.transform, mesh);
+                delete mesh;
+            }
+            METRIC_END(std::format("Voxelization of mesh {}", localRequest.meshComponent.getEntityId()))
+        }
+    }
+
+    void VoxelizationService::collectRequests(WorldTile &t,
+                                              std::array<std::vector<VoxelizationRequest>, 3> &requests) const {
+        unsigned int requestIndex = 0;
+        for (auto entity: t.entities) {
+            if (context.worldRepository.meshes.contains(entity)) {
+                auto &meshComponent = context.worldRepository.meshes.at(entity);
+                auto &transformComponent = context.worldRepository.transforms.at(entity);
+                if (transformComponent.isStatic) {
+                    requests[requestIndex].emplace_back(transformComponent.model, meshComponent);
+                    requestIndex++;
+                    if (requestIndex >= requests.size()) {
+                        requestIndex = 0;
+                    }
+                }
+            }
+        }
+    }
+
     void VoxelizationService::voxelize() {
         METRIC_START
         for (auto path: context.engineRepository.svoFilePaths) {
@@ -176,23 +210,25 @@ namespace Metal {
             }
         }
         context.engineRepository.svoFilePaths.clear();
-        std::unordered_map<std::string, SparseVoxelOctreeBuilder> builders;
         for (auto &t: context.worldGridRepository.getTiles()) {
-            for (auto entity: t.second.entities) {
-                if (isVoxelizationCancelled) {
-                    return;
+            std::array<std::vector<VoxelizationRequest>, 3> requests;
+            collectRequests(t.second, requests);
+
+            if (!isVoxelizationCancelled) {
+                std::vector<std::thread> threads;
+                for (int i = 0; i < requests.size(); i++) {
+                    auto &request = requests[i];
+                    if (i == requests.size() - 1) {
+                        voxelizeGroup(request);
+                    } else {
+                        threads.emplace_back([this, request]() {
+                            voxelizeGroup(request);
+                        });
+                    }
                 }
-                if (context.worldRepository.meshes.contains(entity)) {
-                    auto &meshComponent = context.worldRepository.meshes.at(entity);
-                    auto &transformComponent = context.worldRepository.transforms.at(entity);
-                    if (transformComponent.isStatic) {
-                        auto *mesh = context.meshService.stream(meshComponent.meshId, LevelOfDetail::LOD_0);
-                        if (mesh != nullptr) {
-                            METRIC_START
-                            voxelize(&meshComponent, transformComponent.model, mesh, builders);
-                            METRIC_END(std::format("Voxelization of mesh {}", meshComponent.getEntityId()))
-                        }
-                        delete mesh;
+                for (auto &t: threads) {
+                    if (t.joinable()) {
+                        t.join();
                     }
                 }
             }
@@ -208,6 +244,7 @@ namespace Metal {
             delete entry.second;
         }
         textures.clear();
+        builders.clear();
         METRIC_END("Ending Voxelization ")
 
         isVoxelizationDone = true;
@@ -221,6 +258,7 @@ namespace Metal {
             context.engineContext.setGISettingsUpdated(true);
             isVoxelizationDone = false;
             isExecutingThread = false;
+            context.notificationService.pushMessage("Voxelization done", NotificationSeverities::SUCCESS);
         }
         if (localVoxelizationRequestId == context.engineContext.getVoxelizationRequestId()) {
             return;
@@ -229,9 +267,12 @@ namespace Metal {
 
         // New voxelization request; Cancels the previous one and starts all over again
         cancelRequest();
-
+        context.notificationService.pushMessage("Voxelization started", NotificationSeverities::WARNING);
         std::cout << "Dispatching new voxelization request" << std::endl;
         isExecutingThread = true;
+        if (thread.joinable()) {
+            thread.join(); // Wait for the thread to finish
+        }
         thread = std::thread([this]() {
             voxelize();
         });
@@ -243,6 +284,7 @@ namespace Metal {
             isVoxelizationCancelled = true;
             thread.join();
             isVoxelizationCancelled = false;
+            context.notificationService.pushMessage("Voxelization cancelled", NotificationSeverities::SUCCESS);
         }
     }
 } // Metal

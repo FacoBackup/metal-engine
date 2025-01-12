@@ -15,6 +15,10 @@ namespace Metal {
         PipelineInstance *getPipeline() override;
 
         void clearTexture(const VkImage &image) const;
+
+        void changeTextureModeEnd() const;
+
+        void changeTextureModeBegin() const;
     };
 } // Metal
 

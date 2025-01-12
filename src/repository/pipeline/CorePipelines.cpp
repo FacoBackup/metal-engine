@@ -31,7 +31,7 @@ namespace Metal {
 
         if (context.isDebugMode()) {
             PipelineBuilder gridPipelineBuilder = PipelineBuilder::Of(
-                        context.coreFrameBuffers.auxFBO,
+                        context.coreFrameBuffers.shadingBuffer,
                         "QUAD.vert",
                         "tools/Grid.frag"
                     )
@@ -42,7 +42,7 @@ namespace Metal {
             gridPipeline = pipelineService.createPipeline(gridPipelineBuilder);
 
             PipelineBuilder iconPipelineBuilder = PipelineBuilder::Of(
-                        context.coreFrameBuffers.auxFBO,
+                        context.coreFrameBuffers.shadingBuffer,
                         "tools/Icon.vert",
                         "tools/Icon.frag"
                     )
@@ -53,7 +53,7 @@ namespace Metal {
             iconPipeline = pipelineService.createPipeline(iconPipelineBuilder);
 
             PipelineBuilder voxelVisualizerPipelineBuilder = PipelineBuilder::Of(
-                        context.coreFrameBuffers.auxFBO,
+                        context.coreFrameBuffers.shadingBuffer,
                         "QUAD.vert",
                         "tools/VoxelDebugVisualizer.frag"
                     )
@@ -74,8 +74,8 @@ namespace Metal {
         postProcessingPipeline = pipelineService.createPipeline(ppPipelineBuilder);
 
 
-        PipelineBuilder gBufferShadingPipelineBuilder = PipelineBuilder::Of(
-                    context.coreFrameBuffers.auxFBO,
+        PipelineBuilder shadingPipelineBuilder = PipelineBuilder::Of(
+                    context.coreFrameBuffers.shadingBuffer,
                     "QUAD.vert",
                     "GBufferShading.frag"
                 )
@@ -86,10 +86,10 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialD.get())
                 .addDescriptorSet(context.coreDescriptorSets.lightsData.get())
                 .addDescriptorSet(context.coreDescriptorSets.globalIlluminationDescriptor.get());
-        gBufferShadingPipeline = pipelineService.createPipeline(gBufferShadingPipelineBuilder);
+        shadingPipeline = pipelineService.createPipeline(shadingPipelineBuilder);
 
         PipelineBuilder atmosphereBuilder = PipelineBuilder::Of(
-                    context.coreFrameBuffers.auxFBO,
+                    context.coreFrameBuffers.shadingBuffer,
                     "QUAD.vert",
                     "Atmosphere.frag"
                 )
@@ -112,7 +112,7 @@ namespace Metal {
 
     void CorePipelines::dispose() const {
         gBufferPipeline->dispose(vulkanContext);
-        gBufferShadingPipeline->dispose(vulkanContext);
+        shadingPipeline->dispose(vulkanContext);
         atmospherePipeline->dispose(vulkanContext);
         postProcessingPipeline->dispose(vulkanContext);
         giComputePipeline->dispose(vulkanContext);

@@ -9,10 +9,10 @@
 
 namespace Metal {
     void EngineRepository::registerFields() {
+        registerInt(shadingResInvScale, "", "Shading inverted resolution scale (Restart required)", 1, 16);
         registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);
         registerBool(giEnabled, GLOBAL_ILLUMINATION, "Enabled?");
         registerFloat(giStrength, GLOBAL_ILLUMINATION, "Strength");
-        registerInt(giResScale, GLOBAL_ILLUMINATION, "Inverted resolution scale (Restart required)", 1, 16);
         registerInt(giBounces, GLOBAL_ILLUMINATION, "Max bounces", 0, 5);
         registerInt(giTileSubdivision, GLOBAL_ILLUMINATION, "Grid subdivision", 1);
         registerFloat(giEmissiveFactor, GLOBAL_ILLUMINATION, "Emissive surface factor", 0);

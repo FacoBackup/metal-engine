@@ -12,14 +12,14 @@ namespace Metal {
     struct WorldRepository;
     struct AbstractComponent;
     class Entity;
+    class HierarchyHeaderPanel;
 
     class HierarchyPanel final : public AbstractDockPanel {
         static constexpr auto TRANSPARENT = ImVec4(0, 0, 0, 0);
         static constexpr auto PADDING = ImVec2(0, 0);
         static constexpr auto TABLE_FLAGS = ImGuiTableFlags_ScrollY | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg
                                             | ImGuiTableFlags_NoBordersInBody;
-
-        char *search = "";
+        HierarchyHeaderPanel *headerPanel = nullptr;
         ImVec4 rowColor = ImVec4(0, 0, 0, 1);
         Entity *onDrag = nullptr;
         bool isOnSearch = false;
@@ -29,6 +29,7 @@ namespace Metal {
         WorldRepository *world = nullptr;
         EditorRepository *editorRepository = nullptr;
         bool isSomethingHovered = false;
+
     public:
         void onInitialize() override;
 
@@ -40,7 +41,7 @@ namespace Metal {
 
         bool isOpen(Entity *node, int flags) const;
 
-        static const char* GetIcon(const Metal::Entity * node);
+        static const char *GetIcon(const Metal::Entity *node);
 
         std::string getNodeLabel(Entity *node, bool addId) const;
 

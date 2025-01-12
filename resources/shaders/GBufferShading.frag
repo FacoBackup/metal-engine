@@ -52,7 +52,7 @@ void main() {
         globalIllumination = texture(globalIlluminationSampler, texCoords).rgb;
         float threshold = .1;
         float luminance = dot(globalIllumination.rgb, vec3(0.2126, 0.7152, 0.0722));
-        shadows = clamp((luminance / threshold), 0, 1);
+//        shadows = clamp((luminance / threshold), 0, 1);
     }
 
     shaderData.ambientOcclusion = materialC.g * shadows;

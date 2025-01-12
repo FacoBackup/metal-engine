@@ -12,6 +12,9 @@ namespace Metal {
         unsigned int renderIndex = 0;
         for (const auto &pair: worldRepository.meshes) {
             if (const auto &mesh = pair.second; !mesh.meshId.empty()) {
+                if (worldRepository.hiddenEntities.contains(mesh.getEntityId())) {
+                    continue;
+                }
                 const auto *meshInstance = streamingRepository.streamMesh(mesh.meshId, LevelOfDetail::LOD_0);
                 if (meshInstance != nullptr) {
                     const auto *materialInstance = streamingRepository.streamMaterial(mesh.materialId);

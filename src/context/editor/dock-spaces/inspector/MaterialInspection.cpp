@@ -25,11 +25,15 @@ namespace Metal {
         }
         ImGui::Spacing();
         ImGui::Separator();
-        if (UIUtil::ButtonSimple(Icons::save + "Save changes" + id, std::max(ImGui::GetContentRegionAvail().x / 2.f, 100.f), UIUtil::ONLY_ICON_BUTTON_SIZE)) {
+        if (UIUtil::ButtonSimple(Icons::save + "Save changes" + id,
+                                 std::max(ImGui::GetContentRegionAvail().x / 2.f, 100.f),
+                                 UIUtil::ONLY_ICON_BUTTON_SIZE)) {
             DUMP_TEMPLATE(context->getAssetDirectory() + FORMAT_FILE_MATERIAL(prevSelection), *data)
             context->notificationService.pushMessage("Material was saved", NotificationSeverities::SUCCESS);
-            context->materialService.getResources().at(prevSelection)->dispose(context->vulkanContext);
-            context->materialService.getResources().erase(prevSelection);
+            if (context->materialService.getResources().contains(prevSelection)) {
+                context->materialService.getResources().at(prevSelection)->dispose(context->vulkanContext);
+                context->materialService.getResources().erase(prevSelection);
+            }
         }
         UIUtil::RenderTooltip("Save changes");
         ImGui::Separator();

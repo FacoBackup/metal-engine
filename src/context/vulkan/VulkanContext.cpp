@@ -96,14 +96,11 @@ namespace Metal {
     }
 
     void VulkanContext::createPresentMode() {
-        constexpr VkPresentModeKHR present_modes[] = {
-            VK_PRESENT_MODE_MAILBOX_KHR, VK_PRESENT_MODE_IMMEDIATE_KHR,
-            VK_PRESENT_MODE_FIFO_KHR
-        };
+         VkPresentModeKHR presentModes = !context.engineRepository.vsync ? VK_PRESENT_MODE_IMMEDIATE_KHR : VK_PRESENT_MODE_FIFO_KHR;
         imguiVulkanWindow.PresentMode = ImGui_ImplVulkanH_SelectPresentMode(
             physDevice.physical_device, imguiVulkanWindow.Surface,
-            &present_modes[0],
-            IM_ARRAYSIZE(present_modes));
+            &presentModes,
+            1);
     }
 
     void VulkanContext::createSurfaceFormat() {
