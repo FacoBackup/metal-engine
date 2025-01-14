@@ -8,13 +8,14 @@ layout(local_size_x = 8, local_size_y = 8) in;
 #include "./Atmosphere.glsl"
 
 #define LIGHTS_SET 2
-layout(set = 3, binding = 0) uniform sampler2D gBufferMaterialA;// Albedo
-layout(set = 4, binding = 0) uniform sampler2D gBufferMaterialB;// Normal; Roughness
-layout(set = 5, binding = 0) uniform sampler2D gBufferMaterialD;// Position
+layout(set = 3, binding = 0) uniform sampler2D gBufferAlbedo;// Albedo + (isEmissive ? -1 : 1) * AO
+layout(set = 4, binding = 0) uniform sampler2D gBufferNormal ;// Normal + Metallic | Roughness
+layout(set = 5, binding = 0) uniform sampler2D gBufferPosition;// Position + ID
 layout(set = 6, binding = 0, rgba32f) uniform image2D surfaceCacheImage;
 layout(set = 7, binding = 0, rgba32f) uniform image2D globalIlluminationImage;
 
 #include "./LightsBuffer.glsl"
+#include "./GBufferUtil.glsl"
 
 struct BounceInfo {
     vec3 albedo;
@@ -149,11 +150,11 @@ float testLight(vec3 lightPosition, in vec3 rayOrigin){
 
 void main() {
     vec2 texCoords = vec2(gl_GlobalInvocationID.xy) / imageSize(globalIlluminationImage);
-    vec4 materialD = texture(gBufferMaterialD, texCoords);
-    if (materialD.a != 1.){
+    vec4 materialD = texture(gBufferPosition, texCoords);
+    if (materialD.a == 0){
         return;
     }
-    vec4 albedoEmissive = texture(gBufferMaterialA, texCoords);
+    vec4 albedoEmissive = texture(gBufferAlbedo, texCoords);
     if (albedoEmissive.a != 0){
         return;
     }
@@ -163,14 +164,15 @@ void main() {
     rngState = uint(uint(gl_GlobalInvocationID.x) * uint(1973) + uint(gl_GlobalInvocationID.y) * uint(9277) + uint(globalData.globalFrameCount) * uint(26699)) | uint(1);
 
     float bias = max(.05, 1e-4 * length(hitPosition.xyz));
-    vec4 normalRoughness = texture(gBufferMaterialB, texCoords);
-    vec3 normal = normalRoughness.rgb;
+    vec4 materialB = texture(gBufferNormal , texCoords);
+    vec3 normal = materialB.rgb;
     vec3 currentPosition = hitPosition.xyz + normal * bias;
 
     vec4 previousFrame = imageLoad(globalIlluminationImage, ivec2(gl_GlobalInvocationID.xy));
 
     vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
-    vec3 currentFrame = pathTraceScene(albedoEmissive.rgb, normal, currentPosition, normalRoughness.a, rayDir);
+    vec2 metallicRoughness = decompressRoughnessMetallic(materialB.a);
+    vec3 currentFrame = pathTraceScene(albedoEmissive.rgb, normal, currentPosition, metallicRoughness.y, rayDir);
 
     float shadows = 0;
     { // ------ SHADOWS

@@ -17,12 +17,12 @@ namespace Metal {
                     "GBufferGen.frag"
                 )
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialDataAlbedo.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialDataNormal.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialDataRoughness.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialDataMetallic.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialDataAO.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialDataHeight.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferPositionataAlbedo.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferPositionataNormal.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferPositionataRoughness.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferPositionataMetallic.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferPositionataAO.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferPositionataHeight.get())
                 .setPrepareForMesh()
                 .setDepthTest()
                 .setCullMode(VK_CULL_MODE_BACK_BIT)
@@ -38,7 +38,7 @@ namespace Metal {
                     .setBlendEnabled()
                     .setPushConstantsSize(sizeof(GridPushConstant))
                     .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                    .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialD.get());
+                    .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get());
             gridPipeline = pipelineService.createPipeline(gridPipelineBuilder);
 
             PipelineBuilder iconPipelineBuilder = PipelineBuilder::Of(
@@ -80,10 +80,9 @@ namespace Metal {
                     "GBufferShading.frag"
                 )
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialA.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialB.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialC.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialD.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferAlbedo.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferNormal.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get())
                 .addDescriptorSet(context.coreDescriptorSets.lightsData.get())
                 .addDescriptorSet(context.coreDescriptorSets.globalIlluminationDescriptor.get());
         shadingPipeline = pipelineService.createPipeline(shadingPipelineBuilder);
@@ -94,7 +93,7 @@ namespace Metal {
                     "Atmosphere.frag"
                 )
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialD.get());
+                .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get());
         atmospherePipeline = pipelineService.createPipeline(atmosphereBuilder);
 
 
@@ -102,9 +101,9 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.svoData.get())
                 .addDescriptorSet(context.coreDescriptorSets.lightsData.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialA.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialB.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferMaterialD.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferAlbedo.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferNormal.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get())
                 .addDescriptorSet(context.coreDescriptorSets.surfaceCacheCompute.get())
                 .addDescriptorSet(context.coreDescriptorSets.giCompute.get());
         giComputePipeline = pipelineService.createPipeline(giBuilder);

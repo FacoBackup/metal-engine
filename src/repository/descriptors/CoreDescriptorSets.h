@@ -15,21 +15,20 @@ namespace Metal {
         }
 
         std::unique_ptr<DescriptorInstance> globalDataDescriptor = nullptr;
-        std::unique_ptr<DescriptorInstance> gBufferMaterialDataAlbedo = nullptr;
-        std::unique_ptr<DescriptorInstance> gBufferMaterialDataNormal = nullptr;
-        std::unique_ptr<DescriptorInstance> gBufferMaterialDataRoughness = nullptr;
-        std::unique_ptr<DescriptorInstance> gBufferMaterialDataMetallic = nullptr;
-        std::unique_ptr<DescriptorInstance> gBufferMaterialDataAO = nullptr;
-        std::unique_ptr<DescriptorInstance> gBufferMaterialDataHeight = nullptr;
+        std::unique_ptr<DescriptorInstance> gBufferPositionataAlbedo = nullptr;
+        std::unique_ptr<DescriptorInstance> gBufferPositionataNormal = nullptr;
+        std::unique_ptr<DescriptorInstance> gBufferPositionataRoughness = nullptr;
+        std::unique_ptr<DescriptorInstance> gBufferPositionataMetallic = nullptr;
+        std::unique_ptr<DescriptorInstance> gBufferPositionataAO = nullptr;
+        std::unique_ptr<DescriptorInstance> gBufferPositionataHeight = nullptr;
         std::unique_ptr<DescriptorInstance> postProcessingDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> voxelPositionDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> voxelHitPositionDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> globalIlluminationDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> surfaceCacheFragment = nullptr;
-        std::unique_ptr<DescriptorInstance> gBufferMaterialA = nullptr;
-        std::unique_ptr<DescriptorInstance> gBufferMaterialB = nullptr;
-        std::unique_ptr<DescriptorInstance> gBufferMaterialC = nullptr;
-        std::unique_ptr<DescriptorInstance> gBufferMaterialD = nullptr;
+        std::unique_ptr<DescriptorInstance> gBufferAlbedo = nullptr;
+        std::unique_ptr<DescriptorInstance> gBufferNormal = nullptr;
+        std::unique_ptr<DescriptorInstance> gBufferPosition = nullptr;
         std::unique_ptr<DescriptorInstance> surfaceCacheCompute = nullptr;
         std::unique_ptr<DescriptorInstance> giCompute = nullptr;
         std::unique_ptr<DescriptorInstance> svoData = nullptr;

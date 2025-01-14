@@ -1,14 +1,14 @@
 #include "./GlobalDataBuffer.glsl"
+#include "./GBufferUtil.glsl"
 
 
 layout(location = 0) in vec2 texCoords;
 
-layout(set = 1, binding = 0) uniform sampler2D gBufferMaterialA;
-layout(set = 2, binding = 0) uniform sampler2D gBufferMaterialB;
-layout(set = 3, binding = 0) uniform sampler2D gBufferMaterialC;
-layout(set = 4, binding = 0) uniform sampler2D gBufferMaterialD;
-#define LIGHTS_SET 5
-layout(set = 6, binding = 0) uniform sampler2D globalIlluminationSampler;
+layout(set = 1, binding = 0) uniform sampler2D gBufferAlbedo;
+layout(set = 2, binding = 0) uniform sampler2D gBufferNormal ;
+layout(set = 3, binding = 0) uniform sampler2D gBufferPosition;
+#define LIGHTS_SET 4
+layout(set = 5, binding = 0) uniform sampler2D globalIlluminationSampler;
 
 #include "./Shading.glsl"
 
@@ -30,19 +30,20 @@ vec3 randomColor(int seed) {
 layout(location = 0) out vec4 finalColor;
 
 void main() {
-    vec4 materialC = texture(gBufferMaterialC, texCoords);
-    vec4 worldPos = texture(gBufferMaterialD, texCoords);
-    if (worldPos.a != 1.){
+    vec4 worldPos = texture(gBufferPosition, texCoords); // Position + ID
+    if (worldPos.a == 0.){
         discard;
     }
-    vec4 materialA = texture(gBufferMaterialA, texCoords);
-    vec4 materialB = texture(gBufferMaterialB, texCoords);
+    vec4 materialA = texture(gBufferAlbedo, texCoords); // Albedo + (isEmissive ? -1 : 1) * AO
+    vec4 materialB = texture(gBufferNormal , texCoords); // Normal + Metallic | Roughness
 
     vec4 albedoEmissive = materialA;
     ShaderData shaderData;
     shaderData.N = normalize(materialB.rgb);
-    shaderData.roughness = max(materialB.a, .015);
-    shaderData.metallic = materialC.b;
+
+    vec2 metallicRoughness = decompressRoughnessMetallic(materialB.a);
+    shaderData.metallic = metallicRoughness.x;
+    shaderData.roughness = max(metallicRoughness.y, .015);
     shaderData.viewSpacePosition = vec3(globalData.viewMatrix * worldPos);
     shaderData.worldSpacePosition = worldPos.rgb;
 
@@ -51,7 +52,7 @@ void main() {
         globalIllumination = texture(globalIlluminationSampler, texCoords);
     }
 
-    shaderData.ambientOcclusion = materialC.g * globalIllumination.a;
+    shaderData.ambientOcclusion = abs(materialA.a) * globalIllumination.a;
     shaderData.V = normalize(globalData.cameraWorldPosition - shaderData.worldSpacePosition);
     shaderData.distanceFromCamera = length(shaderData.V);
     shaderData.albedo = albedoEmissive.rgb;
@@ -79,9 +80,9 @@ void main() {
         } else if (globalData.debugFlag == DEPTH){
             finalColor = vec4(worldPos.rgb, 1);
         } else if (globalData.debugFlag == UV){
-            finalColor = vec4(texture(gBufferMaterialA, texCoords).rgb, 1);
+            finalColor = vec4(texture(gBufferAlbedo, texCoords).rgb, 1);
         } else if (globalData.debugFlag == RANDOM){
-            finalColor = vec4(randomColor(int(texture(gBufferMaterialC, texCoords).r)), 1);
+            finalColor = vec4(randomColor(int(worldPos.a)), 1);
         } else if (globalData.debugFlag == LIGHTING_ONLY){
             shaderData.albedo = vec3(1, 1, 1);
             shouldReturn = false;
@@ -98,7 +99,7 @@ void main() {
     }
     #endif
 
-    if (albedoEmissive.a > 0) { // EMISSION
+    if (materialA.a < 0) { // EMISSION
         finalColor = vec4(albedoEmissive.rgb, 1.);
         return;
     }

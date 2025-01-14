@@ -60,38 +60,37 @@ namespace Metal {
             globalDataDescriptor->write(vulkanContext);
         }
 
-        gBufferMaterialDataAlbedo = std::make_unique<DescriptorInstance>();
-        gBufferMaterialDataNormal = std::make_unique<DescriptorInstance>();
-        gBufferMaterialDataRoughness = std::make_unique<DescriptorInstance>();
-        gBufferMaterialDataMetallic = std::make_unique<DescriptorInstance>();
-        gBufferMaterialDataAO = std::make_unique<DescriptorInstance>();
-        gBufferMaterialDataHeight = std::make_unique<DescriptorInstance>();
+        gBufferPositionataAlbedo = std::make_unique<DescriptorInstance>();
+        gBufferPositionataNormal = std::make_unique<DescriptorInstance>();
+        gBufferPositionataRoughness = std::make_unique<DescriptorInstance>();
+        gBufferPositionataMetallic = std::make_unique<DescriptorInstance>();
+        gBufferPositionataAO = std::make_unique<DescriptorInstance>();
+        gBufferPositionataHeight = std::make_unique<DescriptorInstance>();
 
-        gBufferMaterialDataAlbedo->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
+        gBufferPositionataAlbedo->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
                                                     VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-        gBufferMaterialDataNormal->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
+        gBufferPositionataNormal->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
                                                     VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-        gBufferMaterialDataRoughness->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
+        gBufferPositionataRoughness->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
                                                        VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-        gBufferMaterialDataMetallic->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
+        gBufferPositionataMetallic->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
                                                       VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-        gBufferMaterialDataAO->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+        gBufferPositionataAO->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                 0);
-        gBufferMaterialDataHeight->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
+        gBufferPositionataHeight->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
                                                     VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
 
-        gBufferMaterialDataAlbedo->create(vulkanContext);
-        gBufferMaterialDataNormal->create(vulkanContext);
-        gBufferMaterialDataRoughness->create(vulkanContext);
-        gBufferMaterialDataMetallic->create(vulkanContext);
-        gBufferMaterialDataAO->create(vulkanContext);
-        gBufferMaterialDataHeight->create(vulkanContext);
+        gBufferPositionataAlbedo->create(vulkanContext);
+        gBufferPositionataNormal->create(vulkanContext);
+        gBufferPositionataRoughness->create(vulkanContext);
+        gBufferPositionataMetallic->create(vulkanContext);
+        gBufferPositionataAO->create(vulkanContext);
+        gBufferPositionataHeight->create(vulkanContext);
 
         // G-BUFFER
-        GBUFFER_D(gBufferMaterialA, 0)
-        GBUFFER_D(gBufferMaterialB, 1)
-        GBUFFER_D(gBufferMaterialC, 2)
-        GBUFFER_D(gBufferMaterialD, 3)
+        GBUFFER_D(gBufferAlbedo, 0)
+        GBUFFER_D(gBufferNormal, 1)
+        GBUFFER_D(gBufferPosition, 2)
 
         surfaceCacheCompute = std::make_unique<DescriptorInstance>();
         surfaceCacheCompute->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
