@@ -3,7 +3,6 @@
 #include "./CommandBufferRecorder.h"
 #include "../render-pass/impl/GBufferShadingPass.h"
 #include "../render-pass/impl/OpaqueRenderPass.h"
-#include "../render-pass/impl/UpscalingPass.h"
 #include "../render-pass/impl/PostProcessingPass.h"
 #include "../render-pass/impl/tools/GridPass.h"
 #include "../render-pass/impl/AtmospherePass.h"
@@ -19,9 +18,6 @@ namespace Metal {
         gBuffer = new CommandBufferRecorder(context.coreFrameBuffers.gBufferFBO, context);
         fullScreen = new CommandBufferRecorder(context.coreFrameBuffers.shadingFBO, context);
         postProcessing = new CommandBufferRecorder(context.coreFrameBuffers.postProcessingFBO, context);
-        composition = new CommandBufferRecorder(context.coreFrameBuffers.compositionFBO, context);
-
-        compositionRenderPass.push_back(std::make_unique<UpscalingPass>(context));
 
         fullScreenRenderPasses.push_back(std::make_unique<GBufferShadingPass>(context));
         fullScreenRenderPasses.push_back(std::make_unique<AtmospherePass>(context));
@@ -38,7 +34,6 @@ namespace Metal {
     void PassesService::onSync() {
         gBuffer->recordCommands(gBufferPasses);
         fullScreen->recordCommands(fullScreenRenderPasses, computePasses);
-        composition->recordCommands(compositionRenderPass);
         postProcessing->recordCommands(postProcessingPasses);
     }
 } // Metal

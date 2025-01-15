@@ -68,7 +68,7 @@ namespace Metal {
         materialHeight = std::make_unique<DescriptorInstance>();
 
         materialAlbedo->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                        VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
+                                         VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
         materialNormal->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
                                          VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
         materialRoughness->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
@@ -144,19 +144,9 @@ namespace Metal {
             postProcessingDescriptor->create(vulkanContext);
             postProcessingDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                          context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                                         context.coreFrameBuffers.compositionFBO->attachments[0]->
+                                                         context.coreFrameBuffers.shadingFBO->attachments[0]->
                                                          vkImageView);
             postProcessingDescriptor->write(vulkanContext);
-        } {
-            upscalingDescriptor = std::make_unique<DescriptorInstance>();
-            upscalingDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                  VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-            upscalingDescriptor->create(vulkanContext);
-            upscalingDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                    context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                                    context.coreFrameBuffers.shadingFBO->attachments[0]->
-                                                    vkImageView);
-            upscalingDescriptor->write(vulkanContext);
         }
     }
 } // Metal

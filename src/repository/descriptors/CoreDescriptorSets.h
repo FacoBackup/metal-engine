@@ -22,7 +22,6 @@ namespace Metal {
         std::unique_ptr<DescriptorInstance> materialAO = nullptr;
         std::unique_ptr<DescriptorInstance> materialHeight = nullptr;
         std::unique_ptr<DescriptorInstance> postProcessingDescriptor = nullptr;
-        std::unique_ptr<DescriptorInstance> upscalingDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> voxelPositionDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> voxelHitPositionDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> globalIlluminationDescriptor = nullptr;

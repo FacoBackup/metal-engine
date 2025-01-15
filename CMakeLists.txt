@@ -271,9 +271,6 @@ add_executable(
         src/context/editor/dock-spaces/inspector/MaterialInspection.cpp
         src/context/editor/dock-spaces/inspector/MaterialInspection.h
         src/service/voxel/VoxelizationRequest.h
-        src/context/engine/render-pass/impl/UpScalingPass.cpp
-        src/context/engine/render-pass/impl/UpScalingPass.h
-        src/dto/push-constant/UpscalingPushConstant.h
 )
 
 

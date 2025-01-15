@@ -6,7 +6,6 @@
 #include "../../dto/push-constant/GridPushConstant.h"
 #include "../../dto/push-constant/VoxelDebugSettingsPushConstant.h"
 #include "../../dto/push-constant/IconPushConstant.h"
-#include "../../dto/push-constant/UpscalingPushConstant.h"
 #include "../../service/pipeline/PipelineInstance.h"
 #include "../../service/pipeline/PipelineService.h"
 #include "../../service/pipeline/PipelineBuilder.h"
@@ -75,16 +74,6 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.postProcessingDescriptor.get());
         postProcessingPipeline = pipelineService.createPipeline(ppPipelineBuilder);
 
-        PipelineBuilder upScalingPipelineBuilder = PipelineBuilder::Of(
-                    context.coreFrameBuffers.compositionFBO,
-                    "QUAD.vert",
-                    "Upscaling.frag"
-                )
-                .setPushConstantsSize(sizeof(UpscalingPushConstant))
-                .addDescriptorSet(context.coreDescriptorSets.upscalingDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get());
-        upScalingPipeline = pipelineService.createPipeline(upScalingPipelineBuilder);
-
         PipelineBuilder shadingPipelineBuilder = PipelineBuilder::Of(
                     context.coreFrameBuffers.shadingFBO,
                     "QUAD.vert",
@@ -125,7 +114,6 @@ namespace Metal {
         shadingPipeline->dispose(vulkanContext);
         atmospherePipeline->dispose(vulkanContext);
         postProcessingPipeline->dispose(vulkanContext);
-        upScalingPipeline->dispose(vulkanContext);
         giComputePipeline->dispose(vulkanContext);
         if (context.isDebugMode()) {
             gridPipeline->dispose(vulkanContext);

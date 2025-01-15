@@ -9,7 +9,8 @@
 
 namespace Metal {
     void EngineRepository::registerFields() {
-        registerInt(shadingResInvScale, "", "Shading inverted resolution scale (Restart required)", 1, 16);
+        registerInt(shadingResInvScale, "Display settings (Restart required)", "Shading inverted resolution scale", 1, 16);
+        registerBool(vsync, "Display settings (Restart required)", "VSync?");
         registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);
         registerBool(giEnabled, GLOBAL_ILLUMINATION, "Enabled?");
         registerFloat(giStrength, GLOBAL_ILLUMINATION, "Strength");
