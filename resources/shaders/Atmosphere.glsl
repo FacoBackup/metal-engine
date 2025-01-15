@@ -1,4 +1,3 @@
-#define PI 3.14159265359
 
 float saturatedDot( in vec3 a, in vec3 b )
 {

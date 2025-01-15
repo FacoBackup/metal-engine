@@ -1,5 +1,4 @@
 #include "./VoxelInfo.glsl"
-#define PI_2 6.28318530718
 #define MAX_VOXEL_SIZE 10000000
 
 #define DEFINE_OCTREE_BUFFER(B, M, N) \

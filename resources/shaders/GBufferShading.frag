@@ -13,18 +13,7 @@ layout(set = 5, binding = 0) uniform sampler2D globalIlluminationSampler;
 #include "./Shading.glsl"
 
 #ifdef DEBUG
-vec3 randomColor(int seed) {
-    float hash = fract(sin(float(seed)) * 43758.5453);
-
-    float r = fract(hash * 13.756);
-    float g = fract(hash * 15.734);
-    float b = fract(hash * 17.652);
-
-    return vec3(r, g, b);
-}
-
 #include "./DebugFlags.glsl"
-
 #endif
 
 layout(location = 0) out vec4 finalColor;
@@ -78,18 +67,18 @@ void main() {
         } else if (globalData.debugFlag == AO){
             finalColor = vec4(vec3(shaderData.ambientOcclusion), 1);
         } else if (globalData.debugFlag == DEPTH){
-            finalColor = vec4(worldPos.rgb, 1);
+            finalColor = vec4(vec3(worldPos.a / 100.), 1);
         } else if (globalData.debugFlag == UV){
             finalColor = vec4(texture(gBufferAlbedo, texCoords).rgb, 1);
         } else if (globalData.debugFlag == RANDOM){
-            finalColor = vec4(randomColor(int(worldPos.a)), 1);
+            finalColor = vec4(albedoEmissive.rgb, 1);
         } else if (globalData.debugFlag == LIGHTING_ONLY){
             shaderData.albedo = vec3(1, 1, 1);
             shouldReturn = false;
         } else if (globalData.debugFlag == POSITION){
             finalColor = vec4(shaderData.worldSpacePosition, 1);
         } else if (globalData.debugFlag == EMISSIVE){
-            finalColor = vec4(albedoEmissive.a > 0 ? vec3(1) : vec3(0), 1);
+            finalColor = vec4(albedoEmissive.a < 0 ? vec3(1) : vec3(0), 1);
         } else if (globalData.debugFlag == GI){
             finalColor = vec4(globalIllumination.rgb, 1);
         } else {

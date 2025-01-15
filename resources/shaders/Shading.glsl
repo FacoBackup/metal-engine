@@ -1,4 +1,3 @@
-#define PI 3.14159265
 #include "./LightsBuffer.glsl"
 
 struct ShaderData {

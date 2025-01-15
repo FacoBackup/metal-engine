@@ -12,13 +12,6 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     bool enabledSun;
 
     bool giEnabled;
-// POST PROCESSING
-    float distortionIntensity;
-    float chromaticAberrationIntensity;
-    bool distortionEnabled;
-    bool chromaticAberrationEnabled;
-    bool vignetteEnabled;
-    float vignetteStrength;
 
 // GI
     uint giBounces;

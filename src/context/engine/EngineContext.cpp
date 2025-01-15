@@ -117,12 +117,6 @@ namespace Metal {
         globalDataUBO.lightsQuantity = lightsCount;
         globalDataUBO.enabledSun = context.engineRepository.atmosphereEnabled;
 
-        globalDataUBO.distortionIntensity = camera.distortionIntensity;
-        globalDataUBO.chromaticAberrationIntensity = camera.chromaticAberrationIntensity;
-        globalDataUBO.distortionEnabled = camera.distortionEnabled;
-        globalDataUBO.chromaticAberrationEnabled = camera.chromaticAberrationEnabled;
-        globalDataUBO.vignetteEnabled = camera.vignetteEnabled;
-        globalDataUBO.vignetteStrength = camera.vignetteStrength;
         globalDataUBO.giBounces = context.engineRepository.giBounces;
         globalDataUBO.giEnabled = context.engineRepository.giEnabled;
         globalDataUBO.giTileSubdivision = context.engineRepository.giTileSubdivision;
@@ -138,10 +132,9 @@ namespace Metal {
             context.engineRepository.elapsedTime += .0005f * context.engineRepository.elapsedTimeSpeed;
             setGISettingsUpdated(true);
         }
-        globalDataUBO.sunPosition = glm::vec3(0,
+        globalDataUBO.sunPosition = glm::vec3(std::sin(context.engineRepository.elapsedTime),
                                               std::cos(context.engineRepository.elapsedTime),
-                                              std::sin(context.engineRepository.elapsedTime)) * context.engineRepository
-                                    .sunDistance;
+                                              0) * context.engineRepository.sunDistance;
         globalDataUBO.sunColor = CalculateSunColor(
                                      globalDataUBO.sunPosition.y / context.engineRepository.sunDistance,
                                      context.engineRepository.nightColor, context.engineRepository.dawnColor,

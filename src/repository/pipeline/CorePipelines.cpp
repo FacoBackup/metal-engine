@@ -1,10 +1,12 @@
 #include "CorePipelines.h"
 #include "../../context/ApplicationContext.h"
 
+#include "../../dto/push-constant/PostProcessingPushConstant.h"
 #include "../../dto/push-constant/MeshPushConstant.h"
 #include "../../dto/push-constant/GridPushConstant.h"
 #include "../../dto/push-constant/VoxelDebugSettingsPushConstant.h"
 #include "../../dto/push-constant/IconPushConstant.h"
+#include "../../dto/push-constant/UpscalingPushConstant.h"
 #include "../../service/pipeline/PipelineInstance.h"
 #include "../../service/pipeline/PipelineService.h"
 #include "../../service/pipeline/PipelineBuilder.h"
@@ -17,12 +19,12 @@ namespace Metal {
                     "GBufferGen.frag"
                 )
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferPositionataAlbedo.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferPositionataNormal.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferPositionataRoughness.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferPositionataMetallic.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferPositionataAO.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferPositionataHeight.get())
+                .addDescriptorSet(context.coreDescriptorSets.materialAlbedo.get())
+                .addDescriptorSet(context.coreDescriptorSets.materialNormal.get())
+                .addDescriptorSet(context.coreDescriptorSets.materialRoughness.get())
+                .addDescriptorSet(context.coreDescriptorSets.materialMetallic.get())
+                .addDescriptorSet(context.coreDescriptorSets.materialAO.get())
+                .addDescriptorSet(context.coreDescriptorSets.materialHeight.get())
                 .setPrepareForMesh()
                 .setDepthTest()
                 .setCullMode(VK_CULL_MODE_BACK_BIT)
@@ -31,7 +33,7 @@ namespace Metal {
 
         if (context.isDebugMode()) {
             PipelineBuilder gridPipelineBuilder = PipelineBuilder::Of(
-                        context.coreFrameBuffers.shadingBuffer,
+                        context.coreFrameBuffers.shadingFBO,
                         "QUAD.vert",
                         "tools/Grid.frag"
                     )
@@ -42,7 +44,7 @@ namespace Metal {
             gridPipeline = pipelineService.createPipeline(gridPipelineBuilder);
 
             PipelineBuilder iconPipelineBuilder = PipelineBuilder::Of(
-                        context.coreFrameBuffers.shadingBuffer,
+                        context.coreFrameBuffers.shadingFBO,
                         "tools/Icon.vert",
                         "tools/Icon.frag"
                     )
@@ -53,7 +55,7 @@ namespace Metal {
             iconPipeline = pipelineService.createPipeline(iconPipelineBuilder);
 
             PipelineBuilder voxelVisualizerPipelineBuilder = PipelineBuilder::Of(
-                        context.coreFrameBuffers.shadingBuffer,
+                        context.coreFrameBuffers.shadingFBO,
                         "QUAD.vert",
                         "tools/VoxelDebugVisualizer.frag"
                     )
@@ -64,18 +66,27 @@ namespace Metal {
             voxelDebugVisualizerPipeline = pipelineService.createPipeline(voxelVisualizerPipelineBuilder);
         }
 
-
         PipelineBuilder ppPipelineBuilder = PipelineBuilder::Of(
                     context.coreFrameBuffers.postProcessingFBO,
                     "QUAD.vert",
                     "PostProcessing.frag"
                 )
+                .setPushConstantsSize(sizeof(PostProcessingPushConstant))
                 .addDescriptorSet(context.coreDescriptorSets.postProcessingDescriptor.get());
         postProcessingPipeline = pipelineService.createPipeline(ppPipelineBuilder);
 
+        PipelineBuilder upScalingPipelineBuilder = PipelineBuilder::Of(
+                    context.coreFrameBuffers.compositionFBO,
+                    "QUAD.vert",
+                    "Upscaling.frag"
+                )
+                .setPushConstantsSize(sizeof(UpscalingPushConstant))
+                .addDescriptorSet(context.coreDescriptorSets.upscalingDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get());
+        upScalingPipeline = pipelineService.createPipeline(upScalingPipelineBuilder);
 
         PipelineBuilder shadingPipelineBuilder = PipelineBuilder::Of(
-                    context.coreFrameBuffers.shadingBuffer,
+                    context.coreFrameBuffers.shadingFBO,
                     "QUAD.vert",
                     "GBufferShading.frag"
                 )
@@ -88,7 +99,7 @@ namespace Metal {
         shadingPipeline = pipelineService.createPipeline(shadingPipelineBuilder);
 
         PipelineBuilder atmosphereBuilder = PipelineBuilder::Of(
-                    context.coreFrameBuffers.shadingBuffer,
+                    context.coreFrameBuffers.shadingFBO,
                     "QUAD.vert",
                     "Atmosphere.frag"
                 )
@@ -114,6 +125,7 @@ namespace Metal {
         shadingPipeline->dispose(vulkanContext);
         atmospherePipeline->dispose(vulkanContext);
         postProcessingPipeline->dispose(vulkanContext);
+        upScalingPipeline->dispose(vulkanContext);
         giComputePipeline->dispose(vulkanContext);
         if (context.isDebugMode()) {
             gridPipeline->dispose(vulkanContext);

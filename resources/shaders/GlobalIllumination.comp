@@ -65,7 +65,7 @@ void evaluateSurface(in Light sunLight, inout BounceInfo bounceInfo){
     vec4 previousCacheData = imageLoad(surfaceCacheImage, coord);
     float accumulationCount = previousCacheData.a;
 
-    if (accumulationCount < 100 || bounceInfo.isEmissive){
+    if (accumulationCount < 100 || (bounceInfo.isEmissive  && accumulationCount < 10000)){
         vec3 lIndirect = vec3(0);
         vec3 lT = vec3(1);
         if (bounceInfo.isEmissive){

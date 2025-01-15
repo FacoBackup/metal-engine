@@ -15,13 +15,14 @@ namespace Metal {
         }
 
         std::unique_ptr<DescriptorInstance> globalDataDescriptor = nullptr;
-        std::unique_ptr<DescriptorInstance> gBufferPositionataAlbedo = nullptr;
-        std::unique_ptr<DescriptorInstance> gBufferPositionataNormal = nullptr;
-        std::unique_ptr<DescriptorInstance> gBufferPositionataRoughness = nullptr;
-        std::unique_ptr<DescriptorInstance> gBufferPositionataMetallic = nullptr;
-        std::unique_ptr<DescriptorInstance> gBufferPositionataAO = nullptr;
-        std::unique_ptr<DescriptorInstance> gBufferPositionataHeight = nullptr;
+        std::unique_ptr<DescriptorInstance> materialAlbedo = nullptr;
+        std::unique_ptr<DescriptorInstance> materialNormal = nullptr;
+        std::unique_ptr<DescriptorInstance> materialRoughness = nullptr;
+        std::unique_ptr<DescriptorInstance> materialMetallic = nullptr;
+        std::unique_ptr<DescriptorInstance> materialAO = nullptr;
+        std::unique_ptr<DescriptorInstance> materialHeight = nullptr;
         std::unique_ptr<DescriptorInstance> postProcessingDescriptor = nullptr;
+        std::unique_ptr<DescriptorInstance> upscalingDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> voxelPositionDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> voxelHitPositionDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> globalIlluminationDescriptor = nullptr;

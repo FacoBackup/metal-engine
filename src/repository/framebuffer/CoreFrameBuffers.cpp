@@ -18,12 +18,20 @@ namespace Metal {
             framebufferService.createRenderPass(gBufferFBO);
         } {
             // SHADING BUFFER
-            shadingBuffer = framebufferService.createFrameBuffer(
+            shadingFBO = framebufferService.createFrameBuffer(
                 vulkanContext.getWindowWidth() / context.engineRepository.shadingResInvScale,
                 vulkanContext.getWindowHeight() / context.engineRepository.shadingResInvScale);
             framebufferService.createAttachment("Color", VK_FORMAT_R16G16B16A16_SFLOAT,
-                                                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, shadingBuffer);
-            framebufferService.createRenderPass(shadingBuffer);
+                                                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, shadingFBO);
+            framebufferService.createRenderPass(shadingFBO);
+        } {
+            // UPSCALING BUFFER
+            compositionFBO = framebufferService.createFrameBuffer(
+                vulkanContext.getWindowWidth(),
+                vulkanContext.getWindowHeight());
+            framebufferService.createAttachment("Color", VK_FORMAT_R16G16B16A16_SFLOAT,
+                                                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, compositionFBO);
+            framebufferService.createRenderPass(compositionFBO);
         } {
             // POST PROCESSING
             postProcessingFBO = framebufferService.createFrameBuffer(vulkanContext.getWindowWidth(),

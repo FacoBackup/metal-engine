@@ -78,6 +78,18 @@ vec2 parallaxOcclusionMapping(vec2 initialUV, vec3 worldSpacePosition, float hei
     return prevTexCoords * weight + currentUVs * (1.0 - weight);
 }
 
+#ifdef DEBUG
+vec3 randomColor(int seed) {
+    float hash = fract(sin(float(seed)) * 43758.5453);
+
+    float r = fract(hash * 13.756);
+    float g = fract(hash * 15.734);
+    float b = fract(hash * 17.652);
+
+    return vec3(r, g, b);
+}
+#endif
+
 void main () {
     bool isDecalPass = false;// TODO - MOVE TO PUSH CONSTANT
     vec2 localUV = inUV;
@@ -92,7 +104,7 @@ void main () {
     }
     float metallic = push.metallicFactor;
     float roughness = push.roughnessFactor;
-    outMaterialA = vec4(push.albedoEmissive.rgb, push.albedoEmissive.a != 0 ? -1 : 1);
+    outMaterialA = vec4(push.albedoEmissive.rgb, gl_FragCoord.z);
     outMaterialB = vec4(N, 0);
     outMaterialC = vec4(inPosition, push.renderIndex + 1);
     if (push.useAlbedoTexture){
@@ -120,6 +132,8 @@ void main () {
     #ifdef DEBUG
     if (globalData.debugFlag == UV) {
         outMaterialA = vec4(normalize(localUV), 0, 1);
+    } else if (globalData.debugFlag == RANDOM) {
+        outMaterialA = vec4(randomColor(int(push.renderIndex + 1)), -1);
     }
     #endif
 }

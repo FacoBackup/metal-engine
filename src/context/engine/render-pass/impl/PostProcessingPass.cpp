@@ -12,6 +12,7 @@ namespace Metal {
         pushConstant.vignetteEnabled = camera.vignetteEnabled;
         pushConstant.vignetteStrength = camera.vignetteStrength;
 
+        recordPushConstant(&pushConstant);
         recordDrawSimpleInstanced(3, 1);
     }
 
