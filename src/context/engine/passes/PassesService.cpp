@@ -2,7 +2,7 @@
 #include "../../../context/ApplicationContext.h"
 #include "./CommandBufferRecorder.h"
 #include "../render-pass/impl/GBufferShadingPass.h"
-#include "../render-pass/impl/OpaqueRenderPass.h"
+#include "../render-pass/impl/GBufferGenPass.h"
 #include "../render-pass/impl/PostProcessingPass.h"
 #include "../render-pass/impl/tools/GridPass.h"
 #include "../render-pass/impl/AtmospherePass.h"
@@ -19,21 +19,50 @@ namespace Metal {
         fullScreen = new CommandBufferRecorder(context.coreFrameBuffers.shadingFBO, context);
         postProcessing = new CommandBufferRecorder(context.coreFrameBuffers.postProcessingFBO, context);
 
-        fullScreenRenderPasses.push_back(std::make_unique<GBufferShadingPass>(context));
-        fullScreenRenderPasses.push_back(std::make_unique<AtmospherePass>(context));
+        addPass(fullScreenRenderPasses, new GBufferShadingPass(context));
+        addPass(fullScreenRenderPasses, new AtmospherePass(context));
         if (context.isDebugMode()) {
-            fullScreenRenderPasses.push_back(std::make_unique<GridPass>(context));
-            fullScreenRenderPasses.push_back(std::make_unique<VoxelVisualizerPass>(context));
-            fullScreenRenderPasses.push_back(std::make_unique<IconsPass>(context));
+            addPass(fullScreenRenderPasses, new GridPass(context));
+            addPass(fullScreenRenderPasses, new VoxelVisualizerPass(context));
+            addPass(fullScreenRenderPasses, new IconsPass(context));
         }
-        computePasses.push_back(std::make_unique<GlobalIlluminationPass>(context));
-        postProcessingPasses.push_back(std::make_unique<PostProcessingPass>(context));
-        gBufferPasses.push_back(std::make_unique<OpaqueRenderPass>(context));
+        addPass(computePasses, new GlobalIlluminationPass(context));
+        addPass(postProcessingPasses, new PostProcessingPass(context));
+        addPass(gBufferPasses, new GBufferGenPass(context));
+
+        for (auto *pass : allPasses) {
+            pass->onInitialize();
+        }
+    }
+
+    void PassesService::addPass(std::vector<AbstractPass *> &p, AbstractPass *pointer) {
+        p.push_back(std::move(pointer));
+        allPasses.push_back(pointer);
     }
 
     void PassesService::onSync() {
         gBuffer->recordCommands(gBufferPasses);
         fullScreen->recordCommands(fullScreenRenderPasses, computePasses);
         postProcessing->recordCommands(postProcessingPasses);
+    }
+
+    void PassesService::dispose() {
+        delete gBuffer;
+        delete fullScreen;
+        delete postProcessing;
+
+
+        computePasses.clear();
+        giPasses.clear();
+        fullScreenRenderPasses.clear();
+        gBufferPasses.clear();
+        postProcessingPasses.clear();
+
+        for (auto &pass: allPasses) {
+            pass->getPipeline()->dispose(context.vulkanContext);
+
+            delete pass;
+        }
+        allPasses.clear();
     }
 } // Metal

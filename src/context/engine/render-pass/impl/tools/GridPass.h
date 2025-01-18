@@ -11,7 +11,7 @@ namespace Metal {
             : AbstractRenderPass(context) {
         }
 
-        PipelineInstance *getPipeline() override;
+       void onInitialize() override;
 
         bool shouldRun() override;
 

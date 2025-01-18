@@ -218,11 +218,10 @@ namespace Metal {
         context.coreFrameBuffers.onInitialize();
         context.coreTextures.onInitialize();
         context.coreDescriptorSets.onInitialize();
-        context.corePipelines.onInitialize();
         // ------- REPOSITORY INITIALIZATION
     }
 
-    void VulkanContext::dispose() {
+    void VulkanContext::dispose() const {
         context.pipelineService.disposeAll();
         context.textureService.disposeAll();
         context.meshService.disposeAll();

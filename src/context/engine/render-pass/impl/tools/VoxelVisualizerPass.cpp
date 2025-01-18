@@ -1,13 +1,24 @@
 #include "VoxelVisualizerPass.h"
 #include "../../../../ApplicationContext.h"
 
+#include "../../../../../service/pipeline/PipelineBuilder.h"
+
 namespace Metal {
-    bool VoxelVisualizerPass::shouldRun() {
-        return context.editorRepository.showVoxels;
+    void VoxelVisualizerPass::onInitialize() {
+        PipelineBuilder voxelVisualizerPipelineBuilder = PipelineBuilder::Of(
+                    context.coreFrameBuffers.shadingFBO,
+                    "QUAD.vert",
+                    "tools/VoxelDebugVisualizer.frag"
+                )
+                .setPushConstantsSize(sizeof(VoxelDebugSettingsPushConstant))
+                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.svoData.get())
+                .addDescriptorSet(context.coreDescriptorSets.surfaceCacheFragment.get());
+        pipelineInstance = context.pipelineService.createPipeline(voxelVisualizerPipelineBuilder);
     }
 
-    PipelineInstance *VoxelVisualizerPass::getPipeline() {
-        return context.corePipelines.voxelDebugVisualizerPipeline;
+    bool VoxelVisualizerPass::shouldRun() {
+        return context.editorRepository.showVoxels;
     }
 
     void VoxelVisualizerPass::onSync() {

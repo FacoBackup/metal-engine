@@ -87,8 +87,8 @@ add_executable(
         src/service/pipeline/ShaderModule.h
         src/context/engine/render-pass/AbstractRenderPass.cpp
         src/context/engine/render-pass/AbstractRenderPass.h
-        src/context/engine/render-pass/impl/OpaqueRenderPass.cpp
-        src/context/engine/render-pass/impl/OpaqueRenderPass.h
+        src/context/engine/render-pass/impl/GBufferGenPass.cpp
+        src/context/engine/render-pass/impl/GBufferGenPass.h
         src/service/texture/TextureInstance.h
         src/repository/abstract/ResourceRepository.h
         src/service/abstract/AbstractResourceService.cpp
@@ -98,8 +98,6 @@ add_executable(
         src/repository/framebuffer/CoreFrameBuffers.h
         src/repository/abstract/AbstractCoreRepository.h
         src/repository/abstract/AbstractCoreRepository.cpp
-        src/repository/pipeline/CorePipelines.cpp
-        src/repository/pipeline/CorePipelines.h
         src/service/framebuffer/FrameBufferService.cpp
         src/service/framebuffer/FrameBufferService.h
         src/service/framebuffer/FrameBufferInstance.h

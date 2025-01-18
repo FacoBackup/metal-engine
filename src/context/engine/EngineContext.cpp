@@ -11,7 +11,7 @@
 namespace Metal {
     void EngineContext::onInitialize() {
         context.worldGridService.onSync();
-        passesService.onInitialize();
+        context.passesService.onInitialize();
     }
 
     void EngineContext::updateVoxelData() {
@@ -75,7 +75,7 @@ namespace Metal {
         updateVoxelData();
         updateLights();
 
-        passesService.onSync();
+        context.passesService.onSync();
 
         setLightingDataUpdated(false);
         setCameraUpdated(false);
@@ -96,8 +96,8 @@ namespace Metal {
                 lights[index] = LightData(
                     l.color * l.intensity,
                     translation,
-                    translation - glm::vec3(l.radius/2),
-                    translation + glm::vec3(l.radius/2),
+                    translation - glm::vec3(l.radius / 2),
+                    translation + glm::vec3(l.radius / 2),
                     true
                 );
                 index++;
@@ -112,10 +112,12 @@ namespace Metal {
                 auto &mesh = entry.second;
                 if (mesh.emissiveSurface) {
                     lights[index] = LightData(
-                        mesh.albedoColor, // Approximation. The path tracer will sample the albedo color defined in the SVO
+                        mesh.albedoColor,
+                        // Approximation. The path tracer will sample the albedo color defined in the SVO
                         translation,
-                        translation - mesh.emissiveSurfaceArea/2.f,  // Approximation. This will be used by the path tracer to find the PDF
-                        translation + mesh.emissiveSurfaceArea/2.f,
+                        translation - mesh.emissiveSurfaceArea / 2.f,
+                        // Approximation. This will be used by the path tracer to find the PDF
+                        translation + mesh.emissiveSurfaceArea / 2.f,
                         false
                     );
                 }

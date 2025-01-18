@@ -9,7 +9,6 @@ namespace Metal {
     struct MeshInstance;
     class StreamingRepository;
     struct CoreFrameBuffers;
-    struct CorePipelines;
     struct PipelineInstance;
     struct CoreBuffers;
 
@@ -20,6 +19,7 @@ namespace Metal {
         VkCommandBuffer vkCommandBuffer = VK_NULL_HANDLE;
         WorldRepository &worldRepository;
         StreamingRepository &streamingRepository;
+        PipelineInstance *pipelineInstance = nullptr;
 
         explicit AbstractPass(ApplicationContext &context, bool isComputePass);
 
@@ -33,8 +33,8 @@ namespace Metal {
             this->vkCommandBuffer = vkCommandBuffer;
         }
 
-        virtual PipelineInstance *getPipeline() {
-            return nullptr;
+        PipelineInstance *getPipeline() {
+            return pipelineInstance;
         }
 
         virtual void bindStaticDescriptorSets();

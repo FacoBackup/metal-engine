@@ -5,6 +5,7 @@
 namespace Metal {
     class GlobalIlluminationPass final : public AbstractComputePass {
         bool isFirstRun = true;
+
     public:
         explicit GlobalIlluminationPass(ApplicationContext &context)
             : AbstractComputePass(context) {
@@ -12,7 +13,7 @@ namespace Metal {
 
         void onSync() override;
 
-        PipelineInstance *getPipeline() override;
+        void onInitialize() override;
 
         void clearTexture(const VkImage &image) const;
 

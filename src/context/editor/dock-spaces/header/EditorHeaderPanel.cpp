@@ -58,8 +58,8 @@ namespace Metal {
                 }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Compile shaders")) {
-                    context->corePipelines.dispose();
-                    context->corePipelines.onInitialize();
+                    context->passesService.dispose();
+                    context->passesService.onInitialize();
                 }
                 ImGui::EndMenu();
             }

@@ -1,11 +1,19 @@
 #include "IconsPass.h"
 
 #include "../../../../../context/ApplicationContext.h"
-#include "../../../../../repository/pipeline/CorePipelines.h"
+#include "../../../../../service/pipeline/PipelineBuilder.h"
 
 namespace Metal {
-    PipelineInstance *IconsPass::getPipeline() {
-        return context.corePipelines.iconPipeline;
+    void IconsPass::onInitialize() {
+        PipelineBuilder iconPipelineBuilder = PipelineBuilder::Of(
+                    context.coreFrameBuffers.shadingFBO,
+                    "QUAD.vert",
+                    "tools/Icon.frag"
+                )
+                .setPushConstantsSize(sizeof(IconPushConstant))
+                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.lightsData.get());
+        pipelineInstance = context.pipelineService.createPipeline(iconPipelineBuilder);
     }
 
     bool IconsPass::shouldRun() {

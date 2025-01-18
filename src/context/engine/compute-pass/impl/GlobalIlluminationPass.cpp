@@ -3,9 +3,20 @@
 #include "../../../../service/texture/TextureInstance.h"
 #include "../../../../util/ImageUtils.h"
 
+#include "../../../../service/pipeline/PipelineBuilder.h"
+
 namespace Metal {
-    PipelineInstance *GlobalIlluminationPass::getPipeline() {
-        return context.corePipelines.giComputePipeline;
+    void GlobalIlluminationPass::onInitialize() {
+        PipelineBuilder giBuilder = PipelineBuilder::Of("GlobalIllumination.comp")
+                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.svoData.get())
+                .addDescriptorSet(context.coreDescriptorSets.lightsData.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferAlbedo.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferNormal.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get())
+                .addDescriptorSet(context.coreDescriptorSets.surfaceCacheCompute.get())
+                .addDescriptorSet(context.coreDescriptorSets.giCompute.get());
+        pipelineInstance = context.pipelineService.createPipeline(giBuilder);
     }
 
     void GlobalIlluminationPass::clearTexture(const VkImage &image) const {

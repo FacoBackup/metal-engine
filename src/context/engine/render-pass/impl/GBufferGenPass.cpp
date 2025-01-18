@@ -1,14 +1,35 @@
-#include "OpaqueRenderPass.h"
+#include "GBufferGenPass.h"
 
 #include "../../../../context/ApplicationContext.h"
-#include "../../../../repository/pipeline/CorePipelines.h"
 #include "../../../../enum/LevelOfDetail.h"
 #include "../../../../repository/world/components/MeshComponent.h"
 #include "../../../../repository/world/components/TransformComponent.h"
 #include "../../../../service//framebuffer/FrameBufferInstance.h"
 
+#include "../../../../service/pipeline/PipelineBuilder.h"
+
 namespace Metal {
-    void OpaqueRenderPass::onSync() {
+    void GBufferGenPass::onInitialize() {
+        PipelineBuilder gBufferPipelineBuilder = PipelineBuilder::Of(
+                        context.coreFrameBuffers.gBufferFBO,
+                        "GBufferGen.vert",
+                        "GBufferGen.frag"
+                    )
+                    .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
+                    .addDescriptorSet(context.coreDescriptorSets.materialAlbedo.get())
+                    .addDescriptorSet(context.coreDescriptorSets.materialNormal.get())
+                    .addDescriptorSet(context.coreDescriptorSets.materialRoughness.get())
+                    .addDescriptorSet(context.coreDescriptorSets.materialMetallic.get())
+                    .addDescriptorSet(context.coreDescriptorSets.materialAO.get())
+                    .addDescriptorSet(context.coreDescriptorSets.materialHeight.get())
+                    .setPrepareForMesh()
+                    .setDepthTest()
+                    .setCullMode(VK_CULL_MODE_BACK_BIT)
+                    .setPushConstantsSize(sizeof(MeshPushConstant));
+        pipelineInstance = context.pipelineService.createPipeline(gBufferPipelineBuilder);
+    }
+
+    void GBufferGenPass::onSync() {
         unsigned int renderIndex = 0;
         for (const auto &pair: worldRepository.meshes) {
             if (const auto &mesh = pair.second; !mesh.meshId.empty()) {
@@ -105,9 +126,5 @@ namespace Metal {
         //     0, nullptr,
         //     imageMemoryBarriers.size(), imageMemoryBarriers.data()
         // );
-    }
-
-    PipelineInstance *OpaqueRenderPass::getPipeline() {
-        return context.corePipelines.gBufferPipeline;
     }
 } // Metal

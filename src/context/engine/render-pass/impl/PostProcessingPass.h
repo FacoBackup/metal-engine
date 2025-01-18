@@ -11,9 +11,9 @@ namespace Metal {
             : AbstractRenderPass(context) {
         }
 
-        void onSync() override;
+        void onInitialize() override;
 
-        PipelineInstance *getPipeline() override;
+        void onSync() override;
     };
 } // Metal
 

@@ -13,7 +13,7 @@ namespace Metal {
 
         void onSync() override;
 
-        PipelineInstance *getPipeline() override;
+        void onInitialize() override;
     };
 } // Metal
 
