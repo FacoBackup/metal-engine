@@ -126,7 +126,7 @@ void main () {
     if (push.useAOTexture){
         outMaterialA.a *= texture(aoSampler, localUV).r;
     }
-
+    outMaterialA.a *= push.albedoEmissive.a > 0 ? -1 : 1;
     outMaterialB.a = compressRoughnessMetallic(metallic, roughness);
 
     #ifdef DEBUG

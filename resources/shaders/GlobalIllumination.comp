@@ -95,7 +95,7 @@ void evaluateSurface(in Light sunLight, inout BounceInfo bounceInfo){
 }
 
 vec3 pathTraceScene(vec3 surfaceAlbedo, vec3 firstHitNormal, vec3 firstHitPos, float roughness, vec3 rayDir) {
-    Light sunLight = Light(globalData.sunColor, normalize(globalData.sunPosition) * 20, -1, -1, -1);
+    Light sunLight = Light(globalData.sunColor, normalize(globalData.sunPosition) * 20, vec3(0), vec3(0), true);
 
     BounceInfo bounceInfo;
     bounceInfo.throughput = vec3(1);
@@ -182,10 +182,8 @@ void main() {
         if (globalData.lightsQuantity > 0){
             for (int i = 0; i < globalData.lightsQuantity; ++i) {
                 Light l = lightsBuffer.lights[i];
-                if (length(l.position - hitPosition.xyz) < l.outerRadius) {
-                    shadows += testLight(l.position, shadowsPosition);
-                    total++;
-                }
+                shadows += testLight(l.position, shadowsPosition);
+                total++;
             }
         }
         if (globalData.enabledSun){

@@ -44,13 +44,12 @@ namespace Metal {
 
             PipelineBuilder iconPipelineBuilder = PipelineBuilder::Of(
                         context.coreFrameBuffers.shadingFBO,
-                        "tools/Icon.vert",
+                        "QUAD.vert",
                         "tools/Icon.frag"
                     )
-                    .useTriangleStrip()
                     .setPushConstantsSize(sizeof(IconPushConstant))
                     .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                    .addDescriptorSet(context.coreDescriptorSets.iconsDescriptor.get());
+                    .addDescriptorSet(context.coreDescriptorSets.lightsData.get());
             iconPipeline = pipelineService.createPipeline(iconPipelineBuilder);
 
             PipelineBuilder voxelVisualizerPipelineBuilder = PipelineBuilder::Of(

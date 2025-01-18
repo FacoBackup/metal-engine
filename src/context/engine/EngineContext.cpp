@@ -85,19 +85,40 @@ namespace Metal {
     void EngineContext::updateLights() {
         if (lightingDataUpdated) {
             int index = 0;
+
+            // Register lights
             for (auto &entry: context.worldRepository.lights) {
                 if (context.worldRepository.hiddenEntities.contains(entry.first)) {
                     continue;
                 }
-
-                auto l = entry.second;
+                auto &translation = context.worldRepository.transforms.at(entry.first).translation;
+                auto &l = entry.second;
                 lights[index] = LightData(
                     l.color * l.intensity,
-                    context.worldRepository.transforms.at(entry.first).translation,
-                    l.innerRadius,
-                    l.outerRadius,
-                    l.radius
+                    translation,
+                    translation - glm::vec3(l.radius/2),
+                    translation + glm::vec3(l.radius/2),
+                    true
                 );
+                index++;
+            }
+
+            // Register emissive surfaces as light sources
+            for (auto &entry: context.worldRepository.meshes) {
+                if (context.worldRepository.hiddenEntities.contains(entry.first)) {
+                    continue;
+                }
+                auto &translation = context.worldRepository.transforms.at(entry.first).translation;
+                auto &mesh = entry.second;
+                if (mesh.emissiveSurface) {
+                    lights[index] = LightData(
+                        mesh.albedoColor, // Approximation. The path tracer will sample the albedo color defined in the SVO
+                        translation,
+                        translation - mesh.emissiveSurfaceArea/2.f,  // Approximation. This will be used by the path tracer to find the PDF
+                        translation + mesh.emissiveSurfaceArea/2.f,
+                        false
+                    );
+                }
                 index++;
             }
             context.coreBuffers.lights->update(lights.data());

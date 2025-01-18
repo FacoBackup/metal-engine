@@ -13,9 +13,5 @@ namespace Metal {
         globalIllumination = context.textureService.createForCompute(context.vulkanContext.getWindowWidth() / context.engineRepository.shadingResInvScale, context.vulkanContext.getWindowHeight() / context.engineRepository.shadingResInvScale);
         globalIllumination->setAsNoDisposal();
 
-        if (context.isDebugMode()) {
-            icons = context.textureService.loadTexture(Util::uuidV4(), "resources/textures/icons.png", false);
-            icons->setAsNoDisposal();
-        }
     }
 } // Metal

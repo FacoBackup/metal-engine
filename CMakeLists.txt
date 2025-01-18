@@ -247,7 +247,6 @@ add_executable(
         src/repository/world/components/LightComponent.h
         src/context/engine/render-pass/impl/tools/IconsPass.cpp
         src/context/engine/render-pass/impl/tools/IconsPass.h
-        src/dto/push-constant/IconPushConstant.h
         src/repository/editor/EditorRepository.cpp
         src/dto/push-constant/GridPushConstant.h
         src/context/engine/render-pass/impl/AtmospherePass.cpp

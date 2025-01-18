@@ -20,6 +20,7 @@ namespace Metal {
         CommandBufferRecorder *gBuffer = nullptr;
         CommandBufferRecorder *fullScreen = nullptr;
         CommandBufferRecorder *postProcessing = nullptr;
+
     public:
         explicit PassesService(ApplicationContext &context);
 

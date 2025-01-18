@@ -33,7 +33,6 @@ namespace Metal {
         std::unique_ptr<DescriptorInstance> giCompute = nullptr;
         std::unique_ptr<DescriptorInstance> svoData = nullptr;
         std::unique_ptr<DescriptorInstance> lightsData = nullptr;
-        std::unique_ptr<DescriptorInstance> iconsDescriptor = nullptr;
 
         void onInitialize() override;
     };

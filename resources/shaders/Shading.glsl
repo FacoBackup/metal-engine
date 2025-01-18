@@ -83,23 +83,24 @@ vec3 computeDirectionalLight(in ShaderData shaderData){
 vec3 computeSphereLight(in ShaderData shaderData, in Light info){
     vec3 L = info.position - shaderData.worldSpacePosition;
     vec3 centerToRay        = dot(L, shaderData.VrN) * shaderData.VrN - L;
-    vec3 closestPoint        = L + centerToRay * clamp(info.radius / length(centerToRay), 0.0, 1.0);
+
+    vec3 closestPoint        = L + centerToRay * clamp(.01/ length(centerToRay), 0.0, 1.0);
     vec4 baseContribution = precomputeContribution(shaderData, closestPoint + shaderData.worldSpacePosition);
 
     if (baseContribution.a == 0.){
         return vec3(0.);
     }
 
-    float distanceFromFrag =  length(L);
-    float intensity = 1.;
-    float innerRadius = min(info.outerRadius, info.innerRadius);
-    if (distanceFromFrag > innerRadius) {
-        intensity = clamp(mix(1., 0., (distanceFromFrag - innerRadius) / (info.outerRadius - innerRadius)), 0., 1.);
-    }
-    if (intensity < .01){
-        return vec3(0);
-    }
-    return computeBRDF(shaderData, baseContribution.rgb, baseContribution.a, info.color) * intensity;
+//    float distanceFromFrag =  length(L);
+//    float intensity = 1.;
+//    float innerRadius = min(info.outerRadius, info.innerRadius);
+//    if (distanceFromFrag > innerRadius) {
+//        intensity = clamp(mix(1., 0., (distanceFromFrag - innerRadius) / (info.outerRadius - innerRadius)), 0., 1.);
+//    }
+//    if (intensity < .01){
+//        return vec3(0);
+//    }
+    return computeBRDF(shaderData, baseContribution.rgb, baseContribution.a, info.color);
 }
 
 vec3 physicallyBasedShadePixel(in ShaderData shaderData) {

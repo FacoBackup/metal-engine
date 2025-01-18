@@ -7,9 +7,9 @@ namespace Metal {
     struct LightData final {
         alignas(16) glm::vec3 color{};
         alignas(16) glm::vec3 position{};
-        alignas(4) float innerRadius;
-        alignas(4) float outerRadius;
-        alignas(4) float radius;
+        alignas(16) glm::vec3 min;
+        alignas(16) glm::vec3 max;
+        alignas(4) bool isSphere;
     };
 }
 
