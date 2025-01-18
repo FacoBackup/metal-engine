@@ -6,7 +6,7 @@
 namespace Metal {
     void IconsPass::onInitialize() {
         PipelineBuilder iconPipelineBuilder = PipelineBuilder::Of(
-                    context.coreFrameBuffers.shadingFBO,
+                    context.coreFrameBuffers.postProcessingFBO,
                     "QUAD.vert",
                     "tools/Icon.frag"
                 )

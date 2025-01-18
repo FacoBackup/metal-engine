@@ -215,8 +215,8 @@ add_executable(
         src/service/material/MaterialData.h
         src/context/engine/render-pass/impl/PostProcessingPass.cpp
         src/context/engine/render-pass/impl/PostProcessingPass.h
-        src/context/engine/render-pass/impl/GBufferShadingPass.cpp
-        src/context/engine/render-pass/impl/GBufferShadingPass.h
+        src/context/engine/compute-pass/impl/GBufferShadingPass.cpp
+        src/context/engine/compute-pass/impl/GBufferShadingPass.h
         src/service/pipeline/PipelineBuilder.h
         src/service/framebuffer/FrameBufferAttachment.cpp
         src/repository/engine/EngineRepository.cpp
@@ -247,8 +247,6 @@ add_executable(
         src/context/engine/render-pass/impl/tools/IconsPass.h
         src/repository/editor/EditorRepository.cpp
         src/dto/push-constant/GridPushConstant.h
-        src/context/engine/render-pass/impl/AtmospherePass.cpp
-        src/context/engine/render-pass/impl/AtmospherePass.h
         src/context/engine/compute-pass/AbstractComputePass.cpp
         src/context/engine/compute-pass/AbstractComputePass.h
         src/context/engine/passes/AbstractPass.cpp

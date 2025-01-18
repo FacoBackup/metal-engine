@@ -6,7 +6,7 @@
 namespace Metal {
     void GridPass::onInitialize() {
         PipelineBuilder gridPipelineBuilder = PipelineBuilder::Of(
-                    context.coreFrameBuffers.shadingFBO,
+                    context.coreFrameBuffers.postProcessingFBO,
                     "QUAD.vert",
                     "tools/Grid.frag"
                 )

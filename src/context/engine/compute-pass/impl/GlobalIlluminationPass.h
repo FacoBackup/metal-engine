@@ -14,12 +14,6 @@ namespace Metal {
         void onSync() override;
 
         void onInitialize() override;
-
-        void clearTexture(const VkImage &image) const;
-
-        void changeTextureModeEnd() const;
-
-        void changeTextureModeBegin() const;
     };
 } // Metal
 

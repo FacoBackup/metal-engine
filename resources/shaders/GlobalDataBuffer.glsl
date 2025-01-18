@@ -9,7 +9,7 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     vec3 sunPosition;
     float giStrength;
     uint lightsQuantity;
-    bool enabledSun;
+    bool isAtmosphereEnabled;
 
     bool giEnabled;
 

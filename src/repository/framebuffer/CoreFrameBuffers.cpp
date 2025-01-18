@@ -16,15 +16,7 @@ namespace Metal {
                                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, gBufferFBO);
             framebufferService.createDepthAttachment(gBufferFBO);
             framebufferService.createRenderPass(gBufferFBO);
-        } {
-            // SHADING BUFFER
-            shadingFBO = framebufferService.createFrameBuffer(
-                vulkanContext.getWindowWidth() / context.engineRepository.shadingResInvScale,
-                vulkanContext.getWindowHeight() / context.engineRepository.shadingResInvScale);
-            framebufferService.createAttachment("Color", VK_FORMAT_R16G16B16A16_SFLOAT,
-                                                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, shadingFBO);
-            framebufferService.createRenderPass(shadingFBO);
-        } {
+        }{
             // POST PROCESSING
             postProcessingFBO = framebufferService.createFrameBuffer(vulkanContext.getWindowWidth(),
                                                                      vulkanContext.getWindowHeight());

@@ -10,9 +10,19 @@
 #include "../../../util/VulkanUtils.h"
 
 namespace Metal {
+
+    void CommandBufferRecorder::createCommandBuffer() {
+        VkCommandBufferAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocInfo.commandPool = context.vulkanContext.commandPool;
+        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocInfo.commandBufferCount = MAX_FRAMES_IN_FLIGHT;
+        VulkanUtils::CheckVKResult(
+            vkAllocateCommandBuffers(context.vulkanContext.device.device, &allocInfo, _commandBuffers.data()));
+    }
     CommandBufferRecorder::CommandBufferRecorder(FrameBufferInstance *frameBuffer,
-                                                 ApplicationContext &applicationContext,
-                                                 const bool clearBuffer): context(applicationContext) {
+                                                   ApplicationContext &applicationContext,
+                                                   const bool clearBuffer): context(applicationContext) {
         createRenderPassInfo(frameBuffer, clearBuffer);
 
         viewport.width = static_cast<float>(frameBuffer->bufferWidth);
@@ -25,14 +35,13 @@ namespace Metal {
         scissor.extent.width = frameBuffer->bufferWidth;
         scissor.extent.height = frameBuffer->bufferHeight;
 
-        VkCommandBufferAllocateInfo allocInfo{};
-        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo.commandPool = context.vulkanContext.commandPool;
-        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandBufferCount = MAX_FRAMES_IN_FLIGHT;
-        VulkanUtils::CheckVKResult(
-            vkAllocateCommandBuffers(context.vulkanContext.device.device, &allocInfo, _commandBuffers.data()));
+        createCommandBuffer();
         computePassMode = false;
+    }
+
+    CommandBufferRecorder::CommandBufferRecorder(ApplicationContext &applicationContext) : context(applicationContext) {
+        createCommandBuffer();
+        computePassMode = true;
     }
 
     void CommandBufferRecorder::createRenderPassInfo(const FrameBufferInstance *frameBuffer, const bool clearBuffer) {
@@ -62,20 +71,21 @@ namespace Metal {
     }
 
     void CommandBufferRecorder::recordCommands(
-        const std::vector<AbstractPass *> &passes,
-        const std::vector<AbstractPass *> &computePasses) const {
+        const std::vector<AbstractPass *> &passes) const {
         auto vkCommandBuffer = _commandBuffers[context.getFrameIndex()];
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         vkBeginCommandBuffer(vkCommandBuffer, &beginInfo);
 
-        RecordCommandsInternal(computePasses, vkCommandBuffer);
-
-        vkCmdBeginRenderPass(vkCommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-        vkCmdSetViewport(vkCommandBuffer, 0, 1, &viewport);
-        vkCmdSetScissor(vkCommandBuffer, 0, 1, &scissor);
-        RecordCommandsInternal(passes, vkCommandBuffer);
-        vkCmdEndRenderPass(vkCommandBuffer);
+        if (computePassMode) {
+            RecordCommandsInternal(passes, vkCommandBuffer);
+        } else {
+            vkCmdBeginRenderPass(vkCommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+            vkCmdSetViewport(vkCommandBuffer, 0, 1, &viewport);
+            vkCmdSetScissor(vkCommandBuffer, 0, 1, &scissor);
+            RecordCommandsInternal(passes, vkCommandBuffer);
+            vkCmdEndRenderPass(vkCommandBuffer);
+        }
 
         vkEndCommandBuffer(vkCommandBuffer);
         context.vulkanContext.pushCommandBuffer(vkCommandBuffer);

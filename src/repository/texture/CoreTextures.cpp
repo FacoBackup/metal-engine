@@ -13,5 +13,8 @@ namespace Metal {
         globalIllumination = context.textureService.createForCompute(context.vulkanContext.getWindowWidth() / context.engineRepository.shadingResInvScale, context.vulkanContext.getWindowHeight() / context.engineRepository.shadingResInvScale);
         globalIllumination->setAsNoDisposal();
 
+        shading = context.textureService.createForCompute(context.vulkanContext.getWindowWidth() / context.engineRepository.shadingResInvScale, context.vulkanContext.getWindowHeight() / context.engineRepository.shadingResInvScale);
+        shading->setAsNoDisposal();
+
     }
 } // Metal

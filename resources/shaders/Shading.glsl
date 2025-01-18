@@ -17,7 +17,7 @@ struct ShaderData {
     float metallic;
     float ambientOcclusion;
     uint lightsQuantity;
-    bool enabledSun;
+    bool isAtmosphereEnabled;
 };
 
 vec3 getDiffuse(vec3 KS, float metallic) {
@@ -104,7 +104,7 @@ vec3 computeSphereLight(in ShaderData shaderData, in Light info){
 }
 
 vec3 physicallyBasedShadePixel(in ShaderData shaderData) {
-    vec3 finalColor = shaderData.enabledSun ? computeDirectionalLight(shaderData) : vec3(0);
+    vec3 finalColor = shaderData.isAtmosphereEnabled ? computeDirectionalLight(shaderData) : vec3(0);
 
     for (uint i = 0; i < shaderData.lightsQuantity; i++){
         finalColor += computeSphereLight(shaderData, lightsBuffer.lights[i]);

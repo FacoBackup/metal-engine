@@ -138,7 +138,7 @@ namespace Metal {
         globalDataUBO.cameraWorldPosition = camera.position;
         globalDataUBO.giStrength = context.engineRepository.giStrength;
         globalDataUBO.lightsQuantity = lightsCount;
-        globalDataUBO.enabledSun = context.engineRepository.atmosphereEnabled;
+        globalDataUBO.isAtmosphereEnabled = context.engineRepository.atmosphereEnabled;
 
         globalDataUBO.giBounces = context.engineRepository.giBounces;
         globalDataUBO.giEnabled = context.engineRepository.giEnabled;

@@ -1,13 +1,15 @@
 #ifndef GBUFFERSHADINGPASS_H
 #define GBUFFERSHADINGPASS_H
-#include "../AbstractRenderPass.h"
+#include "../../render-pass/AbstractRenderPass.h"
+#include "../AbstractComputePass.h"
 
 namespace Metal {
 
-    class GBufferShadingPass final : public AbstractRenderPass {
+    class GBufferShadingPass final : public AbstractComputePass {
+        bool isFirstRun = true;
     public:
         explicit GBufferShadingPass(ApplicationContext &context)
-            : AbstractRenderPass(context) {
+            : AbstractComputePass(context) {
         }
 
         void onSync() override;

@@ -13,13 +13,12 @@ namespace Metal {
     class PassesService final : public AbstractRuntimeComponent {
         std::vector<AbstractPass *> computePasses;
         std::vector<AbstractPass *> giPasses;
-        std::vector<AbstractPass *> fullScreenRenderPasses;
         std::vector<AbstractPass *> gBufferPasses;
         std::vector<AbstractPass *> postProcessingPasses;
         std::vector<AbstractPass *> allPasses;
 
         CommandBufferRecorder *gBuffer = nullptr;
-        CommandBufferRecorder *fullScreen = nullptr;
+        CommandBufferRecorder *compute = nullptr;
         CommandBufferRecorder *postProcessing = nullptr;
 
     public:

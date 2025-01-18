@@ -79,7 +79,7 @@ void evaluateSurface(in Light sunLight, inout BounceInfo bounceInfo){
                     computeLightContribution(l, bounceInfo, lT, lIndirect);
                 }
             }
-            if (globalData.enabledSun){
+            if (globalData.isAtmosphereEnabled){
                 computeLightContribution(sunLight, bounceInfo, lT, lIndirect);
             }
         }
@@ -115,7 +115,7 @@ vec3 pathTraceScene(vec3 surfaceAlbedo, vec3 firstHitNormal, vec3 firstHitPos, f
         Ray ray = Ray(bounceInfo.currentPosition, localRayDir, 1.0 / localRayDir);
         Hit hitData = traceAllTiles(ray);
         if (!hitData.anyHit) {
-            if (globalData.enabledSun){
+            if (globalData.isAtmosphereEnabled){
                 bounceInfo.albedo = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), ray.d, 2.0f) * 0.05f;
                 bounceInfo.isEmissive = true;
                 evaluateSurface(sunLight, bounceInfo);
@@ -186,7 +186,7 @@ void main() {
                 total++;
             }
         }
-        if (globalData.enabledSun){
+        if (globalData.isAtmosphereEnabled){
             shadows += testLight(globalData.sunPosition, shadowsPosition);
             total++;
         }

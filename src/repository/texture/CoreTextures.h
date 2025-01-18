@@ -16,6 +16,7 @@ namespace Metal {
 
         TextureInstance *giSurfaceCache = nullptr;
         TextureInstance *globalIllumination = nullptr;
+        TextureInstance *shading = nullptr;
     };
 } // Metal
 
