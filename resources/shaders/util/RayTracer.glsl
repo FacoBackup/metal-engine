@@ -1,4 +1,4 @@
-#include "./VoxelInfo.glsl"
+#include "../util/VoxelInfo.glsl"
 #define MAX_VOXEL_SIZE 10000000
 
 #define DEFINE_OCTREE_BUFFER(B, M, N) \
@@ -118,7 +118,7 @@ uint getLevelOfDetail(float distanceFromRayOrigin){
 #define CHILD_MASK(V) (V >> 1) & 0xFFu
 #define CHILD_GROUP_INDEX(V) (V >> 9) & 0x7FFFFFu
 
-Hit trace(
+SurfaceInteraction trace(
 in Ray ray,
 uint bufferIndex
 #ifdef DEBUG_VOXELS
@@ -127,9 +127,11 @@ bool showRayTestCount,
 inout ivec2 debugColor
 #endif
 ) {
+    SurfaceInteraction hitData;
+    hitData.anyHit = false;
     vec4 localTileInfo = tileInfo.tileCenterValid[bufferIndex - 1];
     uint matrialBufferOffset = tileInfo.voxelBufferOffset[bufferIndex - 1];
-    if (localTileInfo.w == 0) { return Hit(vec3(0), vec3(0), false, 0, 0, 0, bufferIndex, 0, 0); }
+    if (localTileInfo.w == 0) { return hitData; }
 
     vec3 center = localTileInfo.xyz * TILE_SIZE;
     float scale = TILE_SIZE / 2;
@@ -137,14 +139,13 @@ inout ivec2 debugColor
     vec3 maxBox = center + scale;
     float minDistance = 1e10;// Large initial value
 
-    if (!intersect(minBox, maxBox, ray)) return Hit(vec3(0), vec3(0), false, 0, 0, 0, bufferIndex, 0, 0);
+    if (!intersect(minBox, maxBox, ray)) return hitData;
     Stack stack[6];
     scale *= 0.5f;
     stack[0] = Stack(0u, center, scale, 1);
 
     uint index = 0u;
     int stackPos = 1;
-    Hit hitData = Hit(vec3(0), vec3(0), false, 0, 0, 0, bufferIndex, 0, 0);
     uint hitIndex;
     uint currentDepth = 1;
     while (stackPos-- > 0) {
@@ -206,7 +207,7 @@ inout ivec2 debugColor
 
     if (hitData.anyHit){
         vec3 vSize = vec3(hitData.voxelSize);
-        hitData.hitPosition = intersectRayAABB(ray, hitData.voxelPosition - vSize, hitData.voxelPosition + vSize).rgb;
+        hitData.point = intersectRayAABB(ray, hitData.voxelPosition - vSize, hitData.voxelPosition + vSize).rgb;
         hitData.matData1 = getVoxel(hitIndex + matrialBufferOffset, bufferIndex);
         hitData.matData2 = getVoxel(hitIndex + matrialBufferOffset + 1, bufferIndex);
     }
@@ -214,7 +215,7 @@ inout ivec2 debugColor
     return hitData;
 }
 
-Hit traceAllTiles(
+SurfaceInteraction traceAllTiles(
 in Ray ray
 #ifdef DEBUG_VOXELS
 , bool showRaySearchCount,
@@ -222,7 +223,7 @@ bool showRayTestCount,
 inout ivec2 colorData
 #endif
 ){
-    Hit hitData = trace(ray, 1
+    SurfaceInteraction hitData = trace(ray, 1
     #ifdef DEBUG_VOXELS
     , showRaySearchCount, showRayTestCount, colorData
     #endif
@@ -284,28 +285,4 @@ inout ivec2 colorData
         );
     }
     return hitData;
-}
-
-// ----- UTIL -----
-uint wang_hash(inout uint seed)
-{
-    seed = uint(seed ^ uint(61)) ^ uint(seed >> uint(16));
-    seed *= uint(9);
-    seed = seed ^ (seed >> 4);
-    seed *= uint(0x27d4eb2d);
-    seed = seed ^ (seed >> 15);
-    return seed;
-}
-
-float RandomFloat01(inout uint state){
-    return float(wang_hash(state)) / 4294967296.0;
-}
-
-vec3 RandomUnitVector(inout uint state) {
-    float z = RandomFloat01(state) * 2.0f - 1.0f;
-    float a = RandomFloat01(state) * PI_2;
-    float r = sqrt(1.0f - z * z);
-    float x = r * cos(a);
-    float y = r * sin(a);
-    return vec3(x, y, z);
 }

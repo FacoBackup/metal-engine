@@ -16,7 +16,7 @@ namespace Metal {
     class EngineContext final : public AbstractRuntimeComponent {
         GlobalDataUBO globalDataUBO{};
         TileInfoUBO tileInfoUBO{};
-        std::array<LightData, MAX_LIGHTS> lights{};
+        std::vector<LightData> lights{};
         unsigned int lightsCount = 0;
         long long start = -1;
         bool cameraUpdated = true;

@@ -7,18 +7,18 @@ namespace Metal {
     void GBufferShadingPass::onInitialize() {
         PipelineBuilder shadingPipelineBuilder = PipelineBuilder::Of("GBufferShading.comp")
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.svoData.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferAlbedo.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferNormal.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get())
                 .addDescriptorSet(context.coreDescriptorSets.lightsData.get())
-                .addDescriptorSet(context.coreDescriptorSets.globalIlluminationDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.shadingCompute.get());
         pipelineInstance = context.pipelineService.createPipeline(shadingPipelineBuilder);
     }
 
     void GBufferShadingPass::onSync() {
         bool surfaceCacheReset = context.engineContext.isGISettingsUpdated() || context.engineContext.
-                                isLightingDataUpdated();
+                                 isLightingDataUpdated();
         if (isFirstRun || context.engineContext.isCameraUpdated() || surfaceCacheReset) {
             clearTexture(context.coreTextures.shading->vkImage);
             isFirstRun = false;

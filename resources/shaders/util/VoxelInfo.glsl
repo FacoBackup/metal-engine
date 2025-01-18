@@ -1,7 +1,13 @@
-struct Hit {
-    vec3 hitPosition;
-    vec3 voxelPosition;
+
+struct SurfaceInteraction {
+    vec3 incomingRayDir;
+    vec3 point;
+    vec3 normal;
+    vec3 tangent;
+    vec3 binormal;
     bool anyHit;
+
+    vec3 voxelPosition;
     float voxelSize;
     uint voxel;
     uint voxelBufferIndex;
@@ -10,10 +16,19 @@ struct Hit {
     uint matData2;
 };
 
-struct VoxelMaterialData {
-    vec3 albedo;
-    bool isEmissive;
-    vec3 normal;
+struct MaterialInfo {
+    vec3  baseColor;
+    float subsurface;
+    float roughness;
+    float metallic;
+    float specular;
+    float specularTint;
+    float clearcoat;
+    float clearcoatGloss;
+    float anisotropic;
+    float sheen;
+    float sheenTint;
+    bool  isEmissive;
 };
 
 // THANKS TO https://www.shadertoy.com/view/llfcRl
@@ -32,19 +47,19 @@ vec3 unpackNormal(uint data) {
     return normalize(nor);
 }
 
-VoxelMaterialData unpackVoxel(in Hit hit) {
-    VoxelMaterialData voxel;
+MaterialInfo unpackVoxel(in SurfaceInteraction hit) {
+    MaterialInfo voxel;
 
     uint first = hit.matData1;
     uint second = hit.matData2;
 
     {
-        voxel.albedo.r = ((first >> 16u) & 0xFFu) / 255.f;
-        voxel.albedo.g = ((first >> 8u) & 0xFFu) / 255.f;
-        voxel.albedo.b = (first & 0xFFu) / 255.f;
+        voxel.baseColor.r = ((first >> 16u) & 0xFFu) / 255.f;
+        voxel.baseColor.g = ((first >> 8u) & 0xFFu) / 255.f;
+        voxel.baseColor.b = (first & 0xFFu) / 255.f;
         voxel.isEmissive = ((first >> 24u) & 0x1u) == 1;
     }
 
-    voxel.normal = unpackNormal(second);
+    hit.normal = unpackNormal(second);
     return voxel;
 }

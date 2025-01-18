@@ -86,6 +86,8 @@ namespace Metal {
         if (lightingDataUpdated) {
             int index = 0;
 
+            lights.clear();
+            lights.resize(MAX_LIGHTS);
             // Register lights
             for (auto &entry: context.worldRepository.lights) {
                 if (context.worldRepository.hiddenEntities.contains(entry.first)) {

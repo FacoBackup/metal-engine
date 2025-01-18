@@ -49,7 +49,7 @@ void main(){
     for (uint i = 0; i < globalData.lightsQuantity; i++){
         Light l = lightsBuffer.lights[i];
         if (l.isSphere){
-            if (rayMarch(globalData.cameraWorldPosition.xyz, dir, l.max - l.min, computeSphereRadius(l.min, l.max), l.position, true)){
+            if (rayMarch(globalData.cameraWorldPosition.xyz, dir, l.max - l.min, computeSphereRadius(l), l.position, true)){
                 finalColor = vec4(l.color, 1);
                 return;
             }

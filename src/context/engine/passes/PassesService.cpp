@@ -20,7 +20,7 @@ namespace Metal {
 
         addPass(gBufferPasses, new GBufferGenPass(context));
 
-        addPass(computePasses, new GlobalIlluminationPass(context));
+        // addPass(computePasses, new GlobalIlluminationPass(context));
         addPass(computePasses, new GBufferShadingPass(context));
         addPass(postProcessingPasses, new PostProcessingPass(context));
         if (context.isDebugMode()) {

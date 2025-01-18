@@ -4,7 +4,7 @@ layout(local_size_x = 8, local_size_y = 8) in;
 #include "./GlobalDataBuffer.glsl"
 #include "./CreateRay.glsl"
 // SET 1
-#include "./RayTracer.glsl"
+#include "./util/RayTracer.glsl"
 #include "./Atmosphere.glsl"
 
 #define LIGHTS_SET 2
