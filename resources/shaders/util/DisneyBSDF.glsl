@@ -2,6 +2,14 @@
 #include "../util/RayTracerUtil.glsl"
 #include "../util/RayTracer.glsl"
 
+// Principled PBR Path tracer. Except where otherwise noted:
+
+// Copyright © 2019 Markus Moenig Distributed under The MIT License.
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+// Based on an collaboration with pixotronics.com
+
+// Implementation of http://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf
 
 // Disney brdf's taken from here:: https://github.com/wdas/brdf/blob/master/src/brdfs/disney.brdf
 float schlickWeight(float cosTheta) {
@@ -216,13 +224,13 @@ vec3 bsdfEvaluate(const in vec3 wi, const in vec3 wo, const in vec3 X, const in 
 
 
 void disneyDiffuseSample(out vec3 wi, const in vec3 wo, out float pdf, const in vec2 u, const in vec3 normal, const in MaterialInfo material) {
-//    COSINE SAMPLE
+    //    COSINE SAMPLE
     vec3 wiLocal = cosineSampleHemisphere(u);
     vec3 tangent = vec3(0.), binormal = vec3(0.);
     createBasis(normal, tangent, binormal);
     wi = wiLocal.x * tangent + wiLocal.y * binormal + wiLocal.z * normal;
     if (dot(wo, normal) < 0.) wi.z *= -1.;
-//    COSINE SAMPLE
+    //    COSINE SAMPLE
 
 }
 
@@ -386,7 +394,7 @@ float powerHeuristic(float nf, float fPdf, float ng, float gPdf){
 }
 
 float visibilityTest(vec3 ro, vec3 rayDirection, vec3 lightPosition) {
-//    vec3 rayDirection = normalize(lightPosition - ro); // Treats light as a point light instead of spherical
+    //    vec3 rayDirection = normalize(lightPosition - ro); // Treats light as a point light instead of spherical
 
     Ray ray = Ray(ro, rayDirection, 1./rayDirection);
     SurfaceInteraction hitData = traceAllTiles(ray);
@@ -400,12 +408,8 @@ float visibilityTest(vec3 ro, vec3 rayDirection, vec3 lightPosition) {
 
 vec3 sampleLightType(const in Light light, const in SurfaceInteraction interaction, out vec3 wi, out float lightPdf, out float visibility) {
     vec3 L = lightSample(light, interaction, wi, lightPdf);
-    if(interaction.isPrimaryHit){
-        vec3 shadowsPosition = interaction.point + RandomUnitVector()/16; // Adds small offset to sample position in order to enable accumulation
-        visibility = visibilityTest(shadowsPosition, wi, light.position);
-    }else {
-        visibility = 1;
-    }
+    vec3 shadowsPosition = interaction.point + RandomUnitVector()/16;// Adds small offset to sample position in order to enable accumulation
+    visibility = visibilityTest(shadowsPosition, wi, light.position);
     return L;
 }
 
@@ -451,7 +455,7 @@ vec3 calculateDirectLight(const in Light light, const in SurfaceInteraction inte
         lightPdf = light_pdf(light, interaction);
         if (lightPdf < EPSILON) return Ld;
         weight = powerHeuristic(1., scatteringPdf, 1., lightPdf);
-        vec3 shadowsPosition = interaction.point + RandomUnitVector()/16; // Adds small offset to sample position in order to enable accumulation
+        vec3 shadowsPosition = interaction.point + RandomUnitVector()/16;// Adds small offset to sample position in order to enable accumulation
         Li *= visibilityTest(shadowsPosition, wi, light.position);
         isBlack = dot(Li, Li) == 0.;
         if (!isBlack) {

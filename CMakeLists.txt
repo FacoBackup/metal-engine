@@ -253,8 +253,6 @@ add_executable(
         src/context/engine/passes/AbstractPass.h
         src/context/engine/passes/PassesService.cpp
         src/context/engine/passes/PassesService.h
-        src/context/engine/compute-pass/impl/GlobalIlluminationPass.cpp
-        src/context/engine/compute-pass/impl/GlobalIlluminationPass.h
         src/util/ImageUtils.h
         src/service/material/MaterialInstance.cpp
         src/service/material/MaterialInstance.h

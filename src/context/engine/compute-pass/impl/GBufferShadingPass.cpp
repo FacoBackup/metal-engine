@@ -12,13 +12,17 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.gBufferNormal.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get())
                 .addDescriptorSet(context.coreDescriptorSets.lightsData.get())
-                .addDescriptorSet(context.coreDescriptorSets.shadingCompute.get());
+                .addDescriptorSet(context.coreDescriptorSets.shadingCompute.get())
+                .addDescriptorSet(context.coreDescriptorSets.surfaceCacheCompute.get());
         pipelineInstance = context.pipelineService.createPipeline(shadingPipelineBuilder);
     }
 
     void GBufferShadingPass::onSync() {
         bool surfaceCacheReset = context.engineContext.isGISettingsUpdated() || context.engineContext.
                                  isLightingDataUpdated();
+        if (surfaceCacheReset) {
+            clearTexture(context.coreTextures.giSurfaceCache->vkImage);
+        }
         if (isFirstRun || context.engineContext.isCameraUpdated() || surfaceCacheReset) {
             clearTexture(context.coreTextures.shading->vkImage);
             context.engineContext.resetGiAccumulationCount();

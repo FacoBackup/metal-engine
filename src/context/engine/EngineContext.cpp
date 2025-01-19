@@ -105,26 +105,6 @@ namespace Metal {
                 index++;
             }
 
-            // Register emissive surfaces as light sources
-            for (auto &entry: context.worldRepository.meshes) {
-                if (context.worldRepository.hiddenEntities.contains(entry.first)) {
-                    continue;
-                }
-                auto &translation = context.worldRepository.transforms.at(entry.first).translation;
-                auto &mesh = entry.second;
-                if (mesh.emissiveSurface) {
-                    lights[index] = LightData(
-                        mesh.albedoColor,
-                        // Approximation. The path tracer will sample the albedo color defined in the SVO
-                        translation,
-                        translation - mesh.emissiveSurfaceArea / 2.f,
-                        // Approximation. This will be used by the path tracer to find the PDF
-                        translation + mesh.emissiveSurfaceArea / 2.f,
-                        false
-                    );
-                    index++;
-                }
-            }
             context.coreBuffers.lights->update(lights.data());
             lightsCount = index;
         }
@@ -143,7 +123,6 @@ namespace Metal {
         globalDataUBO.isAtmosphereEnabled = context.engineRepository.atmosphereEnabled;
 
         globalDataUBO.giBounces = context.engineRepository.giBounces;
-        globalDataUBO.giEnabled = context.engineRepository.giEnabled;
         globalDataUBO.giTileSubdivision = context.engineRepository.giTileSubdivision;
         globalDataUBO.giEmissiveFactor = context.engineRepository.giEmissiveFactor;
 

@@ -5,7 +5,6 @@
 #include "../render-pass/impl/GBufferGenPass.h"
 #include "../render-pass/impl/PostProcessingPass.h"
 #include "../render-pass/impl/tools/GridPass.h"
-#include "../compute-pass/impl/GlobalIlluminationPass.h"
 #include "../render-pass/impl/tools/VoxelVisualizerPass.h"
 #include "../render-pass/impl/tools/IconsPass.h"
 
@@ -20,7 +19,6 @@ namespace Metal {
 
         addPass(gBufferPasses, new GBufferGenPass(context));
 
-        // addPass(computePasses, new GlobalIlluminationPass(context));
         addPass(computePasses, new GBufferShadingPass(context));
         addPass(postProcessingPasses, new PostProcessingPass(context));
         if (context.isDebugMode()) {

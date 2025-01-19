@@ -27,27 +27,29 @@ void main() {
     ivec2 colorData = ivec2(0);
     Ray ray = Ray(rayOrigin, rayDirection, 1./rayDirection);
     SurfaceInteraction hitData = traceAllTiles(ray, settings.showRaySearchCount, settings.showRayTestCount, colorData);
-    MaterialInfo matData;
-    unpackVoxel(hitData, matData);
-    switch (settings.voxelDebugFlag){
-        case ALBEDO:
-        finalColor = vec4(matData.baseColor, 1);
-        break;
-        case NORMAL:
-        finalColor = vec4(hitData.normal, 1);
-        break;
-        case EMISSIVE:
-        finalColor = vec4(vec3(matData.isEmissive ? 1 : 0), 1);
-        break;
-        case RANDOM:
-        finalColor = vec4(randomColor(rand(hitData.voxelPosition.xyz)), 1);
-        break;
-        case GI:
-        finalColor = vec4(texture(surfaceCache, genHashSurfaceCache(hitData.point.xyz)).rgb * globalData.giStrength, 1);
-        break;
-        default:
-        finalColor = vec4(normalize(hitData.point.xyz), 1);
-        break;
+    if (hitData.anyHit){
+        MaterialInfo matData;
+        unpackVoxel(hitData, matData);
+        switch (settings.voxelDebugFlag){
+            case ALBEDO:
+            finalColor = vec4(matData.baseColor, 1);
+            break;
+            case NORMAL:
+            finalColor = vec4(hitData.normal, 1);
+            break;
+            case EMISSIVE:
+            finalColor = vec4(vec3(matData.isEmissive ? 1 : 0), 1);
+            break;
+            case RANDOM:
+            finalColor = vec4(randomColor(rand(hitData.voxelPosition.xyz)), 1);
+            break;
+            case GI:
+            finalColor = vec4(texture(surfaceCache, genHashSurfaceCache(hitData.point.xyz)).rgb * globalData.giStrength, 1);
+            break;
+            default :
+            finalColor = vec4(normalize(hitData.point.xyz), 1);
+            break;
+        }
     }
 
     if (length(finalColor.rgb) == 0){

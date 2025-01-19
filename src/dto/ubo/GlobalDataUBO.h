@@ -15,7 +15,6 @@ namespace Metal {
         alignas(4) float giStrength;
         alignas(4) unsigned int lightCount = 0;
         alignas(4) bool isAtmosphereEnabled;
-        alignas(4) bool giEnabled;
 
 
         // GI

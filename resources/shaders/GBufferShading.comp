@@ -1,24 +1,22 @@
 layout(local_size_x = 8, local_size_y = 8) in;
-#define LIGHTS_SET 5
-
-#include "./util/PixelShading.glsl"
-#include "./GBufferUtil.glsl"
-
 vec2 texCoords;
 
 layout(set = 2, binding = 0) uniform sampler2D gBufferAlbedo;
 layout(set = 3, binding = 0) uniform sampler2D gBufferNormal;
 layout(set = 4, binding = 0) uniform sampler2D gBufferPosition;
+#define LIGHTS_SET 5
 layout(set = 6, binding = 0, rgba32f) uniform image2D outputImage;
+layout(set = 7, binding = 0, rgba32f) uniform image2D surfaceCacheImage;
+
+#include "./util/PixelShading.glsl"
+#include "./GBufferUtil.glsl"
 
 #ifdef DEBUG
 #include "./DebugFlags.glsl"
 #endif
 
 void main() {
-
     texCoords = vec2(gl_GlobalInvocationID.xy) / imageSize(outputImage);
-
     vec4 worldPos = texture(gBufferPosition, texCoords);// Position + ID
     if (worldPos.a == 0.){
         if (globalData.isAtmosphereEnabled){
@@ -43,7 +41,6 @@ void main() {
         material.isEmissive = materialA.a < 0;
         interaction.point = worldPos.rgb;
         interaction.anyHit = true;
-        interaction.isPrimaryHit = true;
 
         #ifdef DEBUG
         if (globalData.debugFlag != LIT){
@@ -64,7 +61,7 @@ void main() {
                 material.baseColor = vec3(1, 1, 1);
                 shouldReturn = false;
             } else if (globalData.debugFlag == POSITION){
-                finalColor = worldPos.rgb;
+                finalColor = normalize(worldPos.rgb);
             } else if (globalData.debugFlag == EMISSIVE){
                 finalColor = material.isEmissive ? vec3(1) : vec3(0);
             } else {

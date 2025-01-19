@@ -11,7 +11,6 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     uint lightCount;
     bool isAtmosphereEnabled;
 
-    bool giEnabled;
 
 // GI
     uint giBounces;

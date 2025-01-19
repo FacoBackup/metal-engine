@@ -50,7 +50,7 @@ namespace Metal {
     void AbstractComputePass::endWriting(VkImage &vkImage) const {
         // // Convert image layout to READ_ONLY_OPTIMAL before reading from it in fragment shader.
         VkImageMemoryBarrier write2ReadBarrier = ImageUtils::writeToReadOnlyBarrier(
-            context.coreTextures.globalIllumination->vkImage);
+            vkImage);
 
         vkCmdPipelineBarrier(
             vkCommandBuffer,
