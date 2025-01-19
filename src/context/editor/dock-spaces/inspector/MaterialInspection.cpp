@@ -14,6 +14,15 @@ namespace Metal {
         appendChild(formPanel);
     }
 
+    void MaterialInspection::saveChanges() {
+        DUMP_TEMPLATE(context->getAssetDirectory() + FORMAT_FILE_MATERIAL(prevSelection), *data)
+        context->notificationService.pushMessage("Material was saved", NotificationSeverities::SUCCESS);
+        if (context->materialService.getResources().contains(prevSelection)) {
+            context->materialService.getResources().at(prevSelection)->dispose(context->vulkanContext);
+            context->materialService.getResources().erase(prevSelection);
+        }
+    }
+
     void MaterialInspection::onSync() {
         if (prevSelection != context->fileInspection.materialId) {
             delete data;
@@ -24,22 +33,13 @@ namespace Metal {
             return;
         }
         ImGui::Spacing();
-        ImGui::Separator();
-        if (UIUtil::ButtonSimple(Icons::save + "Save changes" + id,
-                                 std::max(ImGui::GetContentRegionAvail().x / 2.f, 100.f),
-                                 UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            DUMP_TEMPLATE(context->getAssetDirectory() + FORMAT_FILE_MATERIAL(prevSelection), *data)
-            context->notificationService.pushMessage("Material was saved", NotificationSeverities::SUCCESS);
-            if (context->materialService.getResources().contains(prevSelection)) {
-                context->materialService.getResources().at(prevSelection)->dispose(context->vulkanContext);
-                context->materialService.getResources().erase(prevSelection);
-            }
-        }
-        UIUtil::RenderTooltip("Save changes");
-        ImGui::Separator();
-        ImGui::Spacing();
 
         formPanel->setInspection(data);
         formPanel->onSync();
+
+        if(data->isNotFrozen()) {
+            saveChanges();
+            data->freezeVersion();
+        }
     }
 } // Metal

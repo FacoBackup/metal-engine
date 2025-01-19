@@ -129,6 +129,7 @@ inout ivec2 debugColor
 ) {
     SurfaceInteraction hitData;
     hitData.anyHit = false;
+    hitData.bufferIndex = bufferIndex;
     vec4 localTileInfo = tileInfo.tileCenterValid[bufferIndex - 1];
     uint matrialBufferOffset = tileInfo.voxelBufferOffset[bufferIndex - 1];
     if (localTileInfo.w == 0) { return hitData; }
