@@ -1,5 +1,3 @@
-#define MAXDEPTH 4.
-
 #define EPSILON 0.0001
 
 #define USE_MIS
@@ -9,10 +7,9 @@
 #define clearCoatBoost 1.
 
 uint state;
-uint wang_hash()
-{
-    state = uint(state ^ uint(61)) ^ uint(state >> uint(16));
-    state *= uint(9);
+uint wang_hash() {
+    state = uint(state ^ 61u) ^ uint(state >> 16u);
+    state *= 9u;
     state = state ^ (state >> 4);
     state *= uint(0x27d4eb2d);
     state = state ^ (state >> 15);
@@ -20,7 +17,7 @@ uint wang_hash()
 }
 
 float random(){
-    return float(wang_hash()) / 4294967296.0;
+    return (float(wang_hash()) / 4294967296.0);
 }
 
 vec3 RandomUnitVector() {
@@ -55,7 +52,7 @@ void createBasis(vec3 normal, out vec3 tangent, out vec3 binormal){
 void directionOfAnisotropicity(vec3 normal, out vec3 tangent, out vec3 binormal){
     tangent = cross(normal, vec3(1.,0.,1.));
     binormal = normalize(cross(normal, tangent));
-    tangent = normalize(cross(normal,binormal));
+    tangent = normalize(cross(normal, binormal));
 }
 
 vec3 sphericalDirection(float sinTheta, float cosTheta, float sinPhi, float cosPhi) {

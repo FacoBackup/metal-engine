@@ -122,8 +122,8 @@ namespace Metal {
                         translation + mesh.emissiveSurfaceArea / 2.f,
                         false
                     );
+                    index++;
                 }
-                index++;
             }
             context.coreBuffers.lights->update(lights.data());
             lightsCount = index;
@@ -139,7 +139,7 @@ namespace Metal {
         globalDataUBO.invView = camera.invViewMatrix;
         globalDataUBO.cameraWorldPosition = camera.position;
         globalDataUBO.giStrength = context.engineRepository.giStrength;
-        globalDataUBO.lightsQuantity = lightsCount;
+        globalDataUBO.lightCount = lightsCount;
         globalDataUBO.isAtmosphereEnabled = context.engineRepository.atmosphereEnabled;
 
         globalDataUBO.giBounces = context.engineRepository.giBounces;

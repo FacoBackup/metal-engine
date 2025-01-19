@@ -21,6 +21,7 @@ namespace Metal {
                                  isLightingDataUpdated();
         if (isFirstRun || context.engineContext.isCameraUpdated() || surfaceCacheReset) {
             clearTexture(context.coreTextures.shading->vkImage);
+            context.engineContext.resetGiAccumulationCount();
             isFirstRun = false;
         }
 

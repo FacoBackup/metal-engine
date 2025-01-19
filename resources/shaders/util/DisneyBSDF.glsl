@@ -167,7 +167,6 @@ vec3 disneySheen(float LdotH, const in MaterialInfo material) {
     return FH * material.sheen * Csheen;
 }
 
-
 vec3 lightSample(const in Light light, const in SurfaceInteraction interaction, out vec3 wi, out float lightPdf) {
     vec2 u = vec2(random(), random());
 
@@ -367,24 +366,17 @@ vec3 bsdfSample(out vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y,
     float rnd = random();
     if (rnd <= 0.3333) {
         disneyDiffuseSample(wi, wo, pdf, u, interaction.normal, material);
-    }
-    else if (rnd >= 0.3333 && rnd < 0.6666) {
+    } else if (rnd >= 0.3333 && rnd < 0.6666) {
         disneyMicrofacetAnisoSample(wi, wo, X, Y, u, interaction, material);
-    }
-    else {
+    } else {
         disneyClearCoatSample(wi, wo, u, interaction, material);
     }
     f = bsdfEvaluate(wi, wo, X, Y, interaction, material);
     pdf = bsdfPdf(wi, wo, X, Y, interaction, material);
-    if (pdf < EPSILON)
-    return vec3(0.);
+    if (pdf < EPSILON){
+        return vec3(0.);
+    }
     return f;
-}
-
-float visibilityTest(vec3 ro, vec3 rd) {
-    Ray ray = Ray(ro, rd, 1/rd);
-    SurfaceInteraction interaction = traceAllTiles(ray);
-    return !interaction.anyHit ? 1. : 0.;
 }
 
 float powerHeuristic(float nf, float fPdf, float ng, float gPdf){
@@ -393,14 +385,31 @@ float powerHeuristic(float nf, float fPdf, float ng, float gPdf){
     return (f*f)/(f*f + g*g);
 }
 
+float visibilityTest(vec3 ro, vec3 rayDirection, vec3 lightPosition) {
+//    vec3 rayDirection = normalize(lightPosition - ro); // Treats light as a point light instead of spherical
+
+    Ray ray = Ray(ro, rayDirection, 1./rayDirection);
+    SurfaceInteraction hitData = traceAllTiles(ray);
+    float lightDistance = length(lightPosition - ro);
+    float hitDistance = length(hitData.point - ro);
+    if (hitData.anyHit && hitDistance < lightDistance) {
+        return 0;
+    }
+    return 1;
+}
+
 vec3 sampleLightType(const in Light light, const in SurfaceInteraction interaction, out vec3 wi, out float lightPdf, out float visibility) {
     vec3 L = lightSample(light, interaction, wi, lightPdf);
-    visibility = visibilityTest(interaction.point + wi * .01, wi);
+    if(interaction.isPrimaryHit){
+        vec3 shadowsPosition = interaction.point + RandomUnitVector()/16; // Adds small offset to sample position in order to enable accumulation
+        visibility = visibilityTest(shadowsPosition, wi, light.position);
+    }else {
+        visibility = 1;
+    }
     return L;
 }
 
 vec3 calculateDirectLight(const in Light light, const in SurfaceInteraction interaction, const in MaterialInfo material, out vec3 wi, out vec3 f, out float scatteringPdf) {
-
     // Light MIS
     vec3 wo = -interaction.incomingRayDir;
     vec3 Ld = vec3(0.);
@@ -442,8 +451,8 @@ vec3 calculateDirectLight(const in Light light, const in SurfaceInteraction inte
         lightPdf = light_pdf(light, interaction);
         if (lightPdf < EPSILON) return Ld;
         weight = powerHeuristic(1., scatteringPdf, 1., lightPdf);
-
-        Li *= visibilityTest(interaction.point + wi * .01, wi);
+        vec3 shadowsPosition = interaction.point + RandomUnitVector()/16; // Adds small offset to sample position in order to enable accumulation
+        Li *= visibilityTest(shadowsPosition, wi, light.position);
         isBlack = dot(Li, Li) == 0.;
         if (!isBlack) {
             Ld +=  Li * f * weight / scatteringPdf;

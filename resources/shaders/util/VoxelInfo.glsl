@@ -1,4 +1,3 @@
-
 struct SurfaceInteraction {
     vec3 incomingRayDir;
     vec3 point;
@@ -6,6 +5,7 @@ struct SurfaceInteraction {
     vec3 tangent;
     vec3 binormal;
     bool anyHit;
+    bool isPrimaryHit;
 
     vec3 voxelPosition;
     float voxelSize;
@@ -47,19 +47,24 @@ vec3 unpackNormal(uint data) {
     return normalize(nor);
 }
 
-MaterialInfo unpackVoxel(in SurfaceInteraction hit) {
-    MaterialInfo voxel;
-
+void unpackVoxel(inout SurfaceInteraction hit, inout MaterialInfo material) {
     uint first = hit.matData1;
     uint second = hit.matData2;
 
-    {
-        voxel.baseColor.r = ((first >> 16u) & 0xFFu) / 255.f;
-        voxel.baseColor.g = ((first >> 8u) & 0xFFu) / 255.f;
-        voxel.baseColor.b = (first & 0xFFu) / 255.f;
-        voxel.isEmissive = ((first >> 24u) & 0x1u) == 1;
-    }
+    material.baseColor.r = ((first >> 16u) & 0xFFu) / 255.f;
+    material.baseColor.g = ((first >> 8u) & 0xFFu) / 255.f;
+    material.baseColor.b = (first & 0xFFu) / 255.f;
+    material.isEmissive = ((first >> 24u) & 0x1u) == 1;
 
     hit.normal = unpackNormal(second);
-    return voxel;
+    material.roughness = .5;
+    material.metallic = 0;
+    material.subsurface = 0.;
+    material.specular = 0.;
+    material.specularTint = 0.;
+    material.clearcoat = 0.;
+    material.clearcoatGloss = 1.;
+    material.anisotropic = 0.;
+    material.sheen = 0.;
+    material.sheenTint = 0.;
 }

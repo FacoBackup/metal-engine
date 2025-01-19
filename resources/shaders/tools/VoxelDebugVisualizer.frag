@@ -27,7 +27,8 @@ void main() {
     ivec2 colorData = ivec2(0);
     Ray ray = Ray(rayOrigin, rayDirection, 1./rayDirection);
     SurfaceInteraction hitData = traceAllTiles(ray, settings.showRaySearchCount, settings.showRayTestCount, colorData);
-    MaterialInfo matData = unpackVoxel(hitData);
+    MaterialInfo matData;
+    unpackVoxel(hitData, matData);
     switch (settings.voxelDebugFlag){
         case ALBEDO:
         finalColor = vec4(matData.baseColor, 1);

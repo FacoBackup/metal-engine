@@ -3,7 +3,6 @@ layout(local_size_x = 8, local_size_y = 8) in;
 
 #include "./util/PixelShading.glsl"
 #include "./GBufferUtil.glsl"
-#include "./Atmosphere.glsl"
 
 vec2 texCoords;
 
@@ -17,18 +16,20 @@ layout(set = 6, binding = 0, rgba32f) uniform image2D outputImage;
 #endif
 
 void main() {
-    vec3 finalColor = vec3(0);
+
     texCoords = vec2(gl_GlobalInvocationID.xy) / imageSize(outputImage);
 
     vec4 worldPos = texture(gBufferPosition, texCoords);// Position + ID
     if (worldPos.a == 0.){
         if (globalData.isAtmosphereEnabled){
             vec3 dir = createRay(texCoords, globalData.invProj, globalData.invView);
-            finalColor = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), dir, 2.0f) * 0.05f;
+            imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(calculate_sky_luminance_rgb(normalize(globalData.sunPosition), dir, 2.0f) * 0.05f, 1));
         } else {
             return;
         }
     } else {
+        vec3 finalColor = vec3(0);
+
         MaterialInfo material;
         SurfaceInteraction interaction;
         vec4 materialA = texture(gBufferAlbedo, texCoords);// Albedo + (isEmissive ? -1 : 1) * AO
@@ -42,6 +43,7 @@ void main() {
         material.isEmissive = materialA.a < 0;
         interaction.point = worldPos.rgb;
         interaction.anyHit = true;
+        interaction.isPrimaryHit = true;
 
         #ifdef DEBUG
         if (globalData.debugFlag != LIT){
@@ -78,10 +80,15 @@ void main() {
         if (material.isEmissive) { // EMISSION
             finalColor = materialA.rgb;
         } else {
+            state = uint(uint(gl_GlobalInvocationID.x) * uint(1973) + uint(gl_GlobalInvocationID.y) * uint(9277) + uint(globalData.globalFrameCount) * uint(26699)) | uint(1);
+            texCoords = (vec2(gl_GlobalInvocationID.xy) + vec2(random(), random())) / imageSize(outputImage);
+
             finalColor = calculatePixelColor(texCoords, material, interaction);
         }
+        vec4 previousFrame = imageLoad(outputImage, ivec2(gl_GlobalInvocationID.xy));
+        float accumulationCount = previousFrame.a;
+        vec3 accumulatedResult = previousFrame.rgb * (1. - 1./accumulationCount) + finalColor * 1./accumulationCount;
+        imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(accumulatedResult, accumulationCount + 1));
     }
 
-    // TODO - ACCUMULATION
-    imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(finalColor, 1));
 }

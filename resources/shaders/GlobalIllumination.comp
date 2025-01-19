@@ -73,8 +73,8 @@ void evaluateSurface(in Light sunLight, inout BounceInfo bounceInfo){
             lIndirect += bounceInfo.throughput * localIndirect;
             lT *= bounceInfo.albedo * globalData.giEmissiveFactor;
         } else {
-            if (globalData.lightsQuantity > 0){
-                for (int i = 0; i < globalData.lightsQuantity; ++i) {
+            if (globalData.lightCount > 0){
+                for (int i = 0; i < globalData.lightCount; ++i) {
                     Light l = lightsBuffer.lights[i];
                     computeLightContribution(l, bounceInfo, lT, lIndirect);
                 }
@@ -179,8 +179,8 @@ void main() {
     { // ------ SHADOWS
         float total = 1;
         vec3 shadowsPosition = currentPosition + RandomUnitVector(rngState)/32;// Adds small offset to sample position in order to enable accumulation
-        if (globalData.lightsQuantity > 0){
-            for (int i = 0; i < globalData.lightsQuantity; ++i) {
+        if (globalData.lightCount > 0){
+            for (int i = 0; i < globalData.lightCount; ++i) {
                 Light l = lightsBuffer.lights[i];
                 shadows += testLight(l.position, shadowsPosition);
                 total++;

@@ -42,11 +42,11 @@ bool rayMarch(vec3 ro, vec3 rd, vec3 halfSize, float width, vec3 translation, bo
 }
 
 void main(){
-    if (globalData.lightsQuantity == 0){
+    if (globalData.lightCount == 0){
         discard;
     }
     vec3 dir = createRay(texCoords, globalData.invProj, globalData.invView);
-    for (uint i = 0; i < globalData.lightsQuantity; i++){
+    for (uint i = 0; i < globalData.lightCount; i++){
         Light l = lightsBuffer.lights[i];
         if (l.isSphere){
             if (rayMarch(globalData.cameraWorldPosition.xyz, dir, l.max - l.min, computeSphereRadius(l), l.position, true)){
