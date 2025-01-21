@@ -17,17 +17,39 @@
 #define MAX_DEPTH 12
 
 namespace Metal {
+    bool VoxelizationService::isTriangleFlatInAxis(const Triangle &triangle) {
+        if (triangle.v0.y == triangle.v1.y && triangle.v1.y == triangle.v2.y) {
+            return true; // Flat in the Y-axis
+        }
+        if (triangle.v0.x == triangle.v1.x && triangle.v1.x == triangle.v2.x) {
+            return true; // Flat in the X-axis
+        }
+        if (triangle.v0.z == triangle.v1.z && triangle.v1.z == triangle.v2.z) {
+            return true; // Flat in the Z-axis
+        }
+        return false;
+    }
+
     void VoxelizationService::iterateTriangle(const MeshComponent *component, const Triangle &triangle) {
         const float edgeLength1 = glm::distance(triangle.v0, triangle.v1);
         const float edgeLength2 = glm::distance(triangle.v1, triangle.v2);
         const float edgeLength3 = glm::distance(triangle.v2, triangle.v0);
 
         const float maxEdgeLength = std::max(edgeLength1, std::max(edgeLength2, edgeLength3));
+        int localMaxDepth = MAX_DEPTH;
         const auto voxelSize = static_cast<float>(TILE_SIZE / std::pow(2, MAX_DEPTH));
         float stepSize = voxelSize / maxEdgeLength;
         if (edgeLength1 == INFINITY || edgeLength2 == INFINITY || edgeLength3 == INFINITY) {
             stepSize = .01f;
         }
+        //
+        // if (isTriangleFlatInAxis(triangle)) {
+        //     while (stepSize < .01) {
+        //         const auto voxelSizeLocal = static_cast<float>(TILE_SIZE / std::pow(2, localMaxDepth));
+        //         stepSize = voxelSizeLocal / maxEdgeLength;
+        //         localMaxDepth--;
+        //     }
+        // }
 
         glm::vec3 albedo = component->albedoColor * 255.f;
         auto *mat = context.materialService.stream(component->materialId);
@@ -68,7 +90,7 @@ namespace Metal {
                     }
                     auto ptr = VoxelData(albedo, normal, component->emissiveSurface);
                     builders.at(voxelTile->id).insert(
-                        MAX_DEPTH,
+                        localMaxDepth,
                         point,
                         ptr);
                 }
@@ -185,7 +207,7 @@ namespace Metal {
     }
 
     void VoxelizationService::collectRequests(WorldTile &t,
-                                              std::vector<std::vector<VoxelizationRequest>> &requests) const {
+                                              std::vector<std::vector<VoxelizationRequest> > &requests) const {
         unsigned int requestIndex = 0;
         for (auto entity: t.entities) {
             if (context.worldRepository.meshes.contains(entity) && !context.worldRepository.hiddenEntities.
@@ -212,7 +234,7 @@ namespace Metal {
         }
         context.engineRepository.svoFilePaths.clear();
         for (auto &t: context.worldGridRepository.getTiles()) {
-            std::vector<std::vector<VoxelizationRequest>> requests;
+            std::vector<std::vector<VoxelizationRequest> > requests;
             requests.resize(1); // TODO - FIX FOR MULTIPLE THREADS
             collectRequests(t.second, requests);
 

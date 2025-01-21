@@ -87,8 +87,8 @@ add_executable(
         src/service/pipeline/ShaderModule.h
         src/context/engine/render-pass/AbstractRenderPass.cpp
         src/context/engine/render-pass/AbstractRenderPass.h
-        src/context/engine/render-pass/impl/OpaqueRenderPass.cpp
-        src/context/engine/render-pass/impl/OpaqueRenderPass.h
+        src/context/engine/render-pass/impl/GBufferGenPass.cpp
+        src/context/engine/render-pass/impl/GBufferGenPass.h
         src/service/texture/TextureInstance.h
         src/repository/abstract/ResourceRepository.h
         src/service/abstract/AbstractResourceService.cpp
@@ -98,8 +98,6 @@ add_executable(
         src/repository/framebuffer/CoreFrameBuffers.h
         src/repository/abstract/AbstractCoreRepository.h
         src/repository/abstract/AbstractCoreRepository.cpp
-        src/repository/pipeline/CorePipelines.cpp
-        src/repository/pipeline/CorePipelines.h
         src/service/framebuffer/FrameBufferService.cpp
         src/service/framebuffer/FrameBufferService.h
         src/service/framebuffer/FrameBufferInstance.h
@@ -217,8 +215,8 @@ add_executable(
         src/service/material/MaterialData.h
         src/context/engine/render-pass/impl/PostProcessingPass.cpp
         src/context/engine/render-pass/impl/PostProcessingPass.h
-        src/context/engine/render-pass/impl/GBufferShadingPass.cpp
-        src/context/engine/render-pass/impl/GBufferShadingPass.h
+        src/context/engine/compute-pass/impl/GBufferShadingPass.cpp
+        src/context/engine/compute-pass/impl/GBufferShadingPass.h
         src/service/pipeline/PipelineBuilder.h
         src/service/framebuffer/FrameBufferAttachment.cpp
         src/repository/engine/EngineRepository.cpp
@@ -247,19 +245,14 @@ add_executable(
         src/repository/world/components/LightComponent.h
         src/context/engine/render-pass/impl/tools/IconsPass.cpp
         src/context/engine/render-pass/impl/tools/IconsPass.h
-        src/dto/push-constant/IconPushConstant.h
         src/repository/editor/EditorRepository.cpp
         src/dto/push-constant/GridPushConstant.h
-        src/context/engine/render-pass/impl/AtmospherePass.cpp
-        src/context/engine/render-pass/impl/AtmospherePass.h
         src/context/engine/compute-pass/AbstractComputePass.cpp
         src/context/engine/compute-pass/AbstractComputePass.h
         src/context/engine/passes/AbstractPass.cpp
         src/context/engine/passes/AbstractPass.h
         src/context/engine/passes/PassesService.cpp
         src/context/engine/passes/PassesService.h
-        src/context/engine/compute-pass/impl/GlobalIlluminationPass.cpp
-        src/context/engine/compute-pass/impl/GlobalIlluminationPass.h
         src/util/ImageUtils.h
         src/service/material/MaterialInstance.cpp
         src/service/material/MaterialInstance.h

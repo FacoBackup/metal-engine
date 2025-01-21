@@ -6,12 +6,13 @@
 namespace Metal {
     class IconsPass final : public AbstractRenderPass {
         IconPushConstant pushConstant{};
+
     public:
         explicit IconsPass(ApplicationContext &context)
             : AbstractRenderPass(context) {
         }
 
-        PipelineInstance *getPipeline() override;
+        void onInitialize() override;
 
         bool shouldRun() override;
 

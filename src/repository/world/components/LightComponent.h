@@ -9,8 +9,6 @@ namespace Metal {
     struct LightComponent final : AbstractComponent {
         glm::vec3 color = glm::vec3(1.0f);
         float intensity = 1.0f;
-        float innerRadius = 99;
-        float outerRadius = 100;
         float radius = 1;
 
         void registerFields() override;
@@ -19,7 +17,7 @@ namespace Metal {
 
         void onUpdate(InspectableMember *member, ApplicationContext &context) override;
 
-        SERIALIZE_TEMPLATE(color.x, color.y, color.z, entityId, intensity, innerRadius, outerRadius, radius)
+        SERIALIZE_TEMPLATE(color.x, color.y, color.z, entityId, intensity, radius)
     };
 } // Metal
 

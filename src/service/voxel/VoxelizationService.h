@@ -31,6 +31,8 @@ namespace Metal {
 
         void voxelize(const MeshComponent *component, const glm::mat4x4 &modelMatrix, const MeshData *mesh);
 
+        static bool isTriangleFlatInAxis(const Triangle &triangle);
+
         static void FillStorage(SparseVoxelOctreeBuilder &builder, unsigned int &bufferIndex,
                                 unsigned int &materialBufferIndex,
                                 SparseVoxelOctreeData &voxels, OctreeNode *node);

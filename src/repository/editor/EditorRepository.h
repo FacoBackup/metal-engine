@@ -28,7 +28,6 @@ namespace Metal {
         glm::vec3 accentColor{0.26f, 0.59f, 0.98f};
         std::string projectName = "New project";
         bool showIcons = true;
-        float iconScale = 1;
         bool isDarkMode = true;
         bool showGrid = true;
         bool gridOverlayObjects = false;
@@ -66,7 +65,7 @@ namespace Metal {
         SAVE_TEMPLATE(
             iconColor.x, iconColor.y, iconColor.z,
             accentColor.x, accentColor.y, accentColor.z,
-            projectName, showIcons, iconScale,
+            projectName, showIcons,
             isDarkMode,
             showGrid,
             gridOverlayObjects,

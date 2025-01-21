@@ -11,7 +11,7 @@
 namespace Metal {
     void EngineContext::onInitialize() {
         context.worldGridService.onSync();
-        passesService.onInitialize();
+        context.passesService.onInitialize();
     }
 
     void EngineContext::updateVoxelData() {
@@ -75,7 +75,7 @@ namespace Metal {
         updateVoxelData();
         updateLights();
 
-        passesService.onSync();
+        context.passesService.onSync();
 
         setLightingDataUpdated(false);
         setCameraUpdated(false);
@@ -85,21 +85,26 @@ namespace Metal {
     void EngineContext::updateLights() {
         if (lightingDataUpdated) {
             int index = 0;
+
+            lights.clear();
+            lights.resize(MAX_LIGHTS);
+            // Register lights
             for (auto &entry: context.worldRepository.lights) {
                 if (context.worldRepository.hiddenEntities.contains(entry.first)) {
                     continue;
                 }
-
-                auto l = entry.second;
+                auto &translation = context.worldRepository.transforms.at(entry.first).translation;
+                auto &l = entry.second;
                 lights[index] = LightData(
                     l.color * l.intensity,
-                    context.worldRepository.transforms.at(entry.first).translation,
-                    l.innerRadius,
-                    l.outerRadius,
-                    l.radius
+                    translation,
+                    translation - glm::vec3(l.radius / 2),
+                    translation + glm::vec3(l.radius / 2),
+                    true
                 );
                 index++;
             }
+
             context.coreBuffers.lights->update(lights.data());
             lightsCount = index;
         }
@@ -114,17 +119,10 @@ namespace Metal {
         globalDataUBO.invView = camera.invViewMatrix;
         globalDataUBO.cameraWorldPosition = camera.position;
         globalDataUBO.giStrength = context.engineRepository.giStrength;
-        globalDataUBO.lightsQuantity = lightsCount;
-        globalDataUBO.enabledSun = context.engineRepository.atmosphereEnabled;
+        globalDataUBO.lightCount = lightsCount;
+        globalDataUBO.isAtmosphereEnabled = context.engineRepository.atmosphereEnabled;
 
-        globalDataUBO.distortionIntensity = camera.distortionIntensity;
-        globalDataUBO.chromaticAberrationIntensity = camera.chromaticAberrationIntensity;
-        globalDataUBO.distortionEnabled = camera.distortionEnabled;
-        globalDataUBO.chromaticAberrationEnabled = camera.chromaticAberrationEnabled;
-        globalDataUBO.vignetteEnabled = camera.vignetteEnabled;
-        globalDataUBO.vignetteStrength = camera.vignetteStrength;
         globalDataUBO.giBounces = context.engineRepository.giBounces;
-        globalDataUBO.giEnabled = context.engineRepository.giEnabled;
         globalDataUBO.giTileSubdivision = context.engineRepository.giTileSubdivision;
         globalDataUBO.giEmissiveFactor = context.engineRepository.giEmissiveFactor;
 
@@ -136,11 +134,11 @@ namespace Metal {
 
         if (context.engineRepository.incrementTime) {
             context.engineRepository.elapsedTime += .0005f * context.engineRepository.elapsedTimeSpeed;
+            setGISettingsUpdated(true);
         }
-        globalDataUBO.sunPosition = glm::vec3(0,
+        globalDataUBO.sunPosition = glm::vec3(std::sin(context.engineRepository.elapsedTime),
                                               std::cos(context.engineRepository.elapsedTime),
-                                              std::sin(context.engineRepository.elapsedTime)) * context.engineRepository
-                                    .sunDistance;
+                                              0) * context.engineRepository.sunDistance;
         globalDataUBO.sunColor = CalculateSunColor(
                                      globalDataUBO.sunPosition.y / context.engineRepository.sunDistance,
                                      context.engineRepository.nightColor, context.engineRepository.dawnColor,

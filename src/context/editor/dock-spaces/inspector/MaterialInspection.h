@@ -13,6 +13,8 @@ namespace Metal {
     public:
         void onInitialize() override;
 
+        void saveChanges();
+
         void onSync() override;
     };
 } // Metal

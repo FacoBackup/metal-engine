@@ -4,16 +4,16 @@
 #include "../../../../dto/push-constant/MeshPushConstant.h"
 
 namespace Metal {
-    class OpaqueRenderPass final : public AbstractRenderPass {
+    class GBufferGenPass final : public AbstractRenderPass {
         MeshPushConstant mPushConstant{};
     public:
-        explicit OpaqueRenderPass(ApplicationContext &context)
+        explicit GBufferGenPass(ApplicationContext &context)
             : AbstractRenderPass(context) {
         }
 
         void onSync() override;
 
-        PipelineInstance *getPipeline() override;
+        void onInitialize() override;
     };
 }
 

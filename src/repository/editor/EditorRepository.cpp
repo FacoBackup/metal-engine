@@ -16,7 +16,6 @@ namespace Metal {
         registerBool(showRaySearchCountVoxels, "Voxels", "Show ray search count");
         registerBool(showRayTestCountVoxels, "Voxels", "Show ray test count");
 
-        registerFloat(iconScale, "Icons", "Size");
         registerColor(iconColor, "Icons", "Base color");
 
         registerBool(showGrid, "Grid", "Enabled?");

@@ -101,7 +101,7 @@ vec3 aces(vec3 x) {
     return (x * (a * x + b)) / (x * (c * x + d) + e);
 }
 
-void main(void) {
+void main() {
 
     vec2 texCoords = postProcessing.distortionEnabled ? lensDistortion(texCoords, postProcessing.distortionIntensity * .5) : texCoords;
     vec3 color = postProcessing.chromaticAberrationEnabled ? chromaticAberration(texCoords) : texture(sceneColor, texCoords).rgb;

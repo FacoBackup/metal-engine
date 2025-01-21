@@ -9,7 +9,6 @@ namespace Metal {
     struct MeshInstance;
     class StreamingRepository;
     struct CoreFrameBuffers;
-    struct CorePipelines;
     struct PipelineInstance;
     struct CoreBuffers;
 

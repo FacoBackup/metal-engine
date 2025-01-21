@@ -8,7 +8,6 @@
 #include "../../dto/ubo/LightData.h"
 #include "../../dto/ubo/TileInfoUBO.h"
 #include "../../enum/engine-definitions.h"
-#include "passes/PassesService.h"
 
 using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
@@ -16,9 +15,8 @@ using TimePoint = std::chrono::time_point<Clock>;
 namespace Metal {
     class EngineContext final : public AbstractRuntimeComponent {
         GlobalDataUBO globalDataUBO{};
-        PassesService passesService{context};
         TileInfoUBO tileInfoUBO{};
-        std::array<LightData, MAX_LIGHTS> lights{};
+        std::vector<LightData> lights{};
         unsigned int lightsCount = 0;
         long long start = -1;
         bool cameraUpdated = true;

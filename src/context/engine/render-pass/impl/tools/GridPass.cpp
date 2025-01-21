@@ -1,11 +1,20 @@
 #include "GridPass.h"
 
 #include "../../../../../context/ApplicationContext.h"
-#include "../../../../../repository/pipeline/CorePipelines.h"
+#include "../../../../../service/pipeline/PipelineBuilder.h"
 
 namespace Metal {
-    PipelineInstance *GridPass::getPipeline() {
-        return context.corePipelines.gridPipeline;
+    void GridPass::onInitialize() {
+        PipelineBuilder gridPipelineBuilder = PipelineBuilder::Of(
+                    context.coreFrameBuffers.postProcessingFBO,
+                    "QUAD.vert",
+                    "tools/Grid.frag"
+                )
+                .setBlendEnabled()
+                .setPushConstantsSize(sizeof(GridPushConstant))
+                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get());
+        pipelineInstance = context.pipelineService.createPipeline(gridPipelineBuilder);
     }
 
     bool GridPass::shouldRun() {

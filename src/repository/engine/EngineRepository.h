@@ -6,7 +6,6 @@
 
 namespace Metal {
     struct EngineRepository final : Inspectable {
-        bool giEnabled = false;
         bool vsync = true;
         int shadingResInvScale = 2;
         int giTileSubdivision = 40;
@@ -23,7 +22,6 @@ namespace Metal {
         glm::vec3 dawnColor{1, .39f, .19f};
         glm::vec3 nightColor{.1f, .1f, .1f};
         glm::vec3 middayColor{.9f, .9f, .9f};
-        bool screenSpaceShadows = false;
         std::vector<std::string> svoFilePaths{};
 
         void registerFields() override;
@@ -46,9 +44,7 @@ namespace Metal {
             dawnColor.x, dawnColor.y, dawnColor.z,
             nightColor.x, nightColor.y, nightColor.z,
             middayColor.x, middayColor.y, middayColor.z,
-            screenSpaceShadows,
             svoFilePaths,
-            giEnabled,
             giTileSubdivision,
             giEmissiveFactor,
             giStrength,

@@ -8,17 +8,9 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     vec3 sunColor;
     vec3 sunPosition;
     float giStrength;
-    uint lightsQuantity;
-    bool enabledSun;
+    uint lightCount;
+    bool isAtmosphereEnabled;
 
-    bool giEnabled;
-// POST PROCESSING
-    float distortionIntensity;
-    float chromaticAberrationIntensity;
-    bool distortionEnabled;
-    bool chromaticAberrationEnabled;
-    bool vignetteEnabled;
-    float vignetteStrength;
 
 // GI
     uint giBounces;

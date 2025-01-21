@@ -150,6 +150,10 @@ namespace Metal {
         }
         source = "#define TILE_SIZE " + std::to_string(TILE_SIZE) + std::string("\n") + source;
         source = "#define MAX_LIGHTS " + std::to_string(MAX_LIGHTS) + std::string("\n") + source;
+        source = "#define PI_2 6.28318530718\n" + source;
+        source = "#define PI 3.14159265\n" + source;
+
+
         const glslang_stage_t shaderStage = ShaderStageFromFilename(pFilename.c_str());
 
         glslang_initialize_process();

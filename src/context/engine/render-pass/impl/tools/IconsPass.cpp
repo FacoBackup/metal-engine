@@ -1,11 +1,19 @@
 #include "IconsPass.h"
 
 #include "../../../../../context/ApplicationContext.h"
-#include "../../../../../repository/pipeline/CorePipelines.h"
+#include "../../../../../service/pipeline/PipelineBuilder.h"
 
 namespace Metal {
-    PipelineInstance *IconsPass::getPipeline() {
-        return context.corePipelines.iconPipeline;
+    void IconsPass::onInitialize() {
+        PipelineBuilder iconPipelineBuilder = PipelineBuilder::Of(
+                    context.coreFrameBuffers.postProcessingFBO,
+                    "QUAD.vert",
+                    "tools/Icon.frag"
+                )
+                .setPushConstantsSize(sizeof(IconPushConstant))
+                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.lightsData.get());
+        pipelineInstance = context.pipelineService.createPipeline(iconPipelineBuilder);
     }
 
     bool IconsPass::shouldRun() {
@@ -13,17 +21,8 @@ namespace Metal {
     }
 
     void IconsPass::onSync() {
-        for (auto &light: context.worldRepository.lights) {
-            if (worldRepository.hiddenEntities.contains(light.second.getEntityId())) {
-                continue;
-            }
-            pushConstant.translation = worldRepository.transforms.at(light.first).translation;
-            pushConstant.iconColor = context.editorRepository.iconColor;
-            pushConstant.imageIndex = 2;
-            pushConstant.iconScale = context.editorRepository.iconScale;
-            pushConstant.isSelected = context.editorRepository.selected.contains(light.first);
-            recordPushConstant(&pushConstant);
-            recordDrawSimpleInstanced(4, 1);
-        }
+        pushConstant.iconColor = context.editorRepository.iconColor;
+        recordPushConstant(&pushConstant);
+        recordDrawSimpleInstanced(3, 1);
     }
 } // Metal

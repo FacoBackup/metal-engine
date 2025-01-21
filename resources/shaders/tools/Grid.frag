@@ -16,7 +16,7 @@ layout(push_constant) uniform Push {
 
 layout(location = 0) in vec2 texCoords;
 layout(location = 0) out vec4 finalColor;
-layout(set = 1, binding = 0) uniform sampler2D gBufferMaterialD;
+layout(set = 1, binding = 0) uniform sampler2D gBufferPosition;
 
 vec3 p = vec3(0);
 bool rayMarch(vec3 ro, vec3 rd, float width) {
@@ -39,10 +39,10 @@ float getGridLine(float gridScale){
 }
 
 void main() {
-    vec4 worldPos = texture(gBufferMaterialD, texCoords);
+    vec4 worldPos = texture(gBufferPosition, texCoords);
     bool hasData = false;
     bool isOverlay = false;
-    if (worldPos.a == 1){
+    if (worldPos.a != 0){
         hasData = OVERLAY_OBJECTS;
         isOverlay = true;
         p = worldPos.rgb;

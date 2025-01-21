@@ -6,12 +6,13 @@
 namespace Metal {
     class GridPass final : public AbstractRenderPass {
         GridPushConstant pushConstant{};
+
     public:
         explicit GridPass(ApplicationContext &context)
             : AbstractRenderPass(context) {
         }
 
-        PipelineInstance *getPipeline() override;
+        void onInitialize() override;
 
         bool shouldRun() override;
 

@@ -10,7 +10,6 @@ namespace Metal {
         std::string meshId;
         std::string materialId;
 
-
         glm::vec3 albedoColor{1, 1, 1};
         bool emissiveSurface = false;
         float roughnessFactor = 1;

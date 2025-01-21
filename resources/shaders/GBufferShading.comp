@@ -1,0 +1,91 @@
+layout(local_size_x = 8, local_size_y = 8) in;
+vec2 texCoords;
+
+layout(set = 2, binding = 0) uniform sampler2D gBufferAlbedo;
+layout(set = 3, binding = 0) uniform sampler2D gBufferNormal;
+layout(set = 4, binding = 0) uniform sampler2D gBufferPosition;
+#define LIGHTS_SET 5
+layout(set = 6, binding = 0, rgba32f) uniform image2D outputImage;
+layout(set = 7, binding = 0, rgba32f) uniform image2D surfaceCacheImage;
+
+#include "./util/PixelShading.glsl"
+#include "./GBufferUtil.glsl"
+
+#ifdef DEBUG
+#include "./DebugFlags.glsl"
+#endif
+
+void main() {
+    texCoords = vec2(gl_GlobalInvocationID.xy) / imageSize(outputImage);
+    vec4 worldPos = texture(gBufferPosition, texCoords);// Position + ID
+    if (worldPos.a == 0.){
+        if (globalData.isAtmosphereEnabled){
+            vec3 dir = createRay(texCoords, globalData.invProj, globalData.invView);
+            imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(calculate_sky_luminance_rgb(normalize(globalData.sunPosition), dir, 2.0f) * 0.05f, 1));
+        } else {
+            return;
+        }
+    } else {
+        vec3 finalColor = vec3(0);
+
+        MaterialInfo material;
+        SurfaceInteraction interaction;
+        vec4 materialA = texture(gBufferAlbedo, texCoords);// Albedo + (isEmissive ? -1 : 1) * AO
+        vec4 materialB = texture(gBufferNormal, texCoords);// Normal + Metallic | Roughness
+
+        vec2 metallicRoughness = decompressRoughnessMetallic(materialB.a);
+        interaction.normal = normalize(materialB.rgb);
+        material.baseColor = materialA.rgb;
+        material.metallic = metallicRoughness.x;
+        material.roughness = max(metallicRoughness.y, .015);
+        material.isEmissive = materialA.a < 0;
+        interaction.point = worldPos.rgb;
+        interaction.anyHit = true;
+
+        #ifdef DEBUG
+        if (globalData.debugFlag != LIT){
+            bool shouldReturn = true;
+            if (globalData.debugFlag == NORMAL){
+                finalColor = interaction.normal;
+            } else if (globalData.debugFlag == ROUGHNESS){
+                finalColor = vec3(material.roughness);
+            } else if (globalData.debugFlag == METALLIC){
+                finalColor = vec3(material.metallic);
+            }  else if (globalData.debugFlag == DEPTH){
+                finalColor = vec3(worldPos.a / 100.);
+            } else if (globalData.debugFlag == UV){
+                finalColor = vec3(materialA.rg, 0);
+            } else if (globalData.debugFlag == RANDOM){
+                finalColor = materialA.rgb;
+            } else if (globalData.debugFlag == LIGHTING_ONLY){
+                material.baseColor = vec3(1, 1, 1);
+                shouldReturn = false;
+            } else if (globalData.debugFlag == POSITION){
+                finalColor = normalize(worldPos.rgb);
+            } else if (globalData.debugFlag == EMISSIVE){
+                finalColor = material.isEmissive ? vec3(1) : vec3(0);
+            } else {
+                finalColor = materialA.rgb;
+            }
+            if (shouldReturn) {
+                imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(finalColor, 1));
+                return;
+            }
+        }
+        #endif
+
+        if (material.isEmissive) { // EMISSION
+            finalColor = materialA.rgb;
+        } else {
+            state = uint(uint(gl_GlobalInvocationID.x) * uint(1973) + uint(gl_GlobalInvocationID.y) * uint(9277) + uint(globalData.globalFrameCount) * uint(26699)) | uint(1);
+            texCoords = (vec2(gl_GlobalInvocationID.xy) + vec2(random(), random())) / imageSize(outputImage);
+
+            finalColor = calculatePixelColor(texCoords, material, interaction);
+        }
+        vec4 previousFrame = imageLoad(outputImage, ivec2(gl_GlobalInvocationID.xy));
+        float accumulationCount = previousFrame.a;
+        vec3 accumulatedResult = previousFrame.rgb * (1. - 1./accumulationCount) + finalColor * 1./accumulationCount;
+        imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(accumulatedResult, accumulationCount + 1));
+    }
+
+}

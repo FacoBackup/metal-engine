@@ -6,12 +6,13 @@
 #define LEVEL_OF_DETAIL "Level of detail"
 #define GLOBAL_ILLUMINATION "Global illumination"
 #define ATMOSPHERE "Atmosphere"
+#define SUN "Sun"
 
 namespace Metal {
     void EngineRepository::registerFields() {
-        registerInt(shadingResInvScale, "", "Shading inverted resolution scale (Restart required)", 1, 16);
+        registerInt(shadingResInvScale, "Display settings (Restart required)", "Shading inverted resolution scale", 1, 16);
+        registerBool(vsync, "Display settings (Restart required)", "VSync?");
         registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);
-        registerBool(giEnabled, GLOBAL_ILLUMINATION, "Enabled?");
         registerFloat(giStrength, GLOBAL_ILLUMINATION, "Strength");
         registerInt(giBounces, GLOBAL_ILLUMINATION, "Max bounces", 0, 5);
         registerInt(giTileSubdivision, GLOBAL_ILLUMINATION, "Grid subdivision", 1);
@@ -20,19 +21,18 @@ namespace Metal {
         registerFloat(elapsedTime, ATMOSPHERE, "Elapsed time");
         registerBool(incrementTime, ATMOSPHERE, "Increment time");
         registerFloat(elapsedTimeSpeed, ATMOSPHERE, "Time of day speed");
-        registerFloat(sunDistance, ATMOSPHERE, "Sun distance");
-        registerFloat(sunLightIntensity, ATMOSPHERE, "Sun light intensity");
-        registerColor(dawnColor, ATMOSPHERE, "Dawn color");
-        registerColor(nightColor, ATMOSPHERE, "Night color");
-        registerColor(middayColor, ATMOSPHERE, "Midday color");
-        registerBool(screenSpaceShadows, ATMOSPHERE, "Screen space shadows");
+        registerFloat(sunDistance, SUN, "Sun distance");
+        registerFloat(sunLightIntensity, SUN, "Sun light intensity");
+        registerColor(dawnColor, SUN, "Dawn color");
+        registerColor(nightColor, SUN, "Night color");
+        registerColor(middayColor, SUN, "Midday color");
     }
 
     void EngineRepository::onUpdate(InspectableMember *member, ApplicationContext &context) {
         if (member != nullptr && member->name == LEVEL_OF_DETAIL) {
             context.worldGridRepository.hasMainTileChanged = true;
         }
-        if (member != nullptr && (member->group == GLOBAL_ILLUMINATION || member->group == ATMOSPHERE)) {
+        if (member != nullptr && (member->group == GLOBAL_ILLUMINATION || member->group == ATMOSPHERE || member->group == SUN)) {
             context.engineContext.setGISettingsUpdated(true);
         }
     }

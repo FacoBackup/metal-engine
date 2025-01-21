@@ -6,8 +6,6 @@ namespace Metal {
     void LightComponent::registerFields() {
         registerColor(color, "", "Color");
         registerFloat(intensity, "", "Intensity", .1, 100);
-        registerFloat(innerRadius, "", "Inner Radius", 1, 100);
-        registerFloat(outerRadius, "", "Outer Radius", 1, 100);
         registerFloat(radius, "", "Radius", .1, 10);
     }
 

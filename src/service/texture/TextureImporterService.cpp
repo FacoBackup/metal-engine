@@ -15,31 +15,36 @@
 namespace fs = std::filesystem;
 
 namespace Metal {
-    std::string TextureImporterService::importTexture(const std::string &targetDir, const std::string &pathToFile) const {
-        auto metadata = FileMetadata{};
-        metadata.type = EntryType::TEXTURE;
-        metadata.name = fs::path(pathToFile).filename().string();
-        metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.'));
+    std::string TextureImporterService::importTexture(const std::string &targetDir,
+                                                      const std::string &pathToFile) const {
+        try {
+            auto metadata = FileMetadata{};
+            metadata.type = EntryType::TEXTURE;
+            metadata.name = fs::path(pathToFile).filename().string();
+            metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.'));
 
-        int width, height, channels;
-        unsigned char *data = stbi_load(pathToFile.c_str(), &width, &height, &channels, 0);
-        if (!data) {
-            throw std::runtime_error("Failed to load image: " + pathToFile);
+            int width, height, channels;
+            unsigned char *data = stbi_load(pathToFile.c_str(), &width, &height, &channels, 0);
+            if (!data) {
+                throw std::runtime_error("Failed to load image: " + pathToFile);
+            }
+            const auto textureData = TextureData{width, height, channels, data};
+            DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(metadata.getId()), metadata)
+
+            reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_0);
+            reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_1);
+            reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_2);
+            reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_3);
+
+            stbi_image_free(textureData.data);
+            return metadata.getId();
+        } catch (std::exception &e) {
+            return "";
         }
-        const auto textureData = TextureData{width, height, channels, data};
-        DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(metadata.getId()), metadata)
-
-        reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_0);
-        reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_1);
-        reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_2);
-        reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_3);
-
-        stbi_image_free(textureData.data);
-        return metadata.getId();
     }
 
     void TextureImporterService::reduceImage(const std::string &fileId,
-                                      const TextureData &textureData, const LevelOfDetail &levelOfDetail) const {
+                                             const TextureData &textureData, const LevelOfDetail &levelOfDetail) const {
         const int newWidth = textureData.width / levelOfDetail.level;
         const int newHeight = textureData.height / levelOfDetail.level;
 

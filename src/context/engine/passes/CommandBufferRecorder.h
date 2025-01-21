@@ -19,7 +19,7 @@ namespace Metal {
         bool computePassMode;
 
         static void RecordCommandsInternal(
-            const std::vector<std::unique_ptr<AbstractPass>> &passes,
+            const std::vector<AbstractPass *> &passes,
             VkCommandBuffer vkCommandBuffer);
 
         void createRenderPassInfo(const FrameBufferInstance *frameBuffer, bool clearBuffer);
@@ -28,9 +28,11 @@ namespace Metal {
         explicit CommandBufferRecorder(FrameBufferInstance *frameBuffer, ApplicationContext &applicationContext,
                                        bool clearBuffer = true);
 
-        void recordCommands(
-            const std::vector<std::unique_ptr<AbstractPass> > &passes,
-            const std::vector<std::unique_ptr<AbstractPass> > &computePasses = {}) const;
+        void createCommandBuffer();
+
+        explicit CommandBufferRecorder(ApplicationContext &applicationContext);
+
+        void recordCommands(const std::vector<AbstractPass *> &passes) const;
     };
 } // Metal
 

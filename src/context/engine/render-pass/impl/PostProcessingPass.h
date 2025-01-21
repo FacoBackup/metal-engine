@@ -6,15 +6,14 @@
 namespace Metal {
     class PostProcessingPass final : public AbstractRenderPass {
         PostProcessingPushConstant pushConstant{};
-
     public:
         explicit PostProcessingPass(ApplicationContext &context)
             : AbstractRenderPass(context) {
         }
 
-        void onSync() override;
+        void onInitialize() override;
 
-        PipelineInstance *getPipeline() override;
+        void onSync() override;
     };
 } // Metal
 

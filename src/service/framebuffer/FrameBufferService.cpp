@@ -8,7 +8,8 @@
 #include "FrameBufferAttachment.h"
 
 namespace Metal {
-    FrameBufferInstance *FrameBufferService::createFrameBuffer(const uint32_t w, const uint32_t h, glm::vec4 clearColor) {
+    FrameBufferInstance *FrameBufferService::createFrameBuffer(const uint32_t w, const uint32_t h, glm::vec4 clearColor,
+                                                               bool linear) {
         auto *framebuffer = new FrameBufferInstance();
         framebuffer->bufferWidth = w;
         framebuffer->bufferHeight = h;
@@ -17,9 +18,9 @@ namespace Metal {
 
         VkSamplerCreateInfo samplerCreateInfo{};
         // TODO - ENABLE/DISABLE LINEAR FILTERING
-        samplerCreateInfo.magFilter = VK_FILTER_LINEAR;
-        samplerCreateInfo.minFilter = VK_FILTER_LINEAR;
-        samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+        samplerCreateInfo.magFilter = linear ? VK_FILTER_LINEAR : VK_FILTER_NEAREST;
+        samplerCreateInfo.minFilter = linear ? VK_FILTER_LINEAR : VK_FILTER_NEAREST;
+        samplerCreateInfo.mipmapMode = linear ? VK_SAMPLER_MIPMAP_MODE_LINEAR : VK_SAMPLER_MIPMAP_MODE_NEAREST;
         samplerCreateInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
         samplerCreateInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
         samplerCreateInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;

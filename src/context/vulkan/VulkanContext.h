@@ -68,7 +68,7 @@ namespace Metal {
         VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
         VkCommandPool commandPool = VK_NULL_HANDLE;
 
-        void dispose();
+        void dispose() const;
 
         void onInitialize() override;
 
