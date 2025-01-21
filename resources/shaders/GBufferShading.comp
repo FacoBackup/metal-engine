@@ -83,7 +83,7 @@ void main() {
             finalColor = calculatePixelColor(texCoords, material, interaction);
         }
         vec4 previousFrame = imageLoad(outputImage, ivec2(gl_GlobalInvocationID.xy));
-        float accumulationCount = previousFrame.a;
+        float accumulationCount = min(200, previousFrame.a);
         vec3 accumulatedResult = previousFrame.rgb * (1. - 1./accumulationCount) + finalColor * 1./accumulationCount;
         imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(accumulatedResult, accumulationCount + 1));
     }

@@ -37,7 +37,7 @@ vec3 calculatePixelColor(in vec2 texCoords, MaterialInfo material, SurfaceIntera
         vec3 Ld = vec3(0);
         for (uint i = 0; i < globalData.lightCount; i++){
             Light l = lightsBuffer.lights[i];
-            l.color *= 50.;
+            l.color *= 20.;
             Ld += beta * calculateDirectLight(l, interaction, material, wi, f, scatteringPdf);
         }
 
