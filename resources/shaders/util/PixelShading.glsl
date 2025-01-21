@@ -20,18 +20,18 @@ vec3 calculatePixelColor(in vec2 texCoords, MaterialInfo material, SurfaceIntera
     material.anisotropic = 0.;
     material.sheen = 0.;
     material.sheenTint = 0.;
-
     //    material.clearcoat = 1.;
     //    material.specular = 0.1;
     //    material.subsurface = 1.;
     //    material.clearcoatGloss = 1.;
 
-    { // Direct lighting - Disney BSDF
-        vec3 X = vec3(0.), Y = vec3(0.);
-        directionOfAnisotropicity(interaction.normal, X, Y);
-        interaction.tangent = X;
-        interaction.binormal = Y;
+    // Direct lighting - Disney BSDF
+    vec3 X = vec3(0.), Y = vec3(0.);
+    directionOfAnisotropicity(interaction.normal, X, Y);
+    interaction.tangent = X;
+    interaction.binormal = Y;
 
+    for (uint i = 0; i < globalData.giSamples; i++){
         vec3 f = vec3(0.);
         float scatteringPdf = 0.;
         vec3 Ld = vec3(0);
@@ -43,13 +43,13 @@ vec3 calculatePixelColor(in vec2 texCoords, MaterialInfo material, SurfaceIntera
 
         L += Ld;
 
-        if (scatteringPdf > EPSILON && dot(f, f) > EPSILON)
-        beta *=  f / scatteringPdf;
-
-//                wi = normalize(interaction.normal + RandomUnitVector());
-        float bias = max(.05, 1e-4 * length(interaction.point));
-        interaction.point = interaction.point + bias * interaction.normal;
+        if (scatteringPdf > EPSILON && dot(f, f) > EPSILON){
+            beta *=  f / scatteringPdf;
+        }
     }
 
-    return L + (material.baseColor / PI) * calculateIndirectLighting(material, interaction, wi) * globalData.giStrength;
+    float bias = max(.05, 1e-4 * length(interaction.point));
+    interaction.point = interaction.point + bias * interaction.normal;
+
+    return L / globalData.giSamples + (material.baseColor / PI) * calculateIndirectLighting(material, interaction, wi) * globalData.giStrength;
 }

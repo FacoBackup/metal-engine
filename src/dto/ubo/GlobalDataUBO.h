@@ -18,6 +18,8 @@ namespace Metal {
 
 
         // GI
+        alignas(4) bool multipleImportanceSampling;
+        alignas(4) unsigned int giSamples;
         alignas(4) unsigned int giBounces;
         alignas(4) unsigned int giTileSubdivision;
         alignas(4) float giEmissiveFactor;

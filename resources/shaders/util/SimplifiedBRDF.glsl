@@ -17,7 +17,7 @@ void evaluateLightSimplified(in Light l, in BounceInfo bounceInfo, inout vec3 th
     float hitDistance = length(hitData.point - localHitPosition);
     float shadows = 1;
     if (hitData.anyHit && hitDistance < lightDistance) {
-        shadows = clamp(1 / lightDistance, 0, 1);
+        shadows = 0;// clamp(1 / lightDistance, 0, 1)
     }
     if (shadows != 0){
         float NdotL = max(dot(bounceInfo.hitNormal, lightDir), 0.0);
@@ -28,28 +28,25 @@ void evaluateLightSimplified(in Light l, in BounceInfo bounceInfo, inout vec3 th
     }
 }
 
-void fetchSurfaceCacheRadiance(in Light sunLight, inout BounceInfo bounceInfo){
+void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo){
     ivec2 coord = ivec2(worldToSurfaceCacheHash(bounceInfo.currentPosition) * vec2(globalData.surfaceCacheWidth, globalData.surfaceCacheHeight));
 
-    vec4 previousCacheData = imageLoad(surfaceCacheImage, coord);
-    float accumulationCount = previousCacheData.a;
+    vec4 previousCacheData;
+    float accumulationCount;
 
-    if (length(previousCacheData.rgb) < 1){
+    if (!bounceInfo.isEmissive){
+        previousCacheData = imageLoad(surfaceCacheImage, coord);
+        accumulationCount = previousCacheData.a;
+    }
+
+    if (length(previousCacheData.rgb) < 1 && !bounceInfo.isEmissive){
         vec3 lIndirect = vec3(0);
         vec3 lT = vec3(1);
-        if (bounceInfo.isEmissive){
-            vec3 localIndirect = bounceInfo.albedo * globalData.giEmissiveFactor;
-            lIndirect += bounceInfo.throughput * localIndirect;
-            lT *= bounceInfo.albedo * globalData.giEmissiveFactor;
-        } else {
-            if (globalData.lightCount > 0){
-                for (int i = 0; i < globalData.lightCount; ++i) {
-                    Light l = lightsBuffer.lights[i];
-                    evaluateLightSimplified(l, bounceInfo, lT, lIndirect);
-                }
-            }
-            if (globalData.isAtmosphereEnabled){
-                evaluateLightSimplified(sunLight, bounceInfo, lT, lIndirect);
+
+        if (globalData.lightCount > 0){
+            for (int i = 0; i < globalData.lightCount; ++i) {
+                Light l = lightsBuffer.lights[i];
+                evaluateLightSimplified(l, bounceInfo, lT, lIndirect);
             }
         }
 
@@ -58,14 +55,19 @@ void fetchSurfaceCacheRadiance(in Light sunLight, inout BounceInfo bounceInfo){
         bounceInfo.indirectLight += accumulatedResult;
         bounceInfo.throughput *= lT;
     } else {
-        bounceInfo.indirectLight += previousCacheData.rgb;
-        bounceInfo.throughput *= previousCacheData.rgb;
+        if (bounceInfo.isEmissive){
+            vec3 scaledAlbedo = bounceInfo.albedo * globalData.giEmissiveFactor;
+            bounceInfo.indirectLight += bounceInfo.throughput * scaledAlbedo;
+            bounceInfo.throughput *= scaledAlbedo;
+        } else {
+            bounceInfo.indirectLight += previousCacheData.rgb;
+            bounceInfo.throughput *= previousCacheData.rgb;
+        }
     }
 }
 
 vec3 calculateIndirectLighting(MaterialInfo material, SurfaceInteraction interaction, vec3 rayDir) {
-    if(globalData.giBounces == 0) return vec3(0);
-    Light sunLight = Light(globalData.sunColor, normalize(globalData.sunPosition) * 20, -vec3(10000), vec3(10000), true);
+    if (globalData.giBounces == 0) return vec3(0);
 
     BounceInfo bounceInfo;
     bounceInfo.indirectLight = vec3(0);
@@ -88,7 +90,7 @@ vec3 calculateIndirectLighting(MaterialInfo material, SurfaceInteraction interac
             if (globalData.isAtmosphereEnabled){
                 bounceInfo.albedo = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), ray.d, 2.0f) * 0.05f;
                 bounceInfo.isEmissive = true;
-                fetchSurfaceCacheRadiance(sunLight, bounceInfo);
+                fetchSurfaceCacheRadiance(bounceInfo);
             }
             break;
         }
@@ -102,7 +104,7 @@ vec3 calculateIndirectLighting(MaterialInfo material, SurfaceInteraction interac
         bounceInfo.hitNormal = interaction.normal;
         bounceInfo.currentPosition = interaction.point;
 
-        fetchSurfaceCacheRadiance(sunLight, bounceInfo);
+        fetchSurfaceCacheRadiance(bounceInfo);
     }
     return bounceInfo.indirectLight / globalData.giBounces;
 }

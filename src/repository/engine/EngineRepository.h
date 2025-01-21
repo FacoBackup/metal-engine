@@ -7,9 +7,11 @@
 namespace Metal {
     struct EngineRepository final : Inspectable {
         bool vsync = true;
+        bool multipleImportanceSampling = true;
         int shadingResInvScale = 2;
         int giTileSubdivision = 40;
         float giEmissiveFactor = 2;
+        int giSamples = 1;
         int giBounces = 1;
         float giStrength = 1;
         int numberOfTiles = 10;
@@ -17,7 +19,8 @@ namespace Metal {
         bool atmosphereEnabled = false;
         bool incrementTime = false;
         float elapsedTimeSpeed = 1;
-        float sunDistance = 100000;
+        float sunDistance = 10000;
+        float sunRadius = 2000;
         float sunLightIntensity = 2;
         glm::vec3 dawnColor{1, .39f, .19f};
         glm::vec3 nightColor{.1f, .1f, .1f};
@@ -34,11 +37,14 @@ namespace Metal {
 
         SAVE_TEMPLATE(
             vsync,
+            giSamples,
+            multipleImportanceSampling,
             giBounces,
             atmosphereEnabled,
             elapsedTime,
             incrementTime,
             elapsedTimeSpeed,
+            sunRadius,
             sunDistance,
             sunLightIntensity,
             dawnColor.x, dawnColor.y, dawnColor.z,

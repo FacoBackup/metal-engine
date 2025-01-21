@@ -7,6 +7,7 @@
 #include "../util/Util.h"
 #include "../context/ApplicationContext.h"
 #include "FilesUtil.h"
+#include "../enum/LightType.h"
 #include "glslang/Include/glslang_c_interface.h"
 #include "glslang/Public/resource_limits_c.h"
 #define BASE_PATH "../resources/shaders/"
@@ -147,6 +148,9 @@ namespace Metal {
         std::string source = ProcessShader(BASE_PATH + pFilename);
         if (context.isDebugMode()) {
             source = "#define DEBUG\n" + source;
+        }
+        for (auto &entry: LightTypes::getEntries()) {
+            source = "#define " + entry.first + " " + std::to_string(entry.second) + "\n" + source;
         }
         source = "#define TILE_SIZE " + std::to_string(TILE_SIZE) + std::string("\n") + source;
         source = "#define MAX_LIGHTS " + std::to_string(MAX_LIGHTS) + std::string("\n") + source;

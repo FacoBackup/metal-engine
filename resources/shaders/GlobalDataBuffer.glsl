@@ -13,6 +13,8 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
 
 
 // GI
+    bool multipleImportanceSampling;
+    uint giSamples;
     uint giBounces;
     uint giTileSubdivision;
     float giEmissiveFactor;

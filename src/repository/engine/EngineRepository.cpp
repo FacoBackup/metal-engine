@@ -14,7 +14,9 @@ namespace Metal {
         registerBool(vsync, "Display settings (Restart required)", "VSync?");
         registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);
         registerFloat(giStrength, GLOBAL_ILLUMINATION, "Strength");
-        registerInt(giBounces, GLOBAL_ILLUMINATION, "Max bounces", 0, 5);
+        registerInt(giSamples, GLOBAL_ILLUMINATION, "Samples per pixel", 1, 32);
+        registerInt(giBounces, GLOBAL_ILLUMINATION, "Bounces", 0, 7);
+        registerBool(multipleImportanceSampling, GLOBAL_ILLUMINATION, "Enable multiple importance sampling?");
         registerInt(giTileSubdivision, GLOBAL_ILLUMINATION, "Grid subdivision", 1);
         registerFloat(giEmissiveFactor, GLOBAL_ILLUMINATION, "Emissive surface factor", 0);
         registerBool(atmosphereEnabled, ATMOSPHERE, "Enabled?");
@@ -22,6 +24,7 @@ namespace Metal {
         registerBool(incrementTime, ATMOSPHERE, "Increment time");
         registerFloat(elapsedTimeSpeed, ATMOSPHERE, "Time of day speed");
         registerFloat(sunDistance, SUN, "Sun distance");
+        registerFloat(sunRadius, SUN, "Sun radius");
         registerFloat(sunLightIntensity, SUN, "Sun light intensity");
         registerColor(dawnColor, SUN, "Dawn color");
         registerColor(nightColor, SUN, "Night color");
@@ -34,6 +37,7 @@ namespace Metal {
         }
         if (member != nullptr && (member->group == GLOBAL_ILLUMINATION || member->group == ATMOSPHERE || member->group == SUN)) {
             context.engineContext.setGISettingsUpdated(true);
+            context.engineContext.setLightingDataUpdated(true);
         }
     }
 

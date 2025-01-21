@@ -11,6 +11,7 @@ namespace Metal {
         std::string materialId;
 
         glm::vec3 albedoColor{1, 1, 1};
+        glm::vec3 emissiveSurfaceArea{1, 1, 1};
         bool emissiveSurface = false;
         float roughnessFactor = 1;
         float metallicFactor = .5;
@@ -27,6 +28,7 @@ namespace Metal {
                            parallaxHeightScale, parallaxLayers,
                            emissiveSurface,
                            albedoColor.x, albedoColor.y, albedoColor.z,
+                           emissiveSurfaceArea.x, emissiveSurfaceArea.y, emissiveSurfaceArea.z,
                            roughnessFactor,
                            metallicFactor)
     };
