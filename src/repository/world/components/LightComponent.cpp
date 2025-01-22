@@ -1,7 +1,6 @@
 #include "LightComponent.h"
 
 #include "../../../context/ApplicationContext.h"
-#include "../../../enum/LightType.h"
 
 namespace Metal {
     void LightComponent::registerFields() {
@@ -25,9 +24,6 @@ namespace Metal {
             }
             if (lightType == 1) {
                 lightTypeLabel = "Plane";
-            }
-            if (lightType == 2) {
-                lightTypeLabel = "Spotlight";
             }
         }
     }

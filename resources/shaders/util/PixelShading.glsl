@@ -46,10 +46,11 @@ vec3 calculatePixelColor(in vec2 texCoords, MaterialInfo material, SurfaceIntera
         if (scatteringPdf > EPSILON && dot(f, f) > EPSILON){
             beta *=  f / scatteringPdf;
         }
+
+        float bias = max(.05, 1e-4 * length(interaction.point));
+        interaction.point = interaction.point + bias * interaction.normal;
+        L += (material.baseColor / PI) * calculateIndirectLighting(material, interaction, wi) * globalData.giStrength;
     }
 
-    float bias = max(.05, 1e-4 * length(interaction.point));
-    interaction.point = interaction.point + bias * interaction.normal;
-
-    return L / globalData.giSamples + (material.baseColor / PI) * calculateIndirectLighting(material, interaction, wi) * globalData.giStrength;
+    return L / globalData.giSamples;
 }

@@ -78,9 +78,9 @@ namespace Metal {
 
         void onSync() override;
 
-        void registerBespokeLights(int &index);
+        void registerExplicitLightSources(int &index);
 
-        void registerEmissiveLights(int &index);
+        void registerEmissiveLightSources(int &index);
 
         void registerSun(int &index);
 

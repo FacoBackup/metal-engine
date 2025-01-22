@@ -3,15 +3,12 @@
 #include "../../../context/ApplicationContext.h"
 #include "../../../enum/EntryType.h"
 
-#define EMISSIVE "Is emissive surface?"
-
 namespace Metal {
     void MeshComponent::registerFields() {
         registerResourceSelection(meshId, "", "Mesh", EntryType::MESH, false);
         registerResourceSelection(materialId, "", "Material", EntryType::MATERIAL, false);
 
-        registerBool(emissiveSurface, "Behaviour", EMISSIVE);
-        registerVec3(emissiveSurfaceArea, "Behaviour", "Emissive area contribution");
+        registerBool(emissiveSurface, "", "Is emissive surface?");
 
         registerColor(albedoColor, "Material", "Albedo Color");
         registerFloat(roughnessFactor, "Material", "Roughness Factor", 0, 1, false, .001);
@@ -22,9 +19,6 @@ namespace Metal {
 
     void MeshComponent::onUpdate(InspectableMember *member, ApplicationContext &context) {
         context.engineContext.setGISettingsUpdated(true);
-        if (member != nullptr && member->name == EMISSIVE) {
-            context.engineContext.setLightingDataUpdated(true);
-        }
     }
 
     ComponentTypes::ComponentType MeshComponent::getType() {

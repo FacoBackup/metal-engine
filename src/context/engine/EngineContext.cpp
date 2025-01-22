@@ -83,7 +83,7 @@ namespace Metal {
         setGISettingsUpdated(false);
     }
 
-    void EngineContext::registerBespokeLights(int &index) {
+    void EngineContext::registerExplicitLightSources(int &index) {
         // Register lights
         for (auto &entry: context.worldRepository.lights) {
             if (context.worldRepository.hiddenEntities.contains(entry.first)) {
@@ -108,28 +108,6 @@ namespace Metal {
         }
     }
 
-    void EngineContext::registerEmissiveLights(int &index) {
-        // Register emissive surfaces as light sources
-        for (auto &entry: context.worldRepository.meshes) {
-            if (context.worldRepository.hiddenEntities.contains(entry.first)) {
-                continue;
-            }
-            auto &translation = context.worldRepository.transforms.at(entry.first).translation;
-            auto &mesh = entry.second;
-            if (mesh.emissiveSurface) {
-                lights[index] = LightData(
-                    mesh.albedoColor,
-                    // Approximation. The path tracer will sample the albedo color defined in the SVO
-                    translation,
-                    translation - mesh.emissiveSurfaceArea / 2.f,
-                    translation + mesh.emissiveSurfaceArea / 2.f,
-                    LightTypes::LightType::EMISSIVE_SURFACE
-                );
-                index++;
-            }
-        }
-    }
-
     void EngineContext::registerSun(int &index) {
         if (context.engineRepository.atmosphereEnabled) {
             lights[index] = LightData(
@@ -151,9 +129,7 @@ namespace Metal {
             lights.reserve(1);
             registerSun(index);
 
-            registerBespokeLights(index);
-
-            registerEmissiveLights(index);
+            registerExplicitLightSources(index);
 
             context.coreBuffers.lights->update(lights.data());
             lightsCount = index;
@@ -169,7 +145,7 @@ namespace Metal {
         globalDataUBO.invView = camera.invViewMatrix;
         globalDataUBO.cameraWorldPosition = camera.position;
         globalDataUBO.giStrength = context.engineRepository.giStrength;
-        globalDataUBO.lightCount = lightsCount ;
+        globalDataUBO.lightCount = lightsCount;
         globalDataUBO.isAtmosphereEnabled = context.engineRepository.atmosphereEnabled;
 
         globalDataUBO.multipleImportanceSampling = context.engineRepository.multipleImportanceSampling;
@@ -191,7 +167,8 @@ namespace Metal {
         }
         globalDataUBO.sunPosition = glm::vec3(0,
                                               std::cos(context.engineRepository.elapsedTime),
-                                              std::sin(context.engineRepository.elapsedTime)) * context.engineRepository.sunDistance;
+                                              std::sin(context.engineRepository.elapsedTime)) * context.engineRepository
+                                    .sunDistance;
         globalDataUBO.sunColor = CalculateSunColor(
                                      globalDataUBO.sunPosition.y / context.engineRepository.sunDistance,
                                      context.engineRepository.nightColor, context.engineRepository.dawnColor,
