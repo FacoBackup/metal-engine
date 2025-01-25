@@ -4,6 +4,7 @@
 #include "../../service/buffer/BufferInstance.h"
 #include "../../service/voxel/SVOInstance.h"
 #include "../../enum/LevelOfDetail.h"
+#include "../../enum/LightType.h"
 #include "../../service/camera/Camera.h"
 #include "../../service/framebuffer/FrameBufferInstance.h"
 #include "../../service/texture/TextureInstance.h"
@@ -82,28 +83,53 @@ namespace Metal {
         setGISettingsUpdated(false);
     }
 
+    void EngineContext::registerExplicitLightSources(int &index) {
+        // Register lights
+        for (auto &entry: context.worldRepository.lights) {
+            if (context.worldRepository.hiddenEntities.contains(entry.first)) {
+                continue;
+            }
+            auto &t = context.worldRepository.transforms.at(entry.first);
+            auto &translation = t.translation;
+            auto &l = entry.second;
+
+            glm::vec3 normal(0.0f, 1.0f, 0.0f);
+            glm::vec3 rotatedNormal = t.rotation * normal;
+
+            lights[index] = LightData(
+                l.color * l.intensity,
+                translation,
+                glm::normalize(rotatedNormal),
+                glm::vec3(0),
+                l.lightType,
+                l.radiusSize
+            );
+            index++;
+        }
+    }
+
+    void EngineContext::registerSun(int &index) {
+        if (context.engineRepository.atmosphereEnabled) {
+            lights[index] = LightData(
+                globalDataUBO.sunColor,
+                globalDataUBO.sunPosition,
+                globalDataUBO.sunPosition - glm::vec3(context.engineRepository.sunRadius / 2),
+                globalDataUBO.sunPosition + glm::vec3(context.engineRepository.sunRadius / 2),
+                LightTypes::SPHERE
+            );
+            index++;
+        }
+    }
+
     void EngineContext::updateLights() {
         if (lightingDataUpdated) {
             int index = 0;
 
             lights.clear();
-            lights.resize(MAX_LIGHTS);
-            // Register lights
-            for (auto &entry: context.worldRepository.lights) {
-                if (context.worldRepository.hiddenEntities.contains(entry.first)) {
-                    continue;
-                }
-                auto &translation = context.worldRepository.transforms.at(entry.first).translation;
-                auto &l = entry.second;
-                lights[index] = LightData(
-                    l.color * l.intensity,
-                    translation,
-                    translation - glm::vec3(l.radius / 2),
-                    translation + glm::vec3(l.radius / 2),
-                    true
-                );
-                index++;
-            }
+            lights.reserve(1);
+            registerSun(index);
+
+            registerExplicitLightSources(index);
 
             context.coreBuffers.lights->update(lights.data());
             lightsCount = index;
@@ -122,6 +148,10 @@ namespace Metal {
         globalDataUBO.lightCount = lightsCount;
         globalDataUBO.isAtmosphereEnabled = context.engineRepository.atmosphereEnabled;
 
+        globalDataUBO.enabledDenoiser = context.engineRepository.enabledDenoiser;
+        globalDataUBO.multipleImportanceSampling = context.engineRepository.multipleImportanceSampling;
+        globalDataUBO.giMaxAccumulation = context.engineRepository.giMaxAccumulation;
+        globalDataUBO.giSamples = context.engineRepository.giSamples;
         globalDataUBO.giBounces = context.engineRepository.giBounces;
         globalDataUBO.giTileSubdivision = context.engineRepository.giTileSubdivision;
         globalDataUBO.giEmissiveFactor = context.engineRepository.giEmissiveFactor;
@@ -135,10 +165,12 @@ namespace Metal {
         if (context.engineRepository.incrementTime) {
             context.engineRepository.elapsedTime += .0005f * context.engineRepository.elapsedTimeSpeed;
             setGISettingsUpdated(true);
+            lightingDataUpdated = true;
         }
-        globalDataUBO.sunPosition = glm::vec3(std::sin(context.engineRepository.elapsedTime),
+        globalDataUBO.sunPosition = glm::vec3(0,
                                               std::cos(context.engineRepository.elapsedTime),
-                                              0) * context.engineRepository.sunDistance;
+                                              std::sin(context.engineRepository.elapsedTime)) * context.engineRepository
+                                    .sunDistance;
         globalDataUBO.sunColor = CalculateSunColor(
                                      globalDataUBO.sunPosition.y / context.engineRepository.sunDistance,
                                      context.engineRepository.nightColor, context.engineRepository.dawnColor,

@@ -6,7 +6,10 @@ namespace Metal {
     void LightComponent::registerFields() {
         registerColor(color, "", "Color");
         registerFloat(intensity, "", "Intensity", .1, 100);
-        registerFloat(radius, "", "Radius", .1, 10);
+        registerInt(lightType, "", "Light type");
+        registerText(lightTypeLabel, "", "Type", true);
+
+        registerFloat(radiusSize, "", "Radius/Size", .1, 10);
     }
 
     ComponentTypes::ComponentType LightComponent::getType() {
@@ -15,5 +18,13 @@ namespace Metal {
 
     void LightComponent::onUpdate(InspectableMember *member, ApplicationContext &context) {
         context.engineContext.setLightingDataUpdated(true);
+        if (member != nullptr) {
+            if (lightType == 0) {
+                lightTypeLabel = "Sphere";
+            }
+            if (lightType == 1) {
+                lightTypeLabel = "Plane";
+            }
+        }
     }
 } // Metal

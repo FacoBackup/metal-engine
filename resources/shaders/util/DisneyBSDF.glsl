@@ -175,22 +175,71 @@ vec3 disneySheen(float LdotH, const in MaterialInfo material) {
     return FH * material.sheen * Csheen;
 }
 
+vec3 perpendicular(const vec3 v) {
+    if (abs(v.x) < abs(v.y)) {
+        return normalize(vec3(0.0, -v.z, v.y));
+    }
+    return normalize(vec3(-v.z, 0.0, v.x));
+}
+
+float visibilityTest(const in Light light, const in SurfaceInteraction interaction, vec3 wi) {
+    float bias = max(.05, 1e-4 * length(interaction.point));
+    vec3 shadowsPosition = interaction.point + bias * wi;// Adds small offset to sample position in order to enable accumulation
+
+    Ray ray = Ray(shadowsPosition, wi, 1./wi);
+    SurfaceInteraction hitData = traceAllTiles(ray);
+    float lightDistance = length(light.position - shadowsPosition);
+    float hitDistance = length(hitData.point - shadowsPosition);
+    if (hitData.anyHit && hitDistance < lightDistance) {
+        return 0;
+    }
+    return 1;
+}
+
 vec3 lightSample(const in Light light, const in SurfaceInteraction interaction, out vec3 wi, out float lightPdf) {
     vec2 u = vec2(random(), random());
-
     vec3 tangent = vec3(0.), binormal = vec3(0.);
-    vec3 lightDir = normalize(light.position - interaction.point);
-    createBasis(lightDir, tangent, binormal);
 
-    float sinThetaMax2 = pow2(computeSphereRadius(light)) / distanceSq(light.position, interaction.point);
-    float cosThetaMax = sqrt(max(EPSILON, 1. - sinThetaMax2));
-    wi = uniformSampleCone(u, cosThetaMax, tangent, binormal, lightDir);
+    switch (light.lightType){
+        case LIGHT_TYPE_SPHERE:{
+            vec3 lightDir = normalize(light.position - interaction.point);
+            createBasis(lightDir, tangent, binormal);
 
-    if (dot(wi, interaction.normal) > 0.) {
-        lightPdf = 1. / (TWO_PI * (1. - cosThetaMax));
+            float sinThetaMax2 = pow2(light.radiusSize) / distanceSq(light.position, interaction.point);
+            float cosThetaMax = sqrt(max(EPSILON, 1. - sinThetaMax2));
+            wi = uniformSampleCone(u, cosThetaMax, tangent, binormal, lightDir);
+
+            if (dot(wi, interaction.normal) > 0.) {
+                lightPdf = 1. / (TWO_PI * (1. - cosThetaMax));
+            }
+
+            float visibility = visibilityTest(light, interaction, wi);
+            return light.color * visibility;
+        }
+        case LIGHT_TYPE_PLANE: {
+            vec3 tangent1 = normalize(perpendicular(light.minNormal));
+            vec3 tangent2 = cross(light.minNormal, tangent1);
+            vec3 lightSamplePoint = light.position
+            + u.x * light.radiusSize * tangent1
+            + u.y * light.radiusSize * tangent2;
+
+            wi = normalize(lightSamplePoint - interaction.point);
+
+            float distSq = distanceSq(lightSamplePoint, interaction.point);
+            float cosTheta = max(0.0, dot(-wi, light.minNormal));
+            lightPdf = distSq / (cosTheta * (light.radiusSize * light.radiusSize));
+
+            if (cosTheta > 0.0){
+                float visibility = visibilityTest(light, interaction, wi);
+                return light.color * visibility;
+            }
+            return vec3(0.0);
+        }
+        default :{
+            lightPdf = 0.0;
+            return vec3(0.0);
+        }
     }
-
-    return light.color;
 }
 
 float lightPdf(const in vec4 light, const in SurfaceInteraction interaction) {
@@ -359,7 +408,7 @@ float bsdfPdf(const in vec3 wi, const in vec3 wo, const in vec3 X, const in vec3
 }
 
 float light_pdf(const in Light light, const in SurfaceInteraction interaction) {
-    float sinThetaMax2 =  pow2(computeSphereRadius(light)) / distanceSq(light.position, interaction.point);
+    float sinThetaMax2 =  pow2(light.radiusSize) / distanceSq(light.position, interaction.point);
     float cosThetaMax = sqrt(max(EPSILON, 1. - sinThetaMax2));
     return 1. / (TWO_PI * (1. - cosThetaMax));
 }
@@ -393,36 +442,20 @@ float powerHeuristic(float nf, float fPdf, float ng, float gPdf){
     return (f*f)/(f*f + g*g);
 }
 
-float visibilityTest(vec3 ro, vec3 rayDirection, vec3 lightPosition) {
-    //    vec3 rayDirection = normalize(lightPosition - ro); // Treats light as a point light instead of spherical
-
-    Ray ray = Ray(ro, rayDirection, 1./rayDirection);
-    SurfaceInteraction hitData = traceAllTiles(ray);
-    float lightDistance = length(lightPosition - ro);
-    float hitDistance = length(hitData.point - ro);
-    if (hitData.anyHit && hitDistance < lightDistance) {
-        return 0;
-    }
-    return 1;
-}
-
-vec3 sampleLightType(const in Light light, const in SurfaceInteraction interaction, out vec3 wi, out float lightPdf, out float visibility) {
-    vec3 L = lightSample(light, interaction, wi, lightPdf);
-    vec3 shadowsPosition = interaction.point + RandomUnitVector()/16;// Adds small offset to sample position in order to enable accumulation
-    visibility = visibilityTest(shadowsPosition, wi, light.position);
-    return L;
+vec3 sampleLightType(const in Light light, const in SurfaceInteraction interaction, out vec3 wi, out float lightPdf) {
+    return lightSample(light, interaction, wi, lightPdf);
 }
 
 vec3 calculateDirectLight(const in Light light, const in SurfaceInteraction interaction, const in MaterialInfo material, out vec3 wi, out vec3 f, out float scatteringPdf) {
     // Light MIS
     vec3 wo = -interaction.incomingRayDir;
     vec3 Ld = vec3(0.);
-    float lightPdf = 0., visibility = 1.;
+    float lightPdf = 0.;
     scatteringPdf = 0.;
     bool isBlack = false;
 
-    vec3 Li = sampleLightType(light, interaction, wi, lightPdf, visibility);
-    Li *= visibility;
+    vec3 Li = sampleLightType(light, interaction, wi, lightPdf);
+
 
     isBlack = dot(Li, Li) == 0.;
 
@@ -430,10 +463,10 @@ vec3 calculateDirectLight(const in Light light, const in SurfaceInteraction inte
         vec3 f = bsdfEvaluate(wi, wo, interaction.tangent, interaction.binormal, interaction, material) * abs(dot(wi, interaction.normal));
         float weight = 1.;
 
-        #ifdef USE_MIS
-        scatteringPdf = bsdfPdf(wi, wo, interaction.tangent, interaction.binormal, interaction, material);
-        weight = powerHeuristic(1., lightPdf, 1., scatteringPdf);
-        #endif
+        if (globalData.multipleImportanceSampling){
+            scatteringPdf = bsdfPdf(wi, wo, interaction.tangent, interaction.binormal, interaction, material);
+            weight = powerHeuristic(1., lightPdf, 1., scatteringPdf);
+        }
 
         isBlack = dot(f, f) == 0.;
         if (!isBlack) {
@@ -445,23 +478,23 @@ vec3 calculateDirectLight(const in Light light, const in SurfaceInteraction inte
     f = bsdfSample(wi, wo, interaction.tangent, interaction.binormal, scatteringPdf, interaction, material);
     f *= abs(dot(wi, interaction.normal));
 
-    #ifdef USE_MIS
-    isBlack = dot(f, f) == 0.;
-    Li = light.color;
+    if (globalData.multipleImportanceSampling){
 
-    if (!isBlack && scatteringPdf > EPSILON) {
-        float weight = 1.;
+        isBlack = dot(f, f) == 0.;
+        Li = light.color;
 
-        lightPdf = light_pdf(light, interaction);
-        if (lightPdf < EPSILON) return Ld;
-        weight = powerHeuristic(1., scatteringPdf, 1., lightPdf);
-        vec3 shadowsPosition = interaction.point + RandomUnitVector()/16;// Adds small offset to sample position in order to enable accumulation
-        Li *= visibilityTest(shadowsPosition, wi, light.position);
-        isBlack = dot(Li, Li) == 0.;
-        if (!isBlack) {
-            Ld +=  Li * f * weight / scatteringPdf;
+        if (!isBlack && scatteringPdf > EPSILON) {
+            float weight = 1.;
+
+            lightPdf = light_pdf(light, interaction);
+            if (lightPdf < EPSILON) return Ld;
+            weight = powerHeuristic(1., scatteringPdf, 1., lightPdf);
+            Li *= visibilityTest(light, interaction, wi);
+            isBlack = dot(Li, Li) == 0.;
+            if (!isBlack) {
+                Ld +=  Li * f * weight / scatteringPdf;
+            }
         }
     }
-    #endif
     return Ld;
 }

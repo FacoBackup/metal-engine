@@ -20,36 +20,39 @@ vec3 calculatePixelColor(in vec2 texCoords, MaterialInfo material, SurfaceIntera
     material.anisotropic = 0.;
     material.sheen = 0.;
     material.sheenTint = 0.;
-
     //    material.clearcoat = 1.;
     //    material.specular = 0.1;
     //    material.subsurface = 1.;
     //    material.clearcoatGloss = 1.;
 
-    { // Direct lighting - Disney BSDF
-        vec3 X = vec3(0.), Y = vec3(0.);
-        directionOfAnisotropicity(interaction.normal, X, Y);
-        interaction.tangent = X;
-        interaction.binormal = Y;
+    // Direct lighting - Disney BSDF
+    vec3 X = vec3(0.), Y = vec3(0.);
+    directionOfAnisotropicity(interaction.normal, X, Y);
+    interaction.tangent = X;
+    interaction.binormal = Y;
 
+    for (uint i = 0; i < globalData.giSamples; i++){
         vec3 f = vec3(0.);
         float scatteringPdf = 0.;
         vec3 Ld = vec3(0);
         for (uint i = 0; i < globalData.lightCount; i++){
             Light l = lightsBuffer.lights[i];
-            l.color *= 50.;
+            l.color *= 20.;
             Ld += beta * calculateDirectLight(l, interaction, material, wi, f, scatteringPdf);
         }
 
         L += Ld;
 
-        if (scatteringPdf > EPSILON && dot(f, f) > EPSILON)
-        beta *=  f / scatteringPdf;
+        if (scatteringPdf > EPSILON && dot(f, f) > EPSILON){
+            beta *=  f / scatteringPdf;
+        }
 
-//                wi = normalize(interaction.normal + RandomUnitVector());
-        float bias = max(.05, 1e-4 * length(interaction.point));
-        interaction.point = interaction.point + bias * interaction.normal;
+        if (globalData.giBounces > 0 && globalData.giStrength > 0){
+            float bias = max(.05, 1e-4 * length(interaction.point));
+            vec3 point =  interaction.point + bias * interaction.normal;
+            L += (material.baseColor / PI) * calculateIndirectLighting(material.roughness, interaction.normal, point, rayDir) * globalData.giStrength;
+        }
     }
 
-    return L + (material.baseColor / PI) * calculateIndirectLighting(material, interaction, wi) * globalData.giStrength;
+    return L / globalData.giSamples;
 }

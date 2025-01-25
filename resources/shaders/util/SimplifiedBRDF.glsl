@@ -17,7 +17,7 @@ void evaluateLightSimplified(in Light l, in BounceInfo bounceInfo, inout vec3 th
     float hitDistance = length(hitData.point - localHitPosition);
     float shadows = 1;
     if (hitData.anyHit && hitDistance < lightDistance) {
-        shadows = clamp(1 / lightDistance, 0, 1);
+        shadows = 0;// clamp(1 / lightDistance, 0, 1)
     }
     if (shadows != 0){
         float NdotL = max(dot(bounceInfo.hitNormal, lightDir), 0.0);
@@ -28,52 +28,53 @@ void evaluateLightSimplified(in Light l, in BounceInfo bounceInfo, inout vec3 th
     }
 }
 
-void fetchSurfaceCacheRadiance(in Light sunLight, inout BounceInfo bounceInfo){
+void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo){
     ivec2 coord = ivec2(worldToSurfaceCacheHash(bounceInfo.currentPosition) * vec2(globalData.surfaceCacheWidth, globalData.surfaceCacheHeight));
 
-    vec4 previousCacheData = imageLoad(surfaceCacheImage, coord);
-    float accumulationCount = previousCacheData.a;
+    vec4 previousCacheData;
 
-    if (length(previousCacheData.rgb) < 1){
+    if (!bounceInfo.isEmissive){
+        previousCacheData = imageLoad(surfaceCacheImage, coord);
+    }
+
+    if (previousCacheData.a == 1){
         vec3 lIndirect = vec3(0);
         vec3 lT = vec3(1);
-        if (bounceInfo.isEmissive){
-            vec3 localIndirect = bounceInfo.albedo * globalData.giEmissiveFactor;
-            lIndirect += bounceInfo.throughput * localIndirect;
-            lT *= bounceInfo.albedo * globalData.giEmissiveFactor;
-        } else {
-            if (globalData.lightCount > 0){
-                for (int i = 0; i < globalData.lightCount; ++i) {
-                    Light l = lightsBuffer.lights[i];
-                    evaluateLightSimplified(l, bounceInfo, lT, lIndirect);
-                }
-            }
-            if (globalData.isAtmosphereEnabled){
-                evaluateLightSimplified(sunLight, bounceInfo, lT, lIndirect);
+
+        if (globalData.lightCount > 0){
+            for (int i = 0; i < globalData.lightCount; ++i) {
+                Light l = lightsBuffer.lights[i];
+                evaluateLightSimplified(l, bounceInfo, lT, lIndirect);
             }
         }
 
-        vec3 accumulatedResult = previousCacheData.rgb * (1. - 1./accumulationCount) + lIndirect * 1./accumulationCount;
-        imageStore(surfaceCacheImage, coord, vec4(accumulatedResult, accumulationCount + 1));
-        bounceInfo.indirectLight += accumulatedResult;
+//        vec3 accumulatedResult = previousCacheData.rgb * (1. - 1./accumulationCount) + lIndirect * 1./accumulationCount;
+        imageStore(surfaceCacheImage, coord, vec4(lIndirect, 0));
+        bounceInfo.indirectLight += lIndirect;
         bounceInfo.throughput *= lT;
     } else {
-        bounceInfo.indirectLight += previousCacheData.rgb;
-        bounceInfo.throughput *= previousCacheData.rgb;
+        if (bounceInfo.isEmissive){
+            vec3 scaledAlbedo = bounceInfo.albedo * globalData.giEmissiveFactor;
+            bounceInfo.indirectLight += bounceInfo.throughput * scaledAlbedo;
+            bounceInfo.throughput *= scaledAlbedo;
+        } else {
+            bounceInfo.indirectLight += previousCacheData.rgb;
+            bounceInfo.throughput *= previousCacheData.rgb;
+        }
     }
 }
 
-vec3 calculateIndirectLighting(MaterialInfo material, SurfaceInteraction interaction, vec3 rayDir) {
-    if(globalData.giBounces == 0) return vec3(0);
-    Light sunLight = Light(globalData.sunColor, normalize(globalData.sunPosition) * 20, -vec3(10000), vec3(10000), true);
+vec3 calculateIndirectLighting(float roughness, vec3 normal, vec3 currentPosition, vec3 rayDir) {
+    if (globalData.giBounces == 0) return vec3(0);
 
     BounceInfo bounceInfo;
     bounceInfo.indirectLight = vec3(0);
     bounceInfo.throughput = vec3(1);
-    bounceInfo.currentPosition = interaction.point;
-    bounceInfo.hitNormal = interaction.normal;
+    bounceInfo.currentPosition = currentPosition;
+    bounceInfo.hitNormal = normal;
+    MaterialInfo material;
 
-    float localRoughness = material.roughness;
+    float localRoughness = roughness;
     vec3 localRayDir = rayDir;
 
     for (uint j = 0; j < globalData.giBounces; j++){
@@ -83,12 +84,12 @@ vec3 calculateIndirectLighting(MaterialInfo material, SurfaceInteraction interac
         specularRayDir = normalize(mix(specularRayDir, diffuseRayDir, localRoughness * localRoughness));
         localRayDir = mix(diffuseRayDir, specularRayDir, 1. - localRoughness);
         Ray ray = Ray(bounceInfo.currentPosition, localRayDir, 1.0 / localRayDir);
-        interaction = traceAllTiles(ray);
+        SurfaceInteraction interaction = traceAllTiles(ray);
         if (!interaction.anyHit) {
             if (globalData.isAtmosphereEnabled){
                 bounceInfo.albedo = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), ray.d, 2.0f) * 0.05f;
                 bounceInfo.isEmissive = true;
-                fetchSurfaceCacheRadiance(sunLight, bounceInfo);
+                fetchSurfaceCacheRadiance(bounceInfo);
             }
             break;
         }
@@ -102,7 +103,7 @@ vec3 calculateIndirectLighting(MaterialInfo material, SurfaceInteraction interac
         bounceInfo.hitNormal = interaction.normal;
         bounceInfo.currentPosition = interaction.point;
 
-        fetchSurfaceCacheRadiance(sunLight, bounceInfo);
+        fetchSurfaceCacheRadiance(bounceInfo);
     }
     return bounceInfo.indirectLight / globalData.giBounces;
 }

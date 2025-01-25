@@ -44,7 +44,6 @@ namespace Metal {
         instance->descriptorNormalTexture = std::make_unique<DescriptorInstance>();
         instance->descriptorRoughnessTexture = std::make_unique<DescriptorInstance>();
         instance->descriptorMetallicTexture = std::make_unique<DescriptorInstance>();
-        instance->descriptorAOTexture = std::make_unique<DescriptorInstance>();
         instance->descriptorHeightTexture = std::make_unique<DescriptorInstance>();
 
         instance->descriptorAlbedoTexture->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
@@ -59,9 +58,6 @@ namespace Metal {
         instance->descriptorMetallicTexture->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
                                                               VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                               0);
-        instance->descriptorAOTexture->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                        VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                        0);
         instance->descriptorHeightTexture->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
                                                             VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                             0);
@@ -70,21 +66,18 @@ namespace Metal {
         instance->descriptorNormalTexture->create(vulkanContext);
         instance->descriptorRoughnessTexture->create(vulkanContext);
         instance->descriptorMetallicTexture->create(vulkanContext);
-        instance->descriptorAOTexture->create(vulkanContext);
         instance->descriptorHeightTexture->create(vulkanContext);
 
         instance->useAlbedoTexture = streamAndWrite(data->albedo, instance, instance->descriptorAlbedoTexture);
         instance->useNormalTexture = streamAndWrite(data->normal, instance, instance->descriptorNormalTexture);
         instance->useRoughnessTexture = streamAndWrite(data->roughness, instance, instance->descriptorRoughnessTexture);
         instance->useMetallicTexture = streamAndWrite(data->metallic, instance, instance->descriptorMetallicTexture);
-        instance->useAOTexture = streamAndWrite(data->ao, instance, instance->descriptorAOTexture);
         instance->useHeightTexture = streamAndWrite(data->height, instance, instance->descriptorHeightTexture);
 
         instance->descriptorAlbedoTexture->write(vulkanContext);
         instance->descriptorNormalTexture->write(vulkanContext);
         instance->descriptorRoughnessTexture->write(vulkanContext);
         instance->descriptorMetallicTexture->write(vulkanContext);
-        instance->descriptorAOTexture->write(vulkanContext);
         instance->descriptorHeightTexture->write(vulkanContext);
 
         delete data;

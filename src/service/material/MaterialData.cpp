@@ -8,7 +8,6 @@ namespace Metal {
         registerResourceSelection(normal, "", "normal", EntryType::TEXTURE);
         registerResourceSelection(roughness, "", "Roughness texture", EntryType::TEXTURE);
         registerResourceSelection(metallic, "", "Metallic Texture", EntryType::TEXTURE);
-        registerResourceSelection(ao, "", "Ambient occlusion Texture", EntryType::TEXTURE);
         registerResourceSelection(height, "", "Height Texture", EntryType::TEXTURE);
     }
 

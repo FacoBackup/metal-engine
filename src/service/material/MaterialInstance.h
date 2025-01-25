@@ -16,7 +16,6 @@ namespace Metal {
         std::unique_ptr<DescriptorInstance> descriptorNormalTexture = nullptr;
         std::unique_ptr<DescriptorInstance> descriptorRoughnessTexture = nullptr;
         std::unique_ptr<DescriptorInstance> descriptorMetallicTexture = nullptr;
-        std::unique_ptr<DescriptorInstance> descriptorAOTexture = nullptr;
         std::unique_ptr<DescriptorInstance> descriptorHeightTexture = nullptr;
         std::vector<std::string> textures{};
 
@@ -24,7 +23,6 @@ namespace Metal {
         bool useNormalTexture{};
         bool useRoughnessTexture{};
         bool useMetallicTexture{};
-        bool useAOTexture{};
         bool useHeightTexture{};
 
         void dispose(VulkanContext &context) override;

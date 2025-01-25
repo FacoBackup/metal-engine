@@ -113,10 +113,6 @@ namespace Metal {
                                     materialData.normal = TEXTURE_P;
                                     break;
                                 }
-                                case aiTextureType_AMBIENT_OCCLUSION: {
-                                    materialData.ao = TEXTURE_P;
-                                    break;
-                                }
                                 case aiTextureType_HEIGHT: {
                                     materialData.height = TEXTURE_P;
                                     break;

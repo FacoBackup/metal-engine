@@ -78,6 +78,12 @@ namespace Metal {
 
         void onSync() override;
 
+        void registerExplicitLightSources(int &index);
+
+        void registerEmissiveLightSources(int &index);
+
+        void registerSun(int &index);
+
         void updateLights();
 
         static glm::vec3 CalculateSunColor(float elevation, glm::vec3 &nightColor, glm::vec3 &dawnColor,

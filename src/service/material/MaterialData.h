@@ -12,7 +12,6 @@ namespace Metal {
         std::string normal;
         std::string roughness;
         std::string metallic;
-        std::string ao;
         std::string height;
 
         void registerFields() override;
@@ -26,7 +25,6 @@ namespace Metal {
             normal,
             roughness,
             metallic,
-            ao,
             height)
     };
 }

@@ -1,7 +1,5 @@
 #define EPSILON 0.0001
 
-#define USE_MIS
-
 #define TWO_PI 6.28318
 
 #define clearCoatBoost 1.

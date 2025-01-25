@@ -5,23 +5,36 @@
 
 #define LEVEL_OF_DETAIL "Level of detail"
 #define GLOBAL_ILLUMINATION "Global illumination"
+#define DENOISING "Denoising"
 #define ATMOSPHERE "Atmosphere"
 #define SUN "Sun"
 
 namespace Metal {
     void EngineRepository::registerFields() {
-        registerInt(shadingResInvScale, "Display settings (Restart required)", "Shading inverted resolution scale", 1, 16);
+        registerInt(shadingResInvScale, "Display settings (Restart required)", "Shading inverted resolution scale", 1,
+                    16);
         registerBool(vsync, "Display settings (Restart required)", "VSync?");
         registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);
         registerFloat(giStrength, GLOBAL_ILLUMINATION, "Strength");
-        registerInt(giBounces, GLOBAL_ILLUMINATION, "Max bounces", 0, 5);
+        registerInt(giMaxAccumulation, GLOBAL_ILLUMINATION, "Maximum accumulation (With denoiser disabled)", 1, 10000);
+        registerInt(giSamples, GLOBAL_ILLUMINATION, "Samples per pixel", 1, 32);
+        registerInt(giBounces, GLOBAL_ILLUMINATION, "Bounces", 0, 7);
+        registerBool(multipleImportanceSampling, GLOBAL_ILLUMINATION, "Enable multiple importance sampling?");
         registerInt(giTileSubdivision, GLOBAL_ILLUMINATION, "Grid subdivision", 1);
         registerFloat(giEmissiveFactor, GLOBAL_ILLUMINATION, "Emissive surface factor", 0);
+
+        registerBool(enabledDenoiser, DENOISING, "Enabled?");
+        registerFloat(denoiserStepWidth, DENOISING, "Step width", 1, 15, false, .001);
+        registerFloat(denoiserPositionPhi, DENOISING, "Position weight", 0, 1, false, .001);
+        registerFloat(denoiserColorPhi, DENOISING, "Color weight", 0, 1, false, .001);
+        registerFloat(denoiserNormalPhi, DENOISING, "Normal weight", 0, 1, false, .001);
+
         registerBool(atmosphereEnabled, ATMOSPHERE, "Enabled?");
         registerFloat(elapsedTime, ATMOSPHERE, "Elapsed time");
         registerBool(incrementTime, ATMOSPHERE, "Increment time");
         registerFloat(elapsedTimeSpeed, ATMOSPHERE, "Time of day speed");
         registerFloat(sunDistance, SUN, "Sun distance");
+        registerFloat(sunRadius, SUN, "Sun radius");
         registerFloat(sunLightIntensity, SUN, "Sun light intensity");
         registerColor(dawnColor, SUN, "Dawn color");
         registerColor(nightColor, SUN, "Night color");
@@ -32,8 +45,10 @@ namespace Metal {
         if (member != nullptr && member->name == LEVEL_OF_DETAIL) {
             context.worldGridRepository.hasMainTileChanged = true;
         }
-        if (member != nullptr && (member->group == GLOBAL_ILLUMINATION || member->group == ATMOSPHERE || member->group == SUN)) {
+        if (member != nullptr && (member->group == GLOBAL_ILLUMINATION || member->group == ATMOSPHERE || member->group
+                                  == SUN)) {
             context.engineContext.setGISettingsUpdated(true);
+            context.engineContext.setLightingDataUpdated(true);
         }
     }
 
