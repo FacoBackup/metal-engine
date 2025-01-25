@@ -125,8 +125,18 @@ namespace Metal {
             postProcessingDescriptor->create(vulkanContext);
             postProcessingDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                          context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                                         context.coreTextures.shading->vkImageView);
+                                                         context.coreFrameBuffers.denoisedResultFBO->attachments[0]->
+                                                         vkImageView);
             postProcessingDescriptor->write(vulkanContext);
+        } {
+            noisyInput = std::make_unique<DescriptorInstance>();
+            noisyInput->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
+                                         VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
+            noisyInput->create(vulkanContext);
+            noisyInput->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                           context.coreFrameBuffers.gBufferFBO->vkImageSampler,
+                                           context.coreTextures.shading->vkImageView);
+            noisyInput->write(vulkanContext);
         }
     }
 } // Metal

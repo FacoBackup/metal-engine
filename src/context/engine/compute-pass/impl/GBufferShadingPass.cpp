@@ -23,7 +23,11 @@ namespace Metal {
         if (surfaceCacheReset) {
             clearTexture(context.coreTextures.giSurfaceCache->vkImage);
         }
-        if (isFirstRun || context.engineContext.isCameraUpdated() || surfaceCacheReset) {
+
+        if (context.engineRepository.enabledDenoiser) {
+            clearTexture(context.coreTextures.shading->vkImage);
+            context.engineContext.resetGiAccumulationCount();
+        } else if (isFirstRun || context.engineContext.isCameraUpdated() || surfaceCacheReset) {
             clearTexture(context.coreTextures.shading->vkImage);
             context.engineContext.resetGiAccumulationCount();
             isFirstRun = false;

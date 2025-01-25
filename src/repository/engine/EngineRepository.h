@@ -7,8 +7,16 @@
 namespace Metal {
     struct EngineRepository final : Inspectable {
         bool vsync = true;
-        bool multipleImportanceSampling = true;
+
+        bool enabledDenoiser = true;
+        float denoiserStepWidth = 3;
+        float denoiserPositionPhi = .3;
+        float denoiserColorPhi = 1;
+        float denoiserNormalPhi = .5;
+
+        bool multipleImportanceSampling = false;
         int shadingResInvScale = 2;
+        int giMaxAccumulation = 200;
         int giTileSubdivision = 40;
         float giEmissiveFactor = 2;
         int giSamples = 1;
@@ -54,10 +62,15 @@ namespace Metal {
             giTileSubdivision,
             giEmissiveFactor,
             giStrength,
-            shadingResInvScale
+            shadingResInvScale,
+            giMaxAccumulation,
+            denoiserColorPhi,
+            denoiserNormalPhi,
+            denoiserPositionPhi,
+            denoiserStepWidth,
+            enabledDenoiser
         )
     };
 } // Metal
-CEREAL_CLASS_VERSION(Metal::EngineRepository, 2)
 
 #endif //ENGINEREPO_H

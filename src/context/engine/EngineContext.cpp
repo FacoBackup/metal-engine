@@ -148,7 +148,9 @@ namespace Metal {
         globalDataUBO.lightCount = lightsCount;
         globalDataUBO.isAtmosphereEnabled = context.engineRepository.atmosphereEnabled;
 
+        globalDataUBO.enabledDenoiser = context.engineRepository.enabledDenoiser;
         globalDataUBO.multipleImportanceSampling = context.engineRepository.multipleImportanceSampling;
+        globalDataUBO.giMaxAccumulation = context.engineRepository.giMaxAccumulation;
         globalDataUBO.giSamples = context.engineRepository.giSamples;
         globalDataUBO.giBounces = context.engineRepository.giBounces;
         globalDataUBO.giTileSubdivision = context.engineRepository.giTileSubdivision;

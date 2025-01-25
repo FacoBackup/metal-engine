@@ -51,7 +51,7 @@ void main() {
                 finalColor = vec3(material.roughness);
             } else if (globalData.debugFlag == METALLIC){
                 finalColor = vec3(material.metallic);
-            }  else if (globalData.debugFlag == DEPTH){
+            } else if (globalData.debugFlag == DEPTH){
                 finalColor = vec3(worldPos.a / 100.);
             } else if (globalData.debugFlag == UV){
                 finalColor = vec3(materialA.rg, 0);
@@ -82,10 +82,14 @@ void main() {
 
             finalColor = calculatePixelColor(texCoords, material, interaction);
         }
-        vec4 previousFrame = imageLoad(outputImage, ivec2(gl_GlobalInvocationID.xy));
-        float accumulationCount = min(200, previousFrame.a);
-        vec3 accumulatedResult = previousFrame.rgb * (1. - 1./accumulationCount) + finalColor * 1./accumulationCount;
-        imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(accumulatedResult, accumulationCount + 1));
-    }
 
+        if (globalData.enabledDenoiser){
+            imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(finalColor, 1));
+        } else {
+            vec4 previousFrame = imageLoad(outputImage, ivec2(gl_GlobalInvocationID.xy));
+            float accumulationCount = min(globalData.giMaxAccumulation, previousFrame.a);
+            vec3 accumulatedResult = previousFrame.rgb * (1. - 1./accumulationCount) + finalColor * 1./accumulationCount;
+            imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(accumulatedResult, accumulationCount + 1));
+        }
+    }
 }

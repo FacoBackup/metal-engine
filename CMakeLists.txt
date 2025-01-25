@@ -265,6 +265,8 @@ add_executable(
         src/context/editor/dock-spaces/inspector/MaterialInspection.h
         src/service/voxel/VoxelizationRequest.h
         src/enum/LightType.h
+        src/context/engine/render-pass/impl/DenoiserPass.cpp
+        src/context/engine/render-pass/impl/DenoiserPass.h
 )
 
 
