@@ -64,7 +64,6 @@ namespace Metal {
         materialNormal = std::make_unique<DescriptorInstance>();
         materialRoughness = std::make_unique<DescriptorInstance>();
         materialMetallic = std::make_unique<DescriptorInstance>();
-        materialAO = std::make_unique<DescriptorInstance>();
         materialHeight = std::make_unique<DescriptorInstance>();
 
         materialAlbedo->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
@@ -75,8 +74,6 @@ namespace Metal {
                                             VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
         materialMetallic->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
                                            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-        materialAO->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                     0);
         materialHeight->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
                                          VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
 
@@ -84,7 +81,6 @@ namespace Metal {
         materialNormal->create(vulkanContext);
         materialRoughness->create(vulkanContext);
         materialMetallic->create(vulkanContext);
-        materialAO->create(vulkanContext);
         materialHeight->create(vulkanContext);
 
         // G-BUFFER

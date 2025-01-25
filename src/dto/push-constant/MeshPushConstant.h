@@ -14,7 +14,6 @@ namespace Metal {
         alignas(4) bool useNormalTexture = false;
         alignas(4) bool useRoughnessTexture = false;
         alignas(4) bool useMetallicTexture = false;
-        alignas(4) bool useAOTexture = false;
         alignas(4) bool useHeightTexture = false;
 
         alignas(4) float parallaxHeightScale;

@@ -19,7 +19,6 @@ namespace Metal {
         std::unique_ptr<DescriptorInstance> materialNormal = nullptr;
         std::unique_ptr<DescriptorInstance> materialRoughness = nullptr;
         std::unique_ptr<DescriptorInstance> materialMetallic = nullptr;
-        std::unique_ptr<DescriptorInstance> materialAO = nullptr;
         std::unique_ptr<DescriptorInstance> materialHeight = nullptr;
         std::unique_ptr<DescriptorInstance> noisyInput = nullptr;
         std::unique_ptr<DescriptorInstance> postProcessingDescriptor = nullptr;

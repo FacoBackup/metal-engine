@@ -10,8 +10,7 @@ layout(set = 1, binding = 0) uniform sampler2D albedoEmissiveSampler;
 layout(set = 2, binding = 0) uniform sampler2D normalSampler;
 layout(set = 3, binding = 0) uniform sampler2D roughnessSampler;
 layout(set = 4, binding = 0) uniform sampler2D metallicSampler;
-layout(set = 5, binding = 0) uniform sampler2D aoSampler;
-layout(set = 6, binding = 0) uniform sampler2D heightMapSampler;
+layout(set = 5, binding = 0) uniform sampler2D heightMapSampler;
 
 layout (location = 0) out vec4 outMaterialA;
 layout (location = 1) out vec4 outMaterialB;
@@ -123,9 +122,6 @@ void main () {
         metallic = texture(metallicSampler, localUV).r;
     }
 
-    if (push.useAOTexture){
-        outMaterialA.a *= texture(aoSampler, localUV).r;
-    }
     outMaterialA.a *= push.albedoEmissive.a > 0 ? -1 : 1;
     outMaterialB.a = compressRoughnessMetallic(metallic, roughness);
 

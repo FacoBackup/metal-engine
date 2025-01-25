@@ -13,7 +13,7 @@ namespace Metal {
         glm::vec3 albedoColor{1, 1, 1};
         bool emissiveSurface = false;
         float roughnessFactor = 1;
-        float metallicFactor = .5;
+        float metallicFactor = 0;
         int parallaxLayers = 16;
         float parallaxHeightScale = 1;
 
