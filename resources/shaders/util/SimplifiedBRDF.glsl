@@ -32,14 +32,12 @@ void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo){
     ivec2 coord = ivec2(worldToSurfaceCacheHash(bounceInfo.currentPosition) * vec2(globalData.surfaceCacheWidth, globalData.surfaceCacheHeight));
 
     vec4 previousCacheData;
-    float accumulationCount;
 
     if (!bounceInfo.isEmissive){
         previousCacheData = imageLoad(surfaceCacheImage, coord);
-        accumulationCount = previousCacheData.a;
     }
 
-    if (length(previousCacheData.rgb) < 1 && !bounceInfo.isEmissive){
+    if (previousCacheData.a == 1){
         vec3 lIndirect = vec3(0);
         vec3 lT = vec3(1);
 
@@ -50,9 +48,9 @@ void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo){
             }
         }
 
-        vec3 accumulatedResult = previousCacheData.rgb * (1. - 1./accumulationCount) + lIndirect * 1./accumulationCount;
-        imageStore(surfaceCacheImage, coord, vec4(accumulatedResult, accumulationCount + 1));
-        bounceInfo.indirectLight += accumulatedResult;
+//        vec3 accumulatedResult = previousCacheData.rgb * (1. - 1./accumulationCount) + lIndirect * 1./accumulationCount;
+        imageStore(surfaceCacheImage, coord, vec4(lIndirect, 0));
+        bounceInfo.indirectLight += lIndirect;
         bounceInfo.throughput *= lT;
     } else {
         if (bounceInfo.isEmissive){
@@ -66,16 +64,17 @@ void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo){
     }
 }
 
-vec3 calculateIndirectLighting(MaterialInfo material, SurfaceInteraction interaction, vec3 rayDir) {
+vec3 calculateIndirectLighting(float roughness, vec3 normal, vec3 currentPosition, vec3 rayDir) {
     if (globalData.giBounces == 0) return vec3(0);
 
     BounceInfo bounceInfo;
     bounceInfo.indirectLight = vec3(0);
     bounceInfo.throughput = vec3(1);
-    bounceInfo.currentPosition = interaction.point;
-    bounceInfo.hitNormal = interaction.normal;
+    bounceInfo.currentPosition = currentPosition;
+    bounceInfo.hitNormal = normal;
+    MaterialInfo material;
 
-    float localRoughness = material.roughness;
+    float localRoughness = roughness;
     vec3 localRayDir = rayDir;
 
     for (uint j = 0; j < globalData.giBounces; j++){
@@ -85,7 +84,7 @@ vec3 calculateIndirectLighting(MaterialInfo material, SurfaceInteraction interac
         specularRayDir = normalize(mix(specularRayDir, diffuseRayDir, localRoughness * localRoughness));
         localRayDir = mix(diffuseRayDir, specularRayDir, 1. - localRoughness);
         Ray ray = Ray(bounceInfo.currentPosition, localRayDir, 1.0 / localRayDir);
-        interaction = traceAllTiles(ray);
+        SurfaceInteraction interaction = traceAllTiles(ray);
         if (!interaction.anyHit) {
             if (globalData.isAtmosphereEnabled){
                 bounceInfo.albedo = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), ray.d, 2.0f) * 0.05f;

@@ -47,9 +47,11 @@ vec3 calculatePixelColor(in vec2 texCoords, MaterialInfo material, SurfaceIntera
             beta *=  f / scatteringPdf;
         }
 
-        float bias = max(.05, 1e-4 * length(interaction.point));
-        interaction.point = interaction.point + bias * interaction.normal;
-        L += (material.baseColor / PI) * calculateIndirectLighting(material, interaction, wi) * globalData.giStrength;
+        if (globalData.giBounces > 0 && globalData.giStrength > 0){
+            float bias = max(.05, 1e-4 * length(interaction.point));
+            vec3 point =  interaction.point + bias * interaction.normal;
+            L += (material.baseColor / PI) * calculateIndirectLighting(material.roughness, interaction.normal, point, rayDir) * globalData.giStrength;
+        }
     }
 
     return L / globalData.giSamples;
