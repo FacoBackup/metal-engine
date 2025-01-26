@@ -210,6 +210,8 @@ add_executable(
         src/service/voxel/impl/VoxelData.h
         src/service/voxel/VoxelizationService.cpp
         src/service/voxel/VoxelizationService.h
+        src/service/voxel/impl/VoxelizerService.cpp
+        src/service/voxel/impl/VoxelizerService.h
         src/service/mesh/SceneData.h
         src/service/mesh/EntityAssetData.h
         src/service/material/MaterialData.h

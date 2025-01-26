@@ -42,7 +42,11 @@ namespace Metal::Util {
 
     template<typename T>
     int indexOf(const std::vector<T> &v, T val) {
-        return std::find(v.begin(), v.end(), val) != v.end();
+        auto it = std::find(v.begin(), v.end(), val); // Find the iterator
+        if (it != v.end()) {
+            return std::distance(v.begin(), it); // Calculate the index
+        }
+        return -1; // Return -1 if not found
     }
 }
 #endif //UTIL_H

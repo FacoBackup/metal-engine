@@ -43,8 +43,6 @@ namespace Metal {
         void insert(int maxDepth, glm::vec3 &point, VoxelData &data);
 
         void dispose() const;
-
-        void findRepeatedStructures();
     };
 } // Metal
 

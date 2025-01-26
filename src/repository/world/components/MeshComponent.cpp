@@ -5,8 +5,8 @@
 
 namespace Metal {
     void MeshComponent::registerFields() {
-        registerResourceSelection(meshId, "", "Mesh", EntryType::MESH, false);
-        registerResourceSelection(materialId, "", "Material", EntryType::MATERIAL, false);
+        registerResourceSelection(meshId, "", "Mesh", EntryType::MESH);
+        registerResourceSelection(materialId, "", "Material", EntryType::MATERIAL);
 
         registerBool(emissiveSurface, "", "Is emissive surface?");
 
@@ -19,6 +19,7 @@ namespace Metal {
 
     void MeshComponent::onUpdate(InspectableMember *member, ApplicationContext &context) {
         context.engineContext.setGISettingsUpdated(true);
+        needsReVoxelization = true;
     }
 
     ComponentTypes::ComponentType MeshComponent::getType() {

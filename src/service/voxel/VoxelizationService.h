@@ -1,14 +1,13 @@
-#ifndef VOXELIZERSERVICE_H
-#define VOXELIZERSERVICE_H
+#ifndef VOXELIZATIONSERVICE_H
+#define VOXELIZATIONSERVICE_H
+
 #include <string>
 #include <thread>
 #include <unordered_map>
-#include <glm/mat4x4.hpp>
 
 #include "../../common/AbstractRuntimeComponent.h"
 #include "impl/OctreeNode.h"
 #include "impl/SparseVoxelOctreeData.h"
-#include "impl/Triangle.h"
 
 namespace Metal {
     struct WorldTile;
@@ -19,20 +18,6 @@ namespace Metal {
     struct MeshData;
 
     class VoxelizationService final : public AbstractRuntimeComponent {
-        std::unordered_map<std::string, TextureData *> textures{};
-        std::unordered_map<std::string, SparseVoxelOctreeBuilder> builders{};
-        std::string localVoxelizationRequestId;
-        bool isVoxelizationDone = false;
-        bool isVoxelizationCancelled = false;
-        bool isExecutingThread = false;
-        std::thread thread;
-
-        void iterateTriangle(const MeshComponent *component, const Triangle &triangle);
-
-        void voxelize(const MeshComponent *component, const glm::mat4x4 &modelMatrix, const MeshData *mesh);
-
-        static bool isTriangleFlatInAxis(const Triangle &triangle);
-
         static void FillStorage(SparseVoxelOctreeBuilder &builder, unsigned int &bufferIndex,
                                 unsigned int &materialBufferIndex,
                                 SparseVoxelOctreeData &voxels, OctreeNode *node);
@@ -41,13 +26,22 @@ namespace Metal {
 
         void serialize(SparseVoxelOctreeBuilder &builder) const;
 
-        void voxelize();
+        void beginVoxelization();
 
-        void voxelizeGroup(const std::vector<VoxelizationRequest> &request);
+        void voxelizeGroup(const std::vector<VoxelizationRequest> &request) const;
 
         void collectRequests(WorldTile &t, std::vector<std::vector<VoxelizationRequest>> &requests) const;
 
     public:
+        std::unordered_map<std::string, TextureData *> textures{};
+        std::unordered_map<std::string, SparseVoxelOctreeBuilder> builders{};
+        std::string localVoxelizationRequestId;
+        bool isVoxelizationDone = false;
+        bool isVoxelizationCancelled = false;
+        bool isExecutingThread = false;
+        std::array<std::thread, 3> threads{};
+        std::thread mainThread;
+
         explicit VoxelizationService(ApplicationContext &context)
             : AbstractRuntimeComponent(context) {
         }

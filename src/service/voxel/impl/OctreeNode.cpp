@@ -31,42 +31,4 @@ namespace Metal {
             }
         }
     }
-
-    std::string OctreeNode::getId() {
-        if (treeHashId.empty()) {
-            prepareData();
-            char charData = static_cast<char>(childMask | isLeaf);
-            std::string id;
-            id += charData;
-            if (isLeaf) {
-                id += std::to_string(data[0]);
-                id += std::to_string(data[1]);
-            } else {
-                for (int i = 0; i < 8; i++) {
-                    if (auto &child = children[i]; child != nullptr) {
-                        id += child->getId();
-                    }
-                }
-            }
-            treeHashId = id;
-        }
-        return treeHashId;
-    }
-
-    void OctreeNode::repeatedStructures(std::unordered_map<std::string, OctreeNode *> &repeated,
-                                        int targetDepth) {
-        if (depth == targetDepth) {
-            isStructureStart = true;
-            std::string identifier = getId();
-            if (!repeated.contains(identifier)) {
-                repeated.insert({identifier, this});
-            }
-        } else {
-            for (auto *child: children) {
-                if (child != nullptr) {
-                    child->repeatedStructures(repeated, targetDepth);
-                }
-            }
-        }
-    }
 } // Metal

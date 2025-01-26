@@ -58,7 +58,7 @@ namespace Metal {
         if (node == nullptr || (isOnSearch &&
                                 searchMatch.contains(node->getId()) &&
                                 searchMatchWith.contains(node->getId()) &&
-                                strcmp(searchMatchWith[node->getId()].c_str(), headerPanel->search))) {
+                                strcmp(searchMatchWith[node->getId()].c_str(), headerPanel->search) == 0)) {
             return false;
         }
 
