@@ -22,7 +22,6 @@ namespace Metal {
                                  isLightingDataUpdated();
         if (surfaceCacheReset) {
             clearTexture(context.coreTextures.giSurfaceCache->vkImage);
-            clearTexture(context.coreTextures.diSurfaceCache->vkImage);
         }
 
         if (context.engineRepository.enabledDenoiser) {

@@ -44,14 +44,8 @@ void main() {
     float currentLuminance = dot(currentFrame.rgb, vec3(0.2126, 0.7152, 0.0722));
     float cacheLuminance = dot(accumulatedResult, vec3(0.2126, 0.7152, 0.0722));
 
-    // Introduce a confidence weight for the current frame
-    float noiseThreshold = 0.01 * globalData.denoiserNoiseThreshold;// Threshold to classify noisy pixels
-    float currentConfidence = smoothstep(noiseThreshold, noiseThreshold * 2.0, currentLuminance);
-
-    // Blend factor gives more weight to the cached value when the current frame is noisy
-    float outputBlendFactor = currentConfidence * (currentLuminance / (currentLuminance + cacheLuminance + 0.001));
+    float outputBlendFactor = globalData.denoiserNoiseThreshold * (currentLuminance / (currentLuminance + cacheLuminance + 0.001));
     vec3 outputColor = mix(accumulatedResult, currentFrame.rgb, outputBlendFactor);
 
-    // Store the final blended result
     imageStore(currentFrameImage, ivec2(gl_GlobalInvocationID.xy), vec4(outputColor, currentFrame.a));
 }

@@ -113,9 +113,10 @@ namespace Metal {
             lights[index] = LightData(
                 globalDataUBO.sunColor,
                 globalDataUBO.sunPosition,
-                globalDataUBO.sunPosition - glm::vec3(context.engineRepository.sunRadius / 2),
-                globalDataUBO.sunPosition + glm::vec3(context.engineRepository.sunRadius / 2),
-                LightTypes::SPHERE
+                glm::vec3(0),
+                glm::vec3(0),
+                LightTypes::SPHERE,
+                context.engineRepository.sunRadius
             );
             index++;
         }
