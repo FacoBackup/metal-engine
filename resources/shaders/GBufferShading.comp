@@ -84,7 +84,7 @@ void main() {
         }
 
         if (globalData.enabledDenoiser){
-            imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(finalColor, 1));
+            imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(finalColor, worldPos.a)); // Stores primitive ID in the A channel when denoiser is enabled
         } else {
             vec4 previousFrame = imageLoad(outputImage, ivec2(gl_GlobalInvocationID.xy));
             float accumulationCount = min(globalData.giMaxAccumulation, previousFrame.a);

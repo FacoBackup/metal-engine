@@ -10,8 +10,6 @@ namespace Metal {
 
         bool enabledDenoiser = true;
         float denoiserStepWidth = 3;
-        float denoiserPositionPhi = .3;
-        float denoiserColorPhi = 1;
         float denoiserNormalPhi = .5;
 
         bool multipleImportanceSampling = false;
@@ -64,9 +62,7 @@ namespace Metal {
             giStrength,
             shadingResInvScale,
             giMaxAccumulation,
-            denoiserColorPhi,
             denoiserNormalPhi,
-            denoiserPositionPhi,
             denoiserStepWidth,
             enabledDenoiser
         )

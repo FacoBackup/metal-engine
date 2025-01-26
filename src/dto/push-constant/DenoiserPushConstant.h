@@ -3,7 +3,7 @@
 
 namespace Metal {
     struct DenoiserPushConstant {
-        alignas(4) float colorPhi, normalPhi, positionPhi, stepWidth;
+        alignas(4) float normalPhi,  stepWidth;
     };
 }
 #endif

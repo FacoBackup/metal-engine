@@ -25,8 +25,6 @@ namespace Metal {
 
         registerBool(enabledDenoiser, DENOISING, "Enabled?");
         registerFloat(denoiserStepWidth, DENOISING, "Step width", 1, 15, false, .001);
-        registerFloat(denoiserPositionPhi, DENOISING, "Position weight", 0, 1, false, .001);
-        registerFloat(denoiserColorPhi, DENOISING, "Color weight", 0, 1, false, .001);
         registerFloat(denoiserNormalPhi, DENOISING, "Normal weight", 0, 1, false, .001);
 
         registerBool(atmosphereEnabled, ATMOSPHERE, "Enabled?");

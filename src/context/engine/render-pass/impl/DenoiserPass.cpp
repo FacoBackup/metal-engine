@@ -21,8 +21,6 @@ namespace Metal {
 
     void DenoiserPass::onSync() {
         pushConstant.stepWidth = context.engineRepository.denoiserStepWidth;
-        pushConstant.positionPhi = context.engineRepository.denoiserPositionPhi;
-        pushConstant.colorPhi = context.engineRepository.denoiserColorPhi;
         pushConstant.normalPhi = context.engineRepository.denoiserNormalPhi;
         recordPushConstant(&pushConstant);
         recordDrawSimpleInstanced(3, 1);
