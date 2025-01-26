@@ -32,7 +32,7 @@ void main() {
         unpackVoxel(hitData, matData);
         switch (settings.voxelDebugFlag){
             case ALBEDO:
-            finalColor = vec4(matData.baseColor, 1);
+            finalColor = vec4(matData.baseColor/2, 1);
             break;
             case NORMAL:
             finalColor = vec4(hitData.normal, 1);
@@ -43,11 +43,11 @@ void main() {
             case RANDOM:
             finalColor = vec4(randomColor(rand(hitData.voxelPosition.xyz)), 1);
             break;
-            case GI:
-            finalColor = vec4(texture(surfaceCache, genHashSurfaceCache(hitData.point.xyz)).rgb * globalData.giStrength, 1);
+            case POSITION:
+            finalColor = vec4(normalize(hitData.voxelPosition.xyz), 1);
             break;
             default :
-            finalColor = vec4(normalize(hitData.voxelPosition.xyz), 1);
+            finalColor = vec4(texture(surfaceCache, genHashSurfaceCache(hitData.point.xyz)).rgb * globalData.giStrength, 1);
             break;
         }
     }

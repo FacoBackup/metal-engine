@@ -1,0 +1,57 @@
+layout(local_size_x = 8, local_size_y = 8) in;
+#include "./GlobalDataBuffer.glsl"
+
+#ifdef DEBUG
+#include "./DebugFlags.glsl"
+#endif
+
+layout(set = 1, binding = 0) uniform sampler2D gBufferPosition;
+layout(set = 2, binding = 0, rgba32f) uniform image2D currentFrameImage;
+layout(set = 3, binding = 0, rgba32f) uniform image2D diSurfaceCacheImage;
+layout(set = 4, binding = 0, rgba32f) uniform image2D diSurfaceCacheImageVisibility;
+
+void main() {
+
+    #ifdef DEBUG
+    if (globalData.debugFlag != LIT && globalData.debugFlag != GI){
+        return;
+    }
+    #endif
+
+    vec2 texCoords = vec2(gl_GlobalInvocationID.xy) / imageSize(currentFrameImage);
+    vec4 worldPos = texture(gBufferPosition, texCoords);
+    if (worldPos.a == 0){
+        return;
+    }
+
+    ivec2 coord = ivec2(worldToSurfaceCacheHash(worldPos.rgb) * vec2(globalData.surfaceCacheWidth, globalData.surfaceCacheHeight));
+    imageStore(diSurfaceCacheImageVisibility, coord, vec4(1));
+
+    vec4 currentFrame = imageLoad(currentFrameImage, ivec2(gl_GlobalInvocationID.xy));
+
+    vec4 previousCacheData = imageLoad(diSurfaceCacheImage, coord);
+    float accumulationCount = max(min(globalData.giMaxAccumulation, previousCacheData.a), 1);
+    vec3 accumulatedResult = previousCacheData.rgb * (1. - 1./accumulationCount) + currentFrame.rgb * 1./accumulationCount;
+    imageStore(diSurfaceCacheImage, coord, vec4(accumulatedResult, accumulationCount + 1));
+
+    #ifdef DEBUG
+    if (globalData.debugFlag == GI){
+        imageStore(currentFrameImage, ivec2(gl_GlobalInvocationID.xy), vec4(previousCacheData.rgb, currentFrame.a));
+        return;
+    }
+    #endif
+
+    float currentLuminance = dot(currentFrame.rgb, vec3(0.2126, 0.7152, 0.0722));
+    float cacheLuminance = dot(accumulatedResult, vec3(0.2126, 0.7152, 0.0722));
+
+    // Introduce a confidence weight for the current frame
+    float noiseThreshold = 0.01 * globalData.denoiserNoiseThreshold;// Threshold to classify noisy pixels
+    float currentConfidence = smoothstep(noiseThreshold, noiseThreshold * 2.0, currentLuminance);
+
+    // Blend factor gives more weight to the cached value when the current frame is noisy
+    float outputBlendFactor = currentConfidence * (currentLuminance / (currentLuminance + cacheLuminance + 0.001));
+    vec3 outputColor = mix(accumulatedResult, currentFrame.rgb, outputBlendFactor);
+
+    // Store the final blended result
+    imageStore(currentFrameImage, ivec2(gl_GlobalInvocationID.xy), vec4(outputColor, currentFrame.a));
+}

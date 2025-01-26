@@ -1,8 +1,12 @@
 #include "./GlobalDataBuffer.glsl"
 
+#ifdef DEBUG
+#include "./DebugFlags.glsl"
+#endif
+
 layout(location = 0) in vec2 texCoords;
 
-layout(set = 1, binding = 0) uniform sampler2D noisyInput; // Stores primitive ID in the A channel when denoiser is enabled
+layout(set = 1, binding = 0) uniform sampler2D noisyInput;// Stores primitive ID in the A channel when denoiser is enabled
 layout(set = 2, binding = 0) uniform sampler2D gBufferNormal;
 
 layout(location = 0) out vec4 finalColor;
@@ -17,17 +21,23 @@ float gaussian(float x, float sigma) {
 }
 
 void main() {
+    #ifdef DEBUG
+    if (globalData.debugFlag != LIT && globalData.debugFlag != LIGHTING_ONLY){
+        finalColor = vec4(texture(noisyInput, texCoords).rgb, 1);
+        return;
+    }
+    #endif
     if (!globalData.enabledDenoiser){
         finalColor = vec4(texture(noisyInput, texCoords).rgb, 1);
         return;
     }
+
     vec2 u_resolution = textureSize(noisyInput, 0);
     vec3 centerNormal = texture(gBufferNormal, texCoords).xyz;
-    vec4 centerColorAndId = texture(noisyInput, texCoords); // Color and ID at the current fragment
-    vec3 centerColor = centerColorAndId.rgb;
+    vec4 centerColorAndId = texture(noisyInput, texCoords);// Color and ID at the current fragment
     float centerId = centerColorAndId.a;
 
-    float sigmaSpatial = push.stepWidth / u_resolution.x; // Spatial Gaussian spread
+    float sigmaSpatial = push.stepWidth / u_resolution.x;// Spatial Gaussian spread
 
     float totalWeight = 0.0;
     for (int y = -int(push.stepWidth); y <= int(push.stepWidth); y++) {

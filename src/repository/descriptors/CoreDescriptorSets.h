@@ -26,8 +26,10 @@ namespace Metal {
         std::unique_ptr<DescriptorInstance> gBufferAlbedo = nullptr;
         std::unique_ptr<DescriptorInstance> gBufferNormal = nullptr;
         std::unique_ptr<DescriptorInstance> gBufferPosition = nullptr;
-        std::unique_ptr<DescriptorInstance> surfaceCacheCompute = nullptr;
-        std::unique_ptr<DescriptorInstance> shadingCompute = nullptr;
+        std::unique_ptr<DescriptorInstance> giSurfaceCacheCompute = nullptr;
+        std::unique_ptr<DescriptorInstance> diSurfaceCacheCompute = nullptr;
+        std::unique_ptr<DescriptorInstance> diSurfaceCacheComputeVisibility = nullptr;
+        std::unique_ptr<DescriptorInstance> currentImageCompute = nullptr;
         std::unique_ptr<DescriptorInstance> svoData = nullptr;
         std::unique_ptr<DescriptorInstance> lightsData = nullptr;
 

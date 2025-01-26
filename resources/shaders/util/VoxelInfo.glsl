@@ -53,7 +53,7 @@ void unpackVoxel(inout SurfaceInteraction hit, inout MaterialInfo material) {
     material.baseColor.r = ((first >> 16u) & 0xFFu) / 255.f;
     material.baseColor.g = ((first >> 8u) & 0xFFu) / 255.f;
     material.baseColor.b = (first & 0xFFu) / 255.f;
-//    material.baseColor *= 2;
+    material.baseColor *= 2;
     material.isEmissive = ((first >> 24u) & 0x1u) == 1;
 
     hit.normal = unpackNormal(second);

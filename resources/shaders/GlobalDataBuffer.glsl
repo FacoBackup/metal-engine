@@ -20,6 +20,7 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     uint giBounces;
     uint giTileSubdivision;
     float giEmissiveFactor;
+    float denoiserNoiseThreshold;
 
     uint debugFlag;
 

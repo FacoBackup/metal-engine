@@ -16,7 +16,7 @@ namespace Metal {
         registerBool(vsync, "Display settings (Restart required)", "VSync?");
         registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);
         registerFloat(giStrength, GLOBAL_ILLUMINATION, "Strength");
-        registerInt(giMaxAccumulation, GLOBAL_ILLUMINATION, "Maximum accumulation (With denoiser disabled)", 1, 10000);
+        registerInt(giMaxAccumulation, GLOBAL_ILLUMINATION, "Maximum accumulation", 1, 10000);
         registerInt(giSamples, GLOBAL_ILLUMINATION, "Samples per pixel", 1, 32);
         registerInt(giBounces, GLOBAL_ILLUMINATION, "Bounces", 0, 7);
         registerBool(multipleImportanceSampling, GLOBAL_ILLUMINATION, "Enable multiple importance sampling?");
@@ -26,6 +26,7 @@ namespace Metal {
         registerBool(enabledDenoiser, DENOISING, "Enabled?");
         registerFloat(denoiserStepWidth, DENOISING, "Step width", 1, 15, false, .001);
         registerFloat(denoiserNormalPhi, DENOISING, "Normal weight", 0, 1, false, .001);
+        registerFloat(denoiserNoiseThreshold, DENOISING, "Noise threshold", 0);
 
         registerBool(atmosphereEnabled, ATMOSPHERE, "Enabled?");
         registerFloat(elapsedTime, ATMOSPHERE, "Elapsed time");

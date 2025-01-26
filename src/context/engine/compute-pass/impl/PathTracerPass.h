@@ -1,14 +1,13 @@
 #ifndef GBUFFERSHADINGPASS_H
 #define GBUFFERSHADINGPASS_H
-#include "../../render-pass/AbstractRenderPass.h"
 #include "../AbstractComputePass.h"
 
 namespace Metal {
-
-    class GBufferShadingPass final : public AbstractComputePass {
+    class PathTracerPass final : public AbstractComputePass {
         bool isFirstRun = true;
+
     public:
-        explicit GBufferShadingPass(ApplicationContext &context)
+        explicit PathTracerPass(ApplicationContext &context)
             : AbstractComputePass(context) {
         }
 
@@ -16,7 +15,6 @@ namespace Metal {
 
         void onInitialize() override;
     };
-
 } // Metal
 
 #endif //GBUFFERSHADINGPASS_H

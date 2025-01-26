@@ -88,19 +88,33 @@ namespace Metal {
         GBUFFER_D(gBufferNormal, 1)
         GBUFFER_D(gBufferPosition, 2)
 
-        surfaceCacheCompute = std::make_unique<DescriptorInstance>();
-        surfaceCacheCompute->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
-        surfaceCacheCompute->create(vulkanContext);
-        surfaceCacheCompute->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
+        giSurfaceCacheCompute = std::make_unique<DescriptorInstance>();
+        giSurfaceCacheCompute->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
+        giSurfaceCacheCompute->create(vulkanContext);
+        giSurfaceCacheCompute->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
                                                 context.coreTextures.giSurfaceCache->vkImageView);
-        surfaceCacheCompute->write(vulkanContext);
+        giSurfaceCacheCompute->write(vulkanContext);
 
-        shadingCompute = std::make_unique<DescriptorInstance>();
-        shadingCompute->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
-        shadingCompute->create(vulkanContext);
-        shadingCompute->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
-                                           context.coreTextures.shading->vkImageView);
-        shadingCompute->write(vulkanContext);
+        diSurfaceCacheCompute = std::make_unique<DescriptorInstance>();
+        diSurfaceCacheCompute->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
+        diSurfaceCacheCompute->create(vulkanContext);
+        diSurfaceCacheCompute->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
+                                                  context.coreTextures.diSurfaceCache->vkImageView);
+        diSurfaceCacheCompute->write(vulkanContext);
+
+        diSurfaceCacheComputeVisibility = std::make_unique<DescriptorInstance>();
+        diSurfaceCacheComputeVisibility->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
+        diSurfaceCacheComputeVisibility->create(vulkanContext);
+        diSurfaceCacheComputeVisibility->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
+                                                  context.coreTextures.diSurfaceCacheImageVisibility->vkImageView);
+        diSurfaceCacheComputeVisibility->write(vulkanContext);
+
+        currentImageCompute = std::make_unique<DescriptorInstance>();
+        currentImageCompute->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
+        currentImageCompute->create(vulkanContext);
+        currentImageCompute->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
+                                           context.coreTextures.currentFrame->vkImageView);
+        currentImageCompute->write(vulkanContext);
 
         if (context.isDebugMode()) {
             surfaceCacheFragment = std::make_unique<DescriptorInstance>();
@@ -131,7 +145,7 @@ namespace Metal {
             noisyInput->create(vulkanContext);
             noisyInput->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                            context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                           context.coreTextures.shading->vkImageView);
+                                           context.coreTextures.currentFrame->vkImageView);
             noisyInput->write(vulkanContext);
         }
     }

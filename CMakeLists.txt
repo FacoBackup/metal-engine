@@ -217,8 +217,8 @@ add_executable(
         src/service/material/MaterialData.h
         src/context/engine/render-pass/impl/PostProcessingPass.cpp
         src/context/engine/render-pass/impl/PostProcessingPass.h
-        src/context/engine/compute-pass/impl/GBufferShadingPass.cpp
-        src/context/engine/compute-pass/impl/GBufferShadingPass.h
+        src/context/engine/compute-pass/impl/PathTracerPass.cpp
+        src/context/engine/compute-pass/impl/PathTracerPass.h
         src/service/pipeline/PipelineBuilder.h
         src/service/framebuffer/FrameBufferAttachment.cpp
         src/repository/engine/EngineRepository.cpp
@@ -269,6 +269,10 @@ add_executable(
         src/enum/LightType.h
         src/context/engine/render-pass/impl/DenoiserPass.cpp
         src/context/engine/render-pass/impl/DenoiserPass.h
+        src/context/engine/compute-pass/impl/AccumulationPass.cpp
+        src/context/engine/compute-pass/impl/AccumulationPass.h
+        src/context/engine/compute-pass/impl/SurfaceCacheResetPass.cpp
+        src/context/engine/compute-pass/impl/SurfaceCacheResetPass.h
 )
 
 

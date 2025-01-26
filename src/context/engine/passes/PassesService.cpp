@@ -1,7 +1,9 @@
 #include "PassesService.h"
 #include "../../../context/ApplicationContext.h"
 #include "./CommandBufferRecorder.h"
-#include "../compute-pass/impl/GBufferShadingPass.h"
+#include "../compute-pass/impl/AccumulationPass.h"
+#include "../compute-pass/impl/PathTracerPass.h"
+#include "../compute-pass/impl/SurfaceCacheResetPass.h"
 #include "../render-pass/impl/DenoiserPass.h"
 #include "../render-pass/impl/GBufferGenPass.h"
 #include "../render-pass/impl/PostProcessingPass.h"
@@ -21,7 +23,10 @@ namespace Metal {
 
         addPass(gBufferPasses, new GBufferGenPass(context));
 
-        addPass(computePasses, new GBufferShadingPass(context));
+        addPass(computePasses, new PathTracerPass(context));
+        addPass(computePasses, new AccumulationPass(context));
+        addPass(computePasses, new SurfaceCacheResetPass(context));
+
         addPass(denoisingPass, new DenoiserPass(context));
         addPass(postProcessingPasses, new PostProcessingPass(context));
         if (context.isDebugMode()) {

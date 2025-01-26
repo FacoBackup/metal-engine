@@ -34,7 +34,7 @@ void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo){
     vec4 previousCacheData;
 
     if (!bounceInfo.isEmissive){
-        previousCacheData = imageLoad(surfaceCacheImage, coord);
+        previousCacheData = imageLoad(giSurfaceCacheCompute, coord);
     }
 
     if (previousCacheData.a == 1){
@@ -49,7 +49,7 @@ void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo){
         }
 
 //        vec3 accumulatedResult = previousCacheData.rgb * (1. - 1./accumulationCount) + lIndirect * 1./accumulationCount;
-        imageStore(surfaceCacheImage, coord, vec4(lIndirect, 0));
+        imageStore(giSurfaceCacheCompute, coord, vec4(lIndirect, 0));
         bounceInfo.indirectLight += lIndirect;
         bounceInfo.throughput *= lT;
     } else {
