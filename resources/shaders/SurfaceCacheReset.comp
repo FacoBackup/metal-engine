@@ -6,6 +6,7 @@ layout(set = 1, binding = 0, rgba32f) uniform image2D diSurfaceCacheImageVisibil
 void main() {
     vec4 visibility = imageLoad(diSurfaceCacheImageVisibility, ivec2(gl_GlobalInvocationID.xy));
     if (visibility.r != 1){
-        imageStore(diSurfaceCacheImage, ivec2(gl_GlobalInvocationID.xy), vec4(0, 0, 0, 1));
+        vec4 prev = imageLoad(diSurfaceCacheImage, ivec2(gl_GlobalInvocationID.xy));
+        imageStore(diSurfaceCacheImage, ivec2(gl_GlobalInvocationID.xy), vec4(prev.rgb, 2));
     }
 }
