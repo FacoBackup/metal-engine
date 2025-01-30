@@ -1,9 +1,13 @@
 #ifndef ACCUMULATIONPASS_H
 #define ACCUMULATIONPASS_H
 #include "../AbstractComputePass.h"
+#include "../../../../dto/push-constant/AccumulationPushConstant.h"
 
 namespace Metal {
     class AccumulationPass final : public AbstractComputePass {
+        AccumulationPushConstant pushConstant{};
+        bool initialized = false;
+
     public:
         explicit AccumulationPass(ApplicationContext &context)
             : AbstractComputePass(context) {
@@ -13,7 +17,6 @@ namespace Metal {
 
         void onInitialize() override;
 
-        bool shouldRun() override;
     };
 } // Metal
 

@@ -3,8 +3,7 @@
 #include "./CommandBufferRecorder.h"
 #include "../compute-pass/impl/AccumulationPass.h"
 #include "../compute-pass/impl/PathTracerPass.h"
-#include "../compute-pass/impl/SurfaceCacheResetPass.h"
-#include "../render-pass/impl/DenoiserPass.h"
+#include "../compute-pass/impl/DenoiserPass.h"
 #include "../render-pass/impl/GBufferGenPass.h"
 #include "../render-pass/impl/PostProcessingPass.h"
 #include "../render-pass/impl/tools/GridPass.h"
@@ -19,15 +18,13 @@ namespace Metal {
         gBuffer = new CommandBufferRecorder(context.coreFrameBuffers.gBufferFBO, context);
         compute = new CommandBufferRecorder(context);
         postProcessing = new CommandBufferRecorder(context.coreFrameBuffers.postProcessingFBO, context);
-        denoising = new CommandBufferRecorder(context.coreFrameBuffers.denoisedResultFBO, context);
 
         addPass(gBufferPasses, new GBufferGenPass(context));
 
         addPass(computePasses, new PathTracerPass(context));
         addPass(computePasses, new AccumulationPass(context));
-        addPass(computePasses, new SurfaceCacheResetPass(context));
+        addPass(computePasses, new DenoiserPass(context));
 
-        addPass(denoisingPass, new DenoiserPass(context));
         addPass(postProcessingPasses, new PostProcessingPass(context));
         if (context.isDebugMode()) {
             addPass(postProcessingPasses, new GridPass(context));
@@ -48,7 +45,6 @@ namespace Metal {
     void PassesService::onSync() {
         gBuffer->recordCommands(gBufferPasses);
         compute->recordCommands(computePasses);
-        denoising->recordCommands(denoisingPass);
         postProcessing->recordCommands(postProcessingPasses);
     }
 
@@ -56,10 +52,8 @@ namespace Metal {
         delete gBuffer;
         delete compute;
         delete postProcessing;
-        delete denoising;
 
         computePasses.clear();
-        denoisingPass.clear();
         gBufferPasses.clear();
         postProcessingPasses.clear();
 

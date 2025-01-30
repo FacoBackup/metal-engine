@@ -267,12 +267,10 @@ add_executable(
         src/context/editor/dock-spaces/inspector/MaterialInspection.h
         src/service/voxel/VoxelizationRequest.h
         src/enum/LightType.h
-        src/context/engine/render-pass/impl/DenoiserPass.cpp
-        src/context/engine/render-pass/impl/DenoiserPass.h
+        src/context/engine/compute-pass/impl/DenoiserPass.cpp
+        src/context/engine/compute-pass/impl/DenoiserPass.h
         src/context/engine/compute-pass/impl/AccumulationPass.cpp
         src/context/engine/compute-pass/impl/AccumulationPass.h
-        src/context/engine/compute-pass/impl/SurfaceCacheResetPass.cpp
-        src/context/engine/compute-pass/impl/SurfaceCacheResetPass.h
 )
 
 

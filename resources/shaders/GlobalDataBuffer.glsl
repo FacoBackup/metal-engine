@@ -38,7 +38,7 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
 float rand(vec3 co) {
     return fract(sin(dot(co, vec3(12.9898, 71.9898, 78.233))) * 43758.5453);
 }
-vec2 spatialHashToUV(ivec3 coord, uint width, uint height) {
+vec2 coordToSpatialHash(ivec3 coord, uint width, uint height) {
     const int p1 = 39937;
     const int p2 = 37199;
     const int p3 = 39119;
@@ -55,28 +55,10 @@ vec2 spatialHashToUV(ivec3 coord, uint width, uint height) {
     return vec2(u, v);
 }
 
-//float getGridSize(in vec3 world){
-//    float dist = length(globalData.cameraWorldPosition - world);
-//
-//    if(dist <= 2){
-//        return globalData.giTileSubdivision;
-//    }
-//    if(dist <= 8){
-//        return round(globalData.giTileSubdivision / 2);
-//    }
-//    if(dist <= 16){
-//        return round(globalData.giTileSubdivision / 3);
-//    }
-//
-//    return round(globalData.giTileSubdivision / 4);
-//
-//}
-
 vec2 genHashSurfaceCache(vec3 world){
     float gridSize = float(globalData.giTileSubdivision);
-
     ivec3 coord = ivec3(int(round(world.x * gridSize)), int(round(world.y * gridSize)), int(round(world.z * gridSize)));
-    return spatialHashToUV(coord, globalData.surfaceCacheWidth, globalData.surfaceCacheHeight);
+    return coordToSpatialHash(coord, globalData.surfaceCacheWidth, globalData.surfaceCacheHeight);
 }
 
 vec3 worldToCacheSpace(in vec3 worldSpacePos){

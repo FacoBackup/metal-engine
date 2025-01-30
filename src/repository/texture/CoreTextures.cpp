@@ -11,11 +11,8 @@ namespace Metal {
         giSurfaceCache = context.textureService.createForCompute(SURFACE_CACHE_RES, SURFACE_CACHE_RES);
         giSurfaceCache->setAsNoDisposal();
 
-        diSurfaceCache = context.textureService.createForCompute(SURFACE_CACHE_RES, SURFACE_CACHE_RES);
-        diSurfaceCache->setAsNoDisposal();
-
-        diSurfaceCacheImageVisibility = context.textureService.createForCompute(SURFACE_CACHE_RES, SURFACE_CACHE_RES);
-        diSurfaceCacheImageVisibility->setAsNoDisposal();
+        previousFrame = context.textureService.createForCompute(context.vulkanContext.getWindowWidth() / context.engineRepository.shadingResInvScale, context.vulkanContext.getWindowHeight() / context.engineRepository.shadingResInvScale);
+        previousFrame->setAsNoDisposal();
 
         currentFrame = context.textureService.createForCompute(context.vulkanContext.getWindowWidth() / context.engineRepository.shadingResInvScale, context.vulkanContext.getWindowHeight() / context.engineRepository.shadingResInvScale);
         currentFrame->setAsNoDisposal();

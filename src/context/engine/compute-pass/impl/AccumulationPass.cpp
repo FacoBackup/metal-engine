@@ -6,21 +6,21 @@
 namespace Metal {
     void AccumulationPass::onInitialize() {
         PipelineBuilder shadingPipelineBuilder = PipelineBuilder::Of("PathTracerAccumulation.comp")
+                .setPushConstantsSize(sizeof(AccumulationPushConstant))
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get())
-                .addDescriptorSet(context.coreDescriptorSets.currentImageCompute.get())
-                .addDescriptorSet(context.coreDescriptorSets.diSurfaceCacheCompute.get())
-                .addDescriptorSet(context.coreDescriptorSets.diSurfaceCacheComputeVisibility.get());
+                .addDescriptorSet(context.coreDescriptorSets.currentFrameDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.previousFrameDescriptor.get());
         pipelineInstance = context.pipelineService.createPipeline(shadingPipelineBuilder);
     }
 
-    bool AccumulationPass::shouldRun() {
-        return context.engineRepository.enabledDenoiser;
-    }
-
     void AccumulationPass::onSync() {
-        clearTexture(context.coreTextures.diSurfaceCacheImageVisibility->vkImage);
-        recordImageDispatch(context.coreTextures.currentFrame, 8, 8);
-        endWriting(context.coreTextures.currentFrame->vkImage);
+        if (initialized) {
+            recordPushConstant(&pushConstant);
+            recordImageDispatch(context.coreTextures.currentFrame, 8, 8);
+            endWriting(context.coreTextures.currentFrame->vkImage);
+        }
+        initialized = true;
+        pushConstant.previousFrameProjView = context.engineContext.getGlobalDataUBO().projView;
     }
 } // Metal

@@ -5,10 +5,13 @@ layout(local_size_x = 8, local_size_y = 8) in;
 #include "./DebugFlags.glsl"
 #endif
 
+layout(push_constant) uniform Push {
+    mat4 prevProjView;
+} push;
+
 layout(set = 1, binding = 0) uniform sampler2D gBufferPosition;
-layout(set = 2, binding = 0, rgba32f) uniform image2D currentFrameImage;
-layout(set = 3, binding = 0, rgba32f) uniform image2D diSurfaceCacheImage;
-layout(set = 4, binding = 0, rgba32f) uniform image2D diSurfaceCacheImageVisibility;
+layout(set = 2, binding = 0, rgba32f) uniform image2D currentFrame;
+layout(set = 3, binding = 0, rgba32f) uniform image2D previousFrame;
 
 void main() {
 
@@ -17,35 +20,23 @@ void main() {
         return;
     }
     #endif
-
-    vec2 texCoords = vec2(gl_GlobalInvocationID.xy) / imageSize(currentFrameImage);
+    ivec2 sizeImg = imageSize(currentFrame);
+    vec2 texCoords = vec2(gl_GlobalInvocationID.xy) / imageSize(currentFrame);
     vec4 worldPos = texture(gBufferPosition, texCoords);
     if (worldPos.a == 0){
         return;
     }
 
-    ivec2 coord = ivec2(worldToSurfaceCacheHash(worldPos.rgb) * vec2(globalData.surfaceCacheWidth, globalData.surfaceCacheHeight));
-    imageStore(diSurfaceCacheImageVisibility, coord, vec4(1));
+    vec4 clipSpacePosition = push.prevProjView * vec4(worldPos.rgb, 1.0);
+    vec3 ndcPosition = clipSpacePosition.xyz / clipSpacePosition.w;
+    vec2 uvTexture = ndcPosition.xy * 0.5 + 0.5;
+    ivec2 imageSpace = ivec2(uvTexture * sizeImg);
 
-    vec4 currentFrame = imageLoad(currentFrameImage, ivec2(gl_GlobalInvocationID.xy));
+    vec4 currentFrameColor = imageLoad(currentFrame, ivec2(gl_GlobalInvocationID.xy));
+    vec4 previousFrameColor = imageLoad(previousFrame, imageSpace);
 
-    vec4 previousCacheData = imageLoad(diSurfaceCacheImage, coord);
-    float accumulationCount = max(min(globalData.giMaxAccumulation, previousCacheData.a), 1);
-    vec3 accumulatedResult = previousCacheData.rgb * (1. - 1./accumulationCount) + currentFrame.rgb * 1./accumulationCount;
-    imageStore(diSurfaceCacheImage, coord, vec4(accumulatedResult, accumulationCount + 1));
+    float accumulationCount = max(min(globalData.giMaxAccumulation, previousFrameColor.a), 1);
+    vec3 accumulatedResult = previousFrameColor.rgb * (1. - 1./accumulationCount) + currentFrameColor.rgb * 1./accumulationCount;
 
-    #ifdef DEBUG
-    if (globalData.debugFlag == GI){
-        imageStore(currentFrameImage, ivec2(gl_GlobalInvocationID.xy), vec4(previousCacheData.rgb, currentFrame.a));
-        return;
-    }
-    #endif
-
-    float currentLuminance = dot(currentFrame.rgb, vec3(0.2126, 0.7152, 0.0722));
-    float cacheLuminance = dot(accumulatedResult, vec3(0.2126, 0.7152, 0.0722));
-
-    float outputBlendFactor = globalData.denoiserNoiseThreshold * (currentLuminance / (currentLuminance + cacheLuminance + 0.001));
-    vec3 outputColor = mix(accumulatedResult, currentFrame.rgb, outputBlendFactor);
-
-    imageStore(currentFrameImage, ivec2(gl_GlobalInvocationID.xy), vec4(outputColor, currentFrame.a));
+    imageStore(currentFrame, ivec2(gl_GlobalInvocationID.xy), vec4(accumulatedResult, currentFrameColor.a));
 }

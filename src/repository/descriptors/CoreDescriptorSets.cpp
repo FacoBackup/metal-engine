@@ -95,26 +95,19 @@ namespace Metal {
                                                 context.coreTextures.giSurfaceCache->vkImageView);
         giSurfaceCacheCompute->write(vulkanContext);
 
-        diSurfaceCacheCompute = std::make_unique<DescriptorInstance>();
-        diSurfaceCacheCompute->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
-        diSurfaceCacheCompute->create(vulkanContext);
-        diSurfaceCacheCompute->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
-                                                  context.coreTextures.diSurfaceCache->vkImageView);
-        diSurfaceCacheCompute->write(vulkanContext);
+        previousFrameDescriptor = std::make_unique<DescriptorInstance>();
+        previousFrameDescriptor->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
+        previousFrameDescriptor->create(vulkanContext);
+        previousFrameDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
+                                                  context.coreTextures.previousFrame->vkImageView);
+        previousFrameDescriptor->write(vulkanContext);
 
-        diSurfaceCacheComputeVisibility = std::make_unique<DescriptorInstance>();
-        diSurfaceCacheComputeVisibility->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
-        diSurfaceCacheComputeVisibility->create(vulkanContext);
-        diSurfaceCacheComputeVisibility->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
-                                                  context.coreTextures.diSurfaceCacheImageVisibility->vkImageView);
-        diSurfaceCacheComputeVisibility->write(vulkanContext);
-
-        currentImageCompute = std::make_unique<DescriptorInstance>();
-        currentImageCompute->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
-        currentImageCompute->create(vulkanContext);
-        currentImageCompute->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
+        currentFrameDescriptor = std::make_unique<DescriptorInstance>();
+        currentFrameDescriptor->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
+        currentFrameDescriptor->create(vulkanContext);
+        currentFrameDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
                                            context.coreTextures.currentFrame->vkImageView);
-        currentImageCompute->write(vulkanContext);
+        currentFrameDescriptor->write(vulkanContext);
 
         if (context.isDebugMode()) {
             surfaceCacheFragment = std::make_unique<DescriptorInstance>();
@@ -135,18 +128,8 @@ namespace Metal {
             postProcessingDescriptor->create(vulkanContext);
             postProcessingDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                          context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                                         context.coreFrameBuffers.denoisedResultFBO->attachments[0]->
-                                                         vkImageView);
+                                                         context.coreTextures.currentFrame->vkImageView);
             postProcessingDescriptor->write(vulkanContext);
-        } {
-            noisyInput = std::make_unique<DescriptorInstance>();
-            noisyInput->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                         VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-            noisyInput->create(vulkanContext);
-            noisyInput->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                           context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                           context.coreTextures.currentFrame->vkImageView);
-            noisyInput->write(vulkanContext);
         }
     }
 } // Metal

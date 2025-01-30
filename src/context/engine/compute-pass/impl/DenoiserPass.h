@@ -1,14 +1,14 @@
 #ifndef DENOISERPASS_H
 #define DENOISERPASS_H
-#include "../AbstractRenderPass.h"
+#include "../AbstractComputePass.h"
 #include "../../../../dto/push-constant/DenoiserPushConstant.h"
 
 namespace Metal {
-    class DenoiserPass final : public AbstractRenderPass {
+    class DenoiserPass final : public AbstractComputePass {
         DenoiserPushConstant pushConstant{};
     public:
         explicit DenoiserPass(ApplicationContext &context)
-            : AbstractRenderPass(context) {
+            : AbstractComputePass(context) {
         }
 
         void onInitialize() override;
