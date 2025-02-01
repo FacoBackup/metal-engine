@@ -4,7 +4,7 @@
 
 namespace Metal {
     struct DenoiserPushConstant {
-        alignas(4) float normalPhi, stepWidth;
+        alignas(4) float diffWeight;
     };
 }
 #endif

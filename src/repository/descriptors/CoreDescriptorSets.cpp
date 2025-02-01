@@ -102,6 +102,13 @@ namespace Metal {
                                                   context.coreTextures.previousFrame->vkImageView);
         previousFrameDescriptor->write(vulkanContext);
 
+        previousFrameMetadataDescriptor = std::make_unique<DescriptorInstance>();
+        previousFrameMetadataDescriptor->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
+        previousFrameMetadataDescriptor->create(vulkanContext);
+        previousFrameMetadataDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
+                                                  context.coreTextures.previousFrameMetadata->vkImageView);
+        previousFrameMetadataDescriptor->write(vulkanContext);
+
         currentFrameDescriptor = std::make_unique<DescriptorInstance>();
         currentFrameDescriptor->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
         currentFrameDescriptor->create(vulkanContext);

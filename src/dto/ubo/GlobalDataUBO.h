@@ -25,7 +25,6 @@ namespace Metal {
         alignas(4) unsigned int giBounces;
         alignas(4) unsigned int giTileSubdivision;
         alignas(4) float giEmissiveFactor;
-        alignas(4) float denoiserNoiseThreshold;
 
         alignas(4) unsigned int debugFlag;
 

@@ -5,9 +5,8 @@
 
 #define LEVEL_OF_DETAIL "Level of detail"
 #define GLOBAL_ILLUMINATION "Global illumination"
-#define DENOISING "Denoising"
 #define ATMOSPHERE "Atmosphere"
-#define SUN "Sun"
+#define SUN "Sun color"
 
 namespace Metal {
     void EngineRepository::registerFields() {
@@ -23,18 +22,16 @@ namespace Metal {
         registerInt(giTileSubdivision, GLOBAL_ILLUMINATION, "Grid subdivision", 1);
         registerFloat(giEmissiveFactor, GLOBAL_ILLUMINATION, "Emissive surface factor", 0);
 
-        registerBool(enabledDenoiser, DENOISING, "Enabled?");
-        registerFloat(denoiserStepWidth, DENOISING, "Step width", 1, 15, false, .001);
-        registerFloat(denoiserNormalPhi, DENOISING, "Normal weight", 0, 1, false, .001);
-        registerFloat(denoiserNoiseThreshold, DENOISING, "Noise threshold", 0);
+        registerBool(enabledDenoiser, GLOBAL_ILLUMINATION, "Enabled?");
+        registerFloat(denoiserDiffWeight, GLOBAL_ILLUMINATION, "Difference weight", 0, 1, false, .001);
 
         registerBool(atmosphereEnabled, ATMOSPHERE, "Enabled?");
         registerFloat(elapsedTime, ATMOSPHERE, "Elapsed time");
         registerBool(incrementTime, ATMOSPHERE, "Increment time");
         registerFloat(elapsedTimeSpeed, ATMOSPHERE, "Time of day speed");
-        registerFloat(sunDistance, SUN, "Sun distance");
-        registerFloat(sunRadius, SUN, "Sun radius");
-        registerFloat(sunLightIntensity, SUN, "Sun light intensity");
+        registerFloat(sunDistance, ATMOSPHERE, "Sun distance");
+        registerFloat(sunRadius, ATMOSPHERE, "Sun radius");
+        registerFloat(sunLightIntensity, ATMOSPHERE, "Sun light intensity");
         registerColor(dawnColor, SUN, "Dawn color");
         registerColor(nightColor, SUN, "Night color");
         registerColor(middayColor, SUN, "Midday color");

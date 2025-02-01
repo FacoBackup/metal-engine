@@ -9,9 +9,7 @@ namespace Metal {
         bool vsync = true;
 
         bool enabledDenoiser = true;
-        float denoiserStepWidth = 3;
-        float denoiserNormalPhi = .5;
-        float denoiserNoiseThreshold = .65;
+        float denoiserDiffWeight = .5;
 
         bool multipleImportanceSampling = false;
         int shadingResInvScale = 2;
@@ -63,10 +61,8 @@ namespace Metal {
             giStrength,
             shadingResInvScale,
             giMaxAccumulation,
-            denoiserNormalPhi,
-            denoiserStepWidth,
-            enabledDenoiser,
-            denoiserNoiseThreshold
+            denoiserDiffWeight,
+            enabledDenoiser
         )
     };
 } // Metal

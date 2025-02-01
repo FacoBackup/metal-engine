@@ -156,7 +156,6 @@ namespace Metal {
         globalDataUBO.giBounces = context.engineRepository.giBounces;
         globalDataUBO.giTileSubdivision = context.engineRepository.giTileSubdivision;
         globalDataUBO.giEmissiveFactor = context.engineRepository.giEmissiveFactor;
-        globalDataUBO.denoiserNoiseThreshold = context.engineRepository.denoiserNoiseThreshold;
 
         globalDataUBO.debugFlag = ShadingMode::IndexOfValue(context.editorRepository.shadingMode);
         globalDataUBO.surfaceCacheWidth = SURFACE_CACHE_RES;

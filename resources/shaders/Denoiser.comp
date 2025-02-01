@@ -7,18 +7,16 @@ layout(local_size_x = 8, local_size_y = 8) in;
 #endif
 
 
-layout(set = 1, binding = 0, rgba32f) uniform image2D currentFrame;// Stores primitive ID in the A channel when denoiser is enabled
-layout(set = 2, binding = 0, rgba32f) uniform image2D previousFrame;
-layout(set = 3, binding = 0) uniform sampler2D gBufferNormal;
+layout(set = 1, binding = 0, rgba32f) uniform image2D currentFrameImage;// Color + surface ID
+layout(set = 2, binding = 0, rgba32f) uniform image2D previousFrameImage;// Color + acuumulation count
+layout(set = 3, binding = 0, rgba32f) uniform image2D previousFrameMetadataImage;// surface ID + Normal
+layout(set = 4, binding = 0) uniform sampler2D gBufferPosition;
+layout(set = 5, binding = 0) uniform sampler2D gBufferNormal;
 
 layout(push_constant) uniform Push {
-    float  normalPhi, stepWidth;
+    float diffWeight;
 } push;
 
-// Gaussian function for weight calculation
-float gaussian(float x, float sigma) {
-    return exp(-0.5 * (x * x) / (sigma * sigma));
-}
 
 void main() {
     ivec2 coords =  ivec2(gl_GlobalInvocationID.xy);
@@ -31,51 +29,51 @@ void main() {
         return;
     }
 
-    vec2 samplerRes = imageSize(currentFrame);
+    vec2 samplerRes = imageSize(currentFrameImage);
     vec2 texCoords = vec2(coords)/samplerRes;
-    vec3 centerNormal = texture(gBufferNormal, texCoords).xyz;
-    vec4 centerColorAndId = imageLoad(currentFrame, coords);// Color and ID at the current fragment
-    vec4 prev = imageLoad(previousFrame, coords);
-    imageStore(previousFrame, coords, vec4(centerColorAndId.rgb, prev.a + 1));
 
-    float centerId = centerColorAndId.a;
-
-    float sigmaSpatial = push.stepWidth / samplerRes.x;// Spatial Gaussian spread
-    vec3 finalColor = vec3(0);
-    float totalWeight = 0.0;
-
-    if(push.stepWidth > 0){
-        for (int y = -int(push.stepWidth); y <= int(push.stepWidth); y++) {
-            for (int x = -int(push.stepWidth); x <= int(push.stepWidth); x++) {
-                vec2 offset = vec2(float(x), float(y)) / samplerRes;
-                vec2 sampleUV = texCoords + offset;
-
-                vec4 sampleColorAndId = imageLoad(currentFrame, ivec2(sampleUV * samplerRes));
-                vec3 sampleColor = sampleColorAndId.rgb;
-                float sampleId = sampleColorAndId.a;
-
-                vec3 sampleNormal = texture(gBufferNormal, sampleUV).xyz;
-
-                // Check if the primitive ID matches
-                if (abs(sampleId - centerId) > 0.001) {
-                    continue;
-                }
-
-                // Compute spatial and range weights
-                float spatialWeight = gaussian(length(offset), sigmaSpatial);
-                float rangeWeight = gaussian(length(sampleNormal - centerNormal), push.normalPhi);
-
-                float weight = spatialWeight * rangeWeight;
-
-                finalColor.rgb += sampleColor * weight;
-                totalWeight += weight;
-            }
-        }
-    }else {
-        totalWeight = 1;
-        finalColor = centerColorAndId.rgb;
+    vec4 worldPos = texture(gBufferPosition, texCoords);
+    if (worldPos.a == 0){
+        imageStore(previousFrameImage, coords, vec4(0, 0, 0, 1));
+        imageStore(previousFrameMetadataImage, coords, vec4(0));
+        return;
     }
 
-    finalColor.rgb /= totalWeight;
-    imageStore(currentFrame, coords, vec4(finalColor.rgb, 1));
+    vec3 currentNormal = texture(gBufferNormal, texCoords).xyz;
+
+    vec4 currentFrame = imageLoad(currentFrameImage, coords);// Color + surface ID
+    vec4 previousFrameMetadata = imageLoad(previousFrameMetadataImage, coords);
+    bool validHistory = (previousFrameMetadata.r == currentFrame.a) && (dot(previousFrameMetadata.gba, currentNormal) > 0.95);
+
+    if (!validHistory){
+        imageStore(previousFrameImage, coords, vec4(currentFrame.rgb, 1));
+    } else {
+        vec4 prev = imageLoad(previousFrameImage, coords);
+        float accumulationCount = prev.a + 1.0;
+
+        // --- Adjust Accumulation Count Based on Luminance Change ---
+        float currentLuminance = dot(currentFrame.rgb, vec3(0.2126, 0.7152, 0.0722));
+        float luminanceVariance = 0.0;
+
+        // 3x3 neighborhood sampling for luminance variance
+        for (int dx = -1; dx <= 1; ++dx) {
+            for (int dy = -1; dy <= 1; ++dy) {
+                ivec2 neighborCoord = coords + ivec2(dx, dy);
+                // Ensure coordinates are within image bounds
+                neighborCoord = clamp(neighborCoord, ivec2(0), imageSize(currentFrameImage) - ivec2(1));
+
+                vec3 neighborColor = imageLoad(currentFrameImage, neighborCoord).rgb;
+                float neighborLuminance = dot(neighborColor, vec3(0.2126, 0.7152, 0.0722));
+
+                luminanceVariance += abs(currentLuminance - neighborLuminance);
+            }
+        }
+
+        luminanceVariance /= 9.0;
+
+        float varianceFactor = clamp(1.0 - luminanceVariance * push.diffWeight, 0.1, 1.0);
+        accumulationCount *= varianceFactor;
+        imageStore(previousFrameImage, coords, vec4(currentFrame.rgb, round(accumulationCount)));
+    }
+    imageStore(previousFrameMetadataImage, coords, vec4(currentFrame.a, texture(gBufferNormal, texCoords).rgb));
 }

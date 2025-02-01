@@ -10,15 +10,14 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.currentFrameDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.previousFrameDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.previousFrameMetadataDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferNormal.get());
         pipelineInstance = context.pipelineService.createPipeline(builder);
     }
 
     void DenoiserPass::onSync() {
-        // clearTexture(context.coreTextures.previousFrame->vkImage);
-
-        pushConstant.stepWidth = context.engineRepository.denoiserStepWidth;
-        pushConstant.normalPhi = context.engineRepository.denoiserNormalPhi;
+        pushConstant.diffWeight = context.engineRepository.denoiserDiffWeight;
         recordPushConstant(&pushConstant);
         startWriting(context.coreTextures.currentFrame->vkImage);
         recordImageDispatch(context.coreTextures.currentFrame, 8, 8);
