@@ -26,6 +26,8 @@ namespace Metal {
         unsigned int giAccumulationCount = 0;
 
     public:
+        GlobalDataUBO &getGlobalDataUBO() { return globalDataUBO; }
+
         void setLightingDataUpdated(const bool val) {
             lightingDataUpdated = val;
         }

@@ -1,0 +1,79 @@
+layout(local_size_x = 8, local_size_y = 8) in;
+
+#include "./GlobalDataBuffer.glsl"
+
+#ifdef DEBUG
+#include "./DebugFlags.glsl"
+#endif
+
+
+layout(set = 1, binding = 0, rgba32f) uniform image2D currentFrameImage;// Color + surface ID
+layout(set = 2, binding = 0, rgba32f) uniform image2D previousFrameImage;// Color + acuumulation count
+layout(set = 3, binding = 0, rgba32f) uniform image2D previousFrameMetadataImage;// surface ID + Normal
+layout(set = 4, binding = 0) uniform sampler2D gBufferPosition;
+layout(set = 5, binding = 0) uniform sampler2D gBufferNormal;
+
+layout(push_constant) uniform Push {
+    float diffWeight;
+} push;
+
+
+void main() {
+    ivec2 coords =  ivec2(gl_GlobalInvocationID.xy);
+    #ifdef DEBUG
+    if (globalData.debugFlag != LIT && globalData.debugFlag != LIGHTING_ONLY){
+        return;
+    }
+    #endif
+    if (!globalData.enabledDenoiser){
+        return;
+    }
+
+    vec2 samplerRes = imageSize(currentFrameImage);
+    vec2 texCoords = vec2(coords)/samplerRes;
+
+    vec4 worldPos = texture(gBufferPosition, texCoords);
+    if (worldPos.a == 0){
+        imageStore(previousFrameImage, coords, vec4(0, 0, 0, 1));
+        imageStore(previousFrameMetadataImage, coords, vec4(0));
+        return;
+    }
+
+    vec3 currentNormal = texture(gBufferNormal, texCoords).xyz;
+
+    vec4 currentFrame = imageLoad(currentFrameImage, coords);// Color + surface ID
+    vec4 previousFrameMetadata = imageLoad(previousFrameMetadataImage, coords);
+    bool validHistory = (previousFrameMetadata.r == currentFrame.a) && (dot(previousFrameMetadata.gba, currentNormal) > 0.95);
+
+    if (!validHistory){
+        imageStore(previousFrameImage, coords, vec4(currentFrame.rgb, 1));
+    } else {
+        vec4 prev = imageLoad(previousFrameImage, coords);
+        float accumulationCount = prev.a + 1.0;
+
+        // --- Adjust Accumulation Count Based on Luminance Change ---
+        float currentLuminance = dot(currentFrame.rgb, vec3(0.2126, 0.7152, 0.0722));
+        float luminanceVariance = 0.0;
+
+        // 3x3 neighborhood sampling for luminance variance
+        for (int dx = -1; dx <= 1; ++dx) {
+            for (int dy = -1; dy <= 1; ++dy) {
+                ivec2 neighborCoord = coords + ivec2(dx, dy);
+                // Ensure coordinates are within image bounds
+                neighborCoord = clamp(neighborCoord, ivec2(0), imageSize(currentFrameImage) - ivec2(1));
+
+                vec3 neighborColor = imageLoad(currentFrameImage, neighborCoord).rgb;
+                float neighborLuminance = dot(neighborColor, vec3(0.2126, 0.7152, 0.0722));
+
+                luminanceVariance += abs(currentLuminance - neighborLuminance);
+            }
+        }
+
+        luminanceVariance /= 9.0;
+
+        float varianceFactor = clamp(1.0 - luminanceVariance * push.diffWeight, 0.1, 1.0);
+        accumulationCount *= varianceFactor;
+        imageStore(previousFrameImage, coords, vec4(currentFrame.rgb, round(accumulationCount)));
+    }
+    imageStore(previousFrameMetadataImage, coords, vec4(currentFrame.a, texture(gBufferNormal, texCoords).rgb));
+}

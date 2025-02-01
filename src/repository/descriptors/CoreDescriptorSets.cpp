@@ -88,19 +88,33 @@ namespace Metal {
         GBUFFER_D(gBufferNormal, 1)
         GBUFFER_D(gBufferPosition, 2)
 
-        surfaceCacheCompute = std::make_unique<DescriptorInstance>();
-        surfaceCacheCompute->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
-        surfaceCacheCompute->create(vulkanContext);
-        surfaceCacheCompute->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
+        giSurfaceCacheCompute = std::make_unique<DescriptorInstance>();
+        giSurfaceCacheCompute->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
+        giSurfaceCacheCompute->create(vulkanContext);
+        giSurfaceCacheCompute->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
                                                 context.coreTextures.giSurfaceCache->vkImageView);
-        surfaceCacheCompute->write(vulkanContext);
+        giSurfaceCacheCompute->write(vulkanContext);
 
-        shadingCompute = std::make_unique<DescriptorInstance>();
-        shadingCompute->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
-        shadingCompute->create(vulkanContext);
-        shadingCompute->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
-                                           context.coreTextures.shading->vkImageView);
-        shadingCompute->write(vulkanContext);
+        previousFrameDescriptor = std::make_unique<DescriptorInstance>();
+        previousFrameDescriptor->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
+        previousFrameDescriptor->create(vulkanContext);
+        previousFrameDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
+                                                  context.coreTextures.previousFrame->vkImageView);
+        previousFrameDescriptor->write(vulkanContext);
+
+        previousFrameMetadataDescriptor = std::make_unique<DescriptorInstance>();
+        previousFrameMetadataDescriptor->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
+        previousFrameMetadataDescriptor->create(vulkanContext);
+        previousFrameMetadataDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
+                                                  context.coreTextures.previousFrameMetadata->vkImageView);
+        previousFrameMetadataDescriptor->write(vulkanContext);
+
+        currentFrameDescriptor = std::make_unique<DescriptorInstance>();
+        currentFrameDescriptor->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
+        currentFrameDescriptor->create(vulkanContext);
+        currentFrameDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
+                                           context.coreTextures.currentFrame->vkImageView);
+        currentFrameDescriptor->write(vulkanContext);
 
         if (context.isDebugMode()) {
             surfaceCacheFragment = std::make_unique<DescriptorInstance>();
@@ -121,18 +135,8 @@ namespace Metal {
             postProcessingDescriptor->create(vulkanContext);
             postProcessingDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                          context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                                         context.coreFrameBuffers.denoisedResultFBO->attachments[0]->
-                                                         vkImageView);
+                                                         context.coreTextures.currentFrame->vkImageView);
             postProcessingDescriptor->write(vulkanContext);
-        } {
-            noisyInput = std::make_unique<DescriptorInstance>();
-            noisyInput->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                         VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-            noisyInput->create(vulkanContext);
-            noisyInput->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                           context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                           context.coreTextures.shading->vkImageView);
-            noisyInput->write(vulkanContext);
         }
     }
 } // Metal

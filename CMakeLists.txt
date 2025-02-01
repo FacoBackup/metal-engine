@@ -210,13 +210,15 @@ add_executable(
         src/service/voxel/impl/VoxelData.h
         src/service/voxel/VoxelizationService.cpp
         src/service/voxel/VoxelizationService.h
+        src/service/voxel/impl/VoxelizerService.cpp
+        src/service/voxel/impl/VoxelizerService.h
         src/service/mesh/SceneData.h
         src/service/mesh/EntityAssetData.h
         src/service/material/MaterialData.h
         src/context/engine/render-pass/impl/PostProcessingPass.cpp
         src/context/engine/render-pass/impl/PostProcessingPass.h
-        src/context/engine/compute-pass/impl/GBufferShadingPass.cpp
-        src/context/engine/compute-pass/impl/GBufferShadingPass.h
+        src/context/engine/compute-pass/impl/PathTracerPass.cpp
+        src/context/engine/compute-pass/impl/PathTracerPass.h
         src/service/pipeline/PipelineBuilder.h
         src/service/framebuffer/FrameBufferAttachment.cpp
         src/repository/engine/EngineRepository.cpp
@@ -265,8 +267,10 @@ add_executable(
         src/context/editor/dock-spaces/inspector/MaterialInspection.h
         src/service/voxel/VoxelizationRequest.h
         src/enum/LightType.h
-        src/context/engine/render-pass/impl/DenoiserPass.cpp
-        src/context/engine/render-pass/impl/DenoiserPass.h
+        src/context/engine/compute-pass/impl/DenoiserPass.cpp
+        src/context/engine/compute-pass/impl/DenoiserPass.h
+        src/context/engine/compute-pass/impl/AccumulationPass.cpp
+        src/context/engine/compute-pass/impl/AccumulationPass.h
 )
 
 

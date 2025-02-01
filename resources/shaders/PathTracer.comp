@@ -6,7 +6,7 @@ layout(set = 3, binding = 0) uniform sampler2D gBufferNormal;
 layout(set = 4, binding = 0) uniform sampler2D gBufferPosition;
 #define LIGHTS_SET 5
 layout(set = 6, binding = 0, rgba32f) uniform image2D outputImage;
-layout(set = 7, binding = 0, rgba32f) uniform image2D surfaceCacheImage;
+layout(set = 7, binding = 0, rgba32f) uniform image2D giSurfaceCacheCompute;
 
 #include "./util/PixelShading.glsl"
 #include "./GBufferUtil.glsl"
@@ -43,7 +43,7 @@ void main() {
         interaction.anyHit = true;
 
         #ifdef DEBUG
-        if (globalData.debugFlag != LIT){
+        if (globalData.debugFlag != LIT && globalData.debugFlag != GI){
             bool shouldReturn = true;
             if (globalData.debugFlag == NORMAL){
                 finalColor = interaction.normal;
@@ -84,7 +84,7 @@ void main() {
         }
 
         if (globalData.enabledDenoiser){
-            imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(finalColor, 1));
+            imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(finalColor, worldPos.a)); // Stores primitive ID in the A channel when denoiser is enabled
         } else {
             vec4 previousFrame = imageLoad(outputImage, ivec2(gl_GlobalInvocationID.xy));
             float accumulationCount = min(globalData.giMaxAccumulation, previousFrame.a);

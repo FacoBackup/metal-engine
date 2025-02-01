@@ -9,10 +9,7 @@ namespace Metal {
         bool vsync = true;
 
         bool enabledDenoiser = true;
-        float denoiserStepWidth = 3;
-        float denoiserPositionPhi = .3;
-        float denoiserColorPhi = 1;
-        float denoiserNormalPhi = .5;
+        float denoiserDiffWeight = .5;
 
         bool multipleImportanceSampling = false;
         int shadingResInvScale = 2;
@@ -28,7 +25,7 @@ namespace Metal {
         bool incrementTime = false;
         float elapsedTimeSpeed = 1;
         float sunDistance = 10000;
-        float sunRadius = 2000;
+        float sunRadius = 3000;
         float sunLightIntensity = 2;
         glm::vec3 dawnColor{1, .39f, .19f};
         glm::vec3 nightColor{.1f, .1f, .1f};
@@ -64,10 +61,7 @@ namespace Metal {
             giStrength,
             shadingResInvScale,
             giMaxAccumulation,
-            denoiserColorPhi,
-            denoiserNormalPhi,
-            denoiserPositionPhi,
-            denoiserStepWidth,
+            denoiserDiffWeight,
             enabledDenoiser
         )
     };

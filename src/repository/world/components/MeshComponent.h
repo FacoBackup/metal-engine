@@ -16,6 +16,7 @@ namespace Metal {
         float metallicFactor = 0;
         int parallaxLayers = 16;
         float parallaxHeightScale = 1;
+        bool needsReVoxelization = false;
 
         void registerFields() override;
 

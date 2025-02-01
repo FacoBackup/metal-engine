@@ -40,6 +40,7 @@
 #include "../service/transform/TransformService.h"
 #include "../service/voxel/SVOService.h"
 #include "../service/voxel/VoxelizationService.h"
+#include "../service/voxel/impl/VoxelizerService.h"
 #include "editor/EditorPanel.h"
 #include "gui/GuiContext.h"
 
@@ -80,6 +81,7 @@ namespace Metal {
         FilesService filesService{*this};
         CameraService cameraService{*this};
         VoxelizationService voxelizationService{*this};
+        VoxelizerService voxelizerService{*this};
         SVOService svoService{*this};
         WorldGridService worldGridService{*this};
         TransformService transformService{*this};

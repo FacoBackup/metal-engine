@@ -20,14 +20,15 @@ namespace Metal {
         std::unique_ptr<DescriptorInstance> materialRoughness = nullptr;
         std::unique_ptr<DescriptorInstance> materialMetallic = nullptr;
         std::unique_ptr<DescriptorInstance> materialHeight = nullptr;
-        std::unique_ptr<DescriptorInstance> noisyInput = nullptr;
         std::unique_ptr<DescriptorInstance> postProcessingDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> surfaceCacheFragment = nullptr;
         std::unique_ptr<DescriptorInstance> gBufferAlbedo = nullptr;
         std::unique_ptr<DescriptorInstance> gBufferNormal = nullptr;
         std::unique_ptr<DescriptorInstance> gBufferPosition = nullptr;
-        std::unique_ptr<DescriptorInstance> surfaceCacheCompute = nullptr;
-        std::unique_ptr<DescriptorInstance> shadingCompute = nullptr;
+        std::unique_ptr<DescriptorInstance> giSurfaceCacheCompute = nullptr;
+        std::unique_ptr<DescriptorInstance> previousFrameDescriptor = nullptr;
+        std::unique_ptr<DescriptorInstance> previousFrameMetadataDescriptor = nullptr;
+        std::unique_ptr<DescriptorInstance> currentFrameDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> svoData = nullptr;
         std::unique_ptr<DescriptorInstance> lightsData = nullptr;
 

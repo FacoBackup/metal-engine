@@ -1,6 +1,7 @@
 #ifndef ENGINEID_H
 #define ENGINEID_H
 
+#define SURFACE_CACHE_RES 2000
 
 typedef unsigned long long EntityID;
 #define MAX_LIGHTS 300
@@ -19,7 +20,7 @@ typedef unsigned long long EntityID;
 #define FORMAT_FILE_MATERIAL(baseName) (baseName + FILE_NAME_SEPARATOR + FILE_MATERIAL + METAL_FILE_EXTENSION)
 #define FORMAT_FILE_SCENE(baseName) (baseName + FILE_NAME_SEPARATOR + FILE_SCENE + METAL_FILE_EXTENSION)
 #define FORMAT_FILE_METADATA(baseName) (baseName + FILE_METADATA)
-#define FORMAT_FILE_SVO(baseName) (baseName + FILE_SVO + METAL_FILE_EXTENSION)
+#define FORMAT_FILE_SVO(baseName) (baseName + FILE_NAME_SEPARATOR + FILE_SVO + METAL_FILE_EXTENSION)
 
 #define METRIC_START \
 auto currentTime = Clock::now(); \

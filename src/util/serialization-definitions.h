@@ -35,7 +35,11 @@ ar(__VA_ARGS__); \
 }\
 template<class Archive>\
 void load(Archive &ar) {\
-ar(__VA_ARGS__);\
+try{\
+ar(__VA_ARGS__); \
+}catch (std::exception ex) {\
+std::cout << "Could not parse data" << std::endl;\
+}\
 }
 
 #define SERIALIZE_TEMPLATE(...) \

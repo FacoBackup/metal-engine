@@ -15,7 +15,9 @@ namespace Metal {
         void onInitialize() override;
 
         TextureInstance *giSurfaceCache = nullptr;
-        TextureInstance *shading = nullptr;
+        TextureInstance *currentFrame = nullptr;
+        TextureInstance *previousFrameMetadata = nullptr;
+        TextureInstance *previousFrame = nullptr;
     };
 } // Metal
 
