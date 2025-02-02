@@ -8,7 +8,6 @@ namespace Metal {
         alignas(16) glm::vec3 color{};
         alignas(16) glm::vec3 position{};
         alignas(16) glm::vec3 minNormal;
-        alignas(16) glm::vec3 max;
         alignas(4) unsigned int lightType;
         alignas(4) float radiusSize;
     };

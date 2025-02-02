@@ -1,11 +1,11 @@
-#include "DenoiserPass.h"
+#include "AccumulationMetadataPass.h"
 #include "../../../ApplicationContext.h"
 #include "../../../../service/texture/TextureInstance.h"
 #include "../../../../service/pipeline/PipelineBuilder.h"
 
 namespace Metal {
-    void DenoiserPass::onInitialize() {
-        PipelineBuilder builder = PipelineBuilder::Of("Denoiser.comp")
+    void AccumulationMetadataPass::onInitialize() {
+        PipelineBuilder builder = PipelineBuilder::Of("AccumulationMetadata.comp")
                 .setPushConstantsSize(sizeof(DenoiserPushConstant))
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.currentFrameDescriptor.get())
@@ -16,10 +16,10 @@ namespace Metal {
         pipelineInstance = context.pipelineService.createPipeline(builder);
     }
 
-    void DenoiserPass::onSync() {
+    void AccumulationMetadataPass::onSync() {
         pushConstant.diffWeight = context.engineRepository.denoiserDiffWeight;
         recordPushConstant(&pushConstant);
-        startWriting(context.coreTextures.currentFrame->vkImage);
         recordImageDispatch(context.coreTextures.currentFrame, 8, 8);
+        endWriting(context.coreTextures.currentFrame->vkImage);
     }
 } // Metal

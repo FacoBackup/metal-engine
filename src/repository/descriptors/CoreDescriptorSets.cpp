@@ -20,7 +20,8 @@ P->write(vulkanContext);
 namespace Metal {
     void CoreDescriptorSets::onInitialize() {
         constexpr auto COMPUTE_FRAGMENT_STAGES = static_cast<VkShaderStageFlagBits>(
-            VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT); {
+            VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT);
+        {
             svoData = std::make_unique<DescriptorInstance>();
             // ONE FOR EACH ADJACENT TILE AND ONE FOR THE CENTER TILE
 
@@ -39,7 +40,18 @@ namespace Metal {
             svoData->addBufferDescriptor(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                                          context.coreBuffers.tileInfo);
             svoData->write(vulkanContext);
-        } {
+        }
+
+        {
+            volumesData = std::make_unique<DescriptorInstance>();
+            volumesData->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0);
+            volumesData->create(vulkanContext);
+            volumesData->addBufferDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+                                         context.coreBuffers.volumes);
+            volumesData->write(vulkanContext);
+        }
+
+        {
             lightsData = std::make_unique<DescriptorInstance>();
             lightsData->addLayoutBinding(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0);
             lightsData->create(vulkanContext);

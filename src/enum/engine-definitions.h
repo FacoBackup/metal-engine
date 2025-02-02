@@ -4,6 +4,7 @@
 #define SURFACE_CACHE_RES 2000
 
 typedef unsigned long long EntityID;
+#define MAX_VOLUMES 20
 #define MAX_LIGHTS 300
 #define EMPTY_ENTITY 0
 #define FILE_METADATA ".mjson"

@@ -2,7 +2,6 @@ struct Light {
     vec3 color;
     vec3 position;
     vec3 minNormal;
-    vec3 max;
     uint lightType;
     float radiusSize;
 };

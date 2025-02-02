@@ -49,14 +49,20 @@ namespace Metal {
                 return transforms.contains(entity) ? &transforms.find(entity)->second : nullptr;
             case ComponentTypes::LIGHT:
                 return lights.contains(entity) ? &lights.find(entity)->second : nullptr;
+            case ComponentTypes::VOLUME:
+                return volumes.contains(entity) ? &volumes.find(entity)->second : nullptr;
             default:
                 return nullptr;
         }
     }
+
     void WorldRepository::deleteRecursively(const std::vector<EntityID> &entities) {
         for (EntityID entity: entities) {
             if (lights.contains(entity)) {
                 lights.erase(entity);
+            }
+            if (volumes.contains(entity)) {
+                volumes.erase(entity);
             }
             if (transforms.contains(entity)) {
                 transforms.erase(entity);
@@ -88,6 +94,7 @@ namespace Metal {
             }
         }
     }
+
     void WorldRepository::deleteEntities(const std::vector<EntityID> &entities) {
         deleteRecursively(entities);
         context.engineContext.setLightingDataUpdated(true);
@@ -128,6 +135,14 @@ namespace Metal {
                 getEntity(entity)->components.push_back(ComponentTypes::LIGHT);
                 createComponent(entity, ComponentTypes::TRANSFORM);
                 context.engineContext.setLightingDataUpdated(true);
+                break;
+            }
+            case ComponentTypes::VOLUME: {
+                volumes.emplace(entity, VolumeComponent{});
+                volumes.at(entity).setEntityId(entity);
+                getEntity(entity)->components.push_back(ComponentTypes::VOLUME);
+                createComponent(entity, ComponentTypes::TRANSFORM);
+                context.engineContext.setVolumeDataUpdated(true);
                 break;
             }
             case ComponentTypes::TRANSFORM: {
