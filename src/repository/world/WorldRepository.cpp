@@ -97,12 +97,12 @@ namespace Metal {
 
     void WorldRepository::deleteEntities(const std::vector<EntityID> &entities) {
         deleteRecursively(entities);
-        context.engineContext.setLightingDataUpdated(true);
+        context.engineContext.setLightVolumeDataNeedsUpdate(true);
     }
 
     void WorldRepository::changeVisibility(EntityID entity, bool isVisible) {
         changeVisibilityRecursively(entity, isVisible);
-        context.engineContext.setLightingDataUpdated(true);
+        context.engineContext.setLightVolumeDataNeedsUpdate(true);
     }
 
     void WorldRepository::changeVisibilityRecursively(EntityID entity, const bool isVisible) {
@@ -134,7 +134,7 @@ namespace Metal {
                 lights.at(entity).setEntityId(entity);
                 getEntity(entity)->components.push_back(ComponentTypes::LIGHT);
                 createComponent(entity, ComponentTypes::TRANSFORM);
-                context.engineContext.setLightingDataUpdated(true);
+                context.engineContext.setLightVolumeDataNeedsUpdate(true);
                 break;
             }
             case ComponentTypes::VOLUME: {
@@ -142,7 +142,7 @@ namespace Metal {
                 volumes.at(entity).setEntityId(entity);
                 getEntity(entity)->components.push_back(ComponentTypes::VOLUME);
                 createComponent(entity, ComponentTypes::TRANSFORM);
-                context.engineContext.setVolumeDataUpdated(true);
+                context.engineContext.setLightVolumeDataNeedsUpdate(true);
                 break;
             }
             case ComponentTypes::TRANSFORM: {

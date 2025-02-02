@@ -16,8 +16,7 @@ namespace Metal {
         TileInfoUBO tileInfoUBO{};
         long long start = -1;
         bool cameraUpdated = true;
-        bool lightingDataUpdated = true;
-        bool volumeDataUpdated = true;
+        bool lightVolumeDataNeedsUpdate = true;
         bool giSettingsUpdated = true;
         std::string voxelizationRequestId;
         unsigned int giAccumulationCount = 0;
@@ -25,16 +24,12 @@ namespace Metal {
     public:
         GlobalDataUBO &getGlobalDataUBO() { return globalDataUBO; }
 
-        void setLightingDataUpdated(const bool val) {
-            lightingDataUpdated = val;
-        }
-
-        void setVolumeDataUpdated(const bool val) {
-            volumeDataUpdated  = val;
+        void setLightVolumeDataNeedsUpdate(const bool val) {
+            lightVolumeDataNeedsUpdate = val;
         }
 
         [[nodiscard]] bool isLightingDataUpdated() const {
-            return lightingDataUpdated;
+            return lightVolumeDataNeedsUpdate;
         }
 
         void setCameraUpdated(const bool val) {

@@ -4,7 +4,7 @@
 #include "../../service/buffer/BufferInstance.h"
 #include "../../service/voxel/SVOInstance.h"
 #include "../../enum/LevelOfDetail.h"
-#include "../../enum/LightType.h"
+#include "../../enum/LightVolumeType.h"
 #include "../../service/camera/Camera.h"
 #include "../../service/framebuffer/FrameBufferInstance.h"
 #include "../../service/texture/TextureInstance.h"
@@ -74,18 +74,13 @@ namespace Metal {
 
         updateGlobalData();
         updateVoxelData();
-        if (lightingDataUpdated) {
-            context.lightsService.updateLights();
-        }
-
-        if (volumeDataUpdated) {
-            context.volumesService.updateVolumes();
+        if (lightVolumeDataNeedsUpdate) {
+            context.lightVolumesService.update();
         }
 
         context.passesService.onSync();
 
-        setLightingDataUpdated(false);
-        setVolumeDataUpdated(false);
+        setLightVolumeDataNeedsUpdate(false);
         setCameraUpdated(false);
         setGISettingsUpdated(false);
     }
@@ -99,8 +94,7 @@ namespace Metal {
         globalDataUBO.invView = camera.invViewMatrix;
         globalDataUBO.cameraWorldPosition = camera.position;
         globalDataUBO.giStrength = context.engineRepository.giStrength;
-        globalDataUBO.lightCount = context.lightsService.getLightCount();
-        globalDataUBO.volumeCount = context.volumesService.getVolumeCount();
+        globalDataUBO.lightVolumeCount = context.lightVolumesService.getLightVolumeCount();
         globalDataUBO.isAtmosphereEnabled = context.engineRepository.atmosphereEnabled;
 
         globalDataUBO.enabledDenoiser = context.engineRepository.enabledDenoiser;
@@ -120,11 +114,11 @@ namespace Metal {
         if (context.engineRepository.incrementTime) {
             context.engineRepository.elapsedTime += .0005f * context.engineRepository.elapsedTimeSpeed;
             setGISettingsUpdated(true);
-            lightingDataUpdated = true;
+            lightVolumeDataNeedsUpdate = true;
         }
-        context.lightsService.computeSunInfo();
-        globalDataUBO.sunPosition = context.lightsService.getSunPosition();
-        globalDataUBO.sunColor = context.lightsService.getSunColor();
+        context.lightVolumesService.computeSunInfo();
+        globalDataUBO.sunPosition = context.lightVolumesService.getSunPosition();
+        globalDataUBO.sunColor = context.lightVolumesService.getSunColor();
         context.coreBuffers.globalData->update(&globalDataUBO);
     }
 }

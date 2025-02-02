@@ -4,7 +4,7 @@
 #include "../../context/ApplicationContext.h"
 
 #define LEVEL_OF_DETAIL "Level of detail"
-#define GLOBAL_ILLUMINATION "Global illumination"
+#define PATH_TRACER "Path tracer"
 #define ATMOSPHERE "Atmosphere"
 #define SUN "Sun color"
 
@@ -14,16 +14,16 @@ namespace Metal {
                     16);
         registerBool(vsync, "Display settings (Restart required)", "VSync?");
         registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);
-        registerFloat(giStrength, GLOBAL_ILLUMINATION, "Strength");
-        registerInt(giMaxAccumulation, GLOBAL_ILLUMINATION, "Maximum accumulation", 1, 10000);
-        registerInt(giSamples, GLOBAL_ILLUMINATION, "Samples per pixel", 1, 32);
-        registerInt(giBounces, GLOBAL_ILLUMINATION, "Bounces", 0, 7);
-        registerBool(multipleImportanceSampling, GLOBAL_ILLUMINATION, "Enable multiple importance sampling?");
-        registerInt(giTileSubdivision, GLOBAL_ILLUMINATION, "Grid subdivision", 1);
-        registerFloat(giEmissiveFactor, GLOBAL_ILLUMINATION, "Emissive surface factor", 0);
 
-        registerBool(enabledDenoiser, GLOBAL_ILLUMINATION, "Enabled?");
-        registerFloat(denoiserDiffWeight, GLOBAL_ILLUMINATION, "Difference weight", 0, 1, false, .001);
+        registerBool(enabledDenoiser, PATH_TRACER, "Enable denoiser?");
+        registerFloat(denoiserDiffWeight, PATH_TRACER, "Denoiser variance weight", 0, 1, false, .001);
+        registerFloat(giStrength, PATH_TRACER, "Strength");
+        registerInt(giMaxAccumulation, PATH_TRACER, "Maximum accumulation", 1, 10000);
+        registerInt(giSamples, PATH_TRACER, "Samples per pixel", 1, 32);
+        registerInt(giBounces, PATH_TRACER, "Bounces", 0, 7);
+        registerBool(multipleImportanceSampling, PATH_TRACER, "Enable multiple importance sampling?");
+        registerInt(giTileSubdivision, PATH_TRACER, "Grid subdivision", 1);
+        registerFloat(giEmissiveFactor, PATH_TRACER, "Emissive surface factor", 0);
 
         registerBool(atmosphereEnabled, ATMOSPHERE, "Enabled?");
         registerFloat(elapsedTime, ATMOSPHERE, "Elapsed time");
@@ -41,10 +41,10 @@ namespace Metal {
         if (member != nullptr && member->name == LEVEL_OF_DETAIL) {
             context.worldGridRepository.hasMainTileChanged = true;
         }
-        if (member != nullptr && (member->group == GLOBAL_ILLUMINATION || member->group == ATMOSPHERE || member->group
+        if (member != nullptr && (member->group == PATH_TRACER || member->group == ATMOSPHERE || member->group
                                   == SUN)) {
             context.engineContext.setGISettingsUpdated(true);
-            context.engineContext.setLightingDataUpdated(true);
+            context.engineContext.setLightVolumeDataNeedsUpdate(true);
         }
     }
 

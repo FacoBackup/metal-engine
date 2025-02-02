@@ -3,18 +3,20 @@
 #include <vector>
 
 #include "../../common/AbstractRuntimeComponent.h"
-#include "../../dto/buffers/LightData.h"
+#include "../../dto/buffers/LightVolumeData.h"
 
 namespace Metal {
-    class LightsService final : public AbstractRuntimeComponent {
-        std::vector<LightData> lights{};
-        unsigned int lightsCount = 0;
+    class LightVolumeService final : public AbstractRuntimeComponent {
+        std::vector<LightVolumeData> items{};
+        unsigned int count = 0;
         glm::vec3 sunColor{};
         glm::vec3 sunPosition{};
 
-        void registerExplicitLightSources(int &index);
+        void registerLights();
 
-        void registerSun(int &index);
+        void registerSun();
+
+        void registerVolumes();
 
         static glm::vec3 CalculateSunColor(float elevation, glm::vec3 &nightColor, glm::vec3 &dawnColor,
                                            glm::vec3 &middayColor);
@@ -22,14 +24,14 @@ namespace Metal {
         static glm::vec3 BlendColors(glm::vec3 &c1, glm::vec3 &c2, float t);
 
     public:
-        explicit LightsService(ApplicationContext &context)
+        explicit LightVolumeService(ApplicationContext &context)
             : AbstractRuntimeComponent(context) {
         }
 
-        void updateLights();
+        void update();
 
-        [[nodiscard]] unsigned int getLightCount() const {
-            return lightsCount;
+        [[nodiscard]] unsigned int getLightVolumeCount() const {
+            return count;
         }
 
         void computeSunInfo();

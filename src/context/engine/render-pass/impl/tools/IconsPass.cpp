@@ -12,7 +12,7 @@ namespace Metal {
                 )
                 .setPushConstantsSize(sizeof(IconPushConstant))
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.lightsData.get());
+                .addDescriptorSet(context.coreDescriptorSets.lightVolumeData.get());
         pipelineInstance = context.pipelineService.createPipeline(iconPipelineBuilder);
     }
 

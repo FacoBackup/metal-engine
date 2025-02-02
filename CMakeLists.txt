@@ -242,7 +242,7 @@ add_executable(
         src/service/world/WorldGridService.cpp
         src/service/world/WorldGridService.h
         src/dto/buffers/TileInfoUBO.h
-        src/dto/buffers/LightData.h
+        src/dto/buffers/LightVolumeData.h
         src/repository/world/components/LightComponent.cpp
         src/repository/world/components/LightComponent.h
         src/context/engine/render-pass/impl/tools/IconsPass.cpp
@@ -266,18 +266,13 @@ add_executable(
         src/context/editor/dock-spaces/inspector/MaterialInspection.cpp
         src/context/editor/dock-spaces/inspector/MaterialInspection.h
         src/service/voxel/VoxelizationRequest.h
-        src/enum/LightType.h
+        src/enum/LightVolumeType.h
         src/context/engine/compute-pass/impl/AccumulationMetadataPass.cpp
         src/context/engine/compute-pass/impl/AccumulationMetadataPass.h
         src/context/engine/compute-pass/impl/AccumulationPass.cpp
         src/context/engine/compute-pass/impl/AccumulationPass.h
-        src/context/engine/compute-pass/impl/VolumetricPathTracer.cpp
-        src/context/engine/compute-pass/impl/VolumetricPathTracer.h
-        src/dto/buffers/VolumeData.h
-        src/service/lights/LightsService.cpp
-        src/service/lights/LightsService.h
-        src/service/volumes/VolumesService.cpp
-        src/service/volumes/VolumesService.h
+        src/service/lights/LightVolumeService.cpp
+        src/service/lights/LightVolumeService.h
         src/repository/world/components/VolumeComponent.cpp
         src/repository/world/components/VolumeComponent.h
 )

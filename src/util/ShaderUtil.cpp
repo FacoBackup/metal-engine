@@ -7,7 +7,7 @@
 #include "../util/Util.h"
 #include "../context/ApplicationContext.h"
 #include "FilesUtil.h"
-#include "../enum/LightType.h"
+#include "../enum/LightVolumeType.h"
 #include "glslang/Include/glslang_c_interface.h"
 #include "glslang/Public/resource_limits_c.h"
 #define BASE_PATH "../resources/shaders/"
@@ -149,12 +149,11 @@ namespace Metal {
         if (context.isDebugMode()) {
             source = "#define DEBUG\n" + source;
         }
-        for (auto &entry: LightTypes::getEntries()) {
+        for (auto &entry: LightVolumeTypes::getEntries()) {
             source = "#define " + entry.first + " " + std::to_string(entry.second) + "\n" + source;
         }
         source = "#define TILE_SIZE " + std::to_string(TILE_SIZE) + std::string("\n") + source;
-        source = "#define MAX_LIGHTS " + std::to_string(MAX_LIGHTS) + std::string("\n") + source;
-        source = "#define MAX_VOLUMES " + std::to_string(MAX_VOLUMES) + std::string("\n") + source;
+        source = "#define MAX_LIGHT_VOLUMES " + std::to_string(MAX_LIGHT_VOLUMES) + std::string("\n") + source;
         source = "#define PI_2 6.28318530718\n" + source;
         source = "#define PI 3.14159265\n" + source;
 

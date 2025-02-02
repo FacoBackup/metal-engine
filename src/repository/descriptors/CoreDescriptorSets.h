@@ -30,8 +30,7 @@ namespace Metal {
         std::unique_ptr<DescriptorInstance> previousFrameMetadataDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> currentFrameDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> svoData = nullptr;
-        std::unique_ptr<DescriptorInstance> volumesData = nullptr;
-        std::unique_ptr<DescriptorInstance> lightsData = nullptr;
+        std::unique_ptr<DescriptorInstance> lightVolumeData = nullptr;
 
         void onInitialize() override;
     };

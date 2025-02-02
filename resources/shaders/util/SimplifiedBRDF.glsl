@@ -7,7 +7,7 @@ struct BounceInfo {
     vec3 indirectLight;
 };
 
-void evaluateLightSimplified(in Light l, in BounceInfo bounceInfo, inout vec3 throughput, inout vec3 indirectLight){
+void evaluateLightSimplified(in LightVolume l, in BounceInfo bounceInfo, inout vec3 throughput, inout vec3 indirectLight){
     float bias = max(.05, 1e-4 * length(bounceInfo.currentPosition.xyz));
     vec3 localHitPosition = bounceInfo.currentPosition.xyz + bounceInfo.hitNormal * bias;
     vec3 lightDir = normalize(l.position - localHitPosition);
@@ -41,10 +41,12 @@ void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo){
         vec3 lIndirect = vec3(0);
         vec3 lT = vec3(1);
 
-        if (globalData.lightCount > 0){
-            for (int i = 0; i < globalData.lightCount; ++i) {
-                Light l = lightsBuffer.lights[i];
-                evaluateLightSimplified(l, bounceInfo, lT, lIndirect);
+        if (globalData.lightVolumeCount > 0){
+            for (int i = 0; i < globalData.lightVolumeCount; ++i) {
+                LightVolume l = lightVolumeBuffer.items[i];
+                if (l.itemType != ITEM_TYPE_VOLUME){
+                    evaluateLightSimplified(l, bounceInfo, lT, lIndirect);
+                }
             }
         }
 

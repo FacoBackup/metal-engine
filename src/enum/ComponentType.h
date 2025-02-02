@@ -42,7 +42,7 @@ namespace Metal::ComponentTypes {
         if (mode == LIGHT)
             return Icons::lightbulb.c_str();
         if (mode == VOLUME)
-            return Icons::lens_blur.c_str();
+            return Icons::blur_on.c_str();
         return nullptr;
     }
 }

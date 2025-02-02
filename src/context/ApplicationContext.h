@@ -39,8 +39,7 @@
 #include "../service/notification/NotificationService.h"
 #include "../service/transform/TransformService.h"
 #include "../service/voxel/SVOService.h"
-#include "../service/lights/LightsService.h"
-#include "../service/volumes/VolumesService.h"
+#include "../service/lights/LightVolumeService.h"
 #include "../service/voxel/VoxelizationService.h"
 #include "../service/voxel/impl/VoxelizerService.h"
 #include "editor/EditorPanel.h"
@@ -87,8 +86,7 @@ namespace Metal {
         SVOService svoService{*this};
         WorldGridService worldGridService{*this};
         TransformService transformService{*this};
-        LightsService lightsService{*this};
-        VolumesService volumesService{*this};
+        LightVolumeService lightVolumesService{*this};
         // ----------- Services
 
         // ----------- Repository

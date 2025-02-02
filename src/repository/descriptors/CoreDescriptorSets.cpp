@@ -43,22 +43,14 @@ namespace Metal {
         }
 
         {
-            volumesData = std::make_unique<DescriptorInstance>();
-            volumesData->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0);
-            volumesData->create(vulkanContext);
-            volumesData->addBufferDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                                         context.coreBuffers.volumes);
-            volumesData->write(vulkanContext);
+            lightVolumeData = std::make_unique<DescriptorInstance>();
+            lightVolumeData->addLayoutBinding(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0);
+            lightVolumeData->create(vulkanContext);
+            lightVolumeData->addBufferDescriptor(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                                            context.coreBuffers.lightVolumeBuffer);
+            lightVolumeData->write(vulkanContext);
         }
 
-        {
-            lightsData = std::make_unique<DescriptorInstance>();
-            lightsData->addLayoutBinding(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0);
-            lightsData->create(vulkanContext);
-            lightsData->addBufferDescriptor(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                            context.coreBuffers.lights);
-            lightsData->write(vulkanContext);
-        }
         // GLOBAL DATA UBO
         {
             globalDataDescriptor = std::make_unique<DescriptorInstance>();

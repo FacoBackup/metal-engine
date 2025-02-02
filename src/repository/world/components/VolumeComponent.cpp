@@ -12,6 +12,6 @@ namespace Metal {
     }
 
     void VolumeComponent::onUpdate(InspectableMember *member, ApplicationContext &context) {
-        context.engineContext.setVolumeDataUpdated(true);
+        context.engineContext.setLightVolumeDataNeedsUpdate(true);
     }
 } // Metal

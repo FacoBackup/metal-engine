@@ -1,9 +1,9 @@
-#include "LightsService.h"
+#include "LightVolumeService.h"
 #include "../../context/ApplicationContext.h"
 #include "../buffer/BufferInstance.h"
 
 namespace Metal {
-    void LightsService::registerExplicitLightSources(int &index) {
+    void LightVolumeService::registerLights() {
         // Register lights
         for (auto &entry: context.worldRepository.lights) {
             if (context.worldRepository.hiddenEntities.contains(entry.first)) {
@@ -16,56 +16,73 @@ namespace Metal {
             glm::vec3 normal(0.0f, 1.0f, 0.0f);
             glm::vec3 rotatedNormal = t.rotation * normal;
 
-            lights[index] = LightData(
+            items.push_back(LightVolumeData(
                 l.color * l.intensity,
                 translation,
                 glm::normalize(rotatedNormal),
                 l.lightType,
                 l.radiusSize
-            );
-            index++;
+            ));
         }
     }
 
-    void LightsService::registerSun(int &index) {
+    void LightVolumeService::registerSun() {
         if (context.engineRepository.atmosphereEnabled) {
-            lights[index] = LightData(
+            items.push_back(LightVolumeData(
                 sunColor,
                 sunPosition,
                 glm::vec3(0),
-                LightTypes::SPHERE,
+                LightVolumeTypes::SPHERE,
                 context.engineRepository.sunRadius
-            );
-            index++;
+            ));
         }
     }
 
-    void LightsService::updateLights() {
-        int index = 0;
+    void LightVolumeService::registerVolumes() {
+        for (auto &entry: context.worldRepository.volumes) {
+            if (context.worldRepository.hiddenEntities.contains(entry.first)) {
+                continue;
+            }
+            auto &t = context.worldRepository.transforms.at(entry.first);
+            auto &translation = t.translation;
+            auto &l = entry.second;
 
-        lights.clear();
-        lights.reserve(1);
-        registerSun(index);
+            items.push_back(LightVolumeData(
+                l.albedo,
+                translation,
+                t.scale,
+                LightVolumeTypes::VOLUME,
+                l.density
+            ));
+        }
+    }
 
-        registerExplicitLightSources(index);
+    void LightVolumeService::update() {
+        items.clear();
 
-        context.coreBuffers.lights->update(lights.data());
-        lightsCount = index;
+        registerSun();
+        registerLights();
+        registerVolumes();
+
+        if (!items.empty()) {
+            context.coreBuffers.lightVolumeBuffer->update(items.data());
+        }
+        count = items.size();
     }
 
 
-    void LightsService::computeSunInfo() {
+    void LightVolumeService::computeSunInfo() {
         sunPosition = glm::vec3(0,
                                 std::cos(context.engineRepository.elapsedTime),
                                 std::sin(context.engineRepository.elapsedTime)) * context.engineRepository
                       .sunDistance;
-        sunColor = LightsService::CalculateSunColor(
+        sunColor = LightVolumeService::CalculateSunColor(
                        sunPosition.y / context.engineRepository.sunDistance,
                        context.engineRepository.nightColor, context.engineRepository.dawnColor,
                        context.engineRepository.middayColor) * context.engineRepository.sunLightIntensity;
     }
 
-    glm::vec3 LightsService::CalculateSunColor(const float elevation, glm::vec3 &nightColor, glm::vec3 &dawnColor,
+    glm::vec3 LightVolumeService::CalculateSunColor(const float elevation, glm::vec3 &nightColor, glm::vec3 &dawnColor,
                                                glm::vec3 &middayColor) {
         if (elevation <= -0.1f) {
             return nightColor;
@@ -81,7 +98,7 @@ namespace Metal {
         return middayColor;
     }
 
-    glm::vec3 LightsService::BlendColors(glm::vec3 &c1, glm::vec3 &c2, float t) {
+    glm::vec3 LightVolumeService::BlendColors(glm::vec3 &c1, glm::vec3 &c2, float t) {
         return {
             (c1.x * (1 - t) + c2.x * t),
             (c1.y * (1 - t) + c2.y * t),
