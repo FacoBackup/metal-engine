@@ -62,6 +62,7 @@ namespace Metal {
 
         registerSun();
         registerLights();
+        volumesOffset = items.size();
         registerVolumes();
 
         if (!items.empty()) {

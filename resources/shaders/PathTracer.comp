@@ -93,11 +93,10 @@ void main() {
         }
     }
 
-    vec3 volumetricColor = vec3(0.0);
-    bool anyHit = false;
-    traceVolumes(anyHit, volumetricColor, worldPos.rgb, rayDirection);
-    if (anyHit){
-        finalColor += volumetricColor;
+    vec4 volumetricColor = vec4(0.0);
+    traceVolumes(volumetricColor, worldPos.rgb, rayDirection);
+    if(volumetricColor.a > 0.001){
+        finalColor = volumetricColor.rgb * volumetricColor.a + finalColor * (1.0 - volumetricColor.a);
     }
 
     imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(finalColor, finalData));

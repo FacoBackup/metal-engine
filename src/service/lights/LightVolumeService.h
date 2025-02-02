@@ -9,6 +9,7 @@ namespace Metal {
     class LightVolumeService final : public AbstractRuntimeComponent {
         std::vector<LightVolumeData> items{};
         unsigned int count = 0;
+        unsigned int volumesOffset = 0;
         glm::vec3 sunColor{};
         glm::vec3 sunPosition{};
 
@@ -42,6 +43,10 @@ namespace Metal {
 
         [[nodiscard]] glm::vec3 getSunColor() const {
             return sunColor;
+        }
+
+        unsigned int getVolumesOffset() const {
+            return volumesOffset;
         }
     };
 } // Metal

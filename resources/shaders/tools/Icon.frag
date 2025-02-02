@@ -7,10 +7,6 @@
 layout (location = 0) in vec2 texCoords;
 layout (location = 0) out vec4 finalColor;
 
-layout(push_constant) uniform Push {
-    vec3 iconColor;
-} push;
-
 float sdSphere(vec3 p, float s, in vec3 translation){
     return length(p - translation)-s;
 }
@@ -83,7 +79,7 @@ void main(){
         discard;
     }
     vec3 dir = createRay(texCoords, globalData.invProj, globalData.invView);
-    for (uint i = 0; i < globalData.lightVolumeCount; i++){
+    for (uint i = 0; i < globalData.volumesOffset; i++){
         LightVolume l = lightVolumeBuffer.items[i];
         if (rayMarch(globalData.cameraWorldPosition.xyz, dir, l)){
             finalColor = vec4(l.color, 1);

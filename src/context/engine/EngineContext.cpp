@@ -95,6 +95,7 @@ namespace Metal {
         globalDataUBO.cameraWorldPosition = camera.position;
         globalDataUBO.giStrength = context.engineRepository.giStrength;
         globalDataUBO.lightVolumeCount = context.lightVolumesService.getLightVolumeCount();
+        globalDataUBO.volumesOffset = context.lightVolumesService.getVolumesOffset();
         globalDataUBO.isAtmosphereEnabled = context.engineRepository.atmosphereEnabled;
 
         globalDataUBO.enabledDenoiser = context.engineRepository.enabledDenoiser;

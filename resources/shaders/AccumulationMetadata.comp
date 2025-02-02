@@ -51,27 +51,22 @@ void main() {
         vec4 prev = imageLoad(previousFrameImage, coords);
         float accumulationCount = prev.a + 1.0;
 
-        // --- Adjust Accumulation Count Based on Luminance Change ---
-        float currentLuminance = dot(currentFrame.rgb, vec3(0.2126, 0.7152, 0.0722));
-        float luminanceVariance = 0.0;
+        // --- Adjust Accumulation Count Based on Color Change ---
+        vec3 currentColor = currentFrame.rgb;
+        vec3 colorVariance = vec3(0.0);
 
-        // 3x3 neighborhood sampling for luminance variance
         for (int dx = -1; dx <= 1; ++dx) {
             for (int dy = -1; dy <= 1; ++dy) {
                 ivec2 neighborCoord = coords + ivec2(dx, dy);
-                // Ensure coordinates are within image bounds
                 neighborCoord = clamp(neighborCoord, ivec2(0), imageSize(currentFrameImage) - ivec2(1));
 
                 vec3 neighborColor = imageLoad(currentFrameImage, neighborCoord).rgb;
-                float neighborLuminance = dot(neighborColor, vec3(0.2126, 0.7152, 0.0722));
-
-                luminanceVariance += abs(currentLuminance - neighborLuminance);
+                colorVariance += abs(currentColor - neighborColor);
             }
         }
-
-        luminanceVariance /= 9.0;
-
-        float varianceFactor = clamp(1.0 - luminanceVariance * push.diffWeight, 0.1, 1.0);
+        colorVariance /= 9.0;
+        float averageColorVariance = (colorVariance.r + colorVariance.g + colorVariance.b) / 3.0;
+        float varianceFactor = clamp(1.0 - averageColorVariance * push.diffWeight, 0.1, 1.0);
         accumulationCount *= varianceFactor;
         imageStore(previousFrameImage, coords, vec4(currentFrame.rgb, round(accumulationCount)));
     }

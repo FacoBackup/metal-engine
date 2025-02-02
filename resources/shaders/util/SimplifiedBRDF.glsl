@@ -42,15 +42,12 @@ void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo){
         vec3 lT = vec3(1);
 
         if (globalData.lightVolumeCount > 0){
-            for (int i = 0; i < globalData.lightVolumeCount; ++i) {
+            for (int i = 0; i < globalData.volumesOffset; ++i) {
                 LightVolume l = lightVolumeBuffer.items[i];
-                if (l.itemType != ITEM_TYPE_VOLUME){
-                    evaluateLightSimplified(l, bounceInfo, lT, lIndirect);
-                }
+                evaluateLightSimplified(l, bounceInfo, lT, lIndirect);
             }
         }
 
-//        vec3 accumulatedResult = previousCacheData.rgb * (1. - 1./accumulationCount) + lIndirect * 1./accumulationCount;
         imageStore(giSurfaceCacheCompute, coord, vec4(lIndirect, 0));
         bounceInfo.indirectLight += lIndirect;
         bounceInfo.throughput *= lT;
