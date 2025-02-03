@@ -205,7 +205,7 @@ vec3 lightSample(const in LightVolume light, const in SurfaceInteraction interac
             vec3 lightDir = normalize(light.position - interaction.point);
             createBasis(lightDir, tangent, binormal);
 
-            float sinThetaMax2 = pow2(light.radiusSize) / distanceSq(light.position, interaction.point);
+            float sinThetaMax2 = pow2(light.dataB.x) / distanceSq(light.position, interaction.point);
             float cosThetaMax = sqrt(max(EPSILON, 1. - sinThetaMax2));
             wi = uniformSampleCone(u, cosThetaMax, tangent, binormal, lightDir);
 
@@ -217,17 +217,17 @@ vec3 lightSample(const in LightVolume light, const in SurfaceInteraction interac
             return light.color * visibility;
         }
         case ITEM_TYPE_PLANE: {
-            vec3 tangent1 = normalize(perpendicular(light.minNormal));
-            vec3 tangent2 = cross(light.minNormal, tangent1);
+            vec3 tangent1 = normalize(perpendicular(light.dataA));
+            vec3 tangent2 = cross(light.dataA, tangent1);
             vec3 lightSamplePoint = light.position
-            + u.x * light.radiusSize * tangent1
-            + u.y * light.radiusSize * tangent2;
+            + u.x * light.dataB.x * tangent1
+            + u.y * light.dataB.x * tangent2;
 
             wi = normalize(lightSamplePoint - interaction.point);
 
             float distSq = distanceSq(lightSamplePoint, interaction.point);
-            float cosTheta = max(0.0, dot(-wi, light.minNormal));
-            lightPdf = distSq / (cosTheta * (light.radiusSize * light.radiusSize));
+            float cosTheta = max(0.0, dot(-wi, light.dataA));
+            lightPdf = distSq / (cosTheta * (light.dataB.x * light.dataB.x));
 
             if (cosTheta > 0.0){
                 float visibility = visibilityTest(light, interaction, wi);
@@ -408,7 +408,7 @@ float bsdfPdf(const in vec3 wi, const in vec3 wo, const in vec3 X, const in vec3
 }
 
 float light_pdf(const in LightVolume light, const in SurfaceInteraction interaction) {
-    float sinThetaMax2 =  pow2(light.radiusSize) / distanceSq(light.position, interaction.point);
+    float sinThetaMax2 =  pow2(light.dataB.x) / distanceSq(light.position, interaction.point);
     float cosThetaMax = sqrt(max(EPSILON, 1. - sinThetaMax2));
     return 1. / (TWO_PI * (1. - cosThetaMax));
 }

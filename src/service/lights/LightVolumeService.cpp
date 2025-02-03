@@ -20,8 +20,8 @@ namespace Metal {
                 l.color * l.intensity,
                 translation,
                 glm::normalize(rotatedNormal),
-                l.lightType,
-                l.radiusSize
+                glm::vec3(l.radiusSize),
+                l.lightType
             ));
         }
     }
@@ -32,8 +32,8 @@ namespace Metal {
                 sunColor,
                 sunPosition,
                 glm::vec3(0),
-                LightVolumeTypes::SPHERE,
-                context.engineRepository.sunRadius
+                glm::vec3(context.engineRepository.sunRadius),
+                LightVolumeTypes::SPHERE
             ));
         }
     }
@@ -51,8 +51,8 @@ namespace Metal {
                 l.albedo,
                 translation,
                 t.scale,
-                LightVolumeTypes::VOLUME,
-                l.density
+                glm::vec3(l.density, l.scatteringAlbedo, l.g),
+                LightVolumeTypes::VOLUME
             ));
         }
     }
@@ -84,7 +84,7 @@ namespace Metal {
     }
 
     glm::vec3 LightVolumeService::CalculateSunColor(const float elevation, glm::vec3 &nightColor, glm::vec3 &dawnColor,
-                                               glm::vec3 &middayColor) {
+                                                    glm::vec3 &middayColor) {
         if (elevation <= -0.1f) {
             return nightColor;
         }
