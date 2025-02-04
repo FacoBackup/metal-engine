@@ -21,7 +21,7 @@ void evaluateLightSimplified(in LightVolume l, in BounceInfo bounceInfo, inout v
     }
     if (shadows != 0){
         float NdotL = max(dot(bounceInfo.hitNormal, lightDir), 0.0);
-        vec3 lightColorContribution = l.color * bounceInfo.albedo / PI;
+        vec3 lightColorContribution = l.color.rgb * l.color.a * bounceInfo.albedo / PI;
         vec3 lightContribution = lightColorContribution * NdotL * shadows / length(l.position - localHitPosition);
         indirectLight += throughput * lightContribution;
         throughput *= lightColorContribution;

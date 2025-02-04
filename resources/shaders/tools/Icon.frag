@@ -82,7 +82,7 @@ void main(){
     for (uint i = 0; i < globalData.volumesOffset; i++){
         LightVolume l = lightVolumeBuffer.items[i];
         if (rayMarch(globalData.cameraWorldPosition.xyz, dir, l)){
-            finalColor = vec4(l.color, 1);
+            finalColor = vec4(l.color.rgb * l.color.a, 1);
             return;
         }
     }

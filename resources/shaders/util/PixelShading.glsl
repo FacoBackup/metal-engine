@@ -36,8 +36,8 @@ vec3 calculatePixelColor( vec3 rayDirection, in vec2 texCoords, MaterialInfo mat
         vec3 Ld = vec3(0);
         for (uint i = 0; i < globalData.volumesOffset; i++){
             LightVolume l = lightVolumeBuffer.items[i];
-            l.color *= 20.;
-            Ld += beta * calculateDirectLight(l, interaction, material, wi, f, scatteringPdf);
+            l.color.rgb *= 20.;
+            Ld += beta * calculateDirectLight(l, interaction, material, wi, f, scatteringPdf) * l.color.a;
         }
 
         L += Ld;

@@ -6,7 +6,8 @@
 #define LEVEL_OF_DETAIL "Level of detail"
 #define PATH_TRACER "Path tracer"
 #define ATMOSPHERE "Atmosphere"
-#define SUN "Sun color"
+#define SUN "Sun"
+#define VOLUMES "Volumes"
 
 namespace Metal {
     void EngineRepository::registerFields() {
@@ -14,6 +15,8 @@ namespace Metal {
                     16);
         registerBool(vsync, "Display settings (Restart required)", "VSync?");
         registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);
+
+        registerInt(volumeShadowSteps, VOLUMES, "Shadow steps", 1);
 
         registerBool(enabledDenoiser, PATH_TRACER, "Enable denoiser?");
         registerFloat(denoiserDiffWeight, PATH_TRACER, "Denoiser variance weight", 0, 10, false, .001);

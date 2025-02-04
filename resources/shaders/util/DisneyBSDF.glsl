@@ -214,7 +214,7 @@ vec3 lightSample(const in LightVolume light, const in SurfaceInteraction interac
             }
 
             float visibility = visibilityTest(light, interaction, wi);
-            return light.color * visibility;
+            return light.color.rgb * visibility;
         }
         case ITEM_TYPE_PLANE: {
             vec3 tangent1 = normalize(perpendicular(light.dataA));
@@ -231,7 +231,7 @@ vec3 lightSample(const in LightVolume light, const in SurfaceInteraction interac
 
             if (cosTheta > 0.0){
                 float visibility = visibilityTest(light, interaction, wi);
-                return light.color * visibility;
+                return light.color.rgb * visibility;
             }
             return vec3(0.0);
         }
@@ -481,7 +481,7 @@ vec3 calculateDirectLight(const in LightVolume light, const in SurfaceInteractio
     if (globalData.multipleImportanceSampling){
 
         isBlack = dot(f, f) == 0.;
-        Li = light.color;
+        Li = light.color.rgb;
 
         if (!isBlack && scatteringPdf > EPSILON) {
             float weight = 1.;

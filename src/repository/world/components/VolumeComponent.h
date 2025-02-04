@@ -13,6 +13,7 @@ namespace Metal {
         float density = 1;
         float g = 0;
         float scatteringAlbedo = 5;
+        int samples = 64;
 
         void registerFields() override;
 
@@ -20,7 +21,7 @@ namespace Metal {
 
         void onUpdate(InspectableMember *member, ApplicationContext &context) override;
 
-        SERIALIZE_TEMPLATE(albedo.x, albedo.y, albedo.z, entityId, density, scatteringAlbedo, g)
+        SERIALIZE_TEMPLATE(albedo.x, albedo.y, albedo.z, entityId, density, scatteringAlbedo, g, samples)
     };
 } // Metal
 

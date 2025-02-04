@@ -10,6 +10,7 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     float giStrength;
     uint lightVolumeCount;
     uint volumesOffset;
+    uint volumeShadowSteps;
     bool isAtmosphereEnabled;
 
 // GI

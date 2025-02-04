@@ -1,7 +1,7 @@
 #ifndef L_V
 #define L_V
 struct LightVolume {
-    vec3 color;
+    vec4 color;
     vec3 position;
     vec3 dataA;
     vec3 dataB;// Density for volume
@@ -31,8 +31,8 @@ float hash(vec3 p) {
 }
 
 float densityVariation(vec3 p, float baseDensity) {
-    float noise = hash(p * 0.5);
-    return baseDensity * (0.5 + 0.5 * noise);
+//    float noise = hash(p * 0.5);
+    return baseDensity; //* (0.5 + 0.5 * noise);
 }
 
 bool intersectBox(vec3 ro, vec3 rd, vec3 dimensions, out float tEntry, out float tExit) {
@@ -73,7 +73,7 @@ vec4 integrateVolume(vec3 ro, vec3 rd, in LightVolume volume, float sceneDepth) 
 
     tEntry = max(tEntry, 0.0);
 
-    int steps = 64;
+    int steps = int(volume.color.a);
     float dt = (tExit - tEntry) / float(steps);
 
     vec3 scattering = vec3(0.0);
@@ -110,10 +110,9 @@ vec4 integrateVolume(vec3 ro, vec3 rd, in LightVolume volume, float sceneDepth) 
             vec3 L = normalize(samplePos - pos);
             float lightDist = length(samplePos - pos);
 
-            int shadowSteps = 8;
-            float dtShadow = lightDist / float(shadowSteps);
+            float dtShadow = lightDist / float(globalData.volumeShadowSteps);
             float opticalDepth = 0.0;
-            for (int j = 0; j < shadowSteps; j++) {
+            for (int j = 0; j < globalData.volumeShadowSteps; j++) {
                 float tShadow = float(j) * dtShadow;
                 vec3 posShadow = pos + L * tShadow;
                 vec3 localShadow = posShadow - volume.position;
@@ -122,13 +121,13 @@ vec4 integrateVolume(vec3 ro, vec3 rd, in LightVolume volume, float sceneDepth) 
             float lightTransmittance = exp(-opticalDepth);
             float g = volume.dataB.z;// phase function asymmetry parameter; 0.0 for isotropic
             float phase = phaseHenyeyGreenstein(rd, L, g);
-            inScattered += light.color * lightTransmittance * phase;
+            inScattered += light.color.rgb * light.color.a * lightTransmittance * phase;
         }
         scattering += viewTransmittance * scatteringCoefficient * inScattered * dt;
         viewTransmittance *= exp(-extinctionCoefficient * dt);
     }
     float volumeAlpha = 1.0 - viewTransmittance;
-    return vec4(scattering * volume.color, volumeAlpha);
+    return vec4(scattering * volume.color.rgb, volumeAlpha);
 }
 
 void traceVolumes(inout vec4 finalColor, vec3 worldPosition, vec3 rayDirection){

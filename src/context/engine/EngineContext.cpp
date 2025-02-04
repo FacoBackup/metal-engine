@@ -72,11 +72,11 @@ namespace Metal {
         context.cameraService.onSync();
         context.voxelizationService.onSync();
 
-        updateGlobalData();
         updateVoxelData();
         if (lightVolumeDataNeedsUpdate) {
             context.lightVolumesService.update();
         }
+        updateGlobalData();
 
         context.passesService.onSync();
 
@@ -96,6 +96,7 @@ namespace Metal {
         globalDataUBO.giStrength = context.engineRepository.giStrength;
         globalDataUBO.lightVolumeCount = context.lightVolumesService.getLightVolumeCount();
         globalDataUBO.volumesOffset = context.lightVolumesService.getVolumesOffset();
+        globalDataUBO.volumeShadowSteps = context.engineRepository.volumeShadowSteps;
         globalDataUBO.isAtmosphereEnabled = context.engineRepository.atmosphereEnabled;
 
         globalDataUBO.enabledDenoiser = context.engineRepository.enabledDenoiser;

@@ -12,6 +12,7 @@ namespace Metal {
         float denoiserDiffWeight = .5;
 
         bool multipleImportanceSampling = false;
+        int volumeShadowSteps = 8;
         int shadingResInvScale = 2;
         int giMaxAccumulation = 200;
         int giTileSubdivision = 40;
@@ -62,7 +63,8 @@ namespace Metal {
             shadingResInvScale,
             giMaxAccumulation,
             denoiserDiffWeight,
-            enabledDenoiser
+            enabledDenoiser,
+            volumeShadowSteps
         )
     };
 } // Metal

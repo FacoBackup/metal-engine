@@ -17,7 +17,7 @@ namespace Metal {
             glm::vec3 rotatedNormal = t.rotation * normal;
 
             items.push_back(LightVolumeData(
-                l.color * l.intensity,
+                glm::vec4(l.color, l.intensity),
                 translation,
                 glm::normalize(rotatedNormal),
                 glm::vec3(l.radiusSize),
@@ -29,7 +29,7 @@ namespace Metal {
     void LightVolumeService::registerSun() {
         if (context.engineRepository.atmosphereEnabled) {
             items.push_back(LightVolumeData(
-                sunColor,
+                glm::vec4(sunColor, context.engineRepository.sunLightIntensity),
                 sunPosition,
                 glm::vec3(0),
                 glm::vec3(context.engineRepository.sunRadius),
@@ -48,7 +48,7 @@ namespace Metal {
             auto &l = entry.second;
 
             items.push_back(LightVolumeData(
-                l.albedo,
+                glm::vec4(l.albedo, l.samples),
                 translation,
                 t.scale,
                 glm::vec3(l.density, l.scatteringAlbedo, l.g),
@@ -78,9 +78,9 @@ namespace Metal {
                                 std::sin(context.engineRepository.elapsedTime)) * context.engineRepository
                       .sunDistance;
         sunColor = LightVolumeService::CalculateSunColor(
-                       sunPosition.y / context.engineRepository.sunDistance,
-                       context.engineRepository.nightColor, context.engineRepository.dawnColor,
-                       context.engineRepository.middayColor) * context.engineRepository.sunLightIntensity;
+            sunPosition.y / context.engineRepository.sunDistance,
+            context.engineRepository.nightColor, context.engineRepository.dawnColor,
+            context.engineRepository.middayColor);
     }
 
     glm::vec3 LightVolumeService::CalculateSunColor(const float elevation, glm::vec3 &nightColor, glm::vec3 &dawnColor,
