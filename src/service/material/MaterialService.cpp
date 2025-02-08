@@ -25,9 +25,11 @@ namespace Metal {
         if (texture == nullptr) {
             return false;
         }
-        descriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                       context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                       texture->vkImageView);
+        auto &ref = descriptor->bindings.emplace_back();
+        ref.bindingPoint = 0;
+        ref.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        ref.sampler = context.coreFrameBuffers.gBufferFBO->vkImageSampler;
+        ref.view = texture->vkImageView;
         instance->textures.push_back(id);
         return true;
     }
@@ -46,21 +48,21 @@ namespace Metal {
         instance->descriptorMetallicTexture = std::make_unique<DescriptorInstance>();
         instance->descriptorHeightTexture = std::make_unique<DescriptorInstance>();
 
-        instance->descriptorAlbedoTexture->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                            0);
-        instance->descriptorNormalTexture->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                            0);
-        instance->descriptorRoughnessTexture->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                               VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                               0);
-        instance->descriptorMetallicTexture->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                              VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                              0);
-        instance->descriptorHeightTexture->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                            0);
+        instance->descriptorAlbedoTexture->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
+            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            0));
+        instance->descriptorNormalTexture->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
+            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            0));
+        instance->descriptorRoughnessTexture->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
+            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            0));
+        instance->descriptorMetallicTexture->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
+            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            0));
+        instance->descriptorHeightTexture->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
+            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            0));
 
         instance->descriptorAlbedoTexture->create(vulkanContext);
         instance->descriptorNormalTexture->create(vulkanContext);
@@ -74,11 +76,16 @@ namespace Metal {
         instance->useMetallicTexture = streamAndWrite(data->metallic, instance, instance->descriptorMetallicTexture);
         instance->useHeightTexture = streamAndWrite(data->height, instance, instance->descriptorHeightTexture);
 
-        instance->descriptorAlbedoTexture->write(vulkanContext);
-        instance->descriptorNormalTexture->write(vulkanContext);
-        instance->descriptorRoughnessTexture->write(vulkanContext);
-        instance->descriptorMetallicTexture->write(vulkanContext);
-        instance->descriptorHeightTexture->write(vulkanContext);
+        DescriptorInstance::Write(vulkanContext, instance->descriptorAlbedoTexture->vkDescriptorSet,
+                                  instance->descriptorAlbedoTexture->bindings);
+        DescriptorInstance::Write(vulkanContext, instance->descriptorNormalTexture->vkDescriptorSet,
+                                  instance->descriptorNormalTexture->bindings);
+        DescriptorInstance::Write(vulkanContext, instance->descriptorRoughnessTexture->vkDescriptorSet,
+                                  instance->descriptorRoughnessTexture->bindings);
+        DescriptorInstance::Write(vulkanContext, instance->descriptorMetallicTexture->vkDescriptorSet,
+                                  instance->descriptorMetallicTexture->bindings);
+        DescriptorInstance::Write(vulkanContext, instance->descriptorHeightTexture->vkDescriptorSet,
+                                  instance->descriptorHeightTexture->bindings);
 
         delete data;
 

@@ -2,6 +2,7 @@
 
 #include <vulkan/vulkan_core.h>
 #include "../../context/ApplicationContext.h"
+#include "../../service/descriptor/DescriptorBinding.h"
 #include "../../service/descriptor/DescriptorInstance.h"
 #include "../../service/framebuffer/FrameBufferInstance.h"
 #include "../../service/framebuffer/FrameBufferAttachment.h"
@@ -9,138 +10,171 @@
 
 #define GBUFFER_D(P, N)\
 P = std::make_unique<DescriptorInstance>();\
-P->addLayoutBinding(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);\
-P->create(vulkanContext);\
-P->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,\
-                                              context.coreFrameBuffers.gBufferFBO->vkImageSampler,\
-                                              context.coreFrameBuffers.gBufferFBO->attachments[N]->vkImageView);\
-P->write(vulkanContext);
+P->addLayoutBinding(DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0, context.coreFrameBuffers.gBufferFBO->vkImageSampler, context.coreFrameBuffers.gBufferFBO->attachments[N]->vkImageView));\
+P->create(vulkanContext);
 
+#define G context.coreFrameBuffers.gBufferFBO->attachments
+#define COMPUTE_FRAGMENT_STAGES static_cast<VkShaderStageFlagBits>(VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT)
+#define ALL_STAGES static_cast<VkShaderStageFlagBits>( VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT |VK_SHADER_STAGE_COMPUTE_BIT)
 
 namespace Metal {
-    void CoreDescriptorSets::onInitialize() {
-        constexpr auto COMPUTE_FRAGMENT_STAGES = static_cast<VkShaderStageFlagBits>(
-            VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT);
-        {
-            svoData = std::make_unique<DescriptorInstance>();
-            // ONE FOR EACH ADJACENT TILE AND ONE FOR THE CENTER TILE
-
-            svoData->addLayoutBinding(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0);
-            svoData->addLayoutBinding(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1);
-            svoData->addLayoutBinding(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 2);
-            svoData->addLayoutBinding(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 3);
-            svoData->addLayoutBinding(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 4);
-            svoData->addLayoutBinding(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 5);
-            svoData->addLayoutBinding(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 6);
-            svoData->addLayoutBinding(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 7);
-            svoData->addLayoutBinding(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 8);
-            svoData->addLayoutBinding(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 9);
-
-            svoData->create(vulkanContext);
-            svoData->addBufferDescriptor(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                         context.coreBuffers.tileInfo);
-            svoData->write(vulkanContext);
-        }
-
-        {
-            lightVolumeData = std::make_unique<DescriptorInstance>();
-            lightVolumeData->addLayoutBinding(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0);
-            lightVolumeData->create(vulkanContext);
-            lightVolumeData->addBufferDescriptor(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                            context.coreBuffers.lightVolumeBuffer);
-            lightVolumeData->write(vulkanContext);
-        }
-
-        // GLOBAL DATA UBO
-        {
-            globalDataDescriptor = std::make_unique<DescriptorInstance>();
-            globalDataDescriptor->addLayoutBinding(static_cast<VkShaderStageFlagBits>(
-                                                       VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT |
-                                                       VK_SHADER_STAGE_COMPUTE_BIT),
-                                                   VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0);
-            globalDataDescriptor->create(vulkanContext);
-            globalDataDescriptor->addBufferDescriptor(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                                      context.coreBuffers.globalData);
-            globalDataDescriptor->write(vulkanContext);
-        }
-
+    void CoreDescriptorSets::createMaterialDescriptors() {
         materialAlbedo = std::make_unique<DescriptorInstance>();
         materialNormal = std::make_unique<DescriptorInstance>();
         materialRoughness = std::make_unique<DescriptorInstance>();
         materialMetallic = std::make_unique<DescriptorInstance>();
         materialHeight = std::make_unique<DescriptorInstance>();
 
-        materialAlbedo->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                         VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-        materialNormal->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                         VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-        materialRoughness->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-        materialMetallic->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                           VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
-        materialHeight->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                         VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
+        materialAlbedo->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
+                                                               VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0));
+        materialNormal->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
+                                                               VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0));
+        materialRoughness->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
+                                                                  VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0));
+        materialMetallic->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
+                                                                 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0));
+        materialHeight->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
+                                                               VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0));
 
         materialAlbedo->create(vulkanContext);
         materialNormal->create(vulkanContext);
         materialRoughness->create(vulkanContext);
         materialMetallic->create(vulkanContext);
         materialHeight->create(vulkanContext);
+    }
 
-        // G-BUFFER
-        GBUFFER_D(gBufferAlbedo, 0)
-        GBUFFER_D(gBufferNormal, 1)
-        GBUFFER_D(gBufferPosition, 2)
+    void CoreDescriptorSets::createBuffersDescriptors() {
+    {
+            svoData = std::make_unique<DescriptorInstance>();
+            // ONE FOR EACH ADJACENT TILE AND ONE FOR THE CENTER TILE
 
-        giSurfaceCacheCompute = std::make_unique<DescriptorInstance>();
-        giSurfaceCacheCompute->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
-        giSurfaceCacheCompute->create(vulkanContext);
-        giSurfaceCacheCompute->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
-                                                context.coreTextures.giSurfaceCache->vkImageView);
-        giSurfaceCacheCompute->write(vulkanContext);
+            svoData->addLayoutBinding(DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                                                            0, context.coreBuffers.tileInfo));
+            svoData->addLayoutBinding(
+                DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
+            svoData->addLayoutBinding(
+                DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 2));
+            svoData->addLayoutBinding(
+                DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 3));
+            svoData->addLayoutBinding(
+                DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 4));
+            svoData->addLayoutBinding(
+                DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 5));
+            svoData->addLayoutBinding(
+                DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 6));
+            svoData->addLayoutBinding(
+                DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 7));
+            svoData->addLayoutBinding(
+                DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 8));
+            svoData->addLayoutBinding(
+                DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 9));
 
-        previousFrameDescriptor = std::make_unique<DescriptorInstance>();
-        previousFrameDescriptor->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
-        previousFrameDescriptor->create(vulkanContext);
-        previousFrameDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
-                                                  context.coreTextures.previousFrame->vkImageView);
-        previousFrameDescriptor->write(vulkanContext);
+            svoData->create(vulkanContext);
+        } {
+            lightVolumeData = std::make_unique<DescriptorInstance>();
+            lightVolumeData->addLayoutBinding(DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES,
+                                                                    VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0,
+                                                                    context.coreBuffers.lightVolumeBuffer));
+            lightVolumeData->create(vulkanContext);
+        } {
+            globalDataDescriptor = std::make_unique<DescriptorInstance>();
+            globalDataDescriptor->addLayoutBinding(
+                DescriptorBinding::Of(ALL_STAGES, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0,
+                                      context.coreBuffers.globalData));
+            globalDataDescriptor->create(vulkanContext);
+        }
+    }
 
-        previousFrameMetadataDescriptor = std::make_unique<DescriptorInstance>();
-        previousFrameMetadataDescriptor->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
-        previousFrameMetadataDescriptor->create(vulkanContext);
-        previousFrameMetadataDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
-                                                  context.coreTextures.previousFrameMetadata->vkImageView);
-        previousFrameMetadataDescriptor->write(vulkanContext);
+    void CoreDescriptorSets::createGBufferDescriptors() {
+        gBufferAlbedo = std::make_unique<DescriptorInstance>();
+        gBufferAlbedo->addLayoutBinding(DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES,
+                                                              VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
+                                                              context.coreFrameBuffers.gBufferFBO->vkImageSampler,
+                                                              G[0]->vkImageView));
+        gBufferAlbedo->create(vulkanContext);
 
-        currentFrameDescriptor = std::make_unique<DescriptorInstance>();
-        currentFrameDescriptor->addLayoutBinding(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0);
-        currentFrameDescriptor->create(vulkanContext);
-        currentFrameDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_NULL_HANDLE,
-                                           context.coreTextures.currentFrame->vkImageView);
-        currentFrameDescriptor->write(vulkanContext);
+        gBufferNormal = std::make_unique<DescriptorInstance>();
+        gBufferNormal->addLayoutBinding(DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES,
+                                                              VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
+                                                              context.coreFrameBuffers.gBufferFBO->vkImageSampler,
+                                                              G[1]->vkImageView));
+        gBufferNormal->create(vulkanContext);
+
+        gBufferPosition = std::make_unique<DescriptorInstance>();
+        gBufferPosition->addLayoutBinding(DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES,
+                                                                VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
+                                                                context.coreFrameBuffers.gBufferFBO->vkImageSampler,
+                                                                G[2]->vkImageView));
+        gBufferPosition->create(vulkanContext);
+    }
+
+    void CoreDescriptorSets::createPathTracingDescriptors() {
+        {
+            giSurfaceCacheCompute = std::make_unique<DescriptorInstance>();
+            giSurfaceCacheCompute->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
+                                                                          VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
+                                                                          VK_NULL_HANDLE,
+                                                                          context.coreTextures.giSurfaceCache->
+                                                                          vkImageView));
+            giSurfaceCacheCompute->create(vulkanContext);
+        }
+
+        {
+            previousFrameDescriptor = std::make_unique<DescriptorInstance>();
+            previousFrameDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
+                                                                            VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
+                                                                            VK_NULL_HANDLE,
+                                                                            context.coreTextures.previousFrame->
+                                                                            vkImageView));
+            previousFrameDescriptor->create(vulkanContext);
+        }
+
+        {
+            previousFrameMetadataDescriptor = std::make_unique<DescriptorInstance>();
+            previousFrameMetadataDescriptor->addLayoutBinding(DescriptorBinding::Of(
+                VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+                0, VK_NULL_HANDLE,
+                context.coreTextures.previousFrameMetadata->vkImageView));
+            previousFrameMetadataDescriptor->create(vulkanContext);
+        }
+
+        {
+            currentFrameDescriptor = std::make_unique<DescriptorInstance>();
+            currentFrameDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
+                                                                           VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
+                                                                           VK_NULL_HANDLE,
+                                                                           context.coreTextures.currentFrame->vkImageView));
+            currentFrameDescriptor->create(vulkanContext);
+        }
+    }
+
+    void CoreDescriptorSets::onInitialize() {
+        createBuffersDescriptors();
+        createMaterialDescriptors();
+        createGBufferDescriptors();
+        createPathTracingDescriptors();
 
         if (context.isDebugMode()) {
             surfaceCacheFragment = std::make_unique<DescriptorInstance>();
-            surfaceCacheFragment->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                   VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
+            surfaceCacheFragment->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
+                                                                         VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
+                                                                         context.coreFrameBuffers.gBufferFBO->
+                                                                         vkImageSampler,
+                                                                         context.coreTextures.giSurfaceCache->
+                                                                         vkImageView));
             surfaceCacheFragment->create(vulkanContext);
-            surfaceCacheFragment->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                     context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                                     context.coreTextures.giSurfaceCache->vkImageView);
-            surfaceCacheFragment->write(vulkanContext);
         }
 
-        // POST PROCESSING
         {
             postProcessingDescriptor = std::make_unique<DescriptorInstance>();
-            postProcessingDescriptor->addLayoutBinding(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                       VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0);
+            postProcessingDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
+                                                                             VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                                                             0,
+                                                                             context.coreFrameBuffers.gBufferFBO->
+                                                                             vkImageSampler,
+                                                                             context.coreTextures.currentFrame->
+                                                                             vkImageView));
             postProcessingDescriptor->create(vulkanContext);
-            postProcessingDescriptor->addImageDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                         context.coreFrameBuffers.gBufferFBO->vkImageSampler,
-                                                         context.coreTextures.currentFrame->vkImageView);
-            postProcessingDescriptor->write(vulkanContext);
         }
     }
 } // Metal

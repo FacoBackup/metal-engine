@@ -2,6 +2,7 @@
 
 #include "../../context/ApplicationContext.h"
 #include "../../service/buffer/BufferInstance.h"
+#include "../../service/descriptor/DescriptorBinding.h"
 #include "../../service/voxel/SVOInstance.h"
 #include "../../enum/LevelOfDetail.h"
 #include "../../enum/LightVolumeType.h"
@@ -18,13 +19,17 @@ namespace Metal {
     void EngineContext::updateVoxelData() {
         if (context.worldGridRepository.hasMainTileChanged) {
             unsigned int i = 0;
+            std::vector<DescriptorBinding> bindings{};
             for (auto *tile: context.worldGridRepository.getLoadedTiles()) {
                 if (tile != nullptr) {
                     const auto *svo = context.streamingRepository.streamSVO(tile->id);
                     if (svo != nullptr) {
-                        context.coreDescriptorSets.svoData->addBufferDescriptor(
-                            i + 1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                            svo->voxelsBuffer);
+                        auto &b = bindings.emplace_back();
+
+                        b.bindingPoint = i + 1;
+                        b.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+                        b.bufferInstance = svo->voxelsBuffer;
+
                         tileInfoUBO.tileCenterValid[i] = glm::vec4(tile->x, 0,
                                                                    tile->z, 1);
                         tileInfoUBO.voxelBufferOffset[i] = svo->voxelBufferOffset;
@@ -38,7 +43,8 @@ namespace Metal {
             }
 
             if (i > 0) {
-                context.coreDescriptorSets.svoData->write(context.vulkanContext);
+                DescriptorInstance::Write(context.vulkanContext, context.coreDescriptorSets.svoData->vkDescriptorSet,
+                                          bindings);
                 context.coreBuffers.tileInfo->update(tileInfoUBO.tileCenterValid.data());
             }
             context.worldGridRepository.hasMainTileChanged = false;

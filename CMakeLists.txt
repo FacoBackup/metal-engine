@@ -275,6 +275,7 @@ add_executable(
         src/service/lights/LightVolumeService.h
         src/repository/world/components/VolumeComponent.cpp
         src/repository/world/components/VolumeComponent.h
+        src/service/descriptor/DescriptorBinding.h
 )
 
 

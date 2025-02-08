@@ -3,6 +3,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "../../repository/abstract/RuntimeResource.h"
+#include "./DescriptorBinding.h"
 
 namespace Metal {
     struct BufferInstance;
@@ -10,27 +11,15 @@ namespace Metal {
     struct DescriptorInstance final {
         VkDescriptorSetLayout vkDescriptorSetLayout = VK_NULL_HANDLE;
         VkDescriptorSet vkDescriptorSet = VK_NULL_HANDLE;
-        bool ready = false;
+        std::vector<DescriptorBinding> bindings;
 
         void dispose(const VulkanContext &context) const;
 
+        static void Write(const VulkanContext &context, const VkDescriptorSet &vkDescriptorSet, std::vector<DescriptorBinding> &bindings);
+
         void create(const VulkanContext &context);
 
-        void addLayoutBinding(VkShaderStageFlagBits stageFlags,
-                              VkDescriptorType descriptorType,
-                              uint32_t bindingPoint);
-
-        void addBufferDescriptor(uint32_t bindingPoint, VkDescriptorType type,
-                                 const std::shared_ptr<BufferInstance> &bufferInstance);
-
-        void addImageDescriptor(uint32_t bindingPoint, VkDescriptorType type, VkSampler sampler, VkImageView view, VkImageLayout layout = VK_IMAGE_LAYOUT_GENERAL);
-
-        void write(const VulkanContext &context);
-
-        std::vector<VkDescriptorSetLayoutBinding> descriptorSetLayoutBindings;
-        std::vector<VkWriteDescriptorSet> writeDescriptorSets;
-        std::vector<VkDescriptorImageInfo> imageInfos;
-        std::vector<VkDescriptorBufferInfo> bufferInfos;
+        void addLayoutBinding(DescriptorBinding binding);
     };
 } // Metal
 
