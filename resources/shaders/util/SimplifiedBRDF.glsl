@@ -1,3 +1,5 @@
+#include "../util/LightVisibility.glsl"
+
 struct BounceInfo {
     vec3 albedo;
     bool isEmissive;
@@ -11,21 +13,13 @@ void evaluateLightSimplified(in LightVolume l, in BounceInfo bounceInfo, inout v
     float bias = max(.05, 1e-4 * length(bounceInfo.currentPosition.xyz));
     vec3 localHitPosition = bounceInfo.currentPosition.xyz + bounceInfo.hitNormal * bias;
     vec3 lightDir = normalize(l.position - localHitPosition);
-    Ray ray = Ray(localHitPosition, lightDir, 1./lightDir);
-    SurfaceInteraction hitData = traceAllTiles(ray);
-    float lightDistance = length(l.position - localHitPosition);
-    float hitDistance = length(hitData.point - localHitPosition);
-    float shadows = 1;
-    if (hitData.anyHit && hitDistance < lightDistance) {
-        shadows = 0;// clamp(1 / lightDistance, 0, 1)
-    }
-    if (shadows != 0){
-        float NdotL = max(dot(bounceInfo.hitNormal, lightDir), 0.0);
-        vec3 lightColorContribution = l.color.rgb * l.color.a * bounceInfo.albedo / PI;
-        vec3 lightContribution = lightColorContribution * NdotL * shadows / length(l.position - localHitPosition);
-        indirectLight += throughput * lightContribution;
-        throughput *= lightColorContribution;
-    }
+
+    vec3 visibility = visibilityTest(l, bounceInfo.currentPosition.xyz, lightDir);
+    float NdotL = max(dot(bounceInfo.hitNormal, lightDir), 0.0);
+    vec3 lightColorContribution = l.color.rgb * l.color.a * bounceInfo.albedo * visibility / PI;
+    vec3 lightContribution = lightColorContribution * NdotL / length(l.position - localHitPosition);
+    indirectLight += throughput * lightContribution;
+    throughput *= lightColorContribution;
 }
 
 void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo){

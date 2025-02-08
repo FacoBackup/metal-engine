@@ -15,41 +15,55 @@ namespace Metal {
 
     void DescriptorInstance::Write(const VulkanContext &context, const VkDescriptorSet &vkDescriptorSet,
                                    std::vector<DescriptorBinding> &bindings) {
-        std::vector<VkWriteDescriptorSet> writeDescriptorSets{};
+        std::vector<VkWriteDescriptorSet> writeDescriptorSets;
+        // These vectors will hold the Vk*Info objects so their memory remains valid.
+        std::vector<VkDescriptorBufferInfo> bufferInfos;
+        std::vector<VkDescriptorImageInfo> imageInfos;
+
         for (auto &binding: bindings) {
             if (binding.bufferInstance != nullptr) {
                 VkDescriptorBufferInfo bufferInfo{};
                 bufferInfo.buffer = binding.bufferInstance->vkBuffer;
                 bufferInfo.range = binding.bufferInstance->dataSize;
                 bufferInfo.offset = 0;
+                // Store the buffer info in the vector.
+                bufferInfos.push_back(bufferInfo);
 
-                auto &descriptorWrite = writeDescriptorSets.emplace_back();
+                VkWriteDescriptorSet descriptorWrite{};
                 descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
                 descriptorWrite.dstSet = vkDescriptorSet;
                 descriptorWrite.dstBinding = binding.bindingPoint;
                 descriptorWrite.dstArrayElement = 0;
                 descriptorWrite.descriptorType = binding.descriptorType;
                 descriptorWrite.descriptorCount = 1;
-                descriptorWrite.pBufferInfo = &bufferInfo;
+                // Use the address of the element in the vector.
+                descriptorWrite.pBufferInfo = &bufferInfos.back();
+
+                writeDescriptorSets.push_back(descriptorWrite);
             } else if (binding.view != VK_NULL_HANDLE) {
                 VkDescriptorImageInfo imageInfo{};
                 imageInfo.imageView = binding.view;
                 imageInfo.imageLayout = binding.layout;
                 imageInfo.sampler = binding.sampler;
+                // Store the image info in the vector.
+                imageInfos.push_back(imageInfo);
 
-                auto &descriptorWrite = writeDescriptorSets.emplace_back();
+                VkWriteDescriptorSet descriptorWrite{};
                 descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
                 descriptorWrite.dstSet = vkDescriptorSet;
                 descriptorWrite.dstBinding = binding.bindingPoint;
                 descriptorWrite.dstArrayElement = 0;
                 descriptorWrite.descriptorType = binding.descriptorType;
                 descriptorWrite.descriptorCount = 1;
-                descriptorWrite.pImageInfo = &imageInfo;
+                // Use the address of the element in the vector.
+                descriptorWrite.pImageInfo = &imageInfos.back();
+
+                writeDescriptorSets.push_back(descriptorWrite);
             }
         }
 
         vkUpdateDescriptorSets(context.device.device,
-                               writeDescriptorSets.size(),
+                               static_cast<uint32_t>(writeDescriptorSets.size()),
                                writeDescriptorSets.data(),
                                0,
                                nullptr);
@@ -72,9 +86,11 @@ namespace Metal {
         }
 
         VkDescriptorSetLayoutCreateInfo layoutInfo{};
+
         layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         layoutInfo.bindingCount = descriptorSetLayoutBindings.size();
         layoutInfo.pBindings = descriptorSetLayoutBindings.data();
+        layoutInfo.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT_EXT;
 
         VulkanUtils::CheckVKResult(vkCreateDescriptorSetLayout(context.device.device, &layoutInfo,
                                                                nullptr,

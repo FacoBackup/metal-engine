@@ -1,6 +1,7 @@
 #include "../LightVolumeBuffer.glsl"
 #include "../util/RayTracerUtil.glsl"
 #include "../util/RayTracer.glsl"
+#include "../util/LightVisibility.glsl"
 
 // Principled PBR Path tracer. Except where otherwise noted:
 
@@ -182,19 +183,6 @@ vec3 perpendicular(const vec3 v) {
     return normalize(vec3(-v.z, 0.0, v.x));
 }
 
-float visibilityTest(const in LightVolume light, const in SurfaceInteraction interaction, vec3 wi) {
-    float bias = max(.05, 1e-4 * length(interaction.point));
-    vec3 shadowsPosition = interaction.point + bias * wi;// Adds small offset to sample position in order to enable accumulation
-
-    Ray ray = Ray(shadowsPosition, wi, 1./wi);
-    SurfaceInteraction hitData = traceAllTiles(ray);
-    float lightDistance = length(light.position - shadowsPosition);
-    float hitDistance = length(hitData.point - shadowsPosition);
-    if (hitData.anyHit && hitDistance < lightDistance) {
-        return 0;
-    }
-    return 1;
-}
 
 vec3 lightSample(const in LightVolume light, const in SurfaceInteraction interaction, out vec3 wi, out float lightPdf) {
     vec2 u = vec2(random(), random());
@@ -213,7 +201,7 @@ vec3 lightSample(const in LightVolume light, const in SurfaceInteraction interac
                 lightPdf = 1. / (TWO_PI * (1. - cosThetaMax));
             }
 
-            float visibility = visibilityTest(light, interaction, wi);
+            vec3 visibility = visibilityTest(light, interaction.point, wi);
             return light.color.rgb * visibility;
         }
         case ITEM_TYPE_PLANE: {
@@ -230,7 +218,7 @@ vec3 lightSample(const in LightVolume light, const in SurfaceInteraction interac
             lightPdf = distSq / (cosTheta * (light.dataB.x * light.dataB.x));
 
             if (cosTheta > 0.0){
-                float visibility = visibilityTest(light, interaction, wi);
+                vec3 visibility = visibilityTest(light, interaction.point, wi);
                 return light.color.rgb * visibility;
             }
             return vec3(0.0);
@@ -489,7 +477,7 @@ vec3 calculateDirectLight(const in LightVolume light, const in SurfaceInteractio
             lightPdf = light_pdf(light, interaction);
             if (lightPdf < EPSILON) return Ld;
             weight = powerHeuristic(1., scatteringPdf, 1., lightPdf);
-            Li *= visibilityTest(light, interaction, wi);
+            Li *= visibilityTest(light, interaction.point, wi);
             isBlack = dot(Li, Li) == 0.;
             if (!isBlack) {
                 Ld +=  Li * f * weight / scatteringPdf;

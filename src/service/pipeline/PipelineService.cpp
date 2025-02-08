@@ -16,10 +16,9 @@ namespace Metal {
                                                const uint32_t pushConstantsSize, PipelineInstance *pipeline) const {
         VkPipelineLayoutCreateInfo layoutInfo = {};
         layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        std::vector<VkDescriptorSetLayout> descriptorLayouts;
-        descriptorLayouts.resize(descriptorSetsToBind.size());
+        std::vector<VkDescriptorSetLayout> descriptorLayouts{};
         for (int i = 0; i < descriptorSetsToBind.size(); i++) {
-            descriptorLayouts[i] = descriptorSetsToBind[i]->vkDescriptorSetLayout;
+            descriptorLayouts.push_back(descriptorSetsToBind[i]->vkDescriptorSetLayout);
         }
         layoutInfo.pSetLayouts = descriptorLayouts.data();
         layoutInfo.setLayoutCount = descriptorLayouts.size();
