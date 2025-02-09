@@ -3,7 +3,7 @@
 #include "./CommandBufferRecorder.h"
 #include "../compute-pass/impl/AccumulationPass.h"
 #include "../compute-pass/impl/PathTracerPass.h"
-#include "../compute-pass/impl/DenoiserPass.h"
+#include "../compute-pass/impl/AccumulationMetadataPass.h"
 #include "../render-pass/impl/GBufferGenPass.h"
 #include "../render-pass/impl/PostProcessingPass.h"
 #include "../render-pass/impl/tools/GridPass.h"
@@ -23,7 +23,7 @@ namespace Metal {
 
         addPass(computePasses, new PathTracerPass(context));
         addPass(computePasses, new AccumulationPass(context));
-        addPass(computePasses, new DenoiserPass(context));
+        addPass(computePasses, new AccumulationMetadataPass(context));
 
         addPass(postProcessingPasses, new PostProcessingPass(context));
         if (context.isDebugMode()) {

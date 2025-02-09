@@ -4,11 +4,12 @@ vec2 texCoords;
 layout(set = 2, binding = 0) uniform sampler2D gBufferAlbedo;
 layout(set = 3, binding = 0) uniform sampler2D gBufferNormal;
 layout(set = 4, binding = 0) uniform sampler2D gBufferPosition;
-#define LIGHTS_SET 5
+#define LIGHT_VOLUME_SET 5
 layout(set = 6, binding = 0, rgba32f) uniform image2D outputImage;
 layout(set = 7, binding = 0, rgba32f) uniform image2D giSurfaceCacheCompute;
 
 #include "./util/PixelShading.glsl"
+#include "./util/VolumeRayTracer.glsl"
 #include "./GBufferUtil.glsl"
 
 #ifdef DEBUG
@@ -18,16 +19,15 @@ layout(set = 7, binding = 0, rgba32f) uniform image2D giSurfaceCacheCompute;
 void main() {
     texCoords = vec2(gl_GlobalInvocationID.xy) / imageSize(outputImage);
     vec4 worldPos = texture(gBufferPosition, texCoords);// Position + ID
+    vec3 finalColor = vec3(0);
+    float finalData = 1;
+    vec3 rayDirection = createRay(texCoords, globalData.invProj, globalData.invView);
+
     if (worldPos.a == 0.){
         if (globalData.isAtmosphereEnabled){
-            vec3 dir = createRay(texCoords, globalData.invProj, globalData.invView);
-            imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(calculate_sky_luminance_rgb(normalize(globalData.sunPosition), dir, 2.0f) * 0.05f, 1));
-        } else {
-            return;
+            finalColor = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), rayDirection, 2.0f) * 0.05f;
         }
     } else {
-        vec3 finalColor = vec3(0);
-
         MaterialInfo material;
         SurfaceInteraction interaction;
         vec4 materialA = texture(gBufferAlbedo, texCoords);// Albedo + (isEmissive ? -1 : 1) * AO
@@ -80,16 +80,24 @@ void main() {
             state = uint(uint(gl_GlobalInvocationID.x) * uint(1973) + uint(gl_GlobalInvocationID.y) * uint(9277) + uint(globalData.globalFrameCount) * uint(26699)) | uint(1);
             texCoords = (vec2(gl_GlobalInvocationID.xy) + vec2(random(), random())) / imageSize(outputImage);
 
-            finalColor = calculatePixelColor(texCoords, material, interaction);
+            finalColor = calculatePixelColor(rayDirection, texCoords, material, interaction);
         }
 
         if (globalData.enabledDenoiser){
-            imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(finalColor, worldPos.a)); // Stores primitive ID in the A channel when denoiser is enabled
+            finalData = worldPos.a;
         } else {
             vec4 previousFrame = imageLoad(outputImage, ivec2(gl_GlobalInvocationID.xy));
             float accumulationCount = min(globalData.giMaxAccumulation, previousFrame.a);
-            vec3 accumulatedResult = previousFrame.rgb * (1. - 1./accumulationCount) + finalColor * 1./accumulationCount;
-            imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(accumulatedResult, accumulationCount + 1));
+            finalColor = previousFrame.rgb * (1. - 1./accumulationCount) + finalColor * 1./accumulationCount;
+            finalData = accumulationCount + 1;
         }
     }
+
+    vec4 volumetricColor = vec4(0.0);
+    traceVolumes(volumetricColor, worldPos.rgb, rayDirection);
+    if(volumetricColor.a > 0.001){
+        finalColor = volumetricColor.rgb * volumetricColor.a + finalColor * (1.0 - volumetricColor.a);
+    }
+
+    imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(finalColor, finalData));
 }

@@ -29,7 +29,7 @@ namespace Metal {
         void generateMipmaps(const TextureInstance *image) const;
 
     public:
-        TextureData *stream(const std::string &id, const LevelOfDetail &lod) const;
+        [[nodiscard]] TextureData *stream(const std::string &id, const LevelOfDetail &lod) const;
 
         explicit TextureService(ApplicationContext &context)
             : AbstractResourceService(context) {

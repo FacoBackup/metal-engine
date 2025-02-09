@@ -1,6 +1,7 @@
-#include "../LightsBuffer.glsl"
+#include "../LightVolumeBuffer.glsl"
 #include "../util/RayTracerUtil.glsl"
 #include "../util/RayTracer.glsl"
+#include "../util/LightVisibility.glsl"
 
 // Principled PBR Path tracer. Except where otherwise noted:
 
@@ -182,30 +183,17 @@ vec3 perpendicular(const vec3 v) {
     return normalize(vec3(-v.z, 0.0, v.x));
 }
 
-float visibilityTest(const in Light light, const in SurfaceInteraction interaction, vec3 wi) {
-    float bias = max(.05, 1e-4 * length(interaction.point));
-    vec3 shadowsPosition = interaction.point + bias * wi;// Adds small offset to sample position in order to enable accumulation
 
-    Ray ray = Ray(shadowsPosition, wi, 1./wi);
-    SurfaceInteraction hitData = traceAllTiles(ray);
-    float lightDistance = length(light.position - shadowsPosition);
-    float hitDistance = length(hitData.point - shadowsPosition);
-    if (hitData.anyHit && hitDistance < lightDistance) {
-        return 0;
-    }
-    return 1;
-}
-
-vec3 lightSample(const in Light light, const in SurfaceInteraction interaction, out vec3 wi, out float lightPdf) {
+vec3 lightSample(const in LightVolume light, const in SurfaceInteraction interaction, out vec3 wi, out float lightPdf) {
     vec2 u = vec2(random(), random());
     vec3 tangent = vec3(0.), binormal = vec3(0.);
 
-    switch (light.lightType){
-        case LIGHT_TYPE_SPHERE:{
+    switch (light.itemType){
+        case ITEM_TYPE_SPHERE:{
             vec3 lightDir = normalize(light.position - interaction.point);
             createBasis(lightDir, tangent, binormal);
 
-            float sinThetaMax2 = pow2(light.radiusSize) / distanceSq(light.position, interaction.point);
+            float sinThetaMax2 = pow2(light.dataB.x) / distanceSq(light.position, interaction.point);
             float cosThetaMax = sqrt(max(EPSILON, 1. - sinThetaMax2));
             wi = uniformSampleCone(u, cosThetaMax, tangent, binormal, lightDir);
 
@@ -213,25 +201,35 @@ vec3 lightSample(const in Light light, const in SurfaceInteraction interaction, 
                 lightPdf = 1. / (TWO_PI * (1. - cosThetaMax));
             }
 
-            float visibility = visibilityTest(light, interaction, wi);
-            return light.color * visibility;
+            vec3 visibility = visibilityTest(light, interaction.point, wi);
+            return light.color.rgb * visibility;
         }
-        case LIGHT_TYPE_PLANE: {
-            vec3 tangent1 = normalize(perpendicular(light.minNormal));
-            vec3 tangent2 = cross(light.minNormal, tangent1);
+        case ITEM_TYPE_PLANE: {
+            vec3 lightSize = light.dataB.xyz; // Now a vec3 representing X, Y, and Z size
+            // Compute basis vectors for the light plane (same as used in SDF)
+            vec3 reference = abs(light.dataA.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
+            vec3 tangent1 = normalize(cross(light.dataA, reference));
+            vec3 tangent2 = cross(light.dataA, tangent1);
+
+            // Compute half-extents
+            vec3 halfRight = tangent1 * (lightSize.z * 0.5);
+            vec3 halfUp = tangent2 * (lightSize.x * 0.5);
+
+            // Instead of adding scaled vectors directly, sample from the correctly defined quad
             vec3 lightSamplePoint = light.position
-            + u.x * light.radiusSize * tangent1
-            + u.y * light.radiusSize * tangent2;
+            + (u.x - 0.5) * 2.0 * halfRight  // Shift sample range from [-0.5, 0.5] to full extent
+            + (u.y - 0.5) * 2.0 * halfUp;
 
             wi = normalize(lightSamplePoint - interaction.point);
 
             float distSq = distanceSq(lightSamplePoint, interaction.point);
-            float cosTheta = max(0.0, dot(-wi, light.minNormal));
-            lightPdf = distSq / (cosTheta * (light.radiusSize * light.radiusSize));
+            float cosTheta = max(0.0, dot(-wi, light.dataA));
+            float lightArea = lightSize.x * lightSize.z;
+            lightPdf = distSq / (cosTheta * lightArea);
 
-            if (cosTheta > 0.0){
-                float visibility = visibilityTest(light, interaction, wi);
-                return light.color * visibility;
+            if (cosTheta > 0.0) {
+                vec3 visibility = visibilityTest(light, interaction.point, wi);
+                return light.color.rgb * visibility;
             }
             return vec3(0.0);
         }
@@ -407,8 +405,8 @@ float bsdfPdf(const in vec3 wi, const in vec3 wo, const in vec3 X, const in vec3
     return (pdfDiffuse + pdfMicrofacet + pdfClearCoat)/3.;
 }
 
-float light_pdf(const in Light light, const in SurfaceInteraction interaction) {
-    float sinThetaMax2 =  pow2(light.radiusSize) / distanceSq(light.position, interaction.point);
+float light_pdf(const in LightVolume light, const in SurfaceInteraction interaction) {
+    float sinThetaMax2 =  pow2(light.dataB.x) / distanceSq(light.position, interaction.point);
     float cosThetaMax = sqrt(max(EPSILON, 1. - sinThetaMax2));
     return 1. / (TWO_PI * (1. - cosThetaMax));
 }
@@ -442,12 +440,12 @@ float powerHeuristic(float nf, float fPdf, float ng, float gPdf){
     return (f*f)/(f*f + g*g);
 }
 
-vec3 sampleLightType(const in Light light, const in SurfaceInteraction interaction, out vec3 wi, out float lightPdf) {
+vec3 sampleLightType(const in LightVolume light, const in SurfaceInteraction interaction, out vec3 wi, out float lightPdf) {
     return lightSample(light, interaction, wi, lightPdf);
 }
 
-vec3 calculateDirectLight(const in Light light, const in SurfaceInteraction interaction, const in MaterialInfo material, out vec3 wi, out vec3 f, out float scatteringPdf) {
-    // Light MIS
+vec3 calculateDirectLight(const in LightVolume light, const in SurfaceInteraction interaction, const in MaterialInfo material, out vec3 wi, out vec3 f, out float scatteringPdf) {
+    // LightVolume MIS
     vec3 wo = -interaction.incomingRayDir;
     vec3 Ld = vec3(0.);
     float lightPdf = 0.;
@@ -481,7 +479,7 @@ vec3 calculateDirectLight(const in Light light, const in SurfaceInteraction inte
     if (globalData.multipleImportanceSampling){
 
         isBlack = dot(f, f) == 0.;
-        Li = light.color;
+        Li = light.color.rgb;
 
         if (!isBlack && scatteringPdf > EPSILON) {
             float weight = 1.;
@@ -489,7 +487,7 @@ vec3 calculateDirectLight(const in Light light, const in SurfaceInteraction inte
             lightPdf = light_pdf(light, interaction);
             if (lightPdf < EPSILON) return Ld;
             weight = powerHeuristic(1., scatteringPdf, 1., lightPdf);
-            Li *= visibilityTest(light, interaction, wi);
+            Li *= visibilityTest(light, interaction.point, wi);
             isBlack = dot(Li, Li) == 0.;
             if (!isBlack) {
                 Ld +=  Li * f * weight / scatteringPdf;

@@ -112,7 +112,7 @@ add_executable(
         src/service/descriptor/DescriptorService.h
         src/service/descriptor/DescriptorInstance.cpp
         src/service/descriptor/DescriptorInstance.h
-        src/dto/ubo/GlobalDataUBO.h
+        src/dto/buffers/GlobalDataUBO.h
         src/repository/runtime/RuntimeRepository.h
         src/repository/descriptors/CoreDescriptorSets.cpp
         src/repository/descriptors/CoreDescriptorSets.h
@@ -241,8 +241,8 @@ add_executable(
         src/dto/push-constant/VoxelDebugSettingsPushConstant.h
         src/service/world/WorldGridService.cpp
         src/service/world/WorldGridService.h
-        src/dto/ubo/TileInfoUBO.h
-        src/dto/ubo/LightData.h
+        src/dto/buffers/TileInfoUBO.h
+        src/dto/buffers/LightVolumeData.h
         src/repository/world/components/LightComponent.cpp
         src/repository/world/components/LightComponent.h
         src/context/engine/render-pass/impl/tools/IconsPass.cpp
@@ -266,11 +266,16 @@ add_executable(
         src/context/editor/dock-spaces/inspector/MaterialInspection.cpp
         src/context/editor/dock-spaces/inspector/MaterialInspection.h
         src/service/voxel/VoxelizationRequest.h
-        src/enum/LightType.h
-        src/context/engine/compute-pass/impl/DenoiserPass.cpp
-        src/context/engine/compute-pass/impl/DenoiserPass.h
+        src/enum/LightVolumeType.h
+        src/context/engine/compute-pass/impl/AccumulationMetadataPass.cpp
+        src/context/engine/compute-pass/impl/AccumulationMetadataPass.h
         src/context/engine/compute-pass/impl/AccumulationPass.cpp
         src/context/engine/compute-pass/impl/AccumulationPass.h
+        src/service/lights/LightVolumeService.cpp
+        src/service/lights/LightVolumeService.h
+        src/repository/world/components/VolumeComponent.cpp
+        src/repository/world/components/VolumeComponent.h
+        src/service/descriptor/DescriptorBinding.h
 )
 
 

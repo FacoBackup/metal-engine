@@ -4,13 +4,12 @@
 #include "../Atmosphere.glsl"
 #include "../util/SimplifiedBRDF.glsl"
 
-vec3 calculatePixelColor(in vec2 texCoords, MaterialInfo material, SurfaceInteraction interaction) {
+vec3 calculatePixelColor( vec3 rayDirection, in vec2 texCoords, MaterialInfo material, SurfaceInteraction interaction) {
     vec3 L = vec3(0.);
     vec3 beta = vec3(1.);
 
     vec3 wi;
-    vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
-    interaction.incomingRayDir = rayDir;
+    interaction.incomingRayDir = rayDirection;
 
     material.subsurface = 0.;
     material.specular = 0.;
@@ -35,10 +34,10 @@ vec3 calculatePixelColor(in vec2 texCoords, MaterialInfo material, SurfaceIntera
         vec3 f = vec3(0.);
         float scatteringPdf = 0.;
         vec3 Ld = vec3(0);
-        for (uint i = 0; i < globalData.lightCount; i++){
-            Light l = lightsBuffer.lights[i];
-            l.color *= 20.;
-            Ld += beta * calculateDirectLight(l, interaction, material, wi, f, scatteringPdf);
+        for (uint i = 0; i < globalData.volumesOffset; i++){
+            LightVolume l = lightVolumeBuffer.items[i];
+            l.color.rgb *= 20.;
+            Ld += beta * calculateDirectLight(l, interaction, material, wi, f, scatteringPdf) * l.color.a;
         }
 
         L += Ld;
@@ -50,7 +49,7 @@ vec3 calculatePixelColor(in vec2 texCoords, MaterialInfo material, SurfaceIntera
         if (globalData.giBounces > 0 && globalData.giStrength > 0){
             float bias = max(.05, 1e-4 * length(interaction.point));
             vec3 point =  interaction.point + bias * interaction.normal;
-            L += (material.baseColor / PI) * calculateIndirectLighting(material.roughness, interaction.normal, point, rayDir) * globalData.giStrength;
+            L += (material.baseColor / PI) * calculateIndirectLighting(material.roughness, interaction.normal, point, rayDirection) * globalData.giStrength;
         }
     }
 

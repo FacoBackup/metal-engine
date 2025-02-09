@@ -107,11 +107,13 @@ namespace Metal {
     const char *HierarchyPanel::GetIcon(const Metal::Entity *node) {
         for (const auto comp: node->components) {
             if (comp == ComponentTypes::MESH) {
-                return Icons::view_in_ar.c_str();
+                return ComponentTypes::IconOf(ComponentTypes::MESH);
             }
-
             if (comp == ComponentTypes::LIGHT) {
-                return Icons::lightbulb.c_str();
+                return ComponentTypes::IconOf(ComponentTypes::LIGHT);
+            }
+            if (comp == ComponentTypes::VOLUME) {
+                return ComponentTypes::IconOf(ComponentTypes::VOLUME);
             }
         }
         return Icons::inventory_2.c_str();

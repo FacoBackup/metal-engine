@@ -8,9 +8,10 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     vec3 sunColor;
     vec3 sunPosition;
     float giStrength;
-    uint lightCount;
+    uint lightVolumeCount;
+    uint volumesOffset;
+    uint volumeShadowSteps;
     bool isAtmosphereEnabled;
-
 
 // GI
     bool enabledDenoiser;
@@ -68,4 +69,20 @@ vec3 worldToCacheSpace(in vec3 worldSpacePos){
 vec2 worldToSurfaceCacheHash(in vec3 worldSpacePos){
     vec3 cacheSpace = worldToCacheSpace(worldSpacePos);
     return genHashSurfaceCache(cacheSpace);
+}
+
+bool intersectBox(vec3 ro, vec3 rd, vec3 dimensions, out float tEntry, out float tExit) {
+    vec3 boxMin = -dimensions * 0.5;
+    vec3 boxMax =  dimensions * 0.5;
+    vec3 invRd = 1.0 / rd;
+
+    vec3 t0s = (boxMin - ro) * invRd;
+    vec3 t1s = (boxMax - ro) * invRd;
+    vec3 tsmaller = min(t0s, t1s);
+    vec3 tbigger  = max(t0s, t1s);
+
+    tEntry = max(max(tsmaller.x, tsmaller.y), tsmaller.z);
+    tExit  = min(min(tbigger.x, tbigger.y), tbigger.z);
+
+    return (tExit >= max(tEntry, 0.0));
 }

@@ -24,7 +24,6 @@ namespace Metal {
         ImVec4 accent{};
         ImU32 accentU32 = 0;
 
-        glm::vec3 iconColor{1.f};
         glm::vec3 accentColor{0.26f, 0.59f, 0.98f};
         std::string projectName = "New project";
         bool showIcons = true;
@@ -63,7 +62,6 @@ namespace Metal {
         const char *getIcon() override;
 
         SAVE_TEMPLATE(
-            iconColor.x, iconColor.y, iconColor.z,
             accentColor.x, accentColor.y, accentColor.z,
             projectName, showIcons,
             isDarkMode,

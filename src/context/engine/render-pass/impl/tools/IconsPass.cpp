@@ -10,19 +10,16 @@ namespace Metal {
                     "QUAD.vert",
                     "tools/Icon.frag"
                 )
-                .setPushConstantsSize(sizeof(IconPushConstant))
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.lightsData.get());
+                .addDescriptorSet(context.coreDescriptorSets.lightVolumeData.get());
         pipelineInstance = context.pipelineService.createPipeline(iconPipelineBuilder);
     }
 
     bool IconsPass::shouldRun() {
-        return context.isDebugMode() && context.editorRepository.showGrid;
+        return context.isDebugMode() && context.editorRepository.showIcons;
     }
 
     void IconsPass::onSync() {
-        pushConstant.iconColor = context.editorRepository.iconColor;
-        recordPushConstant(&pushConstant);
         recordDrawSimpleInstanced(3, 1);
     }
 } // Metal

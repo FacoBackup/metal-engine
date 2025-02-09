@@ -17,15 +17,13 @@ namespace Metal {
     }
 
     void TransformComponent::onUpdate(InspectableMember *member, ApplicationContext &context) {
-        bool isMesh = context.worldRepository.meshes.contains(entityId);
+        bool isVolume = context.worldRepository.volumes.contains(entityId);
         bool isLight = context.worldRepository.lights.contains(entityId);
-        if (isLight || isMesh) {
-            if (isMesh && context.worldRepository.meshes.at(entityId).emissiveSurface || isLight) {
-                context.engineContext.setLightingDataUpdated(true);
-            }
+        if (isLight || isVolume) {
+            context.engineContext.setLightVolumeDataNeedsUpdate(true);
         }
         if (member != nullptr && member->name == ROTATION) {
-            rotation = glm::quat(rotationEuler * (glm::pi<float>() / 180.f));
+            rotation = normalize(glm::quat(rotationEuler * (glm::pi<float>() / 180.f)));
         }
         forceTransform = true;
     }

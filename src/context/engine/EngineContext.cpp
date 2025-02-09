@@ -2,9 +2,10 @@
 
 #include "../../context/ApplicationContext.h"
 #include "../../service/buffer/BufferInstance.h"
+#include "../../service/descriptor/DescriptorBinding.h"
 #include "../../service/voxel/SVOInstance.h"
 #include "../../enum/LevelOfDetail.h"
-#include "../../enum/LightType.h"
+#include "../../enum/LightVolumeType.h"
 #include "../../service/camera/Camera.h"
 #include "../../service/framebuffer/FrameBufferInstance.h"
 #include "../../service/texture/TextureInstance.h"
@@ -18,13 +19,17 @@ namespace Metal {
     void EngineContext::updateVoxelData() {
         if (context.worldGridRepository.hasMainTileChanged) {
             unsigned int i = 0;
+            std::vector<DescriptorBinding> bindings{};
             for (auto *tile: context.worldGridRepository.getLoadedTiles()) {
                 if (tile != nullptr) {
                     const auto *svo = context.streamingRepository.streamSVO(tile->id);
                     if (svo != nullptr) {
-                        context.coreDescriptorSets.svoData->addBufferDescriptor(
-                            i + 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                            svo->voxelsBuffer);
+                        auto &b = bindings.emplace_back();
+
+                        b.bindingPoint = i + 1;
+                        b.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+                        b.bufferInstance = svo->voxelsBuffer;
+
                         tileInfoUBO.tileCenterValid[i] = glm::vec4(tile->x, 0,
                                                                    tile->z, 1);
                         tileInfoUBO.voxelBufferOffset[i] = svo->voxelBufferOffset;
@@ -38,7 +43,8 @@ namespace Metal {
             }
 
             if (i > 0) {
-                context.coreDescriptorSets.svoData->write(context.vulkanContext);
+                DescriptorInstance::Write(context.vulkanContext, context.coreDescriptorSets.svoData->vkDescriptorSet,
+                                          bindings);
                 context.coreBuffers.tileInfo->update(tileInfoUBO.tileCenterValid.data());
             }
             context.worldGridRepository.hasMainTileChanged = false;
@@ -72,69 +78,17 @@ namespace Metal {
         context.cameraService.onSync();
         context.voxelizationService.onSync();
 
-        updateGlobalData();
         updateVoxelData();
-        updateLights();
+        if (lightVolumeDataNeedsUpdate) {
+            context.lightVolumesService.update();
+        }
+        updateGlobalData();
 
         context.passesService.onSync();
 
-        setLightingDataUpdated(false);
+        setLightVolumeDataNeedsUpdate(false);
         setCameraUpdated(false);
         setGISettingsUpdated(false);
-    }
-
-    void EngineContext::registerExplicitLightSources(int &index) {
-        // Register lights
-        for (auto &entry: context.worldRepository.lights) {
-            if (context.worldRepository.hiddenEntities.contains(entry.first)) {
-                continue;
-            }
-            auto &t = context.worldRepository.transforms.at(entry.first);
-            auto &translation = t.translation;
-            auto &l = entry.second;
-
-            glm::vec3 normal(0.0f, 1.0f, 0.0f);
-            glm::vec3 rotatedNormal = t.rotation * normal;
-
-            lights[index] = LightData(
-                l.color * l.intensity,
-                translation,
-                glm::normalize(rotatedNormal),
-                glm::vec3(0),
-                l.lightType,
-                l.radiusSize
-            );
-            index++;
-        }
-    }
-
-    void EngineContext::registerSun(int &index) {
-        if (context.engineRepository.atmosphereEnabled) {
-            lights[index] = LightData(
-                globalDataUBO.sunColor,
-                globalDataUBO.sunPosition,
-                glm::vec3(0),
-                glm::vec3(0),
-                LightTypes::SPHERE,
-                context.engineRepository.sunRadius
-            );
-            index++;
-        }
-    }
-
-    void EngineContext::updateLights() {
-        if (lightingDataUpdated) {
-            int index = 0;
-
-            lights.clear();
-            lights.reserve(1);
-            registerSun(index);
-
-            registerExplicitLightSources(index);
-
-            context.coreBuffers.lights->update(lights.data());
-            lightsCount = index;
-        }
     }
 
     void EngineContext::updateGlobalData() {
@@ -146,7 +100,9 @@ namespace Metal {
         globalDataUBO.invView = camera.invViewMatrix;
         globalDataUBO.cameraWorldPosition = camera.position;
         globalDataUBO.giStrength = context.engineRepository.giStrength;
-        globalDataUBO.lightCount = lightsCount;
+        globalDataUBO.lightVolumeCount = context.lightVolumesService.getLightVolumeCount();
+        globalDataUBO.volumesOffset = context.lightVolumesService.getVolumesOffset();
+        globalDataUBO.volumeShadowSteps = context.engineRepository.volumeShadowSteps;
         globalDataUBO.isAtmosphereEnabled = context.engineRepository.atmosphereEnabled;
 
         globalDataUBO.enabledDenoiser = context.engineRepository.enabledDenoiser;
@@ -166,41 +122,11 @@ namespace Metal {
         if (context.engineRepository.incrementTime) {
             context.engineRepository.elapsedTime += .0005f * context.engineRepository.elapsedTimeSpeed;
             setGISettingsUpdated(true);
-            lightingDataUpdated = true;
+            lightVolumeDataNeedsUpdate = true;
         }
-        globalDataUBO.sunPosition = glm::vec3(0,
-                                              std::cos(context.engineRepository.elapsedTime),
-                                              std::sin(context.engineRepository.elapsedTime)) * context.engineRepository
-                                    .sunDistance;
-        globalDataUBO.sunColor = CalculateSunColor(
-                                     globalDataUBO.sunPosition.y / context.engineRepository.sunDistance,
-                                     context.engineRepository.nightColor, context.engineRepository.dawnColor,
-                                     context.engineRepository.middayColor) * context.engineRepository.sunLightIntensity;
+        context.lightVolumesService.computeSunInfo();
+        globalDataUBO.sunPosition = context.lightVolumesService.getSunPosition();
+        globalDataUBO.sunColor = context.lightVolumesService.getSunColor();
         context.coreBuffers.globalData->update(&globalDataUBO);
-    }
-
-
-    glm::vec3 EngineContext::CalculateSunColor(const float elevation, glm::vec3 &nightColor, glm::vec3 &dawnColor,
-                                               glm::vec3 &middayColor) {
-        if (elevation <= -0.1f) {
-            return nightColor;
-        }
-        if (elevation <= 0.0f) {
-            float t = (elevation + 0.1f) / 0.1f;
-            return BlendColors(nightColor, dawnColor, t);
-        }
-        if (elevation <= 0.5f) {
-            float t = elevation / 0.5f;
-            return BlendColors(dawnColor, middayColor, t);
-        }
-        return middayColor;
-    }
-
-    glm::vec3 EngineContext::BlendColors(glm::vec3 &c1, glm::vec3 &c2, float t) {
-        return {
-            (c1.x * (1 - t) + c2.x * t),
-            (c1.y * (1 - t) + c2.y * t),
-            (c1.z * (1 - t) + c2.z * t)
-        };
     }
 }

@@ -9,6 +9,7 @@
 namespace Metal {
     struct TextureInstance;
     struct FrameBufferAttachment;
+
     struct CoreDescriptorSets final : AbstractCoreRepository {
         explicit CoreDescriptorSets(ApplicationContext &context)
             : AbstractCoreRepository(context) {
@@ -30,7 +31,15 @@ namespace Metal {
         std::unique_ptr<DescriptorInstance> previousFrameMetadataDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> currentFrameDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> svoData = nullptr;
-        std::unique_ptr<DescriptorInstance> lightsData = nullptr;
+        std::unique_ptr<DescriptorInstance> lightVolumeData = nullptr;
+
+        void createMaterialDescriptors();
+
+        void createBuffersDescriptors();
+
+        void createGBufferDescriptors();
+
+        void createPathTracingDescriptors();
 
         void onInitialize() override;
     };

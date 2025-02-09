@@ -38,7 +38,7 @@ namespace Metal {
         auto &comp = world.getEntity(editorRepository.mainSelection)->components;
         for (auto a: comp) {
             if (a == ComponentTypes::TRANSFORM) {
-                editorRepository.primitiveSelected = static_cast<TransformComponent *>(context.worldRepository.getComponent(ComponentTypes::TRANSFORM, editorRepository.mainSelection));
+                editorRepository.primitiveSelected = dynamic_cast<TransformComponent *>(context.worldRepository.getComponent(ComponentTypes::TRANSFORM, editorRepository.mainSelection));
                 break;
             }
         }

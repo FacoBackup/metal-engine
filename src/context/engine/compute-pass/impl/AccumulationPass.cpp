@@ -18,7 +18,6 @@ namespace Metal {
         if (initialized) {
             recordPushConstant(&pushConstant);
             recordImageDispatch(context.coreTextures.currentFrame, 8, 8);
-            endWriting(context.coreTextures.currentFrame->vkImage);
         }
         initialized = true;
         pushConstant.previousFrameProjView = context.engineContext.getGlobalDataUBO().projView;

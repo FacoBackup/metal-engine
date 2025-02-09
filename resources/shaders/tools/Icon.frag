@@ -1,15 +1,11 @@
 #include "../GlobalDataBuffer.glsl"
 #include "../CreateRay.glsl"
 
-#define LIGHTS_SET 1
-#include "../LightsBuffer.glsl"
+#define LIGHT_VOLUME_SET 1
+#include "../LightVolumeBuffer.glsl"
 
 layout (location = 0) in vec2 texCoords;
 layout (location = 0) out vec4 finalColor;
-
-layout(push_constant) uniform Push {
-    vec3 iconColor;
-} push;
 
 float sdSphere(vec3 p, float s, in vec3 translation){
     return length(p - translation)-s;
@@ -40,30 +36,30 @@ float udQuad(vec3 p, vec3 a, vec3 b, vec3 c, vec3 d)
     dot(nor, pa)*dot(nor, pa)/dot2(nor));
 }
 
-bool rayMarch(vec3 ro, vec3 rd, in Light l) {
+bool rayMarch(vec3 ro, vec3 rd, in LightVolume l) {
     float t = 0.0;
     for (int i = 0; i < 256; i++) {
         vec3 p = ro + t * rd;
         float d;
 
-        switch (l.lightType){
-            case LIGHT_TYPE_SPHERE:{
-                d = sdSphere(p, l.radiusSize, l.position);
+        switch (l.itemType){
+            case ITEM_TYPE_SPHERE:{
+                d = sdSphere(p, l.dataB.x, l.position);
                 break;
             }
-            case LIGHT_TYPE_PLANE:{
-                vec3 reference = abs(l.minNormal.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
-                vec3 right = normalize(cross(l.minNormal, reference));
-                vec3 up = normalize(cross(right, l.minNormal));
+            case ITEM_TYPE_PLANE:{
+                vec3 reference = abs(l.dataA.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
+                vec3 right = normalize(cross(l.dataA, reference));
+                vec3 up = normalize(cross(right, l.dataA));
 
-                vec3 halfRight = right * (l.radiusSize * 0.5);
-                vec3 halfUp = up * (l.radiusSize * 0.5);
+                // Use correct plane dimensions
+                vec3 halfRight = right * (l.dataB.z * 0.5);
+                vec3 halfUp = up * (l.dataB.x * 0.5);
 
                 vec3 a = l.position - halfRight - halfUp;
                 vec3 b = l.position + halfRight - halfUp;
                 vec3 c = l.position + halfRight + halfUp;
                 vec3 dl = l.position - halfRight + halfUp;
-
                 d = udQuad(p, a, b, c, dl);
                 break;
             }
@@ -79,14 +75,14 @@ bool rayMarch(vec3 ro, vec3 rd, in Light l) {
 }
 
 void main(){
-    if (globalData.lightCount == 0){
+    if (globalData.lightVolumeCount == 0){
         discard;
     }
     vec3 dir = createRay(texCoords, globalData.invProj, globalData.invView);
-    for (uint i = 0; i < globalData.lightCount; i++){
-        Light l = lightsBuffer.lights[i];
+    for (uint i = 0; i < globalData.volumesOffset; i++){
+        LightVolume l = lightVolumeBuffer.items[i];
         if (rayMarch(globalData.cameraWorldPosition.xyz, dir, l)){
-            finalColor = vec4(l.color, 1);
+            finalColor = vec4(l.color.rgb * l.color.a, 1);
             return;
         }
     }

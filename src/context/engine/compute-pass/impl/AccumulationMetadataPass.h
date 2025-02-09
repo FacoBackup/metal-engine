@@ -4,10 +4,10 @@
 #include "../../../../dto/push-constant/DenoiserPushConstant.h"
 
 namespace Metal {
-    class DenoiserPass final : public AbstractComputePass {
+    class AccumulationMetadataPass final : public AbstractComputePass {
         DenoiserPushConstant pushConstant{};
     public:
-        explicit DenoiserPass(ApplicationContext &context)
+        explicit AccumulationMetadataPass(ApplicationContext &context)
             : AbstractComputePass(context) {
         }
 
