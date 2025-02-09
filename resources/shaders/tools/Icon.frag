@@ -52,14 +52,14 @@ bool rayMarch(vec3 ro, vec3 rd, in LightVolume l) {
                 vec3 right = normalize(cross(l.dataA, reference));
                 vec3 up = normalize(cross(right, l.dataA));
 
-                vec3 halfRight = right * (l.dataB.x * 0.5);
+                // Use correct plane dimensions
+                vec3 halfRight = right * (l.dataB.z * 0.5);
                 vec3 halfUp = up * (l.dataB.x * 0.5);
 
                 vec3 a = l.position - halfRight - halfUp;
                 vec3 b = l.position + halfRight - halfUp;
                 vec3 c = l.position + halfRight + halfUp;
                 vec3 dl = l.position - halfRight + halfUp;
-
                 d = udQuad(p, a, b, c, dl);
                 break;
             }

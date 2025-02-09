@@ -79,7 +79,7 @@ vec4 integrateVolume(vec3 ro, vec3 rd, in LightVolume volume, float sceneDepth) 
                 vec3 tangent, bitangent;
                 computeOrthonormalBasis(normal, tangent, bitangent);
                 vec2 diskSample = sampleDisk();
-                samplePos = light.position + (tangent * diskSample.x + bitangent * diskSample.y) * light.dataB.x;
+                samplePos = light.position + (tangent * diskSample.x + bitangent * diskSample.y) * light.dataB.x * light.dataB.z;
             }
 
             vec3 L = normalize(samplePos - pos);

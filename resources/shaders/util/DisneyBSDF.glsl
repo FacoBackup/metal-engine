@@ -205,19 +205,29 @@ vec3 lightSample(const in LightVolume light, const in SurfaceInteraction interac
             return light.color.rgb * visibility;
         }
         case ITEM_TYPE_PLANE: {
-            vec3 tangent1 = normalize(perpendicular(light.dataA));
+            vec3 lightSize = light.dataB.xyz; // Now a vec3 representing X, Y, and Z size
+            // Compute basis vectors for the light plane (same as used in SDF)
+            vec3 reference = abs(light.dataA.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
+            vec3 tangent1 = normalize(cross(light.dataA, reference));
             vec3 tangent2 = cross(light.dataA, tangent1);
+
+            // Compute half-extents
+            vec3 halfRight = tangent1 * (lightSize.z * 0.5);
+            vec3 halfUp = tangent2 * (lightSize.x * 0.5);
+
+            // Instead of adding scaled vectors directly, sample from the correctly defined quad
             vec3 lightSamplePoint = light.position
-            + u.x * light.dataB.x * tangent1
-            + u.y * light.dataB.x * tangent2;
+            + (u.x - 0.5) * 2.0 * halfRight  // Shift sample range from [-0.5, 0.5] to full extent
+            + (u.y - 0.5) * 2.0 * halfUp;
 
             wi = normalize(lightSamplePoint - interaction.point);
 
             float distSq = distanceSq(lightSamplePoint, interaction.point);
             float cosTheta = max(0.0, dot(-wi, light.dataA));
-            lightPdf = distSq / (cosTheta * (light.dataB.x * light.dataB.x));
+            float lightArea = lightSize.x * lightSize.z;
+            lightPdf = distSq / (cosTheta * lightArea);
 
-            if (cosTheta > 0.0){
+            if (cosTheta > 0.0) {
                 vec3 visibility = visibilityTest(light, interaction.point, wi);
                 return light.color.rgb * visibility;
             }

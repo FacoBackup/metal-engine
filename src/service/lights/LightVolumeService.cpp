@@ -20,7 +20,7 @@ namespace Metal {
                 glm::vec4(l.color, l.intensity),
                 translation,
                 glm::normalize(rotatedNormal),
-                glm::vec3(l.radiusSize),
+                l.lightType == LightVolumeTypes::LightVolumeType::SPHERE ? glm::vec3(l.radiusSize) : glm::vec3(t.scale),
                 l.lightType
             ));
         }

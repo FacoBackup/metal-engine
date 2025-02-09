@@ -23,7 +23,7 @@ namespace Metal {
             context.engineContext.setLightVolumeDataNeedsUpdate(true);
         }
         if (member != nullptr && member->name == ROTATION) {
-            rotation = glm::quat(rotationEuler * (glm::pi<float>() / 180.f));
+            rotation = normalize(glm::quat(rotationEuler * (glm::pi<float>() / 180.f)));
         }
         forceTransform = true;
     }

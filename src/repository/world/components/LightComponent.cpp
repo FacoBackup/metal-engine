@@ -9,7 +9,7 @@ namespace Metal {
         registerInt(lightType, "", "Light type");
         registerText(lightTypeLabel, "", "Type", true);
 
-        registerFloat(radiusSize, "", "Radius/Size", .1, 10);
+        registerFloat(radiusSize, "", "Radius (Sphere only)", .1, 10);
     }
 
     ComponentTypes::ComponentType LightComponent::getType() {
