@@ -15,7 +15,7 @@ bool intersectAABB(vec3 rayOrigin, vec3 invRayDir, vec3 boxMin, vec3 boxMax, out
 
 // ------------------------------
 // Helper: Möller–Trumbore triangle intersection
-bool intersectTriangle(vec3 orig, vec3 dir, RTTriangle tri, out float t, out float u, out float v) {
+bool intersectTriangle(vec3 orig, vec3 dir, inout RTTriangle tri, out float t, out float u, out float v) {
     const float EPSILON = 1e-6;
     vec3 edge1 = tri.v2 - tri.v1;
     vec3 edge2 = tri.v3 - tri.v1;
@@ -46,9 +46,8 @@ HitData trace(vec3 rayOrigin, vec3 rayDir){
     for (int i = 0; i < globalData.rtTLASCount; ++i) {
         TopLevelAS instance = tlasBuffer.items[i];
         // Transform the ray into the instance's (BLAS’s) local space.
-        mat4 invTransform = inverse(transformationsBuffer.items[instance.transform]);
-        vec3 localOrigin = (invTransform * vec4(rayOrigin, 1.0)).xyz;
-        vec3 localDir    = normalize((invTransform * vec4(rayDir, 0.0)).xyz);
+        vec3 localOrigin = (instance.transform * vec4(rayOrigin, 1.0)).xyz;
+        vec3 localDir    = normalize((instance.transform * vec4(rayDir, 0.0)).xyz);
         vec3 invDir   = 1.0 / localDir;
 
         // Retrieve the corresponding BLAS

@@ -40,16 +40,14 @@ layout(set = 2, binding = 0) uniform BLAS {
 
 // --------------- TOP LEVEL ---------------
 struct TopLevelAS {
-    uint transform;
+    mat4 transform;
     uint bottomLevelASOffset;
+    uint id;
 };
 layout(set = 3, binding = 0) uniform TLAS {
     TopLevelAS items[MAX_RT_TLAS];
 } tlasBuffer;
 
-layout(set = 4, binding = 0) uniform Transformations {
-    mat4 items[MAX_RT_TLAS];
-} transformationsBuffer;
 
-layout(set = 5, binding = 0, rgba32f) uniform image2D outputImage;
+layout(set = 4, binding = 0, rgba32f) uniform image2D outputImage;
 #endif

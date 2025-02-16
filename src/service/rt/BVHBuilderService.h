@@ -11,11 +11,10 @@ namespace Metal {
 
     class BVHBuilderService final : public AbstractRuntimeComponent {
         unsigned int bvhVersion = 0;
-        unsigned int transformOffset = 0;
 
         void buildBLAS(Metal::MeshData *mesh, Metal::BVH &bvh);
 
-        void buildTLAS(const glm::mat4x4 &model, Metal::MeshData *mesh, BVH &bvh);
+        void buildTLAS(EntityID id, MeshData *mesh, BVH &bvh);
 
     public:
         unsigned int getBVHVersion() {

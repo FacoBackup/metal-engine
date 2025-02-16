@@ -6,23 +6,21 @@
 #include "data/RTTriangle.h"
 
 namespace Metal {
-    void BVHBuilderService::buildBLAS(Metal::MeshData *mesh, Metal::BVH &bvh) {
+    void BVHBuilderService::buildBLAS(MeshData *mesh, BVH &bvh) {
         auto &indices = mesh->indices;
         auto &data = mesh->data;
         auto &blas = bvh.blas.emplace_back();
         blas.maxOffset.w = bvh.triangles.size();
-        blas.minCount.w = indices.size();
-        blas.maxOffset.x = blas.maxOffset.y = blas.maxOffset.z = -INFINITY;
-        blas.minCount.x = blas.minCount.y = blas.minCount.z = INFINITY;
+        blas.minCount.w = indices.size() / 3;
 
         for (int i = 0; i < indices.size(); i += 3) {
             const auto index0 = indices[i];
             const auto index1 = indices[i + 1];
             const auto index2 = indices[i + 2];
 
-            glm::vec4 v0 = glm::vec4(data[index0].vertex, 1);
-            glm::vec4 v1 = glm::vec4(data[index1].vertex, 1);
-            glm::vec4 v2 = glm::vec4(data[index2].vertex, 1);
+            glm::vec3 v0 = data[index0].vertex;
+            glm::vec3 v1 = data[index1].vertex;
+            glm::vec3 v2 = data[index2].vertex;
 
             bvh.triangles.emplace_back(RTTriangle{
                 v0, v1, v2,
@@ -44,17 +42,14 @@ namespace Metal {
         }
     }
 
-    void BVHBuilderService::buildTLAS(const glm::mat4x4 &model, MeshData *mesh, BVH &bvh) {
+    void BVHBuilderService::buildTLAS(EntityID id, MeshData *mesh, BVH &bvh) {
         auto &tlas = bvh.tlas.emplace_back();
-        tlas.transform = transformOffset;
-        transformOffset++;
-        const unsigned int currentOffset = bvh.blas.size();
+        tlas.id = id;
+        tlas.bottomLevelASOffset = bvh.blas.size();
         buildBLAS(mesh, bvh);
-        tlas.bottomLevelASOffset = currentOffset;
     }
 
     BVH BVHBuilderService::buildBVH() {
-        transformOffset = 0;
         bvhVersion++;
         BVH bvh{};
         for (auto &t: context.worldGridRepository.getTiles()) {
@@ -62,11 +57,10 @@ namespace Metal {
                 if (context.worldRepository.meshes.contains(entity) && !context.worldRepository.hiddenEntities.
                     contains(entity)) {
                     auto &meshComponent = context.worldRepository.meshes.at(entity);
-                    auto &transformComponent = context.worldRepository.transforms.at(entity);
                     auto *mesh = context.meshService.stream(meshComponent.meshId, LevelOfDetail::LOD_0);
                     if (mesh != nullptr) {
                         meshComponent.bvhVersion = bvhVersion;
-                        buildTLAS(transformComponent.model, mesh, bvh);
+                        buildTLAS(entity, mesh, bvh);
                         delete mesh;
                     }
                 }

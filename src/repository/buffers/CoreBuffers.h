@@ -17,7 +17,6 @@ namespace Metal {
         std::shared_ptr<BufferInstance> globalData = nullptr;
         std::shared_ptr<BufferInstance> tileInfo = nullptr;
         std::shared_ptr<BufferInstance> lightVolumeBuffer = nullptr;
-        std::shared_ptr<BufferInstance> rtTransformationBuffer = nullptr;
         std::shared_ptr<BufferInstance> rtTrianglesBuffer = nullptr;
         std::shared_ptr<BufferInstance> rtTLASBuffer = nullptr;
         std::shared_ptr<BufferInstance> rtBLASBuffer = nullptr;

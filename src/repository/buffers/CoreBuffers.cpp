@@ -26,10 +26,6 @@ namespace Metal {
                                                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-        rtTransformationBuffer = bufferService.createBuffer(MAX_RT_TLAS * sizeof(glm::mat4x4),
-                                                            VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                                                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                                                            VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
         rtTrianglesBuffer = bufferService.createBuffer(MAX_RT_TRIANGLES * sizeof(RTTriangle),
                                                        VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,

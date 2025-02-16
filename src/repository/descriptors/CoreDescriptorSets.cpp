@@ -74,55 +74,18 @@ namespace Metal {
     void CoreDescriptorSets::createBuffersDescriptors() { {
             rtTrianglesData = std::make_unique<DescriptorInstance>();
             rtTrianglesData->addLayoutBinding(
-                DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0));
+                DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0, context.coreBuffers.rtTrianglesBuffer));
             rtTrianglesData->create(vulkanContext);
-            std::vector<DescriptorBinding> binding{};
-            auto &tlas = binding.emplace_back();
-            tlas.bindingPoint = 0;
-            tlas.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-            tlas.bufferInstance = context.coreBuffers.rtTrianglesBuffer;
-            DescriptorInstance::Write(context.vulkanContext,
-                                      context.coreDescriptorSets.rtTrianglesData->vkDescriptorSet,
-                                      binding);
         } {
             rtBLASData = std::make_unique<DescriptorInstance>();
             rtBLASData->addLayoutBinding(
-                DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0));
+                DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0, context.coreBuffers.rtBLASBuffer));
             rtBLASData->create(vulkanContext);
-            std::vector<DescriptorBinding> bindings{};
-            auto &binding = bindings.emplace_back();
-            binding.bindingPoint = 0;
-            binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-            binding.bufferInstance = context.coreBuffers.rtBLASBuffer;
-            DescriptorInstance::Write(context.vulkanContext,
-                                      context.coreDescriptorSets.rtBLASData->vkDescriptorSet,
-                                      bindings);
         } {
             rtTLASData = std::make_unique<DescriptorInstance>();
             rtTLASData->addLayoutBinding(
-                DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0));
+                DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0, context.coreBuffers.rtTLASBuffer));
             rtTLASData->create(vulkanContext);
-            std::vector<DescriptorBinding> binding{};
-            auto &tlas = binding.emplace_back();
-            tlas.bindingPoint = 0;
-            tlas.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-            tlas.bufferInstance = context.coreBuffers.rtTLASBuffer;
-            DescriptorInstance::Write(context.vulkanContext,
-                                      context.coreDescriptorSets.rtTLASData->vkDescriptorSet,
-                                      binding);
-        } {
-            rtTransformationData = std::make_unique<DescriptorInstance>();
-            rtTransformationData->addLayoutBinding(
-                DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0));
-            rtTransformationData->create(vulkanContext);
-            std::vector<DescriptorBinding> binding{};
-            auto &tlas = binding.emplace_back();
-            tlas.bindingPoint = 0;
-            tlas.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-            tlas.bufferInstance = context.coreBuffers.rtTransformationBuffer;
-            DescriptorInstance::Write(context.vulkanContext,
-                                      context.coreDescriptorSets.rtTransformationData->vkDescriptorSet,
-                                      binding);
         }
 
         createSVOData();

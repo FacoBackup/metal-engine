@@ -71,32 +71,25 @@ namespace Metal {
 
     void EngineContext::dispatchBVHBuild() {
         auto bvh = context.bvhBuilderService.buildBVH();
-        rtTLASCount = bvh.tlas.size();
+        rtTopLevelStructures = bvh.tlas;
+        rtTLASCount = rtTopLevelStructures.size();
         updateTransformations();
         context.coreBuffers.rtBLASBuffer->update(bvh.blas.data(),
                                                  bvh.blas.size() * sizeof(BottomLevelAccelerationStructure));
-        context.coreBuffers.rtTLASBuffer->update(bvh.tlas.data(),
-                                                 bvh.tlas.size() * sizeof(TopLevelAccelerationStructure));
         context.coreBuffers.rtTrianglesBuffer->update(bvh.triangles.data(),
                                                       bvh.triangles.size() * sizeof(RTTriangle));
     }
 
-    void EngineContext::updateTransformations() const {
+    void EngineContext::updateTransformations() {
         std::vector<glm::mat4x4> transformations{};
-        for (auto &t: context.worldGridRepository.getTiles()) {
-            for (auto entity: t.second.entities) {
-                if (context.worldRepository.meshes.contains(entity) && !context.worldRepository.hiddenEntities.
-                    contains(entity)) {
-                    auto &meshComponent = context.worldRepository.meshes.at(entity);
-                    if (meshComponent.bvhVersion == context.bvhBuilderService.getBVHVersion()) {
-                        auto &transformComponent = context.worldRepository.transforms.at(entity);
-                        transformations.push_back(transformComponent.model);
-                    }
-                }
-            }
+        transformations.reserve(rtTLASCount);
+        for (auto &tlas: rtTopLevelStructures) {
+            auto entity = tlas.id;
+            auto &transformComponent = context.worldRepository.transforms.at(entity);
+            tlas.transform = inverse(transformComponent.model);
         }
-        context.coreBuffers.rtTransformationBuffer->update(transformations.data(),
-                                                           transformations.size() * sizeof(glm::mat4x4));
+        context.coreBuffers.rtTLASBuffer->update(rtTopLevelStructures.data(),
+                                                 rtTLASCount * sizeof(TopLevelAccelerationStructure));
     }
 
     void EngineContext::onSync() {

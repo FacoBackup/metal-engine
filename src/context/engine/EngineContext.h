@@ -7,12 +7,14 @@
 #include "../../common/AbstractRuntimeComponent.h"
 #include "../../dto/buffers/TileInfoUBO.h"
 #include "../../service/buffer/BufferInstance.h"
+#include "../../service/rt/data/TopLevelAccelerationStructure.h"
 
 using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
 
 namespace Metal {
     class EngineContext final : public AbstractRuntimeComponent {
+        std::vector<TopLevelAccelerationStructure> rtTopLevelStructures;
         GlobalDataUBO globalDataUBO{};
         TileInfoUBO tileInfoUBO{};
         long long start = -1;
@@ -63,7 +65,7 @@ namespace Metal {
 
         void dispatchBVHBuild();
 
-        void updateTransformations() const;
+        void updateTransformations() ;
 
         std::string getVoxelizationRequestId() {
             return voxelizationRequestId;

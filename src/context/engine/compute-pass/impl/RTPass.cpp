@@ -10,7 +10,6 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.rtTrianglesData.get())
                 .addDescriptorSet(context.coreDescriptorSets.rtBLASData.get())
                 .addDescriptorSet(context.coreDescriptorSets.rtTLASData.get())
-                .addDescriptorSet(context.coreDescriptorSets.rtTransformationData.get())
                 .addDescriptorSet(context.coreDescriptorSets.currentFrameDescriptor.get());
         pipelineInstance = context.pipelineService.createPipeline(shadingPipelineBuilder);
     }
@@ -22,14 +21,8 @@ namespace Metal {
             clearTexture(context.coreTextures.giSurfaceCache->vkImage);
         }
 
-        if (context.engineRepository.enabledDenoiser) {
-            clearTexture(context.coreTextures.currentFrame->vkImage);
-            context.engineContext.resetGiAccumulationCount();
-        } else if (isFirstRun || context.engineContext.isCameraUpdated() || surfaceCacheReset) {
-            clearTexture(context.coreTextures.currentFrame->vkImage);
-            context.engineContext.resetGiAccumulationCount();
-            isFirstRun = false;
-        }
+        clearTexture(context.coreTextures.currentFrame->vkImage);
+        context.engineContext.resetGiAccumulationCount();
 
         startWriting(context.coreTextures.currentFrame->vkImage);
         recordImageDispatch(context.coreTextures.currentFrame, 8, 8);

@@ -32,7 +32,6 @@ namespace Metal {
         std::unique_ptr<DescriptorInstance> currentFrameDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> svoData = nullptr;
         std::unique_ptr<DescriptorInstance> rtTrianglesData = nullptr;
-        std::unique_ptr<DescriptorInstance> rtTransformationData = nullptr;
         std::unique_ptr<DescriptorInstance> rtBLASData = nullptr;
         std::unique_ptr<DescriptorInstance> rtTLASData = nullptr;
         std::unique_ptr<DescriptorInstance> lightVolumeData = nullptr;

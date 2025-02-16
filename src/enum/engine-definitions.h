@@ -7,7 +7,7 @@
 #define MAX_RT_BLAS 1000000
 #define MAX_RT_TLAS 10000
 
-typedef unsigned long long EntityID;
+typedef unsigned int EntityID;
 #define MAX_LIGHT_VOLUMES 300
 #define EMPTY_ENTITY 0
 #define FILE_METADATA ".mjson"
