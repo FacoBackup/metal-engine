@@ -6,6 +6,7 @@
 #include "../../dto/buffers/GlobalDataUBO.h"
 #include "../../common/AbstractRuntimeComponent.h"
 #include "../../dto/buffers/TileInfoUBO.h"
+#include "../../service/buffer/BufferInstance.h"
 
 using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
@@ -20,6 +21,11 @@ namespace Metal {
         bool giSettingsUpdated = true;
         std::string voxelizationRequestId;
         unsigned int giAccumulationCount = 0;
+        unsigned int rtTLASCount = 0;
+
+        std::shared_ptr<BufferInstance> tlasBuffer = nullptr;
+        std::shared_ptr<BufferInstance> blasBuffer = nullptr;
+        std::shared_ptr<BufferInstance> trianglesBuffer = nullptr;
 
     public:
         GlobalDataUBO &getGlobalDataUBO() { return globalDataUBO; }
@@ -59,6 +65,8 @@ namespace Metal {
         void updateCurrentTime();
 
         void dispatchSceneVoxelization();
+
+        void dispatchBVHBuild();
 
         std::string getVoxelizationRequestId() {
             return voxelizationRequestId;

@@ -11,12 +11,12 @@
 #include "../../../service/texture/TextureData.h"
 #include "../../../service/mesh/MeshData.h"
 #include "../../../service/voxel/impl/SparseVoxelOctreeBuilder.h"
-#include "Triangle.h"
+#include "RTTriangle.h"
 
 #define MAX_DEPTH 12
 
 namespace Metal {
-    bool VoxelizerService::isTriangleFlatInAxis(const Triangle &triangle) {
+    bool VoxelizerService::isTriangleFlatInAxis(const RTTriangle &triangle) {
         if (triangle.v0.y == triangle.v1.y && triangle.v1.y == triangle.v2.y) {
             return true; // Flat in the Y-axis
         }
@@ -29,7 +29,7 @@ namespace Metal {
         return false;
     }
 
-    void VoxelizerService::iterateTriangle(const MeshComponent *component, const Triangle &triangle) {
+    void VoxelizerService::iterateTriangle(const MeshComponent *component, const RTTriangle &triangle) {
         const float edgeLength1 = glm::distance(triangle.v0, triangle.v1);
         const float edgeLength2 = glm::distance(triangle.v1, triangle.v2);
         const float edgeLength3 = glm::distance(triangle.v2, triangle.v0);
@@ -109,7 +109,7 @@ namespace Metal {
             const auto index = indices[i];
             const auto index1 = indices[i + 1];
             const auto index2 = indices[i + 2];
-            auto triangle = Triangle(
+            auto triangle = RTTriangle(
                 modelMatrix * glm::vec4(data[index].vertex, 1),
                 modelMatrix * glm::vec4(data[index1].vertex, 1),
                 modelMatrix * glm::vec4(data[index2].vertex, 1),

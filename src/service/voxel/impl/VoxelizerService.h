@@ -8,7 +8,7 @@
 #include "../../../common/AbstractRuntimeComponent.h"
 #include "OctreeNode.h"
 #include "SparseVoxelOctreeData.h"
-#include "Triangle.h"
+#include "RTTriangle.h"
 
 namespace Metal {
     struct WorldTile;
@@ -19,9 +19,9 @@ namespace Metal {
     struct MeshData;
 
     class VoxelizerService final : public AbstractRuntimeComponent {
-        void iterateTriangle(const MeshComponent *component, const Triangle &triangle);
+        void iterateTriangle(const MeshComponent *component, const RTTriangle &triangle);
 
-        static bool isTriangleFlatInAxis(const Triangle &triangle);
+        static bool isTriangleFlatInAxis(const RTTriangle &triangle);
 
     public:
         explicit VoxelizerService(ApplicationContext &context)

@@ -230,7 +230,7 @@ add_executable(
         src/service/notification/NotificationService.h
         src/dto/Notification.h
         src/enum/NotificationSeverity.h
-        src/service/voxel/impl/Triangle.h
+        src/service/voxel/impl/RTTriangle.h
         src/service/voxel/impl/SparseVoxelOctreeData.h
         src/context/engine/render-pass/impl/tools/VoxelVisualizerPass.cpp
         src/context/engine/render-pass/impl/tools/VoxelVisualizerPass.h
@@ -276,6 +276,14 @@ add_executable(
         src/repository/world/components/VolumeComponent.cpp
         src/repository/world/components/VolumeComponent.h
         src/service/descriptor/DescriptorBinding.h
+        src/service/rt/data/TopLevelAccelerationStructure.h
+        src/service/rt/data/BottomLevelAccelerationStructure.h
+        src/service/rt/data/RTTriangle.h
+        src/service/rt/BVHBuilderService.cpp
+        src/service/rt/BVHBuilderService.h
+        src/service/rt/data/BVH.h
+        src/context/engine/compute-pass/impl/RTPass.cpp
+        src/context/engine/compute-pass/impl/RTPass.h
 )
 
 

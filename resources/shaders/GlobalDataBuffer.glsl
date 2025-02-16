@@ -1,3 +1,5 @@
+#ifndef GLOBAL_DATA_B
+#define GLOBAL_DATA_B
 layout(set = 0, binding = 0) uniform GlobalDataBlock {
     mat4 viewMatrix;
     mat4 projectionMatrix;
@@ -11,6 +13,7 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     uint lightVolumeCount;
     uint volumesOffset;
     uint volumeShadowSteps;
+    uint rtTLASCount;
     bool isAtmosphereEnabled;
 
 // GI
@@ -86,3 +89,5 @@ bool intersectBox(vec3 ro, vec3 rd, vec3 dimensions, out float tEntry, out float
 
     return (tExit >= max(tEntry, 0.0));
 }
+
+#endif

@@ -11,6 +11,7 @@
 #include "../repository/descriptors/CoreDescriptorSets.h"
 #include "../repository/texture/CoreTextures.h"
 
+#include "../service/rt/BVHBuilderService.h"
 #include "../service/mesh/MeshService.h"
 #include "../service/world/WorldGridService.h"
 #include "../service/texture/TextureService.h"
@@ -87,6 +88,7 @@ namespace Metal {
         WorldGridService worldGridService{*this};
         TransformService transformService{*this};
         LightVolumeService lightVolumesService{*this};
+        BVHBuilderService bvhBuilderService{*this};
         // ----------- Services
 
         // ----------- Repository

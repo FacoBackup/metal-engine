@@ -1,0 +1,20 @@
+layout(local_size_x = 8, local_size_y = 8) in;
+
+#include "../GlobalDataBuffer.glsl"
+#include "../CreateRay.glsl"
+#include "../rt/RTStructures.glsl"
+#include "../rt/RayTracer.glsl"
+
+layout(set = 4, binding = 0, rgba32f) uniform image2D outputImage;
+
+void main() {
+    vec2 texCoords = vec2(gl_GlobalInvocationID.xy) / imageSize(outputImage);
+
+    vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
+    vec3 rayOrigin = globalData.cameraWorldPosition.rgb;
+
+    HitData data = trace(rayOrigin, rayDir);
+    if (data.didHit) {
+        imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(data.hitPosition, 1.0));
+    }
+}
