@@ -50,7 +50,6 @@ namespace Metal {
     }
 
     BVH BVHBuilderService::buildBVH() {
-        bvhVersion++;
         BVH bvh{};
         for (auto &t: context.worldGridRepository.getTiles()) {
             for (auto entity: t.second.entities) {
@@ -59,7 +58,6 @@ namespace Metal {
                     auto &meshComponent = context.worldRepository.meshes.at(entity);
                     auto *mesh = context.meshService.stream(meshComponent.meshId, LevelOfDetail::LOD_0);
                     if (mesh != nullptr) {
-                        meshComponent.bvhVersion = bvhVersion;
                         buildTLAS(entity, mesh, bvh);
                         delete mesh;
                     }

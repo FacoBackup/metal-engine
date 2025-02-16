@@ -18,7 +18,6 @@ namespace Metal {
         int parallaxLayers = 16;
         float parallaxHeightScale = 1;
         bool needsReVoxelization = false;
-        unsigned int bvhVersion = INFINITY;
 
         void registerFields() override;
 
