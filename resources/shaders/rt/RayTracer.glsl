@@ -46,9 +46,9 @@ HitData trace(vec3 rayOrigin, vec3 rayDir){
     for (int i = 0; i < globalData.rtTLASCount; ++i) {
         TopLevelAS instance = tlasBuffer.items[i];
         // Transform the ray into the instance's (BLAS’s) local space.
-        mat4 invTransform = inverse(instance.transform);
-        vec3 localOrigin = rayOrigin;//(invTransform * vec4(rayOrigin, 1.0)).xyz;
-        vec3 localDir    = rayDir; //normalize((invTransform * vec4(rayDir, 0.0)).xyz);
+        mat4 invTransform = inverse(transformationsBuffer.items[instance.transform]);
+        vec3 localOrigin = (invTransform * vec4(rayOrigin, 1.0)).xyz;
+        vec3 localDir    = normalize((invTransform * vec4(rayDir, 0.0)).xyz);
         vec3 invDir   = 1.0 / localDir;
 
         // Retrieve the corresponding BLAS

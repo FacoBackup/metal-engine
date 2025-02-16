@@ -5,6 +5,7 @@
 #include "../../../util/serialization-definitions.h"
 #include <glm/glm.hpp>
 
+
 namespace Metal {
     struct MeshComponent final : AbstractComponent {
         std::string meshId;
@@ -17,6 +18,7 @@ namespace Metal {
         int parallaxLayers = 16;
         float parallaxHeightScale = 1;
         bool needsReVoxelization = false;
+        unsigned int bvhVersion = INFINITY;
 
         void registerFields() override;
 

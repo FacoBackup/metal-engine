@@ -1,10 +1,6 @@
 #ifndef RT_STRUCTS
 #define RT_STRUCTS
 
-#define MAX_RT_TRIANGLES 10000000
-#define MAX_RT_BLAS 1000000
-#define MAX_RT_TLAS 10000
-
 struct HitData {
     float closestT;
     vec3 hitNormal;
@@ -44,10 +40,16 @@ layout(set = 2, binding = 0) uniform BLAS {
 
 // --------------- TOP LEVEL ---------------
 struct TopLevelAS {
-    mat4 transform;
+    uint transform;
     uint bottomLevelASOffset;
 };
 layout(set = 3, binding = 0) uniform TLAS {
     TopLevelAS items[MAX_RT_TLAS];
 } tlasBuffer;
+
+layout(set = 4, binding = 0) uniform Transformations {
+    mat4 items[MAX_RT_TLAS];
+} transformationsBuffer;
+
+layout(set = 5, binding = 0, rgba32f) uniform image2D outputImage;
 #endif

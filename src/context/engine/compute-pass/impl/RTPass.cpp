@@ -10,6 +10,7 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.rtTrianglesData.get())
                 .addDescriptorSet(context.coreDescriptorSets.rtBLASData.get())
                 .addDescriptorSet(context.coreDescriptorSets.rtTLASData.get())
+                .addDescriptorSet(context.coreDescriptorSets.rtTransformationData.get())
                 .addDescriptorSet(context.coreDescriptorSets.currentFrameDescriptor.get());
         pipelineInstance = context.pipelineService.createPipeline(shadingPipelineBuilder);
     }

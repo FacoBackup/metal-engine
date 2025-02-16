@@ -46,13 +46,16 @@ namespace Metal {
 
     void BVHBuilderService::buildTLAS(const glm::mat4x4 &model, MeshData *mesh, BVH &bvh) {
         auto &tlas = bvh.tlas.emplace_back();
-        tlas.transform = model;
+        tlas.transform = transformOffset;
+        transformOffset++;
         const unsigned int currentOffset = bvh.blas.size();
         buildBLAS(mesh, bvh);
         tlas.bottomLevelASOffset = currentOffset;
     }
 
     BVH BVHBuilderService::buildBVH() {
+        transformOffset = 0;
+        bvhVersion++;
         BVH bvh{};
         for (auto &t: context.worldGridRepository.getTiles()) {
             for (auto entity: t.second.entities) {
@@ -62,6 +65,7 @@ namespace Metal {
                     auto &transformComponent = context.worldRepository.transforms.at(entity);
                     auto *mesh = context.meshService.stream(meshComponent.meshId, LevelOfDetail::LOD_0);
                     if (mesh != nullptr) {
+                        meshComponent.bvhVersion = bvhVersion;
                         buildTLAS(transformComponent.model, mesh, bvh);
                         delete mesh;
                     }

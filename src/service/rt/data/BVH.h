@@ -1,6 +1,7 @@
 #ifndef BVH_H
 #define BVH_H
 #include <vector>
+#include <glm/mat4x4.hpp>
 
 #include "BottomLevelAccelerationStructure.h"
 #include "RTTriangle.h"

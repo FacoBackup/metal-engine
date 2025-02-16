@@ -22,11 +22,6 @@ namespace Metal {
         std::string voxelizationRequestId;
         unsigned int giAccumulationCount = 0;
         unsigned int rtTLASCount = 0;
-
-        std::shared_ptr<BufferInstance> tlasBuffer = nullptr;
-        std::shared_ptr<BufferInstance> blasBuffer = nullptr;
-        std::shared_ptr<BufferInstance> trianglesBuffer = nullptr;
-
     public:
         GlobalDataUBO &getGlobalDataUBO() { return globalDataUBO; }
 
@@ -67,6 +62,8 @@ namespace Metal {
         void dispatchSceneVoxelization();
 
         void dispatchBVHBuild();
+
+        void updateTransformations() const;
 
         std::string getVoxelizationRequestId() {
             return voxelizationRequestId;

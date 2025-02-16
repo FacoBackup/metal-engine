@@ -9,6 +9,10 @@
 namespace Metal {
     void TransformService::onSync() {
         traverse(WorldRepository::ROOT_ID, false);
+        if (somethingChanged) {
+            context.engineContext.updateTransformations();
+            somethingChanged = false;
+        }
     }
 
     void TransformService::traverse(const EntityID entityId, bool parentHasChanged) {
@@ -25,6 +29,7 @@ namespace Metal {
         for (auto child: context.worldRepository.getEntity(entityId)->children) {
             traverse(child, parentHasChanged);
         }
+
     }
 
     void TransformService::transform(TransformComponent *st, const TransformComponent *parentTransform) {
@@ -53,14 +58,15 @@ namespace Metal {
         auto *newTile = context.worldGridRepository.getOrCreateTile(translation);
 
         context.worldGridRepository.moveBetweenTiles(st->getEntityId(), previousTile, newTile);
+        somethingChanged = true;
     }
 
     TransformComponent *TransformService::findParent(EntityID id) const {
         while (id != EMPTY_ENTITY && id != WorldRepository::ROOT_ID) {
             id = context.worldRepository.getEntity(id)->parent;
             TransformComponent *t = context.worldRepository.transforms.contains(id)
-                          ? &context.worldRepository.transforms.at(id)
-                          : nullptr;
+                                        ? &context.worldRepository.transforms.at(id)
+                                        : nullptr;
             if (t != nullptr) {
                 return t;
             }

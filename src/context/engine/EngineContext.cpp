@@ -72,61 +72,31 @@ namespace Metal {
     void EngineContext::dispatchBVHBuild() {
         auto bvh = context.bvhBuilderService.buildBVH();
         rtTLASCount = bvh.tlas.size();
+        updateTransformations();
+        context.coreBuffers.rtBLASBuffer->update(bvh.blas.data(),
+                                                 bvh.blas.size() * sizeof(BottomLevelAccelerationStructure));
+        context.coreBuffers.rtTLASBuffer->update(bvh.tlas.data(),
+                                                 bvh.tlas.size() * sizeof(TopLevelAccelerationStructure));
+        context.coreBuffers.rtTrianglesBuffer->update(bvh.triangles.data(),
+                                                      bvh.triangles.size() * sizeof(RTTriangle));
+    }
 
-        {
-            if (trianglesBuffer != nullptr) { trianglesBuffer->dispose(context.vulkanContext); }
-
-            trianglesBuffer = context.bufferService.createBuffer(
-                bvh.triangles.size() * sizeof(RTTriangle),
-                VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-            std::vector<DescriptorBinding> binding{};
-            auto &triangles = binding.emplace_back();
-            triangles.bindingPoint = 0;
-            triangles.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-            triangles.bufferInstance = trianglesBuffer;
-            trianglesBuffer->update(bvh.triangles.data());
-            DescriptorInstance::Write(context.vulkanContext,
-                                      context.coreDescriptorSets.rtTrianglesData->vkDescriptorSet,
-                                      binding);
-        } {
-            if (blasBuffer != nullptr) { blasBuffer->dispose(context.vulkanContext); }
-
-            blasBuffer = context.bufferService.createBuffer(
-                bvh.triangles.size() * sizeof(BottomLevelAccelerationStructure),
-                VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-            std::vector<DescriptorBinding> binding{};
-            auto &blas = binding.emplace_back();
-            blas.bindingPoint = 0;
-            blas.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-            blas.bufferInstance = blasBuffer;
-            blasBuffer->update(bvh.blas.data());
-            DescriptorInstance::Write(context.vulkanContext,
-                                      context.coreDescriptorSets.rtBLASData->vkDescriptorSet,
-                                      binding);
-        } {
-            if (tlasBuffer != nullptr) { tlasBuffer->dispose(context.vulkanContext); }
-            tlasBuffer = context.bufferService.createBuffer(
-                bvh.triangles.size() * sizeof(TopLevelAccelerationStructure),
-                VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-            std::vector<DescriptorBinding> binding{};
-            auto &tlas = binding.emplace_back();
-            tlas.bindingPoint = 0;
-            tlas.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-            tlas.bufferInstance = tlasBuffer;
-            tlasBuffer->update(bvh.tlas.data());
-            DescriptorInstance::Write(context.vulkanContext,
-                                      context.coreDescriptorSets.rtTLASData->vkDescriptorSet,
-                                      binding);
+    void EngineContext::updateTransformations() const {
+        std::vector<glm::mat4x4> transformations{};
+        for (auto &t: context.worldGridRepository.getTiles()) {
+            for (auto entity: t.second.entities) {
+                if (context.worldRepository.meshes.contains(entity) && !context.worldRepository.hiddenEntities.
+                    contains(entity)) {
+                    auto &meshComponent = context.worldRepository.meshes.at(entity);
+                    if (meshComponent.bvhVersion == context.bvhBuilderService.getBVHVersion()) {
+                        auto &transformComponent = context.worldRepository.transforms.at(entity);
+                        transformations.push_back(transformComponent.model);
+                    }
+                }
+            }
         }
+        context.coreBuffers.rtTransformationBuffer->update(transformations.data(),
+                                                           transformations.size() * sizeof(glm::mat4x4));
     }
 
     void EngineContext::onSync() {
