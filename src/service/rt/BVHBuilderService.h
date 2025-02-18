@@ -10,16 +10,14 @@ namespace Metal {
     struct MeshData;
 
     class BVHBuilderService final : public AbstractRuntimeComponent {
-        void buildBLAS(Metal::MeshData *mesh, Metal::BVH &bvh);
-
-        void buildTLAS(EntityID id, MeshData *mesh, BVH &bvh);
+        static int buildBLAS(MeshData *mesh, BVH &bvh);
 
     public:
         explicit BVHBuilderService(ApplicationContext &context)
             : AbstractRuntimeComponent(context) {
         }
 
-        BVH buildBVH();
+        BVH buildBVH() const;
     };
 }
 

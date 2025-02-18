@@ -284,6 +284,10 @@ add_executable(
         src/service/rt/data/BVH.h
         src/context/engine/compute-pass/impl/RTPass.cpp
         src/context/engine/compute-pass/impl/RTPass.h
+        src/service/rt/data/BoundingBox.h
+        src/service/rt/data/BVHTriangle.h
+        src/service/rt/data/MeshBVH.cpp
+        src/service/rt/data/MeshBVH.h
 )
 
 

@@ -7,6 +7,10 @@ struct HitData {
     vec2 hitUV;
     vec3 hitPosition;
     bool didHit;
+    // TopLevelAS "id"; Refers to the primitive's unique id
+    uint hitId;
+    uint triangleTestCount;
+    uint boxTestCount;
 };
 
 // --------------- RT TRIANGLE ---------------
@@ -23,16 +27,21 @@ struct RTTriangle {
     vec2 uv2;
     vec2 uv3;
 };
+
 layout(set = 1, binding = 0) uniform Triangles {
     RTTriangle items[MAX_RT_TRIANGLES];
 } trianglesBuffer;
 
 // --------------- BOTTOM LEVEL ---------------
 struct BottomLevelAS {
-// stores max position of bounding box and the triangle's offset stored on the triangles buffer
-    vec4 maxOffset;
-// stores min position of bounding box and the triangle count
-    vec4 minCount;
+    vec3 boundsMin;
+    vec3 boundsMax;
+    /**
+    * When TriangleCount is negative (or not set), StartIndex is the index of the first child.
+    * When positive, it is the index of the first triangle.
+    */
+    int startIndex;
+    int triangleCount;
 };
 layout(set = 2, binding = 0) uniform BLAS {
     BottomLevelAS items[MAX_RT_BLAS];
