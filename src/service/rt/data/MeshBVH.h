@@ -25,7 +25,7 @@ namespace Metal {
     private:
         std::vector<BVHTriangle> allTriangles;
 
-        void Split(int parentIndex,  int triGlobalStart, int triNum, int depth = 0);
+        void split(int parentIndex,  int triGlobalStart, int triNum, int depth = 0);
 
         std::tuple<int, float, float> ChooseSplit(const BottomLevelAccelerationStructure &node, int start, int count);
 
@@ -33,7 +33,7 @@ namespace Metal {
 
         static float NodeCost(const glm::vec3 &size, int numTriangles);
 
-        int PushNode(const BottomLevelAccelerationStructure &node);
+        int pushNode(const BottomLevelAccelerationStructure &node);
     };
 } // Metal
 

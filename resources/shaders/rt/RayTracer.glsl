@@ -100,8 +100,8 @@ inout uint triangleTestCount, inout uint boxTestCount) {
             }
         } else {
             // Inner node: retrieve children.
-            int childIndexA = node.startIndex;
-            int childIndexB = node.startIndex + 1;
+            int childIndexA = node.startIndex + nodeOffset;
+            int childIndexB = node.startIndex + nodeOffset + 1;
             BottomLevelAS childA = blasBuffer.items[childIndexA];
             BottomLevelAS childB = blasBuffer.items[childIndexB];
 

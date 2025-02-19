@@ -15,10 +15,7 @@ namespace Metal {
         alignas(4) int startIndex;
         alignas(4) int triangleCount;
 
-        BottomLevelAccelerationStructure() : boundsMin(0, 0, 0), boundsMax(0, 0, 0), startIndex(-1), triangleCount(-1) {
-        }
-
-        BottomLevelAccelerationStructure(const BVHBoundingBox &bounds)
+        explicit BottomLevelAccelerationStructure(const BVHBoundingBox &bounds)
             : boundsMin(bounds.Min), boundsMax(bounds.Max), startIndex(-1), triangleCount(-1) {
         }
 

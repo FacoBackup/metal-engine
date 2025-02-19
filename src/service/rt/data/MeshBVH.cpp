@@ -6,6 +6,9 @@
 #include "../../mesh/MeshData.h"
 #include "RTTriangle.h"
 
+#define MAX_SPLIT_TESTS 5
+#define MAX_DEPTH 32
+
 namespace Metal {
     MeshBVH::MeshBVH(MeshData *mesh) {
         auto &indices = mesh->indices;
@@ -29,8 +32,8 @@ namespace Metal {
         }
 
         // Create root node.
-        allNodes.push_back(BottomLevelAccelerationStructure(bounds));
-        Split(0, 0, static_cast<int>(allTriangles.size()));
+        allNodes.emplace_back(bounds);
+        split(0, 0, static_cast<int>(allTriangles.size()));
 
         // Build final triangles from the BVHTriangles.
         allTris.resize(allTriangles.size());
@@ -54,20 +57,19 @@ namespace Metal {
         }
     }
 
-    int MeshBVH::PushNode(const BottomLevelAccelerationStructure &node) {
+    int MeshBVH::pushNode(const BottomLevelAccelerationStructure &node) {
         allNodes.push_back(node);
         return static_cast<int>(allNodes.size() - 1);
     }
 
-    void MeshBVH::Split(int parentIndex, int triGlobalStart, int triNum, int depth) {
-        const int MaxDepth = 32;
+    void MeshBVH::split(int parentIndex, int triGlobalStart, int triNum, int depth) {
         BottomLevelAccelerationStructure &parent = allNodes[parentIndex];
         glm::vec3 size = parent.calculateBoundsSize();
         float parentCost = NodeCost(size, triNum);
 
         auto [splitAxis, splitPos, cost] = ChooseSplit(parent, triGlobalStart, triNum);
 
-        if (cost < parentCost && depth < MaxDepth) {
+        if (cost < parentCost && depth < MAX_DEPTH) {
             BVHBoundingBox boundsLeft, boundsRight;
             int numOnLeft = 0;
 
@@ -88,16 +90,15 @@ namespace Metal {
             int triStartRight = triGlobalStart + numOnLeft;
 
             // Create child nodes.
-            int childIndexLeft = PushNode(BottomLevelAccelerationStructure(boundsLeft, triStartLeft, 0));
-            int childIndexRight = PushNode(BottomLevelAccelerationStructure(boundsRight, triStartRight, 0));
+            int childIndexLeft = pushNode(BottomLevelAccelerationStructure(boundsLeft, triStartLeft, 0));
+            int childIndexRight = pushNode(BottomLevelAccelerationStructure(boundsRight, triStartRight, 0));
 
             // Mark parent as an internal node.
             parent.startIndex = childIndexLeft;
             parent.triangleCount = -1;
 
-            // Recursively split the children.
-            Split(childIndexLeft, triGlobalStart, numOnLeft, depth + 1);
-            Split(childIndexRight, triGlobalStart + numOnLeft, numOnRight, depth + 1);
+            split(childIndexLeft, triGlobalStart, numOnLeft, depth + 1);
+            split(childIndexRight, triGlobalStart + numOnLeft, numOnRight, depth + 1);
         } else {
             // This node becomes a leaf.
             parent.startIndex = triGlobalStart;
@@ -112,16 +113,14 @@ namespace Metal {
 
         float bestSplitPos = 0.0f;
         int bestSplitAxis = 0;
-        const int numSplitTests = 5;
         float bestCost = std::numeric_limits<float>::max();
 
         // Try several candidate split positions along each axis.
         for (int axis = 0; axis < 3; axis++) {
-            for (int i = 0; i < numSplitTests; i++) {
-                float splitT = (i + 1) / float(numSplitTests + 1);
-                float splitPos = glm::mix(node.boundsMin[axis], node.boundsMax[axis], splitT);
-                float cost = EvaluateSplit(axis, splitPos, start, count);
-                if (cost < bestCost) {
+            for (int i = 0; i < MAX_SPLIT_TESTS; i++) {
+                const float splitT = (i + 1) / static_cast<float>(MAX_SPLIT_TESTS + 1);
+                const float splitPos = glm::mix(node.boundsMin[axis], node.boundsMax[axis], splitT);
+                if (const float cost = EvaluateSplit(axis, splitPos, start, count); cost < bestCost) {
                     bestCost = cost;
                     bestSplitPos = splitPos;
                     bestSplitAxis = axis;
@@ -132,7 +131,7 @@ namespace Metal {
         return std::make_tuple(bestSplitAxis, bestSplitPos, bestCost);
     }
 
-    float MeshBVH::EvaluateSplit(int splitAxis, float splitPos, int start, int count) {
+    float MeshBVH::EvaluateSplit(const int splitAxis, const float splitPos, const int start, const int count) {
         BVHBoundingBox boundsLeft, boundsRight;
         int numOnLeft = 0;
         int numOnRight = 0;
@@ -148,13 +147,13 @@ namespace Metal {
             }
         }
 
-        float costA = NodeCost(boundsLeft.Size(), numOnLeft);
-        float costB = NodeCost(boundsRight.Size(), numOnRight);
+        const float costA = NodeCost(boundsLeft.Size(), numOnLeft);
+        const float costB = NodeCost(boundsRight.Size(), numOnRight);
         return costA + costB;
     }
 
-    float MeshBVH::NodeCost(const glm::vec3 &size, int numTriangles) {
+    float MeshBVH::NodeCost(const glm::vec3 &size, const int numTriangles) {
         float halfArea = size.x * size.y + size.x * size.z + size.y * size.z;
-        return halfArea * numTriangles;
+        return halfArea * static_cast<float>(numTriangles);
     }
 } // Metal
