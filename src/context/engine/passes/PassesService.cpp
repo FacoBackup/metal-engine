@@ -4,6 +4,7 @@
 #include "../compute-pass/impl/AccumulationPass.h"
 #include "../compute-pass/impl/PathTracerPass.h"
 #include "../compute-pass/impl/AccumulationMetadataPass.h"
+#include "../compute-pass/impl/RTPass.h"
 #include "../render-pass/impl/GBufferGenPass.h"
 #include "../render-pass/impl/PostProcessingPass.h"
 #include "../render-pass/impl/tools/GridPass.h"
@@ -21,7 +22,7 @@ namespace Metal {
 
         addPass(gBufferPasses, new GBufferGenPass(context));
 
-        addPass(computePasses, new PathTracerPass(context));
+        addPass(computePasses, new RTPass(context));
         addPass(computePasses, new AccumulationPass(context));
         addPass(computePasses, new AccumulationMetadataPass(context));
 

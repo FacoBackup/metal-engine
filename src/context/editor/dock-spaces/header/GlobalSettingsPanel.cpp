@@ -9,8 +9,8 @@ namespace Metal {
     void GlobalSettingsPanel::onSync() {
         auto &editorRepository = context->editorRepository;
 
-        if (ImGui::Button((Icons::apps + "Voxelize scene" + id + "voxelize").c_str())) {
-            context->engineContext.dispatchSceneVoxelization();
+        if (ImGui::Button((Icons::apps + "Build BVH" + id + "voxelize").c_str())) {
+            context->engineContext.dispatchBVHBuild();
         }
         ImGui::SameLine();
 

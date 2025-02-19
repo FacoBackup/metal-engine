@@ -18,6 +18,8 @@ namespace Metal {
         void dispose(const VulkanContext &context) const;
 
         void update(void *newData) const;
+
+        void update(void *newData, VkDeviceSize size) const;
     };
 } // Metal
 

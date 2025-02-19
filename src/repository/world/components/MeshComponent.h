@@ -5,6 +5,7 @@
 #include "../../../util/serialization-definitions.h"
 #include <glm/glm.hpp>
 
+
 namespace Metal {
     struct MeshComponent final : AbstractComponent {
         std::string meshId;
