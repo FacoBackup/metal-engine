@@ -86,7 +86,7 @@ namespace Metal {
         for (auto &tlas: rtTopLevelStructures) {
             auto entity = tlas.id;
             auto &transformComponent = context.worldRepository.transforms.at(entity);
-            tlas.transform = inverse(transformComponent.model);
+            tlas.invTransform = inverse(transformComponent.model);
         }
         context.coreBuffers.rtTLASBuffer->update(rtTopLevelStructures.data(),
                                                  rtTLASCount * sizeof(TopLevelAccelerationStructure));

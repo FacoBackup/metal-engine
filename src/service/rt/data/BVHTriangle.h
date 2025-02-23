@@ -9,16 +9,16 @@ namespace Metal {
      */
     class BVHTriangle {
     public:
-        glm::vec3 Centre;
-        glm::vec3 Min;
-        glm::vec3 Max;
-        int Index; // The starting index in the triangle index array.
+        glm::vec3 center;
+        glm::vec3 min;
+        glm::vec3 max;
+        int index; // The starting index in the triangle index array.
 
-        BVHTriangle() : Centre(0, 0, 0), Min(0, 0, 0), Max(0, 0, 0), Index(0) {
+        BVHTriangle() : center(0, 0, 0), min(0, 0, 0), max(0, 0, 0), index(0) {
         }
 
         BVHTriangle(const glm::vec3 &centre, const glm::vec3 &min, const glm::vec3 &max, int index)
-            : Centre(centre), Min(min), Max(max), Index(index) {
+            : center(centre), min(min), max(max), index(index) {
         }
     };
 }

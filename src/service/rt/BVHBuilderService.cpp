@@ -7,18 +7,6 @@
 #include "data/RTTriangle.h"
 
 namespace Metal {
-    int BVHBuilderService::buildBLAS(MeshData *mesh, BVH &bvh) {
-        auto instance = MeshBVH(mesh);
-        for (auto &data: instance.allTris) {
-            bvh.triangles.push_back(data);
-        }
-        unsigned int offset = bvh.blas.size();
-        for (auto &data: instance.allNodes) {
-            bvh.blas.push_back(data);
-        }
-        return offset;
-    }
-
     BVH BVHBuilderService::buildBVH() const {
         BVH bvh{};
         for (auto &t: context.worldGridRepository.getTiles()) {
@@ -28,9 +16,39 @@ namespace Metal {
                     auto &meshComponent = context.worldRepository.meshes.at(entity);
                     auto *mesh = context.meshService.stream(meshComponent.meshId, LevelOfDetail::LOD_0);
                     if (mesh != nullptr) {
+                        auto instance = MeshBVH(mesh);
+
                         auto &tlas = bvh.tlas.emplace_back();
                         tlas.id = entity;
-                        tlas.bottomLevelASOffset = buildBLAS(mesh, bvh);
+                        tlas.triangleOffset = bvh.triangles.size();
+                        tlas.nodeOffset = bvh.blas.size();
+
+                        for (auto &data: instance.allTris) {
+                            bvh.triangles.push_back(data);
+                        }
+                        for (auto &data: instance.allNodes) {
+                            bvh.blas.push_back(data);
+                        }
+                        unsigned int stackIndex = 0;
+                        std::array< int, 32> nodes{-1};
+                        for (int i = 0; i< 32; i++)
+                            nodes[i] = -1;
+                        nodes[stackIndex++] = 0;
+                        while (stackIndex > 0) {
+                             int index = nodes.at(--stackIndex);
+                            if (index >= 0) {
+                                BottomLevelAccelerationStructure *currentNode = &instance.allNodes[index];
+                                std::cout << currentNode->startIndex << " | " << currentNode->triangleCount << " | <" <<
+                                        currentNode->
+                                        boundsMax.x << " " << currentNode->boundsMax.y << " " << currentNode->boundsMax.z <<
+                                        "> " << std::endl;
+                                if (currentNode->triangleCount < 0) {
+                                    nodes[stackIndex++] = currentNode->startIndex;
+                                    nodes[stackIndex++] = currentNode->startIndex + 1;
+                                }
+                            }
+                        }
+
                         delete mesh;
                     }
                 }

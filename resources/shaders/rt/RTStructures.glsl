@@ -49,8 +49,9 @@ layout(set = 2, binding = 0) uniform BLAS {
 
 // --------------- TOP LEVEL ---------------
 struct TopLevelAS {
-    mat4 transform;
-    uint bottomLevelASOffset;
+    mat4 invTransform;
+    uint nodeOffset;
+    uint triangleOffset;
     uint id;
 };
 layout(set = 3, binding = 0) uniform TLAS {

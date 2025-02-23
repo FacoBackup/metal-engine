@@ -28,7 +28,7 @@ namespace Metal {
             glm::vec3 maxVec = glm::max(glm::max(a, b), c);
             glm::vec3 minVec = glm::min(glm::min(a, b), c);
             allTriangles[i / 3] = BVHTriangle(centre, minVec, maxVec, static_cast<int>(i));
-            bounds.GrowToInclude(minVec, maxVec);
+            bounds.growToInclude(minVec, maxVec);
         }
 
         // Create root node.
@@ -39,9 +39,9 @@ namespace Metal {
         allTris.resize(allTriangles.size());
         for (size_t i = 0; i < allTriangles.size(); i++) {
             BVHTriangle buildTri = allTriangles[i];
-            auto &vertexData0 = data[indices[buildTri.Index + 0]];
-            auto &vertexData1 = data[indices[buildTri.Index + 1]];
-            auto &vertexData2 = data[indices[buildTri.Index + 2]];
+            auto &vertexData0 = data[indices[buildTri.index + 0]];
+            auto &vertexData1 = data[indices[buildTri.index + 1]];
+            auto &vertexData2 = data[indices[buildTri.index + 2]];
 
             allTris[i] = RTTriangle(
                 vertexData0.vertex,
@@ -64,7 +64,7 @@ namespace Metal {
 
     void MeshBVH::split(int parentIndex, int triGlobalStart, int triNum, int depth) {
         BottomLevelAccelerationStructure &parent = allNodes[parentIndex];
-        glm::vec3 size = parent.calculateBoundsSize();
+        glm::vec3 size = parent.boundsMax - parent.boundsMin;
         float parentCost = NodeCost(size, triNum);
 
         auto [splitAxis, splitPos, cost] = ChooseSplit(parent, triGlobalStart, triNum);
@@ -76,12 +76,12 @@ namespace Metal {
             // Partition the triangles based on the split position.
             for (int i = triGlobalStart; i < triGlobalStart + triNum; i++) {
                 BVHTriangle &tri = allTriangles[i];
-                if (tri.Centre[splitAxis] < splitPos) {
-                    boundsLeft.GrowToInclude(tri.Min, tri.Max);
+                if (tri.center[splitAxis] < splitPos) {
+                    boundsLeft.growToInclude(tri.min, tri.max);
                     std::swap(allTriangles[triGlobalStart + numOnLeft], allTriangles[i]);
                     numOnLeft++;
                 } else {
-                    boundsRight.GrowToInclude(tri.Min, tri.Max);
+                    boundsRight.growToInclude(tri.min, tri.max);
                 }
             }
 
@@ -138,11 +138,11 @@ namespace Metal {
 
         for (int i = start; i < start + count; i++) {
             BVHTriangle &tri = allTriangles[i];
-            if (tri.Centre[splitAxis] < splitPos) {
-                boundsLeft.GrowToInclude(tri.Min, tri.Max);
+            if (tri.center[splitAxis] < splitPos) {
+                boundsLeft.growToInclude(tri.min, tri.max);
                 numOnLeft++;
             } else {
-                boundsRight.GrowToInclude(tri.Min, tri.Max);
+                boundsRight.growToInclude(tri.min, tri.max);
                 numOnRight++;
             }
         }

@@ -12,7 +12,7 @@ namespace Metal {
         }
 
         // Grow the bounding box to include the given min and max.
-        void GrowToInclude(const glm::vec3 &min, const glm::vec3 &max) {
+        void growToInclude(const glm::vec3 &min, const glm::vec3 &max) {
             if (hasPoint) {
                 Min.x = (min.x < Min.x) ? min.x : Min.x;
                 Min.y = (min.y < Min.y) ? min.y : Min.y;

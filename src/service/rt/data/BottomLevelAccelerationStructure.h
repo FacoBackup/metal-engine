@@ -15,20 +15,15 @@ namespace Metal {
         alignas(4) int startIndex;
         alignas(4) int triangleCount;
 
+        /**
+         * Root node only
+         */
         explicit BottomLevelAccelerationStructure(const BVHBoundingBox &bounds)
-            : boundsMin(bounds.Min), boundsMax(bounds.Max), startIndex(-1), triangleCount(-1) {
+            : boundsMin(bounds.Min), boundsMax(bounds.Max), startIndex(1), triangleCount(-1) {
         }
 
         BottomLevelAccelerationStructure(const BVHBoundingBox &bounds, int startIndex, int triCount)
             : boundsMin(bounds.Min), boundsMax(bounds.Max), startIndex(startIndex), triangleCount(triCount) {
-        }
-
-        glm::vec3 calculateBoundsSize() const {
-            return boundsMax - boundsMin;
-        }
-
-        glm::vec3 calculateBoundsCentre() const {
-            return (boundsMin + boundsMax) / 2.0f;
         }
     };
 }

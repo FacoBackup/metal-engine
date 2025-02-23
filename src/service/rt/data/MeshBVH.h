@@ -7,9 +7,6 @@
 
 namespace Metal {
     struct VertexData;
-}
-
-namespace Metal {
     struct MeshData;
     struct RTTriangle;
     /**

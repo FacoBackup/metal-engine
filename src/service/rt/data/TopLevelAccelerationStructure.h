@@ -4,8 +4,9 @@
 
 namespace Metal {
     struct TopLevelAccelerationStructure final {
-        alignas(16) glm::mat4x4 transform;
-        alignas(4) unsigned int bottomLevelASOffset;
+        alignas(16) glm::mat4x4 invTransform;
+        alignas(4) unsigned int nodeOffset;
+        alignas(4) unsigned int triangleOffset;
         alignas(4) EntityID id;
     };
 }
