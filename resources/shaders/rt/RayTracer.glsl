@@ -126,13 +126,13 @@ inout uint boxTestCount
     stack[stackIndex++] = nodeOffset;// Push the root node.
     int totalLoops = 0;
     while (stackIndex > 0) {
-        if (totalLoops > 100){
+        if (totalLoops > 100000){
             break;
         }
         totalLoops++;
         uint nodeIndex = stack[--stackIndex];
         BottomLevelAS node = blasBuffer.items[nodeIndex];
-        if (boxTestCount > globalData.searchCountDivisor){
+        if (boxTestCount > globalData.searchCountDivisor && globalData.searchCountDivisor > 0){
             float tHit = 0;
             vec3 p = vec3(0);
             if (intersectBox(ray.origin, ray.dir, node.boundsMin, node.boundsMax, tHit, p)){
@@ -158,6 +158,7 @@ inout uint boxTestCount
             // Inner node: process children
             uint childIndexA = nodeOffset + node.startIndex;
             uint childIndexB = childIndexA + 1;
+
 
             BottomLevelAS childA = blasBuffer.items[childIndexA];
             BottomLevelAS childB = blasBuffer.items[childIndexB];

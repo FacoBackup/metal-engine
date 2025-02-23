@@ -18,22 +18,21 @@ namespace Metal {
         allNodes.clear();
         allTriangles.resize(indices.size() / 3);
         BVHBoundingBox bounds;
-
-        // Build BVHTriangles and overall bounds.
         for (size_t i = 0; i < indices.size(); i += 3) {
-            glm::vec3 a = data[indices[i + 0]].vertex;
+            glm::vec3 a = data[indices[i]].vertex;
             glm::vec3 b = data[indices[i + 1]].vertex;
             glm::vec3 c = data[indices[i + 2]].vertex;
             glm::vec3 centre = (a + b + c) / 3.0f;
-            glm::vec3 maxVec = glm::max(glm::max(a, b), c);
-            glm::vec3 minVec = glm::min(glm::min(a, b), c);
-            allTriangles[i / 3] = BVHTriangle(centre, minVec, maxVec, static_cast<int>(i));
-            bounds.growToInclude(minVec, maxVec);
+            glm::vec3 max = glm::max(glm::max(a, b), c);
+            glm::vec3 min = glm::min(glm::min(a, b), c);
+            allTriangles.emplace_back(centre, min, max, i);
+            bounds.growToInclude(min, max);
         }
 
-        // Create root node.
+        // Create the root node
         allNodes.emplace_back(bounds);
-        split(0, 0, static_cast<int>(allTriangles.size()));
+        // Recursively build the BVH
+        split(0, 0, allTriangles.size());
 
         // Build final triangles from the BVHTriangles.
         allTris.resize(allTriangles.size());
@@ -57,28 +56,22 @@ namespace Metal {
         }
     }
 
-    int MeshBVH::pushNode(const BottomLevelAccelerationStructure &node) {
-        allNodes.push_back(node);
-        return static_cast<int>(allNodes.size() - 1);
-    }
-
     void MeshBVH::split(int parentIndex, int triGlobalStart, int triNum, int depth) {
-        BottomLevelAccelerationStructure &parent = allNodes[parentIndex];
+        BottomLevelAccelerationStructure parent = allNodes[parentIndex];
         glm::vec3 size = parent.boundsMax - parent.boundsMin;
         float parentCost = NodeCost(size, triNum);
 
-        auto [splitAxis, splitPos, cost] = ChooseSplit(parent, triGlobalStart, triNum);
-
-        if (cost < parentCost && depth < MAX_DEPTH) {
+        SplitResult split = ChooseSplit(parent, triGlobalStart, triNum);
+        if (split.cost < parentCost && depth < MAX_DEPTH) {
             BVHBoundingBox boundsLeft, boundsRight;
             int numOnLeft = 0;
 
-            // Partition the triangles based on the split position.
-            for (int i = triGlobalStart; i < triGlobalStart + triNum; i++) {
+            // Partition triangles
+            for (int i = triGlobalStart; i < triGlobalStart + triNum; ++i) {
                 BVHTriangle &tri = allTriangles[i];
-                if (tri.center[splitAxis] < splitPos) {
+                if (tri.center[split.axis] < split.pos) {
                     boundsLeft.growToInclude(tri.min, tri.max);
-                    std::swap(allTriangles[triGlobalStart + numOnLeft], allTriangles[i]);
+                    std::swap(tri, allTriangles[triGlobalStart + numOnLeft]);
                     numOnLeft++;
                 } else {
                     boundsRight.growToInclude(tri.min, tri.max);
@@ -86,74 +79,68 @@ namespace Metal {
             }
 
             int numOnRight = triNum - numOnLeft;
-            int triStartLeft = triGlobalStart;
-            int triStartRight = triGlobalStart + numOnLeft;
+            int childIndexLeft = static_cast<int>(allNodes.size());
+            allNodes.emplace_back(boundsLeft, triGlobalStart, 0);
+            int childIndexRight = static_cast<int>(allNodes.size());
+            allNodes.emplace_back(boundsRight, triGlobalStart + numOnLeft, 0);
 
-            // Create child nodes.
-            int childIndexLeft = pushNode(BottomLevelAccelerationStructure(boundsLeft, triStartLeft, 0));
-            int childIndexRight = pushNode(BottomLevelAccelerationStructure(boundsRight, triStartRight, 0));
-
-            // Mark parent as an internal node.
+            // Update parent to point to children
             parent.startIndex = childIndexLeft;
-            parent.triangleCount = -1;
+            allNodes[parentIndex] = parent;
 
-            split(childIndexLeft, triGlobalStart, numOnLeft, depth + 1);
-            split(childIndexRight, triGlobalStart + numOnLeft, numOnRight, depth + 1);
+            // Recurse
+            this->split(childIndexLeft, triGlobalStart, numOnLeft, depth + 1);
+            this->split(childIndexRight, triGlobalStart + numOnLeft, numOnRight, depth + 1);
         } else {
-            // This node becomes a leaf.
+            // Make leaf node
             parent.startIndex = triGlobalStart;
             parent.triangleCount = triNum;
+            allNodes[parentIndex] = parent;
         }
     }
 
-    std::tuple<int, float, float> MeshBVH::ChooseSplit(const BottomLevelAccelerationStructure &node, int start,
-                                                       int count) {
-        if (count <= 1)
-            return std::make_tuple(0, 0.0f, std::numeric_limits<float>::infinity());
+    SplitResult MeshBVH::ChooseSplit(const BottomLevelAccelerationStructure &node, int start, int count) {
+        SplitResult best = {0, 0.0f, std::numeric_limits<float>::max()};
+        if (count <= 1) return best;
 
-        float bestSplitPos = 0.0f;
-        int bestSplitAxis = 0;
-        float bestCost = std::numeric_limits<float>::max();
+        glm::vec3 nodeSize = node.boundsMax - node.boundsMin;
 
-        // Try several candidate split positions along each axis.
-        for (int axis = 0; axis < 3; axis++) {
-            for (int i = 0; i < MAX_SPLIT_TESTS; i++) {
-                const float splitT = (i + 1) / static_cast<float>(MAX_SPLIT_TESTS + 1);
-                const float splitPos = glm::mix(node.boundsMin[axis], node.boundsMax[axis], splitT);
-                if (const float cost = EvaluateSplit(axis, splitPos, start, count); cost < bestCost) {
-                    bestCost = cost;
-                    bestSplitPos = splitPos;
-                    bestSplitAxis = axis;
+        for (int axis = 0; axis < 3; ++axis) {
+            for (int i = 0; i < MAX_SPLIT_TESTS; ++i) {
+                float t = (i + 1.0f) / (MAX_SPLIT_TESTS + 1.0f);
+                float splitPos = node.boundsMin[axis] + t * nodeSize[axis];
+                float cost = EvaluateSplit(axis, splitPos, start, count);
+
+                if (cost < best.cost) {
+                    best.axis = axis;
+                    best.pos = splitPos;
+                    best.cost = cost;
                 }
             }
         }
-
-        return std::make_tuple(bestSplitAxis, bestSplitPos, bestCost);
+        return best;
     }
 
-    float MeshBVH::EvaluateSplit(const int splitAxis, const float splitPos, const int start, const int count) {
-        BVHBoundingBox boundsLeft, boundsRight;
-        int numOnLeft = 0;
-        int numOnRight = 0;
+    float MeshBVH::EvaluateSplit(int splitAxis, float splitPos, int start, int count) {
+        BVHBoundingBox left, right;
+        int numLeft = 0, numRight = 0;
 
-        for (int i = start; i < start + count; i++) {
-            BVHTriangle &tri = allTriangles[i];
+        for (int i = start; i < start + count; ++i) {
+            const BVHTriangle &tri = allTriangles[i];
             if (tri.center[splitAxis] < splitPos) {
-                boundsLeft.growToInclude(tri.min, tri.max);
-                numOnLeft++;
+                left.growToInclude(tri.min, tri.max);
+                numLeft++;
             } else {
-                boundsRight.growToInclude(tri.min, tri.max);
-                numOnRight++;
+                right.growToInclude(tri.min, tri.max);
+                numRight++;
             }
         }
 
-        const float costA = NodeCost(boundsLeft.Size(), numOnLeft);
-        const float costB = NodeCost(boundsRight.Size(), numOnRight);
-        return costA + costB;
+        return NodeCost(left.Size(), numLeft) + NodeCost(right.Size(), numRight);
     }
 
-    float MeshBVH::NodeCost(const glm::vec3 &size, const int numTriangles) {
+    float MeshBVH::NodeCost(const glm::vec3 &size, int numTriangles) {
         float halfArea = size.x * size.y + size.x * size.z + size.y * size.z;
-        return halfArea * static_cast<float>(numTriangles);
+        return halfArea * numTriangles;
     }
 } // Metal

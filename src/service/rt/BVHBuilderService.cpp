@@ -29,23 +29,18 @@ namespace Metal {
                         for (auto &data: instance.allNodes) {
                             bvh.blas.push_back(data);
                         }
+
+
                         unsigned int stackIndex = 0;
-                        std::array< int, 32> nodes{-1};
-                        for (int i = 0; i< 32; i++)
-                            nodes[i] = -1;
+                        std::array<int, 32> nodes{};
                         nodes[stackIndex++] = 0;
                         while (stackIndex > 0) {
-                             int index = nodes.at(--stackIndex);
-                            if (index >= 0) {
-                                BottomLevelAccelerationStructure *currentNode = &instance.allNodes[index];
-                                std::cout << currentNode->startIndex << " | " << currentNode->triangleCount << " | <" <<
-                                        currentNode->
-                                        boundsMax.x << " " << currentNode->boundsMax.y << " " << currentNode->boundsMax.z <<
-                                        "> " << std::endl;
-                                if (currentNode->triangleCount < 0) {
-                                    nodes[stackIndex++] = currentNode->startIndex;
-                                    nodes[stackIndex++] = currentNode->startIndex + 1;
-                                }
+                            auto index = nodes.at(--stackIndex);
+                            BottomLevelAccelerationStructure *currentNode = &instance.allNodes[index];
+
+                            if (currentNode->triangleCount <= 0) {
+                                nodes[stackIndex++] = currentNode->startIndex;
+                                nodes[stackIndex++] = currentNode->startIndex + 1;
                             }
                         }
 
