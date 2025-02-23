@@ -69,6 +69,29 @@ namespace Metal {
         voxelizationRequestId = Util::uuidV4();
     }
 
+    void EngineContext::dispatchBVHBuild() {
+        auto bvh = context.bvhBuilderService.buildBVH();
+        rtTopLevelStructures = bvh.tlas;
+        rtTLASCount = rtTopLevelStructures.size();
+        updateTransformations();
+        context.coreBuffers.rtBLASBuffer->update(bvh.blas.data(),
+                                                 bvh.blas.size() * sizeof(BottomLevelAccelerationStructure));
+        context.coreBuffers.rtTrianglesBuffer->update(bvh.triangles.data(),
+                                                      bvh.triangles.size() * sizeof(RTTriangle));
+    }
+
+    void EngineContext::updateTransformations() {
+        std::vector<glm::mat4x4> transformations{};
+        transformations.reserve(rtTLASCount);
+        for (auto &tlas: rtTopLevelStructures) {
+            auto entity = tlas.id;
+            auto &transformComponent = context.worldRepository.transforms.at(entity);
+            tlas.invTransform = inverse(transformComponent.model);
+        }
+        context.coreBuffers.rtTLASBuffer->update(rtTopLevelStructures.data(),
+                                                 rtTLASCount * sizeof(TopLevelAccelerationStructure));
+    }
+
     void EngineContext::onSync() {
         updateCurrentTime();
 
@@ -103,6 +126,8 @@ namespace Metal {
         globalDataUBO.lightVolumeCount = context.lightVolumesService.getLightVolumeCount();
         globalDataUBO.volumesOffset = context.lightVolumesService.getVolumesOffset();
         globalDataUBO.volumeShadowSteps = context.engineRepository.volumeShadowSteps;
+        globalDataUBO.searchCountDivisor = context.editorRepository.voxelSearchCount;
+        globalDataUBO.rtTLASCount = rtTLASCount;
         globalDataUBO.isAtmosphereEnabled = context.engineRepository.atmosphereEnabled;
 
         globalDataUBO.enabledDenoiser = context.engineRepository.enabledDenoiser;

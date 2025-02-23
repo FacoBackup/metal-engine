@@ -1,0 +1,43 @@
+layout(local_size_x = 8, local_size_y = 8) in;
+
+#include "../GlobalDataBuffer.glsl"
+#include "../CreateRay.glsl"
+#include "../rt/RTStructures.glsl"
+#include "../rt/RayTracer.glsl"
+
+#ifdef DEBUG
+#include "../DebugFlags.glsl"
+#endif
+
+vec3 randomColor(float seed) {
+    float r = rand(vec3(seed));
+    float g = rand(vec3(seed + r));
+    return vec3(r, g, rand(vec3(seed + g)));
+}
+
+void main() {
+    vec2 texCoords = vec2(gl_GlobalInvocationID.xy) / imageSize(outputImage);
+
+    vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
+    vec3 rayOrigin = globalData.cameraWorldPosition.rgb;
+
+    HitData data = trace(rayOrigin, rayDir);
+    if (data.didHit) {
+        vec3 finalColor = vec3(0);
+        #ifdef DEBUG
+        if (globalData.debugFlag == NORMAL){
+            finalColor = data.hitNormal;
+        } else if (globalData.debugFlag == UV){
+            finalColor.xy = data.hitUV;
+        } else if (globalData.debugFlag == RANDOM){
+            finalColor = randomColor(float(data.hitId + 1));
+        } else if (globalData.debugFlag == POSITION){
+            finalColor = normalize(data.hitPosition);
+        } else {
+            finalColor.x = data.triangleTestCount / float(globalData.searchCountDivisor);
+            finalColor.z = data.boxTestCount / float(globalData.searchCountDivisor);
+        }
+        #endif
+        imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(finalColor, 1.0));
+    }
+}

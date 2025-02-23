@@ -18,6 +18,17 @@ namespace Metal {
         if (mapped == nullptr) {
             throw std::runtime_error("BufferInstance::update() called on a non-mapped buffer");
         }
-        memcpy(mapped, newData, dataSize);
+        if (newData != nullptr) {
+            memcpy(mapped, newData, dataSize);
+        }
+    }
+
+    void BufferInstance::update(void *newData, VkDeviceSize size) const {
+        if (mapped == nullptr) {
+            throw std::runtime_error("BufferInstance::update() called on a non-mapped buffer");
+        }
+        if (newData != nullptr) {
+            memcpy(mapped, newData, size);
+        }
     }
 } // Metal

@@ -11,6 +11,7 @@ namespace Metal {
     struct TransformComponent;
 
     class TransformService final : AbstractRuntimeComponent {
+        bool somethingChanged = false;
         glm::vec3 distanceAux{};
         glm::mat4x4 auxMat4{};
         glm::vec3 translation{};

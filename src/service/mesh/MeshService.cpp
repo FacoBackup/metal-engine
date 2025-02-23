@@ -87,5 +87,6 @@ namespace Metal {
         }
 
         context.engineContext.dispatchSceneVoxelization();
+        context.engineContext.dispatchBVHBuild();
     }
 } // Metal

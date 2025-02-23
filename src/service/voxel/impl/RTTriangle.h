@@ -4,7 +4,7 @@
 #include <glm/vec3.hpp>
 
 namespace Metal {
-    struct Triangle {
+    struct RTTriangle {
         glm::vec3 v0{};
         glm::vec3 v1{};
         glm::vec3 v2{};
