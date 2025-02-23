@@ -25,6 +25,7 @@ namespace Metal {
         if (member != nullptr && member->name == ROTATION) {
             rotation = normalize(glm::quat(rotationEuler * (glm::pi<float>() / 180.f)));
         }
+        context.engineContext.setWorldChange(true);
         forceTransform = true;
     }
 }

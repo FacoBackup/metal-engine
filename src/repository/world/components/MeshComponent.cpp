@@ -19,7 +19,6 @@ namespace Metal {
 
     void MeshComponent::onUpdate(InspectableMember *member, ApplicationContext &context) {
         context.engineContext.setGISettingsUpdated(true);
-        needsReVoxelization = true;
     }
 
     ComponentTypes::ComponentType MeshComponent::getType() {

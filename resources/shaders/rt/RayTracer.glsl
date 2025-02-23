@@ -72,38 +72,6 @@ float RayBoundingBoxDst(Ray ray, vec3 boxMin, vec3 boxMax) {
     return hit ? (tNear > 0.0 ? tNear : 0.0) : INF;
 }
 
-// Returns true if the ray intersects the box.
-// Outputs tHit (distance along the ray) and hitPos (intersection point).
-bool intersectBox(vec3 rayOrigin, vec3 rayDir, vec3 boxMin, vec3 boxMax, inout float tHit, inout vec3 hitPos) {
-    // Compute the inverse of the ray direction.
-    vec3 invDir = 1.0 / rayDir;
-
-    // Compute the intersection distances for the two slabs for each axis.
-    vec3 t0 = (boxMin - rayOrigin) * invDir;
-    vec3 t1 = (boxMax - rayOrigin) * invDir;
-
-    // Determine the nearest and farthest intersection distances.
-    vec3 tMin = min(t0, t1);
-    vec3 tMax = max(t0, t1);
-
-    // The nearest possible intersection is the maximum of the tMin values.
-    float tNear = max(max(tMin.x, tMin.y), tMin.z);
-    // The farthest intersection is the minimum of the tMax values.
-    float tFar = min(min(tMax.x, tMax.y), tMax.z);
-
-    // If tNear is greater than tFar, the ray misses the box.
-    // Also, if tFar is negative, the box is behind the ray.
-    if (tNear > tFar || tFar < 0.0)
-    return false;
-
-    // Use tNear as the intersection distance and compute the hit position.
-    tHit = tNear;
-    hitPos = rayOrigin + rayDir * tHit;
-
-    return true;
-}
-
-
 // -------------------------
 // BVH Traversal within a Bottom-Level Acceleration structure
 // -------------------------
@@ -124,25 +92,9 @@ inout uint boxTestCount
     uint stack[32];
     int stackIndex = 0;
     stack[stackIndex++] = nodeOffset;// Push the root node.
-    int totalLoops = 0;
     while (stackIndex > 0) {
-        if (totalLoops > 100000){
-            break;
-        }
-        totalLoops++;
         uint nodeIndex = stack[--stackIndex];
         BottomLevelAS node = blasBuffer.items[nodeIndex];
-        if (boxTestCount > globalData.searchCountDivisor && globalData.searchCountDivisor > 0){
-            float tHit = 0;
-            vec3 p = vec3(0);
-            if (intersectBox(ray.origin, ray.dir, node.boundsMin, node.boundsMax, tHit, p)){
-                result.hitPosition = (node.boundsMin + node.boundsMax) / 2;
-                result.didHit = true;
-                result.closestT = tHit;
-                result.hitId = stackIndex;
-                return result;
-            }
-        }
         if (node.triangleCount > 0) {
             // Leaf node: iterate over the triangles.
             for (uint i = 0; i < node.triangleCount; i++) {
@@ -158,7 +110,6 @@ inout uint boxTestCount
             // Inner node: process children
             uint childIndexA = nodeOffset + node.startIndex;
             uint childIndexB = childIndexA + 1;
-
 
             BottomLevelAS childA = blasBuffer.items[childIndexA];
             BottomLevelAS childB = blasBuffer.items[childIndexB];

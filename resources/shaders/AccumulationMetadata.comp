@@ -10,8 +10,8 @@ layout(local_size_x = 8, local_size_y = 8) in;
 layout(set = 1, binding = 0, rgba32f) uniform image2D currentFrameImage;// Color + surface ID
 layout(set = 2, binding = 0, rgba32f) uniform image2D previousFrameImage;// Color + acuumulation count
 layout(set = 3, binding = 0, rgba32f) uniform image2D previousFrameMetadataImage;// surface ID + Normal
-layout(set = 4, binding = 0) uniform sampler2D gBufferPosition;
-layout(set = 5, binding = 0) uniform sampler2D gBufferNormal;
+layout(set = 4, binding = 0, rgba32f) uniform image2D currentPositions;
+layout(set = 5, binding = 0, rgba32f) uniform image2D currentNormals;
 
 layout(push_constant) uniform Push {
     float diffWeight;
@@ -29,17 +29,14 @@ void main() {
         return;
     }
 
-    vec2 samplerRes = imageSize(currentFrameImage);
-    vec2 texCoords = vec2(coords)/samplerRes;
-
-    vec4 worldPos = texture(gBufferPosition, texCoords);
+    vec4 worldPos = imageLoad(currentPositions, coords);
     if (worldPos.a == 0){
         imageStore(previousFrameImage, coords, vec4(0, 0, 0, 1));
         imageStore(previousFrameMetadataImage, coords, vec4(0));
         return;
     }
 
-    vec3 currentNormal = texture(gBufferNormal, texCoords).xyz;
+    vec3 currentNormal = imageLoad(currentNormals, coords).xyz;
 
     vec4 currentFrame = imageLoad(currentFrameImage, coords);// Color + surface ID
     vec4 previousFrameMetadata = imageLoad(previousFrameMetadataImage, coords);
@@ -70,5 +67,5 @@ void main() {
         accumulationCount *= varianceFactor;
         imageStore(previousFrameImage, coords, vec4(currentFrame.rgb, round(accumulationCount)));
     }
-    imageStore(previousFrameMetadataImage, coords, vec4(currentFrame.a, texture(gBufferNormal, texCoords).rgb));
+    imageStore(previousFrameMetadataImage, coords, vec4(currentFrame.a, imageLoad(currentNormals, coords).rgb));
 }

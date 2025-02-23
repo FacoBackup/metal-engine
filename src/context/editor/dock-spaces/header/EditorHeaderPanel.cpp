@@ -75,15 +75,7 @@ namespace Metal {
             if (ImGui::InputText(id.c_str(), projectName, 128)) {
                 context->editorRepository.projectName = projectName;
             }
-            if (context->voxelizationService.isExecutingVoxelization()) {
-                UIUtil::DynamicSpacing(115);
-                if (UIUtil::ButtonSimple(Icons::apps, UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-                    context->voxelizationService.cancelRequest();
-                }
-                UIUtil::RenderTooltip("Cancel voxelization request");
-            } else {
-                UIUtil::DynamicSpacing(90);
-            }
+            UIUtil::DynamicSpacing(90);
             framerate();
 
             ImGui::EndMainMenuBar();

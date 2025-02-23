@@ -60,4 +60,11 @@ layout(set = 3, binding = 0) uniform TLAS {
 
 
 layout(set = 4, binding = 0, rgba32f) uniform image2D outputImage;
+
+#define LIGHT_VOLUME_SET 5
+#include "../LightVolumeBuffer.glsl"
+
+layout(set = 6, binding = 0, rgba32f) uniform image2D currentPositionsImage;
+layout(set = 7, binding = 0, rgba32f) uniform image2D currentNormalsDescriptor;
+
 #endif

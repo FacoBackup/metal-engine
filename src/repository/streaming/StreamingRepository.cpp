@@ -1,7 +1,6 @@
 #include "StreamingRepository.h"
 
 #include "../../context/ApplicationContext.h"
-#include "../../service/voxel/SVOInstance.h"
 #include "../../enum/LevelOfDetail.h"
 #include "../../service/mesh/MeshInstance.h"
 #include "../../service/texture/TextureInstance.h"
@@ -81,10 +80,6 @@ namespace Metal {
         STREAM_NO_LOD(context.materialService, MaterialInstance)
     }
 
-    SVOInstance *StreamingRepository::streamSVO(const std::string &id) {
-        STREAM_NO_LOD(context.svoService, SVOInstance)
-    }
-
     MeshInstance *StreamingRepository::streamMesh(const std::string &id, const LevelOfDetail &lod) {
         STREAM(context.meshService, MeshInstance)
     }
@@ -98,7 +93,6 @@ namespace Metal {
             sinceLastCleanup = context.engineContext.currentTime;
             DISPOSAL(context.meshService.getResources())
             DISPOSAL(context.textureService.getResources())
-            DISPOSAL(context.svoService.getResources())
             DISPOSAL(context.materialService.getResources())
         }
     }

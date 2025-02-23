@@ -20,5 +20,11 @@ namespace Metal {
         currentFrame = context.textureService.createForCompute(context.vulkanContext.getWindowWidth() / context.engineRepository.shadingResInvScale, context.vulkanContext.getWindowHeight() / context.engineRepository.shadingResInvScale);
         currentFrame->setAsNoDisposal();
 
+        currentPositions = context.textureService.createForCompute(context.vulkanContext.getWindowWidth() / context.engineRepository.shadingResInvScale, context.vulkanContext.getWindowHeight() / context.engineRepository.shadingResInvScale);
+        currentPositions->setAsNoDisposal();
+
+        currentNormalsDescriptor = context.textureService.createForCompute(context.vulkanContext.getWindowWidth() / context.engineRepository.shadingResInvScale, context.vulkanContext.getWindowHeight() / context.engineRepository.shadingResInvScale);
+        currentNormalsDescriptor->setAsNoDisposal();
+
     }
 } // Metal

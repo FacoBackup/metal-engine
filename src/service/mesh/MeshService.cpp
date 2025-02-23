@@ -86,7 +86,6 @@ namespace Metal {
             repo.linkEntities(repo.getEntity(entities.at(entity.parentEntity)), repo.getEntity(entities.at(entity.id)));
         }
 
-        context.engineContext.dispatchSceneVoxelization();
         context.engineContext.dispatchBVHBuild();
     }
 } // Metal

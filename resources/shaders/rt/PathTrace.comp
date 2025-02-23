@@ -39,5 +39,7 @@ void main() {
         }
         #endif
         imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(finalColor, 1.0));
+        imageStore(currentPositionsImage, ivec2(gl_GlobalInvocationID.xy), vec4(data.hitPosition, 1.0));
+        imageStore(currentNormalsDescriptor, ivec2(gl_GlobalInvocationID.xy), vec4(data.hitNormal, 1.0));
     }
 }

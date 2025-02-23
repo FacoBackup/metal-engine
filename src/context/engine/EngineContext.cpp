@@ -2,53 +2,13 @@
 
 #include "../../context/ApplicationContext.h"
 #include "../../service/buffer/BufferInstance.h"
-#include "../../service/descriptor/DescriptorBinding.h"
-#include "../../service/voxel/SVOInstance.h"
-#include "../../enum/LevelOfDetail.h"
-#include "../../enum/LightVolumeType.h"
 #include "../../service/camera/Camera.h"
 #include "../../service/framebuffer/FrameBufferInstance.h"
-#include "../../service/texture/TextureInstance.h"
 
 namespace Metal {
     void EngineContext::onInitialize() {
         context.worldGridService.onSync();
         context.passesService.onInitialize();
-    }
-
-    void EngineContext::updateVoxelData() {
-        if (context.worldGridRepository.hasMainTileChanged) {
-            unsigned int i = 0;
-            std::vector<DescriptorBinding> bindings{};
-            for (auto *tile: context.worldGridRepository.getLoadedTiles()) {
-                if (tile != nullptr) {
-                    const auto *svo = context.streamingRepository.streamSVO(tile->id);
-                    if (svo != nullptr) {
-                        auto &b = bindings.emplace_back();
-
-                        b.bindingPoint = i + 1;
-                        b.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-                        b.bufferInstance = svo->voxelsBuffer;
-
-                        tileInfoUBO.tileCenterValid[i] = glm::vec4(tile->x, 0,
-                                                                   tile->z, 1);
-                        tileInfoUBO.voxelBufferOffset[i] = svo->voxelBufferOffset;
-                        i++;
-                    }
-                }
-            }
-
-            for (unsigned int j = i; j < 9; j++) {
-                tileInfoUBO.tileCenterValid[i].w = 0;
-            }
-
-            if (i > 0) {
-                DescriptorInstance::Write(context.vulkanContext, context.coreDescriptorSets.svoData->vkDescriptorSet,
-                                          bindings);
-                context.coreBuffers.tileInfo->update(tileInfoUBO.tileCenterValid.data());
-            }
-            context.worldGridRepository.hasMainTileChanged = false;
-        }
     }
 
     void EngineContext::updateCurrentTime() {
@@ -65,19 +25,8 @@ namespace Metal {
         }
     }
 
-    void EngineContext::dispatchSceneVoxelization() {
-        voxelizationRequestId = Util::uuidV4();
-    }
-
     void EngineContext::dispatchBVHBuild() {
-        auto bvh = context.bvhBuilderService.buildBVH();
-        rtTopLevelStructures = bvh.tlas;
-        rtTLASCount = rtTopLevelStructures.size();
-        updateTransformations();
-        context.coreBuffers.rtBLASBuffer->update(bvh.blas.data(),
-                                                 bvh.blas.size() * sizeof(BottomLevelAccelerationStructure));
-        context.coreBuffers.rtTrianglesBuffer->update(bvh.triangles.data(),
-                                                      bvh.triangles.size() * sizeof(RTTriangle));
+        isBVHReady = false;
     }
 
     void EngineContext::updateTransformations() {
@@ -93,15 +42,25 @@ namespace Metal {
     }
 
     void EngineContext::onSync() {
+        if (!isBVHReady) {
+            auto bvh = context.bvhBuilderService.buildBVH();
+            rtTopLevelStructures = bvh.tlas;
+            rtTLASCount = rtTopLevelStructures.size();
+            updateTransformations();
+            context.coreBuffers.rtBLASBuffer->update(bvh.blas.data(),
+                                                     bvh.blas.size() * sizeof(BottomLevelAccelerationStructure));
+            context.coreBuffers.rtTrianglesBuffer->update(bvh.triangles.data(),
+                                                          bvh.triangles.size() * sizeof(RTTriangle));
+            isBVHReady = true;
+        }
+
         updateCurrentTime();
 
         context.transformService.onSync();
         context.worldGridService.onSync();
         context.streamingRepository.onSync();
         context.cameraService.onSync();
-        context.voxelizationService.onSync();
 
-        updateVoxelData();
         if (lightVolumeDataNeedsUpdate) {
             context.lightVolumesService.update();
         }
@@ -112,6 +71,7 @@ namespace Metal {
         setLightVolumeDataNeedsUpdate(false);
         setCameraUpdated(false);
         setGISettingsUpdated(false);
+        setWorldChange(false);
     }
 
     void EngineContext::updateGlobalData() {

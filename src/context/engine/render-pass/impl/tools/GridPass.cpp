@@ -12,8 +12,7 @@ namespace Metal {
                 )
                 .setBlendEnabled()
                 .setPushConstantsSize(sizeof(GridPushConstant))
-                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get());
+                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get());
         pipelineInstance = context.pipelineService.createPipeline(gridPipelineBuilder);
     }
 

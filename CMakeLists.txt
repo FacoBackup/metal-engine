@@ -87,8 +87,6 @@ add_executable(
         src/service/pipeline/ShaderModule.h
         src/context/engine/render-pass/AbstractRenderPass.cpp
         src/context/engine/render-pass/AbstractRenderPass.h
-        src/context/engine/render-pass/impl/GBufferGenPass.cpp
-        src/context/engine/render-pass/impl/GBufferGenPass.h
         src/service/texture/TextureInstance.h
         src/repository/abstract/ResourceRepository.h
         src/service/abstract/AbstractResourceService.cpp
@@ -203,22 +201,11 @@ add_executable(
         src/repository/world/impl/WorldGridRepository.h
         src/repository/world/impl/WorldTile.h
         src/repository/world/impl/BoundingBox.h
-        src/service/voxel/impl/SparseVoxelOctreeBuilder.cpp
-        src/service/voxel/impl/SparseVoxelOctreeBuilder.h
-        src/service/voxel/impl/OctreeNode.cpp
-        src/service/voxel/impl/OctreeNode.h
-        src/service/voxel/impl/VoxelData.h
-        src/service/voxel/VoxelizationService.cpp
-        src/service/voxel/VoxelizationService.h
-        src/service/voxel/impl/VoxelizerService.cpp
-        src/service/voxel/impl/VoxelizerService.h
         src/service/mesh/SceneData.h
         src/service/mesh/EntityAssetData.h
         src/service/material/MaterialData.h
         src/context/engine/render-pass/impl/PostProcessingPass.cpp
         src/context/engine/render-pass/impl/PostProcessingPass.h
-        src/context/engine/compute-pass/impl/PathTracerPass.cpp
-        src/context/engine/compute-pass/impl/PathTracerPass.h
         src/service/pipeline/PipelineBuilder.h
         src/service/framebuffer/FrameBufferAttachment.cpp
         src/repository/engine/EngineRepository.cpp
@@ -230,14 +217,6 @@ add_executable(
         src/service/notification/NotificationService.h
         src/dto/Notification.h
         src/enum/NotificationSeverity.h
-        src/service/voxel/impl/RTTriangle.h
-        src/service/voxel/impl/SparseVoxelOctreeData.h
-        src/context/engine/render-pass/impl/tools/VoxelVisualizerPass.cpp
-        src/context/engine/render-pass/impl/tools/VoxelVisualizerPass.h
-        src/service/voxel/SVOService.cpp
-        src/service/voxel/SVOService.h
-        src/service/voxel/SVOInstance.cpp
-        src/service/voxel/SVOInstance.h
         src/dto/push-constant/VoxelDebugSettingsPushConstant.h
         src/service/world/WorldGridService.cpp
         src/service/world/WorldGridService.h
@@ -265,7 +244,6 @@ add_executable(
         src/repository/inspection/FileInspectionRepository.h
         src/context/editor/dock-spaces/inspector/MaterialInspection.cpp
         src/context/editor/dock-spaces/inspector/MaterialInspection.h
-        src/service/voxel/VoxelizationRequest.h
         src/enum/LightVolumeType.h
         src/context/engine/compute-pass/impl/AccumulationMetadataPass.cpp
         src/context/engine/compute-pass/impl/AccumulationMetadataPass.h

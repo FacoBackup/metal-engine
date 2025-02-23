@@ -7,7 +7,6 @@
 
 #include "BoundingBox.h"
 #include "../../../enum/engine-definitions.h"
-#include "../../../service/voxel/impl/SparseVoxelOctreeBuilder.h"
 #include "../../../util/serialization-definitions.h"
 #define TILE_SIZE 64
 

@@ -11,10 +11,6 @@ namespace Metal {
             : AbstractResourceService(context) {
         }
 
-        bool streamAndWrite(std::string &id,
-                            MaterialInstance *instance,
-                            std::unique_ptr<DescriptorInstance> &descriptor) const;
-
         MaterialInstance *create(const std::string &id);
 
         MaterialData *stream(const std::string &id) const;

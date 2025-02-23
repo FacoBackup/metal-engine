@@ -19,11 +19,13 @@ namespace Metal {
         TileInfoUBO tileInfoUBO{};
         long long start = -1;
         bool cameraUpdated = true;
+        bool worldChange = true;
         bool lightVolumeDataNeedsUpdate = true;
         bool giSettingsUpdated = true;
-        std::string voxelizationRequestId;
         unsigned int giAccumulationCount = 0;
         unsigned int rtTLASCount = 0;
+        bool isBVHReady = false;
+
     public:
         GlobalDataUBO &getGlobalDataUBO() { return globalDataUBO; }
 
@@ -38,9 +40,16 @@ namespace Metal {
         void setCameraUpdated(const bool val) {
             cameraUpdated = val;
         }
+        void setWorldChange(const bool worldChange) {
+            this->worldChange = worldChange;
+        }
 
         bool isCameraUpdated() const {
             return cameraUpdated;
+        }
+
+        bool hasWorldChanged() const {
+            return worldChange;
         }
 
         void setGISettingsUpdated(const bool val) {
@@ -57,19 +66,11 @@ namespace Metal {
 
         void onInitialize() override;
 
-        void updateVoxelData();
-
         void updateCurrentTime();
-
-        void dispatchSceneVoxelization();
 
         void dispatchBVHBuild();
 
-        void updateTransformations() ;
-
-        std::string getVoxelizationRequestId() {
-            return voxelizationRequestId;
-        }
+        void updateTransformations();
 
         explicit EngineContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {
         }
