@@ -9,6 +9,9 @@ layout(local_size_x = 8, local_size_y = 8) in;
 #include "../DebugFlags.glsl"
 #endif
 
+#include "../util/PixelShading.glsl"
+#include "../util/VolumeRayTracer.glsl"
+
 vec3 randomColor(float seed) {
     float r = rand(vec3(seed));
     float g = rand(vec3(seed + r));
@@ -23,23 +26,67 @@ void main() {
 
     HitData data = trace(rayOrigin, rayDir);
     if (data.didHit) {
-        vec3 finalColor = vec3(0);
+        MaterialInfo material;
+        SurfaceInteraction interaction;
+
+        interaction.normal = data.hitNormal;
+        material.baseColor = vec3(1, 0 ,0 );
+        material.metallic = .5;
+        material.roughness = .5;
+        material.isEmissive = false;
+        interaction.point = data.hitPosition;
+        interaction.anyHit = true;
+
         #ifdef DEBUG
-        if (globalData.debugFlag == NORMAL){
-            finalColor = data.hitNormal;
-        } else if (globalData.debugFlag == UV){
-            finalColor.xy = data.hitUV;
-        } else if (globalData.debugFlag == RANDOM){
-            finalColor = randomColor(float(data.hitId + 1));
-        } else if (globalData.debugFlag == POSITION){
-            finalColor = normalize(data.hitPosition);
-        } else {
-            finalColor.x = data.triangleTestCount / float(globalData.searchCountDivisor);
-            finalColor.z = data.boxTestCount / float(globalData.searchCountDivisor);
+        if (globalData.debugFlag != LIT && globalData.debugFlag != GI){
+            bool shouldReturn = true;
+            if (globalData.debugFlag == NORMAL){
+                finalColor = data.hitNormal;
+            } else if (globalData.debugFlag == UV){
+                finalColor.xy = data.hitUV;
+            } else if (globalData.debugFlag == RANDOM){
+                finalColor = randomColor(float(data.hitId + 1));
+            } else if (globalData.debugFlag == POSITION){
+                finalColor = normalize(data.hitPosition);
+            } else {
+                finalColor.x = data.triangleTestCount / float(globalData.searchCountDivisor);
+                finalColor.z = data.boxTestCount / float(globalData.searchCountDivisor);
+            }
+            if (shouldReturn) {
+                imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(finalColor, 1));
+                return;
+            }
         }
         #endif
-        imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(finalColor, 1.0));
-        imageStore(currentPositionsImage, ivec2(gl_GlobalInvocationID.xy), vec4(data.hitPosition, 1.0));
-        imageStore(currentNormalsDescriptor, ivec2(gl_GlobalInvocationID.xy), vec4(data.hitNormal, 1.0));
+
+        if (material.isEmissive) { // EMISSION
+            finalColor = materialA.rgb;
+        } else {
+            state = uint(uint(gl_GlobalInvocationID.x) * uint(1973) + uint(gl_GlobalInvocationID.y) * uint(9277) + uint(globalData.globalFrameCount) * uint(26699)) | uint(1);
+            texCoords = (vec2(gl_GlobalInvocationID.xy) + vec2(random(), random())) / imageSize(outputImage);
+
+            finalColor = calculatePixelColor(rayDir, texCoords, material, interaction);
+        }
+
+        if (globalData.enabledDenoiser){
+            finalData = worldPos.a;
+        } else {
+            vec4 previousFrame = imageLoad(outputImage, ivec2(gl_GlobalInvocationID.xy));
+            float accumulationCount = min(globalData.giMaxAccumulation, previousFrame.a);
+            finalColor = previousFrame.rgb * (1. - 1./accumulationCount) + finalColor * 1./accumulationCount;
+            finalData = accumulationCount + 1;
+        }
+    }else{
+        if (globalData.isAtmosphereEnabled){
+            finalColor = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), rayDir, 2.0f) * 0.05f;
+        }
     }
+
+    vec4 volumetricColor = vec4(0.0);
+    traceVolumes(volumetricColor, worldPos.rgb, rayDir);
+    if(volumetricColor.a > 0.001){
+        finalColor = volumetricColor.rgb * volumetricColor.a + finalColor * (1.0 - volumetricColor.a);
+    }
+
+    imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(finalColor, finalData));
 }

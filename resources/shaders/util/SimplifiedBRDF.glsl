@@ -1,4 +1,5 @@
 #include "../util/LightVisibility.glsl"
+#include "../rt/RTStructures.glsl"
 
 struct BounceInfo {
     vec3 albedo;
@@ -77,7 +78,7 @@ vec3 calculateIndirectLighting(float roughness, vec3 normal, vec3 currentPositio
         specularRayDir = normalize(mix(specularRayDir, diffuseRayDir, localRoughness * localRoughness));
         localRayDir = mix(diffuseRayDir, specularRayDir, 1. - localRoughness);
         Ray ray = Ray(bounceInfo.currentPosition, localRayDir, 1.0 / localRayDir);
-        SurfaceInteraction interaction = traceAllTiles(ray);
+        SurfaceInteraction interaction = trace(ray.o, ray.d);
         if (!interaction.anyHit) {
             if (globalData.isAtmosphereEnabled){
                 bounceInfo.albedo = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), ray.d, 2.0f) * 0.05f;
