@@ -2,7 +2,6 @@
 
 #include "../../context/ApplicationContext.h"
 #include "../../enum/LevelOfDetail.h"
-#include "../../service/mesh/MeshInstance.h"
 #include "../../service/texture/TextureInstance.h"
 #include <iostream>
 #include "../../repository/abstract/RuntimeResource.h"
@@ -80,10 +79,6 @@ namespace Metal {
         STREAM_NO_LOD(context.materialService, MaterialInstance)
     }
 
-    MeshInstance *StreamingRepository::streamMesh(const std::string &id, const LevelOfDetail &lod) {
-        STREAM(context.meshService, MeshInstance)
-    }
-
     TextureInstance *StreamingRepository::streamTexture(const std::string &id, const LevelOfDetail &lod) {
         STREAM(context.textureService, TextureInstance)
     }
@@ -91,7 +86,6 @@ namespace Metal {
     void StreamingRepository::onSync() {
         if ((context.engineContext.currentTime - sinceLastCleanup).count() >= MAX_TIMEOUT) {
             sinceLastCleanup = context.engineContext.currentTime;
-            DISPOSAL(context.meshService.getResources())
             DISPOSAL(context.textureService.getResources())
             DISPOSAL(context.materialService.getResources())
         }

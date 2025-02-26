@@ -1,6 +1,5 @@
 #include "../LightVolumeBuffer.glsl"
 #include "../util/RayTracerUtil.glsl"
-#include "../util/RayTracer.glsl"
 #include "../util/LightVisibility.glsl"
 
 // Principled PBR Path tracer. Except where otherwise noted:

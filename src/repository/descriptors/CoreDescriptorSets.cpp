@@ -12,21 +12,23 @@
 #define ALL_STAGES static_cast<VkShaderStageFlagBits>( VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT |VK_SHADER_STAGE_COMPUTE_BIT)
 
 namespace Metal {
-
     void CoreDescriptorSets::createBuffersDescriptors() { {
             rtTrianglesData = std::make_unique<DescriptorInstance>();
             rtTrianglesData->addLayoutBinding(
-                DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0, context.coreBuffers.rtTrianglesBuffer));
+                DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0,
+                                      context.coreBuffers.rtTrianglesBuffer));
             rtTrianglesData->create(vulkanContext);
         } {
             rtBLASData = std::make_unique<DescriptorInstance>();
             rtBLASData->addLayoutBinding(
-                DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0, context.coreBuffers.rtBLASBuffer));
+                DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0,
+                                      context.coreBuffers.rtBLASBuffer));
             rtBLASData->create(vulkanContext);
         } {
             rtTLASData = std::make_unique<DescriptorInstance>();
             rtTLASData->addLayoutBinding(
-                DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0, context.coreBuffers.rtTLASBuffer));
+                DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0,
+                                      context.coreBuffers.rtTLASBuffer));
             rtTLASData->create(vulkanContext);
         }
 
@@ -35,6 +37,12 @@ namespace Metal {
                                                                 VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0,
                                                                 context.coreBuffers.lightVolumeBuffer));
         lightVolumeData->create(vulkanContext);
+
+        materialDataDescriptor = std::make_unique<DescriptorInstance>();
+        materialDataDescriptor->addLayoutBinding(DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES,
+                                                                       VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0,
+                                                                       context.coreBuffers.materialData));
+        materialDataDescriptor->create(vulkanContext);
 
 
         globalDataDescriptor = std::make_unique<DescriptorInstance>();
@@ -78,19 +86,12 @@ namespace Metal {
         }{
             currentPositionsDescriptor = std::make_unique<DescriptorInstance>();
             currentPositionsDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
-                                                                           VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
-                                                                           VK_NULL_HANDLE,
-                                                                           context.coreTextures.currentPositions->
-                                                                           vkImageView));
+                                                                             VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
+                                                                             VK_NULL_HANDLE,
+                                                                             context.coreTextures.
+                                                                             currentPositions->
+                                                                             vkImageView));
             currentPositionsDescriptor->create(vulkanContext);
-        }{
-            currentNormalsDescriptor = std::make_unique<DescriptorInstance>();
-            currentNormalsDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
-                                                                           VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
-                                                                           VK_NULL_HANDLE,
-                                                                           context.coreTextures.currentNormalsDescriptor->
-                                                                           vkImageView));
-            currentNormalsDescriptor->create(vulkanContext);
         }
     }
 

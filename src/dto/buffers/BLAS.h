@@ -1,10 +1,15 @@
 #ifndef BOTTOMLEVELACCELERATIONSTRUCTURE_H
 #define BOTTOMLEVELACCELERATIONSTRUCTURE_H
-#include <glm/vec3.hpp>
-#include "BVHBoundingBox.h"
+#include <../../../cmake-build-debug/vcpkg_installed/arm64-osx/include/glm/vec3.hpp>
+#include "../../service/rt/data/BVHBoundingBox.h"
 
 namespace Metal {
-    struct BottomLevelAccelerationStructure final {
+    /**
+     *                  Bottom level acceleration structure
+     *
+     * Stores a hierarchical reference to nodes that group triangles
+     */
+    struct BLAS final {
         alignas(16) glm::vec3 boundsMin;
         alignas(16) glm::vec3 boundsMax;
 
@@ -18,11 +23,11 @@ namespace Metal {
         /**
          * Root node only
          */
-        explicit BottomLevelAccelerationStructure(const BVHBoundingBox &bounds)
+        explicit BLAS(const BVHBoundingBox &bounds)
             : boundsMin(bounds.Min), boundsMax(bounds.Max), startIndex(-1), triangleCount(-1) {
         }
 
-        BottomLevelAccelerationStructure(const BVHBoundingBox &bounds, int startIndex, int triCount)
+        BLAS(const BVHBoundingBox &bounds, int startIndex, int triCount)
             : boundsMin(bounds.Min), boundsMax(bounds.Max), startIndex(startIndex), triangleCount(triCount) {
         }
     };

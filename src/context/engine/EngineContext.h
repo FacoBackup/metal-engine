@@ -7,14 +7,14 @@
 #include "../../common/AbstractRuntimeComponent.h"
 #include "../../dto/buffers/TileInfoUBO.h"
 #include "../../service/buffer/BufferInstance.h"
-#include "../../service/rt/data/TopLevelAccelerationStructure.h"
+#include "../../dto/buffers/TLAS.h"
 
 using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
 
 namespace Metal {
     class EngineContext final : public AbstractRuntimeComponent {
-        std::vector<TopLevelAccelerationStructure> rtTopLevelStructures;
+        std::vector<TLAS> rtTopLevelStructures;
         GlobalDataUBO globalDataUBO{};
         TileInfoUBO tileInfoUBO{};
         long long start = -1;
@@ -70,7 +70,7 @@ namespace Metal {
 
         void dispatchBVHBuild();
 
-        void updateTransformations();
+        void updateTLASs();
 
         explicit EngineContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {
         }

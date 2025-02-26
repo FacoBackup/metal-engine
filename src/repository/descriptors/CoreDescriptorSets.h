@@ -24,11 +24,11 @@ namespace Metal {
         std::unique_ptr<DescriptorInstance> previousFrameMetadataDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> currentFrameDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> currentPositionsDescriptor = nullptr;
-        std::unique_ptr<DescriptorInstance> currentNormalsDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> rtTrianglesData = nullptr;
         std::unique_ptr<DescriptorInstance> rtBLASData = nullptr;
         std::unique_ptr<DescriptorInstance> rtTLASData = nullptr;
         std::unique_ptr<DescriptorInstance> lightVolumeData = nullptr;
+        std::unique_ptr<DescriptorInstance> materialDataDescriptor = nullptr;
 
         void onInitialize() override;
 

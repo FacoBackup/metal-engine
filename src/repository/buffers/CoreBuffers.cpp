@@ -5,9 +5,10 @@
 #include "../../dto/buffers/LightVolumeData.h"
 #include "../../enum/engine-definitions.h"
 #include "../../service/buffer/BufferService.h"
-#include "../../service/rt/data/BottomLevelAccelerationStructure.h"
-#include "../../service/rt/data/RTTriangle.h"
-#include "../../service/rt/data/TopLevelAccelerationStructure.h"
+#include "../../dto/buffers/RTTriangle.h"
+#include "../../dto/buffers/BLAS.h"
+#include "../../dto/buffers/MaterialInfo.h"
+#include "../../dto/buffers/TLAS.h"
 
 namespace Metal {
     void CoreBuffers::onInitialize() {
@@ -27,12 +28,17 @@ namespace Metal {
                                                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-        rtBLASBuffer = bufferService.createBuffer(MAX_RT_BLAS * sizeof(BottomLevelAccelerationStructure),
+        rtBLASBuffer = bufferService.createBuffer(MAX_RT_BLAS * sizeof(BLAS),
                                                   VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-        rtTLASBuffer = bufferService.createBuffer(MAX_RT_TLAS * sizeof(TopLevelAccelerationStructure),
+        rtTLASBuffer = bufferService.createBuffer(MAX_RT_TLAS * sizeof(TLAS),
+                                                  VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                                                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                                  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+        materialData = bufferService.createBuffer(MAX_MATERIALS * sizeof(MaterialInfo),
                                                   VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);

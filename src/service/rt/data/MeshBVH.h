@@ -2,7 +2,7 @@
 #define MESHBVH_H
 #include <vector>
 
-#include "BottomLevelAccelerationStructure.h"
+#include "../../../dto/buffers/BLAS.h"
 #include "BVHTriangle.h"
 
 namespace Metal {
@@ -21,7 +21,7 @@ namespace Metal {
      */
     class MeshBVH {
     public:
-        std::vector<BottomLevelAccelerationStructure> allNodes;
+        std::vector<BLAS> allNodes;
         std::vector<RTTriangle> allTris;
 
         explicit MeshBVH(MeshData *mesh);
@@ -34,7 +34,7 @@ namespace Metal {
                    int triNum,
                    int depth = 0);
 
-        SplitResult ChooseSplit(const BottomLevelAccelerationStructure &node, int start, int count);
+        SplitResult ChooseSplit(const BLAS &node, int start, int count);
 
         float EvaluateSplit(int splitAxis, float splitPos, int start, int count);
 

@@ -11,7 +11,6 @@ using TimePoint = std::chrono::time_point<Clock>;
 
 namespace Metal {
     struct LevelOfDetail;
-    struct MeshInstance;
     struct TextureInstance;
     struct MaterialInstance;
 
@@ -24,8 +23,6 @@ namespace Metal {
         explicit StreamingRepository(ApplicationContext &context)
             : AbstractRuntimeComponent(context) {
         }
-
-        MeshInstance *streamMesh(const std::string &id, const LevelOfDetail &lod);
 
         MaterialInstance *streamMaterial(const std::string &id);
 

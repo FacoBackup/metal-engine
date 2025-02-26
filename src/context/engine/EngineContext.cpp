@@ -29,16 +29,19 @@ namespace Metal {
         isBVHReady = false;
     }
 
-    void EngineContext::updateTransformations() {
+    void EngineContext::updateTLASs() {
         std::vector<glm::mat4x4> transformations{};
         transformations.reserve(rtTLASCount);
         for (auto &tlas: rtTopLevelStructures) {
             auto entity = tlas.id;
             auto &transformComponent = context.worldRepository.transforms.at(entity);
+            auto &meshComponent = context.worldRepository.meshes.at(entity);
             tlas.invTransform = inverse(transformComponent.model);
+            // TODO - CREATE MATERIAL PIPELINE + USE meshComponent.materialId
+            // tlas.materialId = meshComponent.materialId;
         }
         context.coreBuffers.rtTLASBuffer->update(rtTopLevelStructures.data(),
-                                                 rtTLASCount * sizeof(TopLevelAccelerationStructure));
+                                                 rtTLASCount * sizeof(TLAS));
     }
 
     void EngineContext::onSync() {
@@ -46,9 +49,9 @@ namespace Metal {
             auto bvh = context.bvhBuilderService.buildBVH();
             rtTopLevelStructures = bvh.tlas;
             rtTLASCount = rtTopLevelStructures.size();
-            updateTransformations();
+            updateTLASs();
             context.coreBuffers.rtBLASBuffer->update(bvh.blas.data(),
-                                                     bvh.blas.size() * sizeof(BottomLevelAccelerationStructure));
+                                                     bvh.blas.size() * sizeof(BLAS));
             context.coreBuffers.rtTrianglesBuffer->update(bvh.triangles.data(),
                                                           bvh.triangles.size() * sizeof(RTTriangle));
             isBVHReady = true;

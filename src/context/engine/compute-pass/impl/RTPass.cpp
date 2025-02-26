@@ -10,10 +10,10 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.rtTrianglesData.get())
                 .addDescriptorSet(context.coreDescriptorSets.rtBLASData.get())
                 .addDescriptorSet(context.coreDescriptorSets.rtTLASData.get())
+                .addDescriptorSet(context.coreDescriptorSets.materialDataDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.currentFrameDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.lightVolumeData.get())
-                .addDescriptorSet(context.coreDescriptorSets.currentPositionsDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.currentNormalsDescriptor.get());
+                .addDescriptorSet(context.coreDescriptorSets.currentPositionsDescriptor.get());
 
         pipelineInstance = context.pipelineService.createPipeline(shadingPipelineBuilder);
     }
@@ -25,7 +25,6 @@ namespace Metal {
             clearTexture(context.coreTextures.giSurfaceCache->vkImage);
         }
 
-        clearTexture(context.coreTextures.currentNormalsDescriptor->vkImage);
         clearTexture(context.coreTextures.currentPositions->vkImage);
 
         if (context.engineRepository.enabledDenoiser) {

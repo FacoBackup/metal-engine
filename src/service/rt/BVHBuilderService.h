@@ -4,7 +4,7 @@
 
 #include "../../common/AbstractRuntimeComponent.h"
 #include "data/BVH.h"
-#include "data/TopLevelAccelerationStructure.h"
+#include "../../dto/buffers/TLAS.h"
 
 namespace Metal {
     struct MeshData;

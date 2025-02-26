@@ -10,7 +10,7 @@ namespace Metal {
     void TransformService::onSync() {
         traverse(WorldRepository::ROOT_ID, false);
         if (somethingChanged) {
-            context.engineContext.updateTransformations();
+            context.engineContext.updateTLASs();
             somethingChanged = false;
         }
     }

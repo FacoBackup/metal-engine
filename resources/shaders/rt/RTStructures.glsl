@@ -1,6 +1,38 @@
 #ifndef RT_STRUCTS
 #define RT_STRUCTS
 
+struct MaterialInfo {
+    vec3  baseColor;
+    float subsurface;
+    float roughness;
+    float metallic;
+    float specular;
+    float specularTint;
+    float clearcoat;
+    float clearcoatGloss;
+    float anisotropic;
+    float sheen;
+    float sheenTint;
+    bool  isEmissive;
+};
+
+struct SurfaceInteraction {
+    vec3 incomingRayDir;
+    vec3 point;
+    vec3 normal;
+    vec3 tangent;
+    vec3 binormal;
+    bool anyHit;
+
+    vec3 voxelPosition;
+    float voxelSize;
+    uint voxel;
+    uint voxelBufferIndex;
+    uint bufferIndex;
+    uint matData1;
+    uint matData2;
+};
+
 struct HitData {
     float closestT;
     vec3 hitNormal;
@@ -53,18 +85,21 @@ struct TopLevelAS {
     uint nodeOffset;
     uint triangleOffset;
     uint id;
+    uint materialId;
 };
 layout(set = 3, binding = 0) uniform TLAS {
     TopLevelAS items[MAX_RT_TLAS];
 } tlasBuffer;
 
+layout(set = 4, binding = 0) uniform Materials {
+    MaterialInfo items[MAX_MATERIALS];
+} materialBuffer;
 
-layout(set = 4, binding = 0, rgba32f) uniform image2D outputImage;
+layout(set = 5, binding = 0, rgba32f) uniform image2D outputImage;
 
-#define LIGHT_VOLUME_SET 5
+#define LIGHT_VOLUME_SET 6
 #include "../LightVolumeBuffer.glsl"
 
-layout(set = 6, binding = 0, rgba32f) uniform image2D currentPositionsImage;
-layout(set = 7, binding = 0, rgba32f) uniform image2D currentNormalsDescriptor;
+layout(set = 7, binding = 0, rgba32f) uniform image2D currentPositions;
 
 #endif

@@ -7,7 +7,6 @@
 namespace Metal {
     struct FrameBufferInstance;
     struct ShaderModule;
-    struct MeshInstance;
     struct DescriptorInstance;
 
     struct PipelineInstance final : RuntimeResource {

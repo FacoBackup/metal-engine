@@ -120,8 +120,6 @@ add_executable(
         src/service/mesh/MeshService.cpp
         src/service/mesh/MeshService.h
         src/service/mesh/MeshData.h
-        src/service/mesh/MeshInstance.cpp
-        src/service/mesh/MeshInstance.h
         src/util/FilesUtil.h
         src/dto/file/FileEntry.h
         src/enum/EntryType.h
@@ -254,9 +252,9 @@ add_executable(
         src/repository/world/components/VolumeComponent.cpp
         src/repository/world/components/VolumeComponent.h
         src/service/descriptor/DescriptorBinding.h
-        src/service/rt/data/TopLevelAccelerationStructure.h
-        src/service/rt/data/BottomLevelAccelerationStructure.h
-        src/service/rt/data/RTTriangle.h
+        src/dto/buffers/TLAS.h
+        src/dto/buffers/BLAS.h
+        src/dto/buffers/RTTriangle.h
         src/service/rt/BVHBuilderService.cpp
         src/service/rt/BVHBuilderService.h
         src/service/rt/data/BVH.h
@@ -266,6 +264,7 @@ add_executable(
         src/service/rt/data/BVHTriangle.h
         src/service/rt/data/MeshBVH.cpp
         src/service/rt/data/MeshBVH.h
+        src/dto/buffers/MaterialInfo.h
 )
 
 

@@ -4,7 +4,7 @@
 #include "../../enum/LevelOfDetail.h"
 #include "../../service/mesh/MeshData.h"
 #include "data/MeshBVH.h"
-#include "data/RTTriangle.h"
+#include "../../dto/buffers/RTTriangle.h"
 
 namespace Metal {
     BVH BVHBuilderService::buildBVH() const {
@@ -36,7 +36,7 @@ namespace Metal {
                         nodes[stackIndex++] = 0;
                         while (stackIndex > 0) {
                             auto index = nodes.at(--stackIndex);
-                            BottomLevelAccelerationStructure *currentNode = &instance.allNodes[index];
+                            BLAS *currentNode = &instance.allNodes[index];
 
                             if (currentNode->triangleCount <= 0) {
                                 nodes[stackIndex++] = currentNode->startIndex;

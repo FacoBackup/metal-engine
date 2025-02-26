@@ -1,5 +1,4 @@
 #include "MeshService.h"
-#include "MeshInstance.h"
 #include "MeshData.h"
 #include "SceneData.h"
 #include "EntityAssetData.h"
@@ -15,46 +14,12 @@
 #include "../../repository/world/components/MeshComponent.h"
 
 namespace Metal {
-    MeshInstance *MeshService::create(const std::string &id, const LevelOfDetail &levelOfDetail) {
-        MeshData *data = stream(id, levelOfDetail);
-        if (data == nullptr) {
-            return nullptr;
-        }
-        auto *instance = new MeshInstance(id + levelOfDetail.suffix);
-        registerResource(instance);
-
-        instance->indexCount = data->indices.size();
-
-        instance->dataBuffer = context.bufferService.createBuffer(
-            sizeof(VertexData) * data->data.size(),
-            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-            data->data.data());
-
-        instance->indexBuffer = context.bufferService.createBuffer(
-            sizeof(uint32_t) * data->indices.size(),
-            VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-            data->indices.data());
-
-        delete data;
-
-        return instance;
-    }
-
-    MeshData *MeshService::stream(const std::string &id, const LevelOfDetail &levelOfDetail) const {
-        auto pathToFile = context.getAssetDirectory() + FORMAT_FILE_MESH(id, levelOfDetail);
-        if (std::filesystem::exists(pathToFile)) {
-            MeshData *data = new MeshData;
-            PARSE_TEMPLATE(data->load, pathToFile)
-            return data;
-        }
-        return nullptr;
-    }
-
     EntityID MeshService::createMeshEntity(const std::string &name, const std::string &meshId) const {
         const auto id = context.worldRepository.createEntity();
         context.worldRepository.createComponent(id, ComponentTypes::ComponentType::MESH);
         context.worldRepository.meshes[id].meshId = meshId;
         context.worldRepository.getEntity(id)->name = name;
+        context.engineContext.dispatchBVHBuild();
         return id;
     }
 

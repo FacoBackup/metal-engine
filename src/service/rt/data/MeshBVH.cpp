@@ -4,7 +4,7 @@
 #include <algorithm> // for std::swap
 #include <glm/common.hpp>
 #include "../../mesh/MeshData.h"
-#include "RTTriangle.h"
+#include "../../../dto/buffers/RTTriangle.h"
 
 #define MAX_SPLIT_TESTS 5
 #define MAX_DEPTH 32
@@ -57,7 +57,7 @@ namespace Metal {
     }
 
     void MeshBVH::split(int parentIndex, int triGlobalStart, int triNum, int depth) {
-        BottomLevelAccelerationStructure parent = allNodes[parentIndex];
+        BLAS parent = allNodes[parentIndex];
         glm::vec3 size = parent.boundsMax - parent.boundsMin;
         float parentCost = NodeCost(size, triNum);
 
@@ -99,7 +99,7 @@ namespace Metal {
         }
     }
 
-    SplitResult MeshBVH::ChooseSplit(const BottomLevelAccelerationStructure &node, int start, int count) {
+    SplitResult MeshBVH::ChooseSplit(const BLAS &node, int start, int count) {
         SplitResult best = {0, 0.0f, std::numeric_limits<float>::max()};
         if (count <= 1) return best;
 
