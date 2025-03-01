@@ -16,33 +16,41 @@ struct MaterialInfo {
     bool  isEmissive;
 };
 
-struct SurfaceInteraction {
-    vec3 incomingRayDir;
-    vec3 point;
-    vec3 normal;
-    vec3 tangent;
-    vec3 binormal;
-    bool anyHit;
+// -------------------------
+// Constants & Helper Types
+// -------------------------
+#define INF 1e20
+#define EPSILON 1e-6
 
-    vec3 voxelPosition;
-    float voxelSize;
-    uint voxel;
-    uint voxelBufferIndex;
-    uint bufferIndex;
-    uint matData1;
-    uint matData2;
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+    vec3 invDir;
+};
+
+struct BounceInfo {
+    vec3 albedo;
+    bool isEmissive;
+    vec3 hitNormal;
+    vec3 currentPosition;
+    vec3 throughput;
+    vec3 indirectLight;
 };
 
 struct HitData {
-    float closestT;
     vec3 hitNormal;
-    vec2 hitUV;
+    vec3 incomingRayDir;
+    vec3 tangent;
+    vec3 binormal;
     vec3 hitPosition;
+    vec2 hitUV;
+
     bool didHit;
+    float closestT;
     // TopLevelAS "id"; Refers to the primitive's unique id
     uint hitId;
-    uint triangleTestCount;
-    uint boxTestCount;
+    uint triangleId;
+    uint materialId;
 };
 
 // --------------- RT TRIANGLE ---------------
@@ -58,6 +66,8 @@ struct RTTriangle {
     vec2 uv1;
     vec2 uv2;
     vec2 uv3;
+
+    int materialId;
 };
 
 layout(set = 1, binding = 0) uniform Triangles {
@@ -85,7 +95,8 @@ struct TopLevelAS {
     uint nodeOffset;
     uint triangleOffset;
     uint id;
-    uint materialId;
+    // -1 if no material is configured
+    int materialId;
 };
 layout(set = 3, binding = 0) uniform TLAS {
     TopLevelAS items[MAX_RT_TLAS];

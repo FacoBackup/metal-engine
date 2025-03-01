@@ -1,5 +1,5 @@
-#define EPSILON 0.0001
-
+#ifndef RAYTRACE_UTILS
+#define RAYTRACE_UTILS
 #define TWO_PI 6.28318
 
 #define clearCoatBoost 1.
@@ -90,3 +90,4 @@ vec3 cosineSampleHemisphere(const in vec2 u) {
     float z = sqrt(max(EPSILON, 1. - d.x * d.x - d.y * d.y));
     return vec3(d.x, d.y, z);
 }
+#endif

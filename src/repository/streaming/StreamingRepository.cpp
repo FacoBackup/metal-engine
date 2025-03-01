@@ -4,8 +4,9 @@
 #include "../../enum/LevelOfDetail.h"
 #include "../../service/texture/TextureInstance.h"
 #include <iostream>
+
+#include "../../dto/buffers/MaterialInfo.h"
 #include "../../repository/abstract/RuntimeResource.h"
-#include "../../service/material/MaterialInstance.h"
 
 #define MAX_TIMEOUT 1000
 #define MAX_TRIES 5
@@ -75,8 +76,8 @@ return instance;\
 return nullptr;
 
 namespace Metal {
-    MaterialInstance *StreamingRepository::streamMaterial(const std::string &id) {
-        STREAM_NO_LOD(context.materialService, MaterialInstance)
+    MaterialInfo *StreamingRepository::streamMaterial(const std::string &id) {
+        STREAM_NO_LOD(context.materialService, MaterialInfo)
     }
 
     TextureInstance *StreamingRepository::streamTexture(const std::string &id, const LevelOfDetail &lod) {

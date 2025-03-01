@@ -13,6 +13,8 @@ namespace Metal {
             : AbstractResourceService(context) {
         }
 
+        MeshData *stream(const std::string &id, const LevelOfDetail &levelOfDetail) const;
+
         [[nodiscard]] EntityID createMeshEntity(const std::string &name, const std::string &meshId) const;
 
         void createSceneEntities(const std::string &id) const;

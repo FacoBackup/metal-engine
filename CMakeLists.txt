@@ -201,7 +201,6 @@ add_executable(
         src/repository/world/impl/BoundingBox.h
         src/service/mesh/SceneData.h
         src/service/mesh/EntityAssetData.h
-        src/service/material/MaterialData.h
         src/context/engine/render-pass/impl/PostProcessingPass.cpp
         src/context/engine/render-pass/impl/PostProcessingPass.h
         src/service/pipeline/PipelineBuilder.h
@@ -233,11 +232,8 @@ add_executable(
         src/context/engine/passes/PassesService.cpp
         src/context/engine/passes/PassesService.h
         src/util/ImageUtils.h
-        src/service/material/MaterialInstance.cpp
-        src/service/material/MaterialInstance.h
         src/service/material/MaterialService.cpp
         src/service/material/MaterialService.h
-        src/service/material/MaterialData.cpp
         src/repository/inspection/FileInspectionRepository.cpp
         src/repository/inspection/FileInspectionRepository.h
         src/context/editor/dock-spaces/inspector/MaterialInspection.cpp
@@ -265,6 +261,7 @@ add_executable(
         src/service/rt/data/MeshBVH.cpp
         src/service/rt/data/MeshBVH.h
         src/dto/buffers/MaterialInfo.h
+        src/dto/buffers/MaterialInfo.cpp
 )
 
 

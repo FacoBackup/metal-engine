@@ -1,16 +1,8 @@
+#ifndef RAYTRACER
+#define RAYTRACER
+
 #include "../rt/RTStructures.glsl"
 #include "../GlobalDataBuffer.glsl"
-// -------------------------
-// Constants & Helper Types
-// -------------------------
-#define INF 1e20
-#define EPSILON 1e-6
-
-struct Ray {
-    vec3 origin;
-    vec3 dir;
-    vec3 invDir;
-};
 
 // -------------------------
 // Ray - Triangle Intersection
@@ -52,7 +44,6 @@ HitData RayTriangle(Ray ray, RTTriangle tri) {
     hit.hitNormal = normalize(tri.n1 * w + tri.n2 * u + tri.n3 * v);
     hit.hitUV = tri.uv1 * w + tri.uv2 * u + tri.uv3 * v;
     hit.hitPosition = tri.v1 * w + tri.v2 * u + tri.v3 * v;
-
     hit.didHit      = true;
     return hit;
 }
@@ -79,9 +70,7 @@ HitData RayTriangleBVH(
 Ray ray,
 float rayLength,
 uint nodeOffset,
-uint triangleOffset,
-inout uint triangleTestCount,
-inout uint boxTestCount
+uint triangleOffset
 ) {
     HitData result;
     result.closestT = rayLength;
@@ -100,8 +89,8 @@ inout uint boxTestCount
             for (uint i = 0; i < node.triangleCount; i++) {
                 uint triIndex = node.startIndex + i + triangleOffset;
                 RTTriangle tri = trianglesBuffer.items[triIndex];
-                triangleTestCount++;
                 HitData triHit = RayTriangle(ray, tri);
+                triHit.triangleId = triIndex;
                 if (triHit.didHit && triHit.closestT < result.closestT) {
                     result = triHit;
                 }
@@ -117,7 +106,6 @@ inout uint boxTestCount
             // Compute intersection distances
             float dstA = RayBoundingBoxDst(ray, childA.boundsMin, childA.boundsMax);
             float dstB = RayBoundingBoxDst(ray, childB.boundsMin, childB.boundsMax);
-            boxTestCount += 2u;
 
             // Push farther child first
             bool isNearestA = dstA <= dstB;
@@ -149,8 +137,6 @@ HitData trace(vec3 rayOrigin, vec3 rayDir) {
     HitData result;
     result.closestT = INF;
     result.didHit = false;
-    result.triangleTestCount = 0u;
-    result.boxTestCount = 0u;
 
     // Loop over each TLAS instance.
     for (uint i = 0u; i < globalData.rtTLASCount; i++) {
@@ -161,21 +147,12 @@ HitData trace(vec3 rayOrigin, vec3 rayDir) {
         localRay.dir    = (instance.invTransform * vec4(rayDir, 0.0)).xyz;
         localRay.invDir = 1.0 / localRay.dir;
 
-        // Reset local counters for this instance.
-        uint localTriangleCount = 0u;
-        uint localBoxCount = 0u;
-
         // Traverse the BLAS for this instance.
         HitData localHit = RayTriangleBVH(
         localRay,
         result.closestT,
         instance.nodeOffset,
-        instance.triangleOffset,
-        localTriangleCount,
-        localBoxCount);
-
-        result.triangleTestCount += localTriangleCount;
-        result.boxTestCount += localBoxCount;
+        instance.triangleOffset);
 
         if (localHit.didHit && localHit.closestT < result.closestT) {
             result.closestT = localHit.closestT;
@@ -184,8 +161,11 @@ HitData trace(vec3 rayOrigin, vec3 rayDir) {
             result.hitUV = localHit.hitUV;
             result.didHit = true;
             result.hitId = instance.id;
+            result.materialId = instance.materialId;
+            result.incomingRayDir = rayDir;
         }
     }
 
     return result;
 }
+#endif

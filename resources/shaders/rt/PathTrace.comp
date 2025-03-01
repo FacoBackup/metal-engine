@@ -9,20 +9,8 @@ layout(local_size_x = 8, local_size_y = 8) in;
 #include "../DebugFlags.glsl"
 #endif
 
-#include "../util/PixelShading.glsl"
-#include "../util/VolumeRayTracer.glsl"
-
-uint cube_32( in vec3 nor )
-{
-    vec3 mor; uint  id;
-    mor = nor.xyz; id = 0u;
-    if( abs(nor.y) > abs(mor.x) ) { mor = nor.yzx; id = 1u; }
-    if( abs(nor.z) > abs(mor.x) ) { mor = nor.zxy; id = 2u; }
-    uint is = (mor.x<0.0)?1u:0u;
-    vec2 uv = 0.5 + 0.5*mor.yz/abs(mor.x);
-    uvec2 iuv = uvec2(round(uv*vec2(32767.0,16383.0)));
-    return iuv.x | (iuv.y<<15u) | (id<<29u) | (is<<31u);
-}
+#include "../rt/PixelShading.glsl"
+#include "../rt/VolumeRayTracer.glsl"
 
 vec3 randomColor(float seed) {
     float r = rand(vec3(seed));
@@ -39,30 +27,24 @@ void main() {
     HitData data = trace(rayOrigin, rayDir);
     if (data.didHit) {
         imageStore(currentPositions, ivec2(gl_GlobalInvocationID.xy), vec4(data.hitPosition, hit.id + 1));
-        SurfaceInteraction interaction;
-
-        interaction.normal = data.hitNormal;
 
         MaterialInfo material;
-        material.baseColor = vec3(1, 0 ,0 );
-        material.metallic = .5;
-        material.roughness = .5;
-        material.isEmissive = false;
-        material.subsurface = 0.;
-        material.specular = 0.;
-        material.specularTint = 0.;
-        material.clearcoat = 0.;
-        material.clearcoatGloss = 1.;
-        material.anisotropic = 0.;
-        material.sheen = 0.;
-        material.sheenTint = 0.;
-        //    material.clearcoat = 1.;
-        //    material.specular = 0.1;
-        //    material.subsurface = 1.;
-        //    material.clearcoatGloss = 1.;
-
-        interaction.point = data.hitPosition;
-        interaction.anyHit = true;
+        if(data.materialId > -1){
+            material = materialBuffer.items[data.materialId];
+        } else {
+            material.baseColor = vec3(1, 0, 0);
+            material.metallic = .5;
+            material.roughness = .5;
+            material.isEmissive = false;
+            material.subsurface = 0.;
+            material.specular = 0.;
+            material.specularTint = 0.;
+            material.clearcoat = 0.;
+            material.clearcoatGloss = 1.;
+            material.anisotropic = 0.;
+            material.sheen = 0.;
+            material.sheenTint = 0.;
+        }
 
         #ifdef DEBUG
         if (globalData.debugFlag != LIT && globalData.debugFlag != GI){
@@ -71,13 +53,10 @@ void main() {
                 finalColor = data.hitNormal;
             } else if (globalData.debugFlag == UV){
                 finalColor.xy = data.hitUV;
-            } else if (globalData.debugFlag == RANDOM){
-                finalColor = randomColor(float(data.hitId + 1));
             } else if (globalData.debugFlag == POSITION){
                 finalColor = normalize(data.hitPosition);
             } else {
-                finalColor.x = data.triangleTestCount / float(globalData.searchCountDivisor);
-                finalColor.z = data.boxTestCount / float(globalData.searchCountDivisor);
+                finalColor = randomColor(float(data.hitId + 1));
             }
             if (shouldReturn) {
                 imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(finalColor, 1));
@@ -92,7 +71,7 @@ void main() {
             state = uint(uint(gl_GlobalInvocationID.x) * uint(1973) + uint(gl_GlobalInvocationID.y) * uint(9277) + uint(globalData.globalFrameCount) * uint(26699)) | uint(1);
             texCoords = (vec2(gl_GlobalInvocationID.xy) + vec2(random(), random())) / imageSize(outputImage);
 
-            finalColor = calculatePixelColor(rayDir, texCoords, material, interaction);
+            finalColor = calculatePixelColor(texCoords, material, data);
         }
 
         if (globalData.enabledDenoiser){

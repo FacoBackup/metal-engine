@@ -9,7 +9,7 @@
 #define MAX_MATERIALS 10000
 
 typedef unsigned int EntityID;
-typedef unsigned int MaterialID;
+typedef int MaterialID;
 #define MAX_LIGHT_VOLUMES 300
 #define EMPTY_ENTITY 0
 #define FILE_METADATA ".mjson"

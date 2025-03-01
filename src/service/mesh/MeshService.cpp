@@ -23,6 +23,15 @@ namespace Metal {
         return id;
     }
 
+    MeshData *MeshService::stream(const std::string &id, const LevelOfDetail &levelOfDetail) const {
+        auto pathToFile = context.getAssetDirectory() + FORMAT_FILE_MESH(id, levelOfDetail);
+        if (std::filesystem::exists(pathToFile)) {
+            MeshData *data = new MeshData;
+            PARSE_TEMPLATE(data->load, pathToFile)
+            return data;
+        }
+        return nullptr;
+    }
     void MeshService::createSceneEntities(const std::string &id) const {
         auto &repo = context.worldRepository;
         SceneData data;

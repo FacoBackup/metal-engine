@@ -1,6 +1,7 @@
 #include "../LightVolumeBuffer.glsl"
-#include "../util/RayTracerUtil.glsl"
-#include "../util/LightVisibility.glsl"
+#include "../rt/RayTracerUtil.glsl"
+#include "../rt/LightVisibility.glsl"
+#include "../rt/RTStructures.glsl"
 
 // Principled PBR Path tracer. Except where otherwise noted:
 
@@ -48,11 +49,11 @@ float pdfLambertianReflection(const in vec3 wi, const in vec3 wo, const in vec3 
     return sameHemiSphere(wo, wi, normal) ? abs(dot(normal, wi))/PI : 0.;
 }
 
-float pdfMicrofacet(const in vec3 wi, const in vec3 wo, const in SurfaceInteraction interaction, const in MaterialInfo material) {
-    if (!sameHemiSphere(wo, wi, interaction.normal)) return 0.;
+float pdfMicrofacet(const in vec3 wi, const in vec3 wo, const in HitData interaction, const in MaterialInfo material) {
+    if (!sameHemiSphere(wo, wi, interaction.hitNormal)) return 0.;
     vec3 wh = normalize(wo + wi);
 
-    float NdotH = dot(interaction.normal, wh);
+    float NdotH = dot(interaction.hitNormal, wh);
     float alpha2 = material.roughness * material.roughness;
     alpha2 *= alpha2;
 
@@ -63,8 +64,8 @@ float pdfMicrofacet(const in vec3 wi, const in vec3 wo, const in SurfaceInteract
     return pdfDistribution/(4. * dot(wo, wh));
 }
 
-float pdfMicrofacetAniso(const in vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y, const in SurfaceInteraction interaction, const in MaterialInfo material) {
-    if (!sameHemiSphere(wo, wi, interaction.normal)) return 0.;
+float pdfMicrofacetAniso(const in vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y, const in HitData interaction, const in MaterialInfo material) {
+    if (!sameHemiSphere(wo, wi, interaction.hitNormal)) return 0.;
     vec3 wh = normalize(wo + wi);
 
     float aspect = sqrt(1.-material.anisotropic*.9);
@@ -76,7 +77,7 @@ float pdfMicrofacetAniso(const in vec3 wi, const in vec3 wo, const in vec3 X, co
 
     float hDotX = dot(wh, X);
     float hDotY = dot(wh, Y);
-    float NdotH = dot(interaction.normal, wh);
+    float NdotH = dot(interaction.hitNormal, wh);
 
     float denom = hDotX * hDotX/alphax2 + hDotY * hDotY/alphay2 + NdotH * NdotH;
     if (denom == 0.) return 0.;
@@ -84,13 +85,13 @@ float pdfMicrofacetAniso(const in vec3 wi, const in vec3 wo, const in vec3 X, co
     return pdfDistribution/(4. * dot(wo, wh));
 }
 
-float pdfClearCoat(const in vec3 wi, const in vec3 wo, const in SurfaceInteraction interaction, const in MaterialInfo material) {
-    if (!sameHemiSphere(wo, wi, interaction.normal)) return 0.;
+float pdfClearCoat(const in vec3 wi, const in vec3 wo, const in HitData interaction, const in MaterialInfo material) {
+    if (!sameHemiSphere(wo, wi, interaction.hitNormal)) return 0.;
 
     vec3 wh = wi + wo;
     wh = normalize(wh);
 
-    float NdotH = abs(dot(wh, interaction.normal));
+    float NdotH = abs(dot(wh, interaction.hitNormal));
     float Dr = GTR1(NdotH, mix(.1, .001, material.clearcoatGloss));
     return Dr * NdotH/ (4. * dot(wo, wh));
 }
@@ -183,24 +184,24 @@ vec3 perpendicular(const vec3 v) {
 }
 
 
-vec3 lightSample(const in LightVolume light, const in SurfaceInteraction interaction, out vec3 wi, out float lightPdf) {
+vec3 lightSample(const in LightVolume light, const in HitData interaction, out vec3 wi, out float lightPdf) {
     vec2 u = vec2(random(), random());
     vec3 tangent = vec3(0.), binormal = vec3(0.);
 
     switch (light.itemType){
         case ITEM_TYPE_SPHERE:{
-            vec3 lightDir = normalize(light.position - interaction.point);
+            vec3 lightDir = normalize(light.position - interaction.hitPosition);
             createBasis(lightDir, tangent, binormal);
 
-            float sinThetaMax2 = pow2(light.dataB.x) / distanceSq(light.position, interaction.point);
+            float sinThetaMax2 = pow2(light.dataB.x) / distanceSq(light.position, interaction.hitPosition);
             float cosThetaMax = sqrt(max(EPSILON, 1. - sinThetaMax2));
             wi = uniformSampleCone(u, cosThetaMax, tangent, binormal, lightDir);
 
-            if (dot(wi, interaction.normal) > 0.) {
+            if (dot(wi, interaction.hitNormal) > 0.) {
                 lightPdf = 1. / (TWO_PI * (1. - cosThetaMax));
             }
 
-            vec3 visibility = visibilityTest(light, interaction.point, wi);
+            vec3 visibility = visibilityTest(light, interaction.hitPosition, wi);
             return light.color.rgb * visibility;
         }
         case ITEM_TYPE_PLANE: {
@@ -219,15 +220,15 @@ vec3 lightSample(const in LightVolume light, const in SurfaceInteraction interac
             + (u.x - 0.5) * 2.0 * halfRight  // Shift sample range from [-0.5, 0.5] to full extent
             + (u.y - 0.5) * 2.0 * halfUp;
 
-            wi = normalize(lightSamplePoint - interaction.point);
+            wi = normalize(lightSamplePoint - interaction.hitPosition);
 
-            float distSq = distanceSq(lightSamplePoint, interaction.point);
+            float distSq = distanceSq(lightSamplePoint, interaction.hitPosition);
             float cosTheta = max(0.0, dot(-wi, light.dataA));
             float lightArea = lightSize.x * lightSize.z;
             lightPdf = distSq / (cosTheta * lightArea);
 
             if (cosTheta > 0.0) {
-                vec3 visibility = visibilityTest(light, interaction.point, wi);
+                vec3 visibility = visibilityTest(light, interaction.hitPosition, wi);
                 return light.color.rgb * visibility;
             }
             return vec3(0.0);
@@ -239,23 +240,23 @@ vec3 lightSample(const in LightVolume light, const in SurfaceInteraction interac
     }
 }
 
-float lightPdf(const in vec4 light, const in SurfaceInteraction interaction) {
-    float sinThetaMax2 = light.w * light.w / distanceSq(light.xyz, interaction.point);
+float lightPdf(const in vec4 light, const in HitData interaction) {
+    float sinThetaMax2 = light.w * light.w / distanceSq(light.xyz, interaction.hitPosition);
     float cosThetaMax = sqrt(max(EPSILON, 1. - sinThetaMax2));
     return 1. / (TWO_PI * (1. - cosThetaMax));
 }
 
-vec3 bsdfEvaluate(const in vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y, const in SurfaceInteraction interaction, const in MaterialInfo material) {
-    if (!sameHemiSphere(wo, wi, interaction.normal))
+vec3 bsdfEvaluate(const in vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y, const in HitData interaction, const in MaterialInfo material) {
+    if (!sameHemiSphere(wo, wi, interaction.hitNormal))
     return vec3(0.);
 
-    float NdotL = dot(interaction.normal, wo);
-    float NdotV = dot(interaction.normal, wi);
+    float NdotL = dot(interaction.hitNormal, wo);
+    float NdotV = dot(interaction.hitNormal, wi);
 
     if (NdotL < 0. || NdotV < 0.) return vec3(0.);
 
     vec3 H = normalize(wo+wi);
-    float NdotH = dot(interaction.normal, H);
+    float NdotH = dot(interaction.hitNormal, H);
     float LdotH = dot(wo, H);
 
     vec3 diffuse = disneyDiffuse(NdotL, NdotV, LdotH, material);
@@ -312,7 +313,7 @@ vec3 disneySheenSample(out vec3 wi, const in vec3 wo, out float pdf, const in ve
     return disneySheen(LdotH, material);
 }
 
-vec3 disneyMicrofacetSample(out vec3 wi, const in vec3 wo, out float pdf, const in vec2 u, const in SurfaceInteraction interaction, const in MaterialInfo material) {
+vec3 disneyMicrofacetSample(out vec3 wi, const in vec3 wo, out float pdf, const in vec2 u, const in HitData interaction, const in MaterialInfo material) {
     float cosTheta = 0., phi = (2. * PI) * u[1];
     float alpha = material.roughness * material.roughness;
     float tanTheta2 = alpha * alpha * u[0] / (1.0 - u[0]);
@@ -322,18 +323,18 @@ vec3 disneyMicrofacetSample(out vec3 wi, const in vec3 wo, out float pdf, const 
     vec3 whLocal = sphericalDirection(sinTheta, cosTheta, sin(phi), cos(phi));
 
     vec3 tangent = vec3(0.), binormal = vec3(0.);
-    createBasis(interaction.normal, tangent, binormal);
+    createBasis(interaction.hitNormal, tangent, binormal);
 
-    vec3 wh = whLocal.x * tangent + whLocal.y * binormal + whLocal.z * interaction.normal;
+    vec3 wh = whLocal.x * tangent + whLocal.y * binormal + whLocal.z * interaction.hitNormal;
 
-    if (!sameHemiSphere(wo, wh, interaction.normal)) {
+    if (!sameHemiSphere(wo, wh, interaction.hitNormal)) {
         wh *= -1.;
     }
 
     wi = reflect(-wo, wh);
 
-    float NdotL = dot(interaction.normal, wo);
-    float NdotV = dot(interaction.normal, wi);
+    float NdotL = dot(interaction.hitNormal, wo);
+    float NdotV = dot(interaction.hitNormal, wi);
 
     if (NdotL < 0. || NdotV < 0.) {
         pdf = 0.;// If not set to 0 here, create's artifacts. WHY EVEN IF SET OUTSIDE??
@@ -341,14 +342,14 @@ vec3 disneyMicrofacetSample(out vec3 wi, const in vec3 wo, out float pdf, const 
     }
 
     vec3 H = normalize(wo+wi);
-    float NdotH = dot(interaction.normal, H);
+    float NdotH = dot(interaction.hitNormal, H);
     float LdotH = dot(wo, H);
 
     pdf = pdfMicrofacet(wi, wo, interaction, material);
     return disneyMicrofacetIsotropic(NdotL, NdotV, NdotH, LdotH, material);
 }
 
-void disneyMicrofacetAnisoSample(out vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y, const in vec2 u, const in SurfaceInteraction interaction, const in MaterialInfo material) {
+void disneyMicrofacetAnisoSample(out vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y, const in vec2 u, const in HitData interaction, const in MaterialInfo material) {
     float cosTheta = 0., phi = 0.;
 
     float aspect = sqrt(1. - material.anisotropic*.9);
@@ -367,16 +368,16 @@ void disneyMicrofacetAnisoSample(out vec3 wi, const in vec3 wo, const in vec3 X,
     float sinTheta = sqrt(max(0., 1. - cosTheta * cosTheta));
     vec3 whLocal = sphericalDirection(sinTheta, cosTheta, sin(phi), cos(phi));
 
-    vec3 wh = whLocal.x * X + whLocal.y * Y + whLocal.z * interaction.normal;
+    vec3 wh = whLocal.x * X + whLocal.y * Y + whLocal.z * interaction.hitNormal;
 
-    if (!sameHemiSphere(wo, wh, interaction.normal)) {
+    if (!sameHemiSphere(wo, wh, interaction.hitNormal)) {
         wh *= -1.;
     }
 
     wi = reflect(-wo, wh);
 }
 
-void disneyClearCoatSample(out vec3 wi, const in vec3 wo, const in vec2 u, const in SurfaceInteraction interaction, const in MaterialInfo material) {
+void disneyClearCoatSample(out vec3 wi, const in vec3 wo, const in vec2 u, const in HitData interaction, const in MaterialInfo material) {
     float gloss = mix(0.1, 0.001, material.clearcoatGloss);
     float alpha2 = gloss * gloss;
     float cosTheta = sqrt(max(EPSILON, (1. - pow(alpha2, 1. - u[0])) / (1. - alpha2)));
@@ -386,31 +387,31 @@ void disneyClearCoatSample(out vec3 wi, const in vec3 wo, const in vec2 u, const
     vec3 whLocal = sphericalDirection(sinTheta, cosTheta, sin(phi), cos(phi));
 
     vec3 tangent = vec3(0.), binormal = vec3(0.);
-    createBasis(interaction.normal, tangent, binormal);
+    createBasis(interaction.hitNormal, tangent, binormal);
 
-    vec3 wh = whLocal.x * tangent + whLocal.y * binormal + whLocal.z * interaction.normal;
+    vec3 wh = whLocal.x * tangent + whLocal.y * binormal + whLocal.z * interaction.hitNormal;
 
-    if (!sameHemiSphere(wo, wh, interaction.normal)) {
+    if (!sameHemiSphere(wo, wh, interaction.hitNormal)) {
         wh *= -1.;
     }
 
     wi = reflect(-wo, wh);
 }
 
-float bsdfPdf(const in vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y, const in SurfaceInteraction interaction, const in MaterialInfo material) {
-    float pdfDiffuse = pdfLambertianReflection(wi, wo, interaction.normal);
+float bsdfPdf(const in vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y, const in HitData interaction, const in MaterialInfo material) {
+    float pdfDiffuse = pdfLambertianReflection(wi, wo, interaction.hitNormal);
     float pdfMicrofacet = pdfMicrofacetAniso(wi, wo, X, Y, interaction, material);
     float pdfClearCoat = pdfClearCoat(wi, wo, interaction, material);;
     return (pdfDiffuse + pdfMicrofacet + pdfClearCoat)/3.;
 }
 
-float light_pdf(const in LightVolume light, const in SurfaceInteraction interaction) {
-    float sinThetaMax2 =  pow2(light.dataB.x) / distanceSq(light.position, interaction.point);
+float light_pdf(const in LightVolume light, const in HitData interaction) {
+    float sinThetaMax2 =  pow2(light.dataB.x) / distanceSq(light.position, interaction.hitPosition);
     float cosThetaMax = sqrt(max(EPSILON, 1. - sinThetaMax2));
     return 1. / (TWO_PI * (1. - cosThetaMax));
 }
 
-vec3 bsdfSample(out vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y, out float pdf, const in SurfaceInteraction interaction, const in MaterialInfo material) {
+vec3 bsdfSample(out vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y, out float pdf, const in HitData interaction, const in MaterialInfo material) {
 
     vec3 f = vec3(0.);
     pdf = 0.0;
@@ -419,7 +420,7 @@ vec3 bsdfSample(out vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y,
     vec2 u = vec2(random(), random());
     float rnd = random();
     if (rnd <= 0.3333) {
-        disneyDiffuseSample(wi, wo, pdf, u, interaction.normal, material);
+        disneyDiffuseSample(wi, wo, pdf, u, interaction.hitNormal, material);
     } else if (rnd >= 0.3333 && rnd < 0.6666) {
         disneyMicrofacetAnisoSample(wi, wo, X, Y, u, interaction, material);
     } else {
@@ -439,11 +440,11 @@ float powerHeuristic(float nf, float fPdf, float ng, float gPdf){
     return (f*f)/(f*f + g*g);
 }
 
-vec3 sampleLightType(const in LightVolume light, const in SurfaceInteraction interaction, out vec3 wi, out float lightPdf) {
+vec3 sampleLightType(const in LightVolume light, const in HitData interaction, out vec3 wi, out float lightPdf) {
     return lightSample(light, interaction, wi, lightPdf);
 }
 
-vec3 calculateDirectLight(const in LightVolume light, const in SurfaceInteraction interaction, const in MaterialInfo material, out vec3 wi, out vec3 f, out float scatteringPdf) {
+vec3 calculateDirectLight(const in LightVolume light, const in HitData interaction, const in MaterialInfo material, out vec3 wi, out vec3 f, out float scatteringPdf) {
     // LightVolume MIS
     vec3 wo = -interaction.incomingRayDir;
     vec3 Ld = vec3(0.);
@@ -457,7 +458,7 @@ vec3 calculateDirectLight(const in LightVolume light, const in SurfaceInteractio
     isBlack = dot(Li, Li) == 0.;
 
     if (lightPdf > EPSILON && !isBlack) {
-        vec3 f = bsdfEvaluate(wi, wo, interaction.tangent, interaction.binormal, interaction, material) * abs(dot(wi, interaction.normal));
+        vec3 f = bsdfEvaluate(wi, wo, interaction.tangent, interaction.binormal, interaction, material) * abs(dot(wi, interaction.hitNormal));
         float weight = 1.;
 
         if (globalData.multipleImportanceSampling){
@@ -473,7 +474,7 @@ vec3 calculateDirectLight(const in LightVolume light, const in SurfaceInteractio
 
     // BSDF MIS
     f = bsdfSample(wi, wo, interaction.tangent, interaction.binormal, scatteringPdf, interaction, material);
-    f *= abs(dot(wi, interaction.normal));
+    f *= abs(dot(wi, interaction.hitNormal));
 
     if (globalData.multipleImportanceSampling){
 
@@ -486,7 +487,7 @@ vec3 calculateDirectLight(const in LightVolume light, const in SurfaceInteractio
             lightPdf = light_pdf(light, interaction);
             if (lightPdf < EPSILON) return Ld;
             weight = powerHeuristic(1., scatteringPdf, 1., lightPdf);
-            Li *= visibilityTest(light, interaction.point, wi);
+            Li *= visibilityTest(light, interaction.hitPosition, wi);
             isBlack = dot(Li, Li) == 0.;
             if (!isBlack) {
                 Ld +=  Li * f * weight / scatteringPdf;

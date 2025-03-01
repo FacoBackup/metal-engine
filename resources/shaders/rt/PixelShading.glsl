@@ -1,19 +1,18 @@
 #include "../GlobalDataBuffer.glsl"
 #include "../CreateRay.glsl"
-#include "../util/DisneyBSDF.glsl"
+#include "../rt/DisneyBSDF.glsl"
 #include "../Atmosphere.glsl"
-#include "../util/SimplifiedBRDF.glsl"
+#include "../rt/SimplifiedBRDF.glsl"
 
-vec3 calculatePixelColor( vec3 rayDirection, in vec2 texCoords, MaterialInfo material, SurfaceInteraction interaction) {
+vec3 calculatePixelColor(in vec2 texCoords, MaterialInfo material, HitData interaction) {
     vec3 L = vec3(0.);
     vec3 beta = vec3(1.);
 
     vec3 wi;
-    interaction.incomingRayDir = rayDirection;
 
     // Direct lighting - Disney BSDF
     vec3 X = vec3(0.), Y = vec3(0.);
-    directionOfAnisotropicity(interaction.normal, X, Y);
+    directionOfAnisotropicity(interaction.hitNormal, X, Y);
     interaction.tangent = X;
     interaction.binormal = Y;
 
@@ -33,11 +32,11 @@ vec3 calculatePixelColor( vec3 rayDirection, in vec2 texCoords, MaterialInfo mat
             beta *=  f / scatteringPdf;
         }
 
-//        if (globalData.giBounces > 0 && globalData.giStrength > 0){
-//            float bias = max(.05, 1e-4 * length(interaction.point));
-//            vec3 point =  interaction.point + bias * interaction.normal;
-//            L += (material.baseColor / PI) * calculateIndirectLighting(material.roughness, interaction.normal, point, rayDirection) * globalData.giStrength;
-//        }
+        if (globalData.giBounces > 0 && globalData.giStrength > 0){
+            float bias = max(.05, 1e-4 * length(interaction.hitPosition));
+            vec3 point =  interaction.hitPosition + bias * interaction.hitNormal;
+            L += (material.baseColor / PI) * calculateIndirectLighting(material.roughness, interaction.hitNormal, point, rayDirection) * globalData.giStrength;
+        }
     }
 
     return L / globalData.giSamples;

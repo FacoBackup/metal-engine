@@ -5,7 +5,7 @@
 #include "../../../ApplicationContext.h"
 #include "../../../../util/UIUtil.h"
 #include "../../../../util/serialization-definitions.h"
-#include "../../../../service/material/MaterialData.h"
+#include "../../../../dto/buffers/MaterialInfo.h"
 #include "../../../../enum/engine-definitions.h"
 
 namespace Metal {
@@ -21,6 +21,7 @@ namespace Metal {
             context->materialService.getResources().at(prevSelection)->dispose(context->vulkanContext);
             context->materialService.getResources().erase(prevSelection);
         }
+        context->engineContext.updateTLASs();
     }
 
     void MaterialInspection::onSync() {

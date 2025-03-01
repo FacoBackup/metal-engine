@@ -14,7 +14,7 @@ namespace Metal {
         alignas(4) unsigned int nodeOffset;
         alignas(4) unsigned int triangleOffset;
         alignas(4) EntityID id;
-        alignas(4) MaterialID materialId;
+        alignas(4) MaterialID materialId = -1;
     };
 }
 #endif //TOPLEVELACCELERATIONSTRUCTURE_H

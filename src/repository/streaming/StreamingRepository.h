@@ -12,7 +12,7 @@ using TimePoint = std::chrono::time_point<Clock>;
 namespace Metal {
     struct LevelOfDetail;
     struct TextureInstance;
-    struct MaterialInstance;
+    struct MaterialInfo;
 
     class StreamingRepository final : public AbstractRuntimeComponent {
         std::unordered_map<std::string, unsigned int> tries{};
@@ -24,7 +24,7 @@ namespace Metal {
             : AbstractRuntimeComponent(context) {
         }
 
-        MaterialInstance *streamMaterial(const std::string &id);
+        MaterialInfo *streamMaterial(const std::string &id);
 
         TextureInstance *streamTexture(const std::string &id, const LevelOfDetail &lod);
 

@@ -1,8 +1,8 @@
 #include "FilesService.h"
 #include "../../dto/file/FileEntry.h"
+#include "../../dto/buffers/MaterialInfo.h"
 #include "../../enum/EntryType.h"
 #include "../../enum/engine-definitions.h"
-#include "../../util/FilesUtil.h"
 #include "../../context/ApplicationContext.h"
 #include <chrono>
 #include <filesystem>
@@ -108,7 +108,7 @@ namespace Metal {
         materialMetadata.type = EntryType::MATERIAL;
         materialMetadata.name = "New Material";
         DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(materialMetadata.getId()), materialMetadata)
-        MaterialData data{};
+        MaterialInfo data{};
         DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialMetadata.getId()), data)
     }
 

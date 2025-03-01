@@ -4,7 +4,7 @@
 #include <glm/mat4x4.hpp>
 
 #include "../../../dto/buffers/BLAS.h"
-#include "RTTriangle.h"
+#include "../../../dto/buffers/RTTriangle.h"
 #include "../../../dto/buffers/TLAS.h"
 
 namespace Metal {

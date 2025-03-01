@@ -1,6 +1,7 @@
 #include "EngineContext.h"
 
 #include "../../context/ApplicationContext.h"
+#include "../../dto/buffers/MaterialInfo.h"
 #include "../../service/buffer/BufferInstance.h"
 #include "../../service/camera/Camera.h"
 #include "../../service/framebuffer/FrameBufferInstance.h"
@@ -31,14 +32,20 @@ namespace Metal {
 
     void EngineContext::updateTLASs() {
         std::vector<glm::mat4x4> transformations{};
+        std::vector<MaterialInfo> materials{};
         transformations.reserve(rtTLASCount);
         for (auto &tlas: rtTopLevelStructures) {
             auto entity = tlas.id;
             auto &transformComponent = context.worldRepository.transforms.at(entity);
             auto &meshComponent = context.worldRepository.meshes.at(entity);
             tlas.invTransform = inverse(transformComponent.model);
-            // TODO - CREATE MATERIAL PIPELINE + USE meshComponent.materialId
-            // tlas.materialId = meshComponent.materialId;
+            auto *streamed = context.streamingRepository.streamMaterial(meshComponent.materialId);
+            if (streamed != nullptr) {
+                materials.push_back(*streamed);
+                tlas.materialId = materials.size() - 1;
+            }else {
+                tlas.materialId = -1;
+            }
         }
         context.coreBuffers.rtTLASBuffer->update(rtTopLevelStructures.data(),
                                                  rtTLASCount * sizeof(TLAS));
