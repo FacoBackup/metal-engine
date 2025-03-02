@@ -3,7 +3,13 @@
 
 #define SURFACE_CACHE_RES 2000
 
-typedef unsigned long long EntityID;
+#define MAX_RT_TRIANGLES 10000000
+#define MAX_RT_BLAS 1000000
+#define MAX_RT_TLAS 10000
+#define MAX_MATERIALS 10000
+
+typedef unsigned int EntityID;
+typedef int MaterialID;
 #define MAX_LIGHT_VOLUMES 300
 #define EMPTY_ENTITY 0
 #define FILE_METADATA ".mjson"

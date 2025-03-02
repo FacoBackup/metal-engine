@@ -9,8 +9,8 @@ namespace Metal {
     void GlobalSettingsPanel::onSync() {
         auto &editorRepository = context->editorRepository;
 
-        if (ImGui::Button((Icons::apps + "Voxelize scene" + id + "voxelize").c_str())) {
-            context->engineContext.dispatchSceneVoxelization();
+        if (ImGui::Button((Icons::apps + "Build BVH" + id + "bvh").c_str())) {
+            context->engineContext.dispatchBVHBuild();
         }
         ImGui::SameLine();
 
@@ -56,18 +56,8 @@ namespace Metal {
     void GlobalSettingsPanel::shadingMode() {
         auto &editorRepository = context->editorRepository;
 
-        UIUtil::DynamicSpacing(405);
-
-        ImGui::SameLine();
-        if (UIUtil::RenderOption(Icons::grid_on + "##voxels", editorRepository.showVoxels, true,
-                                 editorRepository.accent)) {
-            editorRepository.showVoxels = !editorRepository.showVoxels;
-        }
-
-        UIUtil::RenderTooltip("Show voxels?");
-        UIUtil::Spacing();
+        UIUtil::DynamicSpacing(340);
         ImGui::Text("Shading");
-
 
         ImGui::SameLine();
         if (UIUtil::RenderOption(Icons::circle + "Lit##litShading",

@@ -6,18 +6,13 @@
 #include "../abstract/AbstractCoreRepository.h"
 
 
-namespace Metal {
-    struct SVOInstance;
-}
-
 using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
 
 namespace Metal {
     struct LevelOfDetail;
-    struct MeshInstance;
     struct TextureInstance;
-    struct MaterialInstance;
+    struct MaterialInfo;
 
     class StreamingRepository final : public AbstractRuntimeComponent {
         std::unordered_map<std::string, unsigned int> tries{};
@@ -29,11 +24,7 @@ namespace Metal {
             : AbstractRuntimeComponent(context) {
         }
 
-        MeshInstance *streamMesh(const std::string &id, const LevelOfDetail &lod);
-
-        MaterialInstance *streamMaterial(const std::string &id);
-
-        SVOInstance *streamSVO(const std::string &id);
+        MaterialInfo *streamMaterial(const std::string &id);
 
         TextureInstance *streamTexture(const std::string &id, const LevelOfDetail &lod);
 

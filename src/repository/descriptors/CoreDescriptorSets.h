@@ -15,33 +15,23 @@ namespace Metal {
             : AbstractCoreRepository(context) {
         }
 
+        VkSampler vkImageSampler = VK_NULL_HANDLE;
         std::unique_ptr<DescriptorInstance> globalDataDescriptor = nullptr;
-        std::unique_ptr<DescriptorInstance> materialAlbedo = nullptr;
-        std::unique_ptr<DescriptorInstance> materialNormal = nullptr;
-        std::unique_ptr<DescriptorInstance> materialRoughness = nullptr;
-        std::unique_ptr<DescriptorInstance> materialMetallic = nullptr;
-        std::unique_ptr<DescriptorInstance> materialHeight = nullptr;
         std::unique_ptr<DescriptorInstance> postProcessingDescriptor = nullptr;
-        std::unique_ptr<DescriptorInstance> surfaceCacheFragment = nullptr;
-        std::unique_ptr<DescriptorInstance> gBufferAlbedo = nullptr;
-        std::unique_ptr<DescriptorInstance> gBufferNormal = nullptr;
-        std::unique_ptr<DescriptorInstance> gBufferPosition = nullptr;
-        std::unique_ptr<DescriptorInstance> giSurfaceCacheCompute = nullptr;
         std::unique_ptr<DescriptorInstance> previousFrameDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> previousFrameMetadataDescriptor = nullptr;
-        std::unique_ptr<DescriptorInstance> currentFrameDescriptor = nullptr;
-        std::unique_ptr<DescriptorInstance> svoData = nullptr;
+        std::unique_ptr<DescriptorInstance> rtDescriptorSet = nullptr;
         std::unique_ptr<DescriptorInstance> lightVolumeData = nullptr;
-
-        void createMaterialDescriptors();
-
-        void createBuffersDescriptors();
-
-        void createGBufferDescriptors();
-
-        void createPathTracingDescriptors();
+        std::unique_ptr<DescriptorInstance> currentFrameDescriptor = nullptr;
+        std::unique_ptr<DescriptorInstance> currentPositionsDescriptor = nullptr;
+        std::unique_ptr<DescriptorInstance> currentPositionsFragmentDescriptor = nullptr;
 
         void onInitialize() override;
+
+    private:
+        void createBuffersDescriptors();
+
+        void createPathTracingDescriptors();
     };
 } // Metal
 

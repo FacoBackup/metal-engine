@@ -157,6 +157,10 @@ namespace Metal {
         source = "#define PI_2 6.28318530718\n" + source;
         source = "#define PI 3.14159265\n" + source;
 
+        source = "#define MAX_RT_TRIANGLES " + std::to_string(MAX_RT_TRIANGLES) + std::string("\n") + source;
+        source = "#define MAX_RT_BLAS " + std::to_string(MAX_RT_BLAS) + std::string("\n") + source;
+        source = "#define MAX_RT_TLAS " + std::to_string(MAX_RT_TLAS) + std::string("\n") + source;
+        source = "#define MAX_MATERIALS " + std::to_string(MAX_MATERIALS) + std::string("\n") + source;
 
         const glslang_stage_t shaderStage = ShaderStageFromFilename(pFilename.c_str());
 

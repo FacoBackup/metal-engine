@@ -16,6 +16,7 @@ namespace Metal {
         alignas(4) unsigned int lightVolumeCount = 0;
         alignas(4) unsigned int volumesOffset = 0;
         alignas(4) unsigned int volumeShadowSteps = 0;
+        alignas(4) unsigned int rtTLASCount = 0;
         alignas(4) bool isAtmosphereEnabled;
 
 

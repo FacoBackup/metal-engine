@@ -4,12 +4,14 @@
 #include "../../abstract/form/FormPanel.h"
 
 namespace Metal {
-    struct MaterialData;
+    struct MaterialInfo;
 
     class MaterialInspection final : public AbstractPanel {
         std::string prevSelection;
-        MaterialData *data = nullptr;
+        MaterialInfo *data = nullptr;
         FormPanel *formPanel = nullptr;
+        long long sinceLastChange = 0;
+
     public:
         void onInitialize() override;
 

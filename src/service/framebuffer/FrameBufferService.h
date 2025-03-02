@@ -30,7 +30,9 @@ namespace Metal {
             : AbstractResourceService(context) {
         }
 
-        FrameBufferInstance *createFrameBuffer(uint32_t w, uint32_t h, glm::vec4 clearColor = glm::vec4(0.0f), bool linear = false);
+        void createSampler(bool linear, VkSampler vkImageSampler);
+
+        FrameBufferInstance *createFrameBuffer(unsigned w, unsigned h, glm::vec4 clearColor = glm::vec4(0.0f));
 
         void createDepthAttachment(FrameBufferInstance *framebuffer) const;
 

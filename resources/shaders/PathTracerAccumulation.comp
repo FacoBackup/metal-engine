@@ -9,7 +9,7 @@ layout(push_constant) uniform Push {
     mat4 prevProjView;
 } push;
 
-layout(set = 1, binding = 0) uniform sampler2D gBufferPosition;
+layout(set = 1, binding = 0, rgba32f) uniform image2D currentPositions;
 layout(set = 2, binding = 0, rgba32f) uniform image2D currentFrameImage;// Color + surface ID
 layout(set = 3, binding = 0, rgba32f) uniform image2D previousFrameImage;// Color + acuumulation count
 
@@ -24,8 +24,7 @@ void main() {
     }
 
     ivec2 sizeImg = imageSize(currentFrameImage);
-    vec2 texCoords = vec2(gl_GlobalInvocationID.xy) / sizeImg;
-    vec4 worldPos = texture(gBufferPosition, texCoords);
+    vec4 worldPos = imageLoad(currentPositions, ivec2(gl_GlobalInvocationID.xy));
     if (worldPos.a == 0){
         return;
     }

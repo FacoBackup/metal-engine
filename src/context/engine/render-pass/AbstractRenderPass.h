@@ -6,7 +6,6 @@
 
 namespace Metal {
     struct WorldRepository;
-    struct MeshInstance;
     class StreamingRepository;
     struct CoreFrameBuffers;
     struct PipelineInstance;
@@ -17,8 +16,6 @@ namespace Metal {
         explicit AbstractRenderPass(ApplicationContext &context);
 
         void recordDrawSimpleInstanced(uint32_t vertexCount, uint32_t instanceCount) const;
-
-        void recordDrawMesh(const MeshInstance *instance, uint32_t instanceCount = 1) const;
     };
 }
 

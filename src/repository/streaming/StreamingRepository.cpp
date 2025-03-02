@@ -1,13 +1,12 @@
 #include "StreamingRepository.h"
 
 #include "../../context/ApplicationContext.h"
-#include "../../service/voxel/SVOInstance.h"
 #include "../../enum/LevelOfDetail.h"
-#include "../../service/mesh/MeshInstance.h"
 #include "../../service/texture/TextureInstance.h"
 #include <iostream>
+
+#include "../../dto/buffers/MaterialInfo.h"
 #include "../../repository/abstract/RuntimeResource.h"
-#include "../../service/material/MaterialInstance.h"
 
 #define MAX_TIMEOUT 1000
 #define MAX_TRIES 5
@@ -77,16 +76,8 @@ return instance;\
 return nullptr;
 
 namespace Metal {
-    MaterialInstance *StreamingRepository::streamMaterial(const std::string &id) {
-        STREAM_NO_LOD(context.materialService, MaterialInstance)
-    }
-
-    SVOInstance *StreamingRepository::streamSVO(const std::string &id) {
-        STREAM_NO_LOD(context.svoService, SVOInstance)
-    }
-
-    MeshInstance *StreamingRepository::streamMesh(const std::string &id, const LevelOfDetail &lod) {
-        STREAM(context.meshService, MeshInstance)
+    MaterialInfo *StreamingRepository::streamMaterial(const std::string &id) {
+        STREAM_NO_LOD(context.materialService, MaterialInfo)
     }
 
     TextureInstance *StreamingRepository::streamTexture(const std::string &id, const LevelOfDetail &lod) {
@@ -96,9 +87,7 @@ namespace Metal {
     void StreamingRepository::onSync() {
         if ((context.engineContext.currentTime - sinceLastCleanup).count() >= MAX_TIMEOUT) {
             sinceLastCleanup = context.engineContext.currentTime;
-            DISPOSAL(context.meshService.getResources())
             DISPOSAL(context.textureService.getResources())
-            DISPOSAL(context.svoService.getResources())
             DISPOSAL(context.materialService.getResources())
         }
     }

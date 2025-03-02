@@ -6,15 +6,12 @@
 namespace Metal {
     struct LevelOfDetail;
     struct MeshData;
-    struct MeshInstance;
 
     class MeshService final : public AbstractResourceService {
     public:
         explicit MeshService(ApplicationContext &context)
             : AbstractResourceService(context) {
         }
-
-        MeshInstance *create(const std::string &id, const LevelOfDetail &levelOfDetail);
 
         MeshData *stream(const std::string &id, const LevelOfDetail &levelOfDetail) const;
 

@@ -87,8 +87,6 @@ add_executable(
         src/service/pipeline/ShaderModule.h
         src/context/engine/render-pass/AbstractRenderPass.cpp
         src/context/engine/render-pass/AbstractRenderPass.h
-        src/context/engine/render-pass/impl/GBufferGenPass.cpp
-        src/context/engine/render-pass/impl/GBufferGenPass.h
         src/service/texture/TextureInstance.h
         src/repository/abstract/ResourceRepository.h
         src/service/abstract/AbstractResourceService.cpp
@@ -122,8 +120,6 @@ add_executable(
         src/service/mesh/MeshService.cpp
         src/service/mesh/MeshService.h
         src/service/mesh/MeshData.h
-        src/service/mesh/MeshInstance.cpp
-        src/service/mesh/MeshInstance.h
         src/util/FilesUtil.h
         src/dto/file/FileEntry.h
         src/enum/EntryType.h
@@ -145,7 +141,6 @@ add_executable(
         src/service/files/FilesService.cpp
         src/service/files/FilesService.h
         src/context/editor/dock-spaces/files/FilesContext.cpp
-        src/dto/push-constant/MeshPushConstant.h
         src/service/mesh/VertexData.h
         src/context/editor/dock-spaces/viewport/CameraPositionPanel.cpp
         src/context/editor/dock-spaces/viewport/CameraPositionPanel.h
@@ -203,22 +198,10 @@ add_executable(
         src/repository/world/impl/WorldGridRepository.h
         src/repository/world/impl/WorldTile.h
         src/repository/world/impl/BoundingBox.h
-        src/service/voxel/impl/SparseVoxelOctreeBuilder.cpp
-        src/service/voxel/impl/SparseVoxelOctreeBuilder.h
-        src/service/voxel/impl/OctreeNode.cpp
-        src/service/voxel/impl/OctreeNode.h
-        src/service/voxel/impl/VoxelData.h
-        src/service/voxel/VoxelizationService.cpp
-        src/service/voxel/VoxelizationService.h
-        src/service/voxel/impl/VoxelizerService.cpp
-        src/service/voxel/impl/VoxelizerService.h
         src/service/mesh/SceneData.h
         src/service/mesh/EntityAssetData.h
-        src/service/material/MaterialData.h
         src/context/engine/render-pass/impl/PostProcessingPass.cpp
         src/context/engine/render-pass/impl/PostProcessingPass.h
-        src/context/engine/compute-pass/impl/PathTracerPass.cpp
-        src/context/engine/compute-pass/impl/PathTracerPass.h
         src/service/pipeline/PipelineBuilder.h
         src/service/framebuffer/FrameBufferAttachment.cpp
         src/repository/engine/EngineRepository.cpp
@@ -230,15 +213,6 @@ add_executable(
         src/service/notification/NotificationService.h
         src/dto/Notification.h
         src/enum/NotificationSeverity.h
-        src/service/voxel/impl/Triangle.h
-        src/service/voxel/impl/SparseVoxelOctreeData.h
-        src/context/engine/render-pass/impl/tools/VoxelVisualizerPass.cpp
-        src/context/engine/render-pass/impl/tools/VoxelVisualizerPass.h
-        src/service/voxel/SVOService.cpp
-        src/service/voxel/SVOService.h
-        src/service/voxel/SVOInstance.cpp
-        src/service/voxel/SVOInstance.h
-        src/dto/push-constant/VoxelDebugSettingsPushConstant.h
         src/service/world/WorldGridService.cpp
         src/service/world/WorldGridService.h
         src/dto/buffers/TileInfoUBO.h
@@ -256,16 +230,12 @@ add_executable(
         src/context/engine/passes/PassesService.cpp
         src/context/engine/passes/PassesService.h
         src/util/ImageUtils.h
-        src/service/material/MaterialInstance.cpp
-        src/service/material/MaterialInstance.h
         src/service/material/MaterialService.cpp
         src/service/material/MaterialService.h
-        src/service/material/MaterialData.cpp
         src/repository/inspection/FileInspectionRepository.cpp
         src/repository/inspection/FileInspectionRepository.h
         src/context/editor/dock-spaces/inspector/MaterialInspection.cpp
         src/context/editor/dock-spaces/inspector/MaterialInspection.h
-        src/service/voxel/VoxelizationRequest.h
         src/enum/LightVolumeType.h
         src/context/engine/compute-pass/impl/AccumulationMetadataPass.cpp
         src/context/engine/compute-pass/impl/AccumulationMetadataPass.h
@@ -276,6 +246,21 @@ add_executable(
         src/repository/world/components/VolumeComponent.cpp
         src/repository/world/components/VolumeComponent.h
         src/service/descriptor/DescriptorBinding.h
+        src/dto/buffers/TLAS.h
+        src/dto/buffers/BLAS.h
+        src/dto/buffers/RTTriangle.h
+        src/service/rt/BVHBuilderService.cpp
+        src/service/rt/BVHBuilderService.h
+        src/service/rt/data/BVH.h
+        src/context/engine/compute-pass/impl/RTPass.cpp
+        src/context/engine/compute-pass/impl/RTPass.h
+        src/service/rt/data/BVHBoundingBox.h
+        src/service/rt/data/BVHTriangle.h
+        src/service/rt/data/MeshBVH.cpp
+        src/service/rt/data/MeshBVH.h
+        src/dto/buffers/MaterialInfo.h
+        src/dto/buffers/MaterialInfo.cpp
+        src/dto/buffers/MaterialInfoData.h
 )
 
 

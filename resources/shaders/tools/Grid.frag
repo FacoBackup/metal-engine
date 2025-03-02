@@ -3,13 +3,11 @@
 #include "../Dithering.glsl"
 
 layout(push_constant) uniform Push {
-    bool overlayObjects;
     float scale;
     int threshold;
     float thickness;
 } push;
 
-#define OVERLAY_OBJECTS push.overlayObjects
 #define SCALE push.scale
 #define THRESHOLD push.threshold
 #define THICKNESS push.thickness
@@ -39,17 +37,13 @@ float getGridLine(float gridScale){
 }
 
 void main() {
-    vec4 worldPos = texture(gBufferPosition, texCoords);
     bool hasData = false;
-    bool isOverlay = false;
+    vec4 worldPos = texture(gBufferPosition, texCoords);
     if (worldPos.a != 0){
-        hasData = OVERLAY_OBJECTS;
-        isOverlay = true;
-        p = worldPos.rgb;
-    } else {
-        vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
-        hasData = rayMarch(globalData.cameraWorldPosition.xyz, rayDir, 1);
+       discard;
     }
+    vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
+    hasData = rayMarch(globalData.cameraWorldPosition.xyz, rayDir, 1);
 
     if (hasData){
         float distanceFromCamera = length(globalData.cameraWorldPosition.xyz - p.xyz);
@@ -66,8 +60,8 @@ void main() {
             vec3 xAxisColor = vec3(1.0, 0.0, 0.0);
             vec3 zAxisColor = vec3(0.0, 0.0, 1.0);
 
-            float isXAxis = step(abs(p.z/ SCALE), isOverlay ? 0 : THICKNESS);
-            float isZAxis = step(abs(p.x/ SCALE), isOverlay ? 0 : THICKNESS);
+            float isXAxis = step(abs(p.z/ SCALE), THICKNESS);
+            float isZAxis = step(abs(p.x/ SCALE), THICKNESS);
 
             vec3 axisColor = mix(zAxisColor, xAxisColor, isXAxis);
             vec4 centerLineColor = vec4(axisColor, 1.0) * max(isXAxis, isZAxis);

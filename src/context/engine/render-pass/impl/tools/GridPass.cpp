@@ -13,7 +13,7 @@ namespace Metal {
                 .setBlendEnabled()
                 .setPushConstantsSize(sizeof(GridPushConstant))
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get());
+                .addDescriptorSet(context.coreDescriptorSets.currentPositionsFragmentDescriptor.get());
         pipelineInstance = context.pipelineService.createPipeline(gridPipelineBuilder);
     }
 
@@ -23,7 +23,6 @@ namespace Metal {
 
     void GridPass::onSync() {
         pushConstant.scale = context.editorRepository.gridScale;
-        pushConstant.overlayObjects = context.editorRepository.gridOverlayObjects;
         pushConstant.threshold = context.editorRepository.gridThreshold;
         pushConstant.thickness = context.editorRepository.gridThickness;
         recordPushConstant(&pushConstant);

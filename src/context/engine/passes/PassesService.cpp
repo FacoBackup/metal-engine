@@ -2,12 +2,10 @@
 #include "../../../context/ApplicationContext.h"
 #include "./CommandBufferRecorder.h"
 #include "../compute-pass/impl/AccumulationPass.h"
-#include "../compute-pass/impl/PathTracerPass.h"
 #include "../compute-pass/impl/AccumulationMetadataPass.h"
-#include "../render-pass/impl/GBufferGenPass.h"
+#include "../compute-pass/impl/RTPass.h"
 #include "../render-pass/impl/PostProcessingPass.h"
 #include "../render-pass/impl/tools/GridPass.h"
-#include "../render-pass/impl/tools/VoxelVisualizerPass.h"
 #include "../render-pass/impl/tools/IconsPass.h"
 
 namespace Metal {
@@ -15,20 +13,17 @@ namespace Metal {
     }
 
     void PassesService::onInitialize() {
-        gBuffer = new CommandBufferRecorder(context.coreFrameBuffers.gBufferFBO, context);
         compute = new CommandBufferRecorder(context);
         postProcessing = new CommandBufferRecorder(context.coreFrameBuffers.postProcessingFBO, context);
 
-        addPass(gBufferPasses, new GBufferGenPass(context));
-
-        addPass(computePasses, new PathTracerPass(context));
+        addPass(computePasses, new RTPass(context));
         addPass(computePasses, new AccumulationPass(context));
         addPass(computePasses, new AccumulationMetadataPass(context));
 
         addPass(postProcessingPasses, new PostProcessingPass(context));
+
         if (context.isDebugMode()) {
             addPass(postProcessingPasses, new GridPass(context));
-            addPass(postProcessingPasses, new VoxelVisualizerPass(context));
             addPass(postProcessingPasses, new IconsPass(context));
         }
 
@@ -43,18 +38,15 @@ namespace Metal {
     }
 
     void PassesService::onSync() {
-        gBuffer->recordCommands(gBufferPasses);
         compute->recordCommands(computePasses);
         postProcessing->recordCommands(postProcessingPasses);
     }
 
     void PassesService::dispose() {
-        delete gBuffer;
         delete compute;
         delete postProcessing;
 
         computePasses.clear();
-        gBufferPasses.clear();
         postProcessingPasses.clear();
 
         for (auto &pass: allPasses) {

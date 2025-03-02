@@ -8,7 +8,7 @@ namespace Metal {
         PipelineBuilder shadingPipelineBuilder = PipelineBuilder::Of("PathTracerAccumulation.comp")
                 .setPushConstantsSize(sizeof(AccumulationPushConstant))
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get())
+                .addDescriptorSet(context.coreDescriptorSets.currentPositionsDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.currentFrameDescriptor.get())
                 .addDescriptorSet(context.coreDescriptorSets.previousFrameDescriptor.get());
         pipelineInstance = context.pipelineService.createPipeline(shadingPipelineBuilder);

@@ -6,20 +6,26 @@
 #include "../../dto/buffers/GlobalDataUBO.h"
 #include "../../common/AbstractRuntimeComponent.h"
 #include "../../dto/buffers/TileInfoUBO.h"
+#include "../../service/buffer/BufferInstance.h"
+#include "../../dto/buffers/TLAS.h"
 
 using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
 
 namespace Metal {
     class EngineContext final : public AbstractRuntimeComponent {
+        std::vector<TLAS> rtTopLevelStructures;
         GlobalDataUBO globalDataUBO{};
         TileInfoUBO tileInfoUBO{};
         long long start = -1;
         bool cameraUpdated = true;
+        bool worldChange = true;
         bool lightVolumeDataNeedsUpdate = true;
         bool giSettingsUpdated = true;
-        std::string voxelizationRequestId;
         unsigned int giAccumulationCount = 0;
+        unsigned int rtTLASCount = 0;
+        bool isBVHReady = false;
+        bool isTLASReady = false;
 
     public:
         GlobalDataUBO &getGlobalDataUBO() { return globalDataUBO; }
@@ -35,9 +41,16 @@ namespace Metal {
         void setCameraUpdated(const bool val) {
             cameraUpdated = val;
         }
+        void setWorldChange(const bool worldChange) {
+            this->worldChange = worldChange;
+        }
 
         bool isCameraUpdated() const {
             return cameraUpdated;
+        }
+
+        bool hasWorldChanged() const {
+            return worldChange;
         }
 
         void setGISettingsUpdated(const bool val) {
@@ -54,15 +67,13 @@ namespace Metal {
 
         void onInitialize() override;
 
-        void updateVoxelData();
-
         void updateCurrentTime();
 
-        void dispatchSceneVoxelization();
+        void dispatchBVHBuild();
 
-        std::string getVoxelizationRequestId() {
-            return voxelizationRequestId;
-        }
+        void dispatchTLASUpdate();
+
+        void updateTLASInternal();
 
         explicit EngineContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {
         }
