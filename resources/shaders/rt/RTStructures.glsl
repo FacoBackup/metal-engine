@@ -50,7 +50,7 @@ struct HitData {
     // TopLevelAS "id"; Refers to the primitive's unique id
     uint hitId;
     uint triangleId;
-    uint materialId;
+    int materialId;
 };
 
 // --------------- RT TRIANGLE ---------------

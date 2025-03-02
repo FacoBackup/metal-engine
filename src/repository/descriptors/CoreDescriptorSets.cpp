@@ -28,7 +28,7 @@ namespace Metal {
                                   context.coreBuffers.rtTLASBuffer));
         rtDescriptorSet->addLayoutBinding(
             DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 4,
-                                  context.coreBuffers.materialData));
+                                  context.coreBuffers.rtMaterialData));
         rtDescriptorSet->addLayoutBinding(
             DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 5,
                                   VK_NULL_HANDLE,

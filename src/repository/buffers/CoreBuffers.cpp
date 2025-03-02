@@ -38,7 +38,7 @@ namespace Metal {
                                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-        materialData = bufferService.createBuffer(MAX_MATERIALS * sizeof(MaterialInfo),
+        rtMaterialData = bufferService.createBuffer(MAX_MATERIALS * sizeof(MaterialInfo),
                                                   VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);

@@ -2,6 +2,7 @@
 
 #include "../../context/ApplicationContext.h"
 #include "../../dto/buffers/MaterialInfo.h"
+#include "../../dto/buffers/MaterialInfoData.h"
 #include "../../service/buffer/BufferInstance.h"
 #include "../../service/camera/Camera.h"
 #include "../../service/framebuffer/FrameBufferInstance.h"
@@ -32,7 +33,7 @@ namespace Metal {
 
     void EngineContext::updateTLASs() {
         std::vector<glm::mat4x4> transformations{};
-        std::vector<MaterialInfo> materials{};
+        std::vector<MaterialInfoData> materials{};
         transformations.reserve(rtTLASCount);
         for (auto &tlas: rtTopLevelStructures) {
             auto entity = tlas.id;
@@ -41,14 +42,30 @@ namespace Metal {
             tlas.invTransform = inverse(transformComponent.model);
             auto *streamed = context.streamingRepository.streamMaterial(meshComponent.materialId);
             if (streamed != nullptr) {
-                materials.push_back(*streamed);
+                materials.push_back(MaterialInfoData{
+                    streamed->baseColor,
+                    streamed->subsurface,
+                    streamed->roughness,
+                    streamed->metallic,
+                    streamed->specular,
+                    streamed->specularTint,
+                    streamed->clearcoat,
+                    streamed->clearcoatGloss,
+                    streamed->anisotropic,
+                    streamed->sheen,
+                    streamed->sheenTint,
+                    streamed->isEmissive
+                });
                 tlas.materialId = materials.size() - 1;
-            }else {
+            } else {
                 tlas.materialId = -1;
             }
         }
+
         context.coreBuffers.rtTLASBuffer->update(rtTopLevelStructures.data(),
                                                  rtTLASCount * sizeof(TLAS));
+        context.coreBuffers.rtMaterialData->update(materials.data(),
+                                                   materials.size() * sizeof(MaterialInfoData));
     }
 
     void EngineContext::onSync() {

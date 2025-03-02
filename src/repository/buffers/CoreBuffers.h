@@ -19,7 +19,7 @@ namespace Metal {
         std::shared_ptr<BufferInstance> rtTrianglesBuffer = nullptr;
         std::shared_ptr<BufferInstance> rtTLASBuffer = nullptr;
         std::shared_ptr<BufferInstance> rtBLASBuffer = nullptr;
-        std::shared_ptr<BufferInstance> materialData = nullptr;
+        std::shared_ptr<BufferInstance> rtMaterialData = nullptr;
     };
 } // Metal
 

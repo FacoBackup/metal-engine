@@ -260,6 +260,7 @@ add_executable(
         src/service/rt/data/MeshBVH.h
         src/dto/buffers/MaterialInfo.h
         src/dto/buffers/MaterialInfo.cpp
+        src/dto/buffers/MaterialInfoData.h
 )
 
 
