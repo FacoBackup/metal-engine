@@ -103,6 +103,7 @@ namespace Metal {
     void WorldRepository::changeVisibility(EntityID entity, bool isVisible) {
         changeVisibilityRecursively(entity, isVisible);
         context.engineContext.setLightVolumeDataNeedsUpdate(true);
+        context.engineContext.dispatchBVHBuild();
     }
 
     void WorldRepository::changeVisibilityRecursively(EntityID entity, const bool isVisible) {

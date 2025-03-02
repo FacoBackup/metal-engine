@@ -21,10 +21,11 @@ namespace Metal {
             context->materialService.getResources().at(prevSelection)->dispose(context->vulkanContext);
             context->materialService.getResources().erase(prevSelection);
         }
-        context->engineContext.updateTLASs();
+        context->engineContext.dispatchTLASUpdate();
     }
 
     void MaterialInspection::onSync() {
+
         if (prevSelection != context->fileInspection.materialId) {
             delete data;
             data = context->materialService.stream(context->fileInspection.materialId);
@@ -38,9 +39,13 @@ namespace Metal {
         formPanel->setInspection(data);
         formPanel->onSync();
 
-        if(data->isNotFrozen()) {
-            saveChanges();
+        if (data->isNotFrozen()) {
+            sinceLastChange = context->engineContext.currentTimeMs;
             data->freezeVersion();
+        }
+        if(sinceLastChange != 0 && (context->engineContext.currentTimeMs - sinceLastChange) >= 200) {
+            sinceLastChange = 0;
+            saveChanges();
         }
     }
 } // Metal

@@ -10,6 +10,8 @@ namespace Metal {
         std::string prevSelection;
         MaterialInfo *data = nullptr;
         FormPanel *formPanel = nullptr;
+        long long sinceLastChange = 0;
+
     public:
         void onInitialize() override;
 

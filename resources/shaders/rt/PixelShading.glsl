@@ -33,9 +33,7 @@ vec3 calculatePixelColor(in vec2 texCoords, MaterialInfo material, HitData inter
         }
 
         if (globalData.giBounces > 0 && globalData.giStrength > 0){
-            float bias = max(.05, 1e-4 * length(interaction.hitPosition));
-            vec3 point =  interaction.hitPosition + bias * interaction.hitNormal;
-            L += (material.baseColor / PI) * calculateIndirectLighting(material.roughness, interaction.hitNormal, point, interaction.incomingRayDir) * globalData.giStrength;
+            L += (material.baseColor / PI) * calculateIndirectLighting(material.roughness, interaction.hitNormal, interaction.hitPosition, interaction.incomingRayDir) * globalData.giStrength;
         }
     }
 

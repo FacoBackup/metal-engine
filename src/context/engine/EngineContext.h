@@ -25,6 +25,7 @@ namespace Metal {
         unsigned int giAccumulationCount = 0;
         unsigned int rtTLASCount = 0;
         bool isBVHReady = false;
+        bool isTLASReady = false;
 
     public:
         GlobalDataUBO &getGlobalDataUBO() { return globalDataUBO; }
@@ -70,7 +71,9 @@ namespace Metal {
 
         void dispatchBVHBuild();
 
-        void updateTLASs();
+        void dispatchTLASUpdate();
+
+        void updateTLASInternal();
 
         explicit EngineContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {
         }

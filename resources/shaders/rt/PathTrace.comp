@@ -66,15 +66,13 @@ void main() {
             finalColor = previousFrame.rgb * (1. - 1./accumulationCount) + finalColor * 1./accumulationCount;
             finalData = accumulationCount + 1;
         }
-    }else{
-        if (globalData.isAtmosphereEnabled){
-            finalColor = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), rayDir, 2.0f) * 0.05f;
-        }
+    } else if (globalData.isAtmosphereEnabled){
+        finalColor = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), rayDir, 2.0f) * 0.05f;
     }
 
     vec4 volumetricColor = vec4(0.0);
     traceVolumes(volumetricColor, data.hitPosition, rayDir);
-    if(volumetricColor.a > 0.001){
+    if (volumetricColor.a > 0.001){
         finalColor = volumetricColor.rgb * volumetricColor.a + finalColor * (1.0 - volumetricColor.a);
     }
 

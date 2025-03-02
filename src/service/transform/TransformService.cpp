@@ -10,7 +10,7 @@ namespace Metal {
     void TransformService::onSync() {
         traverse(WorldRepository::ROOT_ID, false);
         if (somethingChanged) {
-            context.engineContext.updateTLASs();
+            context.engineContext.dispatchTLASUpdate();
             somethingChanged = false;
         }
     }
@@ -58,7 +58,7 @@ namespace Metal {
         auto *newTile = context.worldGridRepository.getOrCreateTile(translation);
 
         context.worldGridRepository.moveBetweenTiles(st->getEntityId(), previousTile, newTile);
-        somethingChanged = true;
+        somethingChanged = context.worldRepository.meshes.contains(st->getEntityId());
     }
 
     TransformComponent *TransformService::findParent(EntityID id) const {

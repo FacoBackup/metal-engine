@@ -5,18 +5,16 @@
 #include "../rt/RTStructures.glsl"
 
 vec3 visibilityTest(const in LightVolume light,  in vec3 point, vec3 wi) {
-    float bias = max(.05, 1e-4 * length(point));
-    vec3 shadowsPosition = point + bias * wi;// Offset to avoid self-intersection
 
-    HitData hitData = trace(shadowsPosition, wi);
+    HitData hitData = trace(point, wi);
 
-    float lightDistance = length(light.position - shadowsPosition);
-    float hitDistance = length(hitData.hitPosition - shadowsPosition);
+    float lightDistance = length(light.position - point);
+    float hitDistance = length(hitData.hitPosition - point);
 
     vec3 attenuation = vec3(1);
     // If an opaque surface is blocking the light, return 0 immediately
     if (hitData.didHit && hitDistance < lightDistance) {
-        attenuation = vec3(1 / (1 + lightDistance * lightDistance));
+        attenuation = vec3(0);//vec3(1 / (1 + lightDistance * lightDistance));
     }
 
     float transmittance = 1.0;
@@ -28,7 +26,7 @@ vec3 visibilityTest(const in LightVolume light,  in vec3 point, vec3 wi) {
         LightVolume volume = lightVolumeBuffer.items[i];
 
         float tEntry, tExit;
-        vec3 roLocal = shadowsPosition - volume.position;
+        vec3 roLocal = point - volume.position;
         bool intersects = intersectBox(roLocal, wi, volume.dataA, tEntry, tExit);
         if (!intersects) continue;
 

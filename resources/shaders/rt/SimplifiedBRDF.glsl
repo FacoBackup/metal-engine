@@ -68,6 +68,8 @@ vec3 calculateIndirectLighting(float roughness, vec3 normal, vec3 currentPositio
 
         specularRayDir = normalize(mix(specularRayDir, diffuseRayDir, localRoughness * localRoughness));
         localRayDir = mix(diffuseRayDir, specularRayDir, 1. - localRoughness);
+//        float bias = max(.05, 1e-4 * length(bounceInfo.currentPosition));
+//        vec3 point =  bounceInfo.currentPosition + bias * bounceInfo.hitNormal;
         HitData interaction = trace(bounceInfo.currentPosition, localRayDir);
         if (!interaction.didHit) {
             if (globalData.isAtmosphereEnabled){

@@ -29,9 +29,14 @@ namespace Metal {
 
     void EngineContext::dispatchBVHBuild() {
         isBVHReady = false;
+        dispatchTLASUpdate();
     }
 
-    void EngineContext::updateTLASs() {
+    void EngineContext::dispatchTLASUpdate() {
+        isTLASReady = false;
+    }
+
+    void EngineContext::updateTLASInternal() {
         std::vector<glm::mat4x4> transformations{};
         std::vector<MaterialInfoData> materials{};
         transformations.reserve(rtTLASCount);
@@ -73,12 +78,16 @@ namespace Metal {
             auto bvh = context.bvhBuilderService.buildBVH();
             rtTopLevelStructures = bvh.tlas;
             rtTLASCount = rtTopLevelStructures.size();
-            updateTLASs();
             context.coreBuffers.rtBLASBuffer->update(bvh.blas.data(),
                                                      bvh.blas.size() * sizeof(BLAS));
             context.coreBuffers.rtTrianglesBuffer->update(bvh.triangles.data(),
                                                           bvh.triangles.size() * sizeof(RTTriangle));
             isBVHReady = true;
+        }
+
+        if (!isTLASReady) {
+            updateTLASInternal();
+            isTLASReady = true;
         }
 
         updateCurrentTime();
