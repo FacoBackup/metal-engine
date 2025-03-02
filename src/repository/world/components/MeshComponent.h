@@ -11,25 +11,13 @@ namespace Metal {
         std::string meshId;
         std::string materialId;
 
-        glm::vec3 albedoColor{1, 1, 1};
-        bool emissiveSurface = false;
-        float roughnessFactor = 1;
-        float metallicFactor = 0;
-        int parallaxLayers = 16;
-        float parallaxHeightScale = 1;
-
         void registerFields() override;
 
         void onUpdate(InspectableMember *member, ApplicationContext &context) override;
 
         ComponentTypes::ComponentType getType() override;
 
-        SERIALIZE_TEMPLATE(entityId, meshId, materialId,
-                           parallaxHeightScale, parallaxLayers,
-                           emissiveSurface,
-                           albedoColor.x, albedoColor.y, albedoColor.z,
-                           roughnessFactor,
-                           metallicFactor)
+        SERIALIZE_TEMPLATE(entityId, meshId, materialId)
     };
 }
 #endif //MESHCOMPONENT_H

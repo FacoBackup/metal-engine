@@ -9,7 +9,7 @@ MaterialInfo getMaterialInfo(inout HitData data){
     if(data.materialId > -1){
         material = materialBuffer.items[data.materialId];
     } else {
-        material.baseColor = vec3(1, 0, 0);
+        material.baseColor = vec3(1);
         material.metallic = .5;
         material.roughness = .5;
         material.isEmissive = false;
