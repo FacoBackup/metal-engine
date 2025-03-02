@@ -1,8 +1,7 @@
 layout(local_size_x = 8, local_size_y = 8) in;
 
-#include "../GlobalDataBuffer.glsl"
-#include "../CreateRay.glsl"
 #include "../rt/RTStructures.glsl"
+#include "../CreateRay.glsl"
 #include "../rt/RayTracer.glsl"
 
 #ifdef DEBUG
@@ -20,31 +19,16 @@ vec3 randomColor(float seed) {
 
 void main() {
     vec2 texCoords = vec2(gl_GlobalInvocationID.xy) / imageSize(outputImage);
-
+    vec3 finalColor = vec3(0);
+    float finalData = 0;
     vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
     vec3 rayOrigin = globalData.cameraWorldPosition.rgb;
 
     HitData data = trace(rayOrigin, rayDir);
     if (data.didHit) {
-        imageStore(currentPositions, ivec2(gl_GlobalInvocationID.xy), vec4(data.hitPosition, hit.id + 1));
+        imageStore(currentPositions, ivec2(gl_GlobalInvocationID.xy), vec4(data.hitPosition, data.hitId + 1));
 
-        MaterialInfo material;
-        if(data.materialId > -1){
-            material = materialBuffer.items[data.materialId];
-        } else {
-            material.baseColor = vec3(1, 0, 0);
-            material.metallic = .5;
-            material.roughness = .5;
-            material.isEmissive = false;
-            material.subsurface = 0.;
-            material.specular = 0.;
-            material.specularTint = 0.;
-            material.clearcoat = 0.;
-            material.clearcoatGloss = 1.;
-            material.anisotropic = 0.;
-            material.sheen = 0.;
-            material.sheenTint = 0.;
-        }
+        MaterialInfo material = getMaterialInfo(data);
 
         #ifdef DEBUG
         if (globalData.debugFlag != LIT && globalData.debugFlag != GI){
@@ -66,7 +50,7 @@ void main() {
         #endif
 
         if (material.isEmissive) { // EMISSION
-            finalColor = materialA.rgb;
+            finalColor = material.baseColor;
         } else {
             state = uint(uint(gl_GlobalInvocationID.x) * uint(1973) + uint(gl_GlobalInvocationID.y) * uint(9277) + uint(globalData.globalFrameCount) * uint(26699)) | uint(1);
             texCoords = (vec2(gl_GlobalInvocationID.xy) + vec2(random(), random())) / imageSize(outputImage);
@@ -75,7 +59,7 @@ void main() {
         }
 
         if (globalData.enabledDenoiser){
-            finalData = worldPos.a;
+            finalData = data.hitId;
         } else {
             vec4 previousFrame = imageLoad(outputImage, ivec2(gl_GlobalInvocationID.xy));
             float accumulationCount = min(globalData.giMaxAccumulation, previousFrame.a);
@@ -89,7 +73,7 @@ void main() {
     }
 
     vec4 volumetricColor = vec4(0.0);
-    traceVolumes(volumetricColor, worldPos.rgb, rayDir);
+    traceVolumes(volumetricColor, data.hitPosition, rayDir);
     if(volumetricColor.a > 0.001){
         finalColor = volumetricColor.rgb * volumetricColor.a + finalColor * (1.0 - volumetricColor.a);
     }

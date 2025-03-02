@@ -19,7 +19,7 @@ namespace Metal {
 
         void create(const VulkanContext &context);
 
-        void addLayoutBinding(DescriptorBinding binding);
+        void addLayoutBinding(const DescriptorBinding &binding);
     };
 } // Metal
 

@@ -96,7 +96,6 @@ namespace Metal {
         globalDataUBO.lightVolumeCount = context.lightVolumesService.getLightVolumeCount();
         globalDataUBO.volumesOffset = context.lightVolumesService.getVolumesOffset();
         globalDataUBO.volumeShadowSteps = context.engineRepository.volumeShadowSteps;
-        globalDataUBO.searchCountDivisor = context.editorRepository.voxelSearchCount;
         globalDataUBO.rtTLASCount = rtTLASCount;
         globalDataUBO.isAtmosphereEnabled = context.engineRepository.atmosphereEnabled;
 

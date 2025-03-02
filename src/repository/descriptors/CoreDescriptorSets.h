@@ -18,17 +18,13 @@ namespace Metal {
         VkSampler vkImageSampler = VK_NULL_HANDLE;
         std::unique_ptr<DescriptorInstance> globalDataDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> postProcessingDescriptor = nullptr;
-        std::unique_ptr<DescriptorInstance> surfaceCacheFragment = nullptr;
-        std::unique_ptr<DescriptorInstance> giSurfaceCacheCompute = nullptr;
         std::unique_ptr<DescriptorInstance> previousFrameDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> previousFrameMetadataDescriptor = nullptr;
+        std::unique_ptr<DescriptorInstance> rtDescriptorSet = nullptr;
+        std::unique_ptr<DescriptorInstance> lightVolumeData = nullptr;
         std::unique_ptr<DescriptorInstance> currentFrameDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> currentPositionsDescriptor = nullptr;
-        std::unique_ptr<DescriptorInstance> rtTrianglesData = nullptr;
-        std::unique_ptr<DescriptorInstance> rtBLASData = nullptr;
-        std::unique_ptr<DescriptorInstance> rtTLASData = nullptr;
-        std::unique_ptr<DescriptorInstance> lightVolumeData = nullptr;
-        std::unique_ptr<DescriptorInstance> materialDataDescriptor = nullptr;
+        std::unique_ptr<DescriptorInstance> currentPositionsFragmentDescriptor = nullptr;
 
         void onInitialize() override;
 

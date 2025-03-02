@@ -12,17 +12,10 @@ namespace Metal {
 
     void EditorRepository::registerFields() {
         registerColor(accentColor, "", "Accent color");
-        registerBool(showVoxels, "Voxels", "Show?");
-        registerInt(voxelSearchCount, "Voxels", "Debug count divisor");
-        registerBool(showRaySearchCountVoxels, "Voxels", "Show ray search count");
-        registerBool(showRayTestCountVoxels, "Voxels", "Show ray test count");
-
-        registerBool(showIcons, "Icons", "Show icons?");
-
-        registerBool(showGrid, "Grid", "Enabled?");
-        registerBool(gridOverlayObjects, "Grid", "Overlay objects?");
-        registerFloat(gridScale, "Grid", "Scale");
-        registerInt(gridThreshold, "Grid", "Threshold");
-        registerFloat(gridThickness, "Grid", "Thickness");
+        registerBool(showIcons, "", "Show icons?");
+        registerBool(showGrid, "", "Show grid?");
+        registerFloat(gridScale, "", "Grid Scale");
+        registerInt(gridThreshold, "", "Grid Threshold");
+        registerFloat(gridThickness, "", "Grid Thickness");
     }
 }

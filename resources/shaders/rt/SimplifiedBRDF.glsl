@@ -58,7 +58,6 @@ vec3 calculateIndirectLighting(float roughness, vec3 normal, vec3 currentPositio
     bounceInfo.throughput = vec3(1);
     bounceInfo.currentPosition = currentPosition;
     bounceInfo.hitNormal = normal;
-    MaterialInfo material;
 
     float localRoughness = roughness;
     vec3 localRayDir = rayDir;
@@ -79,10 +78,8 @@ vec3 calculateIndirectLighting(float roughness, vec3 normal, vec3 currentPositio
             break;
         }
 
-        localRoughness = 1;
-
-        unpackVoxel(interaction, material);
-
+        MaterialInfo material = getMaterialInfo(interaction);
+        localRoughness = material.roughness;
         bounceInfo.albedo = material.baseColor;
         bounceInfo.isEmissive = material.isEmissive;
         bounceInfo.hitNormal = interaction.hitNormal;

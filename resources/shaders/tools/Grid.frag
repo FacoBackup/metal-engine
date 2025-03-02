@@ -3,19 +3,18 @@
 #include "../Dithering.glsl"
 
 layout(push_constant) uniform Push {
-    bool overlayObjects;
     float scale;
     int threshold;
     float thickness;
 } push;
 
-#define OVERLAY_OBJECTS push.overlayObjects
 #define SCALE push.scale
 #define THRESHOLD push.threshold
 #define THICKNESS push.thickness
 
 layout(location = 0) in vec2 texCoords;
 layout(location = 0) out vec4 finalColor;
+layout(set = 1, binding = 0) uniform sampler2D gBufferPosition;
 
 vec3 p = vec3(0);
 bool rayMarch(vec3 ro, vec3 rd, float width) {
@@ -39,7 +38,10 @@ float getGridLine(float gridScale){
 
 void main() {
     bool hasData = false;
-
+    vec4 worldPos = texture(gBufferPosition, texCoords);
+    if (worldPos.a != 0){
+       discard;
+    }
     vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
     hasData = rayMarch(globalData.cameraWorldPosition.xyz, rayDir, 1);
 

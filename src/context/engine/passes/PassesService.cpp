@@ -16,16 +16,14 @@ namespace Metal {
         compute = new CommandBufferRecorder(context);
         postProcessing = new CommandBufferRecorder(context.coreFrameBuffers.postProcessingFBO, context);
 
-        if (context.isDebugMode()) {
-            addPass(postProcessingPasses, new GridPass(context));
-        }
-
         addPass(computePasses, new RTPass(context));
         addPass(computePasses, new AccumulationPass(context));
         addPass(computePasses, new AccumulationMetadataPass(context));
 
         addPass(postProcessingPasses, new PostProcessingPass(context));
+
         if (context.isDebugMode()) {
+            addPass(postProcessingPasses, new GridPass(context));
             addPass(postProcessingPasses, new IconsPass(context));
         }
 

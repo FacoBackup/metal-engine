@@ -4,6 +4,26 @@
 #include "../rt/RTStructures.glsl"
 #include "../GlobalDataBuffer.glsl"
 
+MaterialInfo getMaterialInfo(inout HitData data){
+    MaterialInfo material;
+    if(data.materialId > -1){
+        material = materialBuffer.items[data.materialId];
+    } else {
+        material.baseColor = vec3(1, 0, 0);
+        material.metallic = .5;
+        material.roughness = .5;
+        material.isEmissive = false;
+        material.subsurface = 0.;
+        material.specular = 0.;
+        material.specularTint = 0.;
+        material.clearcoat = 0.;
+        material.clearcoatGloss = 1.;
+        material.anisotropic = 0.;
+        material.sheen = 0.;
+        material.sheenTint = 0.;
+    }
+    return material;
+}
 // -------------------------
 // Ray - Triangle Intersection
 // -------------------------
@@ -81,6 +101,7 @@ uint triangleOffset
     uint stack[32];
     int stackIndex = 0;
     stack[stackIndex++] = nodeOffset;// Push the root node.
+    int count = 0;
     while (stackIndex > 0) {
         uint nodeIndex = stack[--stackIndex];
         BottomLevelAS node = blasBuffer.items[nodeIndex];

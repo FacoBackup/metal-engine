@@ -70,7 +70,9 @@ struct RTTriangle {
     int materialId;
 };
 
-layout(set = 1, binding = 0) uniform Triangles {
+#include "../GlobalDataBuffer.glsl"
+
+layout(set = 0, binding = 1) uniform Triangles {
     RTTriangle items[MAX_RT_TRIANGLES];
 } trianglesBuffer;
 
@@ -85,7 +87,7 @@ struct BottomLevelAS {
     int startIndex;
     int triangleCount;
 };
-layout(set = 2, binding = 0) uniform BLAS {
+layout(set = 0, binding = 2) uniform BLAS {
     BottomLevelAS items[MAX_RT_BLAS];
 } blasBuffer;
 
@@ -98,19 +100,21 @@ struct TopLevelAS {
     // -1 if no material is configured
     int materialId;
 };
-layout(set = 3, binding = 0) uniform TLAS {
+layout(set = 0, binding = 3) uniform TLAS {
     TopLevelAS items[MAX_RT_TLAS];
 } tlasBuffer;
 
-layout(set = 4, binding = 0) uniform Materials {
+layout(set = 0, binding = 4) uniform Materials {
     MaterialInfo items[MAX_MATERIALS];
 } materialBuffer;
 
-layout(set = 5, binding = 0, rgba32f) uniform image2D outputImage;
 
-#define LIGHT_VOLUME_SET 6
+layout(set = 0, binding = 5, rgba32f) uniform image2D outputImage;
+layout(set = 0, binding = 6, rgba32f) uniform image2D currentPositions;
+layout(set = 0, binding = 7, rgba32f) uniform image2D giSurfaceCacheCompute;
+
+#define LIGHT_VOLUME_SET 1
 #include "../LightVolumeBuffer.glsl"
 
-layout(set = 7, binding = 0, rgba32f) uniform image2D currentPositions;
 
 #endif

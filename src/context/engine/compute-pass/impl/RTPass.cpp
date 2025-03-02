@@ -6,14 +6,9 @@
 namespace Metal {
     void RTPass::onInitialize() {
         PipelineBuilder shadingPipelineBuilder = PipelineBuilder::Of("rt/PathTrace.comp")
-                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.rtTrianglesData.get())
-                .addDescriptorSet(context.coreDescriptorSets.rtBLASData.get())
-                .addDescriptorSet(context.coreDescriptorSets.rtTLASData.get())
-                .addDescriptorSet(context.coreDescriptorSets.materialDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.currentFrameDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.lightVolumeData.get())
-                .addDescriptorSet(context.coreDescriptorSets.currentPositionsDescriptor.get());
+                .addDescriptorSet(context.coreDescriptorSets.rtDescriptorSet.get())
+                .addDescriptorSet(context.coreDescriptorSets.lightVolumeData.get());
+
 
         pipelineInstance = context.pipelineService.createPipeline(shadingPipelineBuilder);
     }
@@ -25,7 +20,7 @@ namespace Metal {
             clearTexture(context.coreTextures.giSurfaceCache->vkImage);
         }
 
-        clearTexture(context.coreTextures.currentPositions->vkImage);
+        clearTexture(context.coreTextures.currentPositions->vkImage, {0,0,0,0});
 
         if (context.engineRepository.enabledDenoiser) {
             clearTexture(context.coreTextures.currentFrame->vkImage);

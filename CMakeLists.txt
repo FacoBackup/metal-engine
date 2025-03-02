@@ -141,7 +141,6 @@ add_executable(
         src/service/files/FilesService.cpp
         src/service/files/FilesService.h
         src/context/editor/dock-spaces/files/FilesContext.cpp
-        src/dto/push-constant/MeshPushConstant.h
         src/service/mesh/VertexData.h
         src/context/editor/dock-spaces/viewport/CameraPositionPanel.cpp
         src/context/editor/dock-spaces/viewport/CameraPositionPanel.h
@@ -214,7 +213,6 @@ add_executable(
         src/service/notification/NotificationService.h
         src/dto/Notification.h
         src/enum/NotificationSeverity.h
-        src/dto/push-constant/VoxelDebugSettingsPushConstant.h
         src/service/world/WorldGridService.cpp
         src/service/world/WorldGridService.h
         src/dto/buffers/TileInfoUBO.h
