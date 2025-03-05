@@ -5,9 +5,10 @@
 #include "../../../ApplicationContext.h"
 #include "../../../../dto/scripting/IO.h"
 #define IO_CIRCLE_RADIUS 5.0f
-#define IO_CIRCLE_RADIUS_2 10.f
-#define IO_CIRCLE_RADIUS_2_5 IO_CIRCLE_RADIUS * 2.5f
-#define NODE_HEADER_SIZE 30.f
+#define IO_CIRCLE_RADIUS_2 IO_CIRCLE_RADIUS * 2.f
+#define IO_CIRCLE_RADIUS_3 IO_CIRCLE_RADIUS * 3.f
+#define NODE_HEADER_SIZE 25.f
+#define NODE_BORDER_RADIUS 4.0f
 
 namespace Metal {
     ImU32 GetColorForIOType(IOType type) {
@@ -33,16 +34,19 @@ namespace Metal {
             ImVec2 circlePos;
             if (io.isInput) {
                 circlePos = ImVec2(nodeWindowPos.x + IO_CIRCLE_RADIUS_2,
-                                   nodeWindowPos.y + io.offsetY * IO_CIRCLE_RADIUS_2_5 + NODE_HEADER_SIZE);
+                                   nodeWindowPos.y + io.offsetY * IO_CIRCLE_RADIUS_3 + NODE_HEADER_SIZE +
+                                   IO_CIRCLE_RADIUS_2);
             } else {
                 circlePos = ImVec2(nodeWindowPos.x + nodeData->width - IO_CIRCLE_RADIUS_2,
-                                   nodeWindowPos.y + io.offsetY * IO_CIRCLE_RADIUS_2_5 + NODE_HEADER_SIZE);
+                                   nodeWindowPos.y + io.offsetY * IO_CIRCLE_RADIUS_3 + NODE_HEADER_SIZE +
+                                   IO_CIRCLE_RADIUS_2);
             }
 
+            char buf[64];
+            snprintf(buf, sizeof(buf), "io_%s_%s", io.id.c_str(), io.isInput ? "in" : "out");
             ImGui::SetCursorScreenPos(ImVec2(circlePos.x - IO_CIRCLE_RADIUS, circlePos.y - IO_CIRCLE_RADIUS));
-            ImGui::InvisibleButton(std::format("io_%d_%s", io.id, io.isInput ? "in" : "out").c_str(),
-                                   ImVec2(IO_CIRCLE_RADIUS_2, IO_CIRCLE_RADIUS_2));
-            bool ioHovered = ImGui::IsItemHovered();
+            ImGui::InvisibleButton(buf, ImVec2(IO_CIRCLE_RADIUS_2, IO_CIRCLE_RADIUS_2));
+            bool ioHovered = ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
 
             if (io.isInput && ioHovered && s_draggingOutput) {
                 s_hoveredInput = &io;
@@ -54,6 +58,17 @@ namespace Metal {
             }
 
             ImGui::GetWindowDrawList()->AddCircleFilled(circlePos, IO_CIRCLE_RADIUS, ioColor);
+            if (io.name != nullptr) {
+                auto size = ImGui::CalcTextSize(io.name);
+
+                if (io.isInput) {
+                    ImGui::SetCursorScreenPos(ImVec2(circlePos.x + IO_CIRCLE_RADIUS_2, circlePos.y - size.y / 2.f));
+                } else {
+                    ImGui::SetCursorScreenPos(ImVec2(circlePos.x - IO_CIRCLE_RADIUS_2 - size.x,
+                                                     circlePos.y - size.y / 2.f));
+                }
+                ImGui::Text(io.name);
+            }
             if (!io.isInput) {
                 if (!s_draggingOutput && ioHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
                     s_draggingOutput = &io;
@@ -108,22 +123,52 @@ namespace Metal {
     void CanvasPanel::renderNodes(ImVec2 pos) {
         for (auto &node: scriptInstance.nodes) {
             auto &nodeData = node.second;
+            // Calculate node's screen position and size.
             ImVec2 nodePos = ImVec2(pos.x + nodeData->x, pos.y + nodeData->y + 50);
-            ImGui::SetNextWindowPos(nodePos);
-            ImGui::BeginChild(node.first.c_str(), ImVec2(nodeData->width, nodeData->height));
+            ImVec2 nodeSize = ImVec2(nodeData->width, nodeData->height);
+            ImVec2 nodeRectMin = nodePos;
+            ImVec2 nodeRectMax = ImVec2(nodePos.x + nodeSize.x, nodePos.y + nodeSize.y);
 
+            // Get current window's draw list.
+            ImDrawList *drawList = ImGui::GetWindowDrawList();
+
+            // --- Draw Shadow ---
+            ImVec2 shadowOffset(5, 5);
+            ImVec2 shadowMin = ImVec2(nodeRectMin.x + shadowOffset.x, nodeRectMin.y + shadowOffset.y);
+            ImVec2 shadowMax = ImVec2(nodeRectMax.x + shadowOffset.x, nodeRectMax.y + shadowOffset.y);
+            drawList->AddRectFilled(shadowMin, shadowMax, IM_COL32(0, 0, 0, 100), NODE_BORDER_RADIUS);
+
+            // --- Draw Node Background ---
+            drawList->AddRectFilled(nodeRectMin, nodeRectMax, IM_COL32(60, 60, 60, 255), NODE_BORDER_RADIUS);
+            drawList->AddRect(nodeRectMin, nodeRectMax, IM_COL32(80, 80, 80, 255), NODE_BORDER_RADIUS, 0, 2.0f);
+
+            ImVec2 headerRectMin = nodeRectMin;
+            ImVec2 headerRectMax = ImVec2(nodeRectMax.x, nodeRectMin.y + NODE_HEADER_SIZE);
+            // Compute text position (with an inset) without using operator+.
+            ImVec2 textPos = ImVec2(headerRectMin.x + 10, headerRectMin.y + 5);
             bool isSelected = scriptInstance.selectedNodes.contains(nodeData->id);
             if (isSelected) {
-                ImGui::TextColored(ImVec4(0, .5, 1, 1), nodeData->name.c_str());
+                drawList->AddText(textPos, IM_COL32(0, 128, 255, 255), nodeData->name.c_str());
             } else {
-                ImGui::Text(nodeData->name.c_str());
+                drawList->AddText(textPos, IM_COL32(255, 255, 255, 255), nodeData->name.c_str());
             }
-            ImGui::Separator();
+            // Draw separator under the header.
+            ImVec2 separatorStart = ImVec2(nodeRectMin.x, headerRectMax.y);
+            ImVec2 separatorEnd = ImVec2(nodeRectMax.x, headerRectMax.y);
+            drawList->AddLine(separatorStart, separatorEnd, IM_COL32(80, 80, 80, 255), 1.0f);
 
+            // --- Handle Dragging on Header ---
+            // Create an invisible button covering the header area.
+            ImGui::SetCursorScreenPos(headerRectMin);
+            std::string headerId = node.first + "_header";
+            ImGui::InvisibleButton(headerId.c_str(), ImVec2(nodeSize.x, NODE_HEADER_SIZE));
+            if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+                ImVec2 delta = ImGui::GetIO().MouseDelta;
+                nodeData->x += delta.x;
+                nodeData->y += delta.y;
+            }
 
-            handleNodeDrag(nodeData);
-
-            ImGui::EndChild();
+            // --- Render IO Elements ---
             RenderNodeIO(nodeData.get(), nodePos, scriptInstance);
         }
     }
@@ -132,10 +177,8 @@ namespace Metal {
         onSyncChildren();
         ImGui::Separator();
         auto pos = ImGui::GetWindowPos();
-        ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(.5, .5, .5, 1));
-
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, context->themeService.palette4);
         renderNodes(pos);
-
         ImGui::PopStyleColor();
     }
 } // Metal

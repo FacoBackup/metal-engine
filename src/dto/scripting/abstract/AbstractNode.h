@@ -23,13 +23,23 @@ namespace Metal {
         }
 
         void initialize() {
+            unsigned int offsetInput = 0;
+            unsigned int offsetOutput = 0;
             if (isStartNode()) {
-                io.push_back(IO{false, IOType::IO_FLOW, 0, id});
+                io.push_back(IO{nullptr, false, IOType::IO_FLOW, 0, id});
+                offsetOutput++;
             } else {
-                io.push_back(IO{false, IOType::IO_FLOW, 0, id});
-                io.push_back(IO{true, IOType::IO_FLOW, 0, id});
+                io.push_back(IO{nullptr, false, IOType::IO_FLOW, 0, id});
+                io.push_back(IO{nullptr, true, IOType::IO_FLOW, 0, id});
+                offsetOutput++;
+                offsetInput++;
             }
             for (auto ioLocal: getIO()) {
+                if (ioLocal.isInput) {
+                    ioLocal.offsetY += offsetInput;
+                }else {
+                    ioLocal.offsetY += offsetOutput;
+                }
                 io.push_back(ioLocal);
             }
         }

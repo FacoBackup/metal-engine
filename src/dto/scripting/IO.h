@@ -15,10 +15,14 @@ namespace Metal {
         IOType type;
         int offsetY = 0;
         NodeId nodeId;
+        const char *name;
 
-        explicit IO(bool isInput, IOType type, int offsetY, NodeId nodeId) : id(NEW_ID), isInput(isInput), type(type),
-                                                                             offsetY(offsetY),
-                                                                             nodeId(std::move(nodeId)) {
+        explicit IO(const char *name, bool isInput, IOType type, int offsetY, NodeId nodeId) : name(name),
+            id(NEW_ID),
+            isInput(isInput),
+            type(type),
+            offsetY(offsetY),
+            nodeId(std::move(nodeId)) {
         }
     };
 }

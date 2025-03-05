@@ -12,8 +12,8 @@ namespace Metal {
 
         std::vector<IO> getIO() override {
             return {
-                IO{true, getType(), 0, id},
-                IO{false, getType(), 0, id},
+                IO{"Setter", true, getType(), 0, id},
+                IO{"Getter", false, getType(), 0, id},
             };
         }
 

@@ -11,9 +11,9 @@ namespace Metal {
 
     std::vector<IO> AndNode::getIO() {
         return {
-            IO{true, IO_BOOLEAN, 0, id},
-            IO{true, IO_BOOLEAN, 1, id},
-            IO{false, IO_BOOLEAN, 0, id}
+            IO{"A", true, IO_BOOLEAN, 0, id},
+            IO{"B", true, IO_BOOLEAN, 1, id},
+            IO{"Out", false, IO_BOOLEAN, 0, id}
         };
     }
 }

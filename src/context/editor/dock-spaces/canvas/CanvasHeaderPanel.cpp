@@ -16,7 +16,7 @@ namespace Metal {
                 script->addNode(AND);
             }
             if (ImGui::MenuItem("Boolean")) {
-                script->addNode(NodeType::BOOL);
+                script->addNode(BOOL);
             }
             ImGui::EndMenu();
         }
