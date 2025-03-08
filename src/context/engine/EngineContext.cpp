@@ -59,7 +59,10 @@ namespace Metal {
                     streamed->anisotropic,
                     streamed->sheen,
                     streamed->sheenTint,
-                    streamed->isEmissive
+                    streamed->isEmissive,
+                    streamed->transmission,
+                    streamed->ior,
+                    streamed->absorption
                 });
                 tlas.materialId = materials.size() - 1;
             } else {

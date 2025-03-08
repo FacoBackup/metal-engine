@@ -13,6 +13,7 @@
 // Implementation of http://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf
 
 // Disney brdf's taken from here:: https://github.com/wdas/brdf/blob/master/src/brdfs/disney.brdf
+
 float schlickWeight(float cosTheta) {
     float m = clamp(1. - cosTheta, 0., 1.);
     return (m * m) * (m * m) * m;

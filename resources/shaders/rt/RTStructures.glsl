@@ -26,6 +26,10 @@ struct MaterialInfo {
     float sheen;
     float sheenTint;
     bool  isEmissive;
+
+    float transmission;
+    float ior;
+    vec3 absorption;
 };
 
 struct HitData {
@@ -38,7 +42,7 @@ struct HitData {
 
     bool didHit;
     float closestT;
-    // TopLevelAS "id"; Refers to the primitive's unique id
+// TopLevelAS "id"; Refers to the primitive's unique id
     uint hitId;
     uint triangleId;
     int materialId;
@@ -71,10 +75,10 @@ layout(set = 0, binding = 1) uniform Triangles {
 struct BottomLevelAS {
     vec3 boundsMin;
     vec3 boundsMax;
-    /**
-    * When TriangleCount is negative (or not set), StartIndex is the index of the first child.
-    * When positive, it is the index of the first triangle.
-    */
+/**
+* When TriangleCount is negative (or not set), StartIndex is the index of the first child.
+* When positive, it is the index of the first triangle.
+*/
     int startIndex;
     int triangleCount;
 };
@@ -88,7 +92,7 @@ struct TopLevelAS {
     uint nodeOffset;
     uint triangleOffset;
     uint id;
-    // -1 if no material is configured
+// -1 if no material is configured
     int materialId;
 };
 layout(set = 0, binding = 3) uniform TLAS {

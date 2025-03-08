@@ -25,7 +25,6 @@ vec3 calculatePixelColor(in vec2 texCoords, MaterialInfo material, HitData inter
             float scatteringPdf = 0.0;
             vec3 directLighting = vec3(0.0);
 
-            // --- Surface Cache Integration ---
             if (bounce == 2) { // Only use cache from the 3rd bounce onward
                 ivec2 coord = ivec2(worldToSurfaceCacheHash(currentHit.hitPosition) *
                 vec2(globalData.surfaceCacheWidth, globalData.surfaceCacheHeight));
@@ -47,15 +46,38 @@ vec3 calculatePixelColor(in vec2 texCoords, MaterialInfo material, HitData inter
                     imageStore(giSurfaceCacheCompute, coord, vec4(updatedCacheColor, accumulationCount + 1.0));
                 }
             } else {
-                // Compute direct lighting normally for the first and second bounces
-                for (uint i = 0u; i < globalData.volumesOffset; i++) {
-                    LightVolume l = lightVolumeBuffer.items[i];
-                    l.color.rgb *= 20.0;
-                    directLighting += throughput * calculateDirectLight(l, currentHit, currentMaterial, currentRayDir, f, scatteringPdf) * l.color.a;
+
+                if (currentMaterial.transmission > 0.0) {
+                    // Compute refraction using Snell's law
+                    float eta = (dot(currentHit.hitNormal, currentRayDir) < 0.0) ? (1.0 / currentMaterial.ior) : currentMaterial.ior;
+                    vec3 refractedDir = refract(normalize(currentRayDir), normalize(currentHit.hitNormal), eta);
+
+                    // Fresnel reflection ratio
+                    float fresnel = fresnelSchlick(abs(dot(currentHit.hitNormal, currentRayDir)), currentMaterial.ior);
+                    float reflectionRatio = mix(fresnel, 1.0, 1.0 - currentMaterial.transmission);
+
+                    if (random() < reflectionRatio) {
+                        // Reflect instead
+                        currentRayDir = reflect(currentRayDir, currentHit.hitNormal);
+                    } else {
+                        // Refract: update throughput and also assign scattering parameters
+                        throughput *= exp(-currentMaterial.absorption * currentHit.closestT) * currentMaterial.baseColor;
+                        currentRayDir = refractedDir;
+
+                        // Ensure the scattering is properly handled for transparent material
+                        f = currentMaterial.baseColor;
+                        scatteringPdf = max(0.001, dot(f, vec3(1.0)) / 3.0);
+                    }
+                } else {
+                    // Regular opaque surface shading
+                    for (uint i = 0u; i < globalData.volumesOffset; i++) {
+                        LightVolume l = lightVolumeBuffer.items[i];
+                        l.color.rgb *= 20.0;
+                        directLighting += throughput * calculateDirectLight(l, currentHit, currentMaterial, currentRayDir, f, scatteringPdf) * l.color.a;
+                    }
+                    sampleRadiance += directLighting;
                 }
             }
-
-            sampleRadiance += directLighting;
 
             if (scatteringPdf <= EPSILON || dot(f, f) <= EPSILON) {
                 break;

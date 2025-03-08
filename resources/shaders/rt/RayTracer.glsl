@@ -21,6 +21,8 @@ MaterialInfo getMaterialInfo(inout HitData data){
         material.anisotropic = 0.;
         material.sheen = 0.;
         material.sheenTint = 0.;
+        material.transmission = 0.;
+        material.ior = 0.;
     }
     return material;
 }
