@@ -6,6 +6,7 @@
 #include "../../context/editor/dock-spaces/metrics/MetricsPanel.h"
 #include "../../context/editor/dock-spaces/viewport/ViewportPanel.h"
 #include "../../context/editor/dock-spaces/hierarchy/HierarchyPanel.h"
+#include "../../context/editor/dock-spaces/canvas/CanvasPanel.h"
 
 #define CB(clazz) []() { return new clazz; }
 
@@ -16,8 +17,8 @@ namespace Metal {
     DockSpace DockSpace::CONSOLE{2, "Console", Icons::terminal, 4, 4, CB(ConsolePanel)};
     DockSpace DockSpace::FILES{3, "Files", Icons::folder_open, 4, 4, CB(FilesPanel)};
     DockSpace DockSpace::METRICS{4, "Metrics", Icons::bar_chart, 4, 4, CB(MetricsPanel)};
-    const char *DockSpace::OPTIONS = "Inspector\0Hierarchy\0Console\0Files\0Metrics";
-
+    DockSpace DockSpace::CANVAS{5, "Scripting canvas", Icons::code, 4, 4, CB(CanvasPanel)};
+    const char *DockSpace::OPTIONS = "Inspector\0Hierarchy\0Console\0Files\0Metrics\0Scripting";
 
     DockSpace *DockSpace::GetOption(const int selected) {
         switch (selected) {
@@ -31,6 +32,8 @@ namespace Metal {
                 return &FILES;
             case 4:
                 return &METRICS;
+            case 5:
+                return &CANVAS;
             default:
                 return nullptr;
         }

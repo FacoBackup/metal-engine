@@ -4,7 +4,7 @@ namespace Metal {
     DockRepository::DockRepository(ApplicationContext &context) : AbstractRuntimeComponent(context) {
         auto *rightUp = new DockDTO{&DockSpace::HIERARCHY};
         auto *rightDown = new DockDTO{&DockSpace::INSPECTOR};
-        auto *downLeft = new DockDTO{&DockSpace::CONSOLE};
+        auto *downLeft = new DockDTO{&DockSpace::CANVAS};
         auto *downRight = new DockDTO{&DockSpace::FILES};
 
         center.sizeRatioForNodeAtDir = 0.17f;

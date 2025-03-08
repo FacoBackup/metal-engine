@@ -14,6 +14,7 @@ namespace Metal {
         static DockSpace CONSOLE;
         static DockSpace FILES;
         static DockSpace METRICS;
+        static DockSpace CANVAS;
         static const char *OPTIONS;
 
         const int index;
