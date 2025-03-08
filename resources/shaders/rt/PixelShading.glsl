@@ -21,27 +21,40 @@ vec3 calculatePixelColor(in vec2 texCoords, MaterialInfo material, HitData inter
             currentHit.tangent  = tangent;
             currentHit.binormal = binormal;
 
-            if (bounce > 0) {
-                ivec2 coord = ivec2(worldToSurfaceCacheHash(currentHit.hitPosition) *
-                vec2(globalData.surfaceCacheWidth, globalData.surfaceCacheHeight));
-                vec4 cacheData = imageLoad(giSurfaceCacheCompute, coord);
-
-                if (cacheData.a >= globalData.surfaceCacheMinSamples) {
-                    sampleRadiance += throughput * cacheData.rgb;
-                    break;
-                } else {
-// TODO
-                }
-            }
-
             vec3 f = vec3(0.0);
             float scatteringPdf = 0.0;
             vec3 directLighting = vec3(0.0);
-            for (uint i = 0u; i < globalData.volumesOffset; i++) {
-                LightVolume l = lightVolumeBuffer.items[i];
-                l.color.rgb *= 20.0;
-                directLighting += throughput * calculateDirectLight(l, currentHit, currentMaterial, currentRayDir, f, scatteringPdf) * l.color.a;
+
+            // --- Surface Cache Integration ---
+            if (bounce == 2) { // Only use cache from the 3rd bounce onward
+                ivec2 coord = ivec2(worldToSurfaceCacheHash(currentHit.hitPosition) *
+                vec2(globalData.surfaceCacheWidth, globalData.surfaceCacheHeight));
+                vec4 previousCacheData = imageLoad(giSurfaceCacheCompute, coord);
+                float accumulationCount = previousCacheData.a;
+
+                if (accumulationCount >= globalData.surfaceCacheMinSamples) {
+                    directLighting = previousCacheData.rgb;// Use cached lighting
+                } else {
+                    // Compute direct lighting and accumulate it into the cache
+                    for (uint i = 0u; i < globalData.volumesOffset; i++) {
+                        LightVolume l = lightVolumeBuffer.items[i];
+                        l.color.rgb *= 20.0;
+                        directLighting += throughput * calculateDirectLight(l, currentHit, currentMaterial, currentRayDir, f, scatteringPdf) * l.color.a;
+                    }
+
+                    // Accumulate into the cache
+                    vec3 updatedCacheColor = previousCacheData.rgb * (1.0 - 1.0 / accumulationCount) + directLighting * (1.0 / accumulationCount);
+                    imageStore(giSurfaceCacheCompute, coord, vec4(updatedCacheColor, accumulationCount + 1.0));
+                }
+            } else {
+                // Compute direct lighting normally for the first and second bounces
+                for (uint i = 0u; i < globalData.volumesOffset; i++) {
+                    LightVolume l = lightVolumeBuffer.items[i];
+                    l.color.rgb *= 20.0;
+                    directLighting += throughput * calculateDirectLight(l, currentHit, currentMaterial, currentRayDir, f, scatteringPdf) * l.color.a;
+                }
             }
+
             sampleRadiance += directLighting;
 
             if (scatteringPdf <= EPSILON || dot(f, f) <= EPSILON) {
@@ -56,6 +69,7 @@ vec3 calculatePixelColor(in vec2 texCoords, MaterialInfo material, HitData inter
                 }
                 break;
             }
+
             currentMaterial = getMaterialInfo(currentHit);
         }
 
