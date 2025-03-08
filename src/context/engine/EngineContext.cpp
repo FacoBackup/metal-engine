@@ -131,6 +131,7 @@ namespace Metal {
         globalDataUBO.giSamples = context.engineRepository.giSamples;
         globalDataUBO.giBounces = context.engineRepository.giBounces;
         globalDataUBO.giTileSubdivision = context.engineRepository.giTileSubdivision;
+        globalDataUBO.surfaceCacheMinSamples = context.engineRepository.surfaceCacheMinSamples;
         globalDataUBO.giEmissiveFactor = context.engineRepository.giEmissiveFactor;
 
         globalDataUBO.debugFlag = ShadingMode::IndexOfValue(context.editorRepository.shadingMode);

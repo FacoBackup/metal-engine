@@ -16,6 +16,7 @@ namespace Metal {
         int shadingResInvScale = 2;
         int giMaxAccumulation = 200;
         int giTileSubdivision = 40;
+        int surfaceCacheMinSamples = 2;
         float giEmissiveFactor = 2;
         int giSamples = 1;
         int giBounces = 1;
@@ -58,6 +59,7 @@ namespace Metal {
             middayColor.x, middayColor.y, middayColor.z,
             svoFilePaths,
             giTileSubdivision,
+            surfaceCacheMinSamples,
             giEmissiveFactor,
             giStrength,
             shadingResInvScale,

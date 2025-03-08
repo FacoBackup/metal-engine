@@ -1,6 +1,18 @@
 #ifndef RT_STRUCTS
 #define RT_STRUCTS
 
+// -------------------------
+// Constants & Helper Types
+// -------------------------
+#define INF 1e20
+#define EPSILON 1e-6
+
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+    vec3 invDir;
+};
+
 struct MaterialInfo {
     vec3  baseColor;
     float subsurface;
@@ -14,27 +26,6 @@ struct MaterialInfo {
     float sheen;
     float sheenTint;
     bool  isEmissive;
-};
-
-// -------------------------
-// Constants & Helper Types
-// -------------------------
-#define INF 1e20
-#define EPSILON 1e-6
-
-struct Ray {
-    vec3 origin;
-    vec3 dir;
-    vec3 invDir;
-};
-
-struct BounceInfo {
-    vec3 albedo;
-    bool isEmissive;
-    vec3 hitNormal;
-    vec3 currentPosition;
-    vec3 throughput;
-    vec3 indirectLight;
 };
 
 struct HitData {

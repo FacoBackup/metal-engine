@@ -23,6 +23,7 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     uint giSamples;
     uint giBounces;
     uint giTileSubdivision;
+    uint surfaceCacheMinSamples;
     float giEmissiveFactor;
 
     uint debugFlag;
