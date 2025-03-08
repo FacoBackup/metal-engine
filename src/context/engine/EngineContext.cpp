@@ -59,7 +59,10 @@ namespace Metal {
                     streamed->anisotropic,
                     streamed->sheen,
                     streamed->sheenTint,
-                    streamed->isEmissive
+                    streamed->isEmissive,
+                    streamed->transmission,
+                    streamed->ior,
+                    streamed->absorption
                 });
                 tlas.materialId = materials.size() - 1;
             } else {
@@ -131,6 +134,7 @@ namespace Metal {
         globalDataUBO.giSamples = context.engineRepository.giSamples;
         globalDataUBO.giBounces = context.engineRepository.giBounces;
         globalDataUBO.giTileSubdivision = context.engineRepository.giTileSubdivision;
+        globalDataUBO.surfaceCacheMinSamples = context.engineRepository.surfaceCacheMinSamples;
         globalDataUBO.giEmissiveFactor = context.engineRepository.giEmissiveFactor;
 
         globalDataUBO.debugFlag = ShadingMode::IndexOfValue(context.editorRepository.shadingMode);

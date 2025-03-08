@@ -10,8 +10,8 @@ MaterialInfo getMaterialInfo(inout HitData data){
         material = materialBuffer.items[data.materialId];
     } else {
         material.baseColor = vec3(1);
-        material.metallic = .5;
-        material.roughness = .5;
+        material.metallic = 1;
+        material.roughness = 1;
         material.isEmissive = false;
         material.subsurface = 0.;
         material.specular = 0.;
@@ -21,6 +21,8 @@ MaterialInfo getMaterialInfo(inout HitData data){
         material.anisotropic = 0.;
         material.sheen = 0.;
         material.sheenTint = 0.;
+        material.transmission = 0.;
+        material.ior = 0.;
     }
     return material;
 }

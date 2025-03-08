@@ -1,6 +1,18 @@
 #ifndef RT_STRUCTS
 #define RT_STRUCTS
 
+// -------------------------
+// Constants & Helper Types
+// -------------------------
+#define INF 1e20
+#define EPSILON 1e-6
+
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+    vec3 invDir;
+};
+
 struct MaterialInfo {
     vec3  baseColor;
     float subsurface;
@@ -14,27 +26,10 @@ struct MaterialInfo {
     float sheen;
     float sheenTint;
     bool  isEmissive;
-};
 
-// -------------------------
-// Constants & Helper Types
-// -------------------------
-#define INF 1e20
-#define EPSILON 1e-6
-
-struct Ray {
-    vec3 origin;
-    vec3 dir;
-    vec3 invDir;
-};
-
-struct BounceInfo {
-    vec3 albedo;
-    bool isEmissive;
-    vec3 hitNormal;
-    vec3 currentPosition;
-    vec3 throughput;
-    vec3 indirectLight;
+    float transmission;
+    float ior;
+    vec3 absorption;
 };
 
 struct HitData {
@@ -47,7 +42,7 @@ struct HitData {
 
     bool didHit;
     float closestT;
-    // TopLevelAS "id"; Refers to the primitive's unique id
+// TopLevelAS "id"; Refers to the primitive's unique id
     uint hitId;
     uint triangleId;
     int materialId;
@@ -80,10 +75,10 @@ layout(set = 0, binding = 1) uniform Triangles {
 struct BottomLevelAS {
     vec3 boundsMin;
     vec3 boundsMax;
-    /**
-    * When TriangleCount is negative (or not set), StartIndex is the index of the first child.
-    * When positive, it is the index of the first triangle.
-    */
+/**
+* When TriangleCount is negative (or not set), StartIndex is the index of the first child.
+* When positive, it is the index of the first triangle.
+*/
     int startIndex;
     int triangleCount;
 };
@@ -97,7 +92,7 @@ struct TopLevelAS {
     uint nodeOffset;
     uint triangleOffset;
     uint id;
-    // -1 if no material is configured
+// -1 if no material is configured
     int materialId;
 };
 layout(set = 0, binding = 3) uniform TLAS {

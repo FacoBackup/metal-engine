@@ -8,18 +8,22 @@
 
 namespace Metal {
     struct MaterialInfo final : Inspectable {
-        alignas(16) glm::vec3 baseColor;
-        alignas(4) float subsurface;
-        alignas(4) float roughness;
-        alignas(4) float metallic;
-        alignas(4) float specular;
-        alignas(4) float specularTint;
-        alignas(4) float clearcoat;
-        alignas(4) float clearcoatGloss;
-        alignas(4) float anisotropic;
-        alignas(4) float sheen;
-        alignas(4) float sheenTint;
-        alignas(4) bool isEmissive;
+        glm::vec3 baseColor;
+        float subsurface;
+        float roughness;
+        float metallic;
+        float specular;
+        float specularTint;
+        float clearcoat;
+        float clearcoatGloss;
+        float anisotropic;
+        float sheen;
+        float sheenTint;
+        bool isEmissive;
+        // Transparency properties
+        float transmission = 0; // 0 = opaque, 1 = fully transparent
+        float ior = 0; // Index of refraction
+        glm::vec3 absorption;
 
         void registerFields() override;
 
@@ -39,7 +43,10 @@ namespace Metal {
             anisotropic,
             sheen,
             sheenTint,
-            isEmissive
+            isEmissive,
+            transmission,
+            ior,
+            absorption.x, absorption.y, absorption.z
         )
 
         std::vector<std::string> getDependencies() {

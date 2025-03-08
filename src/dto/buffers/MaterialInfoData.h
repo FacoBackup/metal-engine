@@ -16,6 +16,9 @@ namespace Metal {
         alignas(4) float sheen;
         alignas(4) float sheenTint;
         alignas(4) bool isEmissive;
+        alignas(4) float transmission;
+        alignas(4) float ior;
+        alignas(16) glm::vec3 absorption;
     };
 }
 #endif //MATERIALINFODATA_H

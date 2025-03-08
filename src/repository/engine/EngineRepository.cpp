@@ -26,6 +26,7 @@ namespace Metal {
         registerInt(giBounces, PATH_TRACER, "Bounces", 0, 7);
         registerBool(multipleImportanceSampling, PATH_TRACER, "Enable multiple importance sampling?");
         registerInt(giTileSubdivision, PATH_TRACER, "Grid subdivision", 1);
+        registerInt(surfaceCacheMinSamples, PATH_TRACER, "Surface cache min samples", 1);
         registerFloat(giEmissiveFactor, PATH_TRACER, "Emissive surface factor", 0);
 
         registerBool(atmosphereEnabled, ATMOSPHERE, "Enabled?");

@@ -3,7 +3,7 @@
 
 namespace Metal {
     void MaterialInfo::registerFields() {
-        registerColor(baseColor, "", "Base color");
+        registerColor(baseColor, "", "Base color / Absorption");
         registerFloat(subsurface, "", "Subsurface");
         registerFloat(roughness, "", "Roughness");
         registerFloat(metallic, "", "Metallic");
@@ -15,6 +15,10 @@ namespace Metal {
         registerFloat(sheen, "", "Sheen");
         registerFloat(sheenTint, "", "Sheen tint");
         registerBool(isEmissive, "", "Is emissive?");
+
+        registerFloat(transmission, "", "Transmission", 0, 1);
+        registerFloat(ior, "", "IOR (water = 1.33)", 1);
+        registerVec3(absorption, "", "Absorption");
     }
 
     const char *MaterialInfo::getIcon() {
