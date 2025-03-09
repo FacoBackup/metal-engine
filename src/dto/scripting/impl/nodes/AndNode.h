@@ -1,9 +1,9 @@
 #ifndef ANDNODE_H
 #define ANDNODE_H
-#include "../../abstract/AbstractNode.h"
+#include "../../abstract/AbstractScriptNode.h"
 
 namespace Metal {
-    struct AndNode final : AbstractNode {
+    struct AndNode final : AbstractScriptNode {
         AndNode();
 
         std::vector<IO> getIO() override;

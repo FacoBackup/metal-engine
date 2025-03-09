@@ -1,9 +1,9 @@
 #ifndef STARTNODE_H
 #define STARTNODE_H
-#include "../../abstract/AbstractNode.h"
+#include "../../abstract/AbstractScriptNode.h"
 
 namespace Metal {
-    struct StartNode final : AbstractNode {
+    struct StartNode final : AbstractScriptNode {
         StartNode();
 
         bool isStartNode() override;
