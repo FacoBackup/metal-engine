@@ -8,10 +8,16 @@
 namespace Metal {
     struct Link {
         const IOId id = NEW_ID;
-        IO source;
-        IO target;
+        std::string source;
+        std::string target;
+        std::string sourceNodeId;
+        std::string targetNodeId;
 
-        explicit Link(IO source, IO target) : source(std::move(source)), target(std::move(target)) {
+
+        explicit
+        Link(std::string source, std::string target, std::string sourceNodeId,
+             std::string targetNodeId) : source(std::move(source)), target(std::move(target)),
+                                         sourceNodeId(std::move(sourceNodeId)), targetNodeId(std::move(targetNodeId)) {
         }
     };
 } // Metal

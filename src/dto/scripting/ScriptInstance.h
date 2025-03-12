@@ -2,17 +2,18 @@
 #define SCRIPTINSTANCE_H
 #include "NodeType.h"
 #include "script-definitions.h"
-#include "abstract/AbstractNode.h"
+#include "abstract/AbstractDraggable.h"
+#include "Link.h"
+#include "abstract/AbstractVariable.h"
 
 namespace Metal {
-    struct Link;
-
-    struct ScriptInstance final{
+    struct ScriptInstance final {
         const std::string id = NEW_ID;
 
         std::unordered_map<std::string, bool> selectedNodes;
-        std::unordered_map<NodeId, std::shared_ptr<AbstractNode>> nodes;
-        std::unordered_map<IOId, std::shared_ptr<Link>> links;
+        std::unordered_map<NodeId, AbstractDraggable> nodes;
+        std::unordered_map<IOId, Link> links;
+        std::unordered_map<NodeId, AbstractVariable> variables;
 
         explicit ScriptInstance();
 
@@ -20,7 +21,7 @@ namespace Metal {
 
         void removeNode(const NodeId &nodeId);
 
-        void addLink(IO source, IO target);
+        void addLink(const IO &source, const IO &target);
 
         void removeLink(IOId &id);
     };
