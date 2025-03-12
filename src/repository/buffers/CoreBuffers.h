@@ -15,7 +15,8 @@ namespace Metal {
         void onInitialize() override;
 
         std::shared_ptr<BufferInstance> globalData = nullptr;
-        std::shared_ptr<BufferInstance> lightVolumeBuffer = nullptr;
+        std::shared_ptr<BufferInstance> lightsBuffer = nullptr;
+        std::shared_ptr<BufferInstance> volumesBuffer = nullptr;
         std::shared_ptr<BufferInstance> rtTrianglesBuffer = nullptr;
         std::shared_ptr<BufferInstance> rtTLASBuffer = nullptr;
         std::shared_ptr<BufferInstance> rtBLASBuffer = nullptr;

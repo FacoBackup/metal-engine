@@ -47,11 +47,17 @@ namespace Metal {
                                   vkImageView));
         rtDescriptorSet->create(vulkanContext);
 
-        lightVolumeData = std::make_unique<DescriptorInstance>();
-        lightVolumeData->addLayoutBinding(DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES,
-                                                                VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0,
-                                                                context.coreBuffers.lightVolumeBuffer));
-        lightVolumeData->create(vulkanContext);
+        lightsBuffer = std::make_unique<DescriptorInstance>();
+        lightsBuffer->addLayoutBinding(DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES,
+                                                             VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0,
+                                                             context.coreBuffers.lightsBuffer));
+        lightsBuffer->create(vulkanContext);
+
+        volumesBuffer = std::make_unique<DescriptorInstance>();
+        volumesBuffer->addLayoutBinding(DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES,
+                                                              VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0,
+                                                              context.coreBuffers.volumesBuffer));
+        volumesBuffer->create(vulkanContext);
 
         globalDataDescriptor = std::make_unique<DescriptorInstance>();
         globalDataDescriptor->addLayoutBinding(
@@ -83,24 +89,23 @@ namespace Metal {
                                                                            context.coreTextures.currentFrame->
                                                                            vkImageView));
             currentFrameDescriptor->create(vulkanContext);
-        }{
+        } {
             currentPositionsDescriptor = std::make_unique<DescriptorInstance>();
             currentPositionsDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
-                                                                             VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
-                                                                             VK_NULL_HANDLE,
-                                                                             context.coreTextures.
-                                                                             currentPositions->
-                                                                             vkImageView));
+                                                                               VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
+                                                                               VK_NULL_HANDLE,
+                                                                               context.coreTextures.
+                                                                               currentPositions->
+                                                                               vkImageView));
             currentPositionsDescriptor->create(vulkanContext);
-        }
-        {
+        } {
             currentPositionsFragmentDescriptor = std::make_unique<DescriptorInstance>();
             currentPositionsFragmentDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                                             VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
-                                                                             vkImageSampler,
-                                                                             context.coreTextures.
-                                                                             currentPositions->
-                                                                             vkImageView));
+                VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
+                vkImageSampler,
+                context.coreTextures.
+                currentPositions->
+                vkImageView));
             currentPositionsFragmentDescriptor->create(vulkanContext);
         }
     }

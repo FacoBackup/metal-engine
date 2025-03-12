@@ -11,7 +11,7 @@ namespace Metal {
                     "tools/Icon.frag"
                 )
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.lightVolumeData.get());
+                .addDescriptorSet(context.coreDescriptorSets.lightsBuffer.get());
         pipelineInstance = context.pipelineService.createPipeline(iconPipelineBuilder);
     }
 

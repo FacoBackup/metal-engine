@@ -218,7 +218,7 @@ add_executable(
         src/service/world/WorldGridService.cpp
         src/service/world/WorldGridService.h
         src/dto/buffers/TileInfoUBO.h
-        src/dto/buffers/LightVolumeData.h
+        src/dto/buffers/LightData.h
         src/repository/world/components/LightComponent.cpp
         src/repository/world/components/LightComponent.h
         src/context/engine/render-pass/impl/tools/IconsPass.cpp
@@ -243,8 +243,8 @@ add_executable(
         src/context/engine/compute-pass/impl/AccumulationMetadataPass.h
         src/context/engine/compute-pass/impl/AccumulationPass.cpp
         src/context/engine/compute-pass/impl/AccumulationPass.h
-        src/service/lights/LightVolumeService.cpp
-        src/service/lights/LightVolumeService.h
+        src/service/lights/LightsService.cpp
+        src/service/lights/LightsService.h
         src/repository/world/components/VolumeComponent.cpp
         src/repository/world/components/VolumeComponent.h
         src/service/descriptor/DescriptorBinding.h
@@ -290,6 +290,8 @@ add_executable(
         src/context/editor/dock-spaces/canvas/CanvasUtil.h
         src/dto/scripting/abstract/AbstractScriptNode.h
         src/dto/scripting/abstract/AbstractVariable.h
+        src/service/volume/VolumeService.cpp
+        src/service/volume/VolumeService.h
 )
 
 

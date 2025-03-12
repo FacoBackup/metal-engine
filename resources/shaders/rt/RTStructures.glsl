@@ -111,5 +111,8 @@ layout(set = 0, binding = 7, rgba32f) uniform image2D giSurfaceCacheCompute;
 #define LIGHT_VOLUME_SET 1
 #include "../LightVolumeBuffer.glsl"
 
+#define VOLUMES_SET 2
+#include "../VolumesBuffer.glsl"
+
 
 #endif
