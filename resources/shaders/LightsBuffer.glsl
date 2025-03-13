@@ -1,6 +1,6 @@
 #ifndef L_V
 #define L_V
-struct LightVolume {
+struct LightInstance {
     vec4 color;
     vec3 position;
     vec3 dataA;
@@ -9,6 +9,6 @@ struct LightVolume {
 };
 
 layout(set = LIGHT_VOLUME_SET, binding = 0) uniform Lights {
-    LightVolume items[MAX_LIGHT_VOLUMES];
-} lightVolumeBuffer;
+    LightInstance items[MAX_LIGHT_VOLUMES];
+} lightsBuffer;
 #endif

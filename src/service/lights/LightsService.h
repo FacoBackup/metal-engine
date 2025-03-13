@@ -28,7 +28,7 @@ namespace Metal {
 
         void update();
 
-        [[nodiscard]] unsigned int getLightVolumeCount() const {
+        [[nodiscard]] unsigned int getLightCount() const {
             return count;
         }
 

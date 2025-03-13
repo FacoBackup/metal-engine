@@ -12,7 +12,7 @@ namespace Metal {
             auto &translation = t.translation;
             auto &l = entry.second;
 
-            items.push_back(LightData(
+            items.push_back(VolumeData(
                 glm::vec4(l.albedo, l.samples),
                 translation,
                 t.scale,

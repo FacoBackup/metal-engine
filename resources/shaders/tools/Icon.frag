@@ -2,7 +2,7 @@
 #include "../CreateRay.glsl"
 
 #define LIGHT_VOLUME_SET 1
-#include "../LightVolumeBuffer.glsl"
+#include "../LightsBuffer.glsl"
 
 layout (location = 0) in vec2 texCoords;
 layout (location = 0) out vec4 finalColor;
@@ -36,7 +36,7 @@ float udQuad(vec3 p, vec3 a, vec3 b, vec3 c, vec3 d)
     dot(nor, pa)*dot(nor, pa)/dot2(nor));
 }
 
-bool rayMarch(vec3 ro, vec3 rd, in LightVolume l) {
+bool rayMarch(vec3 ro, vec3 rd, in LightInstance l) {
     float t = 0.0;
     for (int i = 0; i < 256; i++) {
         vec3 p = ro + t * rd;
@@ -75,12 +75,9 @@ bool rayMarch(vec3 ro, vec3 rd, in LightVolume l) {
 }
 
 void main(){
-    if (globalData.lightVolumeCount == 0){
-        discard;
-    }
     vec3 dir = createRay(texCoords, globalData.invProj, globalData.invView);
-    for (uint i = 0; i < globalData.volumesOffset; i++){
-        LightVolume l = lightVolumeBuffer.items[i];
+    for (uint i = 0; i < globalData.lightCount; i++){
+        LightInstance l = lightsBuffer.items[i];
         if (rayMarch(globalData.cameraWorldPosition.xyz, dir, l)){
             finalColor = vec4(l.color.rgb * l.color.a, 1);
             return;

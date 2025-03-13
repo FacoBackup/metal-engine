@@ -40,6 +40,7 @@
 #include "../service/notification/NotificationService.h"
 #include "../service/transform/TransformService.h"
 #include "../service/lights/LightsService.h"
+#include "../service/volume/VolumeService.h"
 #include "editor/EditorPanel.h"
 #include "gui/GuiContext.h"
 
@@ -81,7 +82,8 @@ namespace Metal {
         CameraService cameraService{*this};
         WorldGridService worldGridService{*this};
         TransformService transformService{*this};
-        LightsService lightVolumesService{*this};
+        LightsService lightsService{*this};
+        VolumeService volumesService{*this};
         BVHBuilderService bvhBuilderService{*this};
         // ----------- Services
 

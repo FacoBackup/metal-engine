@@ -43,8 +43,6 @@ namespace Metal {
 
         registerSun();
         registerLights();
-        volumesOffset = items.size();
-        registerVolumes();
 
         if (!items.empty()) {
             context.coreBuffers.lightsBuffer->update(items.data());
@@ -54,6 +52,9 @@ namespace Metal {
 
 
     void LightsService::computeSunInfo() {
+        if (!context.engineRepository.atmosphereEnabled) {
+            return;
+        }
         sunPosition = glm::vec3(0,
                                 std::cos(context.engineRepository.elapsedTime),
                                 std::sin(context.engineRepository.elapsedTime)) * context.engineRepository
@@ -65,7 +66,7 @@ namespace Metal {
     }
 
     glm::vec3 LightsService::CalculateSunColor(const float elevation, glm::vec3 &nightColor, glm::vec3 &dawnColor,
-                                                    glm::vec3 &middayColor) {
+                                               glm::vec3 &middayColor) {
         if (elevation <= -0.1f) {
             return nightColor;
         }

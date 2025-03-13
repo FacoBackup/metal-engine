@@ -1,4 +1,5 @@
-#include "../LightVolumeBuffer.glsl"
+#include "../VolumesBuffer.glsl"
+#include "../LightsBuffer.glsl"
 
 vec3 RandomUnitVector();
 
@@ -33,7 +34,7 @@ float phaseHenyeyGreenstein(vec3 wo, vec3 wi, float g) {
     return (1.0 - g*g) / (4.0 * 3.14159265359 * pow(denom, 1.5));
 }
 
-vec4 integrateVolume(vec3 ro, vec3 rd, in LightVolume volume, float sceneDepth) {
+vec4 integrateVolume(vec3 ro, vec3 rd, in VolumeInstance volume, float sceneDepth) {
     vec3 roLocal = ro - volume.position;
 
     float tEntry, tExit;
@@ -67,8 +68,8 @@ vec4 integrateVolume(vec3 ro, vec3 rd, in LightVolume volume, float sceneDepth) 
         float extinctionCoefficient  = scatteringCoefficient + absorptionCoefficient;
 
         vec3 inScattered = vec3(0.0);
-        for (int li = 0; li < globalData.volumesOffset; li++) {
-            LightVolume light = lightVolumeBuffer.items[li];
+        for (int li = 0; li < globalData.lightCount; li++) {
+            LightInstance light = lightsBuffer.items[li];
             vec3 samplePos;
 
             if (light.itemType == ITEM_TYPE_SPHERE) {
@@ -109,8 +110,8 @@ void traceVolumes(inout vec4 finalColor, vec3 worldPosition, vec3 rayDirection){
     vec3 rayOrigin = globalData.cameraWorldPosition;
     float sceneDepth = length(worldPosition.rgb - rayOrigin);
 
-    for (uint i = globalData.volumesOffset; i < globalData.lightVolumeCount; i++) {
-        LightVolume volume = lightVolumeBuffer.items[i];
+    for (uint i = 0; i < globalData.volumeCount; i++) {
+        VolumeInstance volume = volumesBuffer.items[i];
         finalColor += integrateVolume(rayOrigin, rayDirection, volume, sceneDepth);
     }
 }

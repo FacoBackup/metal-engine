@@ -1,10 +1,11 @@
 #ifndef V_T
 #define V_T
 
-#include "../LightVolumeBuffer.glsl"
+#include "../LightsBuffer.glsl"
+#include "../VolumesBuffer.glsl"
 #include "../rt/RTStructures.glsl"
 
-vec3 visibilityTest(const in LightVolume light, in vec3 point, vec3 wi) {
+vec3 visibilityTest(const in LightInstance light, in vec3 point, vec3 wi) {
     HitData hitData = trace(point, wi);
     float lightDistance = length(light.position - point);
     float hitDistance = length(hitData.hitPosition - point);
@@ -30,8 +31,8 @@ vec3 visibilityTest(const in LightVolume light, in vec3 point, vec3 wi) {
     vec3 vColor = vec3(1.0);
     bool anyHit = false;
 
-    for (uint i = globalData.volumesOffset; i < globalData.lightVolumeCount; i++) {
-        LightVolume volume = lightVolumeBuffer.items[i];
+    for (uint i = 0; i < globalData.volumeCount; i++) {
+        VolumeInstance volume = volumesBuffer.items[i];
         float tEntry, tExit;
         vec3 roLocal = point - volume.position;
         bool intersects = intersectBox(roLocal, wi, volume.dataA, tEntry, tExit);

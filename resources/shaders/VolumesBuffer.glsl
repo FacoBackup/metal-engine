@@ -1,6 +1,6 @@
 #ifndef V_V
 #define V_V
-struct Volume {
+struct VolumeInstance {
     vec4 color;
     vec3 position;
     vec3 dataA;
@@ -9,6 +9,6 @@ struct Volume {
 };
 
 layout(set = VOLUMES_SET, binding = 0) uniform Volumes {
-    Volume items[MAX_LIGHT_VOLUMES];
+    VolumeInstance items[MAX_LIGHT_VOLUMES];
 } volumesBuffer;
 #endif
