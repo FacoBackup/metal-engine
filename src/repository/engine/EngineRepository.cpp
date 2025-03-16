@@ -13,6 +13,8 @@ namespace Metal {
     void EngineRepository::registerFields() {
         registerInt(shadingResInvScale, "Display settings (Restart required)", "Shading inverted resolution scale", 1,
                     16);
+        registerInt(volumetricResInvScale, "Display settings (Restart required)", "Volumetric inverted resolution scale",
+                    1, 16);
         registerBool(vsync, "Display settings (Restart required)", "VSync?");
         registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);
 

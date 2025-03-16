@@ -26,6 +26,8 @@ namespace Metal {
         std::unique_ptr<DescriptorInstance> currentFrameDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> currentPositionsDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> currentPositionsFragmentDescriptor = nullptr;
+        std::unique_ptr<DescriptorInstance> volumetricCurrentFrame = nullptr;
+        std::unique_ptr<DescriptorInstance> accumulationMetadataDescriptor = nullptr;
 
         void onInitialize() override;
 

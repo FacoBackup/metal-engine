@@ -90,6 +90,14 @@ namespace Metal {
                                                                            vkImageView));
             currentFrameDescriptor->create(vulkanContext);
         } {
+            volumetricCurrentFrame = std::make_unique<DescriptorInstance>();
+            volumetricCurrentFrame->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
+                                                                           VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
+                                                                           VK_NULL_HANDLE,
+                                                                           context.coreTextures.volumetricCurrentFrame->
+                                                                           vkImageView));
+            volumetricCurrentFrame->create(vulkanContext);
+        } {
             currentPositionsDescriptor = std::make_unique<DescriptorInstance>();
             currentPositionsDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
                                                                                VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
@@ -98,6 +106,39 @@ namespace Metal {
                                                                                currentPositions->
                                                                                vkImageView));
             currentPositionsDescriptor->create(vulkanContext);
+        } {
+            accumulationMetadataDescriptor = std::make_unique<DescriptorInstance>();
+            accumulationMetadataDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
+                VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
+                VK_NULL_HANDLE,
+                context.coreTextures.
+                currentFrame->
+                vkImageView));
+            accumulationMetadataDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
+                VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1,
+                VK_NULL_HANDLE,
+                context.coreTextures.
+                volumetricCurrentFrame->
+                vkImageView));
+            accumulationMetadataDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
+                VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 2,
+                VK_NULL_HANDLE,
+                context.coreTextures.
+                previousFrame->
+                vkImageView));
+            accumulationMetadataDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
+                VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 3,
+                VK_NULL_HANDLE,
+                context.coreTextures.
+                previousFrameMetadata->
+                vkImageView));
+            accumulationMetadataDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
+                VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 4,
+                VK_NULL_HANDLE,
+                context.coreTextures.
+                currentPositions->
+                vkImageView));
+            accumulationMetadataDescriptor->create(vulkanContext);
         } {
             currentPositionsFragmentDescriptor = std::make_unique<DescriptorInstance>();
             currentPositionsFragmentDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,

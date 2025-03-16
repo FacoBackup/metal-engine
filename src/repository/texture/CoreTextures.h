@@ -16,6 +16,7 @@ namespace Metal {
 
         TextureInstance *giSurfaceCache = nullptr;
         TextureInstance *currentFrame = nullptr;
+        TextureInstance *volumetricCurrentFrame = nullptr;
         TextureInstance *currentPositions = nullptr;
         TextureInstance *previousFrameMetadata = nullptr;
         TextureInstance *previousFrame = nullptr;

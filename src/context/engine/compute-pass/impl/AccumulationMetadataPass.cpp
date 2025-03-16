@@ -8,10 +8,7 @@ namespace Metal {
         PipelineBuilder builder = PipelineBuilder::Of("AccumulationMetadata.comp")
                 .setPushConstantsSize(sizeof(DenoiserPushConstant))
                 .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.currentFrameDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.previousFrameDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.previousFrameMetadataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.currentPositionsDescriptor.get());
+                .addDescriptorSet(context.coreDescriptorSets.accumulationMetadataDescriptor.get());
         pipelineInstance = context.pipelineService.createPipeline(builder);
     }
 

@@ -2,43 +2,53 @@ layout(local_size_x = 8, local_size_y = 8) in;
 
 #include "./GlobalDataBuffer.glsl"
 
-#ifdef DEBUG
-#include "./DebugFlags.glsl"
-#endif
-
-
 layout(set = 1, binding = 0, rgba32f) uniform image2D currentFrameImage;// Color + surface ID
-layout(set = 2, binding = 0, rgba32f) uniform image2D previousFrameImage;// Color + acuumulation count
-layout(set = 3, binding = 0, rgba32f) uniform image2D previousFrameMetadataImage;// surface ID + position
-layout(set = 4, binding = 0, rgba32f) uniform image2D currentPositions;
+layout(set = 1, binding = 1, rgba32f) uniform image2D volumetricCurrentFrame;
+layout(set = 1, binding = 2, rgba32f) uniform image2D previousFrameImage;// Color + acuumulation count
+layout(set = 1, binding = 3, rgba32f) uniform image2D previousFrameMetadataImage;// surface ID + position
+layout(set = 1, binding = 4, rgba32f) uniform image2D currentPositions;
 
 layout(push_constant) uniform Push {
     float diffWeight;
 } push;
 
-vec3 i_cube_32( uint data ) {
-    uvec2 iuv = uvec2( data, data>>15u ) & uvec2(32767u,16383u);
-    vec2 uv = vec2(iuv)*2.0/vec2(32767.0,16383.0) - 1.0;
+vec4 composite() {
+    ivec2 fullResCoord = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 fullResSize = imageSize(currentFrameImage);
+    ivec2 halfResSize = imageSize(volumetricCurrentFrame);
 
-    uint is = (data>>31u)&1u;
-    vec3 nor = vec3((is==0u)?1.0:-1.0,uv.xy);
+    vec2 uv = vec2(fullResCoord) / vec2(fullResSize);
 
-    uint id = (data>>29u)&3u;
-    if(id==0u) nor = nor.xyz;
-    else if(id==1u) nor = nor.zxy;
-    else            nor = nor.yzx;
+    vec2 halfTexelPos = uv * vec2(halfResSize) - 0.5;
 
-    return normalize(nor);
+    ivec2 texelBase = ivec2(floor(halfTexelPos));
+    vec2 f = fract(halfTexelPos);
+
+    texelBase = clamp(texelBase, ivec2(0), halfResSize - ivec2(1));
+    ivec2 texelRight = min(texelBase + ivec2(1, 0), halfResSize - ivec2(1));
+    ivec2 texelUp = min(texelBase + ivec2(0, 1), halfResSize - ivec2(1));
+    ivec2 texelUpRight = min(texelBase + ivec2(1, 1), halfResSize - ivec2(1));
+
+    vec4 c00 = imageLoad(volumetricCurrentFrame, texelBase);
+    vec4 c10 = imageLoad(volumetricCurrentFrame, texelRight);
+    vec4 c01 = imageLoad(volumetricCurrentFrame, texelUp);
+    vec4 c11 = imageLoad(volumetricCurrentFrame, texelUpRight);
+
+    vec4 volumetricColor = mix(mix(c00, c10, f.x), mix(c01, c11, f.x), f.y);
+
+    vec4 fullResColor = imageLoad(currentFrameImage, fullResCoord);
+    if (volumetricColor.a > 0.001){
+        fullResColor.rgb = volumetricColor.rgb * volumetricColor.a + fullResColor.rgb * (1.0 - volumetricColor.a);
+    }
+    return fullResColor;
 }
 
 void main() {
     ivec2 coords =  ivec2(gl_GlobalInvocationID.xy);
-    #ifdef DEBUG
-    if (globalData.debugFlag != LIT && globalData.debugFlag != LIGHTING_ONLY){
-        return;
-    }
-    #endif
+
+    vec4 finalColor = composite();
     if (!globalData.enabledDenoiser){
+        imageStore(currentFrameImage, coords, finalColor);
         return;
     }
 
@@ -48,8 +58,7 @@ void main() {
         imageStore(previousFrameMetadataImage, coords, vec4(0));
         return;
     }
-
-    vec4 currentFrame = imageLoad(currentFrameImage, coords);// Color + surface ID
+    vec4 currentFrame = finalColor;// Color + surface ID
     vec4 previousFrameMetadata = imageLoad(previousFrameMetadataImage, coords);
     bool validHistory = (previousFrameMetadata.r == currentFrame.a) && (dot(previousFrameMetadata.gba, worldPos.rgb) > 0.95);
 

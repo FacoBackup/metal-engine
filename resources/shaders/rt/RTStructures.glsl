@@ -104,7 +104,7 @@ layout(set = 0, binding = 4) uniform Materials {
 } materialBuffer;
 
 
-layout(set = 0, binding = 5, rgba32f) uniform image2D outputImage;
+layout(set = 0, binding = 5, rgba32f) uniform image2D currentFrame;
 layout(set = 0, binding = 6, rgba32f) uniform image2D currentPositions;
 layout(set = 0, binding = 7, rgba32f) uniform image2D giSurfaceCacheCompute;
 

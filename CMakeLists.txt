@@ -292,6 +292,7 @@ add_executable(
         src/dto/scripting/abstract/AbstractVariable.h
         src/service/volume/VolumeService.cpp
         src/service/volume/VolumeService.h
+        src/context/engine/compute-pass/impl/VolumetricPass.cpp
 )
 
 

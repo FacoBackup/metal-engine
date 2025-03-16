@@ -4,6 +4,7 @@
 #include "../compute-pass/impl/AccumulationPass.h"
 #include "../compute-pass/impl/AccumulationMetadataPass.h"
 #include "../compute-pass/impl/RTPass.h"
+#include "../compute-pass/impl/VolumetricPass.h"
 #include "../render-pass/impl/PostProcessingPass.h"
 #include "../render-pass/impl/tools/GridPass.h"
 #include "../render-pass/impl/tools/IconsPass.h"
@@ -17,6 +18,7 @@ namespace Metal {
         postProcessing = new CommandBufferRecorder(context.coreFrameBuffers.postProcessingFBO, context);
 
         addPass(computePasses, new RTPass(context));
+        addPass(computePasses, new VolumetricPass(context));
         addPass(computePasses, new AccumulationPass(context));
         addPass(computePasses, new AccumulationMetadataPass(context));
 

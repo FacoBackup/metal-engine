@@ -28,7 +28,8 @@ float phaseHenyeyGreenstein(vec3 wo, vec3 wi, float g) {
     float denom = 1.0 + g*g - 2.0 * g * cosTheta;
     return (1.0 - g*g) / (4.0 * 3.14159265359 * pow(denom, 1.5));
 }
-vec4 integrateVolume(vec3 ro, vec3 rd, in VolumeInstance volume, float sceneDepth) {
+
+vec4 integrateVolume(vec3 ro, vec3 rd, in VolumeInstance volume, float sceneDepth, uint frameIndex) {
     vec3 roLocal = ro - volume.position;
 
     float tEntry, tExit;
@@ -46,18 +47,22 @@ vec4 integrateVolume(vec3 ro, vec3 rd, in VolumeInstance volume, float sceneDept
     int steps = int(volume.color.a);
     float dt = (tExit - tEntry) / float(steps);
 
+    // **Frame-based random offset for smooth temporal accumulation**
+    float randOffset = fract(sin(dot(vec2(frameIndex, 42.0), vec2(12.9898, 78.233))) * 43758.5453);
+    tEntry += randOffset * dt;// Jitter start position
+
     vec3 scattering = vec3(0.0);
     float viewTransmittance = 1.0;
 
     for (int i = 0; i < steps; i++) {
-        float tCurrent = tEntry + dt * (float(i) + 0.5);
+        float tCurrent = tEntry + dt * float(i);
         vec3 pos = ro + rd * tCurrent;
         vec3 localPos = pos - volume.position;
 
         // **Scene Intersection Check**
         HitData hit = trace(ro, rd);
         if (hit.didHit && hit.closestT < tCurrent) {
-            break;  // Stop marching if a surface is hit
+            break;// Stop marching if a surface is hit
         }
 
         float scatteringCoefficient = volume.density * volume.scatteringAlbedo;
@@ -83,19 +88,22 @@ vec4 integrateVolume(vec3 ro, vec3 rd, in VolumeInstance volume, float sceneDept
             vec3 L = normalize(samplePos - pos);
             float lightDist = length(samplePos - pos);
 
-            // **Scene Shadow Check**
-            HitData shadowHit = trace(pos + L * 0.001, L);
+            // **Jittered Shadow Ray Sampling**
+            float shadowJitter = randOffset * 0.5 * dt;// Per-frame offset for smooth shadowing
+            HitData shadowHit = trace(pos + L * shadowJitter, L);
             bool isShadowed = shadowHit.didHit && shadowHit.closestT < lightDist;
 
             if (!isShadowed) {
                 float dtShadow = lightDist / float(globalData.volumeShadowSteps);
                 float opticalDepth = 0.0;
+
                 for (int j = 0; j < globalData.volumeShadowSteps; j++) {
-                    float tShadow = float(j) * dtShadow;
+                    float tShadow = float(j) * dtShadow + randOffset * dtShadow;// Jittered shadow stepping
                     vec3 posShadow = pos + L * tShadow;
                     vec3 localShadow = posShadow - volume.position;
                     opticalDepth += extinctionCoefficient * dtShadow;
                 }
+
                 float lightTransmittance = exp(-opticalDepth);
                 float g = volume.phaseFunctionAsymmetry;
                 float phase = phaseHenyeyGreenstein(rd, L, g);
@@ -106,12 +114,13 @@ vec4 integrateVolume(vec3 ro, vec3 rd, in VolumeInstance volume, float sceneDept
         viewTransmittance *= exp(-max(extinctionCoefficient * dt, 0.0001));
 
         if (viewTransmittance < 0.01) {
-            break; // Early exit if transmission is too low
+            break;// Early exit if transmission is too low
         }
     }
     float volumeAlpha = 1.0 - viewTransmittance;
     return vec4(scattering * volume.color.rgb, volumeAlpha);
 }
+
 
 void traceVolumes(inout vec4 finalColor, vec3 worldPosition, vec3 rayDirection){
     vec3 rayOrigin = globalData.cameraWorldPosition;
@@ -119,6 +128,6 @@ void traceVolumes(inout vec4 finalColor, vec3 worldPosition, vec3 rayDirection){
 
     for (uint i = 0; i < globalData.volumeCount; i++) {
         VolumeInstance volume = volumesBuffer.items[i];
-        finalColor += integrateVolume(rayOrigin, rayDirection, volume, sceneDepth);
+        finalColor += integrateVolume(rayOrigin, rayDirection, volume, sceneDepth, globalData.giAccumulationCount);
     }
 }
