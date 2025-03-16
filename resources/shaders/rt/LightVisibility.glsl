@@ -35,13 +35,13 @@ vec3 visibilityTest(const in LightInstance light, in vec3 point, vec3 wi) {
         VolumeInstance volume = volumesBuffer.items[i];
         float tEntry, tExit;
         vec3 roLocal = point - volume.position;
-        bool intersects = intersectBox(roLocal, wi, volume.dataA, tEntry, tExit);
+        bool intersects = intersectBox(roLocal, wi, volume.size, tEntry, tExit);
         if (!intersects) continue;
 
         if (tEntry > lightDistance) continue;
 
         anyHit = true;
-        sigmaT = volume.dataB.x;
+        sigmaT = volume.density;
         distanceInVolume = tExit - tEntry;
         transmittance *= exp(-sigmaT * distanceInVolume);
         vColor = volume.color.rgb;

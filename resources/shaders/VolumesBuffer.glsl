@@ -3,9 +3,10 @@
 struct VolumeInstance {
     vec4 color;
     vec3 position;
-    vec3 dataA;
-    vec3 dataB; //For volumes: <density, scatteringAlbedo, phase function asymmetry>
-    uint itemType;
+    vec3 size;
+    float density;
+    float scatteringAlbedo;
+    float phaseFunctionAsymmetry;
 };
 
 layout(set = VOLUMES_SET, binding = 0) uniform Volumes {

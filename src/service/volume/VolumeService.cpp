@@ -12,12 +12,13 @@ namespace Metal {
             auto &translation = t.translation;
             auto &l = entry.second;
 
-            items.push_back(VolumeData(
+            items.push_back(VolumeInstance(
                 glm::vec4(l.albedo, l.samples),
                 translation,
                 t.scale,
-                glm::vec3(l.density, l.scatteringAlbedo, l.g),
-                LightVolumeTypes::VOLUME
+                l.density,
+                l.scatteringAlbedo,
+                l.g
             ));
         }
     }

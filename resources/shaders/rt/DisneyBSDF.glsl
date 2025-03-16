@@ -194,7 +194,7 @@ vec3 lightSample(const in LightInstance light, const in HitData interaction, out
             vec3 lightDir = normalize(light.position - interaction.hitPosition);
             createBasis(lightDir, tangent, binormal);
 
-            float sinThetaMax2 = pow2(light.dataB.x) / distanceSq(light.position, interaction.hitPosition);
+            float sinThetaMax2 = pow2(light.scale.x) / distanceSq(light.position, interaction.hitPosition);
             float cosThetaMax = sqrt(max(EPSILON, 1. - sinThetaMax2));
             wi = uniformSampleCone(u, cosThetaMax, tangent, binormal, lightDir);
 
@@ -206,11 +206,11 @@ vec3 lightSample(const in LightInstance light, const in HitData interaction, out
             return light.color.rgb * visibility;
         }
         case ITEM_TYPE_PLANE: {
-            vec3 lightSize = light.dataB.xyz; // Now a vec3 representing X, Y, and Z size
+            vec3 lightSize = light.scale.xyz; // Now a vec3 representing X, Y, and Z size
             // Compute basis vectors for the light plane (same as used in SDF)
-            vec3 reference = abs(light.dataA.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
-            vec3 tangent1 = normalize(cross(light.dataA, reference));
-            vec3 tangent2 = cross(light.dataA, tangent1);
+            vec3 reference = abs(light.planeNormal.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
+            vec3 tangent1 = normalize(cross(light.planeNormal, reference));
+            vec3 tangent2 = cross(light.planeNormal, tangent1);
 
             // Compute half-extents
             vec3 halfRight = tangent1 * (lightSize.z * 0.5);
@@ -224,7 +224,7 @@ vec3 lightSample(const in LightInstance light, const in HitData interaction, out
             wi = normalize(lightSamplePoint - interaction.hitPosition);
 
             float distSq = distanceSq(lightSamplePoint, interaction.hitPosition);
-            float cosTheta = max(0.0, dot(-wi, light.dataA));
+            float cosTheta = max(0.0, dot(-wi, light.planeNormal));
             float lightArea = lightSize.x * lightSize.z;
             lightPdf = distSq / (cosTheta * lightArea);
 
@@ -407,7 +407,7 @@ float bsdfPdf(const in vec3 wi, const in vec3 wo, const in vec3 X, const in vec3
 }
 
 float light_pdf(const in LightInstance light, const in HitData interaction) {
-    float sinThetaMax2 =  pow2(light.dataB.x) / distanceSq(light.position, interaction.hitPosition);
+    float sinThetaMax2 =  pow2(light.scale.x) / distanceSq(light.position, interaction.hitPosition);
     float cosThetaMax = sqrt(max(EPSILON, 1. - sinThetaMax2));
     return 1. / (TWO_PI * (1. - cosThetaMax));
 }

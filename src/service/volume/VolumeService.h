@@ -3,11 +3,11 @@
 #include <vector>
 
 #include "../../common/AbstractRuntimeComponent.h"
-#include "../../dto/buffers/VolumeData.h"
+#include "../../dto/buffers/VolumeInstance.h"
 
 namespace Metal {
     class VolumeService final : public AbstractRuntimeComponent {
-        std::vector<VolumeData> items{};
+        std::vector<VolumeInstance> items{};
         unsigned int count = 0;
 
         void registerVolumes();

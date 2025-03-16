@@ -65,13 +65,14 @@ namespace Metal {
 
     void CanvasPanel::handleCanvasDrag() {
         ImVec2 mouseDelta = ImGui::GetIO().MouseDelta;
-        if (ImGui::IsMouseDragging(ImGuiMouseButton_Right)) {
+        if (isHovered && ImGui::IsMouseDragging(ImGuiMouseButton_Right)) {
             canvasOffset.x += mouseDelta.x;
             canvasOffset.y += mouseDelta.y;
         }
     }
 
     void CanvasPanel::onSync() {
+        isHovered = ImGui::IsWindowHovered();
         header->onSync();
         ImGui::Separator();
         ImGui::BeginChild(("CanvasPanel" + id).c_str(),

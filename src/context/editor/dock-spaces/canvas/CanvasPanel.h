@@ -20,6 +20,7 @@ namespace Metal {
 
         ImVec2 canvasOffset{0, 0};
         bool isDragging = false;
+        bool isHovered = false;
 
     public:
         void onInitialize() override;

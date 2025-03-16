@@ -44,17 +44,17 @@ bool rayMarch(vec3 ro, vec3 rd, in LightInstance l) {
 
         switch (l.itemType){
             case ITEM_TYPE_SPHERE:{
-                d = sdSphere(p, l.dataB.x, l.position);
+                d = sdSphere(p, l.scale.x, l.position);
                 break;
             }
             case ITEM_TYPE_PLANE:{
-                vec3 reference = abs(l.dataA.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
-                vec3 right = normalize(cross(l.dataA, reference));
-                vec3 up = normalize(cross(right, l.dataA));
+                vec3 reference = abs(l.planeNormal.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
+                vec3 right = normalize(cross(l.planeNormal, reference));
+                vec3 up = normalize(cross(right, l.planeNormal));
 
                 // Use correct plane dimensions
-                vec3 halfRight = right * (l.dataB.z * 0.5);
-                vec3 halfUp = up * (l.dataB.x * 0.5);
+                vec3 halfRight = right * (l.scale.z * 0.5);
+                vec3 halfUp = up * (l.scale.x * 0.5);
 
                 vec3 a = l.position - halfRight - halfUp;
                 vec3 b = l.position + halfRight - halfUp;

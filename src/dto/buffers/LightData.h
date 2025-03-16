@@ -8,8 +8,8 @@ namespace Metal {
     struct LightData final {
         alignas(16) glm::vec4 color{};
         alignas(16) glm::vec3 position{};
-        alignas(16) glm::vec3 dataA;
-        alignas(16) glm::vec3 dataB;
+        alignas(16) glm::vec3 planeNormal;
+        alignas(16) glm::vec3 scale;
         alignas(4) unsigned int itemType;
     };
 }

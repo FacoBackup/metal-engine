@@ -3,8 +3,8 @@
 struct LightInstance {
     vec4 color;
     vec3 position;
-    vec3 dataA;
-    vec3 dataB; //For volumes: <density, scatteringAlbedo, phase function asymmetry>
+    vec3 planeNormal;
+    vec3 scale;
     uint itemType;
 };
 

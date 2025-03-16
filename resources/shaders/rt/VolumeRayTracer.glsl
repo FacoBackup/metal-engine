@@ -22,23 +22,17 @@ float hash(vec3 p) {
     return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
 }
 
-float densityVariation(vec3 p, float baseDensity) {
-//    float noise = hash(p * 0.5);
-    return baseDensity; //* (0.5 + 0.5 * noise);
-}
-
 // Henyey–Greenstein phase function
 float phaseHenyeyGreenstein(vec3 wo, vec3 wi, float g) {
     float cosTheta = dot(wo, wi);
     float denom = 1.0 + g*g - 2.0 * g * cosTheta;
     return (1.0 - g*g) / (4.0 * 3.14159265359 * pow(denom, 1.5));
 }
-
 vec4 integrateVolume(vec3 ro, vec3 rd, in VolumeInstance volume, float sceneDepth) {
     vec3 roLocal = ro - volume.position;
 
     float tEntry, tExit;
-    bool intersects = intersectBox(roLocal, rd, volume.dataA, tEntry, tExit);
+    bool intersects = intersectBox(roLocal, rd, volume.size, tEntry, tExit);
     if (!intersects) {
         return vec4(0.0);
     }
@@ -60,11 +54,14 @@ vec4 integrateVolume(vec3 ro, vec3 rd, in VolumeInstance volume, float sceneDept
         vec3 pos = ro + rd * tCurrent;
         vec3 localPos = pos - volume.position;
 
-        float density = densityVariation(localPos, volume.dataB.x);
+        // **Scene Intersection Check**
+        HitData hit = trace(ro, rd);
+        if (hit.didHit && hit.closestT < tCurrent) {
+            break;  // Stop marching if a surface is hit
+        }
 
-        float scatteringAlbedo = volume.dataB.y;// fraction of extinction that is scattering
-        float scatteringCoefficient = density * scatteringAlbedo;
-        float absorptionCoefficient  = density * (1.0 - scatteringAlbedo);
+        float scatteringCoefficient = volume.density * volume.scatteringAlbedo;
+        float absorptionCoefficient  = volume.density * (1.0 - volume.scatteringAlbedo);
         float extinctionCoefficient  = scatteringCoefficient + absorptionCoefficient;
 
         vec3 inScattered = vec3(0.0);
@@ -74,33 +71,43 @@ vec4 integrateVolume(vec3 ro, vec3 rd, in VolumeInstance volume, float sceneDept
 
             if (light.itemType == ITEM_TYPE_SPHERE) {
                 vec3 randDir = RandomUnitVector();
-                samplePos = light.position + randDir * light.dataB.x;
+                samplePos = light.position + randDir * light.scale.x;
             } else if (light.itemType == ITEM_TYPE_PLANE) {
-                vec3 normal = normalize(light.dataA);
+                vec3 normal = normalize(light.planeNormal);
                 vec3 tangent, bitangent;
                 computeOrthonormalBasis(normal, tangent, bitangent);
                 vec2 diskSample = sampleDisk();
-                samplePos = light.position + (tangent * diskSample.x + bitangent * diskSample.y) * light.dataB.x * light.dataB.z;
+                samplePos = light.position + (tangent * diskSample.x + bitangent * diskSample.y) * light.scale.x * light.scale.z;
             }
 
             vec3 L = normalize(samplePos - pos);
             float lightDist = length(samplePos - pos);
 
-            float dtShadow = lightDist / float(globalData.volumeShadowSteps);
-            float opticalDepth = 0.0;
-            for (int j = 0; j < globalData.volumeShadowSteps; j++) {
-                float tShadow = float(j) * dtShadow;
-                vec3 posShadow = pos + L * tShadow;
-                vec3 localShadow = posShadow - volume.position;
-                opticalDepth += densityVariation(localShadow, volume.dataB.x) * dtShadow;
+            // **Scene Shadow Check**
+            HitData shadowHit = trace(pos + L * 0.001, L);
+            bool isShadowed = shadowHit.didHit && shadowHit.closestT < lightDist;
+
+            if (!isShadowed) {
+                float dtShadow = lightDist / float(globalData.volumeShadowSteps);
+                float opticalDepth = 0.0;
+                for (int j = 0; j < globalData.volumeShadowSteps; j++) {
+                    float tShadow = float(j) * dtShadow;
+                    vec3 posShadow = pos + L * tShadow;
+                    vec3 localShadow = posShadow - volume.position;
+                    opticalDepth += extinctionCoefficient * dtShadow;
+                }
+                float lightTransmittance = exp(-opticalDepth);
+                float g = volume.phaseFunctionAsymmetry;
+                float phase = phaseHenyeyGreenstein(rd, L, g);
+                inScattered += light.color.rgb * light.color.a * lightTransmittance * phase;
             }
-            float lightTransmittance = exp(-opticalDepth);
-            float g = volume.dataB.z;// phase function asymmetry parameter; 0.0 for isotropic
-            float phase = phaseHenyeyGreenstein(rd, L, g);
-            inScattered += light.color.rgb * light.color.a * lightTransmittance * phase;
         }
         scattering += viewTransmittance * scatteringCoefficient * inScattered * dt;
-        viewTransmittance *= exp(-extinctionCoefficient * dt);
+        viewTransmittance *= exp(-max(extinctionCoefficient * dt, 0.0001));
+
+        if (viewTransmittance < 0.01) {
+            break; // Early exit if transmission is too low
+        }
     }
     float volumeAlpha = 1.0 - viewTransmittance;
     return vec4(scattering * volume.color.rgb, volumeAlpha);
