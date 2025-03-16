@@ -1,4 +1,4 @@
-#include "../LightVolumeBuffer.glsl"
+#include "../LightsBuffer.glsl"
 #include "../rt/RayTracerUtil.glsl"
 #include "../rt/LightVisibility.glsl"
 #include "../rt/RTStructures.glsl"
@@ -185,7 +185,7 @@ vec3 perpendicular(const vec3 v) {
 }
 
 
-vec3 lightSample(const in LightVolume light, const in HitData interaction, out vec3 wi, out float lightPdf) {
+vec3 lightSample(const in LightInstance light, const in HitData interaction, out vec3 wi, out float lightPdf) {
     vec2 u = vec2(random(), random());
     vec3 tangent = vec3(0.), binormal = vec3(0.);
 
@@ -194,7 +194,7 @@ vec3 lightSample(const in LightVolume light, const in HitData interaction, out v
             vec3 lightDir = normalize(light.position - interaction.hitPosition);
             createBasis(lightDir, tangent, binormal);
 
-            float sinThetaMax2 = pow2(light.dataB.x) / distanceSq(light.position, interaction.hitPosition);
+            float sinThetaMax2 = pow2(light.scale.x) / distanceSq(light.position, interaction.hitPosition);
             float cosThetaMax = sqrt(max(EPSILON, 1. - sinThetaMax2));
             wi = uniformSampleCone(u, cosThetaMax, tangent, binormal, lightDir);
 
@@ -206,11 +206,11 @@ vec3 lightSample(const in LightVolume light, const in HitData interaction, out v
             return light.color.rgb * visibility;
         }
         case ITEM_TYPE_PLANE: {
-            vec3 lightSize = light.dataB.xyz; // Now a vec3 representing X, Y, and Z size
+            vec3 lightSize = light.scale.xyz; // Now a vec3 representing X, Y, and Z size
             // Compute basis vectors for the light plane (same as used in SDF)
-            vec3 reference = abs(light.dataA.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
-            vec3 tangent1 = normalize(cross(light.dataA, reference));
-            vec3 tangent2 = cross(light.dataA, tangent1);
+            vec3 reference = abs(light.planeNormal.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
+            vec3 tangent1 = normalize(cross(light.planeNormal, reference));
+            vec3 tangent2 = cross(light.planeNormal, tangent1);
 
             // Compute half-extents
             vec3 halfRight = tangent1 * (lightSize.z * 0.5);
@@ -224,7 +224,7 @@ vec3 lightSample(const in LightVolume light, const in HitData interaction, out v
             wi = normalize(lightSamplePoint - interaction.hitPosition);
 
             float distSq = distanceSq(lightSamplePoint, interaction.hitPosition);
-            float cosTheta = max(0.0, dot(-wi, light.dataA));
+            float cosTheta = max(0.0, dot(-wi, light.planeNormal));
             float lightArea = lightSize.x * lightSize.z;
             lightPdf = distSq / (cosTheta * lightArea);
 
@@ -406,8 +406,8 @@ float bsdfPdf(const in vec3 wi, const in vec3 wo, const in vec3 X, const in vec3
     return (pdfDiffuse + pdfMicrofacet + pdfClearCoat)/3.;
 }
 
-float light_pdf(const in LightVolume light, const in HitData interaction) {
-    float sinThetaMax2 =  pow2(light.dataB.x) / distanceSq(light.position, interaction.hitPosition);
+float light_pdf(const in LightInstance light, const in HitData interaction) {
+    float sinThetaMax2 =  pow2(light.scale.x) / distanceSq(light.position, interaction.hitPosition);
     float cosThetaMax = sqrt(max(EPSILON, 1. - sinThetaMax2));
     return 1. / (TWO_PI * (1. - cosThetaMax));
 }
@@ -441,12 +441,12 @@ float powerHeuristic(float nf, float fPdf, float ng, float gPdf){
     return (f*f)/(f*f + g*g);
 }
 
-vec3 sampleLightType(const in LightVolume light, const in HitData interaction, out vec3 wi, out float lightPdf) {
+vec3 sampleLightType(const in LightInstance light, const in HitData interaction, out vec3 wi, out float lightPdf) {
     return lightSample(light, interaction, wi, lightPdf);
 }
 
-vec3 calculateDirectLight(const in LightVolume light, const in HitData interaction, const in MaterialInfo material, out vec3 wi, out vec3 f, out float scatteringPdf) {
-    // LightVolume MIS
+vec3 calculateDirectLight(const in LightInstance light, const in HitData interaction, const in MaterialInfo material, out vec3 wi, out vec3 f, out float scatteringPdf) {
+    // LightInstance MIS
     vec3 wo = -interaction.incomingRayDir;
     vec3 Ld = vec3(0.);
     float lightPdf = 0.;

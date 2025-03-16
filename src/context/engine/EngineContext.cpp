@@ -101,7 +101,8 @@ namespace Metal {
         context.cameraService.onSync();
 
         if (lightVolumeDataNeedsUpdate) {
-            context.lightVolumesService.update();
+            context.lightsService.update();
+            context.volumesService.update();
         }
         updateGlobalData();
 
@@ -114,6 +115,8 @@ namespace Metal {
     }
 
     void EngineContext::updateGlobalData() {
+        context.lightsService.computeSunInfo();
+
         auto &camera = context.worldRepository.camera;
         globalDataUBO.viewMatrix = camera.viewMatrix;
         globalDataUBO.projectionMatrix = camera.projectionMatrix;
@@ -122,8 +125,8 @@ namespace Metal {
         globalDataUBO.invView = camera.invViewMatrix;
         globalDataUBO.cameraWorldPosition = camera.position;
         globalDataUBO.giStrength = context.engineRepository.giStrength;
-        globalDataUBO.lightVolumeCount = context.lightVolumesService.getLightVolumeCount();
-        globalDataUBO.volumesOffset = context.lightVolumesService.getVolumesOffset();
+        globalDataUBO.lightCount = context.lightsService.getLightCount();
+        globalDataUBO.volumeCount = context.volumesService.getVolumeCount();
         globalDataUBO.volumeShadowSteps = context.engineRepository.volumeShadowSteps;
         globalDataUBO.rtTLASCount = rtTLASCount;
         globalDataUBO.isAtmosphereEnabled = context.engineRepository.atmosphereEnabled;
@@ -148,9 +151,8 @@ namespace Metal {
             setGISettingsUpdated(true);
             lightVolumeDataNeedsUpdate = true;
         }
-        context.lightVolumesService.computeSunInfo();
-        globalDataUBO.sunPosition = context.lightVolumesService.getSunPosition();
-        globalDataUBO.sunColor = context.lightVolumesService.getSunColor();
+        globalDataUBO.sunPosition = context.lightsService.getSunPosition();
+        globalDataUBO.sunColor = context.lightsService.getSunColor();
         context.coreBuffers.globalData->update(&globalDataUBO);
     }
 }

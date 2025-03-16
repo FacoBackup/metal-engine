@@ -7,8 +7,8 @@ namespace Metal {
     void RTPass::onInitialize() {
         PipelineBuilder shadingPipelineBuilder = PipelineBuilder::Of("rt/PathTrace.comp")
                 .addDescriptorSet(context.coreDescriptorSets.rtDescriptorSet.get())
-                .addDescriptorSet(context.coreDescriptorSets.lightVolumeData.get());
-
+                .addDescriptorSet(context.coreDescriptorSets.lightsBuffer.get())
+                .addDescriptorSet(context.coreDescriptorSets.volumesBuffer.get());
 
         pipelineInstance = context.pipelineService.createPipeline(shadingPipelineBuilder);
     }

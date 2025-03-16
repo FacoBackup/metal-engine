@@ -2,7 +2,7 @@
 #include "../CreateRay.glsl"
 
 #define LIGHT_VOLUME_SET 1
-#include "../LightVolumeBuffer.glsl"
+#include "../LightsBuffer.glsl"
 
 layout (location = 0) in vec2 texCoords;
 layout (location = 0) out vec4 finalColor;
@@ -36,7 +36,7 @@ float udQuad(vec3 p, vec3 a, vec3 b, vec3 c, vec3 d)
     dot(nor, pa)*dot(nor, pa)/dot2(nor));
 }
 
-bool rayMarch(vec3 ro, vec3 rd, in LightVolume l) {
+bool rayMarch(vec3 ro, vec3 rd, in LightInstance l) {
     float t = 0.0;
     for (int i = 0; i < 256; i++) {
         vec3 p = ro + t * rd;
@@ -44,17 +44,17 @@ bool rayMarch(vec3 ro, vec3 rd, in LightVolume l) {
 
         switch (l.itemType){
             case ITEM_TYPE_SPHERE:{
-                d = sdSphere(p, l.dataB.x, l.position);
+                d = sdSphere(p, l.scale.x, l.position);
                 break;
             }
             case ITEM_TYPE_PLANE:{
-                vec3 reference = abs(l.dataA.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
-                vec3 right = normalize(cross(l.dataA, reference));
-                vec3 up = normalize(cross(right, l.dataA));
+                vec3 reference = abs(l.planeNormal.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
+                vec3 right = normalize(cross(l.planeNormal, reference));
+                vec3 up = normalize(cross(right, l.planeNormal));
 
                 // Use correct plane dimensions
-                vec3 halfRight = right * (l.dataB.z * 0.5);
-                vec3 halfUp = up * (l.dataB.x * 0.5);
+                vec3 halfRight = right * (l.scale.z * 0.5);
+                vec3 halfUp = up * (l.scale.x * 0.5);
 
                 vec3 a = l.position - halfRight - halfUp;
                 vec3 b = l.position + halfRight - halfUp;
@@ -75,12 +75,9 @@ bool rayMarch(vec3 ro, vec3 rd, in LightVolume l) {
 }
 
 void main(){
-    if (globalData.lightVolumeCount == 0){
-        discard;
-    }
     vec3 dir = createRay(texCoords, globalData.invProj, globalData.invView);
-    for (uint i = 0; i < globalData.volumesOffset; i++){
-        LightVolume l = lightVolumeBuffer.items[i];
+    for (uint i = 0; i < globalData.lightCount; i++){
+        LightInstance l = lightsBuffer.items[i];
         if (rayMarch(globalData.cameraWorldPosition.xyz, dir, l)){
             finalColor = vec4(l.color.rgb * l.color.a, 1);
             return;

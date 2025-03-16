@@ -2,7 +2,7 @@
 
 #include "../../dto/buffers/GlobalDataUBO.h"
 #include "../../dto/buffers/TileInfoUBO.h"
-#include "../../dto/buffers/LightVolumeData.h"
+#include "../../dto/buffers/LightData.h"
 #include "../../enum/engine-definitions.h"
 #include "../../service/buffer/BufferService.h"
 #include "../../dto/buffers/RTTriangle.h"
@@ -17,11 +17,15 @@ namespace Metal {
                                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-        lightVolumeBuffer = bufferService.createBuffer(MAX_LIGHT_VOLUMES * sizeof(LightVolumeData),
-                                                       VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                                                       VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                                                       VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        lightsBuffer = bufferService.createBuffer(MAX_LIGHT_VOLUMES * sizeof(LightData),
+                                                  VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                                                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                                  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
+        volumesBuffer = bufferService.createBuffer(MAX_LIGHT_VOLUMES * sizeof(LightData),
+                                                  VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                                                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                                  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
         rtTrianglesBuffer = bufferService.createBuffer(MAX_RT_TRIANGLES * sizeof(RTTriangle),
                                                        VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
@@ -39,8 +43,8 @@ namespace Metal {
                                                   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
         rtMaterialData = bufferService.createBuffer(MAX_MATERIALS * sizeof(MaterialInfo),
-                                                  VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                                                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                                                  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+                                                    VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                                                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                                    VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     }
 }

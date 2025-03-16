@@ -109,7 +109,10 @@ layout(set = 0, binding = 6, rgba32f) uniform image2D currentPositions;
 layout(set = 0, binding = 7, rgba32f) uniform image2D giSurfaceCacheCompute;
 
 #define LIGHT_VOLUME_SET 1
-#include "../LightVolumeBuffer.glsl"
+#include "../LightsBuffer.glsl"
+
+#define VOLUMES_SET 2
+#include "../VolumesBuffer.glsl"
 
 
 #endif

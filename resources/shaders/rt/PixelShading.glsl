@@ -35,8 +35,8 @@ vec3 calculatePixelColor(in vec2 texCoords, MaterialInfo material, HitData inter
                     directLighting = previousCacheData.rgb;// Use cached lighting
                 } else {
                     // Compute direct lighting and accumulate it into the cache
-                    for (uint i = 0u; i < globalData.volumesOffset; i++) {
-                        LightVolume l = lightVolumeBuffer.items[i];
+                    for (uint i = 0u; i < globalData.lightCount; i++) {
+                        LightInstance l = lightsBuffer.items[i];
                         l.color.rgb *= 20.0;
                         directLighting += throughput * calculateDirectLight(l, currentHit, currentMaterial, currentRayDir, f, scatteringPdf) * l.color.a;
                     }
@@ -70,8 +70,8 @@ vec3 calculatePixelColor(in vec2 texCoords, MaterialInfo material, HitData inter
                     }
                 } else {
                     // Regular opaque surface shading
-                    for (uint i = 0u; i < globalData.volumesOffset; i++) {
-                        LightVolume l = lightVolumeBuffer.items[i];
+                    for (uint i = 0u; i < globalData.lightCount; i++) {
+                        LightInstance l = lightsBuffer.items[i];
                         l.color.rgb *= 20.0;
                         directLighting += throughput * calculateDirectLight(l, currentHit, currentMaterial, currentRayDir, f, scatteringPdf) * l.color.a;
                     }

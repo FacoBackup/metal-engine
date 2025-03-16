@@ -21,7 +21,8 @@ namespace Metal {
         std::unique_ptr<DescriptorInstance> previousFrameDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> previousFrameMetadataDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> rtDescriptorSet = nullptr;
-        std::unique_ptr<DescriptorInstance> lightVolumeData = nullptr;
+        std::unique_ptr<DescriptorInstance> lightsBuffer = nullptr;
+        std::unique_ptr<DescriptorInstance> volumesBuffer = nullptr;
         std::unique_ptr<DescriptorInstance> currentFrameDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> currentPositionsDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> currentPositionsFragmentDescriptor = nullptr;

@@ -10,8 +10,8 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     vec3 sunColor;
     vec3 sunPosition;
     float giStrength;
-    uint lightVolumeCount;
-    uint volumesOffset;
+    uint lightCount;
+    uint volumeCount;
     uint volumeShadowSteps;
     uint rtTLASCount;
     bool isAtmosphereEnabled;
