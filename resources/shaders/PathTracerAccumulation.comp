@@ -37,7 +37,7 @@ void main() {
     vec4 currentFrameColor = imageLoad(currentFrameImage, ivec2(gl_GlobalInvocationID.xy));// Color + surface ID
     vec4 previousFrameColor = imageLoad(previousFrameImage, imageSpace);
 
-    float accumulationCount = max(min(globalData.giMaxAccumulation, previousFrameColor.a), 1);
+    float accumulationCount = max(min(globalData.maxAccumulation, previousFrameColor.a), 1);
     vec3 accumulatedResult = previousFrameColor.rgb * (1. - 1./accumulationCount) + currentFrameColor.rgb * 1./accumulationCount;
 
     imageStore(currentFrameImage, ivec2(gl_GlobalInvocationID.xy), vec4(accumulatedResult, currentFrameColor.a));

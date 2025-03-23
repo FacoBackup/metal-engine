@@ -14,7 +14,7 @@ namespace Metal {
         bool multipleImportanceSampling = false;
         int volumeShadowSteps = 8;
         int shadingResInvScale = 2;
-        int giMaxAccumulation = 200;
+        int maxAccumulation = 200;
         int giTileSubdivision = 40;
         int surfaceCacheMinSamples = 2;
         float giEmissiveFactor = 2;
@@ -63,7 +63,7 @@ namespace Metal {
             giEmissiveFactor,
             giStrength,
             shadingResInvScale,
-            giMaxAccumulation,
+            maxAccumulation,
             denoiserDiffWeight,
             enabledDenoiser,
             volumeShadowSteps

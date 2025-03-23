@@ -23,7 +23,7 @@ namespace Metal {
         // GI
         alignas(4) bool enabledDenoiser;
         alignas(4) bool multipleImportanceSampling;
-        alignas(4) unsigned int giMaxAccumulation;
+        alignas(4) unsigned int maxAccumulation;
         alignas(4) unsigned int giSamples;
         alignas(4) unsigned int giBounces;
         alignas(4) unsigned int giTileSubdivision;
@@ -34,7 +34,6 @@ namespace Metal {
 
         alignas(4) unsigned int surfaceCacheWidth;
         alignas(4) unsigned int surfaceCacheHeight;
-        alignas(4) unsigned int giAccumulationCount = 0;
         alignas(4) unsigned int globalFrameCount = 0;
     };
 }

@@ -24,10 +24,10 @@ namespace Metal {
 
         if (context.engineRepository.enabledDenoiser) {
             clearTexture(context.coreTextures.currentFrame->vkImage);
-            context.engineContext.resetGiAccumulationCount();
+            context.engineContext.resetAccumulationCount();
         } else if (isFirstRun || context.engineContext.isCameraUpdated() || surfaceCacheReset) {
             clearTexture(context.coreTextures.currentFrame->vkImage);
-            context.engineContext.resetGiAccumulationCount();
+            context.engineContext.resetAccumulationCount();
             isFirstRun = false;
         }
 

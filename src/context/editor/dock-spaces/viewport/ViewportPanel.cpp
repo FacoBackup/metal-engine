@@ -19,13 +19,15 @@ namespace Metal {
     void ViewportPanel::onSync() {
         updateCamera();
         updateInputs();
-
+        ImGui::Dummy(ImVec2{0, 1});
+        ImGui::Dummy(ImVec2{1, 0});
+        ImGui::SameLine();
         headerPanel->onSync();
-        ImGui::Dummy(ImVec2{0, 2});
+
         auto *framebuffer = context->coreFrameBuffers.postProcessingFBO;
         context->descriptorService.setImageDescriptor(framebuffer, 0);
         ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet),
-                     ImVec2{size->x, size->y - 60});
+                     ImVec2{size->x, size->y - 40});
         gizmoPanel->onSync();
         cameraPanel->onSync();
     }

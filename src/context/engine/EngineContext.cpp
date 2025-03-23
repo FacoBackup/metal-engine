@@ -133,17 +133,17 @@ namespace Metal {
 
         globalDataUBO.enabledDenoiser = context.engineRepository.enabledDenoiser;
         globalDataUBO.multipleImportanceSampling = context.engineRepository.multipleImportanceSampling;
-        globalDataUBO.giMaxAccumulation = context.engineRepository.giMaxAccumulation;
+        globalDataUBO.maxAccumulation = context.engineRepository.maxAccumulation;
         globalDataUBO.giSamples = context.engineRepository.giSamples;
         globalDataUBO.giBounces = context.engineRepository.giBounces;
         globalDataUBO.giTileSubdivision = context.engineRepository.giTileSubdivision;
         globalDataUBO.surfaceCacheMinSamples = context.engineRepository.surfaceCacheMinSamples;
         globalDataUBO.giEmissiveFactor = context.engineRepository.giEmissiveFactor;
+        accumulationCount++;
 
         globalDataUBO.debugFlag = ShadingMode::IndexOfValue(context.editorRepository.shadingMode);
         globalDataUBO.surfaceCacheWidth = SURFACE_CACHE_RES;
         globalDataUBO.surfaceCacheHeight = SURFACE_CACHE_RES;
-        globalDataUBO.giAccumulationCount++;
         globalDataUBO.globalFrameCount++;
 
         if (context.engineRepository.incrementTime) {

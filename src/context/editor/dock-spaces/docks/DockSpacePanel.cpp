@@ -31,7 +31,8 @@ namespace Metal {
             sizeInitialized = true;
         }
         beforeWindow();
-        if (ImGui::Begin(dock->internalId.c_str(), &UIUtil::OPEN, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove)) {
+        if (ImGui::Begin(dock->internalId.c_str(), &UIUtil::OPEN,
+                         ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove)) {
             sizeInternal = ImGui::GetWindowSize();
             size.x = sizeInternal.x;
             size.y = sizeInternal.y;
@@ -48,7 +49,24 @@ namespace Metal {
         stylePushCount = 0;
     }
 
+    void DockSpacePanel::renderView(DockViewDTO &viewDTO) {
+        DockSpace *dockData = DockSpace::GetOption(viewDTO.dockSpaceIndex);
+        if (viewDTO.view == nullptr) {
+            viewDTO.view = dockData->getPanel();
+            viewDTO.view->size = &size;
+            viewDTO.view->dock = dock;
+            viewDTO.view->position = &position;
+            appendChild(viewDTO.view);
+        }
+        viewDTO.view->isWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+        viewDTO.view->onSync();
+    }
+
     void DockSpacePanel::renderTabs() {
+        if (dock->direction == CENTER) {
+            renderView(dock->openTabs[0]);
+            return;
+        }
         if (ImGui::BeginTabBar((id + "MyTabBar").c_str())) {
             int tabToClose = -1; // Track which tab should be closed
 
@@ -59,15 +77,7 @@ namespace Metal {
                 bool open = true; // Used for close behavior
                 if (ImGui::BeginTabItem((dockData->icon + " " + dockData->name).c_str(), &open,
                                         ImGuiTabItemFlags_None)) {
-                    if (viewDTO.view == nullptr) {
-                        viewDTO.view = dockData->getPanel();
-                        viewDTO.view->size = &size;
-                        viewDTO.view->dock = dock;
-                        viewDTO.view->position = &position;
-                        appendChild(viewDTO.view);
-                    }
-                    viewDTO.view->isWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
-                    viewDTO.view->onSync();
+                    renderView(viewDTO);
                     ImGui::EndTabItem();
                 }
 

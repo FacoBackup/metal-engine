@@ -8,6 +8,7 @@
 #include "../../abstract/AbstractPanel.h"
 
 namespace Metal {
+    struct DockViewDTO;
     struct DockDTO;
     class AbstractDockPanel;
 
@@ -43,6 +44,8 @@ namespace Metal {
         void onSync() override;
 
         void renderTabs();
+
+        void renderView(DockViewDTO &viewDTO);
 
         void beforeWindow() const;
 
