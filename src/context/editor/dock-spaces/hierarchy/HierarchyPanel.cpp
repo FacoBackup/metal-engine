@@ -1,6 +1,5 @@
 #include "HierarchyPanel.h"
 
-#include "HierarchyHeaderPanel.h"
 #include "../../../../common/interface/Icons.h"
 #include "../../../../util/UIUtil.h"
 #include "../../../../context/ApplicationContext.h"
@@ -95,8 +94,8 @@ namespace Metal {
     void HierarchyPanel::renderHideButton(EntityID entityID, bool isHidden) {
         ImGui::SameLine();
         ImGui::PushID(entityID); // Ensure unique ID for the button
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-        if (ImGui::Button(!isHidden ? Icons::visibility.c_str() : Icons::visibility_off.c_str(), ImVec2(25,   16))) {
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(5, 0));
+        if (ImGui::Button(!isHidden ? Icons::visibility.c_str() : Icons::visibility_off.c_str(), ImVec2(24, 16))) {
             context->worldRepository.changeVisibility(entityID, !isHidden);
         }
         ImGui::PopStyleVar();
@@ -117,18 +116,16 @@ namespace Metal {
         bool isSelected = context->editorRepository.selected.contains(entityID) &&
                           context->editorRepository.selected[entityID];
 
-        if (isHidden) ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
         if (isSelected) ImGui::PushStyleColor(ImGuiCol_Header, context->editorRepository.accent);
-
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 8));
+        ImGui::PushStyleColor(ImGuiCol_Text,
+                              ImVec4(entity->color.x, entity->color.y, entity->color.z, isHidden ? .5 : 1.0f));
 
         const char *icon = GetIcon(entity);
         bool nodeOpen = ImGui::TreeNodeEx((void *) (intptr_t) entityID,
                                           flags | (isSelected ? ImGuiTreeNodeFlags_Selected : 0),
                                           "%s %s", icon, entity->name.c_str());
 
-        ImGui::PopStyleVar();
-        if (isHidden) ImGui::PopStyleColor();
+        ImGui::PopStyleColor();
         if (isSelected) ImGui::PopStyleColor();
 
         // Handle selection
