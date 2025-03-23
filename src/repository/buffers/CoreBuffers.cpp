@@ -1,7 +1,6 @@
 #include "CoreBuffers.h"
 
 #include "../../dto/buffers/GlobalDataUBO.h"
-#include "../../dto/buffers/TileInfoUBO.h"
 #include "../../dto/buffers/LightData.h"
 #include "../../enum/engine-definitions.h"
 #include "../../service/buffer/BufferService.h"

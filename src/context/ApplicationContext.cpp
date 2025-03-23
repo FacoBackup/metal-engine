@@ -28,7 +28,6 @@ namespace Metal {
         }
         PARSE_TEMPLATE(editorRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(EditorRepository))
         PARSE_TEMPLATE(engineRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(EngineRepository))
-        PARSE_TEMPLATE(worldGridRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldGridRepository))
         PARSE_TEMPLATE(worldRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository))
         PARSE_TEMPLATE(dockRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(DockRepository))
 
@@ -103,7 +102,6 @@ namespace Metal {
         try {
             DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(EditorRepository), editorRepository)
             DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(EngineRepository), engineRepository)
-            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldGridRepository), worldGridRepository)
             DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository), worldRepository)
             DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(DockRepository), dockRepository)
             notificationService.pushMessage("Project saved", NotificationSeverities::SUCCESS);

@@ -189,9 +189,6 @@ add_executable(
         src/context/editor/abstract/form/types/QuatField.h
         src/service/transform/TransformService.cpp
         src/service/transform/TransformService.h
-        src/repository/world/impl/WorldGridRepository.cpp
-        src/repository/world/impl/WorldGridRepository.h
-        src/repository/world/impl/WorldTile.h
         src/repository/world/impl/BoundingBox.h
         src/service/mesh/SceneData.h
         src/service/mesh/EntityAssetData.h
@@ -208,9 +205,6 @@ add_executable(
         src/service/notification/NotificationService.h
         src/dto/Notification.h
         src/enum/NotificationSeverity.h
-        src/service/world/WorldGridService.cpp
-        src/service/world/WorldGridService.h
-        src/dto/buffers/TileInfoUBO.h
         src/dto/buffers/LightData.h
         src/repository/world/components/LightComponent.cpp
         src/repository/world/components/LightComponent.h

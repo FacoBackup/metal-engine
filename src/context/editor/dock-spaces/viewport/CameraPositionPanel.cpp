@@ -19,11 +19,6 @@ namespace Metal {
         if (ImGui::Begin(id.c_str(), &UIUtil::OPEN, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar |
             ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse)) {
             const auto &positionCamera = context->worldRepository.camera.position;
-            ImGui::Text("Current tile: %i %i | N of tiles: %i",
-                        context->worldGridRepository.getCurrentTile()->x,
-                        context->worldGridRepository.getCurrentTile()->z,
-                        context->worldGridRepository.getTiles().size());
-            ImGui::SameLine();
             ImGui::TextColored(RED, "X: %i", static_cast<int>(positionCamera.x));
             ImGui::SameLine();
             ImGui::TextColored(GREEN, "Y: %i", static_cast<int>(positionCamera.y));

@@ -152,7 +152,6 @@ namespace Metal {
         for (auto &entry: LightVolumeTypes::getEntries()) {
             source = "#define " + entry.first + " " + std::to_string(entry.second) + "\n" + source;
         }
-        source = "#define TILE_SIZE " + std::to_string(TILE_SIZE) + std::string("\n") + source;
         source = "#define MAX_LIGHT_VOLUMES " + std::to_string(MAX_LIGHT_VOLUMES) + std::string("\n") + source;
         source = "#define PI_2 6.28318530718\n" + source;
         source = "#define PI 3.14159265\n" + source;

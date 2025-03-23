@@ -21,7 +21,6 @@ namespace Metal {
         int giSamples = 1;
         int giBounces = 1;
         float giStrength = 1;
-        int numberOfTiles = 10;
         float elapsedTime = .5f;
         bool atmosphereEnabled = false;
         bool incrementTime = false;

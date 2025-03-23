@@ -9,7 +9,6 @@
 
 namespace Metal {
     void EngineContext::onInitialize() {
-        context.worldGridService.onSync();
         context.passesService.onInitialize();
     }
 
@@ -96,7 +95,6 @@ namespace Metal {
         updateCurrentTime();
 
         context.transformService.onSync();
-        context.worldGridService.onSync();
         context.streamingRepository.onSync();
         context.cameraService.onSync();
 
