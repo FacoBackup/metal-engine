@@ -13,7 +13,6 @@
 
 #include "../service/rt/BVHBuilderService.h"
 #include "../service/mesh/MeshService.h"
-#include "../service/world/WorldGridService.h"
 #include "../service/texture/TextureService.h"
 #include "../service/framebuffer/FrameBufferService.h"
 #include "../service/pipeline/PipelineService.h"
@@ -28,7 +27,6 @@
 #include "../service/camera/CameraService.h"
 #include "./engine/passes/PassesService.h"
 
-#include "../repository/world/impl/WorldGridRepository.h"
 #include "../repository/inspection/FileInspectionRepository.h"
 #include "../repository/world/WorldRepository.h"
 #include "../repository/runtime/RuntimeRepository.h"
@@ -80,7 +78,6 @@ namespace Metal {
         TextureImporterService textureImporter{*this};
         FilesService filesService{*this};
         CameraService cameraService{*this};
-        WorldGridService worldGridService{*this};
         TransformService transformService{*this};
         LightsService lightsService{*this};
         VolumeService volumesService{*this};
@@ -89,7 +86,6 @@ namespace Metal {
 
         // ----------- Repository
         FileInspectionRepository fileInspection{};
-        WorldGridRepository worldGridRepository{*this};
         WorldRepository worldRepository{*this};
         RuntimeRepository runtimeRepository{};
         StreamingRepository streamingRepository{*this};

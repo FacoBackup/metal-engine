@@ -3,7 +3,6 @@
 #include "../../common/interface/Icons.h"
 #include "../../context/ApplicationContext.h"
 
-#define LEVEL_OF_DETAIL "Level of detail"
 #define PATH_TRACER "Path tracer"
 #define ATMOSPHERE "Atmosphere"
 #define SUN "Sun"
@@ -14,8 +13,6 @@ namespace Metal {
         registerInt(shadingResInvScale, "Display settings (Restart required)", "Shading inverted resolution scale", 1,
                     16);
         registerBool(vsync, "Display settings (Restart required)", "VSync?");
-        registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);
-
         registerInt(volumeShadowSteps, VOLUMES, "Shadow steps", 1);
 
         registerBool(enabledDenoiser, PATH_TRACER, "Enable denoiser?");
@@ -42,9 +39,6 @@ namespace Metal {
     }
 
     void EngineRepository::onUpdate(InspectableMember *member, ApplicationContext &context) {
-        if (member != nullptr && member->name == LEVEL_OF_DETAIL) {
-            context.worldGridRepository.hasMainTileChanged = true;
-        }
         if (member != nullptr && (member->group == PATH_TRACER || member->group == ATMOSPHERE || member->group
                                   == SUN)) {
             context.engineContext.setGISettingsUpdated(true);

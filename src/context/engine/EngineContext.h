@@ -5,7 +5,6 @@
 
 #include "../../dto/buffers/GlobalDataUBO.h"
 #include "../../common/AbstractRuntimeComponent.h"
-#include "../../dto/buffers/TileInfoUBO.h"
 #include "../../service/buffer/BufferInstance.h"
 #include "../../dto/buffers/TLAS.h"
 
@@ -16,7 +15,6 @@ namespace Metal {
     class EngineContext final : public AbstractRuntimeComponent {
         std::vector<TLAS> rtTopLevelStructures;
         GlobalDataUBO globalDataUBO{};
-        TileInfoUBO tileInfoUBO{};
         long long start = -1;
         bool cameraUpdated = true;
         bool worldChange = true;

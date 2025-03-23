@@ -44,7 +44,6 @@ namespace Metal {
             return;
         }
         translation = glm::vec3(st->model[3]);
-        auto *previousTile = context.worldGridRepository.getOrCreateTile(translation);
 
         auxMat42 = glm::identity<glm::mat4>();
         auxMat42 = glm::translate(auxMat42, st->translation); // Translation
@@ -55,9 +54,6 @@ namespace Metal {
         st->freezeVersion();
 
         translation = glm::vec3(st->model[3]);
-        auto *newTile = context.worldGridRepository.getOrCreateTile(translation);
-
-        context.worldGridRepository.moveBetweenTiles(st->getEntityId(), previousTile, newTile);
         somethingChanged = context.worldRepository.meshes.contains(st->getEntityId());
     }
 
