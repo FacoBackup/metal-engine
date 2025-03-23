@@ -2,6 +2,7 @@
 #define METAL_ENGINE_DOCKSPACEPANEL_H
 
 #include <imgui.h>
+#include <iosfwd>
 #include <glm/vec2.hpp>
 
 #include "../../abstract/AbstractPanel.h"
@@ -11,7 +12,6 @@ namespace Metal {
     class AbstractDockPanel;
 
     class DockSpacePanel final : public AbstractPanel {
-        ImVec2 padding{DEFAULT.x, DEFAULT.y};
         ImVec2 position{DEFAULT.x, DEFAULT.y};
         glm::vec2 size{};
         ImVec2 sizeInternal{DEFAULT.x, DEFAULT.y};
@@ -20,12 +20,9 @@ namespace Metal {
         int stylePushCount = 0;
         DockSpacePanel *mainWindow = nullptr;
         DockDTO *dock = nullptr;
-        AbstractDockPanel *view = nullptr;
         ImVec2 headerPadding{0, 3};
 
     public:
-        static constexpr int FLAGS = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_MenuBar;
-        static constexpr int FLAGS_CENTER = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar;
         static const ImVec2 DEFAULT;
         static const ImVec2 MAX_SIZE;
         static const ImVec2 PIVOT;
@@ -45,9 +42,7 @@ namespace Metal {
 
         void onSync() override;
 
-        [[nodiscard]] AbstractDockPanel *getView() const;
-
-        void renderHeader();
+        void renderTabs();
 
         void beforeWindow() const;
 

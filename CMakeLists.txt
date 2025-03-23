@@ -159,7 +159,6 @@ add_executable(
         src/repository/world/components/MeshComponent.h
         src/repository/world/components/TransformComponent.h
         src/enum/ShadingMode.h
-        src/enum/EditorMode.h
         src/context/editor/dock-spaces/hierarchy/HierarchyHeaderPanel.cpp
         src/context/editor/dock-spaces/hierarchy/HierarchyHeaderPanel.h
         src/service/selection/SelectionService.cpp
@@ -186,12 +185,8 @@ add_executable(
         src/enum/ResourceType.h
         src/context/editor/dock-spaces/viewport/GizmoPanel.cpp
         src/context/editor/dock-spaces/viewport/GizmoPanel.h
-        src/context/editor/dock-spaces/viewport/ViewportHeaderPanel.cpp
-        src/context/editor/dock-spaces/viewport/ViewportHeaderPanel.h
         src/context/editor/dock-spaces/viewport/GizmoSettingsPanel.cpp
         src/context/editor/dock-spaces/viewport/GizmoSettingsPanel.h
-        src/context/editor/dock-spaces/viewport/PaintingSettingsPanel.cpp
-        src/context/editor/dock-spaces/viewport/PaintingSettingsPanel.h
         src/context/editor/abstract/form/types/QuatField.cpp
         src/context/editor/abstract/form/types/QuatField.h
         src/service/transform/TransformService.cpp
@@ -292,6 +287,7 @@ add_executable(
         src/dto/scripting/abstract/AbstractVariable.h
         src/service/volume/VolumeService.cpp
         src/service/volume/VolumeService.h
+        src/repository/dock/DockViewDTO.h
 )
 
 

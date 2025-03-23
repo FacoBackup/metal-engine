@@ -8,7 +8,6 @@
 
 #include "../../util/serialization-definitions.h"
 #include "../../enum/engine-definitions.h"
-#include "../../enum/EditorMode.h"
 #include "../../enum/ShadingMode.h"
 #include "../../common/inspection/Inspectable.h"
 
@@ -44,11 +43,7 @@ namespace Metal {
         EntityID mainSelection = EMPTY_ENTITY;
         std::unordered_map<EntityID, bool> selected{};
         std::vector<EntityID> copied{};
-        EditorMode::EditorMode editorMode = EditorMode::EditorMode::TRANSFORM;
-        ShadingMode::ShadingMode shadingMode = ShadingMode::ShadingMode::LIT;
-        bool brushModeAdd = true;
-        float brushRadius = 10;
-        float brushDensity = .5f;
+        ShadingMode::ShadingMode shadingMode = ShadingMode::LIT;
 
         void registerFields() override;
 
@@ -79,11 +74,7 @@ namespace Metal {
             mainSelection,
             selected,
             copied,
-            editorMode,
-            shadingMode,
-            brushModeAdd,
-            brushRadius,
-            brushDensity
+            shadingMode
         )
     };
 } // Metal

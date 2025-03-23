@@ -5,27 +5,48 @@
 #include <imgui.h>
 #include "DockSpace.h"
 #include "DockPosition.h"
+#include "DockViewDTO.h"
 #include "../../util/Util.h"
+#include "../../util/serialization-definitions.h"
 
 namespace Metal {
     struct DockDTO {
-        const std::string id = Util::uuidV4();
+        std::string id = Util::uuidV4();
         ImGuiID nodeId{};
-        int selectedOption;
-        const char * internalId = nullptr;
+        std::string internalId;
         ImGuiDir splitDir = ImGuiDir_Down;
         float sizeX{};
         float sizeY{};
         float sizeRatioForNodeAtDir{};
+        DockPosition direction = LEFT;
+        std::vector<DockViewDTO> openTabs;
+
         DockDTO *outAtOppositeDir = nullptr;
         DockDTO *origin = nullptr;
-        DockSpace *description;
-        DockPosition direction = LEFT;
 
-        explicit DockDTO(DockSpace *description) : selectedOption(description->index),
-                                                   description(description) {
-            internalId = ("##" + Util::uuidV4()).c_str();
+        explicit DockDTO(const std::vector<unsigned int> &tabs) {
+            internalId = "##" + Util::uuidV4();
+            for (unsigned int tab: tabs) {
+                openTabs.push_back({nullptr, tab});
+            }
         }
+
+        explicit DockDTO() = default;
+
+        void addNewTab(unsigned int dockSpaceIndex) {
+            openTabs.push_back({nullptr, dockSpaceIndex});
+        }
+
+        SERIALIZE_TEMPLATE(
+            id,
+            internalId,
+            splitDir,
+            sizeX,
+            sizeY,
+            sizeRatioForNodeAtDir,
+            direction,
+            openTabs
+        )
     };
 } // Metal
 

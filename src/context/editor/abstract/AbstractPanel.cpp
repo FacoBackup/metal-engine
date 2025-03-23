@@ -31,6 +31,18 @@ namespace Metal {
         }
     }
 
+    void AbstractPanel::removeChild(AbstractPanel *view) {
+        int index = -1;
+        for (int i = 0; i < children.size(); i++) {
+            if (children[i] == view) {
+                index = i;
+            }
+        }
+        children[index]->removeAllChildren();
+        delete children[index];
+        children.erase(children.begin() + index);
+    }
+
     std::vector<IPanel *> &AbstractPanel::getChildren() {
         return children;
     }

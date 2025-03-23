@@ -31,7 +31,7 @@ void main() {
         MaterialInfo material = getMaterialInfo(data);
 
         #ifdef DEBUG
-        if (globalData.debugFlag != LIT && globalData.debugFlag != GI){
+        if (globalData.debugFlag != LIT){
             bool shouldReturn = true;
             if (globalData.debugFlag == NORMAL){
                 finalColor = data.hitNormal;
