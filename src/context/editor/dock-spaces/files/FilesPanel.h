@@ -3,59 +3,35 @@
 #include <imgui.h>
 #include <__functional/function.h>
 
+#include "FileItem.h"
 #include "FilesContext.h"
+#include "../../../../util/Util.h"
 #include "../docks/AbstractDockPanel.h"
+
+namespace fs = std::filesystem;
 
 namespace Metal {
     struct FileEntry;
 
-    class FilesPanel : public AbstractDockPanel {
-    protected:
-        static constexpr int CARD_SIZE = 90;
-        static constexpr int TEXT_OFFSET = 28;
-        static constexpr ImVec2 TEXTURE_SIZE{CARD_SIZE - 15, CARD_SIZE - TEXT_OFFSET - 4};
+    class FilesPanel final : public AbstractDockPanel {
+        std::string rootPath;
+        std::string currentPath = rootPath;
+        std::vector<FileItem> files;
+        std::vector<std::string> directories;
+        std::string selectedFile;
 
-        FilesContext filesContext{nullptr};
-        bool isSomethingHovered = false;
-        FileEntry *onDrag = nullptr;
-        ImVec2 startDrag{-1, -1};
+        std::stack<fs::path> history;
+        std::stack<fs::path> forwardHistory;
+        char searchBuffer[128] = "";
 
     public:
-        virtual std::string getActionLabel();
-
-        virtual std::function<void()> onAction();
-
         void onInitialize() override;
-
-        void contextMenu();
-
-        void handleDrag() const;
-
-        void handleDragDrop(FileEntry *fileEntry);
 
         void onSync() override;
 
-        static static void SetIconPos(const char *text);
+        void refreshDirectoryContents();
 
-        void renderItem(FileEntry *root);
-
-        void trackDrag();
-
-        void hotkeys();
-
-        void pasteSelected();
-
-        void openSelected();
-
-        void cutSelected();
-
-        void selectAll();
-
-        void deleteSelected() const;
-
-        void onClick(FileEntry *root);
-
-        virtual void openResource(FileEntry *root);
+        void renderNavigationHeader();
     };
 } // Metal
 

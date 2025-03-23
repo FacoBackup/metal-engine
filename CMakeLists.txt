@@ -280,6 +280,7 @@ add_executable(
         src/service/volume/VolumeService.cpp
         src/service/volume/VolumeService.h
         src/repository/dock/DockViewDTO.h
+        src/context/editor/dock-spaces/files/FileItem.h
 )
 
 

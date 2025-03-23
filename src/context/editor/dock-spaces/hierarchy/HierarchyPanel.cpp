@@ -155,9 +155,9 @@ namespace Metal {
     }
 
     void HierarchyPanel::onSync() {
-        ImGui::InputText("##Search", searchBuffer, IM_ARRAYSIZE(searchBuffer));
+        ImGui::InputText((id + "Search").c_str(), searchBuffer, IM_ARRAYSIZE(searchBuffer));
         ImGui::SameLine();
-        if (ImGui::Button(("+" + Icons::inventory_2).c_str())) {
+        if (ImGui::Button((Icons::inventory_2 + id).c_str())) {
             context->worldRepository.createEntity("New Folder", true);
         }
 
