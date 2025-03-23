@@ -30,6 +30,7 @@ namespace Metal {
         PARSE_TEMPLATE(engineRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(EngineRepository))
         PARSE_TEMPLATE(worldGridRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldGridRepository))
         PARSE_TEMPLATE(worldRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository))
+        PARSE_TEMPLATE(dockRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(DockRepository))
 
 
         FilesUtil::MkDir(getShadersDirectory());
@@ -104,6 +105,7 @@ namespace Metal {
             DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(EngineRepository), engineRepository)
             DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldGridRepository), worldGridRepository)
             DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository), worldRepository)
+            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(DockRepository), dockRepository)
             notificationService.pushMessage("Project saved", NotificationSeverities::SUCCESS);
         }catch (const std::exception &e) {
             notificationService.pushMessage("Could not save project", NotificationSeverities::ERROR);

@@ -94,7 +94,7 @@ namespace Metal {
         RuntimeRepository runtimeRepository{};
         StreamingRepository streamingRepository{*this};
         EngineRepository engineRepository{};
-        DockRepository dockRepository{*this};
+        DockRepository dockRepository{};
         EditorRepository editorRepository{};
         // ----------- Repository
 

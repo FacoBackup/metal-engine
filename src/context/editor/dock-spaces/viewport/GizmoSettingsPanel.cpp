@@ -8,6 +8,11 @@ namespace Metal {
         gizmoMode();
         gizmoSelection();
         gizmoGrid();
+        std::string ptCount = std::format("PT samples: {}/{}",
+                    std::min(context->engineRepository.maxAccumulation, context->engineContext.getAccumulationCount()),
+                    context->engineRepository.maxAccumulation);
+        UIUtil::DynamicSpacing(ImGui::CalcTextSize(ptCount.c_str()).x + 10);
+        ImGui::Text(ptCount.c_str());
     }
 
     void GizmoSettingsPanel::onInitialize() {

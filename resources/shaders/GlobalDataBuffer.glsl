@@ -19,7 +19,7 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
 // GI
     bool enabledDenoiser;
     bool multipleImportanceSampling;
-    uint giMaxAccumulation;
+    uint maxAccumulation;
     uint giSamples;
     uint giBounces;
     uint giTileSubdivision;
@@ -31,7 +31,6 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     uint surfaceCacheWidth;
     uint surfaceCacheHeight;
 
-    uint giAccumulationCount;
     uint globalFrameCount;
 } globalData;
 

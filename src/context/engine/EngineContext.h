@@ -22,7 +22,7 @@ namespace Metal {
         bool worldChange = true;
         bool lightVolumeDataNeedsUpdate = true;
         bool giSettingsUpdated = true;
-        unsigned int giAccumulationCount = 0;
+        unsigned int accumulationCount = 0;
         unsigned int rtTLASCount = 0;
         bool isBVHReady = false;
         bool isTLASReady = false;
@@ -41,12 +41,17 @@ namespace Metal {
         void setCameraUpdated(const bool val) {
             cameraUpdated = val;
         }
+
         void setWorldChange(const bool worldChange) {
             this->worldChange = worldChange;
         }
 
         bool isCameraUpdated() const {
             return cameraUpdated;
+        }
+
+        [[nodiscard]]  int getAccumulationCount() const {
+            return accumulationCount;
         }
 
         bool hasWorldChanged() const {
@@ -57,8 +62,8 @@ namespace Metal {
             giSettingsUpdated = val;
         }
 
-        void resetGiAccumulationCount() {
-            globalDataUBO.giAccumulationCount = 0;
+        void resetAccumulationCount() {
+            accumulationCount = 0;
         }
 
         bool isGISettingsUpdated() const {

@@ -1,26 +1,16 @@
 #include "GlobalSettingsPanel.h"
 
 #include "../../../../context/ApplicationContext.h"
-#include "../../../../enum/EditorMode.h"
 #include "../../../../util/UIUtil.h"
 #include "../../../../service/camera/Camera.h"
 
 namespace Metal {
     void GlobalSettingsPanel::onSync() {
-        auto &editorRepository = context->editorRepository;
-
         if (ImGui::Button((Icons::apps + "Build BVH" + id + "bvh").c_str())) {
             context->engineContext.dispatchBVHBuild();
         }
         ImGui::SameLine();
 
-        ImGui::SetNextItemWidth(150);
-        editorMode = EditorMode::IndexOfValue(editorRepository.editorMode);
-        if (ImGui::Combo(id.c_str(), &editorMode, EditorMode::Names)) {
-            editorRepository.editorMode = EditorMode::ValueOfIndex(editorMode);
-        }
-
-        ImGui::SameLine();
         ImGui::SetNextItemWidth(150);
         int option = 0;
 

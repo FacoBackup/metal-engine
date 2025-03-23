@@ -2,21 +2,25 @@
 #define METAL_ENGINE_DOCKREPOSITORY_H
 
 #include "DockDTO.h"
-#include "../../common/AbstractRuntimeComponent.h"
+#include "../../util/serialization-definitions.h"
 
 namespace Metal {
     class DockSpacePanel;
 
-    struct DockRepository final : AbstractRuntimeComponent {
-        DockDTO center{&DockSpace::VIEWPORT};
-        std::vector<DockDTO *> bottom;
-        std::vector<DockDTO *> left;
-        std::vector<DockDTO *> right;
-        DockDTO *dockToRemove = nullptr;
-        DockSpacePanel *dockPanelToRemove = nullptr;
+    struct DockRepository final {
+        DockDTO center{{DockSpace::VIEWPORT.index}};
+        std::vector<DockDTO> bottom;
+        std::vector<DockDTO> left;
+        std::vector<DockDTO> right;
         bool isInitialized = false;
 
-        explicit DockRepository(ApplicationContext &context);
+        explicit DockRepository();
+
+        SAVE_TEMPLATE(
+            bottom,
+            left,
+            right,
+            center)
     };
 } // Metal
 

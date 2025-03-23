@@ -28,6 +28,8 @@ namespace Metal {
 
         void setContext(ApplicationContext *context);
 
+        void removeChild(AbstractPanel * view);
+
         virtual void onRemove() {
         }
     };

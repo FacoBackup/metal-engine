@@ -21,7 +21,7 @@ namespace Metal {
         registerBool(enabledDenoiser, PATH_TRACER, "Enable denoiser?");
         registerFloat(denoiserDiffWeight, PATH_TRACER, "Denoiser variance weight", 0, 10, false, .001);
         registerFloat(giStrength, PATH_TRACER, "Strength");
-        registerInt(giMaxAccumulation, PATH_TRACER, "Maximum accumulation", 1, 10000);
+        registerInt(maxAccumulation, PATH_TRACER, "Maximum accumulation", 1, 10000);
         registerInt(giSamples, PATH_TRACER, "Samples per pixel", 1, 32);
         registerInt(giBounces, PATH_TRACER, "Bounces", 0, 7);
         registerBool(multipleImportanceSampling, PATH_TRACER, "Enable multiple importance sampling?");

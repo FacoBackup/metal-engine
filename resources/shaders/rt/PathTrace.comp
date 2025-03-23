@@ -31,10 +31,15 @@ void main() {
         MaterialInfo material = getMaterialInfo(data);
 
         #ifdef DEBUG
-        if (globalData.debugFlag != LIT && globalData.debugFlag != GI){
-            bool shouldReturn = true;
+        if (globalData.debugFlag != LIT){
             if (globalData.debugFlag == NORMAL){
                 finalColor = data.hitNormal;
+            } else if (globalData.debugFlag == ALBEDO){
+                finalColor = material.baseColor;
+            } else if (globalData.debugFlag == ROUGHNESS){
+                finalColor = vec3(material.roughness);
+            } else if (globalData.debugFlag == METALLIC){
+                finalColor = vec3(material.metallic);
             } else if (globalData.debugFlag == UV){
                 finalColor.xy = data.hitUV;
             } else if (globalData.debugFlag == POSITION){
@@ -42,10 +47,8 @@ void main() {
             } else {
                 finalColor = randomColor(float(data.hitId + 1));
             }
-            if (shouldReturn) {
-                imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(finalColor, 1));
-                return;
-            }
+            imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(finalColor, 1));
+            return;
         }
         #endif
 
@@ -62,7 +65,7 @@ void main() {
             finalData = data.hitId;
         } else {
             vec4 previousFrame = imageLoad(outputImage, ivec2(gl_GlobalInvocationID.xy));
-            float accumulationCount = min(globalData.giMaxAccumulation, previousFrame.a);
+            float accumulationCount = min(globalData.maxAccumulation, previousFrame.a);
             finalColor = previousFrame.rgb * (1. - 1./accumulationCount) + finalColor * 1./accumulationCount;
             finalData = accumulationCount + 1;
         }
@@ -70,11 +73,18 @@ void main() {
         finalColor = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), rayDir, 2.0f) * 0.05f;
     }
 
-    vec4 volumetricColor = vec4(0.0);
-    traceVolumes(volumetricColor, data.hitPosition, rayDir);
-    if (volumetricColor.a > 0.001){
-        finalColor = volumetricColor.rgb * volumetricColor.a + finalColor * (1.0 - volumetricColor.a);
-    }
+    #ifdef DEBUG
+    if (globalData.debugFlag == LIT){
+        #endif
 
+        vec4 volumetricColor = vec4(0.0);
+        traceVolumes(volumetricColor, data.hitPosition, rayDir);
+        if (volumetricColor.a > 0.001){
+            finalColor = volumetricColor.rgb * volumetricColor.a + finalColor * (1.0 - volumetricColor.a);
+        }
+
+        #ifdef DEBUG
+    }
+    #endif
     imageStore(outputImage, ivec2(gl_GlobalInvocationID.xy), vec4(finalColor, finalData));
 }

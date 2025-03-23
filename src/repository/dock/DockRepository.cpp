@@ -1,17 +1,17 @@
 #include "DockRepository.h"
 
 namespace Metal {
-    DockRepository::DockRepository(ApplicationContext &context) : AbstractRuntimeComponent(context) {
-        auto *rightUp = new DockDTO{&DockSpace::HIERARCHY};
-        auto *rightDown = new DockDTO{&DockSpace::INSPECTOR};
-        auto *downLeft = new DockDTO{&DockSpace::CANVAS};
-        auto *downRight = new DockDTO{&DockSpace::FILES};
+    DockRepository::DockRepository() {
+        auto rightUp = DockDTO{{DockSpace::HIERARCHY.index}};
+        auto rightDown = DockDTO{{DockSpace::INSPECTOR.index}};
+        auto downLeft = DockDTO{{DockSpace::CANVAS.index}};
+        auto downRight = DockDTO{{DockSpace::FILES.index}};
 
         center.sizeRatioForNodeAtDir = 0.17f;
-        rightUp->sizeRatioForNodeAtDir = 0.4f;
-        rightDown->sizeRatioForNodeAtDir = 0.6f;
-        downLeft->sizeRatioForNodeAtDir = 0.22f;
-        downRight->sizeRatioForNodeAtDir = 0.5f;
+        rightUp.sizeRatioForNodeAtDir = 0.4f;
+        rightDown.sizeRatioForNodeAtDir = 0.6f;
+        downLeft.sizeRatioForNodeAtDir = 0.22f;
+        downRight.sizeRatioForNodeAtDir = 0.5f;
 
         right.push_back(rightUp);
         right.push_back(rightDown);

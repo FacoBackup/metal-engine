@@ -8,18 +8,13 @@ namespace Metal::ShadingMode {
         NORMAL,
         ROUGHNESS,
         METALLIC,
-        AO,
         RANDOM,
-        DEPTH,
         UV,
-        POSITION,
-        LIGHTING_ONLY,
-        EMISSIVE,
-        GI
+        POSITION
     };
 
     static auto Names =
-            "Lit\0Albedo\0Normal\0Roughness\0Metallic\0Occlusion\0Random\0Depth\0UV\0Position\0Lighting only\0Emission\0Global Illumination\0";
+            "Lit\0Albedo\0Normal\0Roughness\0Metallic\0Random\0UV\0Position\0";
 
     static ShadingMode ValueOfIndex(const int option) {
         if (option == 0) {
@@ -38,30 +33,15 @@ namespace Metal::ShadingMode {
             return ShadingMode::METALLIC;
         }
         if (option == 5) {
-            return ShadingMode::AO;
-        }
-        if (option == 6) {
             return ShadingMode::RANDOM;
         }
-        if (option == 7) {
-            return ShadingMode::DEPTH;
-        }
-        if (option == 8) {
+        if (option == 6) {
             return ShadingMode::UV;
         }
-        if (option == 9) {
+        if (option == 7) {
             return ShadingMode::POSITION;
         }
-        if (option == 10) {
-            return ShadingMode::LIGHTING_ONLY;
-        }
-        if (option == 11) {
-            return ShadingMode::EMISSIVE;
-        }
-        if (option == 12) {
-            return ShadingMode::GI;
-        }
-        return ShadingMode::GI;
+        return ShadingMode::POSITION;
     }
 
     static int IndexOfValue(const ShadingMode mode) {
@@ -80,31 +60,16 @@ namespace Metal::ShadingMode {
         if (mode == ShadingMode::METALLIC) {
             return 4;
         }
-        if (mode == ShadingMode::AO) {
+        if (mode == ShadingMode::RANDOM) {
             return 5;
         }
-        if (mode == ShadingMode::RANDOM) {
+        if (mode == ShadingMode::UV) {
             return 6;
         }
-        if (mode == ShadingMode::DEPTH) {
+        if (mode == ShadingMode::POSITION) {
             return 7;
         }
-        if (mode == ShadingMode::UV) {
-            return 8;
-        }
-        if (mode == ShadingMode::POSITION) {
-            return 9;
-        }
-        if (mode == ShadingMode::LIGHTING_ONLY) {
-            return 10;
-        }
-        if (mode == ShadingMode::EMISSIVE) {
-            return 11;
-        }
-        if (mode == ShadingMode::GI) {
-            return 12;
-        }
-        return 12;
+        return 7;
     }
 }
 

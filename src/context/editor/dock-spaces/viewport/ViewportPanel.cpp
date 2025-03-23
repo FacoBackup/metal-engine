@@ -2,33 +2,33 @@
 
 #include "CameraPositionPanel.h"
 #include "GizmoPanel.h"
+#include "GizmoSettingsPanel.h"
 #include "ImGuizmo.h"
-#include "ViewportHeaderPanel.h"
 #include "../../../../context/ApplicationContext.h"
 #include "../../../../service/descriptor/DescriptorInstance.h"
 #include "../../../../service/framebuffer/FrameBufferInstance.h"
-#include "../../../../service/texture/TextureInstance.h"
 #include "../../../../service/camera/Camera.h"
 
 namespace Metal {
     void ViewportPanel::onInitialize() {
-        appendChild(headerPanel = new ViewportHeaderPanel());
         appendChild(gizmoPanel = new GizmoPanel(position, size));
+        appendChild(headerPanel = new GizmoSettingsPanel());
         appendChild(cameraPanel = new CameraPositionPanel());
     }
 
     void ViewportPanel::onSync() {
         updateCamera();
         updateInputs();
+        ImGui::Dummy(ImVec2{0, 1});
+        ImGui::Dummy(ImVec2{1, 0});
+        ImGui::SameLine();
+        headerPanel->onSync();
 
         auto *framebuffer = context->coreFrameBuffers.postProcessingFBO;
         context->descriptorService.setImageDescriptor(framebuffer, 0);
-        ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet), ImVec2{size->x, size->y});
-
-        if (context->editorRepository.editorMode == EditorMode::EditorMode::TRANSFORM) {
-            gizmoPanel->onSync();
-        }
-        headerPanel->onSync();
+        ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet),
+                     ImVec2{size->x, size->y - 40});
+        gizmoPanel->onSync();
         cameraPanel->onSync();
     }
 

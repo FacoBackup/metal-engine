@@ -17,10 +17,6 @@ namespace Metal {
 
         static void addWindow(DockDTO *d, AbstractPanel *panel);
 
-        void prepareForRemoval(DockDTO *dock, DockSpacePanel *dockSpacePanel) const;
-
-        void updateForRemoval(AbstractPanel *panel) const;
-
         explicit DockService(ApplicationContext &context);
     };
 } // Metal

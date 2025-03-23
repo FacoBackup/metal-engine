@@ -47,10 +47,10 @@ namespace Metal {
 
         void deleteEntities(const std::vector<EntityID> & entities);
 
-        void changeVisibility(EntityID entity, bool isVisible);
+        void changeVisibility(EntityID entity, bool isHidden);
 
     private:
-        void changeVisibilityRecursively(EntityID entity, bool isVisible);
+        void changeVisibilityRecursively(EntityID entity, bool isHidden);
 
         EntityID lastId = ROOT_ID;
     };

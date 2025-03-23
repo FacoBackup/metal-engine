@@ -20,16 +20,20 @@ namespace Metal {
             clearTexture(context.coreTextures.giSurfaceCache->vkImage);
         }
 
-        clearTexture(context.coreTextures.currentPositions->vkImage, {0,0,0,0});
 
         if (context.engineRepository.enabledDenoiser) {
             clearTexture(context.coreTextures.currentFrame->vkImage);
-            context.engineContext.resetGiAccumulationCount();
+            context.engineContext.resetAccumulationCount();
         } else if (isFirstRun || context.engineContext.isCameraUpdated() || surfaceCacheReset) {
             clearTexture(context.coreTextures.currentFrame->vkImage);
-            context.engineContext.resetGiAccumulationCount();
+            context.engineContext.resetAccumulationCount();
             isFirstRun = false;
         }
+
+        if (!context.engineRepository.enabledDenoiser && context.engineRepository.maxAccumulation <= context.engineContext.getAccumulationCount()) {
+            return;
+        }
+        clearTexture(context.coreTextures.currentPositions->vkImage, {0,0,0,0});
 
         startWriting(context.coreTextures.currentFrame->vkImage);
         recordImageDispatch(context.coreTextures.currentFrame, 8, 8);
