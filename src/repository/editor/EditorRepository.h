@@ -18,8 +18,9 @@ namespace Metal {
 
         ImVec4 accent{};
         ImU32 accentU32 = 0;
-
         glm::vec3 accentColor{0.26f, 0.59f, 0.98f};
+        std::unordered_map<EntityID, bool> selected{};
+
         std::string projectName = "New project";
         bool showIcons = true;
         bool isDarkMode = true;
@@ -41,7 +42,7 @@ namespace Metal {
         bool showOnlyEntitiesHierarchy = false;
         TransformComponent *primitiveSelected = nullptr;
         EntityID mainSelection = EMPTY_ENTITY;
-        std::unordered_map<EntityID, bool> selected{};
+
         std::vector<EntityID> copied{};
         ShadingMode::ShadingMode shadingMode = ShadingMode::LIT;
 

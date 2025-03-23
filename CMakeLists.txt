@@ -159,8 +159,6 @@ add_executable(
         src/repository/world/components/MeshComponent.h
         src/repository/world/components/TransformComponent.h
         src/enum/ShadingMode.h
-        src/context/editor/dock-spaces/hierarchy/HierarchyHeaderPanel.cpp
-        src/context/editor/dock-spaces/hierarchy/HierarchyHeaderPanel.h
         src/service/selection/SelectionService.cpp
         src/service/selection/SelectionService.h
         src/repository/world/impl/Entity.cpp

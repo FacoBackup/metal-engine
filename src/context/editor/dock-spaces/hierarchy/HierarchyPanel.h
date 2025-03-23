@@ -15,47 +15,27 @@ namespace Metal {
     class HierarchyHeaderPanel;
 
     class HierarchyPanel final : public AbstractDockPanel {
-        static constexpr auto TRANSPARENT = ImVec4(0, 0, 0, 0);
-        static constexpr auto PADDING = ImVec2(0, 0);
-        static constexpr auto TABLE_FLAGS = ImGuiTableFlags_ScrollY | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg
-                                            | ImGuiTableFlags_NoBordersInBody;
-        HierarchyHeaderPanel *headerPanel = nullptr;
-        ImVec4 rowColor = ImVec4(0, 0, 0, 1);
-        Entity *onDrag = nullptr;
-        bool isOnSearch = false;
-        std::unordered_map<EntityID, std::string> searchMatchWith{};
-        std::unordered_map<EntityID, bool> searchMatch{};
-        std::unordered_map<EntityID, bool> opened{};
-        WorldRepository *world = nullptr;
-        EditorRepository *editorRepository = nullptr;
-        bool isSomethingHovered = false;
+        char searchBuffer[128] = "";
+        EntityID dragSource = EMPTY_ENTITY;
+
+        static const char *GetIcon(const Entity *node);
+
+        bool MatchesSearchRecursive(Entity *entity);
+
+        void handleDrop(EntityID entityID, Entity *entity);
+
+        void handleDrag(EntityID entityID, Entity *entity);
+
+        bool drawContextMenu(EntityID entityID, Entity *entity, bool isHidden);
+
+        void handleSelection(EntityID entityID);
+
+        void renderHideButton(EntityID entityID, bool isHidden);
+
+        void DrawEntityNode(EntityID entityID);
 
     public:
-        void onInitialize() override;
-
-        void contextMenu() const;
-
         void onSync() override;
-
-        bool renderNode(EntityID entityId);
-
-        bool isOpen(Entity *node, int flags) const;
-
-        static const char *GetIcon(const Metal::Entity *node);
-
-        std::string getNodeLabel(Entity *node, bool addId) const;
-
-        bool matchSearch(const Entity *node);
-
-        void renderEntityChildren(const Entity *node);
-
-        int getFlags(const Entity *node);
-
-        void renderEntityColumns(const Entity *node, bool isPinned) const;
-
-        void handleClick(const Entity *node) const;
-
-        void handleDragDrop(Entity *node);
     };
 } // Metal
 

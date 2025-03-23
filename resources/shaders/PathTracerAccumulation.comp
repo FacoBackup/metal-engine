@@ -15,7 +15,7 @@ layout(set = 3, binding = 0, rgba32f) uniform image2D previousFrameImage;// Colo
 
 void main() {
     #ifdef DEBUG
-    if (globalData.debugFlag != LIT && globalData.debugFlag != GI){
+    if (globalData.debugFlag != LIT){
         return;
     }
     #endif

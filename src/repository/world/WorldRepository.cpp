@@ -100,21 +100,21 @@ namespace Metal {
         context.engineContext.setLightVolumeDataNeedsUpdate(true);
     }
 
-    void WorldRepository::changeVisibility(EntityID entity, bool isVisible) {
-        changeVisibilityRecursively(entity, isVisible);
+    void WorldRepository::changeVisibility(EntityID entity, bool isHidden) {
+        changeVisibilityRecursively(entity, isHidden);
         context.engineContext.setLightVolumeDataNeedsUpdate(true);
         context.engineContext.dispatchBVHBuild();
     }
 
-    void WorldRepository::changeVisibilityRecursively(EntityID entity, const bool isVisible) {
-        if (isVisible) {
-            hiddenEntities.erase(entity);
+    void WorldRepository::changeVisibilityRecursively(EntityID entity, const bool isHidden) {
+        if (!isHidden) {
+            hiddenEntities.erase(entity); // Remove from map to show it
         } else {
-            hiddenEntities.insert({entity, true});
+            hiddenEntities[entity] = true; // Ensure it's explicitly marked as hidden
         }
 
         for (const auto child: getEntity(entity)->children) {
-            changeVisibilityRecursively(child, isVisible);
+            changeVisibilityRecursively(child, isHidden);
         }
     }
 

@@ -34,7 +34,7 @@ vec3 i_cube_32( uint data ) {
 void main() {
     ivec2 coords =  ivec2(gl_GlobalInvocationID.xy);
     #ifdef DEBUG
-    if (globalData.debugFlag != LIT && globalData.debugFlag != LIGHTING_ONLY){
+    if (globalData.debugFlag != LIT){
         return;
     }
     #endif
