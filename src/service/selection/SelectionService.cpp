@@ -38,11 +38,27 @@ namespace Metal {
         auto &comp = world.getEntity(editorRepository.mainSelection)->components;
         for (auto a: comp) {
             if (a == ComponentTypes::TRANSFORM) {
-                editorRepository.primitiveSelected = dynamic_cast<TransformComponent *>(context.worldRepository.getComponent(ComponentTypes::TRANSFORM, editorRepository.mainSelection));
+                editorRepository.primitiveSelected = dynamic_cast<TransformComponent *>(context.worldRepository.
+                    getComponent(ComponentTypes::TRANSFORM, editorRepository.mainSelection));
                 break;
             }
         }
+    }
 
+    void SelectionService::removeSelected(EntityID entity_id) {
+        context.editorRepository.selected.erase(entity_id);
+        if (context.editorRepository.mainSelection == entity_id) {
+            for (auto a: context.editorRepository.selected) {
+                context.editorRepository.mainSelection = a.first;
+                updatePrimitiveSelected();
+                return;
+            }
+            context.editorRepository.mainSelection = EMPTY_ENTITY;
+        }
+        if (context.editorRepository.primitiveSelected != nullptr && context.editorRepository.primitiveSelected->
+            getEntityId() == entity_id) {
+            context.editorRepository.primitiveSelected = nullptr;
+        }
     }
 
     SelectionService::SelectionService(ApplicationContext &context)

@@ -23,6 +23,8 @@ namespace Metal {
         void addAllSelected(const std::vector<EntityID> &all) const;
 
         void updatePrimitiveSelected() const;
+
+        void removeSelected(EntityID entity_id);
     };
 } // Metal
 

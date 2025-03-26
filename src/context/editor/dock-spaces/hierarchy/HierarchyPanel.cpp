@@ -6,6 +6,9 @@
 #include "../../../../repository/world/impl/Entity.h"
 #include "../../../../enum/ComponentType.h"
 
+#define BUTTON_HEIGHT 22
+#define BUTTON_PADDING 24.0f
+
 namespace Metal {
     const char *HierarchyPanel::GetIcon(const Entity *node) {
         static constexpr std::array<ComponentTypes::ComponentType, 3> priorityComponents = {
@@ -80,22 +83,30 @@ namespace Metal {
         return false;
     }
 
-    void HierarchyPanel::handleSelection(EntityID entityID) {
-        if (ImGui::IsItemClicked()) {
-            if (ImGui::GetIO().KeyCtrl) {
-                context->selectionService.addSelected(entityID); // CTRL + click: add to selection
-            } else {
-                context->selectionService.clearSelection(); // Click: clear previous selection
+    void HierarchyPanel::renderPinButton(EntityID entityID, bool isSelected) {
+        ImGui::SameLine();
+        ImGui::PushID((entityID + "pinButton" + id).c_str());
+        if (isSelected) ImGui::PushStyleColor(ImGuiCol_Button, context->editorRepository.accent);
+        ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(1.f, .5f));
+        if (ImGui::Button(!isSelected ? Icons::lock_open.c_str() : Icons::lock.c_str(),
+                          ImVec2(BUTTON_HEIGHT, BUTTON_HEIGHT))) {
+            if (!isSelected) {
                 context->selectionService.addSelected(entityID); // Add only this entity
+            } else {
+                context->selectionService.removeSelected(entityID);
             }
         }
+        if (isSelected) ImGui::PopStyleColor();
+        ImGui::PopStyleVar();
+        ImGui::PopID();
     }
 
     void HierarchyPanel::renderHideButton(EntityID entityID, bool isHidden) {
         ImGui::SameLine();
-        ImGui::PushID(entityID); // Ensure unique ID for the button
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(5, 0));
-        if (ImGui::Button(!isHidden ? Icons::visibility.c_str() : Icons::visibility_off.c_str(), ImVec2(24, 16))) {
+        ImGui::PushID((entityID + "pinButton" + id).c_str());
+        ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(1.f, .5f));
+        if (ImGui::Button(!isHidden ? Icons::visibility.c_str() : Icons::visibility_off.c_str(),
+                          ImVec2(BUTTON_HEIGHT, BUTTON_HEIGHT))) {
             context->worldRepository.changeVisibility(entityID, !isHidden);
         }
         ImGui::PopStyleVar();
@@ -103,55 +114,50 @@ namespace Metal {
         ImGui::PopID();
     }
 
-    void HierarchyPanel::DrawEntityNode(EntityID entityID) {
+    void HierarchyPanel::DrawEntityNode(EntityID entityID, int depth) {
         Entity *entity = context->worldRepository.getEntity(entityID);
         if (!entity || !MatchesSearchRecursive(entity)) return;
 
-        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-        if (entity->children.empty()) flags |= ImGuiTreeNodeFlags_Leaf;
-
         bool isHidden = context->worldRepository.hiddenEntities.contains(entityID) &&
                         context->worldRepository.hiddenEntities[entityID];
-
         bool isSelected = context->editorRepository.selected.contains(entityID) &&
                           context->editorRepository.selected[entityID];
 
-        if (isSelected) ImGui::PushStyleColor(ImGuiCol_Header, context->editorRepository.accent);
+        ImVec2 buttonSize(ImGui::GetContentRegionAvail().x - (BUTTON_HEIGHT + 8) * 2, BUTTON_HEIGHT);
+        ImGui::PushID(entityID);
+        ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_Button]);
         ImGui::PushStyleColor(ImGuiCol_Text,
-                              ImVec4(entity->color.x, entity->color.y, entity->color.z, isHidden ? .5 : 1.0f));
+                              ImVec4(entity->color.x, entity->color.y, entity->color.z, isHidden ? 0.5f : 1.0f));
 
-        const char *icon = GetIcon(entity);
-        bool nodeOpen = ImGui::TreeNodeEx((void *) (intptr_t) entityID,
-                                          flags | (isSelected ? ImGuiTreeNodeFlags_Selected : 0),
-                                          "%s %s", icon, entity->name.c_str());
+        const char *arrowIcon = entity->children.empty()
+                                    ? ""
+                                    : (entity->isOpen ? Icons::arrow_drop_down.c_str() : Icons::arrow_right.c_str());
+        const char *entityIcon = GetIcon(entity);
 
-        ImGui::PopStyleColor();
-        if (isSelected) ImGui::PopStyleColor();
+        float padding = (BUTTON_PADDING * depth) / buttonSize.x;
+        ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(padding, 0.5f));
 
-        // Handle selection
-        handleSelection(entityID);
+        if (ImGui::Button((std::string(arrowIcon) + " " + entityIcon + " " + entity->name).c_str(), buttonSize)) {
+            entity->isOpen = !entity->isOpen;
+        }
 
-        // Context Menu
-        if (drawContextMenu(entityID, entity, isHidden)) return;
+        ImGui::PopStyleVar();
+        ImGui::PopStyleColor(2);
 
-        // Drag & Drop Source
         handleDrag(entityID, entity);
-
-        // Drag & Drop Target
         handleDrop(entityID, entity);
-
-        // Add margin before the button
-        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10);
-
+        renderPinButton(entityID, isSelected);
         renderHideButton(entityID, isHidden);
 
-        // Recursively Draw Children
-        if (nodeOpen) {
+        if (drawContextMenu(entityID, entity, isHidden)) return;
+
+        if (entity->isOpen) {
             for (EntityID childID: entity->children) {
-                DrawEntityNode(childID);
+                DrawEntityNode(childID, depth + 1);
             }
-            ImGui::TreePop();
         }
+
+        ImGui::PopID();
     }
 
     void HierarchyPanel::onSync() {
@@ -163,8 +169,11 @@ namespace Metal {
 
         ImGui::Separator();
 
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.f, 0.f));
         if (context->worldRepository.entities.count(WorldRepository::ROOT_ID)) {
             DrawEntityNode(WorldRepository::ROOT_ID);
         }
+        ImGui::PopStyleVar();
+
     }
 } // Metal

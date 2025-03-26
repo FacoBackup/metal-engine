@@ -19,10 +19,11 @@ namespace Metal {
         std::vector<FileItem> files;
         std::vector<std::string> directories;
         std::string selectedFile;
-
         std::stack<fs::path> history;
         std::stack<fs::path> forwardHistory;
         char searchBuffer[128] = "";
+        std::unordered_map<std::string, std::vector<std::string> > directoryCache;
+        bool fetched = false;
 
     public:
         void onInitialize() override;
@@ -32,6 +33,10 @@ namespace Metal {
         void refreshDirectoryContents();
 
         void renderNavigationHeader();
+
+        std::vector<std::string> getDirectories(const std::string &path);
+
+        void RenderDirectoryTree(const std::string &currentDir);
     };
 } // Metal
 

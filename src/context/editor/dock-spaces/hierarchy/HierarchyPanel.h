@@ -28,11 +28,11 @@ namespace Metal {
 
         bool drawContextMenu(EntityID entityID, Entity *entity, bool isHidden);
 
-        void handleSelection(EntityID entityID);
+        void renderPinButton(EntityID entityID, bool isSelected);
 
         void renderHideButton(EntityID entityID, bool isHidden);
 
-        void DrawEntityNode(EntityID entityID);
+        void DrawEntityNode(EntityID entityID, int depth = 0);
 
     public:
         void onSync() override;

@@ -16,6 +16,7 @@ namespace Metal {
         EntityID id;
 
     public:
+        bool isOpen = false;
         std::string name = "New entity";
         glm::vec3 color{};
         bool isContainer = false;
@@ -23,7 +24,7 @@ namespace Metal {
         std::vector<EntityID> children{};
         EntityID parent = EMPTY_ENTITY;
 
-        SERIALIZE_TEMPLATE(id, parent, name, color.x, color.y, color.z, isContainer, components, children)
+        SERIALIZE_TEMPLATE(id, parent, name, color.x, color.y, color.z, isContainer, components, children, isOpen)
 
         Entity() = default;
 
