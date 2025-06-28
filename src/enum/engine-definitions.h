@@ -7,6 +7,7 @@
 #define MAX_RT_BLAS 1000000
 #define MAX_RT_TLAS 10000
 #define MAX_MATERIALS 10000
+#include "../util/Logger.h"
 
 typedef unsigned int EntityID;
 typedef int MaterialID;
@@ -36,6 +37,6 @@ const auto start = duration.count();
 #define METRIC_END(M) \
 currentTime = Clock::now();\
 duration = std::chrono::duration_cast< std::chrono::milliseconds>(currentTime.time_since_epoch());\
-std::cout << M << " " << duration.count() - start << "ms" << std::endl;
+LOG("{} {}ms", M, duration.count() - start);
 
 #endif //ENGINEID_H

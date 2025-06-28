@@ -28,6 +28,9 @@
 #include <cereal/types/variant.hpp>
 #include <filesystem>
 
+#include "Logger.h"
+
+
 #define SAVE_TEMPLATE(...) \
 template<class Archive> \
 void save(Archive &ar) const { \
@@ -38,7 +41,7 @@ void load(Archive &ar) {\
 try{\
 ar(__VA_ARGS__); \
 }catch (std::exception ex) {\
-std::cout << "Could not parse data" << std::endl;\
+ERROR("Could not parse data");\
 }\
 }
 
@@ -56,7 +59,7 @@ archive(DATA);\
 
 #define PARSE_TEMPLATE(D, P) { \
     if (std::filesystem::exists(P)) {\
-        std::cout << "Loading " << P << std::endl;\
+        LOG("Loading {}", P);\
         std::ifstream os(P, std::ios::binary);\
         cereal::BinaryInputArchive archive(os);\
         D(archive);\

@@ -6,12 +6,14 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include "context/ApplicationContext.h"
+#include "util/Logger.h"
 
 int main(int, char **) {
+    Logger::Init();
     Metal::ApplicationContext context{ true};
 
     if (!context.isValidContext()) {
-        printf("GLFW: Vulkan Not Supported\n");
+        ERROR("GLFW: Vulkan Not Supported");
         return 1;
     }
     context.start();

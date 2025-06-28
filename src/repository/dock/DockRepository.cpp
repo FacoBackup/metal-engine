@@ -4,7 +4,7 @@ namespace Metal {
     DockRepository::DockRepository() {
         auto rightUp = DockDTO{{DockSpace::HIERARCHY.index}};
         auto rightDown = DockDTO{{DockSpace::INSPECTOR.index}};
-        auto downLeft = DockDTO{{DockSpace::CANVAS.index}};
+        auto downLeft = DockDTO{{DockSpace::CONSOLE.index}};
         auto downRight = DockDTO{{DockSpace::FILES.index}};
 
         center.sizeRatioForNodeAtDir = 0.17f;

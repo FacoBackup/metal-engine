@@ -1,7 +1,7 @@
 #include "ShaderUtil.h"
 
 #include <regex>
-
+#include "Logger.h"
 #include "../service/pipeline/ShaderModule.h"
 #include "../util/VulkanUtils.h"
 #include "../util/Util.h"
@@ -65,7 +65,7 @@ namespace Metal {
         shaderModule->initialize(program);
 
         if (const char *spirv_messages = glslang_program_SPIRV_get_messages(program)) {
-            printf("SPIR-V message: '%s'", spirv_messages);
+            WARN("SPIR-V message: {}", spirv_messages);
         }
 
         VkShaderModuleCreateInfo shaderCreateInfo{};
@@ -127,7 +127,7 @@ namespace Metal {
                 FilesUtil::ReadFile((BASE_PATH + includeFile).c_str(), source);
                 result.replace(match.position(0), match.length(0), source);
             } catch (const std::exception &e) {
-                std::cerr << "Error loading included shader: " << e.what() << std::endl;
+                ERROR("Error loading included shader: {}", e.what());
                 return "";
             }
         }
@@ -173,6 +173,7 @@ namespace Metal {
                                        shader.SPIRV.size() * sizeof(unsigned int));
         }
         glslang_finalize_process();
+        LOG("Success!");
         return shader.vkShaderModule;
     }
 }

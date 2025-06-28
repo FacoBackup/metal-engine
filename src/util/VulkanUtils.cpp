@@ -1,12 +1,13 @@
 #include "VulkanUtils.h"
 
+#include "Logger.h"
 #include "../../dependencies/vk-bootstrap/src/VkBootstrap.h"
 
 namespace Metal {
     void VulkanUtils::CheckVKResult(VkResult err) {
         if (err == VK_SUCCESS)
             return;
-        printf("[runtime] Error: VkResult = %d\n", err);
+        ERROR("[runtime] Error: VkResult = {}", std::to_string(err));
         if (err < VK_SUCCESS)
             abort();
     }

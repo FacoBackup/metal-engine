@@ -2,6 +2,7 @@
 
 #include "VkBootstrap.h"
 #include "../../util/VulkanUtils.h"
+#include "../../util/Logger.h"
 #include "../ApplicationContext.h"
 
 namespace Metal {
@@ -131,7 +132,7 @@ namespace Metal {
                                           void *pUserData) {
         const auto severity = vkb::to_string_message_severity(messageSeverity);
         const auto type = vkb::to_string_message_type(messageType);
-        printf("[%s: %s] %s\n", severity, type, pCallbackData->pMessage);
+        LOG("[{}: {}] {}", severity, type, pCallbackData->pMessage);
         return VK_FALSE;
     }
 

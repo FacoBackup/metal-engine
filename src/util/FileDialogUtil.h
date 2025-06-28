@@ -1,6 +1,6 @@
 #ifndef FILEDIALOGUTIL_H
 #define FILEDIALOGUTIL_H
-#include <iostream>
+#include "Logger.h"
 #include <string>
 #include <vector>
 #include <nfd.hpp>
@@ -13,7 +13,7 @@ namespace Metal:: FileDialogUtil {
 
         nfdresult_t result = NFD::OpenDialogMultiple(outPaths, filtersToApply.data(), 2);
         if (result == NFD_OKAY) {
-            std::cout << "Success!" << std::endl;
+            LOG("Success!");
 
             nfdpathsetsize_t numPaths;
             NFD::PathSet::Count(outPaths, numPaths);

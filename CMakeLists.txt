@@ -22,8 +22,6 @@ add_executable(
         src/context/gui/GuiContext.h
         src/context/editor/dock-spaces/viewport/ViewportPanel.cpp
         src/context/editor/dock-spaces/viewport/ViewportPanel.h
-        src/context/editor/dock-spaces/canvas/CanvasPanel.cpp
-        src/context/editor/dock-spaces/canvas/CanvasPanel.h
         src/context/editor/dock-spaces/docks/AbstractDockPanel.h
         src/context/ApplicationContext.cpp
         src/context/ApplicationContext.h
@@ -250,36 +248,10 @@ add_executable(
         src/dto/buffers/MaterialInfo.h
         src/dto/buffers/MaterialInfo.cpp
         src/dto/buffers/MaterialInfoData.h
-        src/service/scripting/ScriptService.cpp
-        src/service/scripting/ScriptService.h
-        src/dto/scripting/abstract/AbstractDraggable.h
-        src/dto/scripting/Link.h
-        src/dto/scripting/ScriptInstance.cpp
-        src/dto/scripting/ScriptInstance.h
-        src/dto/scripting/script-definitions.h
-        src/dto/scripting/impl/nodes/AndNode.h
-        src/dto/scripting/impl/types/BooleanType.h
-        src/dto/scripting/abstract/AbstractTypeNode.h
-        src/dto/scripting/IO.h
-        src/dto/scripting/impl/types/FlowType.h
-        src/dto/scripting/impl/nodes/StartNode.h
-        src/dto/scripting/impl/nodes/StartNode.cpp
-        src/dto/scripting/impl/nodes/AndNode.cpp
-        src/dto/scripting/NodeType.h
-        src/context/editor/dock-spaces/canvas/components/CanvasHeaderPanel.cpp
-        src/context/editor/dock-spaces/canvas/components/CanvasHeaderPanel.h
-        src/context/editor/dock-spaces/canvas/components/NodePanel.cpp
-        src/context/editor/dock-spaces/canvas/components/NodePanel.h
-        src/context/editor/dock-spaces/canvas/components/LinkPanel.cpp
-        src/context/editor/dock-spaces/canvas/components/LinkPanel.h
-        src/context/editor/dock-spaces/canvas/components/IOPanel.cpp
-        src/context/editor/dock-spaces/canvas/components/IOPanel.h
-        src/context/editor/dock-spaces/canvas/CanvasUtil.h
-        src/dto/scripting/abstract/AbstractScriptNode.h
-        src/dto/scripting/abstract/AbstractVariable.h
         src/service/volume/VolumeService.cpp
         src/service/volume/VolumeService.h
         src/repository/dock/DockViewDTO.h
+        src/util/Logger.h
 )
 
 

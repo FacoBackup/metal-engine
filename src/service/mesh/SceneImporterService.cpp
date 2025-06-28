@@ -11,6 +11,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include "../../util/FilesUtil.h"
+#include "../../util/Logger.h"
 #include "../../dto/file/FileMetadata.h"
 #include "../../dto/buffers/MaterialInfo.h"
 #include "../../enum/engine-definitions.h"
@@ -19,7 +20,6 @@
 #include <unordered_map>
 #include <../../dependencies/stb/stb_image_write.h>
 #include <cereal/archives/binary.hpp>
-
 #include "../../context/ApplicationContext.h"
 
 #define TEXTURE_P context.textureImporter.importTexture(targetDir, rootDirectory + "/" + texturePath.data)
@@ -105,7 +105,7 @@ namespace Metal
 
         if (!scene || !scene->HasMeshes())
         {
-            std::cerr << "Error loading scene: " << importer.GetErrorString() << std::endl;
+            ERROR("Error loading scene: {}", importer.GetErrorString());
             return;
         }
 
@@ -150,7 +150,7 @@ namespace Metal
                 increment++;
             }
             catch (std::exception e){
-                std::cout << e.what() << std::endl;
+                ERROR("{}", e.what());
             }
         }
 
