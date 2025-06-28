@@ -7,12 +7,15 @@
 #include "../../service/camera/Camera.h"
 #include "../../service/framebuffer/FrameBufferInstance.h"
 
-namespace Metal {
-    void EngineContext::onInitialize() {
+namespace Metal
+{
+    void EngineContext::onInitialize()
+    {
         context.passesService.onInitialize();
     }
 
-    void EngineContext::updateCurrentTime() {
+    void EngineContext::updateCurrentTime()
+    {
         currentTime = Clock::now();
         std::chrono::duration<float> delta = currentTime - previousTime;
         deltaTime = delta.count();
@@ -21,31 +24,41 @@ namespace Metal {
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime.time_since_epoch());
         currentTimeMs = duration.count();
 
-        if (start == -1) {
+        if (start == -1)
+        {
             start = currentTimeMs;
         }
     }
 
-    void EngineContext::dispatchBVHBuild() {
+    void EngineContext::dispatchBVHBuild()
+    {
         isBVHReady = false;
         dispatchTLASUpdate();
     }
 
-    void EngineContext::dispatchTLASUpdate() {
+    void EngineContext::dispatchTLASUpdate()
+    {
         isTLASReady = false;
     }
 
-    void EngineContext::updateTLASInternal() {
+    void EngineContext::updateTLASInternal()
+    {
         std::vector<glm::mat4x4> transformations{};
         std::vector<MaterialInfoData> materials{};
         transformations.reserve(rtTLASCount);
-        for (auto &tlas: rtTopLevelStructures) {
+        for (auto& tlas : rtTopLevelStructures)
+        {
             auto entity = tlas.id;
-            auto &transformComponent = context.worldRepository.transforms.at(entity);
-            auto &meshComponent = context.worldRepository.meshes.at(entity);
+            if (!context.worldRepository.transforms.contains(entity))
+            {
+                continue;
+            }
+            auto& transformComponent = context.worldRepository.transforms.at(entity);
+            auto& meshComponent = context.worldRepository.meshes.at(entity);
             tlas.invTransform = inverse(transformComponent.model);
-            auto *streamed = context.streamingRepository.streamMaterial(meshComponent.materialId);
-            if (streamed != nullptr) {
+            auto* streamed = context.streamingRepository.streamMaterial(meshComponent.materialId);
+            if (streamed != nullptr)
+            {
                 materials.push_back(MaterialInfoData{
                     streamed->baseColor,
                     streamed->subsurface,
@@ -64,7 +77,9 @@ namespace Metal {
                     streamed->absorption
                 });
                 tlas.materialId = materials.size() - 1;
-            } else {
+            }
+            else
+            {
                 tlas.materialId = -1;
             }
         }
@@ -75,8 +90,10 @@ namespace Metal {
                                                    materials.size() * sizeof(MaterialInfoData));
     }
 
-    void EngineContext::onSync() {
-        if (!isBVHReady) {
+    void EngineContext::onSync()
+    {
+        if (!isBVHReady)
+        {
             auto bvh = context.bvhBuilderService.buildBVH();
             rtTopLevelStructures = bvh.tlas;
             rtTLASCount = rtTopLevelStructures.size();
@@ -87,7 +104,8 @@ namespace Metal {
             isBVHReady = true;
         }
 
-        if (!isTLASReady) {
+        if (!isTLASReady)
+        {
             updateTLASInternal();
             isTLASReady = true;
         }
@@ -98,7 +116,8 @@ namespace Metal {
         context.streamingRepository.onSync();
         context.cameraService.onSync();
 
-        if (lightVolumeDataNeedsUpdate) {
+        if (lightVolumeDataNeedsUpdate)
+        {
             context.lightsService.update();
             context.volumesService.update();
         }
@@ -112,10 +131,11 @@ namespace Metal {
         setWorldChange(false);
     }
 
-    void EngineContext::updateGlobalData() {
+    void EngineContext::updateGlobalData()
+    {
         context.lightsService.computeSunInfo();
 
-        auto &camera = context.worldRepository.camera;
+        auto& camera = context.worldRepository.camera;
         globalDataUBO.viewMatrix = camera.viewMatrix;
         globalDataUBO.projectionMatrix = camera.projectionMatrix;
         globalDataUBO.projView = camera.projViewMatrix;
@@ -144,7 +164,8 @@ namespace Metal {
         globalDataUBO.surfaceCacheHeight = SURFACE_CACHE_RES;
         globalDataUBO.globalFrameCount++;
 
-        if (context.engineRepository.incrementTime) {
+        if (context.engineRepository.incrementTime)
+        {
             context.engineRepository.elapsedTime += .0005f * context.engineRepository.elapsedTimeSpeed;
             setGISettingsUpdated(true);
             lightVolumeDataNeedsUpdate = true;
