@@ -1,6 +1,6 @@
 #ifndef DESCRIPTORBINDING_H
 #define DESCRIPTORBINDING_H
-
+#include <memory>
 #include "vulkan/vulkan.h"
 
 namespace Metal {

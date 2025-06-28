@@ -1,6 +1,8 @@
 #ifndef INSPECTEDFIELD_H
 #define INSPECTEDFIELD_H
 
+#include <optional>
+
 #include "InspectableMember.h"
 #include "../../enum/EntryType.h"
 

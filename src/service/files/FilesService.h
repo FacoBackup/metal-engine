@@ -1,5 +1,6 @@
 #ifndef FILESSERVICE_H
 #define FILESSERVICE_H
+#include <memory>
 #include <string>
 #include <unordered_map>
 

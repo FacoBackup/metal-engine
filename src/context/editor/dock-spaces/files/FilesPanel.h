@@ -1,7 +1,7 @@
 #ifndef FILESPANEL_H
 #define FILESPANEL_H
+#include <functional>
 #include <imgui.h>
-#include <__functional/function.h>
 
 #include "FilesContext.h"
 #include "../docks/AbstractDockPanel.h"
@@ -35,7 +35,7 @@ namespace Metal {
 
         void onSync() override;
 
-        static static void SetIconPos(const char *text);
+        static void SetIconPos(const char *text);
 
         void renderItem(FileEntry *root);
 

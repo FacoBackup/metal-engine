@@ -113,9 +113,9 @@ namespace Metal {
     }
 
     void FilesPanel::SetIconPos(const char *text) {
-        const auto windowWidth = ImGui::GetWindowSize().x;
-        const auto windowHeight = ImGui::GetWindowSize().y;
-        const auto textWidth = ImGui::CalcTextSize(text).x;
+        const float windowWidth = ImGui::GetWindowSize().x;
+        const float windowHeight = ImGui::GetWindowSize().y;
+        const float textWidth = ImGui::CalcTextSize(text).x;
         ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
         ImGui::SetCursorPosY((windowHeight - LARGE_FONT_SIZE * 2) * 0.5f);
     }

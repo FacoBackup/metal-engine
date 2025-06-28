@@ -20,8 +20,8 @@ namespace Metal {
 
         int wW{}, hW{};
         glfwGetWindowSize(window, &wW, &hW);
-        this->w = static_cast<uint32_t>(wW);
-        this->h = static_cast<uint32_t>(hW);
+        this->w = static_cast<unsigned int>(wW);
+        this->h = static_cast<unsigned int>(hW);
     }
 
     void VulkanContext::createQueue() {
@@ -33,7 +33,7 @@ namespace Metal {
         std::vector<vkb::CustomQueueDescription> queue_descriptions;
         auto queue_families = physDevice.get_queue_families();
         bool found = false;
-        for (uint32_t i = 0; i < static_cast<uint32_t>(queue_families.size()); i++) {
+        for (unsigned int i = 0; i < static_cast<unsigned int>(queue_families.size()); i++) {
             if (queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
                 found = true;
                 queueFamily = i;

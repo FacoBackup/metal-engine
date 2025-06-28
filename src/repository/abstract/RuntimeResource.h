@@ -1,5 +1,7 @@
 #ifndef IGPURESOURCE_H
 #define IGPURESOURCE_H
+#include <chrono>
+
 #include "../../enum/ResourceType.h"
 #include "../../util/Util.h"
 

@@ -3,7 +3,7 @@
 #include <vector>
 #include "../../../service/pipeline/PipelineInstance.h"
 #include "../../../util/VulkanUtils.h"
-
+#include <array>
 namespace Metal {
     class AbstractPass;
     class ApplicationContext;

@@ -1,14 +1,12 @@
 #ifndef GIZMOSETTINGSPANEL_H
 #define GIZMOSETTINGSPANEL_H
 #include <imgui.h>
-
+#include <array>
 #include "../../abstract/AbstractPanel.h"
 
 namespace Metal {
     struct EditorRepository;
-}
 
-namespace Metal {
     class GizmoSettingsPanel final : public AbstractPanel {
         static constexpr ImVec2 SPACING = ImVec2(0, 0);
         static constexpr const char *SNAP_ROTATE_OPTIONS = "5\0 10\0 15\0 30\0 45\0";

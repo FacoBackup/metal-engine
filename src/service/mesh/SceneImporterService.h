@@ -4,6 +4,7 @@
 #include <assimp/scene.h>
 
 #include "../abstract/AbstractImporter.h"
+#include <unordered_map>
 
 namespace Metal {
     struct LevelOfDetail;

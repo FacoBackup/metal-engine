@@ -1,6 +1,7 @@
 #ifndef RENDERPASSSERVICE_H
 #define RENDERPASSSERVICE_H
 
+#include <memory>
 #include <glm/vec4.hpp>
 #include <vulkan/vulkan_core.h>
 

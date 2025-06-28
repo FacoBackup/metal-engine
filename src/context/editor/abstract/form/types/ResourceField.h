@@ -1,6 +1,8 @@
 #ifndef RESOURCEFIELD_H
 #define RESOURCEFIELD_H
 
+#include <memory>
+
 #include "../../AbstractPanel.h"
 #include "../../../../../common/inspection/InspectedField.h"
 #include "imgui.h"

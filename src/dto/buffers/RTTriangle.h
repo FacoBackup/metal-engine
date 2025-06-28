@@ -1,7 +1,7 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
-#include <../../../cmake-build-debug/vcpkg_installed/arm64-osx/include/glm/vec2.hpp>
-#include <../../../cmake-build-debug/vcpkg_installed/arm64-osx/include/glm/vec3.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
 
 namespace Metal {
     struct RTTriangle final {

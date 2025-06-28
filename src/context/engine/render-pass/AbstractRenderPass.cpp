@@ -6,7 +6,7 @@ namespace Metal {
     AbstractRenderPass::AbstractRenderPass(ApplicationContext &context) : AbstractPass(context, false) {
     }
 
-    void AbstractRenderPass::recordDrawSimpleInstanced(const uint32_t vertexCount, const uint32_t instanceCount) const {
+    void AbstractRenderPass::recordDrawSimpleInstanced(const unsigned int vertexCount, const unsigned int instanceCount) const {
         vkCmdDraw(vkCommandBuffer, vertexCount, instanceCount, 0, 0);
     }
 

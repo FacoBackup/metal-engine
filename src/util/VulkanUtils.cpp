@@ -34,9 +34,9 @@ namespace Metal {
         throw std::runtime_error("Failed to find a suitable depth format!");
     }
 
-    uint32_t VulkanUtils::GetMemTypeIndex(const VkPhysicalDeviceMemoryProperties &deviceMemProps, uint32_t typeBits,
+    unsigned int VulkanUtils::GetMemTypeIndex(const VkPhysicalDeviceMemoryProperties &deviceMemProps, unsigned int typeBits,
                                           VkFlags properties) {
-        for (uint32_t i = 0; i < 32; i++) {
+        for (unsigned int i = 0; i < 32; i++) {
             if ((typeBits & 1) == 1) {
                 if ((deviceMemProps.memoryTypes[i].propertyFlags & properties) == properties) {
                     return i;

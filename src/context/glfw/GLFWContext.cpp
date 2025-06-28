@@ -91,9 +91,9 @@ namespace Metal {
                 validContext = false;
             } else {
                 validContext = true;
-                uint32_t extensions_count = 0;
+                unsigned int extensions_count = 0;
                 const char **glfw_extensions = glfwGetRequiredInstanceExtensions(&extensions_count);
-                for (uint32_t i = 0; i < extensions_count; i++)
+                for (unsigned int i = 0; i < extensions_count; i++)
                     instance_extensions.push_back(glfw_extensions[i]);
             }
         }

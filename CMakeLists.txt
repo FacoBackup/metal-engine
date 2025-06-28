@@ -328,7 +328,7 @@ file(COPY "${CMAKE_SOURCE_DIR}/resources" DESTINATION "${CMAKE_BINARY_DIR}/")
 # ------ STATIC RESOURCES
 
 # ------ VCPKG
-set(CMAKE_TOOLCHAIN_FILE "/Users/gustavoroque/vcpkg/scripts/buildsystems/vcpkg.cmake")
+set(CMAKE_TOOLCHAIN_FILE "C:/Users/cafe/.vcpkg-clion/vcpkg/scripts/buildsystems/vcpkg.cmake")
 set(VCPKG_JSON_PATH "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg.json")
 
 # Include vcpkg toolchain

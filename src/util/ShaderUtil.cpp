@@ -70,8 +70,8 @@ namespace Metal {
 
         VkShaderModuleCreateInfo shaderCreateInfo{};
         shaderCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        shaderCreateInfo.codeSize = shaderModule->SPIRV.size() * sizeof(uint32_t);
-        shaderCreateInfo.pCode = static_cast<const uint32_t *>(shaderModule->SPIRV.data());
+        shaderCreateInfo.codeSize = shaderModule->SPIRV.size() * sizeof(unsigned int);
+        shaderCreateInfo.pCode = static_cast<const unsigned int *>(shaderModule->SPIRV.data());
 
         VulkanUtils::CheckVKResult(vkCreateShaderModule(context.device.device, &shaderCreateInfo,
                                                         nullptr,
@@ -170,7 +170,7 @@ namespace Metal {
             const std::string BinaryFilename = basePath + part.substr(
                                                    part.find_last_of('/') + 1, part.size()) + ".spv";
             FilesUtil::WriteBinaryFile(BinaryFilename.c_str(), shader.SPIRV.data(),
-                                       shader.SPIRV.size() * sizeof(uint32_t));
+                                       shader.SPIRV.size() * sizeof(unsigned int));
         }
         glslang_finalize_process();
         return shader.vkShaderModule;

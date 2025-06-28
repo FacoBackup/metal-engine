@@ -16,6 +16,7 @@
 #include "../../enum/engine-definitions.h"
 #include "../../enum/LevelOfDetail.h"
 #include <meshoptimizer.h>
+#include <unordered_map>
 #include <../../dependencies/stb/stb_image_write.h>
 #include <cereal/archives/binary.hpp>
 
@@ -143,7 +144,7 @@ namespace Metal {
         size_t targetIndexCount = indexCount / levelOfDetail.level;
 
         // Prepare buffers for the simplified mesh
-        std::vector<uint32_t> simplifiedIndices(indexCount);
+        std::vector<unsigned int> simplifiedIndices(indexCount);
         float target_error = 1e-2f;
         float lod_error = 0.f;
 

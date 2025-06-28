@@ -60,7 +60,7 @@ namespace Metal {
         }
 
         vkUpdateDescriptorSets(context.device.device,
-                               static_cast<uint32_t>(writeDescriptorSets.size()),
+                               static_cast<unsigned int>(writeDescriptorSets.size()),
                                writeDescriptorSets.data(),
                                0,
                                nullptr);

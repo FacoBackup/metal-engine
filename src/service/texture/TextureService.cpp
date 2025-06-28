@@ -29,7 +29,7 @@ namespace Metal {
         region.imageSubresource.layerCount = layerCount;
 
         region.imageOffset = {0, 0, 0};
-        region.imageExtent = {static_cast<uint>(image->width), static_cast<uint>(image->height), 1};
+        region.imageExtent = {static_cast<unsigned int>(image->width), static_cast<unsigned int>(image->height), 1};
 
         vkCmdCopyBufferToImage(
             commandBuffer,
@@ -118,7 +118,7 @@ namespace Metal {
         imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
         imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
         imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        imageInfo.extent = {static_cast<uint32_t>(width), static_cast<uint32_t>(height), 1};
+        imageInfo.extent = {static_cast<unsigned int>(width), static_cast<unsigned int>(height), 1};
         imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT |
                           VK_IMAGE_USAGE_SAMPLED_BIT;
 
@@ -149,7 +149,7 @@ namespace Metal {
         image->height = height;
         image->channels = channels;
         image->mipLevels = generateMipMaps
-                               ? static_cast<uint32_t>(std::floor(std::log2(std::max(image->width, image->height)))) + 1
+                               ? static_cast<unsigned int>(std::floor(std::log2(std::max(image->width, image->height)))) + 1
                                : 1;
         image->vkFormat = imageFormat;
         std::cout << "Loading texture " << id << " from " << pathToImage << std::endl;
@@ -252,7 +252,7 @@ namespace Metal {
         int32_t mipWidth = image->width;
         int32_t mipHeight = image->height;
 
-        for (uint32_t i = 1; i < image->mipLevels; i++) {
+        for (unsigned int i = 1; i < image->mipLevels; i++) {
             barrier.subresourceRange.baseMipLevel = i - 1;
             barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
             barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;

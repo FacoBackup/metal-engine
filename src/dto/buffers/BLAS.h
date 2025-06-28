@@ -1,6 +1,6 @@
 #ifndef BOTTOMLEVELACCELERATIONSTRUCTURE_H
 #define BOTTOMLEVELACCELERATIONSTRUCTURE_H
-#include <../../../cmake-build-debug/vcpkg_installed/arm64-osx/include/glm/vec3.hpp>
+#include <glm/vec3.hpp>
 #include "../../service/rt/data/BVHBoundingBox.h"
 
 namespace Metal {

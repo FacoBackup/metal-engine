@@ -4,7 +4,7 @@
 #include <glm/fwd.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/detail/type_quat.hpp>
-
+#include <array>
 #include "../../abstract/AbstractPanel.h"
 
 namespace Metal {

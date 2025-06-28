@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <glm/vec3.hpp>
-
+#include <array>
 #include "FrameBufferInstance.h"
 #include "../../util/VulkanUtils.h"
 #include "FrameBufferAttachment.h"
@@ -123,7 +123,7 @@ namespace Metal {
         std::vector<VkAttachmentDescription> attachmentDescriptions{};
         std::vector<VkAttachmentReference> colorReferences{};
         VkAttachmentReference *depthRef = nullptr;
-        for (uint32_t i = 0; i < framebuffer->attachments.size(); i++) {
+        for (unsigned int i = 0; i < framebuffer->attachments.size(); i++) {
             VkAttachmentDescription &attachmentDescription = attachmentDescriptions.emplace_back();
             const std::shared_ptr<FrameBufferAttachment> fbAttachment = framebuffer->attachments[i];
             attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
