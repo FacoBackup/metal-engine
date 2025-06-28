@@ -20,7 +20,7 @@ namespace Metal {
             attachment->imageDescriptor = std::make_unique<DescriptorInstance>();
             attachment->imageDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
                 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
-                framebuffer->vkImageSampler,
+                context.coreDescriptorSets.vkImageSampler,
                 attachment->vkImageView));
             attachment->imageDescriptor->create(context.vulkanContext);
         }

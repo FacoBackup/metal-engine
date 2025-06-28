@@ -18,12 +18,10 @@ namespace Metal {
         glm::vec4 clearColor;
         VkRenderPass vkRenderPass = VK_NULL_HANDLE;
         VkFramebuffer vkFramebuffer = VK_NULL_HANDLE;
-        VkSampler vkImageSampler = VK_NULL_HANDLE;
         std::vector<std::shared_ptr<FrameBufferAttachment> > attachments{};
 
         void dispose(VulkanContext &context) override {
             std::cout << "Disposing framebuffer instance" << std::endl;
-            vkDestroySampler(context.device.device, vkImageSampler, nullptr);
             vkDestroyFramebuffer(context.device.device, vkFramebuffer, nullptr);
             vkDestroyRenderPass(context.device.device, vkRenderPass, nullptr);
 

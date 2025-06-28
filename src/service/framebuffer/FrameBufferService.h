@@ -31,7 +31,7 @@ namespace Metal {
             : AbstractResourceService(context) {
         }
 
-        void createSampler(bool linear, VkSampler vkImageSampler);
+        void createSampler(bool linear, VkSampler &vkImageSampler);
 
         FrameBufferInstance *createFrameBuffer(unsigned w, unsigned h, glm::vec4 clearColor = glm::vec4(0.0f));
 

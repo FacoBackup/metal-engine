@@ -8,7 +8,7 @@
 #include "FrameBufferAttachment.h"
 
 namespace Metal {
-    void FrameBufferService::createSampler(bool linear, VkSampler vkImageSampler) {
+    void FrameBufferService::createSampler(bool linear, VkSampler &vkImageSampler) {
         VkSamplerCreateInfo samplerCreateInfo{};
         samplerCreateInfo.magFilter = linear ? VK_FILTER_LINEAR : VK_FILTER_NEAREST;
         samplerCreateInfo.minFilter = linear ? VK_FILTER_LINEAR : VK_FILTER_NEAREST;

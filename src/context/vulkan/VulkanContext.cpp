@@ -70,9 +70,9 @@ namespace Metal {
         features.shaderInt64 = true;
         features.multiDrawIndirect = true;
         features.drawIndirectFirstInstance = true;
-        features.textureCompressionBC = true;
-        features.textureCompressionETC2 = true;
-        features.textureCompressionASTC_LDR = true;
+        // features.textureCompressionBC = true;
+        // features.textureCompressionETC2 = true;
+        // features.textureCompressionASTC_LDR = true;
         // required_features.fillModeNonSolid = true; // Wireframe?
 
         physDeviceSelector.set_required_features(features);
