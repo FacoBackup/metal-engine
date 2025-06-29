@@ -5,17 +5,12 @@
 #define VMA_IMPLEMENTATION
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include "context/ApplicationContext.h"
-#include "util/Logger.h"
+#include "MetalContextProvider.h"
+#include "common/Logger.h"
 
 int main(int, char **) {
     Logger::Init();
-    Metal::ApplicationContext context{ true};
+    Metal::ContextProvider::Initialize(true);
 
-    if (!context.isValidContext()) {
-        ERROR("GLFW: Vulkan Not Supported");
-        return 1;
-    }
-    context.start();
     return 0;
 }

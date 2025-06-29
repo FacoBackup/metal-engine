@@ -7,8 +7,8 @@
 #include <glm/fwd.hpp>
 
 #include "InspectableMember.h"
-#include "../../util/Util.h"
-#include "../../enum/EntryType.h"
+#include "../../common/Util.h"
+#include "../../common/enum/EntryType.h"
 
 namespace Metal {
     class ApplicationContext;
@@ -93,7 +93,7 @@ namespace Metal {
             throw std::logic_error("Not implemented");
         }
 
-        virtual void onUpdate(InspectableMember *member, ApplicationContext &context) {
+        virtual void onUpdate(InspectableMember *member) {
         }
     };
 }
