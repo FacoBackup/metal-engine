@@ -4,32 +4,47 @@
 #include <nfd.h>
 #include <cereal/archives/binary.hpp>
 
-#include "../util/FilesUtil.h"
-#include "../util/VulkanUtils.h"
+#include "../common/FilesUtil.h"
+#include "../renderer/util/VulkanUtils.h"
 
-#include "../util/FileDialogUtil.h"
+#include "../ui/util/FileDialogUtil.h"
 
-namespace Metal {
-    void ApplicationContext::updateRootPath(bool forceSelection) {
+namespace Metal
+{
+    ApplicationSingletons& ApplicationContext::getSingletons() const
+    {
+        return *applicationSingletons;
+    }
+
+    void ApplicationContext::updateRootPath(bool forceSelection)
+    {
         std::string cachedPath;
         std::string cachePathFile = std::filesystem::current_path().string() + CACHED_PATH;
         FilesUtil::ReadFile(cachePathFile.c_str(), cachedPath);
         cachedPath.erase(std::ranges::remove(cachedPath, '\n').begin(), cachedPath.cend());
-        if (cachedPath.empty() || forceSelection || !fs::exists(cachedPath)) {
+        if (cachedPath.empty() || forceSelection || !fs::exists(cachedPath))
+        {
             rootDirectory = FileDialogUtil::SelectDirectory();
             rootDirectory.erase(std::ranges::remove(rootDirectory, '\n').begin(), rootDirectory.cend());
-            if (rootDirectory.empty()) {
+            if (rootDirectory.empty())
+            {
                 throw std::runtime_error("No directory selected.");
             }
             save();
             FilesUtil::WriteFile(cachePathFile.c_str(), rootDirectory.c_str());
-        } else {
+        }
+        else
+        {
             rootDirectory = cachedPath;
         }
-        PARSE_TEMPLATE(editorRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(EditorRepository))
-        PARSE_TEMPLATE(engineRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(EngineRepository))
-        PARSE_TEMPLATE(worldRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository))
-        PARSE_TEMPLATE(dockRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(DockRepository))
+        PARSE_TEMPLATE(applicationSingletons->editorRepository.load,
+                       rootDirectory + "/" + HASH_OF_CLASS_NAME(EditorRepository))
+        PARSE_TEMPLATE(applicationSingletons->engineRepository.load,
+                       rootDirectory + "/" + HASH_OF_CLASS_NAME(EngineRepository))
+        PARSE_TEMPLATE(applicationSingletons->worldRepository.load,
+                       rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository))
+        PARSE_TEMPLATE(applicationSingletons->dockRepository.load,
+                       rootDirectory + "/" + HASH_OF_CLASS_NAME(DockRepository))
 
 
         FilesUtil::MkDir(getShadersDirectory());
@@ -37,76 +52,98 @@ namespace Metal {
         FilesUtil::MkDir(getAssetDirectory());
     }
 
-    unsigned int ApplicationContext::getFrameIndex() const {
-        return vulkanContext.imguiVulkanWindow.FrameIndex;
+    unsigned int ApplicationContext::getFrameIndex() const
+    {
+        return applicationSingletons->vulkanContext.imguiVulkanWindow.FrameIndex;
     }
 
-    void ApplicationContext::start() {
+    void ApplicationContext::start()
+    {
+        applicationSingletons = std::make_unique<ApplicationSingletons>();
         NFD_Init();
 
         updateRootPath(false);
 
-        glfwContext.onInitialize();
-        if (!glfwContext.isValidContext()) {
+        applicationSingletons->glfwContext.onInitialize();
+        if (!applicationSingletons->glfwContext.isValidContext())
+        {
             throw std::runtime_error("Could not create window");
         }
-        vulkanContext.onInitialize();
-        guiContext.onInitialize();
-        filesService.onInitialize();
-        editorPanel.onInitialize();
-        engineContext.onInitialize();
+        applicationSingletons->vulkanContext.onInitialize();
+        applicationSingletons->guiContext.onInitialize();
+        applicationSingletons->filesService.onInitialize();
+        applicationSingletons->editorPanel.onInitialize();
+        applicationSingletons->engineContext.onInitialize();
 
-        GLFWwindow *window = glfwContext.getWindow();
-        while (!glfwWindowShouldClose(window)) {
-            if (glfwContext.beginFrame()) {
+        GLFWwindow* window = applicationSingletons->glfwContext.getWindow();
+        while (!glfwWindowShouldClose(window))
+        {
+            if (applicationSingletons->glfwContext.beginFrame())
+            {
                 GuiContext::BeginFrame();
-                editorPanel.onSync();
+                applicationSingletons->editorPanel.onSync();
                 ImGui::Render();
-                auto *drawData = ImGui::GetDrawData();
+                auto* drawData = ImGui::GetDrawData();
                 const bool main_is_minimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
-                if (!main_is_minimized) {
-                    vulkanContext.getCommandBuffers().clear();
-                    auto &wd = vulkanContext.imguiVulkanWindow;
+                if (!main_is_minimized)
+                {
+                    applicationSingletons->vulkanContext.getCommandBuffers().clear();
+                    auto& wd = applicationSingletons->vulkanContext.imguiVulkanWindow;
                     VkSemaphore imageAcquiredSemaphore = wd.FrameSemaphores[wd.SemaphoreIndex].ImageAcquiredSemaphore;
-                    VkResult err = vkAcquireNextImageKHR(vulkanContext.device.device, wd.Swapchain, UINT64_MAX,
+                    VkResult err = vkAcquireNextImageKHR(applicationSingletons->vulkanContext.device.device,
+                                                         wd.Swapchain, UINT64_MAX,
                                                          imageAcquiredSemaphore, VK_NULL_HANDLE,
                                                          &wd.FrameIndex);
-                    if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR) {
-                        glfwContext.setSwapChainRebuild(true);
+                    if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR)
+                    {
+                        applicationSingletons->glfwContext.setSwapChainRebuild(true);
                         return;
                     }
 
                     VulkanUtils::CheckVKResult(err);
-                    ImGui_ImplVulkanH_Frame *fd = &wd.Frames[getFrameIndex()];
-                    VulkanUtils::CheckVKResult(vkWaitForFences(vulkanContext.device.device, 1, &fd->Fence, VK_TRUE,
+                    ImGui_ImplVulkanH_Frame* fd = &wd.Frames[getFrameIndex()];
+                    VulkanUtils::CheckVKResult(vkWaitForFences(applicationSingletons->vulkanContext.device.device, 1,
+                                                               &fd->Fence, VK_TRUE,
                                                                UINT64_MAX));
-                    VulkanUtils::CheckVKResult(vkResetFences(vulkanContext.device.device, 1, &fd->Fence));
-                    VulkanUtils::CheckVKResult(vkResetCommandPool(vulkanContext.device.device, fd->CommandPool,
+                    VulkanUtils::CheckVKResult(vkResetFences(applicationSingletons->vulkanContext.device.device, 1,
+                                                             &fd->Fence));
+                    VulkanUtils::CheckVKResult(vkResetCommandPool(applicationSingletons->vulkanContext.device.device,
+                                                                  fd->CommandPool,
                                                                   VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT));
-                    engineContext.onSync();
+                    applicationSingletons->engineContext.onSync();
                     GuiContext::RecordImguiCommandBuffer(drawData, err, wd, fd);
-                    vulkanContext.submitFrame(imageAcquiredSemaphore, wd.FrameSemaphores[wd.SemaphoreIndex].
-                                              RenderCompleteSemaphore, fd);
+                    applicationSingletons->vulkanContext.submitFrame(imageAcquiredSemaphore,
+                                                                     wd.FrameSemaphores[wd.SemaphoreIndex].
+                                                                     RenderCompleteSemaphore, fd);
                 }
                 if (!main_is_minimized)
-                    glfwContext.presentFrame();
+                    applicationSingletons->glfwContext.presentFrame();
             }
         }
         NFD_Quit();
-        guiContext.dispose();
-        vulkanContext.dispose();
-        glfwContext.dispose();
+        applicationSingletons->guiContext.dispose();
+        applicationSingletons->vulkanContext.dispose();
+        applicationSingletons->glfwContext.dispose();
     }
 
-    void ApplicationContext::save() {
-        try {
-            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(EditorRepository), editorRepository)
-            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(EngineRepository), engineRepository)
-            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository), worldRepository)
-            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(DockRepository), dockRepository)
-            notificationService.pushMessage("Project saved", NotificationSeverities::SUCCESS);
-        }catch (const std::exception &e) {
-            notificationService.pushMessage("Could not save project", NotificationSeverities::ERROR);
+    void ApplicationContext::save()
+    {
+        try
+        {
+            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(EditorRepository),
+                          applicationSingletons->editorRepository)
+            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(EngineRepository),
+                          applicationSingletons->engineRepository)
+            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository),
+                          applicationSingletons->worldRepository)
+            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(DockRepository),
+                          applicationSingletons->dockRepository)
+            applicationSingletons->notificationService.pushMessage("Project saved", NotificationSeverities::SUCCESS);
+        }
+        catch (const std::exception& e)
+        {
+            applicationSingletons->notificationService.pushMessage("Could not save project",
+                                                                   NotificationSeverities::ERROR);
         }
     }
 }

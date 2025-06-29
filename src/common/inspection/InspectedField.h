@@ -4,7 +4,7 @@
 #include <optional>
 
 #include "InspectableMember.h"
-#include "../../enum/EntryType.h"
+#include "../../common/enum/EntryType.h"
 
 namespace Metal {
     template<typename T>

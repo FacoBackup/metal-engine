@@ -7,8 +7,8 @@
 
 #include "InspectedField.h"
 #include "InspectedMethod.h"
-#include "../../util/Util.h"
-#include "../../enum/EntryType.h"
+#include "../Util.h"
+#include "../enum/EntryType.h"
 
 #define  DECLARATION(T, V) \
         std::shared_ptr<InspectedField<T>> field = std::make_shared<InspectedField<T>>(&v);\
