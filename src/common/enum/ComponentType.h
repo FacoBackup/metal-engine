@@ -7,10 +7,11 @@ namespace Metal::ComponentTypes {
         MESH,
         TRANSFORM,
         LIGHT,
+        CAMERA,
         VOLUME
     };
 
-    static constexpr const char *NAMES = "Add Entity\0Mesh\0Light\0Volume\0";
+    static constexpr const char *NAMES = "Add Entity\0Mesh\0Light\0Volume\0Camera\0";
 
     static ComponentType ValueOfIndex(const int option) {
         if (option == 1) {
@@ -18,6 +19,9 @@ namespace Metal::ComponentTypes {
         }
         if (option == 2) {
             return LIGHT;
+        }
+        if (option == 4) {
+            return CAMERA;
         }
         return VOLUME;
     }
@@ -31,6 +35,8 @@ namespace Metal::ComponentTypes {
             return "Light Component";
         if (mode == VOLUME)
             return "Volume Component";
+        if (mode == CAMERA)
+            return "Camera Component";
         return nullptr;
     }
 
@@ -43,6 +49,8 @@ namespace Metal::ComponentTypes {
             return Icons::lightbulb.c_str();
         if (mode == VOLUME)
             return Icons::blur_on.c_str();
+        if (mode == CAMERA)
+            return Icons::camera.c_str();
         return nullptr;
     }
 }

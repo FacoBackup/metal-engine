@@ -59,6 +59,8 @@ namespace Metal
             return lights.contains(entity) ? &lights.find(entity)->second : nullptr;
         case ComponentTypes::VOLUME:
             return volumes.contains(entity) ? &volumes.find(entity)->second : nullptr;
+        case ComponentTypes::CAMERA:
+            return cameras.contains(entity) ? &cameras.find(entity)->second : nullptr;
         default:
             return nullptr;
         }
@@ -71,6 +73,10 @@ namespace Metal
             if (lights.contains(entity))
             {
                 lights.erase(entity);
+            }
+            if (cameras.contains(entity))
+            {
+                cameras.erase(entity);
             }
             if (volumes.contains(entity))
             {
@@ -165,6 +171,15 @@ namespace Metal
                 lights.emplace(entity, LightComponent{});
                 lights.at(entity).setEntityId(entity);
                 getEntity(entity)->components.push_back(ComponentTypes::LIGHT);
+                createComponent(entity, ComponentTypes::TRANSFORM);
+                SINGLETONS.engineContext.setLightVolumeDataNeedsUpdate(true);
+                break;
+            }
+        case ComponentTypes::CAMERA:
+            {
+                cameras.emplace(entity, CameraComponent{});
+                cameras.at(entity).setEntityId(entity);
+                getEntity(entity)->components.push_back(ComponentTypes::CAMERA);
                 createComponent(entity, ComponentTypes::TRANSFORM);
                 SINGLETONS.engineContext.setLightVolumeDataNeedsUpdate(true);
                 break;

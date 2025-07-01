@@ -15,6 +15,7 @@
 #include "../data/components/MeshComponent.h"
 #include "../data/components/TransformComponent.h"
 #include "../data/components/VolumeComponent.h"
+#include "../data/components/CameraComponent.h"
 
 namespace Metal {
     struct WorldRepository final : AbstractRuntimeComponent{
@@ -28,10 +29,11 @@ namespace Metal {
         std::unordered_map<EntityID, TransformComponent> transforms{};
         std::unordered_map<EntityID, LightComponent> lights{};
         std::unordered_map<EntityID, VolumeComponent> volumes{};
+        std::unordered_map<EntityID, CameraComponent> cameras{};
         std::unordered_map<EntityID, bool> culled{};
         std::unordered_map<EntityID, bool> hiddenEntities{};
 
-        SAVE_TEMPLATE(lastId, culled, hiddenEntities, meshes, transforms, camera, lights, volumes, entities)
+        SAVE_TEMPLATE(lastId, culled, hiddenEntities, meshes, transforms, camera, lights, volumes, entities, cameras)
 
         void createComponent(EntityID entity, ComponentTypes::ComponentType type);
 
