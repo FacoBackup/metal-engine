@@ -1,6 +1,6 @@
 #ifndef DOCKVIEWDTO_H
 #define DOCKVIEWDTO_H
-#include "../../common/serialization-definitions.h"
+#include "../../../common/serialization-definitions.h"
 
 namespace Metal {
     class AbstractDockPanel;

@@ -4,10 +4,10 @@
 #include <string>
 #include <imgui.h>
 #include "DockSpace.h"
-#include "../data/dock/DockPosition.h"
+#include "DockPosition.h"
 #include "DockViewDTO.h"
-#include "../../common/Util.h"
-#include "../../common/serialization-definitions.h"
+#include "../../../common/Util.h"
+#include "../../../common/serialization-definitions.h"
 
 namespace Metal {
     struct DockDTO {
