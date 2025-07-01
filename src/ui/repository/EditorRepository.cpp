@@ -13,6 +13,7 @@ namespace Metal {
     void EditorRepository::registerFields() {
         registerColor(accentColor, "", "Accent color");
         registerBool(showIcons, "", "Show icons?");
+        registerBool(isDarkMode, "", "Dark?");
         registerBool(showGrid, "", "Show grid?");
         registerFloat(gridScale, "", "Grid Scale");
         registerInt(gridThreshold, "", "Grid Threshold");

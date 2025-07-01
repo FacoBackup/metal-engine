@@ -17,7 +17,6 @@
 #include "../renderer/service/BufferService.h"
 #include "../renderer/service/DescriptorService.h"
 #include "../ui/service/ThemeService.h"
-#include "../ui/service/DockService.h"
 #include "../ui/service/SelectionService.h"
 #include "../renderer/service/SceneImporterService.h"
 #include "../renderer/service/TextureImporterService.h"
@@ -30,7 +29,6 @@
 #include "../runtime/repository/RuntimeRepository.h"
 #include "../renderer/service/StreamingService.h"
 #include "../runtime/repository/EngineRepository.h"
-#include "../ui/repository/DockRepository.h"
 #include "../ui/repository/EditorRepository.h"
 #include "../renderer/service/MaterialService.h"
 #include "../ui/service/NotificationService.h"
@@ -69,7 +67,6 @@ namespace Metal
         BufferService bufferService{};
         DescriptorService descriptorService{};
         ThemeService themeService{};
-        DockService dockService{};
         SelectionService selectionService{};
         SceneImporterService meshImporter{};
         TextureImporterService textureImporter{};
@@ -87,7 +84,6 @@ namespace Metal
         RuntimeRepository runtimeRepository{};
         StreamingService streamingRepository{};
         EngineRepository engineRepository{};
-        DockRepository dockRepository{};
         EditorRepository editorRepository{};
         // ----------- Repository
     };

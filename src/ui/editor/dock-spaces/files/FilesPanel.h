@@ -4,12 +4,12 @@
 #include <imgui.h>
 
 #include "FilesContext.h"
-#include "../docks/AbstractDockPanel.h"
+#include "../../abstract/AbstractPanel.h"
 
 namespace Metal {
     struct FileEntry;
 
-    class FilesPanel : public AbstractDockPanel {
+    class FilesPanel : public AbstractPanel {
     protected:
         static constexpr int CARD_SIZE = 90;
         static constexpr int TEXT_OFFSET = 28;

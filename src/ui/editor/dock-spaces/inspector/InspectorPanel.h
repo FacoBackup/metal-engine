@@ -2,13 +2,13 @@
 #define INSPECTOR_H
 
 #include "../../../../common/engine-definitions.h"
-#include "../docks/AbstractDockPanel.h"
+#include "../../abstract/AbstractPanel.h"
 
 namespace Metal {
     class FormPanel;
     class Inspectable;
 
-    class InspectorPanel final : public AbstractDockPanel {
+    class InspectorPanel final : public AbstractPanel {
         std::vector<Inspectable *> repositories{};
         std::vector<Inspectable *> additionalInspection{};
         Inspectable *currentInspection = nullptr;

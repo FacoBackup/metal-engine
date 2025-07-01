@@ -4,8 +4,7 @@
 #include <unordered_map>
 
 #include "../../../../common/engine-definitions.h"
-#include "../../../../common/enum/ComponentType.h"
-#include "../docks/AbstractDockPanel.h"
+#include "../../abstract/AbstractPanel.h"
 
 namespace Metal {
     struct EditorRepository;
@@ -14,7 +13,7 @@ namespace Metal {
     class Entity;
     class HierarchyHeaderPanel;
 
-    class HierarchyPanel final : public AbstractDockPanel {
+    class HierarchyPanel final : public AbstractPanel {
         char searchBuffer[128] = "";
         EntityID dragSource = EMPTY_ENTITY;
 

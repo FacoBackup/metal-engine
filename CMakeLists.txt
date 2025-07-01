@@ -22,7 +22,6 @@ add_executable(
         src/ui/GuiContext.h
         src/ui/editor/dock-spaces/viewport/ViewportPanel.cpp
         src/ui/editor/dock-spaces/viewport/ViewportPanel.h
-        src/ui/editor/dock-spaces/docks/AbstractDockPanel.h
         src/context/ApplicationContext.cpp
         src/context/ApplicationContext.h
         src/ui/editor/abstract/AbstractPanel.h
@@ -58,16 +57,8 @@ add_executable(
         src/ui/editor/dock-spaces/header/GlobalSettingsPanel.cpp
         src/ui/editor/dock-spaces/header/GlobalSettingsPanel.h
         src/common/enum/Icons.h
-        src/ui/service/DockService.cpp
-        src/ui/service/DockService.h
-        src/ui/repository/DockRepository.cpp
-        src/ui/repository/DockRepository.h
-        src/ui/data/dock/DockDTO.h
-        src/ui/data/dock/DockSpace.h
-        src/ui/data/dock/DockPosition.h
-        src/ui/editor/dock-spaces/docks/DockSpacePanel.cpp
-        src/ui/editor/dock-spaces/docks/DockSpacePanel.h
-        src/ui/data/dock/DockSpace.cpp
+        src/ui/data/Views.h
+        src/ui/data/Views.cpp
         src/ui/service/ThemeService.cpp
         src/ui/service/ThemeService.h
         src/ui/repository/EditorRepository.h
@@ -248,11 +239,17 @@ add_executable(
         src/renderer/data/MaterialInfoData.h
         src/renderer/service/VolumeService.cpp
         src/renderer/service/VolumeService.h
-        src/ui/data/dock/DockViewDTO.h
         src/common/Logger.h
         src/MetalContextProvider.h
         src/MetalContextProvider.cpp
         src/context/ApplicationSingletons.h
+        src/ui/editor/basic/NavigationPanel.cpp
+        src/ui/editor/basic/NavigationPanel.h
+        src/ui/data/NavigationPosition.h
+        src/ui/editor/basic/NavigationButtonsPanel.cpp
+        src/ui/editor/basic/NavigationButtonsPanel.h
+        src/ui/editor/dock-spaces/notifications/NotificationPanel.cpp
+        src/ui/editor/dock-spaces/notifications/NotificationPanel.h
 )
 
 

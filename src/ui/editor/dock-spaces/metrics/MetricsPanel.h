@@ -1,9 +1,9 @@
 #ifndef METRICSPANEL_H
 #define METRICSPANEL_H
-#include "../docks/AbstractDockPanel.h"
+#include "../../abstract/AbstractPanel.h"
 
 namespace Metal {
-    class MetricsPanel final : public AbstractDockPanel {
+    class MetricsPanel final : public AbstractPanel {
         public:
         void onSync() override;
     };

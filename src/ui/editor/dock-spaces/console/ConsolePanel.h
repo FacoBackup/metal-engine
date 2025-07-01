@@ -1,10 +1,10 @@
 #ifndef CONSOLEPANEL_H
 #define CONSOLEPANEL_H
-#include "../docks/AbstractDockPanel.h"
+#include "../../abstract/AbstractPanel.h"
 
 namespace Metal
 {
-    class ConsolePanel final : public AbstractDockPanel
+    class ConsolePanel final : public AbstractPanel
     {
         bool showInfo = true;
         bool showWarning = true;

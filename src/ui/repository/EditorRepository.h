@@ -10,20 +10,26 @@
 #include "../../common/engine-definitions.h"
 #include "../../common/enum/ShadingMode.h"
 #include "../../common/inspection/Inspectable.h"
+#include "../data/NavigationPosition.h"
 
 namespace Metal {
     struct TransformComponent;
 
     struct EditorRepository final : Inspectable {
-
         ImVec4 accent{};
         ImU32 accentU32 = 0;
         glm::vec3 accentColor{0.26f, 0.59f, 0.98f};
         std::unordered_map<EntityID, bool> selected{};
+        std::unordered_map<NavigationPosition, std::vector<unsigned int> > viewsAvailableForSelection{};
+        std::unordered_map<NavigationPosition, unsigned int> viewsSelected{};
+
+        float topBlockRatio = .75;
+        float rightBlockSize = 300;
+        float leftBlockSize = 300;
 
         std::string projectName = "New project";
         bool showIcons = true;
-        bool isDarkMode = true;
+        bool isDarkMode = false;
         bool showGrid = true;
         float gridScale = 1.f;
         int gridThreshold = 100;
@@ -75,7 +81,9 @@ namespace Metal {
             mainSelection,
             selected,
             copied,
-            shadingMode
+            shadingMode,
+            viewsAvailableForSelection,
+            viewsSelected
         )
     };
 } // Metal

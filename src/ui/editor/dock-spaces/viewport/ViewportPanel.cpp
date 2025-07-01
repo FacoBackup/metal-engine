@@ -11,7 +11,7 @@
 
 namespace Metal {
     void ViewportPanel::onInitialize() {
-        appendChild(gizmoPanel = new GizmoPanel(position, size));
+        appendChild(gizmoPanel = new GizmoPanel(&position, &size));
         appendChild(headerPanel = new GizmoSettingsPanel());
         appendChild(cameraPanel = new CameraPositionPanel());
     }
@@ -27,7 +27,7 @@ namespace Metal {
         auto *framebuffer = SINGLETONS.coreFrameBuffers.postProcessingFBO;
         SINGLETONS.descriptorService.setImageDescriptor(framebuffer, 0);
         ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet),
-                     ImVec2{size->x, size->y - 40});
+                     ImVec2{size.x, size.y - 40});
         gizmoPanel->onSync();
         cameraPanel->onSync();
     }
@@ -49,18 +49,16 @@ namespace Metal {
         }
     }
 
-    void ViewportPanel::updateInputs() const {
+    void ViewportPanel::updateInputs() {
         auto &repo = SINGLETONS.runtimeRepository;
         const ImVec2 windowSize = ImGui::GetWindowSize();
-        size->x = windowSize.x;
-        size->y = windowSize.y;
 
-        repo.viewportH = size->y;
-        repo.viewportW = size->x;
+        repo.viewportH = size.y = windowSize.y;
+        repo.viewportW = size.x = windowSize.x;
 
         const ImVec2 windowPos = ImGui::GetWindowPos();
-        repo.viewportX = windowPos.x;
-        repo.viewportY = windowPos.y;
+        position.x = repo.viewportX = windowPos.x;
+        position.y = repo.viewportY = windowPos.y;
 
         repo.isFocused = ImGui::IsWindowHovered();
         repo.forwardPressed = ImGui::IsKeyDown(ImGuiKey_W);

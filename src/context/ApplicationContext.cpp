@@ -43,9 +43,6 @@ namespace Metal
                        rootDirectory + "/" + HASH_OF_CLASS_NAME(EngineRepository))
         PARSE_TEMPLATE(applicationSingletons->worldRepository.load,
                        rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository))
-        PARSE_TEMPLATE(applicationSingletons->dockRepository.load,
-                       rootDirectory + "/" + HASH_OF_CLASS_NAME(DockRepository))
-
 
         FilesUtil::MkDir(getShadersDirectory());
         FilesUtil::MkDir(getAssetRefDirectory());
@@ -136,8 +133,6 @@ namespace Metal
                           applicationSingletons->engineRepository)
             DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository),
                           applicationSingletons->worldRepository)
-            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(DockRepository),
-                          applicationSingletons->dockRepository)
             applicationSingletons->notificationService.pushMessage("Project saved", NotificationSeverities::SUCCESS);
         }
         catch (const std::exception& e)
