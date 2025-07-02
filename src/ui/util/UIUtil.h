@@ -92,5 +92,41 @@ namespace Metal::UIUtil {
             default: return "";
         }
     }
+
+    inline ImVec2 Add(const ImVec2 &a, const ImVec2 &b) {
+        return ImVec2(a.x + b.x, a.y + b.y);
+    }
+
+    inline ImVec2 Sub(const ImVec2 &a, const ImVec2 &b) {
+        return ImVec2(a.x - b.x, a.y - b.y);
+    }
+
+    static void BeginBlurChild(const char *id, ImVec2 size, float radius = 8.0f) {
+        ImDrawList *draw_list = ImGui::GetWindowDrawList();
+        ImVec2 pos = ImGui::GetCursorScreenPos(); // Inherit layout position
+
+        // Draw shadow (bottom-right offset)
+        ImVec2 shadow_offset = ImVec2(4, 4);
+        ImU32 shadow_color = IM_COL32(0, 0, 0, 80);
+        draw_list->AddRectFilled(Add(pos, shadow_offset), Add(Add(pos, size), shadow_offset), shadow_color, radius);
+
+        // 🔷 Simulated blur: use a semi-transparent color as placeholder
+        ImU32 bg_color = IM_COL32(30, 30, 30, 200); // Fake glassy look
+
+        // Draw rounded background
+        draw_list->AddRectFilled(pos, Add(pos, size), bg_color, radius);
+
+        // Setup ImGui child window
+        ImGui::SetCursorScreenPos(pos);
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, radius);
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(0, 0, 0, 0)); // Transparent so background shows through
+        ImGui::BeginChild(id, size, false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+    }
+
+    static void EndBlurChild() {
+        ImGui::EndChild();
+        ImGui::PopStyleColor();
+        ImGui::PopStyleVar();
+    }
 }
 #endif

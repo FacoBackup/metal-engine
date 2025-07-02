@@ -5,7 +5,6 @@
 
 namespace Metal {
     class GlobalSettingsPanel final : public AbstractPanel {
-        void cameraMode() const;
 
         void shadingMode();
 

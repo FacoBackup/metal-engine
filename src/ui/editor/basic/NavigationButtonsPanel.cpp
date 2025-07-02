@@ -1,6 +1,5 @@
 #include "NavigationButtonsPanel.h"
 
-#include "../../GuiContext.h"
 #include "../../../MetalContextProvider.h"
 #include "../../data/Views.h"
 #include "../../util/UIUtil.h"

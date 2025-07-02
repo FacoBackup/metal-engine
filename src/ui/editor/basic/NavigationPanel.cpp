@@ -41,45 +41,44 @@ namespace Metal {
             selectedLocal = selected.at(position);
         }
 
-        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 8.f);
         switch (position) {
             case NavigationPosition::BOTTOM: {
-                ImGui::SetNextWindowSize(ImVec2(BUTTONS_SIZE, ImGui::GetWindowHeight()));
+                ImGui::SetNextWindowSize(ImVec2(BUTTONS_SIZE, ImGui::GetContentRegionAvail().y));
 
                 buttonsPanel->onSync();
                 ImGui::SameLine();
-                if (ImGui::BeginChild((id + "window").c_str(), ImVec2(ImGui::GetContentRegionAvail().x - MARGIN, ImGui::GetWindowHeight()),
-                               UIUtil::OPEN)) {
-                    selectedView->onSync();
-                }
-                ImGui::EndChild();
+
+                UIUtil::BeginBlurChild((id + "window").c_str(),
+                              ImVec2(ImGui::GetContentRegionAvail().x,
+                                     ImGui::GetContentRegionAvail().y));
+                selectedView->onSync();
+                UIUtil::EndBlurChild();
                 break;
             }
             case NavigationPosition::LEFT: {
-                ImGui::SetNextWindowSize(ImVec2(BUTTONS_SIZE, ImGui::GetWindowHeight()));
+                ImGui::SetNextWindowSize(ImVec2(BUTTONS_SIZE, ImGui::GetContentRegionAvail().y));
 
                 buttonsPanel->onSync();
                 ImGui::SameLine();
-                if (ImGui::BeginChild((id + "window").c_str(), ImVec2(ImGui::GetContentRegionAvail().x - MARGIN, ImGui::GetWindowHeight()),
-                                      UIUtil::OPEN)) {
-                    selectedView->onSync();
-                }
-                ImGui::EndChild();
+                UIUtil::BeginBlurChild((id + "window").c_str(),
+                                       ImVec2(ImGui::GetContentRegionAvail().x - MARGIN,
+                                              ImGui::GetContentRegionAvail().y));
+                selectedView->onSync();
+                UIUtil::EndBlurChild();
+
                 break;
             }
             case NavigationPosition::RIGHT: {
-                if (ImGui::BeginChild((id + "window").c_str(), ImVec2(ImGui::GetWindowWidth() - BUTTONS_SIZE - MARGIN,
-                                                ImGui::GetWindowHeight()),
-                                      UIUtil::OPEN)) {
-                    selectedView->onSync();
-                }
-                ImGui::EndChild();
+                UIUtil::BeginBlurChild((id + "window").c_str(), ImVec2(ImGui::GetWindowWidth() - BUTTONS_SIZE - MARGIN,
+                                                                       ImGui::GetContentRegionAvail().y));
+                selectedView->onSync();
+                UIUtil::EndBlurChild();
+
                 ImGui::SameLine();
-                ImGui::SetNextWindowSize(ImVec2(BUTTONS_SIZE, ImGui::GetWindowHeight()));
+                ImGui::SetNextWindowSize(ImVec2(BUTTONS_SIZE, ImGui::GetContentRegionAvail().y));
                 buttonsPanel->onSync();
                 break;
             }
         }
-        ImGui::PopStyleVar();
     }
 } // Metal

@@ -11,11 +11,7 @@ namespace Metal {
 
         static void framerate();
 
-        void hotKeys();
-
     public:
-        void onInitialize() override;
-
         void onSync() override;
     };
 } // Metal

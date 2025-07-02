@@ -5,6 +5,7 @@
 #include "../../MetalContextProvider.h"
 #include "basic/NavigationPanel.h"
 #include "dock-spaces/header/EditorHeaderPanel.h"
+#include "dock-spaces/header/GlobalSettingsPanel.h"
 #include "dock-spaces/viewport/ViewportPanel.h"
 
 #define MARGIN 1.0f
@@ -19,6 +20,12 @@ namespace Metal {
         ImGui::SetNextWindowPos(ImVec2(MARGIN, TOP_BAR_OFFSET), ImGuiCond_Always);
         ImGui::SetNextWindowSize(ImVec2(SINGLETONS.editorRepository.leftBlockSize, viewSize), ImGuiCond_Always);
         if (ImGui::Begin((id + "left").c_str(), nullptr, WINDOW_FLAGS)) {
+            if (ImGui::BeginChild((id + "headerLeft").c_str(),
+                                  ImVec2(SINGLETONS.editorRepository.leftBlockSize, TOP_BAR_OFFSET),
+                                  UIUtil::OPEN)) {
+                pLeftHeader->onSync();
+            }
+            ImGui::EndChild();
             pLeftNavigation->onSync();
         }
         ImGui::End();
@@ -26,13 +33,19 @@ namespace Metal {
 
     void EditorPanel::renderRightColumn() {
         const ImGuiViewport *viewport = ImGui::GetMainViewport();
-        float viewSize = viewport->Size.y * SINGLETONS.editorRepository.topBlockRatio - MARGIN * 2 - TOP_BAR_OFFSET;
+        float viewSize = viewport->Size.y * SINGLETONS.editorRepository.topBlockRatio - MARGIN * 2;
 
         ImGui::SetNextWindowPos(ImVec2(viewport->Size.x - SINGLETONS.editorRepository.rightBlockSize - MARGIN,
-                                       MARGIN + TOP_BAR_OFFSET),
+                                       MARGIN),
                                 ImGuiCond_Always);
         ImGui::SetNextWindowSize(ImVec2(SINGLETONS.editorRepository.rightBlockSize, viewSize), ImGuiCond_Always);
         if (ImGui::Begin((id + "right").c_str(), nullptr, WINDOW_FLAGS)) {
+            if (ImGui::BeginChild((id + "headerRight").c_str(),
+                                  ImVec2(SINGLETONS.editorRepository.rightBlockSize, TOP_BAR_OFFSET),
+                                  UIUtil::OPEN)) {
+                pRightHeader->onSync();
+            }
+            ImGui::EndChild();
             pRightNavigation->onSync();
         }
         ImGui::End();
@@ -51,16 +64,16 @@ namespace Metal {
     }
 
     void EditorPanel::renderTopColumn() {
-        const ImGuiViewport *viewport = ImGui::GetMainViewport();
-        ImGui::SetNextWindowPos(ImVec2(MARGIN, MARGIN), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(viewport->Size.x - MARGIN - MARGIN, TOP_BAR_OFFSET), ImGuiCond_Always);
-        if (ImGui::Begin((id + "top").c_str(), nullptr, WINDOW_FLAGS)) {
-            if (ImGui::BeginChild((id + "topWindow").c_str())) {
-                pHeader->onSync();
-            }
-            ImGui::EndChild();
-        }
-        ImGui::End();
+        // const ImGuiViewport *viewport = ImGui::GetMainViewport();
+        // ImGui::SetNextWindowPos(ImVec2(MARGIN, MARGIN), ImGuiCond_Always);
+        // ImGui::SetNextWindowSize(ImVec2(viewport->Size.x - MARGIN - MARGIN, TOP_BAR_OFFSET), ImGuiCond_Always);
+        // if (ImGui::Begin((id + "top").c_str(), nullptr, WINDOW_FLAGS)) {
+        //     if (ImGui::BeginChild((id + "topWindow").c_str())) {
+        //         pHeader->onSync();
+        //     }
+        //     ImGui::EndChild();
+        // }
+        // ImGui::End();
     }
 
     void EditorPanel::onSync() {
@@ -93,6 +106,7 @@ namespace Metal {
         appendChild(pBottomNavigation = new NavigationPanel(BOTTOM));
         appendChild(pViewport = new ViewportPanel);
         appendChild(pNotifications = new NotificationPanel);
-        appendChild(pHeader = new EditorHeaderPanel);
+        appendChild(pLeftHeader = new EditorHeaderPanel);
+        appendChild(pRightHeader = new GlobalSettingsPanel);
     }
 }
