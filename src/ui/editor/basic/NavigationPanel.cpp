@@ -5,8 +5,10 @@
 #include "NavigationButtonsPanel.h"
 #include "../../../MetalContextProvider.h"
 #include "../../data/Views.h"
+#include "../../util/UIUtil.h"
 
-#define WINDOW_FLAGS ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse
+#define BUTTONS_SIZE 30
+#define MARGIN 8
 
 namespace Metal {
     void NavigationPanel::onInitialize() {
@@ -42,30 +44,38 @@ namespace Metal {
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 8.f);
         switch (position) {
             case NavigationPosition::BOTTOM: {
-                if (ImGui::BeginChild((id + "window").c_str())) {
+                ImGui::SetNextWindowSize(ImVec2(BUTTONS_SIZE, ImGui::GetWindowHeight()));
+
+                buttonsPanel->onSync();
+                ImGui::SameLine();
+                if (ImGui::BeginChild((id + "window").c_str(), ImVec2(ImGui::GetContentRegionAvail().x - MARGIN, ImGui::GetWindowHeight()),
+                               UIUtil::OPEN)) {
                     selectedView->onSync();
                 }
                 ImGui::EndChild();
-                ImGui::NewLine();
-
-                buttonsPanel->onSync();
                 break;
             }
             case NavigationPosition::LEFT: {
+                ImGui::SetNextWindowSize(ImVec2(BUTTONS_SIZE, ImGui::GetWindowHeight()));
+
                 buttonsPanel->onSync();
                 ImGui::SameLine();
-                if (ImGui::BeginChild((id + "window").c_str())) {
+                if (ImGui::BeginChild((id + "window").c_str(), ImVec2(ImGui::GetContentRegionAvail().x - MARGIN, ImGui::GetWindowHeight()),
+                                      UIUtil::OPEN)) {
                     selectedView->onSync();
                 }
                 ImGui::EndChild();
                 break;
             }
             case NavigationPosition::RIGHT: {
-                if (ImGui::BeginChild((id + "window").c_str())) {
+                if (ImGui::BeginChild((id + "window").c_str(), ImVec2(ImGui::GetWindowWidth() - BUTTONS_SIZE - MARGIN,
+                                                ImGui::GetWindowHeight()),
+                                      UIUtil::OPEN)) {
                     selectedView->onSync();
                 }
                 ImGui::EndChild();
                 ImGui::SameLine();
+                ImGui::SetNextWindowSize(ImVec2(BUTTONS_SIZE, ImGui::GetWindowHeight()));
                 buttonsPanel->onSync();
                 break;
             }

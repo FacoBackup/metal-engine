@@ -7,16 +7,21 @@ namespace Metal {
     class EditorPanel final : public AbstractPanel {
         AbstractPanel *pViewport = nullptr;
         AbstractPanel *pNotifications = nullptr;
-        AbstractPanel *leftNavigation = nullptr;
-        AbstractPanel *rightNavigation = nullptr;
-        AbstractPanel *bottomNavigation = nullptr;
+        AbstractPanel *pHeader = nullptr;
+        AbstractPanel *pLeftNavigation = nullptr;
+        AbstractPanel *pRightNavigation = nullptr;
+        AbstractPanel *pBottomNavigation = nullptr;
 
     public:
         void onInitialize() override;
 
-        void renderHorizontalColumns();
+        void renderLeftColumn();
 
-        void renderVerticalColumns();
+        void renderRightColumn();
+
+        void renderBottomColumn();
+
+        void renderTopColumn();
 
         void onSync() override;
     };

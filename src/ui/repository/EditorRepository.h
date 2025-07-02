@@ -29,7 +29,10 @@ namespace Metal {
 
         std::string projectName = "New project";
         bool showIcons = true;
+
         bool isDarkMode = false;
+        bool isCompactMode = false;
+
         bool showGrid = true;
         float gridScale = 1.f;
         int gridThreshold = 100;
