@@ -21,11 +21,11 @@ namespace Metal {
 
         std::vector<IPanel *> &getChildren();
 
-        void appendChild(AbstractPanel *panel);
+        AbstractPanel *appendChild(AbstractPanel *panel);
 
         void removeAllChildren() override;
 
-        void removeChild(AbstractPanel * view);
+        void removeChild(AbstractPanel *view);
 
         virtual void onRemove() {
         }

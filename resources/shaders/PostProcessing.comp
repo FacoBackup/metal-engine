@@ -1,4 +1,5 @@
-layout(location = 0) in vec2 texCoords;
+layout (local_size_x = 8, local_size_y = 8) in;
+
 #define A  0.15
 #define B  0.50
 #define C  0.10
@@ -7,26 +8,24 @@ layout(location = 0) in vec2 texCoords;
 #define F  0.30
 #define W  11.2
 
-layout(push_constant) uniform Push {
-    float   distortionIntensity;
-    float   chromaticAberrationIntensity;
-    bool    distortionEnabled;
-    bool    chromaticAberrationEnabled;
-    bool    vignetteEnabled;
-    float   vignetteStrength;
+layout (push_constant) uniform Push {
+    float distortionIntensity;
+    float chromaticAberrationIntensity;
+    bool distortionEnabled;
+    bool chromaticAberrationEnabled;
+    bool vignetteEnabled;
+    float vignetteStrength;
 } postProcessing;
 
-layout(set = 0, binding = 0) uniform sampler2D sceneColor;
+layout (set = 0, binding = 0, rgba32f) uniform image2D sceneColor;
+layout (set = 1, binding = 0, rgba32f) uniform image2D finalImage;// Color + surface ID
 
-layout(location = 0) out vec4 finalColor;
-
-
-vec3 chromaticAberration(vec2 uv) {
+vec3 chromaticAberration(vec2 uv, ivec2 size) {
     float amount = postProcessing.chromaticAberrationIntensity * .001;
     vec3 col;
-    col.r = texture(sceneColor, vec2(uv.x + amount, uv.y)).r;
-    col.g = texture(sceneColor, uv).g;
-    col.b = texture(sceneColor, vec2(uv.x - amount, uv.y)).b;
+    col.r = imageLoad(sceneColor, ivec2(size  * vec2(uv.x + amount, uv.y))).r;
+    col.g = imageLoad(sceneColor, ivec2(size * uv)).g;
+    col.b = imageLoad(sceneColor, ivec2(size * vec2(uv.x - amount, uv.y))).b;
     return col;
 }
 
@@ -102,16 +101,18 @@ vec3 aces(vec3 x) {
 }
 
 void main() {
+    ivec2 size = imageSize(sceneColor);
+    vec2 texCoords = vec2(gl_GlobalInvocationID.xy) / size;
 
-    vec2 texCoords = postProcessing.distortionEnabled ? lensDistortion(texCoords, postProcessing.distortionIntensity * .5) : texCoords;
-    vec3 color = postProcessing.chromaticAberrationEnabled ? chromaticAberration(texCoords) : texture(sceneColor, texCoords).rgb;
+    texCoords = postProcessing.distortionEnabled ? lensDistortion(texCoords, postProcessing.distortionIntensity * .5) : texCoords;
+    vec3 color = postProcessing.chromaticAberrationEnabled ? chromaticAberration(texCoords, size) : imageLoad(sceneColor, ivec2(texCoords * size)).rgb;
 
-    finalColor = vec4(neutral(color), 1.);
+    vec4 finalColor = vec4(neutral(color), 1.);
 
     if (postProcessing.vignetteEnabled) {
-        vec2 uv = texCoords;
-        uv *= 1.0 - uv.yx;
-        float vig = pow(uv.x * uv.y * 15., postProcessing.vignetteStrength);
-        finalColor.rgb *= vig;
+        texCoords *= 1.0 - texCoords.yx;
+        float vig = pow(texCoords.x * texCoords.y * 15., postProcessing.vignetteStrength);
+        finalColor *= vig;
     }
+    imageStore(finalImage, ivec2(texCoords * size), finalColor);
 }

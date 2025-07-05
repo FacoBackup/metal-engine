@@ -22,10 +22,10 @@ namespace Metal {
 
 
         if (SINGLETONS.engineRepository.enabledDenoiser) {
-            clearTexture(SINGLETONS.coreTextures.currentFrame->vkImage);
+            clearTexture(SINGLETONS.coreTextures.current1Frame->vkImage);
             SINGLETONS.engineContext.resetAccumulationCount();
         } else if (isFirstRun || SINGLETONS.engineContext.isCameraUpdated() || surfaceCacheReset) {
-            clearTexture(SINGLETONS.coreTextures.currentFrame->vkImage);
+            clearTexture(SINGLETONS.coreTextures.current1Frame->vkImage);
             SINGLETONS.engineContext.resetAccumulationCount();
             isFirstRun = false;
         }
@@ -35,7 +35,7 @@ namespace Metal {
         }
         clearTexture(SINGLETONS.coreTextures.currentPositions->vkImage, {0,0,0,0});
 
-        startWriting(SINGLETONS.coreTextures.currentFrame->vkImage);
-        recordImageDispatch(SINGLETONS.coreTextures.currentFrame, 8, 8);
+        startWriting(SINGLETONS.coreTextures.current1Frame->vkImage);
+        recordImageDispatch(SINGLETONS.coreTextures.current1Frame, 8, 8);
     }
 } // Metal

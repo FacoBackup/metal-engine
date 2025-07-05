@@ -14,12 +14,16 @@ namespace Metal {
         VkSampler vkImageSampler = VK_NULL_HANDLE;
         std::unique_ptr<DescriptorInstance> globalDataDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> postProcessingDescriptor = nullptr;
+        std::unique_ptr<DescriptorInstance> uiDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> previousFrameDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> previousFrameMetadataDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> rtDescriptorSet = nullptr;
         std::unique_ptr<DescriptorInstance> lightsBuffer = nullptr;
         std::unique_ptr<DescriptorInstance> volumesBuffer = nullptr;
-        std::unique_ptr<DescriptorInstance> currentFrameDescriptor = nullptr;
+        std::unique_ptr<DescriptorInstance> current1FrameDescriptor = nullptr;
+        std::unique_ptr<DescriptorInstance> current2FrameDescriptor = nullptr;
+        std::unique_ptr<DescriptorInstance> finalFrameDescriptor = nullptr;
+        std::unique_ptr<DescriptorInstance> windowDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> currentPositionsDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> currentPositionsFragmentDescriptor = nullptr;
 

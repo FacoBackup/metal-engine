@@ -7,6 +7,7 @@
 #include "../passes/impl/PostProcessingPass.h"
 #include "../passes/impl/tools/GridPass.h"
 #include "../passes/impl/tools/IconsPass.h"
+#include "../passes/impl/ui/UIPass.h"
 
 namespace Metal {
     void PassesService::onInitialize() {
@@ -16,10 +17,10 @@ namespace Metal {
         addPass(computePasses, new RTPass());
         addPass(computePasses, new AccumulationPass());
         addPass(computePasses, new AccumulationMetadataPass());
-
-        addPass(postProcessingPasses, new PostProcessingPass());
+        addPass(computePasses, new PostProcessingPass());
 
         if (ContextProvider::Get().isDebugMode()) {
+            addPass(computePasses, new UIPass());
             addPass(postProcessingPasses, new GridPass());
             addPass(postProcessingPasses, new IconsPass());
         }

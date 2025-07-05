@@ -1,0 +1,86 @@
+layout (local_size_x = 8, local_size_y = 8) in;
+
+struct WindowData {
+    vec2 position;
+    vec2 size;
+};
+
+layout (set = 0, binding = 0, rgba32f) uniform image2D sceneImage;
+layout (set = 1, binding = 0, rgba32f) uniform image2D outputImage;
+layout (set = 2, binding = 0) uniform WindowBuffer {
+    WindowData windows[MAX_WINDOWS];
+} windowsBuffer;
+
+layout (push_constant) uniform ViewportData {
+    vec2 viewportPos;
+    float shadowSize;
+    float borderRadius;
+    vec2 viewportSize;
+    int blurStrength;
+    bool isDarkMode;
+    bool isCompact;
+    int windowCount;
+    vec2 windowAspectRatio;
+} ubo;
+
+float roundedBoxSDF(vec2 pixelSize, vec2 fragPos, vec2 pos, vec2 size, float radius) {
+    radius *= length(ubo.windowAspectRatio);
+    vec2 halfSize = size * 0.5;
+    vec2 d = abs(fragPos - (pos + halfSize)) - halfSize + vec2(radius);
+    return length(max(d, 0.0)) - radius;
+}
+
+float shadowMask(vec2 pixelSize, vec2 fragPos, vec2 pos, vec2 size, float radius, float shadowSize) {
+    float sdf = roundedBoxSDF(pixelSize, fragPos, pos, size, radius);
+    return 1.0 - smoothstep(0.0, shadowSize, sdf);
+}
+
+vec4 blur(ivec2 coord, ivec2 outputImageSize) {
+    vec4 color = vec4(0.0);
+    int count = 0;
+
+    int strength = clamp(ubo.blurStrength, 2, 7);
+    for (int y = -strength; y <= strength; ++y) {
+        for (int x = -strength; x <= strength; ++x) {
+            ivec2 sampleCoord = clamp(coord + ivec2(x, y), ivec2(0), outputImageSize - 1);
+            color += imageLoad(sceneImage, sampleCoord);
+            count++;
+        }
+    }
+
+    color /= float(count);
+    return color;
+}
+
+void main() {
+    ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 inputImageSize = imageSize(sceneImage);
+    ivec2 outputImageSize = imageSize(outputImage);
+    vec2 pixelSize = 1. / vec2(outputImageSize);
+    vec2 fragPos = vec2(pixelCoord) * ubo.windowAspectRatio;
+    vec4 sceneColor = imageLoad(sceneImage, pixelCoord * inputImageSize /outputImageSize);
+    vec4 resultColor = sceneColor;
+
+    for (int i = 0; i < ubo.windowCount; ++i) {
+        WindowData w = windowsBuffer.windows[i];
+
+        float sdf = roundedBoxSDF(pixelSize, fragPos, w.position, w.size, ubo.borderRadius);
+
+        if (sdf < 1) {
+            vec4 blurredColor = blur(pixelCoord* inputImageSize /outputImageSize, outputImageSize);
+
+            vec3 tint = ubo.isDarkMode ? vec3(0.1, 0.1, 0.1) : vec3(1.0, 1.0, 1.0); // dark or light tint
+            float intensity = ubo.isDarkMode ? 0.4 : 0.25; // how strong the tint is
+            blurredColor = vec4(mix(blurredColor.rgb, tint, intensity), blurredColor.a);
+
+            float boxMask = 1.0 - clamp(sdf, 0.0, 1.0);
+            resultColor = vec4(mix(sceneColor.rgb, blurredColor.rgb, vec3(boxMask)), 1.0);
+        } else {
+            float shadow = shadowMask(pixelSize, fragPos, w.position, w.size, ubo.borderRadius, ubo.shadowSize);
+            vec4 shadowColor = vec4(0.0, 0.0, 0.0, 0.4 * shadow);
+            resultColor = mix(resultColor, shadowColor + resultColor * (1.0 - shadowColor.a), shadowColor.a);
+        }
+    }
+
+    imageStore(outputImage, pixelCoord, resultColor);
+}

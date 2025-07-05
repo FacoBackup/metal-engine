@@ -2,16 +2,14 @@
 
 #include "../../../MetalContextProvider.h"
 #include "../../data/PipelineBuilder.h"
+#include "../../data/TextureInstance.h"
 
 namespace Metal {
     void PostProcessingPass::onInitialize() {
-        PipelineBuilder ppPipelineBuilder = PipelineBuilder::Of(
-                    SINGLETONS.coreFrameBuffers.postProcessingFBO,
-                    "QUAD.vert",
-                    "PostProcessing.frag"
-                )
+        PipelineBuilder ppPipelineBuilder = PipelineBuilder::Of("PostProcessing.comp")
                 .setPushConstantsSize(sizeof(PostProcessingPC))
-                .addDescriptorSet(SINGLETONS.coreDescriptorSets.postProcessingDescriptor.get());
+                .addDescriptorSet(SINGLETONS.coreDescriptorSets.current1FrameDescriptor.get())
+                .addDescriptorSet(SINGLETONS.coreDescriptorSets.current2FrameDescriptor.get());
         pipelineInstance = SINGLETONS.pipelineService.createPipeline(ppPipelineBuilder);
     }
 
@@ -25,7 +23,9 @@ namespace Metal {
         pushConstant.vignetteStrength = camera.vignetteStrength;
 
         recordPushConstant(&pushConstant);
-        recordDrawSimpleInstanced(3, 1);
+        startWriting(SINGLETONS.coreTextures.current2Frame->vkImage);
+        recordImageDispatch(SINGLETONS.coreTextures.current1Frame, 8, 8);
+        endWriting(SINGLETONS.coreTextures.current2Frame->vkImage);
     }
 
 } // Metal

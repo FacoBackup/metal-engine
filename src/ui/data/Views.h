@@ -30,7 +30,7 @@ namespace Metal {
                                                                             getPanel(std::move(getPanel)) {
         }
 
-        static size_t FindIndexByName(const std::string &name);
+        static unsigned int FindIndexByName(const std::string &name);
     };
 }
 #endif

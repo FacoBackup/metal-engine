@@ -121,9 +121,12 @@ namespace Metal
             SINGLETONS.lightsService.update();
             SINGLETONS.volumesService.update();
         }
+        SINGLETONS.windowService.updateBuffer();
         updateGlobalData();
 
         SINGLETONS.passesService.onSync();
+
+        SINGLETONS.windowService.reset();
 
         setLightVolumeDataNeedsUpdate(false);
         setCameraUpdated(false);

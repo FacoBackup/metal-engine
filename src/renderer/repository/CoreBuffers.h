@@ -10,6 +10,7 @@ namespace Metal {
     struct CoreBuffers final : AbstractRuntimeComponent {
         void onInitialize() override;
 
+        std::shared_ptr<BufferInstance> windowBuffer = nullptr;
         std::shared_ptr<BufferInstance> globalData = nullptr;
         std::shared_ptr<BufferInstance> lightsBuffer = nullptr;
         std::shared_ptr<BufferInstance> volumesBuffer = nullptr;

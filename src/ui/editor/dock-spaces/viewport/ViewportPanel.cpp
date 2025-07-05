@@ -17,19 +17,18 @@ namespace Metal {
     }
 
     void ViewportPanel::onSync() {
+
         updateCamera();
         updateInputs();
-        ImGui::Dummy(ImVec2{0, 1});
-        ImGui::Dummy(ImVec2{1, 0});
-        ImGui::SameLine();
-        headerPanel->onSync();
+        // ImGui::Dummy(ImVec2{0, 1});
+        // ImGui::Dummy(ImVec2{1, 0});
+        // ImGui::SameLine();
+        // headerPanel->onSync();
 
-        auto *framebuffer = SINGLETONS.coreFrameBuffers.postProcessingFBO;
-        SINGLETONS.descriptorService.setImageDescriptor(framebuffer, 0);
-        ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet),
-                     ImVec2{size.x, size.y - 40});
+        ImGui::Image(reinterpret_cast<ImTextureID>(SINGLETONS.coreDescriptorSets.finalFrameDescriptor->vkDescriptorSet),
+                     ImVec2{size.x, size.y});
         gizmoPanel->onSync();
-        cameraPanel->onSync();
+        // cameraPanel->onSync();
     }
 
     void ViewportPanel::updateCamera() {

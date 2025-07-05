@@ -32,7 +32,7 @@ namespace Metal {
         rtDescriptorSet->addLayoutBinding(
             DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 5,
                                   VK_NULL_HANDLE,
-                                  SINGLETONS.coreTextures.currentFrame->
+                                  SINGLETONS.coreTextures.current1Frame->
                                   vkImageView));
         rtDescriptorSet->addLayoutBinding(
             DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 6,
@@ -52,6 +52,7 @@ namespace Metal {
                                                              VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0,
                                                              SINGLETONS.coreBuffers.lightsBuffer));
         lightsBuffer->create();
+
 
         volumesBuffer = std::make_unique<DescriptorInstance>();
         volumesBuffer->addLayoutBinding(DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES,
@@ -82,13 +83,21 @@ namespace Metal {
                 SINGLETONS.coreTextures.previousFrameMetadata->vkImageView));
             previousFrameMetadataDescriptor->create();
         } {
-            currentFrameDescriptor = std::make_unique<DescriptorInstance>();
-            currentFrameDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
-                                                                           VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
-                                                                           VK_NULL_HANDLE,
-                                                                           SINGLETONS.coreTextures.currentFrame->
-                                                                           vkImageView));
-            currentFrameDescriptor->create();
+            current1FrameDescriptor = std::make_unique<DescriptorInstance>();
+            current1FrameDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
+                                                                            VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
+                                                                            VK_NULL_HANDLE,
+                                                                            SINGLETONS.coreTextures.current1Frame->
+                                                                            vkImageView));
+            current1FrameDescriptor->create();
+
+            current2FrameDescriptor = std::make_unique<DescriptorInstance>();
+            current2FrameDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
+                                                                            VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
+                                                                            VK_NULL_HANDLE,
+                                                                            SINGLETONS.coreTextures.current2Frame->
+                                                                            vkImageView));
+            current2FrameDescriptor->create();
         } {
             currentPositionsDescriptor = std::make_unique<DescriptorInstance>();
             currentPositionsDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
@@ -113,15 +122,20 @@ namespace Metal {
     void CoreDescriptorSets::onInitialize() {
         SINGLETONS.framebufferService.createSampler(false, vkImageSampler);
         createBuffersDescriptors();
-        createPathTracingDescriptors(); {
-            postProcessingDescriptor = std::make_unique<DescriptorInstance>();
-            postProcessingDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                                             VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                                             0,
-                                                                             vkImageSampler,
-                                                                             SINGLETONS.coreTextures.currentFrame->
-                                                                             vkImageView));
-            postProcessingDescriptor->create();
-        }
+        createPathTracingDescriptors();
+        finalFrameDescriptor = std::make_unique<DescriptorInstance>();
+        finalFrameDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
+                                                                         VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                                                         0,
+                                                                         vkImageSampler,
+                                                                         SINGLETONS.coreTextures.current1Frame->
+                                                                         vkImageView));
+        finalFrameDescriptor->create();
+
+        windowDescriptor = std::make_unique<DescriptorInstance>();
+        windowDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
+                                                             VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0,
+                                                             SINGLETONS.coreBuffers.windowBuffer));
+        windowDescriptor->create();
     }
 } // Metal

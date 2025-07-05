@@ -250,6 +250,10 @@ add_executable(
         src/ui/editor/basic/NavigationButtonsPanel.h
         src/ui/editor/dock-spaces/notifications/NotificationPanel.cpp
         src/ui/editor/dock-spaces/notifications/NotificationPanel.h
+        src/renderer/passes/impl/ui/UIPass.cpp
+        src/renderer/service/WindowService.cpp
+        src/renderer/service/WindowService.h
+        src/ui/util/UIUtil.cpp
 )
 
 

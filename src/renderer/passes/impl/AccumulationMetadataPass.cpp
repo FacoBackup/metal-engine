@@ -8,7 +8,7 @@ namespace Metal {
         PipelineBuilder builder = PipelineBuilder::Of("AccumulationMetadata.comp")
                 .setPushConstantsSize(sizeof(DenoiserPC))
                 .addDescriptorSet(SINGLETONS.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(SINGLETONS.coreDescriptorSets.currentFrameDescriptor.get())
+                .addDescriptorSet(SINGLETONS.coreDescriptorSets.current1FrameDescriptor.get())
                 .addDescriptorSet(SINGLETONS.coreDescriptorSets.previousFrameDescriptor.get())
                 .addDescriptorSet(SINGLETONS.coreDescriptorSets.previousFrameMetadataDescriptor.get())
                 .addDescriptorSet(SINGLETONS.coreDescriptorSets.currentPositionsDescriptor.get());
@@ -18,7 +18,7 @@ namespace Metal {
     void AccumulationMetadataPass::onSync() {
         pushConstant.diffWeight = SINGLETONS.engineRepository.denoiserDiffWeight;
         recordPushConstant(&pushConstant);
-        recordImageDispatch(SINGLETONS.coreTextures.currentFrame, 8, 8);
-        endWriting(SINGLETONS.coreTextures.currentFrame->vkImage);
+        recordImageDispatch(SINGLETONS.coreTextures.current1Frame, 8, 8);
+        endWriting(SINGLETONS.coreTextures.current1Frame->vkImage);
     }
 } // Metal

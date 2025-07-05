@@ -11,6 +11,7 @@
 
 typedef unsigned int EntityID;
 typedef int MaterialID;
+#define MAX_WINDOWS 20
 #define MAX_LIGHT_VOLUMES 300
 #define EMPTY_ENTITY 0
 #define FILE_METADATA ".mjson"

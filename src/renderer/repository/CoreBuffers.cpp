@@ -6,6 +6,7 @@
 #include "../service/BufferService.h"
 #include "../data/TriangleBuffer.h"
 #include "../data/BLASBuffer.h"
+#include "../data/WindowBuffer.h"
 #include "../data/MaterialInfo.h"
 #include "../data/TLASBuffer.h"
 #include "../../MetalContextProvider.h"
@@ -18,6 +19,11 @@ namespace Metal {
                                                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
         lightsBuffer = SINGLETONS.bufferService.createBuffer(MAX_LIGHT_VOLUMES * sizeof(LightBuffer),
+                                                  VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                                                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                                  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+        windowBuffer = SINGLETONS.bufferService.createBuffer(MAX_WINDOWS * sizeof(WindowBuffer),
                                                   VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);

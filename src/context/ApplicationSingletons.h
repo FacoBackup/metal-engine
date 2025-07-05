@@ -13,6 +13,7 @@
 #include "../renderer/service/MeshService.h"
 #include "../renderer/service/TextureService.h"
 #include "../renderer/service/FrameBufferService.h"
+#include "../renderer/service/WindowService.h"
 #include "../renderer/service/PipelineService.h"
 #include "../renderer/service/BufferService.h"
 #include "../renderer/service/DescriptorService.h"
@@ -76,6 +77,7 @@ namespace Metal
         LightsService lightsService{};
         VolumeService volumesService{};
         BVHBuilderService bvhBuilderService{};
+        WindowService windowService{};
         // ----------- Services
 
         // ----------- Repository

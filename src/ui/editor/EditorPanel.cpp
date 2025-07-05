@@ -8,44 +8,50 @@
 #include "dock-spaces/header/GlobalSettingsPanel.h"
 #include "dock-spaces/viewport/ViewportPanel.h"
 
-#define MARGIN 1.0f
+#define MARGIN 4.0f
 #define WINDOW_FLAGS ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground |ImGuiWindowFlags_NoScrollbar
-#define TOP_BAR_OFFSET 50
+#define TOP_BAR_OFFSET 35
+#define RESIZE_BAR_SIZE 4
 
 namespace Metal {
     void EditorPanel::renderLeftColumn() {
         const ImGuiViewport *viewport = ImGui::GetMainViewport();
-        float viewSize = viewport->Size.y * SINGLETONS.editorRepository.topBlockRatio - MARGIN - TOP_BAR_OFFSET;
+        float viewHeight = viewport->Size.y * SINGLETONS.editorRepository.topBlockRatio - MARGIN * 2 - TOP_BAR_OFFSET;
 
-        ImGui::SetNextWindowPos(ImVec2(MARGIN, TOP_BAR_OFFSET), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(SINGLETONS.editorRepository.leftBlockSize, viewSize), ImGuiCond_Always);
+        UIUtil::BeginWindow(ImVec2(MARGIN, MARGIN * 2 + TOP_BAR_OFFSET),
+                            ImVec2(SINGLETONS.editorRepository.leftBlockSize, viewHeight));
         if (ImGui::Begin((id + "left").c_str(), nullptr, WINDOW_FLAGS)) {
-            if (ImGui::BeginChild((id + "headerLeft").c_str(),
-                                  ImVec2(SINGLETONS.editorRepository.leftBlockSize, TOP_BAR_OFFSET),
-                                  UIUtil::OPEN)) {
-                pLeftHeader->onSync();
-            }
-            ImGui::EndChild();
             pLeftNavigation->onSync();
+
+            ImGui::SameLine();
+
+            ImGui::InvisibleButton("v_splitterLeft", ImVec2(RESIZE_BAR_SIZE,  viewHeight));
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
+            }
+            if (ImGui::IsItemActive()) {
+                SINGLETONS.editorRepository.leftBlockSize += ImGui::GetIO().MouseDelta.x;
+            }
         }
         ImGui::End();
     }
 
     void EditorPanel::renderRightColumn() {
         const ImGuiViewport *viewport = ImGui::GetMainViewport();
-        float viewSize = viewport->Size.y * SINGLETONS.editorRepository.topBlockRatio - MARGIN * 2;
+        float viewHeight = viewport->Size.y * SINGLETONS.editorRepository.topBlockRatio - MARGIN * 2 - TOP_BAR_OFFSET;
 
-        ImGui::SetNextWindowPos(ImVec2(viewport->Size.x - SINGLETONS.editorRepository.rightBlockSize - MARGIN,
-                                       MARGIN),
-                                ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(SINGLETONS.editorRepository.rightBlockSize, viewSize), ImGuiCond_Always);
+        UIUtil::BeginWindow(ImVec2(viewport->Size.x - SINGLETONS.editorRepository.rightBlockSize - MARGIN,
+                                   MARGIN * 2 + TOP_BAR_OFFSET),
+                            ImVec2(SINGLETONS.editorRepository.rightBlockSize, viewHeight));
         if (ImGui::Begin((id + "right").c_str(), nullptr, WINDOW_FLAGS)) {
-            if (ImGui::BeginChild((id + "headerRight").c_str(),
-                                  ImVec2(SINGLETONS.editorRepository.rightBlockSize, TOP_BAR_OFFSET),
-                                  UIUtil::OPEN)) {
-                pRightHeader->onSync();
+            ImGui::InvisibleButton("v_splitterRight", ImVec2(RESIZE_BAR_SIZE,  viewHeight));
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
             }
-            ImGui::EndChild();
+            if (ImGui::IsItemActive()) {
+                SINGLETONS.editorRepository.rightBlockSize -= ImGui::GetIO().MouseDelta.x;
+            }
+            ImGui::SameLine();
             pRightNavigation->onSync();
         }
         ImGui::End();
@@ -53,27 +59,33 @@ namespace Metal {
 
     void EditorPanel::renderBottomColumn() {
         const ImGuiViewport *viewport = ImGui::GetMainViewport();
-        float viewPosition = viewport->Size.y * SINGLETONS.editorRepository.topBlockRatio;
-        float viewSize = viewport->Size.y * (1. - SINGLETONS.editorRepository.topBlockRatio) - MARGIN;
-        ImGui::SetNextWindowPos(ImVec2(MARGIN, viewPosition), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(viewport->Size.x - MARGIN - MARGIN, viewSize), ImGuiCond_Always);
+
+        float viewY = viewport->Size.y * SINGLETONS.editorRepository.topBlockRatio + MARGIN;
+        float viewHeight = viewport->Size.y * (1. - SINGLETONS.editorRepository.topBlockRatio) - MARGIN * 2;
+        float viewWidth = viewport->Size.x - MARGIN * 2;
+
+        UIUtil::BeginWindow(ImVec2(MARGIN, viewY), ImVec2(viewWidth, viewHeight));
         if (ImGui::Begin((id + "bottom").c_str(), nullptr, WINDOW_FLAGS)) {
+            ImGui::InvisibleButton("v_splitterBottom", ImVec2(viewWidth,  RESIZE_BAR_SIZE));
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeNS);
+            }
+            if (ImGui::IsItemActive()) {
+                SINGLETONS.editorRepository.topBlockRatio += ImGui::GetIO().MouseDelta.y/viewport->Size.y;
+            }
+            ImGui::NewLine();
             pBottomNavigation->onSync();
         }
         ImGui::End();
     }
 
     void EditorPanel::renderTopColumn() {
-        // const ImGuiViewport *viewport = ImGui::GetMainViewport();
-        // ImGui::SetNextWindowPos(ImVec2(MARGIN, MARGIN), ImGuiCond_Always);
-        // ImGui::SetNextWindowSize(ImVec2(viewport->Size.x - MARGIN - MARGIN, TOP_BAR_OFFSET), ImGuiCond_Always);
-        // if (ImGui::Begin((id + "top").c_str(), nullptr, WINDOW_FLAGS)) {
-        //     if (ImGui::BeginChild((id + "topWindow").c_str())) {
-        //         pHeader->onSync();
-        //     }
-        //     ImGui::EndChild();
-        // }
-        // ImGui::End();
+        const ImGuiViewport *viewport = ImGui::GetMainViewport();
+        UIUtil::BeginWindow(ImVec2(MARGIN, MARGIN), ImVec2(viewport->Size.x - MARGIN - MARGIN, TOP_BAR_OFFSET));
+        if (ImGui::Begin((id + "top").c_str(), nullptr, WINDOW_FLAGS)) {
+            pHeader->onSync();
+        }
+        ImGui::End();
     }
 
     void EditorPanel::onSync() {
@@ -89,6 +101,7 @@ namespace Metal {
         pViewport->onSync();
         ImGui::End();
         ImGui::PopStyleVar();
+
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 8.f);
         renderTopColumn();
@@ -106,7 +119,6 @@ namespace Metal {
         appendChild(pBottomNavigation = new NavigationPanel(BOTTOM));
         appendChild(pViewport = new ViewportPanel);
         appendChild(pNotifications = new NotificationPanel);
-        appendChild(pLeftHeader = new EditorHeaderPanel);
-        appendChild(pRightHeader = new GlobalSettingsPanel);
+        appendChild(pHeader = new EditorHeaderPanel);
     }
 }

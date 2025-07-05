@@ -1,14 +1,22 @@
 #ifndef NAVIGATIONPANEL_H
 #define NAVIGATIONPANEL_H
+#include <unordered_map>
+
 #include "../../data/NavigationPosition.h"
+#include "../../repository/EditorRepository.h"
 #include "../abstract/AbstractPanel.h"
 
 namespace Metal {
+    struct PanelInstance final {
+        ViewInstance *instance;
+        AbstractPanel *panel;
+    };
+
     class NavigationPanel final : public AbstractPanel {
         NavigationPosition position;
         AbstractPanel *buttonsPanel = nullptr;
-        AbstractPanel *selectedView = nullptr;
-         int selectedLocal = -1;
+        std::array<PanelInstance, 2> panels{};
+
     public:
         explicit NavigationPanel(NavigationPosition position): position(position) {
         }

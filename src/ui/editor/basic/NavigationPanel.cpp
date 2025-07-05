@@ -6,9 +6,7 @@
 #include "../../../MetalContextProvider.h"
 #include "../../data/Views.h"
 #include "../../util/UIUtil.h"
-
-#define BUTTONS_SIZE 30
-#define MARGIN 8
+#define RESIZE_BAR_SIZE 4
 
 namespace Metal {
     void NavigationPanel::onInitialize() {
@@ -28,56 +26,69 @@ namespace Metal {
     }
 
     void NavigationPanel::onSync() {
-        std::unordered_map<NavigationPosition, unsigned int> &selected = SINGLETONS.editorRepository.viewsSelected;
-        if (!selected.contains(position)) {
-            selected.emplace(position, getDefaultView());
-        }
+        std::array<ViewInstance, 2> &selected = SINGLETONS.editorRepository.views.at(position);
 
-        if (selected.at(position) != selectedLocal) {
-            if (selectedView != nullptr) {
-                removeChild(selectedView);
+        for (int i = 0; i < 2; i++) {
+            PanelInstance &panel = panels.at(i);
+            ViewInstance &instance = selected.at(i);
+            if (instance.initialized == false) {
+                continue;
             }
-            appendChild(selectedView = Views::OPTIONS.at(selected.at(position)).getPanel());
-            selectedLocal = selected.at(position);
-        }
-
-        switch (position) {
-            case NavigationPosition::BOTTOM: {
-                ImGui::SetNextWindowSize(ImVec2(BUTTONS_SIZE, ImGui::GetContentRegionAvail().y));
-
-                buttonsPanel->onSync();
-                ImGui::SameLine();
-
-                UIUtil::BeginBlurChild((id + "window").c_str(),
-                              ImVec2(ImGui::GetContentRegionAvail().x,
-                                     ImGui::GetContentRegionAvail().y));
-                selectedView->onSync();
-                UIUtil::EndBlurChild();
-                break;
+            if (panel.panel == nullptr) {
+                panel.instance = &instance;
+                panel.panel = appendChild(Views::OPTIONS[instance.viewIndex].getPanel());
             }
-            case NavigationPosition::LEFT: {
-                ImGui::SetNextWindowSize(ImVec2(BUTTONS_SIZE, ImGui::GetContentRegionAvail().y));
+            switch (position) {
+                case NavigationPosition::BOTTOM: {
+                    float viewWidth = ImGui::GetContentRegionAvail().x * instance.viewRatio;
+                    // ImGui::SetNextWindowSize(ImVec2(BUTTONS_SIZE, ImGui::GetContentRegionAvail().y));
+                    //
+                    // buttonsPanel->onSync();
+                    // ImGui::SameLine();
+                    UIUtil::BeginEmptyWindow((id + "window").c_str(),
+                                             ImVec2(viewWidth,
+                                                    ImGui::GetContentRegionAvail().y));
+                    panel.panel->onSync();
+                    UIUtil::EndEmptyWindow();
+                    ImGui::SameLine();
+                    break;
+                }
+                case NavigationPosition::LEFT: {
+                    // ImGui::SetNextWindowSize(ImVec2(BUTTONS_SIZE, ImGui::GetContentRegionAvail().y));
+                    //
+                    // buttonsPanel->onSync();
+                    // ImGui::SameLine();
+                    UIUtil::BeginEmptyWindow((id + "window").c_str(),
+                                             ImVec2(ImGui::GetContentRegionAvail().x,
+                                                    ImGui::GetContentRegionAvail().y * instance.viewRatio));
+                    // if (i == 0 && selected.at(1).initialized) {
+                    //     ImGui::InvisibleButton((id + "v_splitterLeft").c_str(), ImVec2(viewWidth,  RESIZE_BAR_SIZE));
+                    //     if (ImGui::IsItemHovered()) {
+                    //         ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeNS);
+                    //     }
+                    //     if (ImGui::IsItemActive()) {
+                    //         SINGLETONS.editorRepository.topBlockRatio += ImGui::GetIO().MouseDelta.y/viewport->Size.y;
+                    //     }
+                    //     ImGui::NewLine();
+                    // }
+                    panel.panel->onSync();
+                    UIUtil::EndEmptyWindow();
 
-                buttonsPanel->onSync();
-                ImGui::SameLine();
-                UIUtil::BeginBlurChild((id + "window").c_str(),
-                                       ImVec2(ImGui::GetContentRegionAvail().x - MARGIN,
-                                              ImGui::GetContentRegionAvail().y));
-                selectedView->onSync();
-                UIUtil::EndBlurChild();
+                    break;
+                }
+                case NavigationPosition::RIGHT: {
+                    UIUtil::BeginEmptyWindow((id + "window").c_str(), ImVec2(
+                                                 ImGui::GetWindowWidth(),
+                                                 ImGui::GetContentRegionAvail().y * instance.viewRatio));
 
-                break;
-            }
-            case NavigationPosition::RIGHT: {
-                UIUtil::BeginBlurChild((id + "window").c_str(), ImVec2(ImGui::GetWindowWidth() - BUTTONS_SIZE - MARGIN,
-                                                                       ImGui::GetContentRegionAvail().y));
-                selectedView->onSync();
-                UIUtil::EndBlurChild();
+                    panel.panel->onSync();
+                    UIUtil::EndEmptyWindow();
 
-                ImGui::SameLine();
-                ImGui::SetNextWindowSize(ImVec2(BUTTONS_SIZE, ImGui::GetContentRegionAvail().y));
-                buttonsPanel->onSync();
-                break;
+                    // ImGui::SameLine();
+                    // ImGui::SetNextWindowSize(ImVec2(BUTTONS_SIZE, ImGui::GetContentRegionAvail().y));
+                    // buttonsPanel->onSync();
+                    break;
+                }
             }
         }
     }

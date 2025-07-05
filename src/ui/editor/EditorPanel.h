@@ -2,17 +2,15 @@
 #define METAL_ENGINE_EDITORPANEL_H
 
 #include "abstract/AbstractPanel.h"
-#include "dock-spaces/header/GlobalSettingsPanel.h"
 
 namespace Metal {
     class EditorPanel final : public AbstractPanel {
         AbstractPanel *pViewport = nullptr;
+        AbstractPanel *pHeader = nullptr;
         AbstractPanel *pNotifications = nullptr;
-        AbstractPanel *pLeftHeader = nullptr;
         AbstractPanel *pLeftNavigation = nullptr;
         AbstractPanel *pRightNavigation = nullptr;
         AbstractPanel *pBottomNavigation = nullptr;
-        AbstractPanel * pRightHeader = nullptr;
 
     public:
         void onInitialize() override;

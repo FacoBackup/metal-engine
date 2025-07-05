@@ -23,7 +23,7 @@ namespace Metal {
         Views{METRICS, Icons::bar_chart, CB(MetricsPanel)}
     };
 
-    size_t Views::FindIndexByName(const std::string &name) {
+    unsigned int Views::FindIndexByName(const std::string &name) {
         for (size_t i = 0; i < OPTIONS.size(); ++i) {
             if (OPTIONS[i].name == name) {
                 return i;

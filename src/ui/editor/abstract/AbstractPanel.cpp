@@ -2,9 +2,10 @@
 #include "../../../common/Util.h"
 
 namespace Metal {
-    void AbstractPanel::appendChild(AbstractPanel *panel) {
+    AbstractPanel *AbstractPanel::appendChild(AbstractPanel *panel) {
         panel->onInitialize();
         children.push_back(panel);
+        return panel;
     }
 
     void AbstractPanel::onSyncChildren() const {
