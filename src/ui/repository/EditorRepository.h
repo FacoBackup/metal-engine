@@ -11,49 +11,17 @@
 #include "../../common/enum/ShadingMode.h"
 #include "../../common/inspection/Inspectable.h"
 #include "../data/NavigationPosition.h"
-#include "../data/Views.h"
 
 namespace Metal {
     struct TransformComponent;
-
-    struct ViewInstance final {
-        unsigned int viewIndex;
-        float viewRatio;
-        bool initialized = false;
-
-        SERIALIZE_TEMPLATE(viewIndex, viewRatio, initialized)
-    };
 
     struct EditorRepository final : Inspectable {
         ImVec4 accent{};
         ImU32 accentU32 = 0;
         glm::vec3 accentColor{0.26f, 0.59f, 0.98f};
         std::unordered_map<EntityID, bool> selected{};
-        std::unordered_map<NavigationPosition, std::array<ViewInstance, 2> > views{};
-
-        explicit EditorRepository() {
-            views.insert({
-                RIGHT,
-                {
-                    {
-                        {Views::FindIndexByName(Views::HIERARCHY), .65, true},
-                        {Views::FindIndexByName(Views::INSPECTOR), .35, true}
-                    }
-                }
-            });
-            views.insert({
-                BOTTOM,
-                {
-                    {
-                        {Views::FindIndexByName(Views::CONSOLE), .5, true},
-                        {Views::FindIndexByName(Views::FILES), .5, true}
-                    }
-                }
-            });
-            views.insert({
-                LEFT, {}
-            });
-        }
+        std::unordered_map<NavigationPosition, std::vector<unsigned int> > viewsAvailableForSelection{};
+        std::unordered_map<NavigationPosition, unsigned int> viewsSelected{};
 
         float topBlockRatio = .75;
         float rightBlockSize = 300;
@@ -117,7 +85,8 @@ namespace Metal {
             selected,
             copied,
             shadingMode,
-            views
+            viewsAvailableForSelection,
+            viewsSelected
         )
     };
 } // Metal

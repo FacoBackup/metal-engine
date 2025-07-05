@@ -1,6 +1,5 @@
 #include "UIUtil.h"
 #include "../../MetalContextProvider.h"
-#define RESIZE_BAR_SIZE 4
 
 namespace Metal::UIUtil {
     const ImVec4 DIRECTORY_COLOR{188 / 255.f, 128 / 255.f, 78 / 255.f, 1};
@@ -13,7 +12,7 @@ namespace Metal::UIUtil {
     ImVec2 AUX_VEC2(0, 0);
     ImVec2 DEFAULT_PADDING(4, 4);
 
-    bool RenderOption(const std::string &label, bool selected, float sizeX, float sizeY, const ImVec4 &accent) {
+    bool RenderOption(const std::string& label, bool selected, float sizeX, float sizeY, const ImVec4& accent) {
         int popStyle = 0;
         if (selected) {
             ImGui::PushStyleColor(ImGuiCol_Button, accent);
@@ -33,18 +32,18 @@ namespace Metal::UIUtil {
         return value;
     }
 
-    bool ButtonSimple(const std::string &label, float sizeX, float sizeY) {
+    bool ButtonSimple(const std::string& label, float sizeX, float sizeY) {
         AUX_VEC2.x = sizeX;
         AUX_VEC2.y = sizeY;
         return ImGui::Button(label.c_str(), AUX_VEC2);
     }
 
-    bool RenderOption(const std::string &label, bool selected, bool fixedSize, const ImVec4 &accent) {
+    bool RenderOption(const std::string& label, bool selected, bool fixedSize, const ImVec4& accent) {
         const float size = fixedSize ? ONLY_ICON_BUTTON_SIZE : -1;
         return RenderOption(label, selected, size, size, accent);
     }
 
-    void RenderTooltip(const std::string &text) {
+    void RenderTooltip(const std::string& text) {
         if (ImGui::IsItemHovered()) {
             ImGui::BeginTooltip();
             ImGui::Text("%s", text.c_str());
@@ -89,11 +88,11 @@ namespace Metal::UIUtil {
         }
     }
 
-    ImVec2 Add(const ImVec2 &a, const ImVec2 &b) {
+    ImVec2 Add(const ImVec2& a, const ImVec2& b) {
         return ImVec2(a.x + b.x, a.y + b.y);
     }
 
-    ImVec2 Sub(const ImVec2 &a, const ImVec2 &b) {
+    ImVec2 Sub(const ImVec2& a, const ImVec2& b) {
         return ImVec2(a.x - b.x, a.y - b.y);
     }
 
@@ -103,12 +102,13 @@ namespace Metal::UIUtil {
         SINGLETONS.windowService.beginWindow(glm::vec2(pos.x, pos.y), glm::vec2(size.x, size.y));
     }
 
-    void BeginEmptyWindow(const char *id, ImVec2 size) {
+
+     void BeginEmptyWindow(const char *id, ImVec2 size) {
         ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(0, 0, 0, 0)); // Transparent so background shows through
         ImGui::BeginChild(id, size, false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
     }
 
-    void EndEmptyWindow() {
+     void EndEmptyWindow() {
         ImGui::EndChild();
         ImGui::PopStyleColor();
     }

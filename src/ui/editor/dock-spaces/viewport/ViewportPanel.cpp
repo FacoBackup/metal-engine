@@ -17,7 +17,6 @@ namespace Metal {
     }
 
     void ViewportPanel::onSync() {
-
         updateCamera();
         updateInputs();
         // ImGui::Dummy(ImVec2{0, 1});
@@ -28,7 +27,7 @@ namespace Metal {
         ImGui::Image(reinterpret_cast<ImTextureID>(SINGLETONS.coreDescriptorSets.finalFrameDescriptor->vkDescriptorSet),
                      ImVec2{size.x, size.y});
         gizmoPanel->onSync();
-        // cameraPanel->onSync();
+        cameraPanel->onSync();
     }
 
     void ViewportPanel::updateCamera() {

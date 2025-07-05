@@ -44,7 +44,5 @@ namespace Metal::UIUtil {
     void BeginEmptyWindow(const char *id, ImVec2 size);
 
     void EndEmptyWindow();
-
-    void drawSplitter(const char *id, float &size,  bool isHorizontal);
 }
 #endif
