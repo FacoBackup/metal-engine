@@ -1,6 +1,7 @@
 #ifndef GIZMOSETTINGSPANEL_H
 #define GIZMOSETTINGSPANEL_H
 #include <imgui.h>
+#include <array>
 
 #include "../../abstract/AbstractPanel.h"
 

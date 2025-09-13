@@ -2,6 +2,7 @@
 #define DESCRIPTORBINDING_H
 
 #include "vulkan/vulkan.h"
+#include <memory>
 
 namespace Metal {
     struct BufferInstance;

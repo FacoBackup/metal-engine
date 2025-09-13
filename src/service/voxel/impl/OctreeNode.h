@@ -1,6 +1,7 @@
 #ifndef OCTREENODE_H
 #define OCTREENODE_H
 #include <array>
+#include <unordered_map>
 
 #include "VoxelData.h"
 

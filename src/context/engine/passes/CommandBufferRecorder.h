@@ -1,5 +1,6 @@
 #ifndef RENDERPASS_H
 #define RENDERPASS_H
+#include <array>
 #include <vector>
 #include "../../../service/pipeline/PipelineInstance.h"
 #include "../../../util/VulkanUtils.h"

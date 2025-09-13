@@ -2,6 +2,7 @@
 #define RENDERPASSSERVICE_H
 
 #include <glm/vec4.hpp>
+#include <memory>
 #include <vulkan/vulkan_core.h>
 
 #include "../abstract/AbstractResourceService.h"

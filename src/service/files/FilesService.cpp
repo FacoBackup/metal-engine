@@ -153,7 +153,7 @@ namespace Metal {
                     "",
                     ""));
 
-                child->name = entry.path().filename();
+                child->name = entry.path().filename().string();
                 child->type = EntryType::DIRECTORY;
             }
         }

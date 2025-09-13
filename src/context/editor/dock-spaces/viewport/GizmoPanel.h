@@ -1,8 +1,8 @@
 #ifndef GIZMOPANEL_H
 #define GIZMOPANEL_H
+#include <array>
 #include <imgui.h>
 #include <glm/fwd.hpp>
-#include <glm/mat4x4.hpp>
 #include <glm/detail/type_quat.hpp>
 
 #include "../../abstract/AbstractPanel.h"

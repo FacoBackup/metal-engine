@@ -29,7 +29,7 @@ namespace Metal {
         region.imageSubresource.layerCount = layerCount;
 
         region.imageOffset = {0, 0, 0};
-        region.imageExtent = {static_cast<uint>(image->width), static_cast<uint>(image->height), 1};
+        region.imageExtent = {static_cast<unsigned int>(image->width), static_cast<unsigned int>(image->height), 1};
 
         vkCmdCopyBufferToImage(
             commandBuffer,

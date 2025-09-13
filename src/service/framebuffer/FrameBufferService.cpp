@@ -1,5 +1,6 @@
 #include "FrameBufferService.h"
 
+#include <array>
 #include <iostream>
 #include <glm/vec3.hpp>
 
