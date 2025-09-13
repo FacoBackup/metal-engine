@@ -40,8 +40,8 @@ namespace Metal {
         return finalBuffer;
     }
 
-    uint32_t BufferService::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const {
-        for (uint32_t i = 0; i < vulkanContext.physicalDeviceMemoryProperties.memoryTypeCount; i++) {
+    unsigned int BufferService::findMemoryType(unsigned int typeFilter, VkMemoryPropertyFlags properties) const {
+        for (unsigned int i = 0; i < vulkanContext.physicalDeviceMemoryProperties.memoryTypeCount; i++) {
             if ((typeFilter & (1 << i)) && (vulkanContext.physicalDeviceMemoryProperties.memoryTypes[i].propertyFlags &
                                             properties) == properties) {
                 return i;

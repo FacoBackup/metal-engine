@@ -6,7 +6,7 @@
 
 namespace Metal {
     struct ShaderModule final {
-        std::vector<uint32_t> SPIRV;
+        std::vector<unsigned int> SPIRV;
         VkShaderModule vkShaderModule = VK_NULL_HANDLE;
 
         void initialize(glslang_program_t *program);

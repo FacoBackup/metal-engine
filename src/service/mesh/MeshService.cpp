@@ -31,7 +31,7 @@ namespace Metal {
             data->data.data());
 
         instance->indexBuffer = context.bufferService.createBuffer(
-            sizeof(uint32_t) * data->indices.size(),
+            sizeof(unsigned int) * data->indices.size(),
             VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
             data->indices.data());
 

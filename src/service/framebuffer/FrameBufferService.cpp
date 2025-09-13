@@ -7,18 +7,11 @@
 #include "FrameBufferInstance.h"
 #include "../../util/VulkanUtils.h"
 #include "FrameBufferAttachment.h"
+#include "../../context/ApplicationContext.h"
 
 namespace Metal {
-    FrameBufferInstance *FrameBufferService::createFrameBuffer(const uint32_t w, const uint32_t h, glm::vec4 clearColor,
-                                                               bool linear) {
-        auto *framebuffer = new FrameBufferInstance();
-        framebuffer->bufferWidth = w;
-        framebuffer->bufferHeight = h;
-        framebuffer->clearColor = clearColor;
-        registerResource(framebuffer);
-
+   void FrameBufferService::createSampler(bool linear, VkSampler &vkImageSampler) {
         VkSamplerCreateInfo samplerCreateInfo{};
-        // TODO - ENABLE/DISABLE LINEAR FILTERING
         samplerCreateInfo.magFilter = linear ? VK_FILTER_LINEAR : VK_FILTER_NEAREST;
         samplerCreateInfo.minFilter = linear ? VK_FILTER_LINEAR : VK_FILTER_NEAREST;
         samplerCreateInfo.mipmapMode = linear ? VK_SAMPLER_MIPMAP_MODE_LINEAR : VK_SAMPLER_MIPMAP_MODE_NEAREST;
@@ -34,7 +27,16 @@ namespace Metal {
         samplerCreateInfo.anisotropyEnable = VK_TRUE;
         samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
         VulkanUtils::CheckVKResult(vkCreateSampler(vulkanContext.device.device, &samplerCreateInfo, nullptr,
-                                                   &framebuffer->vkImageSampler));
+                                                   &vkImageSampler));
+    }
+
+    FrameBufferInstance *FrameBufferService::createFrameBuffer(const unsigned w, const unsigned h, glm::vec4 clearColor) {
+        auto *framebuffer = new FrameBufferInstance();
+        framebuffer->bufferWidth = w;
+        framebuffer->bufferHeight = h;
+        framebuffer->clearColor = clearColor;
+        registerResource(framebuffer);
+
         return framebuffer;
     }
 
@@ -123,7 +125,7 @@ namespace Metal {
         std::vector<VkAttachmentDescription> attachmentDescriptions{};
         std::vector<VkAttachmentReference> colorReferences{};
         VkAttachmentReference *depthRef = nullptr;
-        for (uint32_t i = 0; i < framebuffer->attachments.size(); i++) {
+        for (unsigned int i = 0; i < framebuffer->attachments.size(); i++) {
             VkAttachmentDescription &attachmentDescription = attachmentDescriptions.emplace_back();
             const std::shared_ptr<FrameBufferAttachment> fbAttachment = framebuffer->attachments[i];
             attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;

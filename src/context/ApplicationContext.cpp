@@ -37,7 +37,7 @@ namespace Metal {
         FilesUtil::MkDir(getAssetDirectory());
     }
 
-    uint32_t ApplicationContext::getFrameIndex() const {
+    unsigned int ApplicationContext::getFrameIndex() const {
         return vulkanContext.imguiVulkanWindow.FrameIndex;
     }
 

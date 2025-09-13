@@ -13,7 +13,7 @@ namespace Metal {
 
         std::shared_ptr<BufferInstance> dataBuffer = nullptr;
         std::shared_ptr<BufferInstance> indexBuffer = nullptr;
-        uint32_t indexCount = 0;
+        unsigned int indexCount = 0;
 
     };
 } // Metal

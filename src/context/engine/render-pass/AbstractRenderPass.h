@@ -16,9 +16,9 @@ namespace Metal {
     public:
         explicit AbstractRenderPass(ApplicationContext &context);
 
-        void recordDrawSimpleInstanced(uint32_t vertexCount, uint32_t instanceCount) const;
+        void recordDrawSimpleInstanced(unsigned int vertexCount, unsigned int instanceCount) const;
 
-        void recordDrawMesh(const MeshInstance *instance, uint32_t instanceCount = 1) const;
+        void recordDrawMesh(const MeshInstance *instance, unsigned int instanceCount = 1) const;
     };
 }
 

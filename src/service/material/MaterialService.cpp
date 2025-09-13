@@ -28,7 +28,7 @@ namespace Metal {
         auto &ref = descriptor->bindings.emplace_back();
         ref.bindingPoint = 0;
         ref.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        ref.sampler = context.coreFrameBuffers.gBufferFBO->vkImageSampler;
+        ref.sampler = context.coreDescriptorSets.vkImageSampler;
         ref.view = texture->vkImageView;
         instance->textures.push_back(id);
         return true;

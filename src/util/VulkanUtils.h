@@ -13,7 +13,7 @@ namespace Metal {
 
         static VkFormat GetValidDepthFormat(VkPhysicalDevice physicalDevice);
 
-        static uint32_t GetMemTypeIndex(const VkPhysicalDeviceMemoryProperties &deviceMemProps, uint32_t typeBits,
+        static unsigned int GetMemTypeIndex(const VkPhysicalDeviceMemoryProperties &deviceMemProps, unsigned int typeBits,
                                         VkFlags properties);
     };
 }

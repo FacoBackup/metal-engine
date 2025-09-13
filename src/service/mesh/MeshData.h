@@ -10,10 +10,10 @@ namespace Metal {
     struct MeshData final {
         std::string name;
         std::vector<VertexData> data;
-        std::vector<uint32_t> indices;
+        std::vector<unsigned int> indices;
 
         explicit MeshData(std::string name = "", const std::vector<VertexData> &data = {},
-                          const std::vector<uint32_t> &indices = {})
+                          const std::vector<unsigned int> &indices = {})
             : name(std::move(name)),
               data(data),
               indices(indices) {

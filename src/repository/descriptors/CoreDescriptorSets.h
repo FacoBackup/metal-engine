@@ -15,6 +15,7 @@ namespace Metal {
             : AbstractCoreRepository(context) {
         }
 
+        VkSampler vkImageSampler = VK_NULL_HANDLE;
         std::unique_ptr<DescriptorInstance> globalDataDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> materialAlbedo = nullptr;
         std::unique_ptr<DescriptorInstance> materialNormal = nullptr;

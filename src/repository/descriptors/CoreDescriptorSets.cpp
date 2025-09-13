@@ -10,7 +10,7 @@
 
 #define GBUFFER_D(P, N)\
 P = std::make_unique<DescriptorInstance>();\
-P->addLayoutBinding(DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0, context.coreFrameBuffers.gBufferFBO->vkImageSampler, context.coreFrameBuffers.gBufferFBO->attachments[N]->vkImageView));\
+P->addLayoutBinding(DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0, context.coreDescriptorSets.vkImageSampler, context.coreFrameBuffers.gBufferFBO->attachments[N]->vkImageView));\
 P->create(vulkanContext);
 
 #define G context.coreFrameBuffers.gBufferFBO->attachments
@@ -89,21 +89,21 @@ namespace Metal {
         gBufferAlbedo = std::make_unique<DescriptorInstance>();
         gBufferAlbedo->addLayoutBinding(DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES,
                                                               VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
-                                                              context.coreFrameBuffers.gBufferFBO->vkImageSampler,
+                                                              context.coreDescriptorSets.vkImageSampler,
                                                               G[0]->vkImageView));
         gBufferAlbedo->create(vulkanContext);
 
         gBufferNormal = std::make_unique<DescriptorInstance>();
         gBufferNormal->addLayoutBinding(DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES,
                                                               VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
-                                                              context.coreFrameBuffers.gBufferFBO->vkImageSampler,
+                                                              context.coreDescriptorSets.vkImageSampler,
                                                               G[1]->vkImageView));
         gBufferNormal->create(vulkanContext);
 
         gBufferPosition = std::make_unique<DescriptorInstance>();
         gBufferPosition->addLayoutBinding(DescriptorBinding::Of(COMPUTE_FRAGMENT_STAGES,
                                                                 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
-                                                                context.coreFrameBuffers.gBufferFBO->vkImageSampler,
+                                                                context.coreDescriptorSets.vkImageSampler,
                                                                 G[2]->vkImageView));
         gBufferPosition->create(vulkanContext);
     }
@@ -149,6 +149,8 @@ namespace Metal {
     }
 
     void CoreDescriptorSets::onInitialize() {
+        context.framebufferService.createSampler(false, vkImageSampler);
+
         createBuffersDescriptors();
         createMaterialDescriptors();
         createGBufferDescriptors();
@@ -158,8 +160,7 @@ namespace Metal {
             surfaceCacheFragment = std::make_unique<DescriptorInstance>();
             surfaceCacheFragment->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
                                                                          VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
-                                                                         context.coreFrameBuffers.gBufferFBO->
-                                                                         vkImageSampler,
+                                                                         context.coreDescriptorSets.vkImageSampler,
                                                                          context.coreTextures.giSurfaceCache->
                                                                          vkImageView));
             surfaceCacheFragment->create(vulkanContext);
@@ -170,8 +171,7 @@ namespace Metal {
             postProcessingDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
                                                                              VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                                              0,
-                                                                             context.coreFrameBuffers.gBufferFBO->
-                                                                             vkImageSampler,
+                                                                             context.coreDescriptorSets.vkImageSampler,
                                                                              context.coreTextures.currentFrame->
                                                                              vkImageView));
             postProcessingDescriptor->create(vulkanContext);

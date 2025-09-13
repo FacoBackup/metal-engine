@@ -16,7 +16,7 @@ namespace Metal {
         PipelineInstance *createRenderingPipeline(PipelineBuilder &pipelineBuilder);
 
         void createPipelineLayout(const std::vector<DescriptorInstance *> &descriptorSetsToBind,
-                                  uint32_t pushConstantsSize,
+                                  unsigned int pushConstantsSize,
                                   PipelineInstance *pipeline) const;
 
     public:

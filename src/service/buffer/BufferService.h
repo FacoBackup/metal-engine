@@ -22,7 +22,7 @@ namespace Metal {
     public:
         explicit BufferService(ApplicationContext &context);
 
-        [[nodiscard]] uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
+        [[nodiscard]] unsigned int findMemoryType(unsigned int typeFilter, VkMemoryPropertyFlags properties) const;
 
         [[nodiscard]] std::shared_ptr<BufferInstance> createBuffer(VkDeviceSize bufferSize,
                                                                    VkBufferUsageFlags usageFlags,

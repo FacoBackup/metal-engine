@@ -39,7 +39,7 @@ namespace Metal {
 
         void createDescriptorPool() const;
 
-        uint32_t w{}, h{};
+        unsigned int w{}, h{};
         GLFWwindow *window = nullptr;
         bool debugMode = false;
         std::vector<VkCommandBuffer> commandBuffers{};
@@ -59,7 +59,7 @@ namespace Metal {
         ImGui_ImplVulkanH_Window imguiVulkanWindow;
         VkSurfaceKHR surface = VK_NULL_HANDLE;
         VkPipelineCache pipelineCache = VK_NULL_HANDLE;
-        uint32_t queueFamily{};
+        unsigned int queueFamily{};
         vkb::PhysicalDevice physDevice;
         vkb::Device device;
         VkQueue graphicsQueue = VK_NULL_HANDLE;
@@ -72,11 +72,11 @@ namespace Metal {
 
         void onInitialize() override;
 
-        [[nodiscard]] uint32_t getWindowHeight() const {
+        [[nodiscard]] unsigned int getWindowHeight() const {
             return h;
         }
 
-        [[nodiscard]] uint32_t getWindowWidth() const {
+        [[nodiscard]] unsigned int getWindowWidth() const {
             return w;
         }
 

@@ -7,7 +7,7 @@
 
 namespace Metal {
     struct SparseVoxelOctreeData final {
-        std::vector<uint32_t> data{};
+        std::vector<unsigned int> data{};
         unsigned int voxelBufferOffset;
 
         SAVE_TEMPLATE(data, voxelBufferOffset)

@@ -13,7 +13,7 @@
 
 namespace Metal {
     void PipelineService::createPipelineLayout(const std::vector<DescriptorInstance *> &descriptorSetsToBind,
-                                               const uint32_t pushConstantsSize, PipelineInstance *pipeline) const {
+                                               const unsigned int pushConstantsSize, PipelineInstance *pipeline) const {
         VkPipelineLayoutCreateInfo layoutInfo = {};
         layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         std::vector<VkDescriptorSetLayout> descriptorLayouts{};
@@ -109,7 +109,7 @@ namespace Metal {
             meshBindingDescription->inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
             vertexInputInfo.vertexBindingDescriptionCount = 1;
-            vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(meshDescriptions.size());
+            vertexInputInfo.vertexAttributeDescriptionCount = static_cast<unsigned int>(meshDescriptions.size());
             vertexInputInfo.pVertexAttributeDescriptions = meshDescriptions.data();
             vertexInputInfo.pVertexBindingDescriptions = meshBindingDescription;
         }

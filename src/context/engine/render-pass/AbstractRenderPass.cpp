@@ -8,11 +8,11 @@ namespace Metal {
     AbstractRenderPass::AbstractRenderPass(ApplicationContext &context) : AbstractPass(context, false) {
     }
 
-    void AbstractRenderPass::recordDrawSimpleInstanced(const uint32_t vertexCount, const uint32_t instanceCount) const {
+    void AbstractRenderPass::recordDrawSimpleInstanced(const unsigned int vertexCount, const unsigned int instanceCount) const {
         vkCmdDraw(vkCommandBuffer, vertexCount, instanceCount, 0, 0);
     }
 
-    void AbstractRenderPass::recordDrawMesh(const MeshInstance *instance, const uint32_t instanceCount) const {
+    void AbstractRenderPass::recordDrawMesh(const MeshInstance *instance, const unsigned int instanceCount) const {
         constexpr VkDeviceSize offsets[] = {0};
         vkCmdBindVertexBuffers(vkCommandBuffer, 0, 1, &instance->dataBuffer->vkBuffer, offsets);
         vkCmdBindIndexBuffer(vkCommandBuffer, instance->indexBuffer->vkBuffer, 0, VK_INDEX_TYPE_UINT32);

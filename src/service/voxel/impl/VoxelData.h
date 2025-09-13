@@ -26,7 +26,7 @@ namespace Metal {
         // THANKS TO https://www.shadertoy.com/view/llfcRl
         static unsigned int CompressNormal(const glm::vec3 &nor) {
             glm::vec3 mor = nor;
-            uint32_t id = 0;
+            unsigned int id = 0;
 
             if (std::abs(nor.y) > std::abs(mor.x)) {
                 mor = glm::vec3(nor.y, nor.z, nor.x);
@@ -37,7 +37,7 @@ namespace Metal {
                 id = 2u;
             }
 
-            uint32_t is = (mor.x < 0.0f) ? 1u : 0u;
+            unsigned int is = (mor.x < 0.0f) ? 1u : 0u;
             glm::vec2 uv = 0.5f + 0.5f * glm::vec2(mor.y, mor.z) / std::abs(mor.x);
             glm::uvec2 iuv = glm::uvec2(glm::round(uv * glm::vec2(32767.0f, 16383.0f)));
 

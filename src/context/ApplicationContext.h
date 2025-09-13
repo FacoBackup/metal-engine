@@ -124,7 +124,7 @@ namespace Metal {
             return rootDirectory + "/assets/";
         }
 
-        [[nodiscard]] uint32_t getFrameIndex() const;
+        [[nodiscard]] unsigned int getFrameIndex() const;
 
         void start();
 

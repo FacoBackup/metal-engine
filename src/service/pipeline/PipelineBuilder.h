@@ -14,7 +14,7 @@ namespace Metal {
         const char *fragmentShader = nullptr;
         const char *computeShader = nullptr;
         std::vector<DescriptorInstance *> descriptorSetsToBind{};
-        uint32_t pushConstantsSize = 0;
+        unsigned int pushConstantsSize = 0;
         bool blendEnabled = false;
         bool prepareForMesh = false;
         bool depthTest = false;
@@ -60,7 +60,7 @@ namespace Metal {
             return *this;
         }
 
-        PipelineBuilder &setPushConstantsSize(uint32_t size) {
+        PipelineBuilder &setPushConstantsSize(unsigned int size) {
             pushConstantsSize = size;
             return *this;
         }
