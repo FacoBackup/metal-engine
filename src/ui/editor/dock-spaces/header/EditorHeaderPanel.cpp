@@ -83,7 +83,7 @@ namespace Metal {
     }
 
     void EditorHeaderPanel::framerate() {
-        const int framerate = static_cast<int>(round(ImGui::GetIO().Framerate));
+        const int framerate = std::max(1, static_cast<int>(round(ImGui::GetIO().Framerate)));
         ImGui::Text("%i ms | %i fps", 1000 / framerate, framerate);
     }
 
