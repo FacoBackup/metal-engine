@@ -14,6 +14,17 @@ namespace Metal {
         }
         ImGui::SameLine();
 
+        if (ImGui::Button((Icons::play_arrow + "Export to video" + id + "video").c_str())) {
+            context->videoExporterService.exportToVideo();
+        }
+        ImGui::SameLine();
+        if (context->engineRepository.isBaking) {
+            if (ImGui::Button((Icons::stop_circle + "Finish export" + id + "videoEx").c_str())) {
+                context->videoExporterService.finishExportToVideo();
+            }
+            ImGui::SameLine();
+        }
+
         ImGui::SetNextItemWidth(150);
         editorMode = EditorMode::IndexOfValue(editorRepository.editorMode);
         if (ImGui::Combo(id.c_str(), &editorMode, EditorMode::Names)) {

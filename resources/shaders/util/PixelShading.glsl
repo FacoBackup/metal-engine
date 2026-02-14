@@ -30,7 +30,7 @@ vec3 calculatePixelColor( vec3 rayDirection, in vec2 texCoords, MaterialInfo mat
     interaction.tangent = X;
     interaction.binormal = Y;
 
-    for (uint i = 0; i < globalData.giSamples; i++){
+    for (uint i = 0; i < globalData.pathTracerSamples; i++){
         vec3 f = vec3(0.);
         float scatteringPdf = 0.;
         vec3 Ld = vec3(0);
@@ -46,12 +46,12 @@ vec3 calculatePixelColor( vec3 rayDirection, in vec2 texCoords, MaterialInfo mat
             beta *=  f / scatteringPdf;
         }
 
-        if (globalData.giBounces > 0 && globalData.giStrength > 0){
+        if (globalData.pathTracerBounces > 0 && globalData.pathTracerMultiplier > 0){
             float bias = max(.05, 1e-4 * length(interaction.point));
             vec3 point =  interaction.point + bias * interaction.normal;
-            L += (material.baseColor / PI) * calculateIndirectLighting(material.roughness, interaction.normal, point, rayDirection) * globalData.giStrength;
+            L += (material.baseColor / PI) * calculateIndirectLighting(material.roughness, interaction.normal, point, rayDirection) * globalData.pathTracerMultiplier;
         }
     }
 
-    return L / globalData.giSamples;
+    return L / globalData.pathTracerSamples;
 }

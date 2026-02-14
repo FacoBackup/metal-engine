@@ -19,7 +19,6 @@ namespace Metal {
         bool lightVolumeDataNeedsUpdate = true;
         bool giSettingsUpdated = true;
         std::string voxelizationRequestId;
-        unsigned int giAccumulationCount = 0;
 
     public:
         GlobalDataUBO &getGlobalDataUBO() { return globalDataUBO; }
@@ -44,9 +43,7 @@ namespace Metal {
             giSettingsUpdated = val;
         }
 
-        void resetGiAccumulationCount() {
-            globalDataUBO.giAccumulationCount = 0;
-        }
+        void resetPathTracerAccumulationCount();
 
         bool isGISettingsUpdated() const {
             return giSettingsUpdated;

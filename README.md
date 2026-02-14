@@ -1,12 +1,10 @@
 # Metal Engine
-Metal Engine is a real time graphics engine written in C++ and backed by Vulkan
+Metal Engine is an offline path trace renderer written on Vulkan and C++ using ImGui for the UI.
 
-![img](samples/classroom.png)
-![img](samples/deferred-shading.png)
-
-## Stack
-- Serialization with Cereal (binary) 
-- Assimp for scene parsing
-- Rendering with Vulkan
-- Windowing with GLFW
+## Features
+- Path tracing with multiple importance sampling
+- Scene loading with Assimp
 - UI with Dear ImGui
+- Vulkan rendering backend
+- GLFW windowing system
+- Cereal serialization for scene data

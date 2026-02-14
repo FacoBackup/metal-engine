@@ -1,12 +1,14 @@
 #include "ShaderUtil.h"
 
 #include <regex>
+#include <fstream>
 
 #include "../service/pipeline/ShaderModule.h"
 #include "../util/VulkanUtils.h"
 #include "../util/Util.h"
 #include "../context/ApplicationContext.h"
 #include "FilesUtil.h"
+#include "../service/log/LogService.h"
 #include "../enum/LightVolumeType.h"
 #include "glslang/Include/glslang_c_interface.h"
 #include "glslang/Public/resource_limits_c.h"
@@ -17,11 +19,11 @@ namespace Metal {
         const char *infoLog = glslang_shader_get_info_log(shader);
         const char *debugLog = glslang_shader_get_info_debug_log(shader);
 
-        if (infoLog) {
-            printf("Shader Info Log:\n%s\n", infoLog);
+        if (infoLog && strlen(infoLog) > 0) {
+            LOG_ERROR_S("Shader Info Log: " + std::string(infoLog));
         }
-        if (debugLog) {
-            printf("Shader Debug Log:\n%s\n", debugLog);
+        if (debugLog && strlen(debugLog) > 0) {
+            LOG_DEBUG_S("Shader Debug Log: " + std::string(debugLog));
         }
     }
 
@@ -65,7 +67,9 @@ namespace Metal {
         shaderModule->initialize(program);
 
         if (const char *spirv_messages = glslang_program_SPIRV_get_messages(program)) {
-            printf("SPIR-V message: '%s'", spirv_messages);
+            if (strlen(spirv_messages) > 0) {
+                LOG_DEBUG_S("SPIR-V message: " + std::string(spirv_messages));
+            }
         }
 
         VkShaderModuleCreateInfo shaderCreateInfo{};
@@ -127,7 +131,7 @@ namespace Metal {
                 FilesUtil::ReadFile((BASE_PATH + includeFile).c_str(), source);
                 result.replace(match.position(0), match.length(0), source);
             } catch (const std::exception &e) {
-                std::cerr << "Error loading included shader: " << e.what() << std::endl;
+                LOG_ERROR_S("Error loading included shader: " + std::string(e.what()));
                 return "";
             }
         }
@@ -157,19 +161,50 @@ namespace Metal {
         source = "#define PI_2 6.28318530718\n" + source;
         source = "#define PI 3.14159265\n" + source;
 
+        const size_t sourceHash = std::hash<std::string>{}(source);
+        const std::string part(BASE_PATH + pFilename);
+        const std::string shaderName = part.substr(part.find_last_of('/') + 1, part.size());
+        const std::string binaryFilename = basePath + shaderName + ".spv";
+        const std::string hashFilename = basePath + shaderName + ".hash";
 
-        const glslang_stage_t shaderStage = ShaderStageFromFilename(pFilename.c_str());
-
-        glslang_initialize_process();
         ShaderModule shader{};
-        if (CompileShader(context.vulkanContext, shaderStage, source.c_str(), &shader)) {
-            const std::string part(BASE_PATH + pFilename);
-            const std::string BinaryFilename = basePath + part.substr(
-                                                   part.find_last_of('/') + 1, part.size()) + ".spv";
-            FilesUtil::WriteBinaryFile(BinaryFilename.c_str(), shader.SPIRV.data(),
-                                       shader.SPIRV.size() * sizeof(unsigned int));
+
+        bool needsCompilation = true;
+        if (std::filesystem::exists(binaryFilename) && std::filesystem::exists(hashFilename)) {
+            size_t cachedHash = 0;
+            std::ifstream hashFile(hashFilename);
+            if (hashFile >> cachedHash && cachedHash == sourceHash) {
+                try {
+                    FilesUtil::ReadBinaryFile(binaryFilename.c_str(), shader.SPIRV);
+                    
+                    VkShaderModuleCreateInfo shaderCreateInfo{};
+                    shaderCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+                    shaderCreateInfo.codeSize = shader.SPIRV.size() * sizeof(unsigned int);
+                    shaderCreateInfo.pCode = static_cast<const unsigned int *>(shader.SPIRV.data());
+
+                    if (vkCreateShaderModule(context.vulkanContext.device.device, &shaderCreateInfo,
+                                             nullptr, &shader.vkShaderModule) == VK_SUCCESS) {
+                        needsCompilation = false;
+                        LOG_INFO(context, "Loaded cached shader: " + shaderName);
+                    }
+                } catch (...) {
+                    needsCompilation = true;
+                }
+            }
         }
-        glslang_finalize_process();
+
+        if (needsCompilation) {
+            const glslang_stage_t shaderStage = ShaderStageFromFilename(pFilename.c_str());
+            glslang_initialize_process();
+            LOG_INFO(context, "Compiling shader: " + shaderName);
+            if (CompileShader(context.vulkanContext, shaderStage, source.c_str(), &shader)) {
+                FilesUtil::WriteBinaryFile(binaryFilename.c_str(), shader.SPIRV.data(),
+                                           shader.SPIRV.size() * sizeof(unsigned int));
+                FilesUtil::WriteFile(hashFilename.c_str(), std::to_string(sourceHash).c_str());
+            }
+            glslang_finalize_process();
+        }
+
         return shader.vkShaderModule;
     }
 }

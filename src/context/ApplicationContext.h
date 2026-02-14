@@ -14,6 +14,7 @@
 #include "../service/mesh/MeshService.h"
 #include "../service/world/WorldGridService.h"
 #include "../service/texture/TextureService.h"
+#include "../service/exporter/VideoExporterService.h"
 #include "../service/framebuffer/FrameBufferService.h"
 #include "../service/pipeline/PipelineService.h"
 #include "../service/buffer/BufferService.h"
@@ -53,6 +54,7 @@ namespace Metal {
         std::string rootDirectory;
 
     public:
+        VideoExporterService videoExporterService{*this, true};
         EngineContext engineContext{*this};
         PassesService passesService{*this};
         VulkanContext vulkanContext{*this, debugMode};
@@ -124,6 +126,10 @@ namespace Metal {
 
         [[nodiscard]] std::string getAssetDirectory() const {
             return rootDirectory + "/assets/";
+        }
+
+        [[nodiscard]] std::string getVideoOutputPath() const {
+            return rootDirectory + "/output.mp4";
         }
 
         [[nodiscard]] unsigned int getFrameIndex() const;

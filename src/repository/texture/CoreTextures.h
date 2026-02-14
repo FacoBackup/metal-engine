@@ -18,6 +18,7 @@ namespace Metal {
         TextureInstance *currentFrame = nullptr;
         TextureInstance *previousFrameMetadata = nullptr;
         TextureInstance *previousFrame = nullptr;
+        TextureInstance *whiteTexture = nullptr;
     };
 } // Metal
 

@@ -9,17 +9,20 @@ namespace Metal {
         bool vsync = true;
 
         bool enabledDenoiser = true;
+        bool isBaking = false;
         float denoiserDiffWeight = .5;
 
         bool multipleImportanceSampling = false;
+        int maxVideoFrames = 100;
         int volumeShadowSteps = 8;
         int shadingResInvScale = 2;
-        int giMaxAccumulation = 200;
+        int pathTracerMaxSamples = 200;
         int giTileSubdivision = 40;
         float giEmissiveFactor = 2;
-        int giSamples = 1;
-        int giBounces = 1;
-        float giStrength = 1;
+        int pathTracerSamples = 1;
+        int pathTracerBounces = 1;
+        int pathTracerAccumulationCount = 0;
+        float pathTracerMultiplier = 1;
         int numberOfTiles = 10;
         float elapsedTime = .5f;
         bool atmosphereEnabled = false;
@@ -43,9 +46,9 @@ namespace Metal {
 
         SAVE_TEMPLATE(
             vsync,
-            giSamples,
+            pathTracerSamples,
             multipleImportanceSampling,
-            giBounces,
+            pathTracerBounces,
             atmosphereEnabled,
             elapsedTime,
             incrementTime,
@@ -59,9 +62,9 @@ namespace Metal {
             svoFilePaths,
             giTileSubdivision,
             giEmissiveFactor,
-            giStrength,
+            pathTracerMultiplier,
             shadingResInvScale,
-            giMaxAccumulation,
+            pathTracerMaxSamples,
             denoiserDiffWeight,
             enabledDenoiser,
             volumeShadowSteps

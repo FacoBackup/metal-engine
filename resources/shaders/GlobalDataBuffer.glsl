@@ -7,7 +7,7 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     vec3 cameraWorldPosition;
     vec3 sunColor;
     vec3 sunPosition;
-    float giStrength;
+    float pathTracerMultiplier;
     uint lightVolumeCount;
     uint volumesOffset;
     uint volumeShadowSteps;
@@ -16,9 +16,9 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
 // GI
     bool enabledDenoiser;
     bool multipleImportanceSampling;
-    uint giMaxAccumulation;
-    uint giSamples;
-    uint giBounces;
+    uint pathTracerMaxSamples;
+    uint pathTracerSamples;
+    uint pathTracerBounces;
     uint giTileSubdivision;
     float giEmissiveFactor;
 
@@ -27,7 +27,7 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     uint surfaceCacheWidth;
     uint surfaceCacheHeight;
 
-    uint giAccumulationCount;
+    uint pathTracerAccumulationCount;
     uint globalFrameCount;
 } globalData;
 

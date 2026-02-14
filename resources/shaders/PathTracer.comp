@@ -87,7 +87,7 @@ void main() {
             finalData = worldPos.a;
         } else {
             vec4 previousFrame = imageLoad(outputImage, ivec2(gl_GlobalInvocationID.xy));
-            float accumulationCount = min(globalData.giMaxAccumulation, previousFrame.a);
+            float accumulationCount = min(globalData.pathTracerMaxSamples, previousFrame.a);
             finalColor = previousFrame.rgb * (1. - 1./accumulationCount) + finalColor * 1./accumulationCount;
             finalData = accumulationCount + 1;
         }

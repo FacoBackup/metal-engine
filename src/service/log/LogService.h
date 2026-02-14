@@ -28,7 +28,7 @@ namespace Metal {
         static ApplicationContext* currentContext;
         explicit LogService(ApplicationContext &context);
 
-        void log(LogLevel level, const std::string &message);
+        void log(LogLevel level, const std::string &message) const;
 
         [[nodiscard]] std::vector<LogEntry> getEntriesSnapshot() const;
         void clear();
@@ -38,7 +38,7 @@ namespace Metal {
         static const char* getLevelAnsiColor(LogLevel level);
 
     private:
-        std::vector<LogEntry> entries;
+        mutable std::vector<LogEntry> entries;
         mutable std::mutex logMutex;
     };
 

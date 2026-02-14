@@ -18,8 +18,10 @@ namespace Metal {
     }
 
     void ViewportPanel::onSync() {
-        updateCamera();
-        updateInputs();
+        if (!context->engineRepository.isBaking) {
+            updateCamera();
+            updateInputs();
+        }
 
         auto *framebuffer = context->coreFrameBuffers.postProcessingFBO;
         context->descriptorService.setImageDescriptor(framebuffer, 0);

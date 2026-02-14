@@ -12,7 +12,7 @@ namespace Metal {
         currentContext = &context;
     }
 
-    void LogService::log(LogLevel level, const std::string &message) {
+    void LogService::log(LogLevel level, const std::string &message) const {
         auto now = std::chrono::system_clock::now();
         auto in_time_t = std::chrono::system_clock::to_time_t(now);
 

@@ -58,7 +58,7 @@ void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo){
 }
 
 vec3 calculateIndirectLighting(float roughness, vec3 normal, vec3 currentPosition, vec3 rayDir) {
-    if (globalData.giBounces == 0) return vec3(0);
+    if (globalData.pathTracerBounces == 0) return vec3(0);
 
     BounceInfo bounceInfo;
     bounceInfo.indirectLight = vec3(0);
@@ -70,7 +70,7 @@ vec3 calculateIndirectLighting(float roughness, vec3 normal, vec3 currentPositio
     float localRoughness = roughness;
     vec3 localRayDir = rayDir;
 
-    for (uint j = 0; j < globalData.giBounces; j++){
+    for (uint j = 0; j < globalData.pathTracerBounces; j++){
         vec3 diffuseRayDir = normalize(bounceInfo.hitNormal + RandomUnitVector());
         vec3 specularRayDir = reflect(localRayDir, bounceInfo.hitNormal);
 
@@ -98,5 +98,5 @@ vec3 calculateIndirectLighting(float roughness, vec3 normal, vec3 currentPositio
 
         fetchSurfaceCacheRadiance(bounceInfo);
     }
-    return bounceInfo.indirectLight / globalData.giBounces;
+    return bounceInfo.indirectLight / globalData.pathTracerBounces;
 }

@@ -30,6 +30,21 @@ namespace Metal::FilesUtil {
         fclose(f);
     }
 
+    static void ReadBinaryFile(const char *pFilename, std::vector<unsigned int> &outData) {
+        std::ifstream file(pFilename, std::ios::binary | std::ios::ate);
+        if (!file.is_open()) {
+            throw std::runtime_error("Error opening binary file : " + std::string(pFilename));
+        }
+
+        const std::streamsize size = file.tellg();
+        file.seekg(0, std::ios::beg);
+
+        outData.resize(size / sizeof(unsigned int));
+        if (!file.read(reinterpret_cast<char *>(outData.data()), size)) {
+            throw std::runtime_error("Error reading binary file: " + std::string(pFilename));
+        }
+    }
+
     static void WriteFile(const char *filename, const char *content) {
         std::ofstream file;
         file.open(filename, std::fstream::trunc);

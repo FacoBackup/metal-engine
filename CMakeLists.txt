@@ -278,10 +278,13 @@ add_executable(
         src/repository/world/components/VolumeComponent.cpp
         src/repository/world/components/VolumeComponent.h
         src/service/descriptor/DescriptorBinding.h
+        src/service/exporter/VideoExporterService.cpp
+        src/service/exporter/VideoExporterService.h
 )
 
 
 # ------ LIBS
+find_package(FFMPEG REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 find_package(imgui REQUIRED)
@@ -297,6 +300,7 @@ find_package(meshoptimizer CONFIG REQUIRED)
 find_package(cereal CONFIG REQUIRED)
 
 set(COMMON_LIBRARIES
+        ${FFMPEG_LIBRARIES}
         glfw
         nfd::nfd
         cereal::cereal
@@ -317,7 +321,7 @@ set(COMMON_LIBRARIES
         glslang::SPVRemapper
 )
 target_link_libraries(metal_engine PRIVATE ${COMMON_LIBRARIES})
-target_include_directories(metal_engine PRIVATE dependencies/stb)
+target_include_directories(metal_engine PRIVATE dependencies/stb ${FFMPEG_INCLUDE_DIRS})
 add_subdirectory(dependencies/vk-bootstrap)
 # ------ LIBS
 

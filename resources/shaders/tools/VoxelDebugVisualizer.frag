@@ -47,7 +47,7 @@ void main() {
             finalColor = vec4(normalize(hitData.voxelPosition.xyz), 1);
             break;
             default :
-            finalColor = vec4(texture(surfaceCache, genHashSurfaceCache(hitData.point.xyz)).rgb * globalData.giStrength, 1);
+            finalColor = vec4(texture(surfaceCache, genHashSurfaceCache(hitData.point.xyz)).rgb * globalData.pathTracerMultiplier, 1);
             break;
         }
     }

@@ -15,15 +15,16 @@ namespace Metal {
                     16);
         registerBool(vsync, "Display settings (Restart required)", "VSync?");
         registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);
+        registerInt(maxVideoFrames, "", "Max video frames", 1);
 
         registerInt(volumeShadowSteps, VOLUMES, "Shadow steps", 1);
 
         registerBool(enabledDenoiser, PATH_TRACER, "Enable denoiser?");
         registerFloat(denoiserDiffWeight, PATH_TRACER, "Denoiser variance weight", 0, 10, false, .001);
-        registerFloat(giStrength, PATH_TRACER, "Strength");
-        registerInt(giMaxAccumulation, PATH_TRACER, "Maximum accumulation", 1, 10000);
-        registerInt(giSamples, PATH_TRACER, "Samples per pixel", 1, 32);
-        registerInt(giBounces, PATH_TRACER, "Bounces", 0, 7);
+        registerFloat(pathTracerMultiplier, PATH_TRACER, "Strength");
+        registerInt(pathTracerMaxSamples, PATH_TRACER, "Maximum accumulation", 1, 10000);
+        registerInt(pathTracerSamples, PATH_TRACER, "Samples per pixel", 1, 32);
+        registerInt(pathTracerBounces, PATH_TRACER, "Bounces", 0, 7);
         registerBool(multipleImportanceSampling, PATH_TRACER, "Enable multiple importance sampling?");
         registerInt(giTileSubdivision, PATH_TRACER, "Grid subdivision", 1);
         registerFloat(giEmissiveFactor, PATH_TRACER, "Emissive surface factor", 0);

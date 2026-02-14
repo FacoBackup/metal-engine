@@ -11,6 +11,10 @@
 #include "../../service/texture/TextureInstance.h"
 
 namespace Metal {
+    void EngineContext::resetPathTracerAccumulationCount() {
+        context.engineRepository.pathTracerAccumulationCount = 0;
+    }
+
     void EngineContext::onInitialize() {
         context.worldGridService.onSync();
         context.passesService.onInitialize();
@@ -78,6 +82,7 @@ namespace Metal {
         context.cameraService.onSync();
         context.voxelizationService.onSync();
 
+
         updateVoxelData();
         if (lightVolumeDataNeedsUpdate) {
             context.lightVolumesService.update();
@@ -89,6 +94,8 @@ namespace Metal {
         setLightVolumeDataNeedsUpdate(false);
         setCameraUpdated(false);
         setGISettingsUpdated(false);
+
+        context.videoExporterService.onSync();
     }
 
     void EngineContext::updateGlobalData() {
@@ -99,7 +106,7 @@ namespace Metal {
         globalDataUBO.invProj = camera.invProjectionMatrix;
         globalDataUBO.invView = camera.invViewMatrix;
         globalDataUBO.cameraWorldPosition = camera.position;
-        globalDataUBO.giStrength = context.engineRepository.giStrength;
+        globalDataUBO.pathTracerMultiplier = context.engineRepository.pathTracerMultiplier;
         globalDataUBO.lightVolumeCount = context.lightVolumesService.getLightVolumeCount();
         globalDataUBO.volumesOffset = context.lightVolumesService.getVolumesOffset();
         globalDataUBO.volumeShadowSteps = context.engineRepository.volumeShadowSteps;
@@ -107,16 +114,17 @@ namespace Metal {
 
         globalDataUBO.enabledDenoiser = context.engineRepository.enabledDenoiser;
         globalDataUBO.multipleImportanceSampling = context.engineRepository.multipleImportanceSampling;
-        globalDataUBO.giMaxAccumulation = context.engineRepository.giMaxAccumulation;
-        globalDataUBO.giSamples = context.engineRepository.giSamples;
-        globalDataUBO.giBounces = context.engineRepository.giBounces;
+        globalDataUBO.pathTracerMaxSamples = context.engineRepository.pathTracerMaxSamples;
+        globalDataUBO.pathTracerSamples = context.engineRepository.pathTracerSamples;
+        globalDataUBO.pathTracerBounces = context.engineRepository.pathTracerBounces;
         globalDataUBO.giTileSubdivision = context.engineRepository.giTileSubdivision;
         globalDataUBO.giEmissiveFactor = context.engineRepository.giEmissiveFactor;
 
         globalDataUBO.debugFlag = ShadingMode::IndexOfValue(context.editorRepository.shadingMode);
         globalDataUBO.surfaceCacheWidth = SURFACE_CACHE_RES;
         globalDataUBO.surfaceCacheHeight = SURFACE_CACHE_RES;
-        globalDataUBO.giAccumulationCount++;
+        context.engineRepository.pathTracerAccumulationCount++;
+        globalDataUBO.pathTracerAccumulationCount = context.engineRepository.pathTracerAccumulationCount;
         globalDataUBO.globalFrameCount++;
 
         if (context.engineRepository.incrementTime) {
