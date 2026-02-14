@@ -6,6 +6,7 @@
 
 #include "VoxelizationRequest.h"
 #include "../../context/ApplicationContext.h"
+#include "../../service/log/LogService.h"
 #include "../../enum/LevelOfDetail.h"
 #include "../../enum/engine-definitions.h"
 #include "../../service/texture/TextureData.h"
@@ -126,8 +127,9 @@ namespace Metal {
         context.engineRepository.svoFilePaths.clear();
 
         for (auto &t: context.worldGridRepository.getTiles()) {
+            const unsigned int threadCount = std::max(1u, std::thread::hardware_concurrency());
             std::vector<std::vector<VoxelizationRequest> > requests;
-            requests.resize(1); // TODO - FIX FOR MULTIPLE THREADS
+            requests.resize(threadCount);
             collectRequests(t.second, requests);
 
             if (!isVoxelizationCancelled) {
@@ -151,8 +153,8 @@ namespace Metal {
         }
 
         for (auto &t: builders) {
-            serialize(t.second);
-            t.second.dispose();
+            serialize(*t.second);
+            t.second->dispose();
         }
 
         for (auto &entry: textures) {
@@ -168,7 +170,7 @@ namespace Metal {
 
     void VoxelizationService::onSync() {
         if (isVoxelizationDone) {
-            std::cout << "Voxelization was finished; Clearing all resources affected" << std::endl;
+            LOG_INFO(context, "Voxelization was finished; Clearing all resources affected");
             context.worldGridRepository.hasMainTileChanged = true;
             context.svoService.disposeAll();
             context.engineContext.setGISettingsUpdated(true);
@@ -188,7 +190,7 @@ namespace Metal {
         // New voxelization request; Cancels the previous one and starts all over again
         cancelRequest();
         context.notificationService.pushMessage("Voxelization started", NotificationSeverities::WARNING);
-        std::cout << "Dispatching new voxelization request" << std::endl;
+        LOG_INFO(context, "Dispatching new voxelization request");
         isExecutingThread = true;
         if (mainThread.joinable()) {
             mainThread.join(); // Wait for the thread to finish
@@ -200,7 +202,7 @@ namespace Metal {
 
     void VoxelizationService::cancelRequest() {
         if (isExecutingThread) {
-            std::cout << "Cancelling previous voxelization request" << std::endl;
+            LOG_INFO(context, "Cancelling previous voxelization request");
             isVoxelizationCancelled = true;
             if (mainThread.joinable()) {
                 mainThread.join();

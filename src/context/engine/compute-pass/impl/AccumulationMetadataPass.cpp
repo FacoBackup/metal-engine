@@ -17,6 +17,7 @@ namespace Metal {
     }
 
     void AccumulationMetadataPass::onSync() {
+        syncWriting(context.coreTextures.currentFrame->vkImage);
         pushConstant.diffWeight = context.engineRepository.denoiserDiffWeight;
         recordPushConstant(&pushConstant);
         recordImageDispatch(context.coreTextures.currentFrame, 8, 8);

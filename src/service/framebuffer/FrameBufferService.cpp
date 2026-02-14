@@ -140,10 +140,10 @@ namespace Metal {
             attachmentDescription.format = fbAttachment->format;
 
             if (fbAttachment->depth) {
-                std::cout << "Depth Attachment " << i << std::endl;
+                LOG_INFO(context, "Depth Attachment " + std::to_string(i));
                 depthRef = new VkAttachmentReference{i, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL};
             } else {
-                std::cout << "Color Attachment " << i << std::endl;
+                LOG_INFO(context, "Color Attachment " + std::to_string(i));
                 VkAttachmentReference &colorRef = colorReferences.emplace_back();
                 colorRef.attachment = i;
                 colorRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;

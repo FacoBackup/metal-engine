@@ -56,37 +56,50 @@ namespace Metal {
 
     void VulkanContext::createPhysicalDevice() {
         vkb::PhysicalDeviceSelector physDeviceSelector(instance);
-        VkPhysicalDeviceFeatures features{};
-        features.tessellationShader = true;
-
-        // NOT SUPPORTED ON MAC M3
-        // features.wideLines = true;
-        // features.sparseResidencyBuffer = true;
-        // features.sparseResidencyImage2D = true;
-        // features.sparseBinding = true;
-
-        features.shaderStorageImageWriteWithoutFormat = true;
-        features.fragmentStoresAndAtomics = true;
-        features.shaderInt64 = true;
-        features.multiDrawIndirect = true;
-        features.drawIndirectFirstInstance = true;
-        // features.textureCompressionBC = true;
-        // features.textureCompressionETC2 = true;
-        // features.textureCompressionASTC_LDR = true;
-        // required_features.fillModeNonSolid = true; // Wireframe?
-
-        physDeviceSelector.set_required_features(features);
-
+        
         auto physicalDeviceResult = physDeviceSelector
                 .set_surface(surface)
+                .require_present()
                 .select();
+        
         if (!physicalDeviceResult) {
             throw std::runtime_error("Failed to create physical device " + physicalDeviceResult.error().message());
         }
 
         physDevice = physicalDeviceResult.value();
+
+        VkPhysicalDeviceFeatures features{};
+        features.tessellationShader = VK_TRUE;
+        features.shaderStorageImageWriteWithoutFormat = VK_TRUE;
+        features.fragmentStoresAndAtomics = VK_TRUE;
+        features.shaderInt64 = VK_TRUE;
+        features.multiDrawIndirect = VK_TRUE;
+        features.drawIndirectFirstInstance = VK_TRUE;
+
+        // Check if features are supported before requesting
+        VkPhysicalDeviceFeatures supportedFeatures;
+        vkGetPhysicalDeviceFeatures(physDevice.physical_device, &supportedFeatures);
+
+        if (!supportedFeatures.tessellationShader) features.tessellationShader = VK_FALSE;
+        if (!supportedFeatures.shaderStorageImageWriteWithoutFormat) features.shaderStorageImageWriteWithoutFormat = VK_FALSE;
+        if (!supportedFeatures.fragmentStoresAndAtomics) features.fragmentStoresAndAtomics = VK_FALSE;
+        if (!supportedFeatures.shaderInt64) features.shaderInt64 = VK_FALSE;
+        if (!supportedFeatures.multiDrawIndirect) features.multiDrawIndirect = VK_FALSE;
+        if (!supportedFeatures.drawIndirectFirstInstance) features.drawIndirectFirstInstance = VK_FALSE;
+
+        // We can't use set_required_features because we already selected the device.
+        // But we can enable them in the DeviceBuilder if we want, or just be aware they might not be there.
+        // vkb handles this via required_features in PhysicalDeviceSelector.
+        // Let's re-select with the features we actually want and are supported.
+        
+        physDeviceSelector.set_required_features(features);
+        physicalDeviceResult = physDeviceSelector.select();
+        if (physicalDeviceResult) {
+            physDevice = physicalDeviceResult.value();
+        }
+
         vkGetPhysicalDeviceProperties(physDevice.physical_device, &physicalDeviceProperties);
-        std::cout << "MAX SAMPLERS " << physicalDeviceProperties.limits.maxDescriptorSetSamplers << " " << physicalDeviceProperties.limits.maxPerStageDescriptorSampledImages << std::endl;
+        LOG_INFO(context, "MAX SAMPLERS " + std::to_string(physicalDeviceProperties.limits.maxDescriptorSetSamplers) + " " + std::to_string(physicalDeviceProperties.limits.maxPerStageDescriptorSampledImages));
         vkGetPhysicalDeviceMemoryProperties(physDevice.physical_device, &physicalDeviceMemoryProperties);
         if (!physDevice.enable_extension_if_present("VK_KHR_timeline_semaphore")) {
             throw std::runtime_error("Failed to enable core extension");
@@ -194,7 +207,7 @@ namespace Metal {
         auto vkbResult = instanceBuilder
                 .set_app_name(ENGINE_NAME)
                 .set_engine_name(ENGINE_NAME)
-                .require_api_version(1, 0, 0)
+                .require_api_version(1, 2, 0)
                 .build();
         if (!vkbResult) {
             throw std::runtime_error("Failed to create runtime instance.");
@@ -238,10 +251,10 @@ namespace Metal {
 
     void VulkanContext::createDescriptorPool() const {
         const std::array sizes{
-            VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 30}, // 1 for imgui
-            VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1},
-            VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 9},
-            VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 10}
+            VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 100}, // 1 for imgui
+            VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 100},
+            VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 100},
+            VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 100}
         };
 
         VkDescriptorPoolCreateInfo poolInfo{};
@@ -249,7 +262,7 @@ namespace Metal {
         poolInfo.poolSizeCount = sizes.size();
         poolInfo.pPoolSizes = sizes.data();
         poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-        poolInfo.maxSets = 50;
+        poolInfo.maxSets = 500;
 
         VulkanUtils::CheckVKResult(vkCreateDescriptorPool(device.device, &poolInfo,
                                                           nullptr, &context.vulkanContext.descriptorPool));

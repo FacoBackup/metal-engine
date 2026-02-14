@@ -50,7 +50,7 @@ namespace Metal {
 
     void WorldGridRepository::createIfAbsent(const int x, const int z) {
         if (std::string id = TILE_ID(x, z); !tiles.contains(id)) {
-            std::cout << "Creating tile " << x << " " << z << " " << id << std::endl;
+            LOG_INFO(context, "Creating tile " + std::to_string(x) + " " + std::to_string(z) + " " + id);
             tiles.insert({id, WorldTile(x, z, id)});
         }
     }

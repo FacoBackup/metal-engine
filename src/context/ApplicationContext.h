@@ -37,6 +37,7 @@
 #include "../repository/editor/EditorRepository.h"
 #include "../service/material/MaterialService.h"
 #include "../service/notification/NotificationService.h"
+#include "../service/log/LogService.h"
 #include "../service/transform/TransformService.h"
 #include "../service/voxel/SVOService.h"
 #include "../service/lights/LightVolumeService.h"
@@ -67,6 +68,7 @@ namespace Metal {
 
         // ----------- Services
         NotificationService notificationService;
+        LogService logService{*this};
         MeshService meshService{*this};
         MaterialService materialService{*this};
         TextureService textureService{*this};

@@ -1,14 +1,14 @@
 #include "BufferInstance.h"
 
 #include <cstring>
-#include <iostream>
-
+#include "../../service/log/LogService.h"
+#include "../../context/ApplicationContext.h"
 #include "../../context/vulkan/VulkanContext.h"
 #include "../../util/VulkanUtils.h"
 
 namespace Metal {
     void BufferInstance::dispose(const VulkanContext &context) const {
-        std::cout << "Disposing of buffer instance" << std::endl;
+        LOG_INFO_S("Disposing of buffer instance");
 
         vkDestroyBuffer(context.device.device, vkBuffer, nullptr);
         vkFreeMemory(context.device.device, vkDeviceMemory, nullptr);

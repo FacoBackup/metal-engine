@@ -13,7 +13,7 @@ namespace Metal {
         vkCmdPushConstants(
             vkCommandBuffer,
             getPipeline()->vkPipelineLayout,
-            isComputePass ? VK_SHADER_STAGE_COMPUTE_BIT : VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+            isComputePass ? VK_SHADER_STAGE_COMPUTE_BIT : (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT),
             0,
             getPipeline()->pushConstantsSize,
             data);

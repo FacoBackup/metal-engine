@@ -41,7 +41,7 @@ namespace Metal {
             sizeInitialized = true;
         }
         beforeWindow();
-        if (ImGui::Begin(dock->internalId, &UIUtil::OPEN, (dock->direction != CENTER ? FLAGS : FLAGS_CENTER))) {
+        if (ImGui::Begin(dock->internalId.c_str(), &UIUtil::OPEN, (dock->direction != CENTER ? FLAGS : FLAGS_CENTER))) {
             view->isWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
             sizeInternal = ImGui::GetWindowSize();
             size.x = sizeInternal.x;

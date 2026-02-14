@@ -14,7 +14,7 @@ namespace Metal {
     SVOInstance *SVOService::create(const std::string &id) {
         if (std::string fileName = context.getAssetDirectory() + FORMAT_FILE_SVO(id);
             std::filesystem::exists(fileName)) {
-            std::cout << "Streaming SVO " << fileName << std::endl;
+            LOG_INFO(context, "Streaming SVO " + fileName);
             auto data = SparseVoxelOctreeData();
             PARSE_TEMPLATE(data.load, fileName)
 

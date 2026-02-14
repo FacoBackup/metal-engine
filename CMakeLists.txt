@@ -78,6 +78,8 @@ add_executable(
         src/context/editor/dock-spaces/files/FilesPanel.h
         src/context/editor/dock-spaces/console/ConsolePanel.cpp
         src/context/editor/dock-spaces/console/ConsolePanel.h
+        src/service/log/LogService.cpp
+        src/service/log/LogService.h
         src/context/editor/dock-spaces/hierarchy/HierarchyPanel.cpp
         src/context/editor/dock-spaces/hierarchy/HierarchyPanel.h
         src/repository/abstract/RuntimeResource.h
@@ -326,7 +328,7 @@ file(COPY "${CMAKE_SOURCE_DIR}/resources" DESTINATION "${CMAKE_BINARY_DIR}/")
 # ------ VCPKG
 
 #set(CMAKE_TOOLCHAIN_FILE "Users/cafe/.vcpkg-clion/vcpkg/scripts/buildsystems/vcpkg.cmake")
-set(CMAKE_TOOLCHAIN_FILE "C:/Users/cafe/.vcpkg-clion/vcpkg/scripts/buildsystems/vcpkg.cmake")
+set(CMAKE_TOOLCHAIN_FILE "C:/Users/russi/vcpkg/scripts/buildsystems/vcpkg.cmake")
 set(VCPKG_JSON_PATH "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg.json")
 
 # Include vcpkg toolchain

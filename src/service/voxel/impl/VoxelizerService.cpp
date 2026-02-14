@@ -55,8 +55,12 @@ namespace Metal {
         TextureData *albedoData = nullptr;
 
         if (mat != nullptr) {
+            std::lock_guard<std::mutex> lock(context.voxelizationService.texturesMutex);
             if (!context.voxelizationService.textures.contains(mat->albedo)) {
                 albedoData = context.textureService.stream(mat->albedo, LevelOfDetail::LOD_0);
+                if (albedoData != nullptr) {
+                    context.voxelizationService.textures[mat->albedo] = albedoData;
+                }
             } else {
                 albedoData = context.voxelizationService.textures.at(mat->albedo);
             }
@@ -79,16 +83,21 @@ namespace Metal {
                 );
                 auto *voxelTile = context.worldGridRepository.getTile(point);
                 if (voxelTile != nullptr) {
-                    if (!context.voxelizationService.builders.contains(voxelTile->id)) {
-                        context.voxelizationService.builders.emplace(voxelTile->id,
-                                         SparseVoxelOctreeBuilder(voxelTile));
+                    SparseVoxelOctreeBuilder* builderPtr = nullptr;
+                    {
+                        std::lock_guard<std::mutex> lock(context.voxelizationService.buildersMutex);
+                        if (!context.voxelizationService.builders.contains(voxelTile->id)) {
+                            context.voxelizationService.builders.emplace(voxelTile->id,
+                                             std::make_unique<SparseVoxelOctreeBuilder>(voxelTile));
+                        }
+                        builderPtr = context.voxelizationService.builders.at(voxelTile->id).get();
                     }
 
                     if (albedoData != nullptr) {
                         albedo = glm::vec3(albedoData->sampleAt(uv));
                     }
                     auto ptr = VoxelData(albedo, normal, component->emissiveSurface);
-                    context.voxelizationService.builders.at(voxelTile->id).insert(
+                    builderPtr->insert(
                         localMaxDepth,
                         point,
                         ptr);

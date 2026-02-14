@@ -1,18 +1,24 @@
 #include "VulkanUtils.h"
 
 #include "../../dependencies/vk-bootstrap/src/VkBootstrap.h"
+#include "../context/ApplicationContext.h"
+#include "../service/log/LogService.h"
 
 namespace Metal {
     void VulkanUtils::CheckVKResult(VkResult err) {
         if (err == VK_SUCCESS)
             return;
-        printf("[runtime] Error: VkResult = %d\n", err);
+        char buffer[128];
+        snprintf(buffer, sizeof(buffer), "[runtime] Error: VkResult = %d", err);
+        LOG_ERROR_S(buffer);
         if (err < VK_SUCCESS)
             abort();
     }
 
     void VulkanUtils::GLFWErrorCallback(int error, const char *description) {
-        fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+        char buffer[1024];
+        snprintf(buffer, sizeof(buffer), "GLFW Error %d: %s", error, description);
+        LOG_ERROR_S(buffer);
     }
 
     VkFormat VulkanUtils::GetValidDepthFormat(VkPhysicalDevice physicalDevice) {

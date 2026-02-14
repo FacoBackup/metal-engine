@@ -4,13 +4,20 @@
 
 #include "OctreeNode.h"
 
+#include <atomic>
+#include <mutex>
+
 namespace Metal {
+    class SparseVoxelOctreeBuilder;
     struct WorldTile;
+    struct VoxelData;
+    struct OctreeNode;
 
     class SparseVoxelOctreeBuilder {
+        mutable std::mutex insertMutex;
         OctreeNode root{};
-        unsigned int nodeQuantity = 1;
-        unsigned int leafVoxelQuantity = 0;
+        std::atomic<unsigned int> nodeQuantity{1};
+        std::atomic<unsigned int> leafVoxelQuantity{0};
         WorldTile *tile = nullptr;
 
         void insertInternal(OctreeNode *node, glm::vec3 &point, VoxelData &data,
@@ -40,7 +47,7 @@ namespace Metal {
             return tile;
         }
 
-        void insert(int maxDepth, glm::vec3 &point, VoxelData &data);
+        void insert(int maxDepth, glm::vec3 point, VoxelData data);
 
         void dispose() const;
     };

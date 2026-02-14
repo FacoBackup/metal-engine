@@ -27,6 +27,8 @@ namespace Metal {
         void endWriting(VkImage &vkImage) const;
 
         void startWriting(VkImage &vkImage) const;
+
+        void syncWriting(VkImage &vkImage) const;
     };
 }
 

@@ -78,7 +78,6 @@ namespace Metal {
     }
 
     PipelineInstance *PipelineService::createRenderingPipeline(PipelineBuilder &pipelineBuilder) {
-        VkVertexInputBindingDescription *meshBindingDescription = nullptr;
         auto meshDescriptions = VertexData::GetAttributeDescriptions();
 
         auto *pipeline = new PipelineInstance();
@@ -102,16 +101,16 @@ namespace Metal {
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
+        VkVertexInputBindingDescription meshBindingDescription{};
         if (pipelineBuilder.prepareForMesh) {
-            meshBindingDescription = new VkVertexInputBindingDescription;
-            meshBindingDescription->binding = 0;
-            meshBindingDescription->stride = sizeof(VertexData);
-            meshBindingDescription->inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+            meshBindingDescription.binding = 0;
+            meshBindingDescription.stride = sizeof(VertexData);
+            meshBindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
             vertexInputInfo.vertexBindingDescriptionCount = 1;
             vertexInputInfo.vertexAttributeDescriptionCount = static_cast<unsigned int>(meshDescriptions.size());
             vertexInputInfo.pVertexAttributeDescriptions = meshDescriptions.data();
-            vertexInputInfo.pVertexBindingDescriptions = meshBindingDescription;
+            vertexInputInfo.pVertexBindingDescriptions = &meshBindingDescription;
         }
 
         VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
@@ -141,7 +140,6 @@ namespace Metal {
         multisampling.sampleShadingEnable = VK_FALSE;
         multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
 
-        VkPipelineColorBlendStateCreateInfo colorBlending{};
         std::vector<VkPipelineColorBlendAttachmentState> colorBlendAttachments{};
         for (int i = 0; i < pipelineBuilder.frameBuffer->attachments.size(); i++) {
             auto &colorBlendAttachment = colorBlendAttachments.emplace_back();
@@ -161,6 +159,8 @@ namespace Metal {
                 colorBlendAttachment.blendEnable = VK_FALSE;
             }
         }
+
+        VkPipelineColorBlendStateCreateInfo colorBlending{};
         colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
         colorBlending.logicOpEnable = VK_FALSE;
         colorBlending.logicOp = VK_LOGIC_OP_COPY;
@@ -215,7 +215,6 @@ namespace Metal {
         for (int i = 0; i < pipelineBuilder.descriptorSetsToBind.size(); i++) {
             pipeline->descriptorSets[i] = pipelineBuilder.descriptorSetsToBind[i]->vkDescriptorSet;
         }
-        delete meshBindingDescription;
         vkDestroyShaderModule(vulkanContext.device.device, fragmentShaderModule, nullptr);
         vkDestroyShaderModule(vulkanContext.device.device, vertexShaderModule, nullptr);
         return pipeline;

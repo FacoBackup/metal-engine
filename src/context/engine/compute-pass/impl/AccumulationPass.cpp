@@ -15,6 +15,7 @@ namespace Metal {
     }
 
     void AccumulationPass::onSync() {
+        syncWriting(context.coreTextures.currentFrame->vkImage);
         if (initialized) {
             recordPushConstant(&pushConstant);
             recordImageDispatch(context.coreTextures.currentFrame, 8, 8);

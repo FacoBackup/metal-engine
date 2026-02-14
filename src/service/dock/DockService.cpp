@@ -99,7 +99,7 @@ namespace Metal {
                 addWindow(dockSpace, panel);
             }
 
-            ImGui::DockBuilderDockWindow(dockRepository.center.internalId, windowId);
+            ImGui::DockBuilderDockWindow(dockRepository.center.internalId.c_str(), windowId);
             ImGui::DockBuilderFinish(windowId);
         }
     }
@@ -122,7 +122,7 @@ namespace Metal {
     }
 
     void DockService::addWindow(DockDTO *d, AbstractPanel *panel) {
-        ImGui::DockBuilderDockWindow(d->internalId, d->nodeId);
+        ImGui::DockBuilderDockWindow(d->internalId.c_str(), d->nodeId);
         for (auto *l: panel->getChildren()) {
             if (dynamic_cast<DockSpacePanel *>(l)) {
                 panel->appendChild(new DockSpacePanel(dynamic_cast<DockSpacePanel *>(l), d));

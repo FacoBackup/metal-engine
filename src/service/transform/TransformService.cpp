@@ -34,8 +34,7 @@ namespace Metal {
             auxMat4 = glm::identity<glm::mat4>();
         }
         if (!st->forceTransform && st->isStatic) {
-            std::cout << "Entity will not be transformed because it is set to static " << st->getEntityId() <<
-                    std::endl;
+            LOG_WARN(context, "Entity will not be transformed because it is set to static " + std::to_string(st->getEntityId()));
             return;
         }
         translation = glm::vec3(st->model[3]);

@@ -9,6 +9,10 @@
 #include "impl/OctreeNode.h"
 #include "impl/SparseVoxelOctreeData.h"
 
+#include <atomic>
+#include <mutex>
+#include <memory>
+
 namespace Metal {
     struct WorldTile;
     struct VoxelizationRequest;
@@ -33,12 +37,14 @@ namespace Metal {
         void collectRequests(WorldTile &t, std::vector<std::vector<VoxelizationRequest>> &requests) const;
 
     public:
+        mutable std::mutex buildersMutex;
+        mutable std::mutex texturesMutex;
         std::unordered_map<std::string, TextureData *> textures{};
-        std::unordered_map<std::string, SparseVoxelOctreeBuilder> builders{};
+        std::unordered_map<std::string, std::unique_ptr<SparseVoxelOctreeBuilder>> builders{};
         std::string localVoxelizationRequestId;
-        bool isVoxelizationDone = false;
-        bool isVoxelizationCancelled = false;
-        bool isExecutingThread = false;
+        std::atomic<bool> isVoxelizationDone{false};
+        std::atomic<bool> isVoxelizationCancelled{false};
+        std::atomic<bool> isExecutingThread{false};
         std::array<std::thread, 3> threads{};
         std::thread mainThread;
 

@@ -12,7 +12,7 @@ namespace Metal {
         const std::string id = Util::uuidV4();
         ImGuiID nodeId{};
         int selectedOption;
-        const char * internalId = nullptr;
+        std::string internalId;
         ImGuiDir splitDir = ImGuiDir_Down;
         float sizeX{};
         float sizeY{};
@@ -23,8 +23,8 @@ namespace Metal {
         DockPosition direction = LEFT;
 
         explicit DockDTO(DockSpace *description) : selectedOption(description->index),
-                                                   description(description) {
-            internalId = ("##" + Util::uuidV4()).c_str();
+                                                   description(description),
+                                                   internalId("##" + Util::uuidV4()) {
         }
     };
 } // Metal

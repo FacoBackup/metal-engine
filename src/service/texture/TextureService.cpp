@@ -152,8 +152,8 @@ namespace Metal {
                                ? static_cast<unsigned int>(std::floor(std::log2(std::max(image->width, image->height)))) + 1
                                : 1;
         image->vkFormat = imageFormat;
-        std::cout << "Loading texture " << id << " from " << pathToImage << std::endl;
-        std::cout << "Texture data: Width " << image->width << " Height " << image->height << std::endl;
+        LOG_INFO(context, "Loading texture " + id + " from " + pathToImage);
+        LOG_INFO(context, "Texture data: Width " + std::to_string(image->width) + " Height " + std::to_string(image->height));
         const std::shared_ptr<BufferInstance> stagingBuffer = context.bufferService.createBuffer(
             image->width * image->height * 4, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
@@ -327,8 +327,8 @@ namespace Metal {
         imageCreateInfo.arrayLayers = 1;
         imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT; // No multisampling
         imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-        imageCreateInfo.usage = VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-        imageCreateInfo.sharingMode = VK_SHARING_MODE_CONCURRENT;
+        imageCreateInfo.usage = VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+        imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
         imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
         createImageWithInfo(imageCreateInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image);

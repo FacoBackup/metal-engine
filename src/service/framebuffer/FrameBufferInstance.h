@@ -3,6 +3,8 @@
 
 #include "../../context/vulkan/VulkanContext.h"
 #include "../../repository/abstract/RuntimeResource.h"
+#include "../../service/log/LogService.h"
+#include "../../context/ApplicationContext.h"
 #include <vector>
 #include <iostream>
 #include <glm/vec4.hpp>
@@ -21,12 +23,12 @@ namespace Metal {
         std::vector<std::shared_ptr<FrameBufferAttachment> > attachments{};
 
         void dispose(VulkanContext &context) override {
-            std::cout << "Disposing framebuffer instance" << std::endl;
+            LOG_INFO_S("Disposing framebuffer instance");
             vkDestroyFramebuffer(context.device.device, vkFramebuffer, nullptr);
             vkDestroyRenderPass(context.device.device, vkRenderPass, nullptr);
 
             for (int i = 0; i < attachments.size(); i++) {
-                std::cout << "Disposing of attachment instance " << i << std::endl;
+                LOG_INFO_S("Disposing of attachment instance " + std::to_string(i));
                 attachments[i]->dispose(context);
             }
         }

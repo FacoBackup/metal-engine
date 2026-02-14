@@ -1,6 +1,7 @@
 #include "DescriptorInstance.h"
 
-#include <iostream>
+#include "../../service/log/LogService.h"
+#include "../../context/ApplicationContext.h"
 
 #include "DescriptorBinding.h"
 #include "../buffer/BufferInstance.h"
@@ -9,7 +10,7 @@
 
 namespace Metal {
     void DescriptorInstance::dispose(const VulkanContext &context) const {
-        std::cout << "Disposing of descriptor instance" << std::endl;
+        LOG_INFO_S("Disposing of descriptor instance");
         vkDestroyDescriptorSetLayout(context.device.device, vkDescriptorSetLayout, nullptr);
     }
 

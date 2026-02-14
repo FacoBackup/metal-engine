@@ -14,7 +14,7 @@
 #define DISPOSAL(R)\
 for (auto it = R.begin(); it != R.end();) {\
     if (lastUse.contains(it->second->getId()) && !it->second->isNoDisposal() && (lastUse.at(it->second->getId()) - context.engineContext.currentTimeMs) >= MAX_TIMEOUT) {\
-        std::cout << "Disposing of " << it->first << " Since last use: " << (lastUse.at(it->second->getId()) - context.engineContext.currentTimeMs) <<std::endl;\
+        LOG_INFO(context, "Disposing of " + it->first + " Since last use: " + std::to_string(lastUse.at(it->second->getId()) - context.engineContext.currentTimeMs));\
         it->second->dispose(context.vulkanContext);\
         auto newIt = R.erase(it);\
         delete it->second;\
@@ -35,7 +35,7 @@ if (!tries.contains(id)) {\
 }\
 tries[id]++;\
 if (tries[id] < MAX_TRIES) {\
-    std::cout << "Steaming " << id << std::endl;\
+    LOG_INFO(context, "Streaming " + id);\
     auto *instance = T.create(id, lod);\
     if (instance != nullptr) {\
         tries[id] = 0;\
@@ -62,7 +62,7 @@ tries[id] = 0;\
 }\
 tries[id]++;\
 if (tries[id] < MAX_TRIES) {\
-std::cout << "Steaming " << id << std::endl;\
+LOG_INFO(context, "Streaming " + id);\
 auto *instance = T.create(id);\
 if (instance != nullptr) {\
     tries[id] = 0;\

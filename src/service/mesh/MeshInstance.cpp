@@ -1,12 +1,13 @@
 #include "MeshInstance.h"
 
-#include <iostream>
+#include "../../service/log/LogService.h"
+#include "../../context/ApplicationContext.h"
 
 #include "../buffer/BufferInstance.h"
 
 namespace Metal {
     void MeshInstance::dispose(VulkanContext &context) {
-        std::cout << "Disposing of mesh instance" << std::endl;
+        LOG_INFO_S("Disposing of mesh instance");
 
         indexBuffer->dispose(context);
         dataBuffer->dispose(context);

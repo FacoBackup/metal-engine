@@ -2,11 +2,12 @@
 #include "../../../repository/world/impl/WorldTile.h"
 
 namespace Metal {
-    void SparseVoxelOctreeBuilder::insert(int maxDepth, glm::vec3 &point, VoxelData &data) {
+    void SparseVoxelOctreeBuilder::insert(int maxDepth, glm::vec3 point, VoxelData data) {
         if (maxDepth < 1) {
             throw std::runtime_error("Depth is not set");
         }
 
+        std::lock_guard<std::mutex> lock(insertMutex);
         if (tile->boundingBox.intersects(point)) {
             WorldToChunkLocal(tile, point);
             auto pos = glm::ivec3{0, 0, 0};

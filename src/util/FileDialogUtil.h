@@ -1,9 +1,10 @@
 #ifndef FILEDIALOGUTIL_H
 #define FILEDIALOGUTIL_H
-#include <iostream>
 #include <string>
 #include <vector>
 #include <nfd.hpp>
+#include "../service/log/LogService.h"
+#include "../context/ApplicationContext.h"
 
 namespace Metal:: FileDialogUtil {
     static std::vector<std::string> PickFiles(std::vector<nfdu8filteritem_t> filtersToApply) {
@@ -13,7 +14,7 @@ namespace Metal:: FileDialogUtil {
 
         nfdresult_t result = NFD::OpenDialogMultiple(outPaths, filtersToApply.data(), 2);
         if (result == NFD_OKAY) {
-            std::cout << "Success!" << std::endl;
+            LOG_INFO_S("Successfully picked files");
 
             nfdpathsetsize_t numPaths;
             NFD::PathSet::Count(outPaths, numPaths);

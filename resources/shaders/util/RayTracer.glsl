@@ -141,7 +141,7 @@ inout ivec2 debugColor
     float minDistance = 1e10;// Large initial value
 
     if (!intersect(minBox, maxBox, ray)) return hitData;
-    Stack stack[6];
+    Stack stack[32];
     scale *= 0.5f;
     stack[0] = Stack(0u, center, scale, 1);
 
