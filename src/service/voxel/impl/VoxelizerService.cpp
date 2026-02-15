@@ -42,13 +42,13 @@ namespace Metal {
             stepSize = .01f;
         }
 
-        if (isTriangleFlatInAxis(triangle)) {
-            while (stepSize < .01) {
-                const auto voxelSizeLocal = static_cast<float>(TILE_SIZE / std::pow(2, localMaxDepth));
-                stepSize = voxelSizeLocal / maxEdgeLength;
-                localMaxDepth--;
-            }
-        }
+        // if (isTriangleFlatInAxis(triangle)) {
+        //     while (stepSize < .01) {
+        //         const auto voxelSizeLocal = static_cast<float>(TILE_SIZE / std::pow(2, localMaxDepth));
+        //         stepSize = voxelSizeLocal / maxEdgeLength;
+        //         localMaxDepth--;
+        //     }
+        // }
 
         glm::vec3 albedo = component->albedoColor * 255.f;
         auto *mat = context.materialService.stream(component->materialId);
