@@ -12,6 +12,7 @@ namespace Metal {
     struct SnapshotWorldTile;
     struct VoxelData;
     struct OctreeNode;
+    struct MeshComponent;
 
     class SparseVoxelOctreeBuilder {
         mutable std::mutex insertMutex;

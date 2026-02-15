@@ -16,8 +16,8 @@
 namespace fs = std::filesystem;
 
 namespace Metal {
-    std::string TextureImporterService::importTexture(const std::string &targetDir,
-                                                      const std::string &pathToFile) const {
+    std::string TextureImporterService::importData(const std::string &targetDir,
+                                            const std::string &pathToFile, const std::stop_token &stopToken) {
         try {
             auto metadata = EntryMetadata{};
             metadata.type = EntryType::TEXTURE;
@@ -41,7 +41,7 @@ namespace Metal {
             return metadata.getId();
         } catch (std::exception &e) {
             LOG_ERROR(context, std::string("Texture import failed: ") + e.what());
-            return "";
+            throw std::runtime_error("Texture import failed");
         }
     }
 
@@ -78,7 +78,8 @@ namespace Metal {
                 for (int y = 0; y < height; ++y) {
                     for (int x = 0; x < width; ++x) {
                         const auto &t = texture->pcData[static_cast<unsigned int>(y * width + x)];
-                        const size_t idx = (static_cast<size_t>(y) * static_cast<size_t>(width) + static_cast<size_t>(x)) * 4u;
+                        const size_t idx = (static_cast<size_t>(y) * static_cast<size_t>(width) + static_cast<size_t>(
+                                                x)) * 4u;
                         owned[idx + 0] = t.r;
                         owned[idx + 1] = t.g;
                         owned[idx + 2] = t.b;

@@ -12,9 +12,9 @@
 
 namespace Metal {
     void MaterialImporterService::persistAllMaterials(const std::string &targetDir, const aiScene *scene,
-                                                   std::unordered_map<unsigned int, std::string> &materialMap,
-                                                   const std::string &rootDirectory,
-                                                   const std::stop_token &stopToken) const {
+                                                      std::unordered_map<unsigned int, std::string> &materialMap,
+                                                      const std::string &rootDirectory,
+                                                      const std::stop_token &stopToken) const {
         namespace fs = std::filesystem;
         LOG_INFO(context, "Processing materials for scene...");
         for (unsigned int i = 0; i < scene->mNumMaterials; ++i) {
@@ -22,7 +22,8 @@ namespace Metal {
             const aiMaterial *material = scene->mMaterials[i];
             auto materialData = MaterialData{};
 
-            const auto importAssimpTexture = [&](const aiString &assimpPath, const std::string &nameHint) -> std::string {
+            const auto importAssimpTexture = [&
+                    ](const aiString &assimpPath, const std::string &nameHint) -> std::string {
                 if (assimpPath.length == 0) return "";
                 const std::string p = assimpPath.C_Str();
 
@@ -31,7 +32,8 @@ namespace Metal {
                     try {
                         const unsigned int embeddedIndex = static_cast<unsigned int>(std::stoul(p.substr(1)));
                         if (scene && embeddedIndex < scene->mNumTextures) {
-                            return context.textureImporter.importEmbeddedTexture(targetDir, scene->mTextures[embeddedIndex], nameHint);
+                            return context.textureImporter.importEmbeddedTexture(
+                                targetDir, scene->mTextures[embeddedIndex], nameHint);
                         }
                     } catch (...) {
                         return "";
@@ -44,7 +46,11 @@ namespace Metal {
                     resolved = fs::path(rootDirectory) / resolved;
                 }
                 resolved = resolved.lexically_normal();
-                return context.textureImporter.importTexture(targetDir, resolved.string());
+                try {
+                    return context.textureImporter.importData(targetDir, resolved.string(), stopToken);
+                } catch (std::exception &e) {
+                    return "";
+                }
             };
 
             const auto trySetFromType = [&](std::string &slot, aiTextureType type, const std::string &nameHint) {

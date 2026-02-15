@@ -23,18 +23,11 @@ namespace Metal {
             auto files = FileDialogUtil::PickFiles({
                 {
                     "Files",
-                    "fbx,gltf,obj,glb,png,jpg,jpeg,vdb,pcd,ply,xyz,las,laz,e57"
+                    context->fileImporterService.collectCompatibleFiles().c_str(),
                 }
             });
             for (const std::string &file: files) {
-                if (context->meshImporter.isCompatible(file)) {
-                    context->meshImporter.importScene(filesContext.currentDirectory->absolutePath,
-                                                      file);
-                } else if (context->textureImporter.isCompatible(file)) {
-                    context->textureImporter.importTexture(filesContext.currentDirectory->absolutePath, file);
-                } else if (context->volumeImporterService.isCompatible(file)) {
-                    context->volumeImporterService.importVolume(filesContext.currentDirectory->absolutePath, file);
-                }
+                context->fileImporterService.importFile(filesContext.currentDirectory->absolutePath, file);
             }
             FilesService::GetEntries(filesContext.currentDirectory);
         };
@@ -99,7 +92,7 @@ namespace Metal {
 
 
                 ImGui::BeginChild((id + "files_list_in_table").c_str(), ImVec2(0, 0),
-                                  ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar );
+                                  ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar);
                 {
                     isSomethingHovered = ImGui::IsWindowHovered();
                     if (ImGui::IsWindowFocused()) {
@@ -135,18 +128,13 @@ namespace Metal {
                     clearDragOnMouseUp();
                 }
                 ImGui::EndChild();
-
                 ImGui::TableNextColumn();
-
                 ImGui::BeginChild((id + "preview_in_table").c_str(), ImVec2(0, 0));
                 {
                     previewPanel->onSync();
                 }
                 ImGui::EndChild();
-
-
                 previewWidth = ImGui::GetColumnWidth(1);
-
                 ImGui::EndTable();
             }
         } else {

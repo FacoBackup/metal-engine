@@ -12,7 +12,6 @@
 #include "../../common/AbstractRuntimeComponent.h"
 #include "impl/OctreeNode.h"
 #include "impl/SparseVoxelOctreeData.h"
-#include "../notification/AsyncTaskService.h"
 #include "../../repository/world/impl/BoundingBox.h"
 #include "../../repository/world/components/MeshComponent.h"
 #include "../../repository/world/impl/WorldTile.h"
@@ -23,37 +22,20 @@ namespace Metal {
     struct TextureData;
     struct MeshComponent;
     class SparseVoxelOctreeBuilder;
+    class WorldSnapshot;
     struct MeshData;
 
-    struct SnapshotWorldTile final {
-        int x;
-        int z;
-        std::string id;
-        BoundingBox boundingBox{};
-
-        explicit SnapshotWorldTile(const WorldTile& tile)
-            : x(tile.x), z(tile.z), id(tile.id), boundingBox(tile.boundingBox) {}
-    };
-
-    struct SnapshotEntity final {
-        glm::mat4x4 model;
-        MeshComponent* meshComponent;
-    };
-
-    struct WorldSnapshot final {
-        std::unordered_map<std::string, SnapshotWorldTile> tiles;
-        std::unordered_map<std::string, std::vector<SnapshotEntity>> entitiesByTile;
-    };
-
     class VoxelizationService final : public AbstractRuntimeComponent {
-        std::string voxelizationTask ;
+        std::string voxelizationTask;
+
     public:
-        WorldSnapshot worldSnapshot;
-        std::vector<std::unique_ptr<MeshComponent>> meshComponentSnapshot;
+        WorldSnapshot *worldSnapshot = nullptr;
+        std::vector<std::unique_ptr<MeshComponent> > meshComponentSnapshot;
+
     private:
         void captureSnapshot();
 
-        static void copyMeshComponent(const MeshComponent& from, MeshComponent& to);
+        static void copyMeshComponent(const MeshComponent &from, MeshComponent &to);
 
         static void FillStorage(SparseVoxelOctreeBuilder &builder, unsigned int &bufferIndex,
                                 unsigned int &materialBufferIndex,
@@ -61,19 +43,18 @@ namespace Metal {
 
         static void PutData(unsigned int &bufferIndex, OctreeNode *node);
 
-        void serialize(SparseVoxelOctreeBuilder &builder) const;
-
         void beginVoxelization();
 
         void voxelizeGroup(const std::vector<VoxelizationRequest> &request) const;
 
-        void collectRequests(const SnapshotWorldTile &t, std::vector<std::vector<VoxelizationRequest>> &requests) const;
+        void collectRequests(const SnapshotWorldTile &t,
+                             std::vector<std::vector<VoxelizationRequest> > &requests) const;
 
     public:
         mutable std::mutex buildersMutex;
         mutable std::mutex texturesMutex;
         std::unordered_map<std::string, TextureData *> textures{};
-        std::unordered_map<std::string, std::unique_ptr<SparseVoxelOctreeBuilder>> builders{};
+        std::unordered_map<std::string, std::unique_ptr<SparseVoxelOctreeBuilder> > builders{};
         std::string localVoxelizationRequestId;
         std::atomic<bool> isVoxelizationDone{false};
         std::atomic<bool> isVoxelizationCancelled{false};
@@ -81,13 +62,13 @@ namespace Metal {
         std::array<std::thread, 3> threads{};
         std::thread mainThread;
 
-        explicit VoxelizationService(ApplicationContext &context)
-            : AbstractRuntimeComponent(context) {
-        }
+        explicit VoxelizationService(ApplicationContext &context);
 
         bool isExecutingVoxelization() const {
             return isExecutingThread;
         }
+
+        void serialize(SparseVoxelOctreeBuilder &builder, const std::string &filePath) const;
 
         void onSync() override;
 

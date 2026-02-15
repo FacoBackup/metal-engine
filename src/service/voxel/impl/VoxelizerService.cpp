@@ -1,13 +1,11 @@
 #include "VoxelizerService.h"
 
-#include <stb_image.h>
 #include <thread>
-#include <cereal/archives/binary.hpp>
 
 #include "../VoxelizationRequest.h"
+#include "SnapshotWorldTile.h"
 #include "../../../context/ApplicationContext.h"
 #include "../../../enum/LevelOfDetail.h"
-#include "../../../enum/engine-definitions.h"
 #include "../../../service/texture/TextureData.h"
 #include "../../../service/mesh/MeshData.h"
 #include "../../../service/voxel/impl/SparseVoxelOctreeBuilder.h"
@@ -82,7 +80,7 @@ namespace Metal {
                     lambda2 * triangle.n2
                 );
                 const SnapshotWorldTile *voxelTile = nullptr;
-                for (auto& pair : context.voxelizationService.worldSnapshot.tiles) {
+                for (auto& pair : context.voxelizationService.worldSnapshot->tiles) {
                     if (pair.second.boundingBox.intersects(point)) {
                         voxelTile = &pair.second;
                         break;

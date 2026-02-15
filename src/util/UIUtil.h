@@ -84,7 +84,7 @@ namespace Metal::UIUtil {
             case EntryType::TEXTURE:
                 return Icons::texture;
             case EntryType::VOLUME:
-                return Icons::view_in_ar;
+                return Icons::cloud;
             case EntryType::DIRECTORY:
                 return Icons::folder;
             case EntryType::SCENE:

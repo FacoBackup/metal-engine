@@ -1,5 +1,6 @@
 #ifndef ABSTRACTIMPORTER_H
 #define ABSTRACTIMPORTER_H
+#include <stop_token>
 #include <string>
 #include <vector>
 
@@ -7,18 +8,22 @@
 
 namespace Metal {
     class AbstractImporter : public AbstractRuntimeComponent {
-    protected:
+    public:
         virtual std::vector<std::string> getSupportedTypes() {
             return {};
         }
 
-    public:
         explicit AbstractImporter(ApplicationContext &context)
             : AbstractRuntimeComponent(context) {
         }
 
+        virtual std::string importData(const std::string &targetDir, const std::string &pathToFile,
+                                       const std::stop_token &stopToken) {
+            return "";
+        }
+
         bool isCompatible(const std::string &path) {
-            for(auto &ext: getSupportedTypes()) {
+            for (auto &ext: getSupportedTypes()) {
                 if (path.find(ext) != std::string::npos) {
                     return true;
                 }

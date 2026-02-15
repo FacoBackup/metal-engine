@@ -27,6 +27,7 @@
 #include "../service/material/MaterialImporterService.h"
 #include "../service/texture/TextureImporterService.h"
 #include "../service/files/FilesService.h"
+#include "../service/files/FileImporterService.h"
 #include "../service/camera/CameraService.h"
 #include "./engine/passes/PassesService.h"
 
@@ -87,11 +88,12 @@ namespace Metal {
         ThemeService themeService{*this};
         DockService dockService{*this};
         SelectionService selectionService{*this};
-        SceneImporterService meshImporter{*this};
+        SceneImporterService sceneImporterService{*this};
         MeshImporterService meshImporterService{*this};
         MaterialImporterService materialImporterService{*this};
         TextureImporterService textureImporter{*this};
         FilesService filesService{*this};
+        FileImporterService fileImporterService{*this};
         CameraService cameraService{*this};
         VoxelizationService voxelizationService{*this};
         VoxelizerService voxelizerService{*this};

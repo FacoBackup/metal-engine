@@ -18,7 +18,7 @@ namespace Metal {
             return {"png", "jpg", "jpeg"};
         }
 
-        std::string importTexture(const std::string &targetDir, const std::string &pathToFile) const;
+        std::string importData(const std::string &targetDir, const std::string &pathToFile, const std::stop_token &stopToken) override;
 
         std::string importEmbeddedTexture(const std::string &targetDir, const ::aiTexture *texture,
                                           const std::string &nameHint) const;

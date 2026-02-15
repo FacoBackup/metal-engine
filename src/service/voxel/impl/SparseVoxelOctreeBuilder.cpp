@@ -1,5 +1,6 @@
 #include "SparseVoxelOctreeBuilder.h"
 #include "../VoxelizationService.h"
+#include "SnapshotWorldTile.h"
 
 namespace Metal {
     void SparseVoxelOctreeBuilder::insert(int maxDepth, glm::vec3 point, VoxelData data) {

@@ -156,6 +156,8 @@ add_executable(
         src/service/texture/TextureService.h
         src/service/files/FilesService.cpp
         src/service/files/FilesService.h
+        src/service/files/FileImporterService.cpp
+        src/service/files/FileImporterService.h
         src/context/editor/dock-spaces/files/FilesContext.cpp
         src/dto/push-constant/MeshPushConstant.h
         src/service/mesh/VertexData.h
@@ -299,11 +301,11 @@ add_executable(
         src/service/notification/AsyncTask.h
         src/service/voxel/VolumeImporterService.cpp
         src/service/voxel/VolumeImporterService.h
+        src/service/voxel/impl/SnapshotWorldTile.h
 )
 
 
 # ------ LIBS
-find_package(FFMPEG REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 find_package(imgui REQUIRED)
@@ -317,9 +319,9 @@ find_package(nfd CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(meshoptimizer CONFIG REQUIRED)
 find_package(cereal CONFIG REQUIRED)
+find_package(OpenVDB CONFIG REQUIRED)
 
 set(COMMON_LIBRARIES
-        ${FFMPEG_LIBRARIES}
         glfw
         nfd::nfd
         cereal::cereal
@@ -338,9 +340,9 @@ set(COMMON_LIBRARIES
         glslang::glslang
         glslang::glslang-default-resource-limits
         glslang::SPVRemapper
+        OpenVDB::openvdb
 )
 target_link_libraries(metal_engine PRIVATE ${COMMON_LIBRARIES})
-target_include_directories(metal_engine PRIVATE dependencies/stb ${FFMPEG_INCLUDE_DIRS})
 add_subdirectory(dependencies/vk-bootstrap)
 # ------ LIBS
 

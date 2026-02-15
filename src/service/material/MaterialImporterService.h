@@ -1,17 +1,19 @@
 #ifndef MATERIALIMPORTERSERVICE_H
 #define MATERIALIMPORTERSERVICE_H
 
-#include "../abstract/AbstractImporter.h"
 #include <assimp/scene.h>
 #include <unordered_map>
 #include <string>
 #include <stop_token>
 
+#include "../abstract/AbstractResourceService.h"
+
 namespace Metal {
-    class MaterialImporterService final : public AbstractImporter {
+    class MaterialImporterService final : public AbstractResourceService {
     public:
         explicit MaterialImporterService(ApplicationContext &context)
-            : AbstractImporter(context) {}
+            : AbstractResourceService(context) {
+        }
 
         void persistAllMaterials(const std::string &targetDir, const aiScene *scene,
                                  std::unordered_map<unsigned int, std::string> &materialMap,

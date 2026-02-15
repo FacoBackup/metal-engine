@@ -13,6 +13,7 @@
 #include "../../service/mesh/MeshData.h"
 #include "../../service/voxel/impl/SparseVoxelOctreeBuilder.h"
 #include "impl/SparseVoxelOctreeData.h"
+#include "impl/SnapshotWorldTile.h"
 #include <functional>
 
 #define METRIC_START \
@@ -65,10 +66,10 @@ namespace Metal {
     }
 
     void VoxelizationService::collectRequests(const SnapshotWorldTile &t,
-                                              std::vector<std::vector<VoxelizationRequest>> &requests) const {
+                                              std::vector<std::vector<VoxelizationRequest> > &requests) const {
         unsigned int requestIndex = 0;
-        if (!worldSnapshot.entitiesByTile.contains(t.id)) return;
-        for (auto &entity: worldSnapshot.entitiesByTile.at(t.id)) {
+        if (!worldSnapshot->entitiesByTile.contains(t.id)) return;
+        for (auto &entity: worldSnapshot->entitiesByTile.at(t.id)) {
             requests[requestIndex].emplace_back(entity.model, *entity.meshComponent);
             requestIndex++;
             if (requestIndex >= requests.size()) {
@@ -77,7 +78,11 @@ namespace Metal {
         }
     }
 
-    void VoxelizationService::serialize(SparseVoxelOctreeBuilder &builder) const {
+    VoxelizationService::VoxelizationService(ApplicationContext &context) : AbstractRuntimeComponent(context) {
+        worldSnapshot = new WorldSnapshot();
+    }
+
+    void VoxelizationService::serialize(SparseVoxelOctreeBuilder &builder, const std::string &filePath) const {
         METRIC_START
         SparseVoxelOctreeData data{};
         data.data.resize(builder.getVoxelQuantity() + builder.getLeafVoxelQuantity() * 2);
@@ -88,8 +93,6 @@ namespace Metal {
         PutData(bufferIndex, &builder.getRoot());
         FillStorage(builder, bufferIndex, materialBufferIndex, data, &builder.getRoot());
 
-        std::string filePath = context.getAssetDirectory() + FORMAT_FILE_SVO(builder.getTile()->id);
-        context.engineRepository.svoFilePaths.push_back(filePath);
         DUMP_TEMPLATE(filePath, data)
         METRIC_END("Ending serialization ")
     }
@@ -116,9 +119,9 @@ namespace Metal {
         }
         context.engineRepository.svoFilePaths.clear();
 
-        for (auto &t: worldSnapshot.tiles) {
+        for (auto &t: worldSnapshot->tiles) {
             const unsigned int threadCount = std::max(1u, std::thread::hardware_concurrency());
-            std::vector<std::vector<VoxelizationRequest>> requests;
+            std::vector<std::vector<VoxelizationRequest> > requests;
             requests.resize(threadCount);
             collectRequests(t.second, requests);
 
@@ -151,7 +154,9 @@ namespace Metal {
         }
 
         for (auto &t: builders) {
-            serialize(*t.second);
+            std::string filePath = context.getAssetDirectory() + FORMAT_FILE_SVO(t.second->getTile()->id);
+            context.engineRepository.svoFilePaths.push_back(filePath);
+            serialize(*t.second, filePath);
             t.second->dispose();
         }
 
@@ -234,30 +239,29 @@ namespace Metal {
     }
 
     void VoxelizationService::captureSnapshot() {
-        worldSnapshot.tiles.clear();
-        worldSnapshot.entitiesByTile.clear();
+        worldSnapshot->tiles.clear();
+        worldSnapshot->entitiesByTile.clear();
         meshComponentSnapshot.clear();
 
-        for (auto& pair : context.worldGridRepository.getTiles()) {
-            auto& tile = pair.second;
-            worldSnapshot.tiles.emplace(tile.id, SnapshotWorldTile(tile));
-            
-            auto& entitiesInTile = worldSnapshot.entitiesByTile[tile.id];
-            for (auto entityId : tile.entities) {
-                if (context.worldRepository.meshes.contains(entityId) && 
+        for (auto &pair: context.worldGridRepository.getTiles()) {
+            auto &tile = pair.second;
+            worldSnapshot->tiles.emplace(tile.id, SnapshotWorldTile(tile.x, tile.z, tile.id, tile.boundingBox));
+
+            auto &entitiesInTile = worldSnapshot->entitiesByTile[tile.id];
+            for (auto entityId: tile.entities) {
+                if (context.worldRepository.meshes.contains(entityId) &&
                     !context.worldRepository.hiddenEntities.contains(entityId)) {
-                    
-                    auto& meshComp = context.worldRepository.meshes.at(entityId);
-                    auto& transComp = context.worldRepository.transforms.at(entityId);
-                    
+                    auto &meshComp = context.worldRepository.meshes.at(entityId);
+                    auto &transComp = context.worldRepository.transforms.at(entityId);
+
                     if (transComp.isStatic) {
                         auto snapshotMesh = std::make_unique<MeshComponent>();
                         copyMeshComponent(meshComp, *snapshotMesh);
-                        
+
                         SnapshotEntity snapshot;
                         snapshot.model = transComp.model;
                         snapshot.meshComponent = snapshotMesh.get();
-                        
+
                         meshComponentSnapshot.push_back(std::move(snapshotMesh));
                         entitiesInTile.push_back(snapshot);
                     }
@@ -266,7 +270,7 @@ namespace Metal {
         }
     }
 
-    void VoxelizationService::copyMeshComponent(const MeshComponent& from, MeshComponent& to) {
+    void VoxelizationService::copyMeshComponent(const MeshComponent &from, MeshComponent &to) {
         to.setEntityId(from.getEntityId());
         to.meshId = from.meshId;
         to.materialId = from.materialId;
