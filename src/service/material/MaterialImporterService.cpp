@@ -20,15 +20,6 @@ namespace Metal {
         for (unsigned int i = 0; i < scene->mNumMaterials; ++i) {
             if (stopToken.stop_requested()) return;
             const aiMaterial *material = scene->mMaterials[i];
-            std::string materialId; {
-                FileMetadata materialMetadata{};
-                materialMetadata.type = EntryType::MATERIAL;
-                materialMetadata.name = "Material " + std::to_string(i);
-                DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(materialMetadata.getId()), materialMetadata)
-                materialId = materialMetadata.getId();
-            }
-            materialMap.insert({i, materialId});
-
             auto materialData = MaterialData{};
 
             const auto importAssimpTexture = [&](const aiString &assimpPath, const std::string &nameHint) -> std::string {
@@ -79,6 +70,24 @@ namespace Metal {
 
             // Height (if present)
             trySetFromType(materialData.height, aiTextureType_HEIGHT, "height");
+
+            // If we didn't import any textures, don't create/persist a material at all.
+            if (materialData.albedo.empty() && materialData.normal.empty() && materialData.roughness.empty() &&
+                materialData.metallic.empty() && materialData.height.empty()) {
+                LOG_INFO(context, "Skipping material " + std::to_string(i) + ": no textures associated");
+                continue;
+            }
+
+            std::string materialId;
+            {
+                FileMetadata materialMetadata{};
+                materialMetadata.type = EntryType::MATERIAL;
+                materialMetadata.name = "Material " + std::to_string(i);
+                DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(materialMetadata.getId()), materialMetadata)
+                materialId = materialMetadata.getId();
+            }
+            materialMap.insert({i, materialId});
+
             DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialId), materialData)
             LOG_INFO(context, "Persisted material: " + materialId);
         }
