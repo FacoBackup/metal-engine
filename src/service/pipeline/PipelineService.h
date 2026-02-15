@@ -15,6 +15,8 @@ namespace Metal {
 
         PipelineInstance *createRenderingPipeline(PipelineBuilder &pipelineBuilder);
 
+        PipelineInstance *createRayTracingPipeline(const PipelineBuilder &pipelineBuilder) const;
+
         void createPipelineLayout(const std::vector<DescriptorInstance *> &descriptorSetsToBind,
                                   unsigned int pushConstantsSize,
                                   PipelineInstance *pipeline) const;

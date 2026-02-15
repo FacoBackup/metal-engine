@@ -15,6 +15,7 @@ namespace Metal {
         VkSampler sampler = VK_NULL_HANDLE;
         VkImageView view = VK_NULL_HANDLE;
         VkImageLayout layout = VK_IMAGE_LAYOUT_GENERAL;
+        VkAccelerationStructureKHR accelerationStructure = VK_NULL_HANDLE;
 
         static DescriptorBinding Of(VkShaderStageFlagBits stageFlags, VkDescriptorType type, unsigned int bindingPoint,
                                     VkSampler sampler, VkImageView view,
@@ -29,6 +30,13 @@ namespace Metal {
 
         static DescriptorBinding Of(VkShaderStageFlagBits stageFlags, VkDescriptorType type, unsigned int bindingPoint) {
             return DescriptorBinding(stageFlags, type, bindingPoint);
+        }
+
+        static DescriptorBinding OfAccelerationStructure(VkShaderStageFlagBits stageFlags, unsigned int bindingPoint,
+                                                          VkAccelerationStructureKHR as) {
+            DescriptorBinding b(stageFlags, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, bindingPoint);
+            b.accelerationStructure = as;
+            return b;
         }
     };
 }

@@ -33,6 +33,7 @@ namespace Metal {
         std::unique_ptr<DescriptorInstance> currentFrameDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> svoData = nullptr;
         std::unique_ptr<DescriptorInstance> lightVolumeData = nullptr;
+        std::unique_ptr<DescriptorInstance> tlasDescriptor = nullptr;
 
         void createMaterialDescriptors();
 

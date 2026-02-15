@@ -20,9 +20,27 @@ namespace Metal {
         // These vectors will hold the Vk*Info objects so their memory remains valid.
         std::vector<VkDescriptorBufferInfo> bufferInfos;
         std::vector<VkDescriptorImageInfo> imageInfos;
+        std::vector<VkWriteDescriptorSetAccelerationStructureKHR> asInfos;
 
         for (auto &binding: bindings) {
-            if (binding.bufferInstance != nullptr) {
+            if (binding.accelerationStructure != VK_NULL_HANDLE) {
+                VkWriteDescriptorSetAccelerationStructureKHR asInfo{};
+                asInfo.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
+                asInfo.accelerationStructureCount = 1;
+                asInfo.pAccelerationStructures = &binding.accelerationStructure;
+                asInfos.push_back(asInfo);
+
+                VkWriteDescriptorSet descriptorWrite{};
+                descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                descriptorWrite.dstSet = vkDescriptorSet;
+                descriptorWrite.dstBinding = binding.bindingPoint;
+                descriptorWrite.dstArrayElement = 0;
+                descriptorWrite.descriptorType = binding.descriptorType;
+                descriptorWrite.descriptorCount = 1;
+                descriptorWrite.pNext = &asInfos.back();
+
+                writeDescriptorSets.push_back(descriptorWrite);
+            } else if (binding.bufferInstance != nullptr) {
                 VkDescriptorBufferInfo bufferInfo{};
                 bufferInfo.buffer = binding.bufferInstance->vkBuffer;
                 bufferInfo.range = binding.bufferInstance->dataSize;

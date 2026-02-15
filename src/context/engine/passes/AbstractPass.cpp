@@ -50,6 +50,9 @@ namespace Metal {
     }
 
     VkPipelineBindPoint AbstractPass::getBindingPoint() const {
+        if (pipelineInstance != nullptr && pipelineInstance->isRayTracing) {
+            return VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR;
+        }
         if (isComputePass) {
             return VK_PIPELINE_BIND_POINT_COMPUTE;
         }

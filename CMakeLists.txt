@@ -233,6 +233,10 @@ add_executable(
         src/context/engine/render-pass/impl/PostProcessingPass.h
         src/context/engine/compute-pass/impl/PathTracerPass.cpp
         src/context/engine/compute-pass/impl/PathTracerPass.h
+        src/context/engine/compute-pass/impl/HWRayTracingPass.cpp
+        src/context/engine/compute-pass/impl/HWRayTracingPass.h
+        src/service/raytracing/RayTracingService.cpp
+        src/service/raytracing/RayTracingService.h
         src/service/pipeline/PipelineBuilder.h
         src/service/framebuffer/FrameBufferAttachment.cpp
         src/repository/engine/EngineRepository.cpp

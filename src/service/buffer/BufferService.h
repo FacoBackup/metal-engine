@@ -31,6 +31,16 @@ namespace Metal {
         std::shared_ptr<BufferInstance> createBuffer(VkDeviceSize dataSize,
                                                      VkBufferUsageFlags usageFlags,
                                                      const void *bufferData) const;
+
+        std::shared_ptr<BufferInstance> createBuffer(VkDeviceSize dataSize,
+                                                     VkBufferUsageFlags usageFlags,
+                                                     const void *bufferData,
+                                                     bool deviceAddress) const;
+
+        [[nodiscard]] std::shared_ptr<BufferInstance> createBuffer(VkDeviceSize bufferSize,
+                                                                   VkBufferUsageFlags usageFlags,
+                                                                   VkMemoryPropertyFlags memoryPropertyFlags,
+                                                                   bool deviceAddress) const;
     };
 } // Metal
 

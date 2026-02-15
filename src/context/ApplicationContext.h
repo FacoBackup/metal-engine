@@ -50,6 +50,7 @@
 #include "../service/voxel/VoxelizationService.h"
 #include "../service/voxel/impl/VoxelizerService.h"
 #include "../service/voxel/VolumeImporterService.h"
+#include "../service/raytracing/RayTracingService.h"
 #include "editor/EditorPanel.h"
 #include "gui/GuiContext.h"
 
@@ -103,6 +104,7 @@ namespace Metal {
         WorldGridService worldGridService{*this};
         TransformService transformService{*this};
         LightVolumeService lightVolumesService{*this};
+        RayTracingService rayTracingService{*this};
         // ----------- Services
 
         // ----------- Repository

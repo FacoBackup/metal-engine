@@ -33,7 +33,7 @@ namespace Metal {
             .language = GLSLANG_SOURCE_GLSL,
             .stage = stage,
             .client = GLSLANG_CLIENT_VULKAN,
-            .client_version = GLSLANG_TARGET_VULKAN_1_1,
+            .client_version = GLSLANG_TARGET_VULKAN_1_2,
             .target_language = GLSLANG_TARGET_SPV,
             .target_language_version = GLSLANG_TARGET_SPV_1_6,
             .code = pShaderCode,
@@ -111,6 +111,18 @@ namespace Metal {
 
         if (s.ends_with(".tese")) {
             return GLSLANG_STAGE_TESSEVALUATION;
+        }
+
+        if (s.ends_with(".rgen")) {
+            return GLSLANG_STAGE_RAYGEN;
+        }
+
+        if (s.ends_with(".rmiss")) {
+            return GLSLANG_STAGE_MISS;
+        }
+
+        if (s.ends_with(".rchit")) {
+            return GLSLANG_STAGE_CLOSESTHIT;
         }
         throw std::runtime_error("Unknown shader stage in file");
     }
