@@ -5,8 +5,8 @@
 
 namespace Metal {
     struct VoxelizationRequest final {
-        glm::mat4x4 &transform;
-        MeshComponent &meshComponent;
+        const glm::mat4x4 &transform;
+        const MeshComponent &meshComponent;
     };
 }
 

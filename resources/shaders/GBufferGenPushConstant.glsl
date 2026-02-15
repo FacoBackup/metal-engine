@@ -6,12 +6,11 @@ layout(push_constant) uniform Push {
     float roughnessFactor;
     float metallicFactor;
 
-    bool useAlbedoTexture;
-
-    bool useNormalTexture;
-    bool useRoughnessTexture;
-    bool useMetallicTexture;
-    bool useHeightTexture;
+    uint useAlbedoTexture;
+    uint useNormalTexture;
+    uint useRoughnessTexture;
+    uint useMetallicTexture;
+    uint useHeightTexture;
 
     float parallaxHeightScale;
     int parallaxLayers;

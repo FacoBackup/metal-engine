@@ -4,14 +4,18 @@
 #include <string>
 #include <thread>
 #include <unordered_map>
+#include <atomic>
+#include <mutex>
+#include <memory>
+#include <vector>
 
 #include "../../common/AbstractRuntimeComponent.h"
 #include "impl/OctreeNode.h"
 #include "impl/SparseVoxelOctreeData.h"
-
-#include <atomic>
-#include <mutex>
-#include <memory>
+#include "../notification/AsyncTaskService.h"
+#include "../../repository/world/impl/BoundingBox.h"
+#include "../../repository/world/components/MeshComponent.h"
+#include "../../repository/world/impl/WorldTile.h"
 
 namespace Metal {
     struct WorldTile;
@@ -21,7 +25,36 @@ namespace Metal {
     class SparseVoxelOctreeBuilder;
     struct MeshData;
 
+    struct SnapshotWorldTile final {
+        int x;
+        int z;
+        std::string id;
+        BoundingBox boundingBox{};
+
+        explicit SnapshotWorldTile(const WorldTile& tile)
+            : x(tile.x), z(tile.z), id(tile.id), boundingBox(tile.boundingBox) {}
+    };
+
+    struct SnapshotEntity final {
+        glm::mat4x4 model;
+        MeshComponent* meshComponent;
+    };
+
+    struct WorldSnapshot final {
+        std::unordered_map<std::string, SnapshotWorldTile> tiles;
+        std::unordered_map<std::string, std::vector<SnapshotEntity>> entitiesByTile;
+    };
+
     class VoxelizationService final : public AbstractRuntimeComponent {
+        std::string voxelizationTask ;
+    public:
+        WorldSnapshot worldSnapshot;
+        std::vector<std::unique_ptr<MeshComponent>> meshComponentSnapshot;
+    private:
+        void captureSnapshot();
+
+        static void copyMeshComponent(const MeshComponent& from, MeshComponent& to);
+
         static void FillStorage(SparseVoxelOctreeBuilder &builder, unsigned int &bufferIndex,
                                 unsigned int &materialBufferIndex,
                                 SparseVoxelOctreeData &voxels, OctreeNode *node);
@@ -34,7 +67,7 @@ namespace Metal {
 
         void voxelizeGroup(const std::vector<VoxelizationRequest> &request) const;
 
-        void collectRequests(WorldTile &t, std::vector<std::vector<VoxelizationRequest>> &requests) const;
+        void collectRequests(const SnapshotWorldTile &t, std::vector<std::vector<VoxelizationRequest>> &requests) const;
 
     public:
         mutable std::mutex buildersMutex;

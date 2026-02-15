@@ -9,7 +9,7 @@
 
 namespace Metal {
     class SparseVoxelOctreeBuilder;
-    struct WorldTile;
+    struct SnapshotWorldTile;
     struct VoxelData;
     struct OctreeNode;
 
@@ -18,17 +18,17 @@ namespace Metal {
         OctreeNode root{};
         std::atomic<unsigned int> nodeQuantity{1};
         std::atomic<unsigned int> leafVoxelQuantity{0};
-        WorldTile *tile = nullptr;
+        const SnapshotWorldTile *tile = nullptr;
 
         void insertInternal(OctreeNode *node, glm::vec3 &point, VoxelData &data,
                             glm::ivec3 &position, int depth, int maxDepth);
 
-        static void WorldToChunkLocal(const WorldTile *tile, glm::vec3 &worldCoordinate);
+        static void WorldToChunkLocal(const SnapshotWorldTile *tile, glm::vec3 &worldCoordinate);
 
     public:
         std::unordered_map<std::string, OctreeNode *> repeatedStructures;
 
-        explicit SparseVoxelOctreeBuilder(WorldTile *tile): tile(tile) {
+        explicit SparseVoxelOctreeBuilder(const SnapshotWorldTile *tile): tile(tile) {
         }
 
         [[nodiscard]] unsigned int getVoxelQuantity() const {
@@ -43,7 +43,7 @@ namespace Metal {
             return root;
         }
 
-        WorldTile *getTile() const {
+        const SnapshotWorldTile *getTile() const {
             return tile;
         }
 

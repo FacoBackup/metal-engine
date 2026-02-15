@@ -1,5 +1,5 @@
 #include "SparseVoxelOctreeBuilder.h"
-#include "../../../repository/world/impl/WorldTile.h"
+#include "../VoxelizationService.h"
 
 namespace Metal {
     void SparseVoxelOctreeBuilder::insert(int maxDepth, glm::vec3 point, VoxelData data) {
@@ -62,7 +62,7 @@ namespace Metal {
         }
     }
 
-    void SparseVoxelOctreeBuilder::WorldToChunkLocal(const WorldTile *tile, glm::vec3 &worldCoordinate) {
+    void SparseVoxelOctreeBuilder::WorldToChunkLocal(const SnapshotWorldTile *tile, glm::vec3 &worldCoordinate) {
         const float minX = tile->boundingBox.center.x - TILE_SIZE / 2.f;
         const float minY = tile->boundingBox.center.y - TILE_SIZE / 2.f;
         const float minZ = tile->boundingBox.center.z - TILE_SIZE / 2.f;

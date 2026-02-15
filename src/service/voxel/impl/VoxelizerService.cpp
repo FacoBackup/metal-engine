@@ -41,14 +41,14 @@ namespace Metal {
         if (edgeLength1 == INFINITY || edgeLength2 == INFINITY || edgeLength3 == INFINITY) {
             stepSize = .01f;
         }
-        //
-        // if (isTriangleFlatInAxis(triangle)) {
-        //     while (stepSize < .01) {
-        //         const auto voxelSizeLocal = static_cast<float>(TILE_SIZE / std::pow(2, localMaxDepth));
-        //         stepSize = voxelSizeLocal / maxEdgeLength;
-        //         localMaxDepth--;
-        //     }
-        // }
+
+        if (isTriangleFlatInAxis(triangle)) {
+            while (stepSize < .01) {
+                const auto voxelSizeLocal = static_cast<float>(TILE_SIZE / std::pow(2, localMaxDepth));
+                stepSize = voxelSizeLocal / maxEdgeLength;
+                localMaxDepth--;
+            }
+        }
 
         glm::vec3 albedo = component->albedoColor * 255.f;
         auto *mat = context.materialService.stream(component->materialId);
@@ -81,7 +81,14 @@ namespace Metal {
                     lambda1 * triangle.n1 +
                     lambda2 * triangle.n2
                 );
-                auto *voxelTile = context.worldGridRepository.getTile(point);
+                const SnapshotWorldTile *voxelTile = nullptr;
+                for (auto& pair : context.voxelizationService.worldSnapshot.tiles) {
+                    if (pair.second.boundingBox.intersects(point)) {
+                        voxelTile = &pair.second;
+                        break;
+                    }
+                }
+
                 if (voxelTile != nullptr) {
                     SparseVoxelOctreeBuilder* builderPtr = nullptr;
                     {

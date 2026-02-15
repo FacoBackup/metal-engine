@@ -13,6 +13,18 @@
 #include "../../service/mesh/MeshData.h"
 #include "../../service/voxel/impl/SparseVoxelOctreeBuilder.h"
 #include "impl/SparseVoxelOctreeData.h"
+#include <functional>
+
+#define METRIC_START \
+auto currentTime = Clock::now(); \
+auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime.time_since_epoch());\
+const auto start = duration.count();
+
+#define METRIC_END(M) \
+currentTime = Clock::now();\
+duration = std::chrono::duration_cast< std::chrono::milliseconds>(currentTime.time_since_epoch());\
+std::cout << M << " " << duration.count() - start << "ms" << std::endl;
+
 
 namespace Metal {
     void VoxelizationService::FillStorage(SparseVoxelOctreeBuilder &builder, unsigned int &bufferIndex,
@@ -52,28 +64,22 @@ namespace Metal {
         bufferIndex++;
     }
 
-    void VoxelizationService::collectRequests(WorldTile &t,
-                                              std::vector<std::vector<VoxelizationRequest> > &requests) const {
+    void VoxelizationService::collectRequests(const SnapshotWorldTile &t,
+                                              std::vector<std::vector<VoxelizationRequest>> &requests) const {
         unsigned int requestIndex = 0;
-        for (auto entity: t.entities) {
-            if (context.worldRepository.meshes.contains(entity) && !context.worldRepository.hiddenEntities.
-                contains(entity)) {
-                auto &meshComponent = context.worldRepository.meshes.at(entity);
-                auto &transformComponent = context.worldRepository.transforms.at(entity);
-                if (transformComponent.isStatic) {
-                    requests[requestIndex].emplace_back(transformComponent.model, meshComponent);
-                    requestIndex++;
-                    if (requestIndex >= requests.size()) {
-                        requestIndex = 0;
-                    }
-                }
+        if (!worldSnapshot.entitiesByTile.contains(t.id)) return;
+        for (auto &entity: worldSnapshot.entitiesByTile.at(t.id)) {
+            requests[requestIndex].emplace_back(entity.model, *entity.meshComponent);
+            requestIndex++;
+            if (requestIndex >= requests.size()) {
+                requestIndex = 0;
             }
         }
     }
 
     void VoxelizationService::serialize(SparseVoxelOctreeBuilder &builder) const {
         METRIC_START
-          SparseVoxelOctreeData data{};
+        SparseVoxelOctreeData data{};
         data.data.resize(builder.getVoxelQuantity() + builder.getLeafVoxelQuantity() * 2);
         data.voxelBufferOffset = builder.getVoxelQuantity();
 
@@ -102,22 +108,6 @@ namespace Metal {
 
     void VoxelizationService::beginVoxelization() {
         METRIC_START
-        // std::filesystem::recursive_directory_iterator iter(context.getAssetDirectory());
-        // for (const auto &entry: std::filesystem::recursive_directory_iterator(context.getAssetDirectory())) {
-        //     std::string fileName = entry.path().filename().string();
-        //     if (entry.is_regular_file() &&
-        //         fileName.find(std::format("{}{}",FILE_NAME_SEPARATOR, FILE_SVO)) !=
-        //         std::string::npos) {
-        //         EntityID id = std::stoi(fileName.substr(0, fileName.find_last_of(FILE_NAME_SEPARATOR)));
-        //         auto *entityFound = context.worldRepository.getEntity(id);
-        //         if (entityFound == nullptr || // Entity doesnt exist
-        //             Util::indexOf(entityFound->components, ComponentTypes::MESH) == -1 || // Component doesnt exist
-        //             context.worldRepository.meshes.at(id).needsReVoxelization // Re-voxelize
-        //         ) {
-        //             std::filesystem::remove(entry.path());
-        //         }
-        //     }
-        // }
 
         for (auto path: context.engineRepository.svoFilePaths) {
             if (std::filesystem::exists(path)) {
@@ -126,9 +116,9 @@ namespace Metal {
         }
         context.engineRepository.svoFilePaths.clear();
 
-        for (auto &t: context.worldGridRepository.getTiles()) {
+        for (auto &t: worldSnapshot.tiles) {
             const unsigned int threadCount = std::max(1u, std::thread::hardware_concurrency());
-            std::vector<std::vector<VoxelizationRequest> > requests;
+            std::vector<std::vector<VoxelizationRequest>> requests;
             requests.resize(threadCount);
             collectRequests(t.second, requests);
 
@@ -137,10 +127,18 @@ namespace Metal {
                 for (int i = 0; i < requests.size(); i++) {
                     auto &request = requests[i];
                     if (i == requests.size() - 1) {
-                        voxelizeGroup(request);
+                        try {
+                            voxelizeGroup(request);
+                        } catch (std::exception &e) {
+                            std::cerr << e.what() << std::endl;
+                        }
                     } else {
                         threads.emplace_back([this, request]() {
-                            voxelizeGroup(request);
+                            try {
+                                voxelizeGroup(request);
+                            } catch (std::exception &e) {
+                                std::cerr << e.what() << std::endl;
+                            }
                         });
                     }
                 }
@@ -164,6 +162,11 @@ namespace Metal {
         textures.clear();
         builders.clear();
         METRIC_END("Ending Voxelization ")
+
+        if (!voxelizationTask.empty()) {
+            context.asyncTaskService.endTask(voxelizationTask, false);
+            voxelizationTask = "";
+        }
 
         isVoxelizationDone = true;
     }
@@ -189,11 +192,21 @@ namespace Metal {
 
         // New voxelization request; Cancels the previous one and starts all over again
         cancelRequest();
+        captureSnapshot();
         context.notificationService.pushMessage("Voxelization started", NotificationSeverities::WARNING);
         LOG_INFO(context, "Dispatching new voxelization request");
+        voxelizationTask = context.asyncTaskService.registerTask(
+            "Voxelizing scene",
+            [this] {
+                cancelRequest();
+            });
         isExecutingThread = true;
-        if (mainThread.joinable()) {
-            mainThread.join(); // Wait for the thread to finish
+        try {
+            if (mainThread.joinable()) {
+                mainThread.join();
+            }
+        } catch (std::exception &e) {
+            std::cerr << e.what() << std::endl;
         }
         mainThread = std::thread([this]() {
             beginVoxelization();
@@ -204,11 +217,65 @@ namespace Metal {
         if (isExecutingThread) {
             LOG_INFO(context, "Cancelling previous voxelization request");
             isVoxelizationCancelled = true;
-            if (mainThread.joinable()) {
-                mainThread.join();
+            try {
+                if (mainThread.joinable()) {
+                    mainThread.join();
+                }
+            } catch (std::exception &e) {
+                std::cerr << e.what() << std::endl;
+            }
+            if (!voxelizationTask.empty()) {
+                context.asyncTaskService.endTask(voxelizationTask, false);
+                voxelizationTask = "";
             }
             isVoxelizationCancelled = false;
             context.notificationService.pushMessage("Voxelization cancelled", NotificationSeverities::SUCCESS);
         }
+    }
+
+    void VoxelizationService::captureSnapshot() {
+        worldSnapshot.tiles.clear();
+        worldSnapshot.entitiesByTile.clear();
+        meshComponentSnapshot.clear();
+
+        for (auto& pair : context.worldGridRepository.getTiles()) {
+            auto& tile = pair.second;
+            worldSnapshot.tiles.emplace(tile.id, SnapshotWorldTile(tile));
+            
+            auto& entitiesInTile = worldSnapshot.entitiesByTile[tile.id];
+            for (auto entityId : tile.entities) {
+                if (context.worldRepository.meshes.contains(entityId) && 
+                    !context.worldRepository.hiddenEntities.contains(entityId)) {
+                    
+                    auto& meshComp = context.worldRepository.meshes.at(entityId);
+                    auto& transComp = context.worldRepository.transforms.at(entityId);
+                    
+                    if (transComp.isStatic) {
+                        auto snapshotMesh = std::make_unique<MeshComponent>();
+                        copyMeshComponent(meshComp, *snapshotMesh);
+                        
+                        SnapshotEntity snapshot;
+                        snapshot.model = transComp.model;
+                        snapshot.meshComponent = snapshotMesh.get();
+                        
+                        meshComponentSnapshot.push_back(std::move(snapshotMesh));
+                        entitiesInTile.push_back(snapshot);
+                    }
+                }
+            }
+        }
+    }
+
+    void VoxelizationService::copyMeshComponent(const MeshComponent& from, MeshComponent& to) {
+        to.setEntityId(from.getEntityId());
+        to.meshId = from.meshId;
+        to.materialId = from.materialId;
+        to.albedoColor = from.albedoColor;
+        to.emissiveSurface = from.emissiveSurface;
+        to.roughnessFactor = from.roughnessFactor;
+        to.metallicFactor = from.metallicFactor;
+        to.parallaxLayers = from.parallaxLayers;
+        to.parallaxHeightScale = from.parallaxHeightScale;
+        to.needsReVoxelization = from.needsReVoxelization;
     }
 } // Metal

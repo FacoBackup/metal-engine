@@ -57,6 +57,10 @@ add_executable(
         src/context/editor/dock-spaces/header/EditorHeaderPanel.h
         src/context/editor/dock-spaces/header/GlobalSettingsPanel.cpp
         src/context/editor/dock-spaces/header/GlobalSettingsPanel.h
+        src/context/editor/dock-spaces/header/AsyncTaskPanel.cpp
+        src/context/editor/dock-spaces/header/AsyncTaskPanel.h
+        src/context/editor/dock-spaces/header/ProjectInfoPanel.cpp
+        src/context/editor/dock-spaces/header/ProjectInfoPanel.h
         src/common/interface/Icons.h
         src/service/dock/DockService.cpp
         src/service/dock/DockService.h
@@ -133,6 +137,10 @@ add_executable(
         src/util/FileDialogUtil.h
         src/context/editor/dock-spaces/files/FilesHeader.cpp
         src/context/editor/dock-spaces/files/FilesHeader.h
+        src/service/material/MaterialImporterService.cpp
+        src/service/material/MaterialImporterService.h
+        src/service/mesh/MeshImporterService.cpp
+        src/service/mesh/MeshImporterService.h
         src/service/mesh/SceneImporterService.cpp
         src/service/mesh/SceneImporterService.h
         src/service/abstract/AbstractImporter.h
@@ -230,6 +238,8 @@ add_executable(
         src/util/serialization-definitions.h
         src/service/notification/NotificationService.cpp
         src/service/notification/NotificationService.h
+        src/service/notification/AsyncTaskService.cpp
+        src/service/notification/AsyncTaskService.h
         src/dto/Notification.h
         src/enum/NotificationSeverity.h
         src/service/voxel/impl/Triangle.h
@@ -280,6 +290,7 @@ add_executable(
         src/service/descriptor/DescriptorBinding.h
         src/service/exporter/VideoExporterService.cpp
         src/service/exporter/VideoExporterService.h
+        src/service/notification/AsyncTask.h
 )
 
 

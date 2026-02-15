@@ -5,7 +5,9 @@
 
 namespace Metal {
     class EditorHeaderPanel final : public AbstractPanel {
-        char projectName[128] = "";
+        AbstractPanel *globalSettings = nullptr;
+        AbstractPanel *projectInfo = nullptr;
+        AbstractPanel *asyncTask = nullptr;
 
         void renderFileTab();
 

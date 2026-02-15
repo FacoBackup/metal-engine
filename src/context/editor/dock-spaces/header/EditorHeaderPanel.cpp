@@ -1,5 +1,7 @@
 #include "EditorHeaderPanel.h"
 #include "GlobalSettingsPanel.h"
+#include "ProjectInfoPanel.h"
+#include "AsyncTaskPanel.h"
 #include "../../../../util/UIUtil.h"
 #include "../../../../context/ApplicationContext.h"
 
@@ -10,12 +12,14 @@ namespace Metal {
         ImGui::Dummy(ImVec2(0, UIUtil::ONLY_ICON_BUTTON_SIZE));
         ImGui::Dummy(ImVec2(2, 0));
         ImGui::SameLine();
-        onSyncChildren();
+        globalSettings->onSync();
         ImGui::Separator();
     }
 
     void EditorHeaderPanel::onInitialize() {
-        appendChild(new GlobalSettingsPanel());
+        appendChild(globalSettings = new GlobalSettingsPanel());
+        appendChild(projectInfo = new ProjectInfoPanel());
+        appendChild(asyncTask = new AsyncTaskPanel());
     }
 
     void EditorHeaderPanel::renderFileTab() {
@@ -65,25 +69,10 @@ namespace Metal {
             }
 
             UIUtil::Spacing();
-            ImGui::Text(Icons::inventory_2.c_str());
-            ImGui::SameLine();
 
-            if (strcmp(projectName, context->editorRepository.projectName.c_str()) != 0) {
-                strcpy(projectName, context->editorRepository.projectName.c_str());
-            }
-            ImGui::SetNextItemWidth(150.0f);
-            if (ImGui::InputText(id.c_str(), projectName, 128)) {
-                context->editorRepository.projectName = projectName;
-            }
-            if (context->voxelizationService.isExecutingVoxelization()) {
-                UIUtil::DynamicSpacing(115);
-                if (UIUtil::ButtonSimple(Icons::apps, UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-                    context->voxelizationService.cancelRequest();
-                }
-                UIUtil::RenderTooltip("Cancel voxelization request");
-            } else {
-                UIUtil::DynamicSpacing(90);
-            }
+            projectInfo->onSync();
+            asyncTask->onSync();
+
             framerate();
 
             ImGui::EndMainMenuBar();

@@ -93,9 +93,14 @@ namespace Metal {
             }
         }
         NFD_Quit();
-        guiContext.dispose();
-        vulkanContext.dispose();
-        glfwContext.dispose();
+        try {
+            asyncTaskService.endAll();
+            guiContext.dispose();
+            vulkanContext.dispose();
+            glfwContext.dispose();
+        } catch (std::exception &e) {
+            std::cerr << e.what() << std::endl;
+        }
     }
 
     void ApplicationContext::save() {
@@ -105,7 +110,7 @@ namespace Metal {
             DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldGridRepository), worldGridRepository)
             DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository), worldRepository)
             notificationService.pushMessage("Project saved", NotificationSeverities::SUCCESS);
-        }catch (const std::exception &e) {
+        } catch (const std::exception &e) {
             notificationService.pushMessage("Could not save project", NotificationSeverities::ERROR);
         }
     }

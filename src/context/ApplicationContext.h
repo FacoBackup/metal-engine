@@ -23,6 +23,8 @@
 #include "../service/dock/DockService.h"
 #include "../service/selection/SelectionService.h"
 #include "../service/mesh/SceneImporterService.h"
+#include "../service/mesh/MeshImporterService.h"
+#include "../service/material/MaterialImporterService.h"
 #include "../service/texture/TextureImporterService.h"
 #include "../service/files/FilesService.h"
 #include "../service/camera/CameraService.h"
@@ -38,6 +40,7 @@
 #include "../repository/editor/EditorRepository.h"
 #include "../service/material/MaterialService.h"
 #include "../service/notification/NotificationService.h"
+#include "../service/notification/AsyncTaskService.h"
 #include "../service/log/LogService.h"
 #include "../service/transform/TransformService.h"
 #include "../service/voxel/SVOService.h"
@@ -70,6 +73,7 @@ namespace Metal {
 
         // ----------- Services
         NotificationService notificationService;
+        AsyncTaskService asyncTaskService;
         LogService logService{*this};
         MeshService meshService{*this};
         MaterialService materialService{*this};
@@ -82,6 +86,8 @@ namespace Metal {
         DockService dockService{*this};
         SelectionService selectionService{*this};
         SceneImporterService meshImporter{*this};
+        MeshImporterService meshImporterService{*this};
+        MaterialImporterService materialImporterService{*this};
         TextureImporterService textureImporter{*this};
         FilesService filesService{*this};
         CameraService cameraService{*this};

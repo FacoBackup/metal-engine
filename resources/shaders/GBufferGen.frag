@@ -95,30 +95,31 @@ void main () {
     vec3 N = normalize(inNormal);
     mat3 TBN = computeTBN(inPosition, localUV, N, isDecalPass);
     vec3 W = inPosition;
-    if (push.useHeightTexture){
+
+    if (push.useHeightTexture == 1){
         vec3 V = globalData.cameraWorldPosition.xyz - inPosition;
         float distanceFromCamera = length(V);
         localUV = parallaxOcclusionMapping(localUV, W, push.parallaxHeightScale, push.parallaxLayers, distanceFromCamera, TBN);
-
     }
+
     float metallic = push.metallicFactor;
     float roughness = push.roughnessFactor;
     outMaterialA = vec4(push.albedoEmissive.rgb, gl_FragCoord.z);
     outMaterialB = vec4(N, 0);
     outMaterialC = vec4(inPosition, push.renderIndex + 1);
-    if (push.useAlbedoTexture){
+    if (push.useAlbedoTexture == 1){
         outMaterialA.rgb = texture(albedoEmissiveSampler, localUV).rgb;
     }
 
-    if (push.useNormalTexture){
+    if (push.useNormalTexture == 1){
         outMaterialB.rgb = vec3(normalize(TBN * (texture(normalSampler, localUV).rgb * 2 - 1)));
     }
 
-    if (push.useRoughnessTexture){
+    if (push.useRoughnessTexture == 1){
         roughness = texture(roughnessSampler, localUV).r;
     }
 
-    if (push.useMetallicTexture){
+    if (push.useMetallicTexture == 1){
         metallic = texture(metallicSampler, localUV).r;
     }
 

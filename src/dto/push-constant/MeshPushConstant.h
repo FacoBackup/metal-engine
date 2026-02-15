@@ -10,11 +10,11 @@ namespace Metal {
         alignas(4) float roughnessFactor;
         alignas(4) float metallicFactor;
 
-        alignas(4) bool useAlbedoTexture = false;
-        alignas(4) bool useNormalTexture = false;
-        alignas(4) bool useRoughnessTexture = false;
-        alignas(4) bool useMetallicTexture = false;
-        alignas(4) bool useHeightTexture = false;
+        alignas(4) unsigned int useAlbedoTexture = 0;
+        alignas(4) unsigned int useNormalTexture = 0;
+        alignas(4) unsigned int useRoughnessTexture = 0;
+        alignas(4) unsigned int useMetallicTexture = 0;
+        alignas(4) unsigned int useHeightTexture = 0;
 
         alignas(4) float parallaxHeightScale;
         alignas(4) int parallaxLayers;
