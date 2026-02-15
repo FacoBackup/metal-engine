@@ -6,6 +6,7 @@
 #include "../compute-pass/impl/AccumulationMetadataPass.h"
 #include "../render-pass/impl/GBufferGenPass.h"
 #include "../render-pass/impl/PostProcessingPass.h"
+#include "../render-pass/impl/tools/SelectedDotPass.h"
 #include "../render-pass/impl/tools/GridPass.h"
 #include "../render-pass/impl/tools/VoxelVisualizerPass.h"
 #include "../render-pass/impl/tools/IconsPass.h"
@@ -26,6 +27,7 @@ namespace Metal {
         addPass(computePasses, new AccumulationMetadataPass(context));
 
         addPass(postProcessingPasses, new PostProcessingPass(context));
+        addPass(postProcessingPasses, new SelectedDotPass(context));
         if (context.isDebugMode()) {
             addPass(postProcessingPasses, new GridPass(context));
             addPass(postProcessingPasses, new VoxelVisualizerPass(context));

@@ -30,8 +30,8 @@ namespace Metal {
 
     void GBufferGenPass::onSync() {
         unsigned int renderIndex = 0;
-        for (const auto &pair: worldRepository.meshes) {
-            if (const auto &mesh = pair.second; !mesh.meshId.empty()) {
+        for (auto &pair: worldRepository.meshes) {
+            if (auto &mesh = pair.second; !mesh.meshId.empty()) {
                 if (worldRepository.hiddenEntities.contains(mesh.getEntityId())) {
                     continue;
                 }
@@ -40,7 +40,7 @@ namespace Metal {
                     const auto *materialInstance = streamingRepository.streamMaterial(mesh.materialId);
 
                     mPushConstant.model = worldRepository.transforms[mesh.getEntityId()].model;
-                    mPushConstant.renderIndex = renderIndex;
+                    mPushConstant.renderIndex = mesh.renderIndex = renderIndex;
 
                     mPushConstant.albedoEmissive = glm::vec4(mesh.albedoColor,
                                                              mesh.emissiveSurface);

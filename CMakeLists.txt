@@ -246,8 +246,12 @@ add_executable(
         src/service/voxel/impl/SparseVoxelOctreeData.h
         src/context/engine/render-pass/impl/tools/VoxelVisualizerPass.cpp
         src/context/engine/render-pass/impl/tools/VoxelVisualizerPass.h
+        src/context/engine/render-pass/impl/tools/SelectedDotPass.cpp
+        src/context/engine/render-pass/impl/tools/SelectedDotPass.h
         src/service/voxel/SVOService.cpp
         src/service/voxel/SVOService.h
+        src/service/picking/PickingService.cpp
+        src/service/picking/PickingService.h
         src/service/voxel/SVOInstance.cpp
         src/service/voxel/SVOInstance.h
         src/dto/push-constant/VoxelDebugSettingsPushConstant.h

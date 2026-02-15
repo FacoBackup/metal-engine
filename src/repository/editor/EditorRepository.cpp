@@ -12,6 +12,7 @@ namespace Metal {
 
     void EditorRepository::registerFields() {
         registerColor(accentColor, "", "Accent color");
+        registerColor(selectionColor, "", "Selection color");
         registerBool(showVoxels, "Voxels", "Show?");
         registerInt(voxelSearchCount, "Voxels", "Debug count divisor");
         registerBool(showRaySearchCountVoxels, "Voxels", "Show ray search count");

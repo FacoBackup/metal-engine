@@ -29,6 +29,7 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
 
     uint pathTracerAccumulationCount;
     uint globalFrameCount;
+    vec2 outputRes;
 } globalData;
 
 

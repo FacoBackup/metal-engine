@@ -100,6 +100,9 @@ namespace Metal {
 
     void EngineContext::updateGlobalData() {
         auto &camera = context.worldRepository.camera;
+        auto *fbo = context.coreFrameBuffers.postProcessingFBO;
+        globalDataUBO.outputRes.x = fbo->bufferWidth;
+        globalDataUBO.outputRes.y = fbo->bufferHeight;
         globalDataUBO.viewMatrix = camera.viewMatrix;
         globalDataUBO.projectionMatrix = camera.projectionMatrix;
         globalDataUBO.projView = camera.projViewMatrix;

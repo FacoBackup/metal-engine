@@ -44,6 +44,7 @@
 #include "../service/log/LogService.h"
 #include "../service/transform/TransformService.h"
 #include "../service/voxel/SVOService.h"
+#include "../service/picking/PickingService.h"
 #include "../service/lights/LightVolumeService.h"
 #include "../service/voxel/VoxelizationService.h"
 #include "../service/voxel/impl/VoxelizerService.h"
@@ -94,6 +95,7 @@ namespace Metal {
         VoxelizationService voxelizationService{*this};
         VoxelizerService voxelizerService{*this};
         SVOService svoService{*this};
+        PickingService pickingService{*this};
         WorldGridService worldGridService{*this};
         TransformService transformService{*this};
         LightVolumeService lightVolumesService{*this};

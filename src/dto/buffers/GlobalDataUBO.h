@@ -34,6 +34,7 @@ namespace Metal {
         alignas(4) unsigned int surfaceCacheHeight;
         alignas(4) unsigned int pathTracerAccumulationCount = 0;
         alignas(4) unsigned int globalFrameCount = 0;
+        alignas(8) glm::vec2 outputRes{};
     };
 }
 

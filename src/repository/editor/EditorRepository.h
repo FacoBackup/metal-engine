@@ -25,6 +25,7 @@ namespace Metal {
         ImU32 accentU32 = 0;
 
         glm::vec3 accentColor{0.26f, 0.59f, 0.98f};
+        glm::vec3 selectionColor{1, 1, 0};
         std::string projectName = "New project";
         bool showIcons = true;
         bool isDarkMode = true;
