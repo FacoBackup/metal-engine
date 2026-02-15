@@ -1,7 +1,7 @@
 #include "MeshImporterService.h"
 #include "MeshData.h"
 #include "VertexData.h"
-#include "../../dto/file/FileMetadata.h"
+#include "../../dto/file/EntryMetadata.h"
 #include "../../enum/engine-definitions.h"
 #include "../../enum/LevelOfDetail.h"
 #include "../../util/FilesUtil.h"
@@ -12,7 +12,7 @@
 
 namespace Metal {
     std::string MeshImporterService::persistMesh(const std::string &targetDir, const MeshData &mesh) const {
-        auto metadata = FileMetadata{};
+        auto metadata = EntryMetadata{};
         metadata.type = EntryType::MESH;
         metadata.name = mesh.name;
         if (metadata.name.find_last_of('.') != std::string::npos) {

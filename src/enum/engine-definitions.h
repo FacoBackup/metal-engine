@@ -13,6 +13,7 @@ typedef unsigned long long EntityID;
 #define METAL_FILE_EXTENSION ".metalasset"
 #define FILE_MATERIAL "-material"
 #define FILE_SVO "-svo"
+#define FILE_VOLUME "-volume"
 #define FILE_NAME_SEPARATOR "##"
 
 #define FORMAT_FILE_MESH(baseName, lod) (baseName + FILE_NAME_SEPARATOR + lod.suffix + FILE_MESH + METAL_FILE_EXTENSION)
@@ -21,4 +22,5 @@ typedef unsigned long long EntityID;
 #define FORMAT_FILE_SCENE(baseName) (baseName + FILE_NAME_SEPARATOR + FILE_SCENE + METAL_FILE_EXTENSION)
 #define FORMAT_FILE_METADATA(baseName) (baseName + FILE_METADATA)
 #define FORMAT_FILE_SVO(baseName) (baseName + FILE_NAME_SEPARATOR + FILE_SVO + METAL_FILE_EXTENSION)
+#define FORMAT_FILE_VOLUME(baseName) (baseName + FILE_NAME_SEPARATOR + FILE_VOLUME + METAL_FILE_EXTENSION)
 #endif //ENGINEID_H

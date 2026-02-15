@@ -3,14 +3,15 @@
 
 #include "FilesHeader.h"
 #include "../../../../common/interface/Icons.h"
-#include "../../../../util/FilesUtil.h"
 #include "../../../../context/ApplicationContext.h"
 #include "../../../../service/mesh/SceneData.h"
 #include "../../../../util/UIUtil.h"
 #include "../../../../dto/file//FileEntry.h"
 #include "FilesContext.h"
 #include "../../../../util/FileDialogUtil.h"
-#include "../../../../enum/LevelOfDetail.h"
+
+#include "FilePreviewPanel.h"
+#include <string>
 
 namespace Metal {
     std::string FilesPanel::getActionLabel() {
@@ -19,13 +20,20 @@ namespace Metal {
 
     std::function<void()> FilesPanel::onAction() {
         return [this]() {
-            auto files = FileDialogUtil::PickFiles({{"Mesh", "fbx,gltf,obj,glb"}, {"Image", "png,jpg,jpeg"}});
+            auto files = FileDialogUtil::PickFiles({
+                {
+                    "Files",
+                    "fbx,gltf,obj,glb,png,jpg,jpeg,vdb,pcd,ply,xyz,las,laz,e57"
+                }
+            });
             for (const std::string &file: files) {
                 if (context->meshImporter.isCompatible(file)) {
                     context->meshImporter.importScene(filesContext.currentDirectory->absolutePath,
                                                       file);
                 } else if (context->textureImporter.isCompatible(file)) {
                     context->textureImporter.importTexture(filesContext.currentDirectory->absolutePath, file);
+                } else if (context->volumeImporterService.isCompatible(file)) {
+                    context->volumeImporterService.importVolume(filesContext.currentDirectory->absolutePath, file);
                 }
             }
             FilesService::GetEntries(filesContext.currentDirectory);
@@ -34,7 +42,9 @@ namespace Metal {
 
     void FilesPanel::onInitialize() {
         filesContext.setCurrentDirectory(context->filesService.getRoot());
-        appendChild(new FilesHeader(filesContext, getActionLabel(), onAction()));
+        appendChild(filesHeader = new FilesHeader(filesContext, getActionLabel(), onAction()));
+        previewPanel = new FilePreviewPanel(filesContext);
+        appendChild(previewPanel);
     }
 
     void FilesPanel::contextMenu() {
@@ -74,42 +84,72 @@ namespace Metal {
     }
 
     void FilesPanel::onSync() {
-        onSyncChildren();
+        filesHeader->onSync();
         ImGui::Separator();
-        if (ImGui::BeginChild(id.c_str())) {
+        bool renderTree = true;
+        if (renderPreview()) {
+            const float totalWidth = ImGui::GetContentRegionAvail().x;
+            const float spacing = ImGui::GetStyle().ItemSpacing.x;
+
+            if (previewWidth < 50.0f) previewWidth = 50.0f;
+            if (previewWidth > totalWidth - 100.0f) previewWidth = totalWidth - 100.0f;
+
+            float filesWidth = totalWidth - previewWidth - spacing;
+            renderTree = ImGui::BeginChild((id + "files_list").c_str(), ImVec2(filesWidth, 0));
+        }
+
+        if (renderTree) {
             isSomethingHovered = ImGui::IsWindowHovered();
             if (ImGui::IsWindowFocused()) {
                 filesContext.selected.clear();
             }
+            updateDragStart();
             handleDrag();
-            hotkeys();
 
-            float size = std::floor(ImGui::GetWindowSize().x / CARD_SIZE) * CARD_SIZE - CARD_SIZE;
-            int rowIndex = 1;
-            for (auto &child: filesContext.currentDirectory->children) {
-                if (filesContext.filterType == EntryType::NONE || child->type == filesContext.filterType) {
-                    const bool isSelected = filesContext.selected.contains(child->getId()) || child->isHovered && onDrag
-                                            !=
-                                            nullptr;
-                    ImGui::PushStyleColor(ImGuiCol_ChildBg, isSelected
-                                                                ? context->editorRepository.accent
-                                                                : context->themeService.palette0);
-                    renderItem(child);
-                    ImGui::PopStyleColor();
+            constexpr ImGuiTableFlags tableFlags = ImGuiTableFlags_RowBg |
+                                                   ImGuiTableFlags_BordersInnerV |
+                                                   ImGuiTableFlags_Resizable |
+                                                   ImGuiTableFlags_SizingStretchProp |
+                                                   ImGuiTableFlags_ScrollY;
 
-                    if (rowIndex * CARD_SIZE < size) {
-                        ImGui::SameLine();
-                        rowIndex++;
-                    } else {
-                        rowIndex = 0;
-                    }
+            ImGuiStyle &style = ImGui::GetStyle();
+            ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(style.CellPadding.x, 2.0f));
+            if (ImGui::BeginTable((id + "entries").c_str(), 4, tableFlags)) {
+                ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
+                ImGui::TableSetupColumn("Date");
+                ImGui::TableSetupColumn("Type");
+                ImGui::TableSetupColumn("Size");
+                ImGui::TableHeadersRow();
+
+                for (auto *child: filesContext.currentDirectory->children) {
+                    renderTreeItem(child);
                 }
+
+                ImGui::EndTable();
             }
+            ImGui::PopStyleVar();
             contextMenu();
-            trackDrag();
+            clearDragOnMouseUp();
         }
 
-        ImGui::EndChild();
+        if (renderPreview()) {
+            ImGui::EndChild();
+
+            ImGui::SameLine();
+            ImGui::Button("##splitter", ImVec2(2, -1));
+            if (ImGui::IsItemActive()) {
+                previewWidth -= ImGui::GetIO().MouseDelta.x;
+            }
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
+            }
+            ImGui::SameLine();
+
+            if (ImGui::BeginChild((id + "preview").c_str(), ImVec2(0, 0), ImGuiChildFlags_Border)) {
+                previewPanel->onSync();
+            }
+            ImGui::EndChild();
+        }
     }
 
     void FilesPanel::SetIconPos(const char *text) {
@@ -120,59 +160,136 @@ namespace Metal {
         ImGui::SetCursorPosY((windowHeight - LARGE_FONT_SIZE * 2) * 0.5f);
     }
 
-    void FilesPanel::renderItem(FileEntry *root) {
-        UIUtil::AUX_VEC2.x = CARD_SIZE;
-        UIUtil::AUX_VEC2.y = CARD_SIZE + 15;
-        if (ImGui::BeginChild(root->getId().c_str(), UIUtil::AUX_VEC2, ImGuiChildFlags_Border)) {
-            root->isHovered = ImGui::IsWindowHovered();
-            isSomethingHovered = isSomethingHovered || root->isHovered;
-            onClick(root);
-            handleDragDrop(root);
-            ImGui::PushFont(context->guiContext.getLargeIconsFont());
-
-            if (root->type == EntryType::DIRECTORY) {
-                SetIconPos(Icons::folder.c_str());
-                ImGui::TextColored(UIUtil::DIRECTORY_COLOR, Icons::folder.c_str());
-            } else if (root->type == EntryType::TEXTURE) {
-                auto *texture = context->streamingRepository.streamTexture(
-                    root->getId(), LevelOfDetail::LOD_3);
-                if (texture != nullptr) {
-                    context->guiContext.renderImage(texture, CARD_SIZE - 8, CARD_SIZE - 22);
-                }
-            } else {
-                std::string icon = UIUtil::GetFileIcon(root->type);
-                SetIconPos(icon.c_str());
-                ImGui::Text(icon.c_str());
-            }
-            ImGui::PopFont();
-            UIUtil::AUX_VEC2.x = 0;
-            UIUtil::AUX_VEC2.y = ImGui::GetContentRegionAvail().y - TEXT_OFFSET;
-            ImGui::Dummy(UIUtil::AUX_VEC2);
-            ImGui::Separator();
-            if (filesContext.toCut.contains(root->getId())) {
-                ImGui::TextDisabled(root->name.c_str());
-            } else {
-                ImGui::Text(root->name.c_str());
-            }
+    void FilesPanel::updateDragStart() {
+        if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && startDrag.x == -1) {
+            startDrag = ImGui::GetMousePos();
         }
-        ImGui::EndChild();
-        UIUtil::RenderTooltip(root->name);
     }
 
-    void FilesPanel::trackDrag() {
-        if (startDrag.x == -1 && ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-            startDrag.x = ImGui::GetMousePos().x;
-            startDrag.y = ImGui::GetMousePos().y;
-        }
-
-        if (startDrag.x != -1 && !ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-            startDrag.x = startDrag.y = -1;
+    void FilesPanel::clearDragOnMouseUp() {
+        if (!ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+            startDrag = ImVec2(-1, -1);
             onDrag = nullptr;
         }
     }
 
+    void FilesPanel::renderTreeItem(FileEntry *entry) {
+        if (entry == nullptr) {
+            return;
+        }
+
+        const bool isDirectory = entry->type == EntryType::DIRECTORY;
+        const bool passesFilter = filesContext.filterType == EntryType::NONE || entry->type == filesContext.filterType;
+        if (!isDirectory && !passesFilter) {
+            return;
+        }
+
+        // Slightly tighter rows than default, and make the *entire* row selectable (all columns).
+        const float rowHeight = ImGui::GetTextLineHeight() + ImGui::GetStyle().CellPadding.y * 2.0f;
+
+        ImGui::TableNextRow(ImGuiTableRowFlags_None, rowHeight);
+        ImGui::TableNextColumn();
+
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_AllowItemOverlap;
+        if (!isDirectory) {
+            flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+        }
+
+        const bool isSelected = filesContext.selected.contains(entry->getId());
+
+        const bool isCut = filesContext.toCut.contains(entry->getId());
+        if (isCut) {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+        }
+
+        const std::string label = entry->name + "##" + entry->getId();
+
+        // Row background + click target spanning all columns.
+        const ImVec2 cursorPos = ImGui::GetCursorPos();
+        ImGuiSelectableFlags selectableFlags = ImGuiSelectableFlags_SpanAllColumns |
+                                               ImGuiSelectableFlags_AllowItemOverlap |
+                                               ImGuiSelectableFlags_AllowDoubleClick;
+        ImGui::Selectable(("##row_" + entry->getId()).c_str(), isSelected, selectableFlags, ImVec2(0.0f, rowHeight));
+
+        entry->isHovered = ImGui::IsItemHovered();
+        isSomethingHovered = isSomethingHovered || entry->isHovered;
+        onClick(entry);
+        handleDragDrop(entry);
+
+        // Draw the tree node (icon + label + expand arrow) on top of the selectable.
+        ImGui::SetCursorPos(cursorPos);
+
+        bool open = false;
+        const std::string icon = UIUtil::GetEntryIcon(entry->type);
+        ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(0, 0, 0, 0));
+        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(0, 0, 0, 0));
+        ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32(0, 0, 0, 0));
+
+        if (isDirectory) {
+            open = ImGui::TreeNodeEx((icon + label).c_str(), flags);
+        } else {
+            ImGui::TreeNodeEx((icon + label).c_str(), flags);
+        }
+
+        ImGui::PopStyleColor(3);
+
+        if (isCut) {
+            ImGui::PopStyleColor();
+        }
+
+        UIUtil::RenderTooltip(entry->name);
+
+        ImGui::TableNextColumn();
+        if (!isDirectory) {
+            ImGui::TextUnformatted(entry->formattedDate.c_str());
+            ImGui::SetItemAllowOverlap();
+        }
+
+        ImGui::TableNextColumn();
+        if (isDirectory) {
+            ImGui::TextUnformatted("Directory");
+            ImGui::SetItemAllowOverlap();
+        } else {
+            const char *typeLabel = "";
+            switch (entry->type) {
+                case EntryType::SCENE: typeLabel = "Scene";
+                    break;
+                case EntryType::MESH: typeLabel = "Mesh";
+                    break;
+                case EntryType::TEXTURE: typeLabel = "Texture";
+                    break;
+                case EntryType::VOLUME: typeLabel = "Volume";
+                    break;
+                case EntryType::MATERIAL: typeLabel = "Material";
+                    break;
+                default: typeLabel = "";
+                    break;
+            }
+            ImGui::TextUnformatted(typeLabel);
+            ImGui::SetItemAllowOverlap();
+        }
+
+        ImGui::TableNextColumn();
+        if (!isDirectory) {
+            ImGui::TextUnformatted(entry->formattedSize.c_str());
+            ImGui::SetItemAllowOverlap();
+        }
+
+        if (isDirectory && open) {
+            if (!loadedDirectoryPaths.contains(entry->absolutePath)) {
+                FilesService::GetEntries(entry);
+                loadedDirectoryPaths.insert(entry->absolutePath);
+            }
+
+            for (auto *child: entry->children) {
+                renderTreeItem(child);
+            }
+            ImGui::TreePop();
+        }
+    }
+
     void FilesPanel::handleDragDrop(FileEntry *fileEntry) {
-        if (fileEntry->isHovered && onDrag != fileEntry && startDrag.x >= 0) {
+        if (fileEntry != nullptr && fileEntry->isHovered && onDrag != fileEntry && startDrag.x >= 0) {
             if (onDrag == nullptr && ImGui::IsMouseDown(ImGuiMouseButton_Left) &&
                 abs(startDrag.x - ImGui::GetMousePos().x) >= 3 &&
                 abs(startDrag.y - ImGui::GetMousePos().y) >= 3) {
@@ -181,34 +298,9 @@ namespace Metal {
 
             if (!ImGui::IsMouseDown(ImGuiMouseButton_Left) && onDrag != nullptr && fileEntry->type ==
                 EntryType::DIRECTORY) {
-                FilesService::Move(onDrag, fileEntry);
+                context->filesService.Move(onDrag, fileEntry);
                 onDrag = nullptr;
             }
-        }
-    }
-
-    void FilesPanel::hotkeys() {
-        if (!isSomethingHovered) {
-            return;
-        }
-        if (ImGui::IsKeyPressed(ImGuiKey_Enter) && !filesContext.selected.empty()) {
-            openSelected();
-        }
-
-        if (ImGui::IsKeyPressed(ImGuiKey_Delete) && !filesContext.selected.empty()) {
-            deleteSelected();
-        }
-
-        if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) && ImGui::IsKeyPressed(ImGuiKey_A)) {
-            selectAll();
-        }
-
-        if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) && ImGui::IsKeyPressed(ImGuiKey_X)) {
-            cutSelected();
-        }
-
-        if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) && ImGui::IsKeyPressed(ImGuiKey_V)) {
-            pasteSelected();
         }
     }
 
@@ -276,6 +368,10 @@ namespace Metal {
             }
             case EntryType::SCENE: {
                 context->meshService.createSceneEntities(root->getId());
+                break;
+            }
+            case EntryType::VOLUME: {
+                context->volumeImporterService.openVolume(root->getId());
                 break;
             }
             case EntryType::DIRECTORY: {

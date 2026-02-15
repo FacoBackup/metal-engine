@@ -12,6 +12,10 @@ namespace Metal {
         explicit ResourceFilesPanel(const std::function<void (FileEntry *)> &callback) : callback(callback) {
         }
 
+        bool renderPreview() override {
+            return false;
+        }
+
         std::function<void()> onAction() override;
 
         std::string getActionLabel() override;

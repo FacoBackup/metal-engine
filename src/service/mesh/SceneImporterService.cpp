@@ -10,7 +10,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include "../../util/FilesUtil.h"
-#include "../../dto/file/FileMetadata.h"
+#include "../../dto/file/EntryMetadata.h"
 #include "../../enum/engine-definitions.h"
 #include "../../enum/LevelOfDetail.h"
 #include "../../context/ApplicationContext.h"
@@ -50,7 +50,7 @@ namespace Metal {
             }
 
             SceneData sceneData{};
-            auto sceneMetadata = FileMetadata{};
+            auto sceneMetadata = EntryMetadata{};
             sceneMetadata.type = EntryType::SCENE;
             sceneMetadata.name = sceneData.name =
                                  scene->mName.length > 0 ? scene->mName.data : scene->mRootNode->mName.data;

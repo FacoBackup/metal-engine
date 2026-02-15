@@ -7,7 +7,7 @@
 #include  "../../util/serialization-definitions.h"
 
 namespace Metal {
-    struct FileMetadata {
+    struct EntryMetadata {
     protected:
         std::string id = Util::uuidV4();
 

@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <cereal/archives/binary.hpp>
 
-#include "../../dto/file/FileMetadata.h"
+#include "../../dto/file/EntryMetadata.h"
 #include "../../enum/EntryType.h"
 #include "../../util/FilesUtil.h"
 #include "../../context/ApplicationContext.h"
@@ -19,7 +19,7 @@ namespace Metal {
     std::string TextureImporterService::importTexture(const std::string &targetDir,
                                                       const std::string &pathToFile) const {
         try {
-            auto metadata = FileMetadata{};
+            auto metadata = EntryMetadata{};
             metadata.type = EntryType::TEXTURE;
             metadata.name = fs::path(pathToFile).filename().string();
             metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.'));
@@ -49,7 +49,7 @@ namespace Metal {
                                                               const std::string &nameHint) const {
         if (!texture) return "";
         try {
-            auto metadata = FileMetadata{};
+            auto metadata = EntryMetadata{};
             metadata.type = EntryType::TEXTURE;
             metadata.name = nameHint.empty() ? "embedded" : nameHint;
             DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(metadata.getId()), metadata)

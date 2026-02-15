@@ -49,10 +49,10 @@ namespace Metal {
             }
 
             pushConstant.model = worldRepository.transforms[entityId].model;
-            // Unused by shader, but keeps layout consistent with `GBufferGenPushConstant.glsl`.
             pushConstant.albedoEmissive.x = context.editorRepository.selectionColor.x;
             pushConstant.albedoEmissive.y = context.editorRepository.selectionColor.y;
             pushConstant.albedoEmissive.z = context.editorRepository.selectionColor.z;
+            pushConstant.albedoEmissive.w = context.editorRepository.selectionOutlineThickness;
             pushConstant.renderIndex = mesh.renderIndex;
             pushConstant.roughnessFactor = 0;
             pushConstant.metallicFactor = 0;

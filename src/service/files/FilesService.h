@@ -29,7 +29,7 @@ namespace Metal {
 
         void createMaterial(std::string targetDir) const;
 
-        static void Move(FileEntry *toMove, FileEntry *targetDir);
+        void Move(FileEntry *toMove, FileEntry *targetDir);
 
         static void GetEntries(FileEntry *root);
     };

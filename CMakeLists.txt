@@ -80,6 +80,8 @@ add_executable(
         src/context/editor/dock-spaces/metrics/MetricsPanel.h
         src/context/editor/dock-spaces/files/FilesPanel.cpp
         src/context/editor/dock-spaces/files/FilesPanel.h
+        src/context/editor/dock-spaces/files/FilePreviewPanel.cpp
+        src/context/editor/dock-spaces/files/FilePreviewPanel.h
         src/context/editor/dock-spaces/console/ConsolePanel.cpp
         src/context/editor/dock-spaces/console/ConsolePanel.h
         src/service/log/LogService.cpp
@@ -148,7 +150,7 @@ add_executable(
         src/enum/LevelOfDetail.cpp
         src/service/texture/TextureImporterService.cpp
         src/service/texture/TextureImporterService.h
-        src/dto/file/FileMetadata.h
+        src/dto/file/EntryMetadata.h
         src/service/texture/TextureData.h
         src/service/texture/TextureService.cpp
         src/service/texture/TextureService.h
@@ -295,6 +297,8 @@ add_executable(
         src/service/exporter/VideoExporterService.cpp
         src/service/exporter/VideoExporterService.h
         src/service/notification/AsyncTask.h
+        src/service/voxel/VolumeImporterService.cpp
+        src/service/voxel/VolumeImporterService.h
 )
 
 

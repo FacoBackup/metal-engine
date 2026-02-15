@@ -26,6 +26,7 @@ namespace Metal {
 
         glm::vec3 accentColor{0.26f, 0.59f, 0.98f};
         glm::vec3 selectionColor{1, 1, 0};
+        int selectionOutlineThickness = 3;
         std::string projectName = "New project";
         bool showIcons = true;
         bool isDarkMode = true;
@@ -64,6 +65,8 @@ namespace Metal {
 
         SAVE_TEMPLATE(
             accentColor.x, accentColor.y, accentColor.z,
+            selectionColor.x, selectionColor.y, selectionColor.z,
+            selectionOutlineThickness,
             projectName, showIcons,
             isDarkMode,
             showGrid,

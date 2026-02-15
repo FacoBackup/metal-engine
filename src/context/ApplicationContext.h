@@ -48,6 +48,7 @@
 #include "../service/lights/LightVolumeService.h"
 #include "../service/voxel/VoxelizationService.h"
 #include "../service/voxel/impl/VoxelizerService.h"
+#include "../service/voxel/VolumeImporterService.h"
 #include "editor/EditorPanel.h"
 #include "gui/GuiContext.h"
 
@@ -95,6 +96,7 @@ namespace Metal {
         VoxelizationService voxelizationService{*this};
         VoxelizerService voxelizerService{*this};
         SVOService svoService{*this};
+        VolumeImporterService volumeImporterService{*this};
         PickingService pickingService{*this};
         WorldGridService worldGridService{*this};
         TransformService transformService{*this};

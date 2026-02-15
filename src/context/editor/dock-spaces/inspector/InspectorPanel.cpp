@@ -1,6 +1,5 @@
 #include "InspectorPanel.h"
 
-#include "MaterialInspection.h"
 #include "../../abstract/form/FormPanel.h"
 #include "../../../../util/UIUtil.h"
 #include "../../../../common/inspection/Inspectable.h"
@@ -12,13 +11,10 @@
 namespace Metal {
     void InspectorPanel::onInitialize() {
         formPanel = new FormPanel();
-        materialPanel = new MaterialInspection();
         appendChild(formPanel);
-        appendChild(materialPanel);
         repositories.push_back(&context->editorRepository);
         repositories.push_back(&context->engineRepository);
         repositories.push_back(&context->worldRepository.camera);
-        repositories.push_back(&context->fileInspection);
     }
 
     void InspectorPanel::onSync() {
@@ -56,10 +52,6 @@ namespace Metal {
         if (ImGui::BeginChild((id + "form").c_str())) {
             formPanel->setInspection(currentInspection);
             formPanel->onSync();
-
-            if (currentInspection == &context->fileInspection) {
-                materialPanel->onSync();
-            }
         }
         ImGui::EndChild();
         ImGui::Columns(1);

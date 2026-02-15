@@ -3,10 +3,10 @@
 #include <string>
 
 #include "../../util/Util.h"
-#include "FileMetadata.h"
+#include "EntryMetadata.h"
 
 namespace Metal {
-    struct FileEntry final : FileMetadata {
+    struct FileEntry final : EntryMetadata {
         std::string absolutePath;
         std::string formattedDate;
         std::string formattedSize;

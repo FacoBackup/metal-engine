@@ -1,7 +1,7 @@
 #include "MaterialImporterService.h"
 #include "../../context/ApplicationContext.h"
 #include "MaterialData.h"
-#include "../../dto/file/FileMetadata.h"
+#include "../../dto/file/EntryMetadata.h"
 #include "../../enum/engine-definitions.h"
 #include "../../util/FilesUtil.h"
 #include <assimp/material.h>
@@ -80,7 +80,7 @@ namespace Metal {
 
             std::string materialId;
             {
-                FileMetadata materialMetadata{};
+                EntryMetadata materialMetadata{};
                 materialMetadata.type = EntryType::MATERIAL;
                 materialMetadata.name = "Material " + std::to_string(i);
                 DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(materialMetadata.getId()), materialMetadata)

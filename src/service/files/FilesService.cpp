@@ -4,6 +4,7 @@
 #include "../../enum/engine-definitions.h"
 #include "../../util/FilesUtil.h"
 #include "../../context/ApplicationContext.h"
+#include "../log/LogService.h"
 #include <chrono>
 #include <filesystem>
 #include <format>
@@ -54,10 +55,12 @@ namespace Metal {
                 if (entry.is_regular_file() &&
                     entry.path().filename().string() == id + FILE_METADATA) {
                     DATA
+                    auto sys_tp = std::chrono::file_clock::to_utc(ftime);
+                        std::string dateStr = std::format("{:%Y-%m-%d %H:%M}", sys_tp);
                     auto child = std::make_unique<FileEntry>(
                         root,
                         absolute(entry.path()).string(),
-                        std::format("{}", ftime),
+                        dateStr,
                         fileSize);
                     PARSE_TEMPLATE(child->load, child->absolutePath.c_str())
                     return child;
@@ -98,13 +101,17 @@ namespace Metal {
                     DELETE_S(FORMAT_FILE_MATERIAL)
                     break;
                 }
+                case EntryType::VOLUME: {
+                    DELETE_S(FORMAT_FILE_VOLUME)
+                    break;
+                }
                 default: break;;
             }
         }
     }
 
     void FilesService::createMaterial(std::string targetDir) const {
-        FileMetadata materialMetadata{};
+        EntryMetadata materialMetadata{};
         materialMetadata.type = EntryType::MATERIAL;
         materialMetadata.name = "New Material";
         DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(materialMetadata.getId()), materialMetadata)
@@ -112,22 +119,33 @@ namespace Metal {
         DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialMetadata.getId()), data)
     }
 
-    void FilesService::Move(FileEntry *toMove,
-                            FileEntry *targetDir) {
-        fs::rename(toMove->absolutePath,
-                   targetDir->absolutePath + "/" + toMove->absolutePath.substr(
-                       toMove->absolutePath.find_last_of('/') + 1));
+    void FilesService::Move(FileEntry *toMove, FileEntry *targetDir) {
+        if (!targetDir || targetDir->type != EntryType::DIRECTORY) {
+            return;
+        }
 
-        toMove->children.erase(
-            std::ranges::remove(toMove->children, toMove).begin(),
-            toMove->children.end());
+        fs::path sourcePath = toMove->absolutePath;
+        fs::path targetPath = fs::path(targetDir->absolutePath) / sourcePath.filename();
+
+        try {
+            fs::rename(sourcePath, targetPath);
+        } catch (const fs::filesystem_error& e) {
+            LOG_ERROR_S("Could not move file");
+            context.notificationService.pushMessage("Could not move entry", NotificationSeverities::ERROR);
+            return;
+        }
+
+        toMove->absolutePath = targetPath.string();
+
+        if (toMove->parent) {
+            auto& oldChildren = toMove->parent->children;
+            oldChildren.erase(std::remove(oldChildren.begin(), oldChildren.end(), toMove),
+                              oldChildren.end());
+        }
+
         toMove->parent = targetDir;
         targetDir->children.push_back(toMove);
-        GetEntries(targetDir);
-        GetEntries(targetDir->parent);
-        GetEntries(toMove);
     }
-
 
     void FilesService::GetEntries(FileEntry *root) {
         if (root->type != EntryType::DIRECTORY) {
@@ -139,10 +157,12 @@ namespace Metal {
                 std::string extension = entry.path().extension().string();
                 if (extension.find(FILE_METADATA) != std::string::npos) {
                     DATA
+                    auto sys_tp = std::chrono::file_clock::to_utc(ftime);
+                    std::string dateStr = std::format("{:%Y-%m-%d %H:%M}", sys_tp);
                     auto &child = root->children.emplace_back(new FileEntry(
                         root,
                         fs::absolute(entry.path()).string(),
-                        std::format("{}", ftime),
+                        dateStr,
                         fileSize));
                     PARSE_TEMPLATE(child->load, child->absolutePath.c_str())
                 }

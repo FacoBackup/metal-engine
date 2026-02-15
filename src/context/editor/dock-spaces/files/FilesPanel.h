@@ -1,6 +1,7 @@
 #ifndef FILESPANEL_H
 #define FILESPANEL_H
 #include <functional>
+#include <unordered_set>
 #include <imgui.h>
 
 #include "FilesContext.h"
@@ -8,6 +9,7 @@
 
 namespace Metal {
     struct FileEntry;
+    class FilePreviewPanel;
 
     class FilesPanel : public AbstractDockPanel {
     protected:
@@ -19,8 +21,16 @@ namespace Metal {
         bool isSomethingHovered = false;
         FileEntry *onDrag = nullptr;
         ImVec2 startDrag{-1, -1};
+        std::unordered_set<std::string> loadedDirectoryPaths{};
+        FilePreviewPanel *previewPanel = nullptr;
+        AbstractPanel *filesHeader = nullptr;
+        float previewWidth = 200.0f;
 
     public:
+        virtual bool renderPreview() {
+            return true;
+        }
+
         virtual std::string getActionLabel();
 
         virtual std::function<void()> onAction();
@@ -37,11 +47,11 @@ namespace Metal {
 
         static void SetIconPos(const char *text);
 
-        void renderItem(FileEntry *root);
+        void updateDragStart();
 
-        void trackDrag();
+        void clearDragOnMouseUp();
 
-        void hotkeys();
+        void renderTreeItem(FileEntry *entry);
 
         void pasteSelected();
 

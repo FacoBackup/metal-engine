@@ -12,7 +12,7 @@ namespace Metal:: FileDialogUtil {
         NFD::Guard nfdGuard;
         NFD::UniquePathSet outPaths;
 
-        nfdresult_t result = NFD::OpenDialogMultiple(outPaths, filtersToApply.data(), 2);
+        nfdresult_t result = NFD::OpenDialogMultiple(outPaths, filtersToApply.data(), filtersToApply.size());
         if (result == NFD_OKAY) {
             LOG_INFO_S("Successfully picked files");
 

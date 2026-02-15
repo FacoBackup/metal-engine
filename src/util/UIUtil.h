@@ -77,12 +77,14 @@ namespace Metal::UIUtil {
         ImGui::SameLine();
     }
 
-    static std::string GetFileIcon(const EntryType::EntryType type) {
+    static std::string GetEntryIcon(const EntryType::EntryType type) {
         switch (type) {
             case EntryType::MESH:
                 return Icons::view_in_ar;
             case EntryType::TEXTURE:
                 return Icons::texture;
+            case EntryType::VOLUME:
+                return Icons::view_in_ar;
             case EntryType::DIRECTORY:
                 return Icons::folder;
             case EntryType::SCENE:

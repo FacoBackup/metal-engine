@@ -15,8 +15,7 @@ void main() {
     if (currentIndex != renderIndex)
     discard;
 
-    int thickness = 3; // <<< change this to control outline width
-
+    int thickness = int(push.albedoEmissive.a);
     bool isBoundary = false;
 
     ivec2 pixel = ivec2(gl_FragCoord.xy);
@@ -47,5 +46,19 @@ void main() {
         break;
     }
 
-    outColor = vec4(push.albedoEmissive.rgb, isBoundary ? 1 : .2);
+    if (isBoundary) {
+        outColor = vec4(push.albedoEmissive.rgb, 1.0);
+    } else {
+        int dotSpacing = 10;
+        int dotRadius = 2;
+
+        vec2 gridIndex = floor(gl_FragCoord.xy / float(dotSpacing));
+        vec2 gridCenter = (gridIndex + 0.5) * float(dotSpacing);
+
+        float dist = distance(gl_FragCoord.xy, gridCenter);
+        if (dist >= dotRadius) {
+            discard;
+        }
+        outColor = vec4(push.albedoEmissive.rgb, 1.0);
+    }
 }
