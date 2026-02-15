@@ -86,67 +86,104 @@ namespace Metal {
     void FilesPanel::onSync() {
         filesHeader->onSync();
         ImGui::Separator();
-        bool renderTree = true;
+
         if (renderPreview()) {
-            const float totalWidth = ImGui::GetContentRegionAvail().x;
-            const float spacing = ImGui::GetStyle().ItemSpacing.x;
-
-            if (previewWidth < 50.0f) previewWidth = 50.0f;
-            if (previewWidth > totalWidth - 100.0f) previewWidth = totalWidth - 100.0f;
-
-            float filesWidth = totalWidth - previewWidth - spacing;
-            renderTree = ImGui::BeginChild((id + "files_list").c_str(), ImVec2(filesWidth, 0));
-        }
-
-        if (renderTree) {
-            isSomethingHovered = ImGui::IsWindowHovered();
-            if (ImGui::IsWindowFocused()) {
-                filesContext.selected.clear();
-            }
-            updateDragStart();
-            handleDrag();
-
-            constexpr ImGuiTableFlags tableFlags = ImGuiTableFlags_RowBg |
-                                                   ImGuiTableFlags_BordersInnerV |
-                                                   ImGuiTableFlags_Resizable |
-                                                   ImGuiTableFlags_SizingStretchProp |
-                                                   ImGuiTableFlags_ScrollY;
-
-            ImGuiStyle &style = ImGui::GetStyle();
-            ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(style.CellPadding.x, 2.0f));
-            if (ImGui::BeginTable((id + "entries").c_str(), 4, tableFlags)) {
-                ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
-                ImGui::TableSetupColumn("Date");
-                ImGui::TableSetupColumn("Type");
-                ImGui::TableSetupColumn("Size");
+            if (ImGui::BeginTable((id + "split_table").c_str(), 2,
+                                  ImGuiTableFlags_Resizable | ImGuiTableFlags_SizingStretchProp)) {
+                ImGui::TableSetupColumn("Files", ImGuiTableColumnFlags_WidthStretch, 0.0f);
+                ImGui::TableSetupColumn("Preview", ImGuiTableColumnFlags_WidthFixed, previewWidth);
                 ImGui::TableHeadersRow();
 
-                for (auto *child: filesContext.currentDirectory->children) {
-                    renderTreeItem(child);
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+
+
+                ImGui::BeginChild((id + "files_list_in_table").c_str(), ImVec2(0, 0),
+                                  ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar );
+                {
+                    isSomethingHovered = ImGui::IsWindowHovered();
+                    if (ImGui::IsWindowFocused()) {
+                        filesContext.selected.clear();
+                    }
+                    updateDragStart();
+                    handleDrag();
+
+                    constexpr ImGuiTableFlags tableFlags = ImGuiTableFlags_RowBg |
+                                                           ImGuiTableFlags_BordersInnerV |
+                                                           ImGuiTableFlags_Resizable |
+                                                           ImGuiTableFlags_SizingStretchProp |
+                                                           ImGuiTableFlags_ScrollY;
+
+                    ImGui::PushStyleVar(ImGuiStyleVar_CellPadding,
+                                        ImVec2(ImGui::GetStyle().CellPadding.x, 2.0f));
+                    if (ImGui::BeginTable((id + "entries").c_str(), 4, tableFlags)) {
+                        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
+                        ImGui::TableSetupColumn("Date");
+                        ImGui::TableSetupColumn("Type");
+                        ImGui::TableSetupColumn("Size");
+                        ImGui::TableHeadersRow();
+
+                        for (auto *child: filesContext.currentDirectory->children) {
+                            renderTreeItem(child);
+                        }
+
+                        ImGui::EndTable();
+                    }
+                    ImGui::PopStyleVar();
+
+                    contextMenu();
+                    clearDragOnMouseUp();
                 }
+                ImGui::EndChild();
+
+                ImGui::TableNextColumn();
+
+                ImGui::BeginChild((id + "preview_in_table").c_str(), ImVec2(0, 0));
+                {
+                    previewPanel->onSync();
+                }
+                ImGui::EndChild();
+
+
+                previewWidth = ImGui::GetColumnWidth(1);
 
                 ImGui::EndTable();
             }
-            ImGui::PopStyleVar();
-            contextMenu();
-            clearDragOnMouseUp();
-        }
+        } else {
+            bool renderTree = ImGui::BeginChild((id + "files_list").c_str(), ImVec2(0, 0));
+            if (renderTree) {
+                isSomethingHovered = ImGui::IsWindowHovered();
+                if (ImGui::IsWindowFocused()) {
+                    filesContext.selected.clear();
+                }
+                updateDragStart();
+                handleDrag();
 
-        if (renderPreview()) {
-            ImGui::EndChild();
+                constexpr ImGuiTableFlags tableFlags = ImGuiTableFlags_RowBg |
+                                                       ImGuiTableFlags_BordersInnerV |
+                                                       ImGuiTableFlags_Resizable |
+                                                       ImGuiTableFlags_SizingStretchProp |
+                                                       ImGuiTableFlags_ScrollY;
 
-            ImGui::SameLine();
-            ImGui::Button("##splitter", ImVec2(2, -1));
-            if (ImGui::IsItemActive()) {
-                previewWidth -= ImGui::GetIO().MouseDelta.x;
-            }
-            if (ImGui::IsItemHovered()) {
-                ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
-            }
-            ImGui::SameLine();
+                ImGui::PushStyleVar(ImGuiStyleVar_CellPadding,
+                                    ImVec2(ImGui::GetStyle().CellPadding.x, 2.0f));
+                if (ImGui::BeginTable((id + "entries").c_str(), 4, tableFlags)) {
+                    ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
+                    ImGui::TableSetupColumn("Date");
+                    ImGui::TableSetupColumn("Type");
+                    ImGui::TableSetupColumn("Size");
+                    ImGui::TableHeadersRow();
 
-            if (ImGui::BeginChild((id + "preview").c_str(), ImVec2(0, 0), ImGuiChildFlags_Border)) {
-                previewPanel->onSync();
+                    for (auto *child: filesContext.currentDirectory->children) {
+                        renderTreeItem(child);
+                    }
+
+                    ImGui::EndTable();
+                }
+                ImGui::PopStyleVar();
+
+                contextMenu();
+                clearDragOnMouseUp();
             }
             ImGui::EndChild();
         }
@@ -184,7 +221,7 @@ namespace Metal {
             return;
         }
 
-        // Slightly tighter rows than default, and make the *entire* row selectable (all columns).
+
         const float rowHeight = ImGui::GetTextLineHeight() + ImGui::GetStyle().CellPadding.y * 2.0f;
 
         ImGui::TableNextRow(ImGuiTableRowFlags_None, rowHeight);
@@ -202,21 +239,21 @@ namespace Metal {
             ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
         }
 
-        const std::string label = entry->name + "##" + entry->getId();
+        const std::string label = entry->name + id + entry->getId();
 
-        // Row background + click target spanning all columns.
+
         const ImVec2 cursorPos = ImGui::GetCursorPos();
         ImGuiSelectableFlags selectableFlags = ImGuiSelectableFlags_SpanAllColumns |
                                                ImGuiSelectableFlags_AllowItemOverlap |
                                                ImGuiSelectableFlags_AllowDoubleClick;
-        ImGui::Selectable(("##row_" + entry->getId()).c_str(), isSelected, selectableFlags, ImVec2(0.0f, rowHeight));
+        ImGui::Selectable((id + "row_" + entry->getId()).c_str(), isSelected, selectableFlags, ImVec2(0.0f, rowHeight));
 
         entry->isHovered = ImGui::IsItemHovered();
         isSomethingHovered = isSomethingHovered || entry->isHovered;
         onClick(entry);
         handleDragDrop(entry);
 
-        // Draw the tree node (icon + label + expand arrow) on top of the selectable.
+
         ImGui::SetCursorPos(cursorPos);
 
         bool open = false;
@@ -306,14 +343,7 @@ namespace Metal {
 
     void FilesPanel::pasteSelected() {
         for (auto &entry: filesContext.toCut) {
-            // var children = filesRepository.parentChildren.get(currentDirectory);
-            // if (!children.contains(key)) {
-            //     var previousParentId = filesRepository.childParent.get(key);
-            //     filesRepository.parentChildren.get(previousParentId).remove(key);
             //
-            //     children.add(key);
-            //     filesRepository.childParent.put(key, currentDirectory);
-            // }
         }
         filesContext.toCut.clear();
         FilesService::GetEntries(filesContext.currentDirectory);
@@ -384,4 +414,4 @@ namespace Metal {
                 break;
         }
     }
-} // Metal
+}

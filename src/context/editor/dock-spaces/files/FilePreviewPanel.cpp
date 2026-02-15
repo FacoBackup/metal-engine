@@ -24,7 +24,7 @@ namespace Metal {
 
         FileEntry *selected = filesContext.selected.begin()->second;
 
-        ImGui::Text("Preview: %s", selected->name.c_str());
+        ImGui::Text(selected->name.c_str());
         ImGui::Separator();
 
         if (selected->type == EntryType::TEXTURE) {
