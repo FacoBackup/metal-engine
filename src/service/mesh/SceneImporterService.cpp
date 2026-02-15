@@ -22,6 +22,7 @@
 namespace Metal {
     void SceneImporterService::importScene(const std::string &targetDir, const std::string &pathToFile) const {
         LOG_INFO(context, "Starting async scene import: " + pathToFile);
+            context.notificationService.pushMessage("Starting scene import", NotificationSeverities::WARNING);
 
         std::stop_source stopSource;
         std::string task = context.asyncTaskService.registerTask("Importing scene: " + fs::path(pathToFile).filename().string(),
@@ -90,7 +91,10 @@ namespace Metal {
             }
 
             DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_SCENE(sceneMetadata.getId()), sceneData)
+
             LOG_INFO(context, "Successfully imported scene: " + sceneMetadata.name + " (" + sceneMetadata.getId() + ")");
+            context.notificationService.pushMessage("Successfully imported scene", NotificationSeverities::SUCCESS);
+
             context.asyncTaskService.endTask(task);
         }).detach();
     }
@@ -108,13 +112,24 @@ namespace Metal {
         increment++;
         currentNode.parentEntity = parentId;
 
+        // IMPORTANT: `scene.entities` is a `std::vector`. Any further `emplace_back` may reallocate and
+        // invalidate references (including `currentNode`). Capture the needed values by copy.
+        const int currentNodeId = currentNode.id;
+        const std::string currentNodeName = currentNode.name;
+
         for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
             if (stopToken.stop_requested()) return;
-            auto &childMeshNode = scene.entities.emplace_back();
             unsigned int meshIndex = node->mMeshes[i];
-            childMeshNode.meshId = meshMap.at(meshIndex);
-            childMeshNode.name = currentNode.name + " (" + std::to_string(meshIndex) + ")";
-            childMeshNode.parentEntity = currentNode.id;
+            const auto it = meshMap.find(meshIndex);
+            if (it == meshMap.end()) {
+                // Mesh reference missing; skip linking to avoid terminating import.
+                continue;
+            }
+
+            auto &childMeshNode = scene.entities.emplace_back();
+            childMeshNode.meshId = it->second;
+            childMeshNode.name = currentNodeName + " (" + std::to_string(meshIndex) + ")";
+            childMeshNode.parentEntity = currentNodeId;
             childMeshNode.id = increment;
             if (meshMaterialMap.contains(childMeshNode.meshId)) {
                 unsigned int matIndex = meshMaterialMap.at(childMeshNode.meshId);
@@ -127,7 +142,7 @@ namespace Metal {
 
         for (unsigned int i = 0; i < node->mNumChildren; ++i) {
             if (stopToken.stop_requested()) return;
-            ProcessNode(increment, scene, node->mChildren[i], currentNode.id, meshMap, meshMaterialMap, materialsMap, stopToken);
+            ProcessNode(increment, scene, node->mChildren[i], currentNodeId, meshMap, meshMaterialMap, materialsMap, stopToken);
         }
     }
 

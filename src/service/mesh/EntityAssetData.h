@@ -2,7 +2,6 @@
 #define ENTITYASSETDATA_H
 #include <string>
 
-#include "../material/MaterialData.h"
 #include "../../util/serialization-definitions.h"
 
 namespace Metal {
@@ -13,7 +12,7 @@ namespace Metal {
         int parentEntity = -1;
         int id;
 
-        SERIALIZE_TEMPLATE(id, name, meshId, parentEntity)
+        SERIALIZE_TEMPLATE(id, name, meshId, materialId, parentEntity)
     };
 }
 #endif //ENTITYASSETDATA_H

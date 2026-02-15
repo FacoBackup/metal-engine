@@ -2,6 +2,7 @@
 
 #include "../../../dependencies/stb/stb_image.h"
 #include "../../../dependencies/stb/stb_image_write.h"
+#include <assimp/texture.h>
 #include <filesystem>
 #include <cereal/archives/binary.hpp>
 
@@ -39,14 +40,74 @@ namespace Metal {
             stbi_image_free(textureData.data);
             return metadata.getId();
         } catch (std::exception &e) {
+            LOG_ERROR(context, std::string("Texture import failed: ") + e.what());
+            return "";
+        }
+    }
+
+    std::string TextureImporterService::importEmbeddedTexture(const std::string &targetDir, const ::aiTexture *texture,
+                                                              const std::string &nameHint) const {
+        if (!texture) return "";
+        try {
+            auto metadata = FileMetadata{};
+            metadata.type = EntryType::TEXTURE;
+            metadata.name = nameHint.empty() ? "embedded" : nameHint;
+            DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(metadata.getId()), metadata)
+
+            int width = 0;
+            int height = 0;
+            int channels = 0;
+
+            unsigned char *data = nullptr;
+            std::vector<unsigned char> owned;
+
+            if (texture->mHeight == 0) {
+                // Compressed texture data (common in glTF/GLB). mWidth holds the byte length.
+                data = stbi_load_from_memory(reinterpret_cast<const stbi_uc *>(texture->pcData),
+                                             static_cast<int>(texture->mWidth),
+                                             &width, &height, &channels, 0);
+                if (!data) {
+                    throw std::runtime_error("Failed to decode embedded (compressed) texture");
+                }
+            } else {
+                // Raw texels.
+                width = static_cast<int>(texture->mWidth);
+                height = static_cast<int>(texture->mHeight);
+                channels = 4;
+                owned.resize(static_cast<size_t>(width) * static_cast<size_t>(height) * 4u);
+                for (int y = 0; y < height; ++y) {
+                    for (int x = 0; x < width; ++x) {
+                        const auto &t = texture->pcData[static_cast<unsigned int>(y * width + x)];
+                        const size_t idx = (static_cast<size_t>(y) * static_cast<size_t>(width) + static_cast<size_t>(x)) * 4u;
+                        owned[idx + 0] = t.r;
+                        owned[idx + 1] = t.g;
+                        owned[idx + 2] = t.b;
+                        owned[idx + 3] = t.a;
+                    }
+                }
+                data = owned.data();
+            }
+
+            const auto textureData = TextureData{width, height, channels, data};
+            reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_0);
+            reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_1);
+            reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_2);
+            reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_3);
+
+            if (texture->mHeight == 0) {
+                stbi_image_free(data);
+            }
+            return metadata.getId();
+        } catch (std::exception &e) {
+            LOG_ERROR(context, std::string("Embedded texture import failed: ") + e.what());
             return "";
         }
     }
 
     void TextureImporterService::reduceImage(const std::string &fileId,
                                              const TextureData &textureData, const LevelOfDetail &levelOfDetail) const {
-        const int newWidth = textureData.width / levelOfDetail.level;
-        const int newHeight = textureData.height / levelOfDetail.level;
+        const int newWidth = std::max(1, textureData.width / levelOfDetail.level);
+        const int newHeight = std::max(1, textureData.height / levelOfDetail.level);
 
         // Allocate memory for the resized image
         auto *resizedData = new unsigned char[newWidth * newHeight * textureData.channels];
@@ -66,7 +127,6 @@ namespace Metal {
         if (!stbi_write_png((context.getAssetDirectory() + FORMAT_FILE_TEXTURE(fileId, levelOfDetail)).c_str(),
                             newWidth, newHeight, textureData.channels, resizedData,
                             newWidth * textureData.channels)) {
-            stbi_image_free(textureData.data);
             delete[] resizedData;
             throw std::runtime_error("Failed to write resized image");
         }

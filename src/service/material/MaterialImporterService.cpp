@@ -6,7 +6,7 @@
 #include "../../util/FilesUtil.h"
 #include <assimp/material.h>
 
-#define TEXTURE_P context.textureImporter.importTexture(targetDir, rootDirectory + "/" + texturePath.data)
+#include <filesystem>
 
 #include <cereal/archives/binary.hpp>
 
@@ -15,6 +15,7 @@ namespace Metal {
                                                    std::unordered_map<unsigned int, std::string> &materialMap,
                                                    const std::string &rootDirectory,
                                                    const std::stop_token &stopToken) const {
+        namespace fs = std::filesystem;
         LOG_INFO(context, "Processing materials for scene...");
         for (unsigned int i = 0; i < scene->mNumMaterials; ++i) {
             if (stopToken.stop_requested()) return;
@@ -29,40 +30,55 @@ namespace Metal {
             materialMap.insert({i, materialId});
 
             auto materialData = MaterialData{};
-            for (int textureType = aiTextureType_NONE + 1; textureType <= aiTextureType_UNKNOWN; ++textureType) {
-                const auto type = static_cast<aiTextureType>(textureType);
 
-                if (unsigned int textureCount = material->GetTextureCount(type); textureCount > 0) {
-                    for (unsigned int j = 0; j < textureCount; ++j) {
-                        aiString texturePath;
-                        if (material->GetTexture(type, j, &texturePath) == AI_SUCCESS) {
-                            switch (type) {
-                                case aiTextureType_BASE_COLOR: {
-                                    materialData.albedo = TEXTURE_P;
-                                    break;
-                                }
-                                case aiTextureType_NORMALS: {
-                                    materialData.normal = TEXTURE_P;
-                                    break;
-                                }
-                                case aiTextureType_HEIGHT: {
-                                    materialData.height = TEXTURE_P;
-                                    break;
-                                }
-                                case aiTextureType_METALNESS: {
-                                    materialData.metallic = TEXTURE_P;
-                                    break;
-                                }
-                                case aiTextureType_DIFFUSE_ROUGHNESS: {
-                                    materialData.roughness = TEXTURE_P;
-                                    break;
-                                }
-                                default: break;
-                            }
+            const auto importAssimpTexture = [&](const aiString &assimpPath, const std::string &nameHint) -> std::string {
+                if (assimpPath.length == 0) return "";
+                const std::string p = assimpPath.C_Str();
+
+                // Embedded textures are referenced as "*<index>".
+                if (!p.empty() && p[0] == '*') {
+                    try {
+                        const unsigned int embeddedIndex = static_cast<unsigned int>(std::stoul(p.substr(1)));
+                        if (scene && embeddedIndex < scene->mNumTextures) {
+                            return context.textureImporter.importEmbeddedTexture(targetDir, scene->mTextures[embeddedIndex], nameHint);
                         }
+                    } catch (...) {
+                        return "";
                     }
+                    return "";
                 }
-            }
+
+                fs::path resolved = fs::path(p);
+                if (!resolved.is_absolute()) {
+                    resolved = fs::path(rootDirectory) / resolved;
+                }
+                resolved = resolved.lexically_normal();
+                return context.textureImporter.importTexture(targetDir, resolved.string());
+            };
+
+            const auto trySetFromType = [&](std::string &slot, aiTextureType type, const std::string &nameHint) {
+                if (!slot.empty()) return;
+                if (material->GetTextureCount(type) == 0) return;
+                aiString texturePath;
+                if (material->GetTexture(type, 0, &texturePath) == AI_SUCCESS) {
+                    slot = importAssimpTexture(texturePath, nameHint);
+                }
+            };
+
+            // Albedo
+            trySetFromType(materialData.albedo, aiTextureType_BASE_COLOR, "albedo");
+            trySetFromType(materialData.albedo, aiTextureType_DIFFUSE, "albedo");
+
+            // Normal
+            trySetFromType(materialData.normal, aiTextureType_NORMALS, "normal");
+            trySetFromType(materialData.normal, aiTextureType_NORMAL_CAMERA, "normal");
+
+            // Metallic / Roughness
+            trySetFromType(materialData.metallic, aiTextureType_METALNESS, "metallic");
+            trySetFromType(materialData.roughness, aiTextureType_DIFFUSE_ROUGHNESS, "roughness");
+
+            // Height (if present)
+            trySetFromType(materialData.height, aiTextureType_HEIGHT, "height");
             DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialId), materialData)
             LOG_INFO(context, "Persisted material: " + materialId);
         }
