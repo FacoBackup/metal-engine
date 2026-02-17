@@ -16,7 +16,6 @@ namespace Metal {
         }
 
 
-            UIUtil::DynamicSpacing(225);
-
+        UIUtil::DynamicSpacing(225);
     }
 }

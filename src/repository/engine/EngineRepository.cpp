@@ -15,7 +15,7 @@ namespace Metal {
                     16);
         registerBool(vsync, "Display settings (Restart required)", "VSync?");
         registerInt(numberOfTiles, "World", "Number of tiles", 2, 100);
-        registerInt(maxVideoFrames, "", "Max video frames", 1);
+        // registerInt(maxVideoFrames, "", "Max video frames", 1);
 
         registerInt(volumeShadowSteps, VOLUMES, "Shadow steps", 1);
 
