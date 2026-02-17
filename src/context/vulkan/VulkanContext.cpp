@@ -133,11 +133,6 @@ namespace Metal {
         if (!supportedFeatures.multiDrawIndirect) features.multiDrawIndirect = VK_FALSE;
         if (!supportedFeatures.drawIndirectFirstInstance) features.drawIndirectFirstInstance = VK_FALSE;
 
-        // We can't use set_required_features because we already selected the device.
-        // But we can enable them in the DeviceBuilder if we want, or just be aware they might not be there.
-        // vkb handles this via required_features in PhysicalDeviceSelector.
-        // Let's re-select with the features we actually want and are supported.
-        
         physDeviceSelector.set_required_features(features);
         physicalDeviceResult = physDeviceSelector.select();
         if (physicalDeviceResult) {

@@ -6,13 +6,6 @@
 #include "../../../../service/raytracing/RayTracingService.h"
 
 namespace Metal {
-    void HWRayTracingPass::onInitialize() {
-        if (!context.vulkanContext.rayTracingSupported) {
-            return;
-        }
-        // Pipeline creation is deferred until TLAS is ready
-    }
-
     bool HWRayTracingPass::shouldRun() {
         if (!context.vulkanContext.rayTracingSupported) {
             return false;
@@ -57,5 +50,7 @@ namespace Metal {
             outputTex->width,
             outputTex->height,
             1);
+
+        endWriting(outputTex->vkImage);
     }
 } // Metal

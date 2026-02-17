@@ -29,8 +29,8 @@ namespace Metal {
         addPass(computePasses, new AccumulationMetadataPass(context));
 
         addPass(postProcessingPasses, new PostProcessingPass(context));
-        addPass(postProcessingPasses, new SelectedDotPass(context));
         if (context.isDebugMode()) {
+            addPass(postProcessingPasses, new SelectedDotPass(context));
             addPass(postProcessingPasses, new GridPass(context));
             addPass(postProcessingPasses, new VoxelVisualizerPass(context));
             addPass(postProcessingPasses, new IconsPass(context));

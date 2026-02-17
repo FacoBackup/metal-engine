@@ -7,7 +7,6 @@
 #include "../../../../context/ApplicationContext.h"
 #include "../../../../service/descriptor/DescriptorInstance.h"
 #include "../../../../service/framebuffer/FrameBufferInstance.h"
-#include "../../../../service/texture/TextureInstance.h"
 #include "../../../../service/camera/Camera.h"
 
 #include <algorithm>

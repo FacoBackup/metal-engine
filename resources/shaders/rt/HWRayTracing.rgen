@@ -21,7 +21,7 @@ void main() {
 
     if (worldPos.a == 0.0) {
         // No geometry - sky color
-        finalColor = vec3(0);
+        finalColor = vec3(0.1, 0.1, 0.15);
     } else {
         // Reconstruct view ray
         vec2 pxNDS = texCoords * 2.0 - 1.0;
@@ -65,15 +65,7 @@ void main() {
         vec4 materialA = texture(gBufferAlbedo, texCoords);
         vec3 albedo = materialA.rgb;
 
-        // Fresnel (Schlick)
-        float cosTheta = max(dot(-rayDirection, normal), 0.0);
-        vec3 F0 = mix(vec3(0.04), albedo, metallic);
-        vec3 fresnel = F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
-
-        // Attenuate by roughness
-        vec3 specular = hitColor * fresnel * (1.0 - roughness);
-        vec3 diffuse = albedo * (1.0 - metallic) * 0.3;
-        finalColor = vec3(1,0,0);
+        finalColor = albedo;
     }
 
     imageStore(outputImage, ivec2(gl_LaunchIDEXT.xy), vec4(finalColor, 1.0));
