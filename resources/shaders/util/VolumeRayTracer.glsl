@@ -1,5 +1,3 @@
-#include "../LightVolumeBuffer.glsl"
-
 vec3 RandomUnitVector();
 
 vec2 sampleDisk() {

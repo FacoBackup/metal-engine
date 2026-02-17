@@ -1,11 +1,25 @@
 #extension GL_EXT_ray_tracing : require
 
-layout(location = 0) rayPayloadInEXT vec3 hitColor;
+#include "../util/HWRayTracingUtil.glsl"
+
+layout(location = 0) rayPayloadInEXT RayPayload payload;
 
 void main() {
-    // No hit - return sky gradient based on ray direction
-//    vec3 dir = normalize(gl_WorldRayDirectionEXT);
-//    float t = 0.5 * (dir.y + 1.0);
-//    hitColor = mix(vec3(0.2, 0.3, 0.5), vec3(0.5, 0.7, 1.0), t);
-    hitColor = vec3(1, 0, 1);
+    payload.hit = false;
+    payload.t = -1.0;
+    payload.hitPosition = vec3(0.0);
+    payload.hitNormal = vec3(0.0, 1.0, 0.0);
+
+    payload.material.baseColor = vec3(1.0, 0.0, 1.0);
+    payload.material.roughness = 1.0;
+    payload.material.metallic = 0.0;
+    payload.material.subsurface = 0.0;
+    payload.material.specular = 0.0;
+    payload.material.specularTint = 0.0;
+    payload.material.clearcoat = 0.0;
+    payload.material.clearcoatGloss = 1.0;
+    payload.material.anisotropic = 0.0;
+    payload.material.sheen = 0.0;
+    payload.material.sheenTint = 0.0;
+    payload.material.isEmissive = false;
 }

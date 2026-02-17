@@ -18,9 +18,10 @@ namespace Metal {
     void ShaderUtil::CheckShaderCompilation(glslang_shader_t *shader) {
         const char *infoLog = glslang_shader_get_info_log(shader);
         const char *debugLog = glslang_shader_get_info_debug_log(shader);
+        const char *shaderCode = glslang_shader_get_preprocessed_code(shader);
 
         if (infoLog && strlen(infoLog) > 0) {
-            LOG_ERROR_S("Shader Info Log: " + std::string(infoLog));
+            LOG_ERROR_S("Shader Info Log: " + std::string(infoLog) + "\n\n" + std::string(shaderCode));
         }
         if (debugLog && strlen(debugLog) > 0) {
             LOG_DEBUG_S("Shader Debug Log: " + std::string(debugLog));

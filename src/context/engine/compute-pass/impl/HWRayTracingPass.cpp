@@ -27,7 +27,9 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.gBufferAlbedo.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferNormal.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get())
-                .addDescriptorSet(context.coreDescriptorSets.currentFrameDescriptor.get());
+                .addDescriptorSet(context.coreDescriptorSets.currentFrameDescriptor.get())
+                .addDescriptorSet(context.coreDescriptorSets.giSurfaceCacheCompute.get())
+                .addDescriptorSet(context.coreDescriptorSets.lightVolumeData.get());
             pipelineInstance = context.pipelineService.createPipeline(builder);
         }
 

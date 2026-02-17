@@ -5,15 +5,14 @@ vec3 visibilityTest(const in LightVolume light,  in vec3 point, vec3 wi) {
     float bias = max(.05, 1e-4 * length(point));
     vec3 shadowsPosition = point + bias * wi;// Offset to avoid self-intersection
 
-    Ray ray = Ray(shadowsPosition, wi, 1. / wi);
-    SurfaceInteraction hitData = traceAllTiles(ray);
+    traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT | gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 0, 0, 0, shadowsPosition, 0.001, wi, 1000.0, 0);
 
     float lightDistance = length(light.position - shadowsPosition);
-    float hitDistance = length(hitData.point - shadowsPosition);
+    float hitDistance = payload.t;
 
     vec3 attenuation = vec3(1);
     // If an opaque surface is blocking the light, return 0 immediately
-    if (hitData.anyHit && hitDistance < lightDistance) {
+    if (payload.hit && hitDistance < lightDistance) {
         attenuation = vec3(1 / (1 + lightDistance * lightDistance));
     }
 
@@ -26,8 +25,8 @@ vec3 visibilityTest(const in LightVolume light,  in vec3 point, vec3 wi) {
         LightVolume volume = lightVolumeBuffer.items[i];
 
         float tEntry, tExit;
-        vec3 roLocal = ray.o - volume.position;
-        bool intersects = intersectBox(roLocal, ray.d, volume.dataA, tEntry, tExit);
+        vec3 roLocal = shadowsPosition - volume.position;
+        bool intersects = intersectBox(roLocal, wi, volume.dataA, tEntry, tExit);
         if (!intersects) continue;
 
         if (tEntry > lightDistance){
