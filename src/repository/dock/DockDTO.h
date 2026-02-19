@@ -19,12 +19,19 @@ namespace Metal {
         float sizeRatioForNodeAtDir{};
         DockDTO *outAtOppositeDir = nullptr;
         DockDTO *origin = nullptr;
-        DockSpace *description;
-        DockPosition direction = LEFT;
+        DockPosition direction = RIGHT_TOP;
+        std::vector<DockSpace *> dockSpaces{};
+
 
         explicit DockDTO(DockSpace *description) : selectedOption(description->index),
-                                                   description(description),
                                                    internalId("##" + Util::uuidV4()) {
+            dockSpaces.emplace_back(description);
+        }
+
+        explicit DockDTO(DockSpace *description, float sizeRatioForNodeAtDir) : selectedOption(description->index),
+            internalId("##" + Util::uuidV4()),
+            sizeRatioForNodeAtDir(sizeRatioForNodeAtDir) {
+            dockSpaces.emplace_back(description);
         }
     };
 } // Metal

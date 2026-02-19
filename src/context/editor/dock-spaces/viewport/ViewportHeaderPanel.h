@@ -14,7 +14,7 @@ namespace Metal {
         AbstractPanel *gizmo = nullptr;
 
     public:
-        static constexpr float HEIGHT = 34;
+        static constexpr float HEIGHT = 24;
 
         void onInitialize() override;
 

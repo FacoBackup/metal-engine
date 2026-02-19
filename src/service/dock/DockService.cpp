@@ -1,4 +1,5 @@
 #include <imgui_internal.h>
+#include <algorithm>
 #include "DockService.h"
 #include "../../repository/dock/DockDTO.h"
 #include "../../context/editor/abstract/AbstractPanel.h"
@@ -20,13 +21,13 @@ namespace Metal {
 
             std::vector<IPanel *> toKeep{};
             for (auto *child: panel->getChildren()) {
-                if (!dynamic_cast<DockSpacePanel *>(child)) {
+                auto *p = dynamic_cast<DockSpacePanel *>(child);
+                if (p == nullptr) {
                     toKeep.push_back(child);
                 } else {
-                    auto *p = dynamic_cast<DockSpacePanel *>(child);
                     p->removeAllChildren();
                     delete p->getDock();
-                    delete child;
+                    delete p;
                 }
             }
 
@@ -38,68 +39,45 @@ namespace Metal {
             ImGui::DockBuilderRemoveNode(windowId);
             ImGui::DockBuilderAddNode(windowId, ImGuiDockNodeFlags_NoTabBar);
             ImGui::DockBuilderSetNodeSize(windowId, ImGui::GetMainViewport()->Size);
+            {
+                dockRepository.top.direction = TOP;
+                dockRepository.top.origin = nullptr;
+                dockRepository.top.outAtOppositeDir = nullptr;
+                dockRepository.top.splitDir = ImGuiDir_Right;
 
-            dockRepository.center.direction = CENTER;
-            dockRepository.center.origin = nullptr;
-            dockRepository.center.outAtOppositeDir = nullptr;
-            dockRepository.center.splitDir = ImGuiDir_Right;
-
-            createDockSpace(&dockRepository.center, &windowId);
-            addWindow(&dockRepository.center, panel);
-
-            const auto &left = dockRepository.left;
-            for (size_t i = 0; i < left.size(); i++) {
-                DockDTO *dockSpace = left[i];
-                if (i == 0) {
-                    dockSpace->origin = &dockRepository.center;
-                    dockSpace->outAtOppositeDir = &dockRepository.center;
-                } else {
-                    DockDTO *previous = left[i - 1];
-                    dockSpace->origin = previous;
-                    dockSpace->outAtOppositeDir = previous;
-                }
-                dockSpace->splitDir = ImGuiDir_Down;
-                dockSpace->direction = LEFT;
-                createDockSpace(dockSpace, &windowId);
-                addWindow(dockSpace, panel);
+                createDockSpace(&dockRepository.top, &windowId);
+                addWindow(&dockRepository.top, panel);
             }
 
-            const auto &right = dockRepository.right;
-            for (size_t i = 0; i < right.size(); i++) {
-                DockDTO *dockSpace = right[i];
-                if (i == 0) {
-                    dockSpace->origin = &dockRepository.center;
-                    dockSpace->outAtOppositeDir = &dockRepository.center;
-                } else {
-                    DockDTO *previous = right[i - 1];
-                    dockSpace->origin = previous;
-                    dockSpace->outAtOppositeDir = previous;
-                }
-                dockSpace->splitDir = ImGuiDir_Down;
-                dockSpace->direction = RIGHT;
-                createDockSpace(dockSpace, &windowId);
-                addWindow(dockSpace, panel);
+            {
+                dockRepository.rightTop.origin = &dockRepository.top;
+                dockRepository.rightTop.outAtOppositeDir = &dockRepository.top;
+                dockRepository.rightTop.splitDir = ImGuiDir_Down;
+                dockRepository.rightTop.direction = RIGHT_TOP;
+                createDockSpace(&dockRepository.rightTop, &windowId);
+                addWindow(&dockRepository.rightTop, panel);
             }
 
-            const auto &bottom = dockRepository.bottom;
-            for (size_t i = 0, bottomSize = bottom.size(); i < bottomSize; i++) {
-                DockDTO *dockSpace = bottom[i];
-                if (i == 0) {
-                    dockSpace->origin = nullptr;
-                    dockSpace->outAtOppositeDir = nullptr;
-                    dockSpace->splitDir = ImGuiDir_Down;
-                } else {
-                    DockDTO *previous = bottom[i - 1];
-                    dockSpace->origin = previous;
-                    dockSpace->outAtOppositeDir = previous;
-                    dockSpace->splitDir = ImGuiDir_Right;
-                }
-                dockSpace->direction = BOTTOM;
-                createDockSpace(dockSpace, &windowId);
-                addWindow(dockSpace, panel);
+            {
+                dockRepository.rightBottom.origin = &dockRepository.rightTop;
+                dockRepository.rightBottom.outAtOppositeDir = &dockRepository.rightTop;
+
+                dockRepository.rightBottom.splitDir = ImGuiDir_Down;
+                dockRepository.rightBottom.direction = RIGHT_BOTTOM;
+                createDockSpace(&dockRepository.rightBottom, &windowId);
+                addWindow(&dockRepository.rightBottom, panel);
             }
 
-            ImGui::DockBuilderDockWindow(dockRepository.center.internalId.c_str(), windowId);
+            {
+                dockRepository.bottom.origin = nullptr;
+                dockRepository.bottom.outAtOppositeDir = nullptr;
+                dockRepository.bottom.splitDir = ImGuiDir_Down;
+
+                dockRepository.bottom.direction = BOTTOM;
+                createDockSpace(&dockRepository.bottom, &windowId);
+                addWindow(&dockRepository.bottom, panel);
+            }
+            ImGui::DockBuilderDockWindow(dockRepository.top.internalId.c_str(), windowId);
             ImGui::DockBuilderFinish(windowId);
         }
     }
@@ -130,52 +108,5 @@ namespace Metal {
             }
         }
         panel->appendChild(new DockSpacePanel(nullptr, d));
-    }
-
-    void DockService::prepareForRemoval(DockDTO *dock, DockSpacePanel *dockSpacePanel) const {
-        DockRepository &dockRepository = ApplicationContext::Get().dockRepository;
-
-        dockRepository.dockToRemove = dock;
-        dockRepository.dockPanelToRemove = dockSpacePanel;
-    }
-
-    void DockService::updateForRemoval(AbstractPanel *panel) const {
-        DockRepository &dockRepository = ApplicationContext::Get().dockRepository;
-
-        if (dockRepository.dockPanelToRemove != nullptr) {
-            switch (dockRepository.dockToRemove->direction) {
-                case LEFT:
-                    dockRepository.left.erase(
-                        std::ranges::remove(dockRepository.left, dockRepository.dockToRemove).begin(),
-                        dockRepository.left.end());
-                    break;
-                case RIGHT:
-                    dockRepository.right.erase(
-                        std::ranges::remove(dockRepository.right, dockRepository.dockToRemove).begin(),
-                        dockRepository.right.end());
-                    break;
-                case BOTTOM:
-                    dockRepository.bottom.erase(
-                        std::ranges::remove(dockRepository.bottom, dockRepository.dockToRemove).begin(),
-                        dockRepository.bottom.end());
-                    break;
-                default:
-                    break;
-            }
-
-            dockRepository.isInitialized = false;
-            dockRepository.dockPanelToRemove->getView()->onRemove();
-            auto &vec = panel->getChildren();
-            vec.erase(std::ranges::remove(vec, dockRepository.dockPanelToRemove).begin(), vec.end());
-
-            dockRepository.dockPanelToRemove->getView()->removeAllChildren();
-
-            delete dockRepository.dockPanelToRemove->getView();
-            delete dockRepository.dockPanelToRemove;
-            delete dockRepository.dockToRemove;
-
-            dockRepository.dockToRemove = nullptr;
-            dockRepository.dockPanelToRemove = nullptr;
-        }
     }
 }

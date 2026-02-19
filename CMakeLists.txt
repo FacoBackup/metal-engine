@@ -64,7 +64,6 @@ add_executable(
         src/common/interface/Icons.h
         src/service/dock/DockService.cpp
         src/service/dock/DockService.h
-        src/repository/dock/DockRepository.cpp
         src/repository/dock/DockRepository.h
         src/repository/dock/DockDTO.h
         src/repository/dock/DockSpace.h

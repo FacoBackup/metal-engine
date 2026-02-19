@@ -19,13 +19,12 @@ namespace Metal {
         } else {
             currentPanel = paintGizmo;
         }
-        ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y));
-        ImGui::SetNextWindowSize(ImVec2(ImGui::GetWindowSize().x, HEIGHT));
-        ImGui::SetNextWindowBgAlpha(.4f);
+
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, PADDING);
-        ImGui::Begin(id.c_str(), &UIUtil::OPEN, FLAGS);
+        if (ImGui::BeginChild(id.c_str(), ImVec2(0, HEIGHT), false, FLAGS)) {
+            currentPanel->onSync();
+        }
+        ImGui::EndChild();
         ImGui::PopStyleVar();
-        currentPanel->onSync();
-        ImGui::End();
     }
 } // Metal

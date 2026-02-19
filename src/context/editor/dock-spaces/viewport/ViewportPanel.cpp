@@ -24,9 +24,14 @@ namespace Metal {
             updateInputs();
         }
 
+        headerPanel->onSync();
+
+        const float tabHeight = ImGui::GetFrameHeightWithSpacing();
+        const ImVec2 viewportSize{size->x, size->y - tabHeight - ViewportHeaderPanel::HEIGHT};
+
         auto *framebuffer = ApplicationContext::Get().coreFrameBuffers.postProcessingFBO;
         ApplicationContext::Get().descriptorService.setImageDescriptor(framebuffer, 0);
-        ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet), ImVec2{size->x, size->y});
+        ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet), viewportSize);
 
         const ImVec2 imageMin = ImGui::GetItemRectMin();
         const ImVec2 imageMax = ImGui::GetItemRectMax();
@@ -35,7 +40,6 @@ namespace Metal {
         if (ApplicationContext::Get().editorRepository.editorMode == EditorMode::EditorMode::TRANSFORM) {
             gizmoPanel->onSync();
         }
-        headerPanel->onSync();
         cameraPanel->onSync();
     }
 

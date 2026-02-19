@@ -5,18 +5,12 @@
 #include "../../common/AbstractRuntimeComponent.h"
 
 namespace Metal {
-    class DockSpacePanel;
-
     struct DockRepository final : AbstractRuntimeComponent {
-        DockDTO center{&DockSpace::VIEWPORT};
-        std::vector<DockDTO *> bottom;
-        std::vector<DockDTO *> left;
-        std::vector<DockDTO *> right;
-        DockDTO *dockToRemove = nullptr;
-        DockSpacePanel *dockPanelToRemove = nullptr;
+        DockDTO top{&DockSpace::VIEWPORT, 0.17f};
+        DockDTO bottom{&DockSpace::FILES, .25f};
+        DockDTO rightTop{&DockSpace::HIERARCHY, 0.6f};
+        DockDTO rightBottom{&DockSpace::INSPECTOR, 0.4f};
         bool isInitialized = false;
-
-        explicit DockRepository();
     };
 } // Metal
 
