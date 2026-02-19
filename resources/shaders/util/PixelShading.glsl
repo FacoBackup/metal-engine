@@ -19,7 +19,7 @@ struct BounceInfo {
     vec3 indirectLight;
 };
 
-void evaluateLightSimplified(in LightVolume l, in BounceInfo bounceInfo, inout vec3 throughput, inout vec3 indirectLight){
+void evaluateLightSimplified(in Light l, in BounceInfo bounceInfo, inout vec3 throughput, inout vec3 indirectLight){
     float bias = max(.05, 1e-4 * length(bounceInfo.currentPosition.xyz));
     vec3 localHitPosition = bounceInfo.currentPosition.xyz + bounceInfo.hitNormal * bias;
     vec3 lightDir = normalize(l.position - localHitPosition);
@@ -38,21 +38,19 @@ void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo){
     vec4 previousCacheData;
 
     if (!bounceInfo.isEmissive){
-        previousCacheData = imageLoad(giSurfaceCacheCompute, coord);
+        previousCacheData = imageLoad(surfaceCacheImage, coord);
     }
 
     if (previousCacheData.a == 1){
         vec3 lIndirect = vec3(0);
         vec3 lT = vec3(1);
 
-        if (globalData.lightVolumeCount > 0){
-            for (int i = 0; i < globalData.volumesOffset; ++i) {
-                LightVolume l = lightVolumeBuffer.items[i];
-                evaluateLightSimplified(l, bounceInfo, lT, lIndirect);
-            }
+        for (int i = 0; i < globalData.lightsCount; ++i) {
+            Light l = lightBuffer.items[i];
+            evaluateLightSimplified(l, bounceInfo, lT, lIndirect);
         }
 
-        imageStore(giSurfaceCacheCompute, coord, vec4(lIndirect, 0));
+        imageStore(surfaceCacheImage, coord, vec4(lIndirect, 0));
         bounceInfo.indirectLight += lIndirect;
         bounceInfo.throughput *= lT;
     } else {
@@ -139,8 +137,8 @@ vec3 calculatePixelColor( vec3 rayDirection, in vec2 texCoords, MaterialInfo mat
         vec3 f = vec3(0.);
         float scatteringPdf = 0.;
         vec3 Ld = vec3(0);
-        for (uint i = 0; i < globalData.volumesOffset; i++){
-            LightVolume l = lightVolumeBuffer.items[i];
+        for (uint i = 0; i < globalData.lightsCount; i++){
+            Light l = lightBuffer.items[i];
             l.color.rgb *= 20.;
             Ld += beta * calculateDirectLight(l, interaction, material, wi, f, scatteringPdf) * l.color.a;
         }

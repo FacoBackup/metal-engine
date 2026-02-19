@@ -19,8 +19,11 @@ namespace Metal {
     void TransformComponent::onUpdate(InspectableMember *member, ApplicationContext &context) {
         bool isVolume = context.worldRepository.volumes.contains(entityId);
         bool isLight = context.worldRepository.lights.contains(entityId);
-        if (isLight || isVolume) {
-            context.engineContext.setLightVolumeDataNeedsUpdate(true);
+        if (isLight) {
+            context.engineContext.setUpdateLights(true);
+        }
+        if (isVolume) {
+            context.engineContext.setUpdateVolumes(true);
         }
         if (member != nullptr && member->name == ROTATION) {
             rotation = normalize(glm::quat(rotationEuler * (glm::pi<float>() / 180.f)));

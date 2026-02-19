@@ -1,6 +1,4 @@
 #include "SparseVoxelOctreeBuilder.h"
-#include "../VoxelizationService.h"
-#include "SnapshotWorldTile.h"
 
 namespace Metal {
     void SparseVoxelOctreeBuilder::insert(int maxDepth, glm::vec3 point, VoxelData data) {
@@ -8,9 +6,8 @@ namespace Metal {
             throw std::runtime_error("Depth is not set");
         }
 
-        std::lock_guard<std::mutex> lock(insertMutex);
-        if (tile->boundingBox.intersects(point)) {
-            WorldToChunkLocal(tile, point);
+        if (boundingBox.intersects(point)) {
+            WorldToChunkLocal(point);
             auto pos = glm::ivec3{0, 0, 0};
             insertInternal(&root, point, data, pos, 0, maxDepth);
         }
@@ -34,7 +31,7 @@ namespace Metal {
             return;
         }
 
-        const auto size = static_cast<float>(TILE_SIZE / std::pow(2, depth));
+        const auto size = static_cast<float>(this->size / std::pow(2, depth));
         const auto childPos = glm::ivec3{
             point.x >= ((size * position.x) + (size / 2)) ? 1 : 0,
             point.y >= ((size * position.y) + (size / 2)) ? 1 : 0,
@@ -63,10 +60,10 @@ namespace Metal {
         }
     }
 
-    void SparseVoxelOctreeBuilder::WorldToChunkLocal(const SnapshotWorldTile *tile, glm::vec3 &worldCoordinate) {
-        const float minX = tile->boundingBox.center.x - TILE_SIZE / 2.f;
-        const float minY = tile->boundingBox.center.y - TILE_SIZE / 2.f;
-        const float minZ = tile->boundingBox.center.z - TILE_SIZE / 2.f;
+    void SparseVoxelOctreeBuilder::WorldToChunkLocal(glm::vec3 &worldCoordinate) {
+        const float minX = boundingBox.center.x - size / 2.f;
+        const float minY = boundingBox.center.y - size / 2.f;
+        const float minZ = boundingBox.center.z - size / 2.f;
 
         worldCoordinate.x = worldCoordinate.x - minX;
         worldCoordinate.y = worldCoordinate.y - minY;

@@ -222,17 +222,11 @@ add_executable(
         src/service/voxel/impl/OctreeNode.cpp
         src/service/voxel/impl/OctreeNode.h
         src/service/voxel/impl/VoxelData.h
-        src/service/voxel/VoxelizationService.cpp
-        src/service/voxel/VoxelizationService.h
-        src/service/voxel/impl/VoxelizerService.cpp
-        src/service/voxel/impl/VoxelizerService.h
         src/service/mesh/SceneData.h
         src/service/mesh/EntityAssetData.h
         src/service/material/MaterialData.h
         src/context/engine/render-pass/impl/PostProcessingPass.cpp
         src/context/engine/render-pass/impl/PostProcessingPass.h
-        src/context/engine/compute-pass/impl/PathTracerPass.cpp
-        src/context/engine/compute-pass/impl/PathTracerPass.h
         src/context/engine/compute-pass/impl/HWRayTracingPass.cpp
         src/context/engine/compute-pass/impl/HWRayTracingPass.h
         src/service/raytracing/RayTracingService.cpp
@@ -250,14 +244,11 @@ add_executable(
         src/service/notification/AsyncTaskService.h
         src/dto/Notification.h
         src/enum/NotificationSeverity.h
-        src/service/voxel/impl/Triangle.h
         src/service/voxel/impl/SparseVoxelOctreeData.h
         src/context/engine/render-pass/impl/tools/VoxelVisualizerPass.cpp
         src/context/engine/render-pass/impl/tools/VoxelVisualizerPass.h
         src/context/engine/render-pass/impl/tools/SelectedDotPass.cpp
         src/context/engine/render-pass/impl/tools/SelectedDotPass.h
-        src/service/voxel/SVOService.cpp
-        src/service/voxel/SVOService.h
         src/service/picking/PickingService.cpp
         src/service/picking/PickingService.h
         src/service/voxel/SVOInstance.cpp
@@ -266,7 +257,7 @@ add_executable(
         src/service/world/WorldGridService.cpp
         src/service/world/WorldGridService.h
         src/dto/buffers/TileInfoUBO.h
-        src/dto/buffers/LightVolumeData.h
+        src/dto/buffers/LightData.h
         src/repository/world/components/LightComponent.cpp
         src/repository/world/components/LightComponent.h
         src/context/engine/render-pass/impl/tools/IconsPass.cpp
@@ -289,23 +280,27 @@ add_executable(
         src/repository/inspection/FileInspectionRepository.h
         src/context/editor/dock-spaces/inspector/MaterialInspection.cpp
         src/context/editor/dock-spaces/inspector/MaterialInspection.h
-        src/service/voxel/VoxelizationRequest.h
         src/enum/LightVolumeType.h
         src/context/engine/compute-pass/impl/AccumulationMetadataPass.cpp
         src/context/engine/compute-pass/impl/AccumulationMetadataPass.h
         src/context/engine/compute-pass/impl/AccumulationPass.cpp
         src/context/engine/compute-pass/impl/AccumulationPass.h
-        src/service/lights/LightVolumeService.cpp
-        src/service/lights/LightVolumeService.h
+        src/service/lights/LightService.cpp
+        src/service/lights/LightService.h
         src/repository/world/components/VolumeComponent.cpp
         src/repository/world/components/VolumeComponent.h
         src/service/descriptor/DescriptorBinding.h
         src/service/exporter/VideoExporterService.cpp
         src/service/exporter/VideoExporterService.h
         src/service/notification/AsyncTask.h
-        src/service/voxel/VolumeImporterService.cpp
-        src/service/voxel/VolumeImporterService.h
-        src/service/voxel/impl/SnapshotWorldTile.h
+        src/service/voxel/VoxelImporterService.cpp
+        src/service/voxel/VoxelImporterService.h
+        src/dto/buffers/MaterialData.h
+        src/dto/buffers/VolumeData.h
+        src/service/volumes/VolumeService.cpp
+        src/service/volumes/VolumeService.h
+        src/service/voxel/VoxelService.cpp
+        src/service/voxel/VoxelService.h
 )
 
 

@@ -9,10 +9,6 @@ namespace Metal {
     void GlobalSettingsPanel::onSync() {
         auto &editorRepository = context->editorRepository;
 
-        if (ImGui::Button((Icons::apps + "Voxelize scene" + id + "voxelize").c_str())) {
-            context->engineContext.dispatchSceneVoxelization();
-        }
-        ImGui::SameLine();
         //
         // if (ImGui::Button((Icons::play_arrow + "Export to video" + id + "video").c_str())) {
         //     context->videoExporterService.exportToVideo();

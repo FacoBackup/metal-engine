@@ -1,14 +1,13 @@
-#ifndef SVOSERVICE_H
-#define SVOSERVICE_H
+#ifndef METAL_ENGINE_VOXELSERVICE_H
+#define METAL_ENGINE_VOXELSERVICE_H
 #include "../abstract/AbstractResourceService.h"
 
 namespace Metal {
-    struct LevelOfDetail;
     struct SVOInstance;
 
-    class SVOService final : public AbstractResourceService {
+    class VoxelService final : public AbstractResourceService {
     public:
-        explicit SVOService(ApplicationContext &context)
+        explicit VoxelService(ApplicationContext &context)
             : AbstractResourceService(context) {
         }
 
@@ -16,4 +15,4 @@ namespace Metal {
     };
 } // Metal
 
-#endif //SVOSERVICE_H
+#endif //METAL_ENGINE_VOXELSERVICE_H

@@ -8,12 +8,8 @@ layout (location = 0) out vec4 outColor;
 #include "../GBufferGenPushConstant.glsl"
 
 void main() {
-
     vec2 uv = gl_FragCoord.xy / vec2(globalData.outputRes);
-
     uint currentIndex = uint(abs(texture(gBufferPositionIndex, uv).a));
-    if (currentIndex != renderIndex)
-    discard;
 
     int thickness = int(push.albedoEmissive.a);
     bool isBoundary = false;
@@ -61,4 +57,7 @@ void main() {
         }
         outColor = vec4(push.albedoEmissive.rgb, 1.0);
     }
+
+    if (currentIndex != renderIndex)
+    outColor.a = .5;
 }

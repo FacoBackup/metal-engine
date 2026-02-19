@@ -1,7 +1,6 @@
-#include "../LightVolumeBuffer.glsl"
 #ifndef V_T
 #define V_T
-vec3 visibilityTest(const in LightVolume light,  in vec3 point, vec3 wi) {
+vec3 visibilityTest(const in Light light,  in vec3 point, vec3 wi) {
     float bias = max(.05, 1e-4 * length(point));
     vec3 shadowsPosition = point + bias * wi;// Offset to avoid self-intersection
 
@@ -21,8 +20,8 @@ vec3 visibilityTest(const in LightVolume light,  in vec3 point, vec3 wi) {
     float sigmaT = 0;
     vec3 vColor = vec3(1);
     bool anyHit = false;
-    for (uint i = globalData.volumesOffset; i < globalData.lightVolumeCount; i++) {
-        LightVolume volume = lightVolumeBuffer.items[i];
+    for (uint i = 0; i < globalData.volumeCount; i++) {
+        Volume volume = volumesBuffer.items[i];
 
         float tEntry, tExit;
         vec3 roLocal = shadowsPosition - volume.position;

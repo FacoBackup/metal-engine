@@ -82,7 +82,7 @@ namespace Metal {
     }
 
     SVOInstance *StreamingRepository::streamSVO(const std::string &id) {
-        STREAM_NO_LOD(context.svoService, SVOInstance)
+        STREAM_NO_LOD(context.voxelService, SVOInstance)
     }
 
     MeshInstance *StreamingRepository::streamMesh(const std::string &id, const LevelOfDetail &lod) {
@@ -98,7 +98,7 @@ namespace Metal {
             sinceLastCleanup = context.engineContext.currentTime;
             DISPOSAL(context.meshService.getResources())
             DISPOSAL(context.textureService.getResources())
-            DISPOSAL(context.svoService.getResources())
+            DISPOSAL(context.voxelService.getResources())
             DISPOSAL(context.materialService.getResources())
         }
     }

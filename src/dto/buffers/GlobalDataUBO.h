@@ -13,8 +13,8 @@ namespace Metal {
         alignas(16) glm::vec3 sunColor{};
         alignas(16) glm::vec3 sunPosition{};
         alignas(4) float pathTracerMultiplier;
-        alignas(4) unsigned int lightVolumeCount = 0;
-        alignas(4) unsigned int volumesOffset = 0;
+        alignas(4) unsigned int lightsCount = 0;
+        alignas(4) unsigned int volumeCount = 0;
         alignas(4) unsigned int volumeShadowSteps = 0;
         alignas(4) bool isAtmosphereEnabled;
 

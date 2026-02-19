@@ -2,7 +2,6 @@
 #include "../../../context/ApplicationContext.h"
 #include "./CommandBufferRecorder.h"
 #include "../compute-pass/impl/AccumulationPass.h"
-#include "../compute-pass/impl/PathTracerPass.h"
 #include "../compute-pass/impl/HWRayTracingPass.h"
 #include "../compute-pass/impl/AccumulationMetadataPass.h"
 #include "../render-pass/impl/GBufferGenPass.h"
@@ -23,7 +22,6 @@ namespace Metal {
 
         addPass(gBufferPasses, new GBufferGenPass(context));
 
-        // addPass(computePasses, new PathTracerPass(context));
         addPass(computePasses, new HWRayTracingPass(context));
         addPass(computePasses, new AccumulationPass(context));
         addPass(computePasses, new AccumulationMetadataPass(context));

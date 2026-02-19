@@ -11,7 +11,7 @@
 #include "../../service/texture/TextureInstance.h"
 
 namespace Metal {
-    void EngineContext::resetPathTracerAccumulationCount() {
+    void EngineContext::resetPathTracerAccumulationCount() const {
         context.engineRepository.pathTracerAccumulationCount = 0;
     }
 
@@ -69,10 +69,6 @@ namespace Metal {
         }
     }
 
-    void EngineContext::dispatchSceneVoxelization() {
-        voxelizationRequestId = Util::uuidV4();
-    }
-
     void EngineContext::onSync() {
         updateCurrentTime();
 
@@ -80,18 +76,21 @@ namespace Metal {
         context.worldGridService.onSync();
         context.streamingRepository.onSync();
         context.cameraService.onSync();
-        context.voxelizationService.onSync();
 
 
         updateVoxelData();
-        if (lightVolumeDataNeedsUpdate) {
-            context.lightVolumesService.update();
+        if (updateLights) {
+            context.lightService.onSync();
+        }
+
+        if (updateVolumes) {
+            context.volumeService.onSync();
         }
         updateGlobalData();
 
         context.passesService.onSync();
 
-        setLightVolumeDataNeedsUpdate(false);
+        setUpdateLights(false);
         setCameraUpdated(false);
         setGISettingsUpdated(false);
 
@@ -110,8 +109,8 @@ namespace Metal {
         globalDataUBO.invView = camera.invViewMatrix;
         globalDataUBO.cameraWorldPosition = camera.position;
         globalDataUBO.pathTracerMultiplier = context.engineRepository.pathTracerMultiplier;
-        globalDataUBO.lightVolumeCount = context.lightVolumesService.getLightVolumeCount();
-        globalDataUBO.volumesOffset = context.lightVolumesService.getVolumesOffset();
+        globalDataUBO.volumeCount = context.volumeService.getCount();
+        globalDataUBO.lightsCount = context.lightService.getCount();
         globalDataUBO.volumeShadowSteps = context.engineRepository.volumeShadowSteps;
         globalDataUBO.isAtmosphereEnabled = context.engineRepository.atmosphereEnabled;
 
@@ -133,11 +132,11 @@ namespace Metal {
         if (context.engineRepository.incrementTime) {
             context.engineRepository.elapsedTime += .0005f * context.engineRepository.elapsedTimeSpeed;
             setGISettingsUpdated(true);
-            lightVolumeDataNeedsUpdate = true;
+            updateLights = true;
         }
-        context.lightVolumesService.computeSunInfo();
-        globalDataUBO.sunPosition = context.lightVolumesService.getSunPosition();
-        globalDataUBO.sunColor = context.lightVolumesService.getSunColor();
+        context.lightService.computeSunInfo();
+        globalDataUBO.sunPosition = context.lightService.getSunPosition();
+        globalDataUBO.sunColor = context.lightService.getSunColor();
         context.coreBuffers.globalData->update(&globalDataUBO);
     }
 }

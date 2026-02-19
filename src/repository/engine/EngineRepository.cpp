@@ -48,7 +48,7 @@ namespace Metal {
         if (member != nullptr && (member->group == PATH_TRACER || member->group == ATMOSPHERE || member->group
                                   == SUN)) {
             context.engineContext.setGISettingsUpdated(true);
-            context.engineContext.setLightVolumeDataNeedsUpdate(true);
+            context.engineContext.setUpdateLights(true);
         }
     }
 

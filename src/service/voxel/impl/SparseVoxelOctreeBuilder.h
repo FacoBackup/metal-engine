@@ -1,11 +1,8 @@
 #ifndef SPARSEVOXELOCTREE_H
 #define SPARSEVOXELOCTREE_H
-#include <vector>
-
 #include "OctreeNode.h"
 
-#include <atomic>
-#include <mutex>
+#include "../../../repository/world/impl/BoundingBox.h"
 
 namespace Metal {
     class SparseVoxelOctreeBuilder;
@@ -15,21 +12,21 @@ namespace Metal {
     struct MeshComponent;
 
     class SparseVoxelOctreeBuilder {
-        mutable std::mutex insertMutex;
         OctreeNode root{};
-        std::atomic<unsigned int> nodeQuantity{1};
-        std::atomic<unsigned int> leafVoxelQuantity{0};
-        const SnapshotWorldTile *tile = nullptr;
+        unsigned int nodeQuantity{1};
+        unsigned int leafVoxelQuantity{0};
+        BoundingBox boundingBox;
+        float size;
 
         void insertInternal(OctreeNode *node, glm::vec3 &point, VoxelData &data,
                             glm::ivec3 &position, int depth, int maxDepth);
 
-        static void WorldToChunkLocal(const SnapshotWorldTile *tile, glm::vec3 &worldCoordinate);
+        void WorldToChunkLocal(glm::vec3 &worldCoordinate);
 
     public:
         std::unordered_map<std::string, OctreeNode *> repeatedStructures;
 
-        explicit SparseVoxelOctreeBuilder(const SnapshotWorldTile *tile): tile(tile) {
+        explicit SparseVoxelOctreeBuilder(BoundingBox boundingBox, float size) : boundingBox(boundingBox), size(size) {
         }
 
         [[nodiscard]] unsigned int getVoxelQuantity() const {
@@ -42,10 +39,6 @@ namespace Metal {
 
         OctreeNode &getRoot() {
             return root;
-        }
-
-        const SnapshotWorldTile *getTile() const {
-            return tile;
         }
 
         void insert(int maxDepth, glm::vec3 point, VoxelData data);

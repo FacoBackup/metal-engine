@@ -389,7 +389,7 @@ namespace Metal {
                 break;
             }
             case EntryType::VOLUME: {
-                context->volumeImporterService.openVolume(root->getId());
+                context->voxelService.create(root->getId());
                 break;
             }
             case EntryType::DIRECTORY: {

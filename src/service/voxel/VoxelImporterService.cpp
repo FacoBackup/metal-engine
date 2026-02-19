@@ -1,11 +1,9 @@
-#include "VolumeImporterService.h"
+#include "VoxelImporterService.h"
 
-#include <algorithm>
 #include <filesystem>
 
 #include <cereal/archives/binary.hpp>
 
-#include "../voxel/impl/SnapshotWorldTile.h"
 #include "../../context/ApplicationContext.h"
 #include "../../dto/file/EntryMetadata.h"
 #include "../../enum/EntryType.h"
@@ -17,11 +15,13 @@
 
 #include <mutex>
 
+#include "impl/SparseVoxelOctreeData.h"
+
 namespace fs = std::filesystem;
 
 namespace Metal {
 
-    std::string VolumeImporterService::importData(const std::string &targetDir,
+    std::string VoxelImporterService::importData(const std::string &targetDir,
                                              const std::string &pathToFile, const std::stop_token &stopToken) {
         try {
             auto metadata = EntryMetadata{};
@@ -42,11 +42,11 @@ namespace Metal {
         }
     }
 
-    std::vector<std::string> VolumeImporterService::getSupportedTypes() {
+    std::vector<std::string> VoxelImporterService::getSupportedTypes() {
         return std::vector<std::string>{"vdb"};
     }
 
-    void VolumeImporterService::convertToSVO(const std::string &sourcePath, const std::string &outPath, const std::stop_token &stopToken) const {
+    void VoxelImporterService::convertToSVO(const std::string &sourcePath, const std::string &outPath, const std::stop_token &stopToken) const {
         static std::once_flag openvdbInitOnce;
         std::call_once(openvdbInitOnce, []() {
             openvdb::initialize();
@@ -54,8 +54,7 @@ namespace Metal {
 
         auto *targetTile = context.worldGridRepository.getTile(glm::vec3(0, 0, 0));
         int resolution = 12;
-        auto builder = SparseVoxelOctreeBuilder(
-            new SnapshotWorldTile(targetTile->x, targetTile->z, targetTile->id, targetTile->boundingBox));
+        auto builder = SparseVoxelOctreeBuilder(targetTile->boundingBox, 32);
 
         try {
             openvdb::io::File file(sourcePath);
@@ -93,11 +92,57 @@ namespace Metal {
             throw std::runtime_error("VDB conversion failed: " + std::string(e.what()));
         }
 
-        context.voxelizationService.serialize(builder, outPath);
+        serialize(builder, outPath);
     }
 
-    void VolumeImporterService::openVolume(const std::string &id) const {
-        // TODO: Replace with actual volume/voxel/VDB streaming and visualization.
-        LOG_INFO(context, "Open Volume requested: " + id);
+    void VoxelImporterService::FillStorage(SparseVoxelOctreeBuilder &builder, unsigned int &bufferIndex,
+                                      unsigned int &materialBufferIndex,
+                                      SparseVoxelOctreeData &voxels, OctreeNode *node) {
+        if (node->isLeaf) {
+            return;
+        }
+
+        voxels.data[node->dataIndex] = node->packVoxelData(bufferIndex);
+        bool isParentOfLeaf = true;
+        for (auto &child: node->children) {
+            if (child != nullptr && !child->isLeaf) {
+                PutData(bufferIndex, child);
+                isParentOfLeaf = false;
+            }
+        }
+
+        for (auto &child: node->children) {
+            if (child != nullptr) {
+                FillStorage(builder, bufferIndex, materialBufferIndex, voxels, child);
+            }
+        }
+
+        if (isParentOfLeaf) {
+            std::array<unsigned int, 2> &compressed = node->data;
+            voxels.data[node->dataIndex] = node->packVoxelData(materialBufferIndex);
+            voxels.data[materialBufferIndex + voxels.voxelBufferOffset] = compressed[0];
+            materialBufferIndex++;
+            voxels.data[materialBufferIndex + voxels.voxelBufferOffset] = compressed[1];
+            materialBufferIndex++;
+        }
     }
+
+    void VoxelImporterService::PutData(unsigned int &bufferIndex, OctreeNode *node) {
+        node->dataIndex = bufferIndex;
+        bufferIndex++;
+    }
+
+    void VoxelImporterService::serialize(SparseVoxelOctreeBuilder &builder, const std::string &filePath) const {
+        SparseVoxelOctreeData data{};
+        data.data.resize(builder.getVoxelQuantity() + builder.getLeafVoxelQuantity() * 2);
+        data.voxelBufferOffset = builder.getVoxelQuantity();
+
+        unsigned int bufferIndex = 0;
+        unsigned int materialBufferIndex = 0;
+        PutData(bufferIndex, &builder.getRoot());
+        FillStorage(builder, bufferIndex, materialBufferIndex, data, &builder.getRoot());
+
+        DUMP_TEMPLATE(filePath, data)
+    }
+
 } // Metal

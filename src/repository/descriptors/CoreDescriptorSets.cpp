@@ -64,11 +64,23 @@ namespace Metal {
 
             svoData->create(vulkanContext);
         } {
-            lightVolumeData = std::make_unique<DescriptorInstance>();
-            lightVolumeData->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
+            lightData = std::make_unique<DescriptorInstance>();
+            lightData->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
                                                                     VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0,
-                                                                    context.coreBuffers.lightVolumeBuffer));
-            lightVolumeData->create(vulkanContext);
+                                                                    context.coreBuffers.lightBuffer));
+            lightData->create(vulkanContext);
+        } {
+            volumeData = std::make_unique<DescriptorInstance>();
+            volumeData->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
+                                                                    VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0,
+                                                                    context.coreBuffers.volumesBuffer));
+            volumeData->create(vulkanContext);
+        } {
+            materialData = std::make_unique<DescriptorInstance>();
+            materialData->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
+                                                                    VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0,
+                                                                    context.coreBuffers.materialBuffer));
+            materialData->create(vulkanContext);
         } {
             globalDataDescriptor = std::make_unique<DescriptorInstance>();
             globalDataDescriptor->addLayoutBinding(
@@ -103,13 +115,13 @@ namespace Metal {
 
     void CoreDescriptorSets::createPathTracingDescriptors() {
         {
-            giSurfaceCacheCompute = std::make_unique<DescriptorInstance>();
-            giSurfaceCacheCompute->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
+            surfaceCacheImage = std::make_unique<DescriptorInstance>();
+            surfaceCacheImage->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
                                                                           VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
                                                                           VK_NULL_HANDLE,
                                                                           context.coreTextures.giSurfaceCache->
                                                                           vkImageView));
-            giSurfaceCacheCompute->create(vulkanContext);
+            surfaceCacheImage->create(vulkanContext);
         }
 
         {

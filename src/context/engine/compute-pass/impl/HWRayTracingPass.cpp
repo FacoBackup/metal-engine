@@ -28,8 +28,9 @@ namespace Metal {
                 .addDescriptorSet(context.coreDescriptorSets.gBufferNormal.get())
                 .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get())
                 .addDescriptorSet(context.coreDescriptorSets.currentFrameDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.giSurfaceCacheCompute.get())
-                .addDescriptorSet(context.coreDescriptorSets.lightVolumeData.get());
+                .addDescriptorSet(context.coreDescriptorSets.surfaceCacheImage.get())
+                .addDescriptorSet(context.coreDescriptorSets.lightData.get())
+                .addDescriptorSet(context.coreDescriptorSets.volumeData.get());
             pipelineInstance = context.pipelineService.createPipeline(builder);
         }
 
@@ -37,10 +38,22 @@ namespace Metal {
     }
 
     void HWRayTracingPass::onSync() {
-        auto *outputTex = context.coreTextures.currentFrame;
+        bool surfaceCacheReset = context.engineContext.isGISettingsUpdated() || context.engineContext.
+                              isUpdateLights();
+        if (surfaceCacheReset) {
+            clearTexture(context.coreTextures.giSurfaceCache->vkImage);
+        }
 
-        clearTexture(outputTex->vkImage);
-        startWriting(outputTex->vkImage);
+        if (context.engineRepository.enabledDenoiser) {
+            clearTexture(context.coreTextures.currentFrame->vkImage);
+            context.engineContext.resetPathTracerAccumulationCount();
+        } else if (isFirstRun || context.engineContext.isCameraUpdated() || surfaceCacheReset) {
+            clearTexture(context.coreTextures.currentFrame->vkImage);
+            context.engineContext.resetPathTracerAccumulationCount();
+            isFirstRun = false;
+        }
+
+        startWriting(context.coreTextures.currentFrame->vkImage);
 
         // Trace rays
         context.vulkanContext.vkCmdTraceRaysKHR(
@@ -49,10 +62,10 @@ namespace Metal {
             &pipelineInstance->missRegion,
             &pipelineInstance->hitRegion,
             &pipelineInstance->callableRegion,
-            outputTex->width,
-            outputTex->height,
+            context.coreTextures.currentFrame->width,
+            context.coreTextures.currentFrame->height,
             1);
 
-        endWriting(outputTex->vkImage);
+        endWriting(context.coreTextures.currentFrame->vkImage);
     }
 } // Metal

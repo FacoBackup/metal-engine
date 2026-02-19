@@ -18,8 +18,8 @@ namespace Metal {
                                                                      file, token);
                          } else if (context.textureImporter.isCompatible(file)) {
                              context.textureImporter.importData(targetDir, file, token);
-                         } else if (context.volumeImporterService.isCompatible(file)) {
-                             context.volumeImporterService.importData(targetDir, file, token);
+                         } else if (context.voxelImporterService.isCompatible(file)) {
+                             context.voxelImporterService.importData(targetDir, file, token);
                          }
 
                          LOG_INFO(context, "Successfully imported file: " + fileName);
@@ -59,7 +59,7 @@ namespace Metal {
         for (std::string type: context.textureImporter.getSupportedTypes()) {
             outStr += type + ",";
         };
-        for (std::string type: context.volumeImporterService.getSupportedTypes()) {
+        for (std::string type: context.voxelImporterService.getSupportedTypes()) {
             outStr += type + ",";
         };
         return outStr;

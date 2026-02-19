@@ -17,7 +17,7 @@ namespace Metal {
     }
 
     void LightComponent::onUpdate(InspectableMember *member, ApplicationContext &context) {
-        context.engineContext.setLightVolumeDataNeedsUpdate(true);
+        context.engineContext.setUpdateLights(true);
         if (member != nullptr) {
             if (lightType == 0) {
                 lightTypeLabel = "Sphere";

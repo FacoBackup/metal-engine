@@ -30,7 +30,6 @@ namespace Metal {
             context.engineRepository.isBaking = true;
             isFirstBakeLoop = false;
             context.notificationService.pushMessage("Starting baking process", NotificationSeverities::SUCCESS);
-            context.engineContext.dispatchSceneVoxelization();
             frameCount = 0;
         } else {
             context.notificationService.pushMessage("Baking already started", NotificationSeverities::WARNING);
@@ -64,7 +63,7 @@ namespace Metal {
     }
 
     void VideoExporterService::onSync() {
-        if (!context.engineRepository.isBaking || context.voxelizationService.isExecutingVoxelization()) {
+        if (!context.engineRepository.isBaking) {
             return;
         }
 

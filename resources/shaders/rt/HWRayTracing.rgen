@@ -5,15 +5,19 @@ layout(set = 2, binding = 0) uniform sampler2D gBufferAlbedo;
 layout(set = 3, binding = 0) uniform sampler2D gBufferNormal;
 layout(set = 4, binding = 0) uniform sampler2D gBufferPosition;
 layout(set = 5, binding = 0, rgba32f) uniform image2D outputImage;
-layout(set = 6, binding = 0, rgba32f) uniform image2D giSurfaceCacheCompute;
+layout(set = 6, binding = 0, rgba32f) uniform image2D surfaceCacheImage;
 
 #include "../util/HWRayTracingUtil.glsl"
 
 layout(location = 0) rayPayloadEXT RayPayload payload;
 
 #include "../GlobalDataBuffer.glsl"
-#define LIGHT_VOLUME_SET 7
-#include "../LightVolumeBuffer.glsl"
+
+#define LIGHT_SET 7
+#include "../LightBuffer.glsl"
+#define VOLUME_SET 8
+#include "../VolumeBuffer.glsl"
+
 #include "../util/DisneyBSDF.glsl"
 #include "../util/PixelShading.glsl"
 #include "../util/VolumeRayTracer.glsl"

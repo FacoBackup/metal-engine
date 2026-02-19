@@ -44,12 +44,11 @@
 #include "../service/notification/AsyncTaskService.h"
 #include "../service/log/LogService.h"
 #include "../service/transform/TransformService.h"
-#include "../service/voxel/SVOService.h"
 #include "../service/picking/PickingService.h"
-#include "../service/lights/LightVolumeService.h"
-#include "../service/voxel/VoxelizationService.h"
-#include "../service/voxel/impl/VoxelizerService.h"
-#include "../service/voxel/VolumeImporterService.h"
+#include "../service/volumes/VolumeService.h"
+#include "../service/voxel/VoxelImporterService.h"
+#include "../service/voxel/VoxelService.h"
+#include "../service/lights/LightService.h"
 #include "../service/raytracing/RayTracingService.h"
 #include "editor/EditorPanel.h"
 #include "gui/GuiContext.h"
@@ -96,15 +95,14 @@ namespace Metal {
         FilesService filesService{*this};
         FileImporterService fileImporterService{*this};
         CameraService cameraService{*this};
-        VoxelizationService voxelizationService{*this};
-        VoxelizerService voxelizerService{*this};
-        SVOService svoService{*this};
-        VolumeImporterService volumeImporterService{*this};
         PickingService pickingService{*this};
         WorldGridService worldGridService{*this};
         TransformService transformService{*this};
-        LightVolumeService lightVolumesService{*this};
+        LightService lightService{*this};
+        VolumeService volumeService{*this};
         RayTracingService rayTracingService{*this};
+        VoxelImporterService voxelImporterService{*this};
+        VoxelService voxelService{*this};
         // ----------- Services
 
         // ----------- Repository

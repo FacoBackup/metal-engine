@@ -4,6 +4,8 @@
 
 namespace Metal {
     class HWRayTracingPass final : public AbstractComputePass {
+        bool isFirstRun = true;
+
     public:
         explicit HWRayTracingPass(ApplicationContext &context)
             : AbstractComputePass(context) {
