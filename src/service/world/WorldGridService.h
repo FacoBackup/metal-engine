@@ -10,8 +10,8 @@ namespace Metal {
         bool changed = false;
 
     public:
-        explicit WorldGridService(ApplicationContext &context)
-            : AbstractRuntimeComponent(context) {
+        explicit WorldGridService()
+            : AbstractRuntimeComponent() {
         }
 
         void addMissingTiles();

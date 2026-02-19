@@ -8,7 +8,7 @@
 namespace Metal {
     void SelectedDotPass::onInitialize() {
         PipelineBuilder builder = PipelineBuilder::Of(
-                    context.coreFrameBuffers.postProcessingFBO,
+                    ApplicationContext::Get().coreFrameBuffers.postProcessingFBO,
                     "tools/SelectedDot.vert",
                     "tools/SelectedDot.frag"
                 )
@@ -16,17 +16,17 @@ namespace Metal {
                 .setPrepareForMesh()
                 .setCullMode(VK_CULL_MODE_BACK_BIT)
                 .setPushConstantsSize(sizeof(MeshPushConstant))
-                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get());
-        pipelineInstance = context.pipelineService.createPipeline(builder);
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.gBufferPosition.get());
+        pipelineInstance = ApplicationContext::Get().pipelineService.createPipeline(builder);
     }
 
     bool SelectedDotPass::shouldRun() {
-        return !context.editorRepository.selected.empty();
+        return !ApplicationContext::Get().editorRepository.selected.empty();
     }
 
     void SelectedDotPass::onSync() {
-        for (const auto &pair: context.editorRepository.selected) {
+        for (const auto &pair: ApplicationContext::Get().editorRepository.selected) {
             if (!pair.second) {
                 continue;
             }
@@ -49,10 +49,10 @@ namespace Metal {
             }
 
             pushConstant.model = worldRepository.transforms[entityId].model;
-            pushConstant.albedoEmissive.x = context.editorRepository.selectionColor.x;
-            pushConstant.albedoEmissive.y = context.editorRepository.selectionColor.y;
-            pushConstant.albedoEmissive.z = context.editorRepository.selectionColor.z;
-            pushConstant.albedoEmissive.w = context.editorRepository.selectionOutlineThickness;
+            pushConstant.albedoEmissive.x = ApplicationContext::Get().editorRepository.selectionColor.x;
+            pushConstant.albedoEmissive.y = ApplicationContext::Get().editorRepository.selectionColor.y;
+            pushConstant.albedoEmissive.z = ApplicationContext::Get().editorRepository.selectionColor.z;
+            pushConstant.albedoEmissive.w = ApplicationContext::Get().editorRepository.selectionOutlineThickness;
             pushConstant.renderIndex = mesh.renderIndex;
             pushConstant.roughnessFactor = 0;
             pushConstant.metallicFactor = 0;

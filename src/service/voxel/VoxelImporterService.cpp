@@ -30,14 +30,14 @@ namespace Metal {
             metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.'));
 
 
-            std::string outPath = context.getAssetDirectory() + FORMAT_FILE_VOLUME(metadata.getId());
+            std::string outPath = ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_VOLUME(metadata.getId());
             convertToSVO(pathToFile, outPath, stopToken);
 
             DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(metadata.getId()), metadata)
-            LOG_INFO(context, "Imported volume: " + metadata.name + " (" + metadata.getId() + ")");
+            LOG_INFO("Imported volume: " + metadata.name + " (" + metadata.getId() + ")");
             return metadata.getId();
         } catch (std::exception &e) {
-            LOG_ERROR(context, std::string("Volume import failed: ") + e.what());
+            LOG_ERROR(std::string("Volume import failed: ") + e.what());
             throw std::runtime_error("Volume import failed");
         }
     }
@@ -52,7 +52,7 @@ namespace Metal {
             openvdb::initialize();
         });
 
-        auto *targetTile = context.worldGridRepository.getTile(glm::vec3(0, 0, 0));
+        auto *targetTile = ApplicationContext::Get().worldGridRepository.getTile(glm::vec3(0, 0, 0));
         int resolution = 12;
         auto builder = SparseVoxelOctreeBuilder(targetTile->boundingBox, 32);
 

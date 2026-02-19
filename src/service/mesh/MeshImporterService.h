@@ -14,8 +14,8 @@ namespace Metal {
 
     class MeshImporterService final : public AbstractResourceService {
     public:
-        explicit MeshImporterService(ApplicationContext &context)
-            : AbstractResourceService(context) {
+        explicit MeshImporterService()
+            : AbstractResourceService() {
         }
 
         void persistAllMeshes(const std::string &targetDir, const aiScene *scene,

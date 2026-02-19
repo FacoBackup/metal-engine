@@ -25,15 +25,15 @@ namespace Metal {
     void EditorHeaderPanel::renderFileTab() {
         if (ImGui::BeginMainMenuBar()) {
             if (UIUtil::ButtonSimple(Icons::save, UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-                context->save();
+                ApplicationContext::Get().save();
             }
             ImGui::SameLine();
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Open", "Ctrl+O")) {
-                    context->updateRootPath(true); // TODO - CLEAR APPLICATION STATE
+                    ApplicationContext::Get().updateRootPath(true); // TODO - CLEAR APPLICATION STATE
                 }
                 if (ImGui::MenuItem("Save", "Ctrl+S")) {
-                    context->save();
+                    ApplicationContext::Get().save();
                 }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Exit")) {
@@ -62,8 +62,8 @@ namespace Metal {
                 }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Compile shaders")) {
-                    context->passesService.dispose();
-                    context->passesService.onInitialize();
+                    ApplicationContext::Get().passesService.dispose();
+                    ApplicationContext::Get().passesService.onInitialize();
                 }
                 ImGui::EndMenu();
             }

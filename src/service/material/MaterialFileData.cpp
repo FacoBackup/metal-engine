@@ -1,9 +1,9 @@
-#include "MaterialData.h"
+#include "MaterialFileData.h"
 
 #include "../../common/interface/Icons.h"
 
 namespace Metal {
-    void MaterialData::registerFields() {
+    void MaterialFileData::registerFields() {
         registerResourceSelection(albedo, "", "Albedo Texture", EntryType::TEXTURE);
         registerResourceSelection(normal, "", "normal", EntryType::TEXTURE);
         registerResourceSelection(roughness, "", "Roughness texture", EntryType::TEXTURE);
@@ -11,11 +11,11 @@ namespace Metal {
         registerResourceSelection(height, "", "Height Texture", EntryType::TEXTURE);
     }
 
-    const char *MaterialData::getIcon() {
+    const char *MaterialFileData::getIcon() {
         return Icons::format_paint.c_str();
     }
 
-    const char *MaterialData::getTitle() {
+    const char *MaterialFileData::getTitle() {
         return "Material";
     }
 }

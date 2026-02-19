@@ -6,10 +6,7 @@
 
 namespace Metal {
 
-    ApplicationContext* LogService::currentContext = nullptr;
-
-    LogService::LogService(ApplicationContext &context) : AbstractRuntimeComponent(context) {
-        currentContext = &context;
+    LogService::LogService() : AbstractRuntimeComponent() {
     }
 
     void LogService::log(LogLevel level, const std::string &message) const {
@@ -59,18 +56,6 @@ namespace Metal {
             case LogLevel::Error: return 0xFF0000FF; // Red
             case LogLevel::Fatal: return 0xFF000088; // Dark Red
             default:              return 0xFFFFFFFF;
-        }
-    }
-
-    const char* LogService::getLevelAnsiColor(LogLevel level) {
-        switch (level) {
-            case LogLevel::Trace: return "\033[90m"; // Gray
-            case LogLevel::Debug: return "\033[37m"; // White
-            case LogLevel::Info:  return "\033[97m"; // Bright White
-            case LogLevel::Warn:  return "\033[93m"; // Bright Yellow
-            case LogLevel::Error: return "\033[91m"; // Bright Red
-            case LogLevel::Fatal: return "\033[41m\033[97m"; // Red Background, White Text
-            default:              return "\033[0m";
         }
     }
 

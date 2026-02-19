@@ -18,14 +18,14 @@ namespace fs = std::filesystem;
 
 #define DELETE_F(F)\
 std::filesystem::remove_all(entry.second->absolutePath);\
-std::filesystem::remove_all(context.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_0));\
-std::filesystem::remove_all(context.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_1));\
-std::filesystem::remove_all(context.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_2));\
-std::filesystem::remove_all(context.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_3));
+std::filesystem::remove_all(ApplicationContext::Get().getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_0));\
+std::filesystem::remove_all(ApplicationContext::Get().getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_1));\
+std::filesystem::remove_all(ApplicationContext::Get().getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_2));\
+std::filesystem::remove_all(ApplicationContext::Get().getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_3));
 
 #define DELETE_S(F)\
 std::filesystem::remove_all(entry.second->absolutePath);\
-std::filesystem::remove_all(context.getAssetDirectory() + F(entry.second->getId()));
+std::filesystem::remove_all(ApplicationContext::Get().getAssetDirectory() + F(entry.second->getId()));
 
 #define DATA \
         auto fileSizeInBytes = fs::file_size(entry.path());\
@@ -43,7 +43,7 @@ std::filesystem::remove_all(context.getAssetDirectory() + F(entry.second->getId(
 
 namespace Metal {
     void FilesService::onInitialize() {
-        root = new FileEntry(nullptr, context.getAssetRefDirectory(), "", "");
+        root = new FileEntry(nullptr, ApplicationContext::Get().getAssetRefDirectory(), "", "");
         root->type = EntryType::DIRECTORY;
         root->name = "Files";
         GetEntries(root);
@@ -115,8 +115,8 @@ namespace Metal {
         materialMetadata.type = EntryType::MATERIAL;
         materialMetadata.name = "New Material";
         DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(materialMetadata.getId()), materialMetadata)
-        MaterialData data{};
-        DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialMetadata.getId()), data)
+        MaterialFileData data{};
+        DUMP_TEMPLATE(ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_MATERIAL(materialMetadata.getId()), data)
     }
 
     void FilesService::Move(FileEntry *toMove, FileEntry *targetDir) {
@@ -130,8 +130,8 @@ namespace Metal {
         try {
             fs::rename(sourcePath, targetPath);
         } catch (const fs::filesystem_error& e) {
-            LOG_ERROR_S("Could not move file");
-            context.notificationService.pushMessage("Could not move entry", NotificationSeverities::ERROR);
+            LOG_ERROR("Could not move file");
+            ApplicationContext::Get().notificationService.pushMessage("Could not move entry", NotificationSeverities::ERROR);
             return;
         }
 

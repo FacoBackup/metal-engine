@@ -41,14 +41,14 @@ namespace Metal {
         registerColor(middayColor, SUN, "Midday color");
     }
 
-    void EngineRepository::onUpdate(InspectableMember *member, ApplicationContext &context) {
+    void EngineRepository::onUpdate(InspectableMember *member) {
         if (member != nullptr && member->name == LEVEL_OF_DETAIL) {
-            context.worldGridRepository.hasMainTileChanged = true;
+            ApplicationContext::Get().worldGridRepository.hasMainTileChanged = true;
         }
         if (member != nullptr && (member->group == PATH_TRACER || member->group == ATMOSPHERE || member->group
                                   == SUN)) {
-            context.engineContext.setGISettingsUpdated(true);
-            context.engineContext.setUpdateLights(true);
+            ApplicationContext::Get().engineContext.setGISettingsUpdated(true);
+            ApplicationContext::Get().engineContext.setUpdateLights(true);
         }
     }
 

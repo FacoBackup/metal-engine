@@ -9,8 +9,8 @@ namespace Metal {
         MeshPushConstant pushConstant{};
 
     public:
-        explicit SelectedDotPass(ApplicationContext &context)
-            : AbstractRenderPass(context) {
+        explicit SelectedDotPass()
+            : AbstractRenderPass() {
         }
 
         void onInitialize() override;

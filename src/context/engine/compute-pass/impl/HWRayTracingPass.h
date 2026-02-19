@@ -7,8 +7,8 @@ namespace Metal {
         bool isFirstRun = true;
 
     public:
-        explicit HWRayTracingPass(ApplicationContext &context)
-            : AbstractComputePass(context) {
+        explicit HWRayTracingPass()
+            : AbstractComputePass() {
         }
 
         bool shouldRun() override;

@@ -21,7 +21,7 @@ namespace Metal {
 
         void updateForRemoval(AbstractPanel *panel) const;
 
-        explicit DockService(ApplicationContext &context);
+        explicit DockService();
     };
 } // Metal
 

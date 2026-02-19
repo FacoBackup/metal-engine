@@ -5,19 +5,19 @@
 
 namespace Metal {
     void CameraService::onSync() {
-        camera = &context.worldRepository.camera;
+        camera = &ApplicationContext::Get().worldRepository.camera;
         if (camera != nullptr) {
             updateAspectRatio();
             if (camera->isNotFrozen()) {
                 updateMatrices();
-                context.engineContext.setCameraUpdated(true);
+                ApplicationContext::Get().engineContext.setCameraUpdated(true);
                 camera->freezeVersion();
             }
         }
     }
 
     void CameraService::updateAspectRatio() const {
-        const auto &runtimeRepository = context.runtimeRepository;
+        const auto &runtimeRepository = ApplicationContext::Get().runtimeRepository;
 
         const float prevAspect = camera->aspectRatio;
         camera->aspectRatio = runtimeRepository.viewportW / runtimeRepository.viewportH;
@@ -54,11 +54,11 @@ namespace Metal {
         camera->invProjectionMatrix = glm::inverse(camera->projectionMatrix);
     }
 
-    CameraService::CameraService(ApplicationContext &context) : AbstractRuntimeComponent(context) {
+    CameraService::CameraService() : AbstractRuntimeComponent() {
     }
 
     void CameraService::handleInputInternal() const {
-        const auto &runtimeRepository = context.runtimeRepository;
+        const auto &runtimeRepository = ApplicationContext::Get().runtimeRepository;
 
         glm::vec3 forward(
             -std::sin(camera->yaw) * std::cos(camera->pitch),
@@ -74,7 +74,7 @@ namespace Metal {
         right = glm::normalize(right);
 
         const float multiplier = 10 * camera->movementSensitivity *
-                                 context.engineContext.deltaTime;
+                                 ApplicationContext::Get().engineContext.deltaTime;
         if (runtimeRepository.leftPressed) {
             camera->position += right * multiplier;
             camera->registerChange();
@@ -116,7 +116,7 @@ namespace Metal {
     }
 
     void CameraService::updateDelta(const bool isFirstMovement) const {
-        const auto &runtimeRepository = context.runtimeRepository;
+        const auto &runtimeRepository = ApplicationContext::Get().runtimeRepository;
         const float mouseX = runtimeRepository.mouseX;
         const float mouseY = runtimeRepository.mouseY;
 

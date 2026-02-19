@@ -8,8 +8,8 @@ namespace Metal {
 
     class CoreTextures final : public AbstractCoreRepository {
     public:
-        explicit CoreTextures(ApplicationContext &context)
-            : AbstractCoreRepository(context) {
+        explicit CoreTextures()
+            : AbstractCoreRepository() {
         }
 
         void onInitialize() override;

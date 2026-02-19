@@ -19,8 +19,8 @@ namespace Metal {
 
         bool updateLoadedTiles();
 
-        explicit WorldGridRepository(ApplicationContext &context)
-            : AbstractRuntimeComponent(context) {
+        explicit WorldGridRepository()
+            : AbstractRuntimeComponent() {
         }
 
         static int getTileLocation(const float v) {

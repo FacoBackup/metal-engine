@@ -21,7 +21,7 @@ namespace Metal {
         bool previousTheme = false;
         float prevLength = 0.0f;
 
-        explicit ThemeService(ApplicationContext &context) : AbstractRuntimeComponent(context) {
+        explicit ThemeService() : AbstractRuntimeComponent() {
         }
 
         void setDarkMode();

@@ -10,19 +10,19 @@
 namespace Metal {
     void HierarchyPanel::onInitialize() {
         appendChild(headerPanel = new HierarchyHeaderPanel());
-        world = &context->worldRepository;
-        editorRepository = &context->editorRepository;
+        world = &ApplicationContext::Get().worldRepository;
+        editorRepository = &ApplicationContext::Get().editorRepository;
     }
 
     void HierarchyPanel::contextMenu() const {
         if (ImGui::BeginPopupContextItem((id + "contextMenu").c_str())) {
             if (ImGui::MenuItem("Delete")) {
                 std::vector<EntityID> entities;
-                for (auto &entry: context->editorRepository.selected) {
+                for (auto &entry: ApplicationContext::Get().editorRepository.selected) {
                     entities.push_back(entry.first);
                 }
-                context->worldRepository.deleteEntities(entities);
-                context->selectionService.clearSelection();
+                ApplicationContext::Get().worldRepository.deleteEntities(entities);
+                ApplicationContext::Get().selectionService.clearSelection();
             }
             ImGui::EndPopup();
         }
@@ -48,7 +48,7 @@ namespace Metal {
             renderNode(WorldRepository::ROOT_ID);
             ImGui::EndTable();
         }
-        if (!context->editorRepository.selected.empty()) {
+        if (!ApplicationContext::Get().editorRepository.selected.empty()) {
             contextMenu();
         }
     }
@@ -187,7 +187,7 @@ namespace Metal {
         if (UIUtil::ButtonSimple(
             (isVisible ? Icons::visibility : Icons::visibility_off) + (isPinned ? "##vpinned" : "##v") + idString +
             id, 20, 15)) {
-            context->worldRepository.changeVisibility(node->getId(), !isVisible);
+            ApplicationContext::Get().worldRepository.changeVisibility(node->getId(), !isVisible);
         }
         ImGui::PopStyleColor();
         ImGui::PopStyleVar(2);
@@ -196,9 +196,9 @@ namespace Metal {
     void HierarchyPanel::handleClick(const Entity *node) const {
         if (ImGui::IsItemClicked()) {
             if (const bool isMultiSelect = ImGui::IsKeyDown(ImGuiKey_LeftCtrl); !isMultiSelect) {
-                context->selectionService.clearSelection();
+                ApplicationContext::Get().selectionService.clearSelection();
             }
-            context->selectionService.addSelected(node->getId());
+            ApplicationContext::Get().selectionService.addSelected(node->getId());
         }
     }
 

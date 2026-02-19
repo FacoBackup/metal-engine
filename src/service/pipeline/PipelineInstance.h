@@ -29,7 +29,7 @@ namespace Metal {
         VkStridedDeviceAddressRegionKHR hitRegion{};
         VkStridedDeviceAddressRegionKHR callableRegion{};
 
-        void dispose(VulkanContext &context) override;
+        void dispose() override;
 
         ResourceType resourceType() override {
             return PIPELINE;

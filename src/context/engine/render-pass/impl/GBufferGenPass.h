@@ -7,8 +7,8 @@ namespace Metal {
     class GBufferGenPass final : public AbstractRenderPass {
         MeshPushConstant mPushConstant{};
     public:
-        explicit GBufferGenPass(ApplicationContext &context)
-            : AbstractRenderPass(context) {
+        explicit GBufferGenPass()
+            : AbstractRenderPass() {
         }
 
         void onSync() override;

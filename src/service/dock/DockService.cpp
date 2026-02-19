@@ -7,12 +7,12 @@
 #include "../../context/ApplicationContext.h"
 
 namespace Metal {
-    DockService::DockService(ApplicationContext &context) : AbstractRuntimeComponent(context) {
+    DockService::DockService() : AbstractRuntimeComponent() {
     }
 
     void DockService::buildViews(ImGuiID windowId, AbstractPanel *panel) const {
         if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DockingEnable) {
-            DockRepository &dockRepository = context.dockRepository;
+            DockRepository &dockRepository = ApplicationContext::Get().dockRepository;
             if (dockRepository.isInitialized) {
                 return;
             }
@@ -133,14 +133,14 @@ namespace Metal {
     }
 
     void DockService::prepareForRemoval(DockDTO *dock, DockSpacePanel *dockSpacePanel) const {
-        DockRepository &dockRepository = context.dockRepository;
+        DockRepository &dockRepository = ApplicationContext::Get().dockRepository;
 
         dockRepository.dockToRemove = dock;
         dockRepository.dockPanelToRemove = dockSpacePanel;
     }
 
     void DockService::updateForRemoval(AbstractPanel *panel) const {
-        DockRepository &dockRepository = context.dockRepository;
+        DockRepository &dockRepository = ApplicationContext::Get().dockRepository;
 
         if (dockRepository.dockPanelToRemove != nullptr) {
             switch (dockRepository.dockToRemove->direction) {

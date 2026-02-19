@@ -8,8 +8,8 @@ namespace Metal {
     struct BufferInstance;
 
     struct CoreBuffers final : AbstractCoreRepository {
-        explicit CoreBuffers(ApplicationContext &context)
-            : AbstractCoreRepository(context) {
+        explicit CoreBuffers()
+            : AbstractCoreRepository() {
         }
 
         void onInitialize() override;

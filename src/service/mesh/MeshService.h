@@ -10,8 +10,8 @@ namespace Metal {
 
     class MeshService final : public AbstractResourceService {
     public:
-        explicit MeshService(ApplicationContext &context)
-            : AbstractResourceService(context) {
+        explicit MeshService()
+            : AbstractResourceService() {
         }
 
         MeshInstance *create(const std::string &id, const LevelOfDetail &levelOfDetail);

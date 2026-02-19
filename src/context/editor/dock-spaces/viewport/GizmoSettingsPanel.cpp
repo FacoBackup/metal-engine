@@ -11,7 +11,7 @@ namespace Metal {
     }
 
     void GizmoSettingsPanel::onInitialize() {
-        editorRepository = &context->editorRepository;
+        editorRepository = &ApplicationContext::Get().editorRepository;
     }
 
     void GizmoSettingsPanel::gizmoGrid() const {

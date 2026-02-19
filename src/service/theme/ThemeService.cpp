@@ -6,7 +6,7 @@ namespace Metal {
     glm::vec3 ThemeService::BACKGROUND_COLOR = glm::vec3(0.f);
 
     void ThemeService::onSync() {
-        EditorRepository &editorRepository = context.editorRepository;
+        EditorRepository &editorRepository = ApplicationContext::Get().editorRepository;
         if (previousTheme == editorRepository.isDarkMode && glm::length(editorRepository.accentColor) == prevLength) {
             return;
         }

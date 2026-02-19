@@ -19,19 +19,19 @@ namespace Metal {
         int fb_width, fb_height;
         glfwGetFramebufferSize(window, &fb_width, &fb_height);
         if (fb_width > 0 && fb_height > 0 &&
-            (swapChainRebuild || context.vulkanContext.imguiVulkanWindow.Width !=
+            (swapChainRebuild || ApplicationContext::Get().vulkanContext.imguiVulkanWindow.Width !=
              fb_width ||
-             context.vulkanContext.imguiVulkanWindow.Height != fb_height)) {
+             ApplicationContext::Get().vulkanContext.imguiVulkanWindow.Height != fb_height)) {
             ImGui_ImplVulkan_SetMinImageCount(MAX_FRAMES_IN_FLIGHT);
-            ImGui_ImplVulkanH_CreateOrResizeWindow(context.vulkanContext.instance.instance,
-                                                   context.vulkanContext.physDevice.physical_device,
-                                                   context.vulkanContext.device.device,
-                                                   &context.vulkanContext.imguiVulkanWindow,
-                                                   context.vulkanContext.queueFamily,
+            ImGui_ImplVulkanH_CreateOrResizeWindow(ApplicationContext::Get().vulkanContext.instance.instance,
+                                                   ApplicationContext::Get().vulkanContext.physDevice.physical_device,
+                                                   ApplicationContext::Get().vulkanContext.device.device,
+                                                   &ApplicationContext::Get().vulkanContext.imguiVulkanWindow,
+                                                   ApplicationContext::Get().vulkanContext.queueFamily,
                                                    nullptr, fb_width,
                                                    fb_height,
                                                    MAX_FRAMES_IN_FLIGHT);
-            context.vulkanContext.imguiVulkanWindow.FrameIndex = 0;
+            ApplicationContext::Get().vulkanContext.imguiVulkanWindow.FrameIndex = 0;
             swapChainRebuild = false;
         }
         if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0) {
@@ -47,7 +47,7 @@ namespace Metal {
     }
 
     ImGui_ImplVulkanH_Window &GLFWContext::getGUIWindow() const {
-        return context.vulkanContext.imguiVulkanWindow;
+        return ApplicationContext::Get().vulkanContext.imguiVulkanWindow;
     }
 
     void GLFWContext::setSwapChainRebuild(const bool val) {
@@ -58,7 +58,7 @@ namespace Metal {
         if (swapChainRebuild) {
             return;
         }
-        auto &wd = context.vulkanContext.imguiVulkanWindow;
+        auto &wd = ApplicationContext::Get().vulkanContext.imguiVulkanWindow;
         VkSemaphore semaphore = wd.FrameSemaphores[wd.SemaphoreIndex].RenderCompleteSemaphore;
         VkPresentInfoKHR info = {};
         info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -67,7 +67,7 @@ namespace Metal {
         info.swapchainCount = 1;
         info.pSwapchains = &wd.Swapchain;
         info.pImageIndices = &wd.FrameIndex;
-        VkResult err = vkQueuePresentKHR(context.vulkanContext.graphicsQueue, &info);
+        VkResult err = vkQueuePresentKHR(ApplicationContext::Get().vulkanContext.graphicsQueue, &info);
         if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR) {
             swapChainRebuild = true;
             return;

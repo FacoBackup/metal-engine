@@ -4,7 +4,7 @@
 
 namespace Metal {
     bool WorldGridRepository::updateLoadedTiles() {
-        if (auto *center = getOrCreateTile(context.worldRepository.camera.position);
+        if (auto *center = getOrCreateTile(ApplicationContext::Get().worldRepository.camera.position);
             currentTile != center || prevSize != tiles.size()) {
             hasMainTileChanged = true;
             currentTile = center;
@@ -50,7 +50,7 @@ namespace Metal {
 
     void WorldGridRepository::createIfAbsent(const int x, const int z) {
         if (std::string id = TILE_ID(x, z); !tiles.contains(id)) {
-            LOG_INFO(context, "Creating tile " + std::to_string(x) + " " + std::to_string(z) + " " + id);
+            LOG_INFO("Creating tile " + std::to_string(x) + " " + std::to_string(z) + " " + id);
             tiles.insert({id, WorldTile(x, z, id)});
         }
     }
@@ -107,7 +107,7 @@ namespace Metal {
 
     void WorldGridRepository::moveBetweenTiles(const EntityID entityId, WorldTile *previousWorldTile,
                                                WorldTile *newWorldTile) const {
-        auto *entity = context.worldRepository.getEntity(entityId);
+        auto *entity = ApplicationContext::Get().worldRepository.getEntity(entityId);
         entity->registerChange();
         entity->freezeVersion();
         if (!entity->onTile.empty()) {

@@ -31,8 +31,8 @@ namespace Metal {
     public:
         [[nodiscard]] TextureData *stream(const std::string &id, const LevelOfDetail &lod) const;
 
-        explicit TextureService(ApplicationContext &context)
-            : AbstractResourceService(context) {
+        explicit TextureService()
+            : AbstractResourceService() {
         }
 
         TextureInstance *loadTexture(const std::string &id, const std::string &pathToImage,

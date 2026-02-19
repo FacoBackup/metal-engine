@@ -5,7 +5,7 @@
 #include "../ApplicationContext.h"
 
 namespace Metal {
-    VulkanContext::VulkanContext(ApplicationContext &context, bool debugMode) : AbstractRuntimeComponent(context),
+    VulkanContext::VulkanContext(bool debugMode) : AbstractRuntimeComponent(),
         debugMode(debugMode) {
     }
 
@@ -140,7 +140,7 @@ namespace Metal {
         }
 
         vkGetPhysicalDeviceProperties(physDevice.physical_device, &physicalDeviceProperties);
-        LOG_INFO(context, "MAX SAMPLERS " + std::to_string(physicalDeviceProperties.limits.maxDescriptorSetSamplers) + " " + std::to_string(physicalDeviceProperties.limits.maxPerStageDescriptorSampledImages));
+        LOG_INFO("MAX SAMPLERS " + std::to_string(physicalDeviceProperties.limits.maxDescriptorSetSamplers) + " " + std::to_string(physicalDeviceProperties.limits.maxPerStageDescriptorSampledImages));
         vkGetPhysicalDeviceMemoryProperties(physDevice.physical_device, &physicalDeviceMemoryProperties);
         if (!physDevice.enable_extension_if_present("VK_KHR_timeline_semaphore")) {
             throw std::runtime_error("Failed to enable core extension");
@@ -156,14 +156,14 @@ namespace Metal {
             physDevice.enable_extension_if_present(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
 
         if (rayTracingSupported) {
-            LOG_INFO(context, "Ray tracing extensions enabled");
+            LOG_INFO("Ray tracing extensions enabled");
         } else {
-            LOG_INFO(context, "Ray tracing extensions NOT supported");
+            LOG_INFO("Ray tracing extensions NOT supported");
         }
     }
 
     void VulkanContext::createPresentMode() {
-         VkPresentModeKHR presentModes = !context.engineRepository.vsync ? VK_PRESENT_MODE_IMMEDIATE_KHR : VK_PRESENT_MODE_FIFO_KHR;
+         VkPresentModeKHR presentModes = !ApplicationContext::Get().engineRepository.vsync ? VK_PRESENT_MODE_IMMEDIATE_KHR : VK_PRESENT_MODE_FIFO_KHR;
         imguiVulkanWindow.PresentMode = ImGui_ImplVulkanH_SelectPresentMode(
             physDevice.physical_device, imguiVulkanWindow.Surface,
             &presentModes,
@@ -255,12 +255,12 @@ namespace Metal {
         imguiVulkanWindow.ClearValue.color.float32[2] = 0;
         imguiVulkanWindow.ClearValue.color.float32[3] = 1;
 
-        this->window = context.glfwContext.getWindow();
+        this->window = ApplicationContext::Get().glfwContext.getWindow();
         vkb::InstanceBuilder instanceBuilder;
 
         // ------- CORE INITIALIZATION
         // ----- INSTANCE AND EXTENSIONS
-        addExtensions(instanceBuilder, context.glfwContext.getInstanceExtensions());
+        addExtensions(instanceBuilder, ApplicationContext::Get().glfwContext.getInstanceExtensions());
         auto vkbResult = instanceBuilder
                 .set_app_name(ENGINE_NAME)
                 .set_engine_name(ENGINE_NAME)
@@ -285,21 +285,21 @@ namespace Metal {
         // ------- CORE INITIALIZATION
 
         // ------- REPOSITORY INITIALIZATION
-        context.coreBuffers.onInitialize();
-        context.coreFrameBuffers.onInitialize();
-        context.coreTextures.onInitialize();
-        context.coreDescriptorSets.onInitialize();
+        ApplicationContext::Get().coreBuffers.onInitialize();
+        ApplicationContext::Get().coreFrameBuffers.onInitialize();
+        ApplicationContext::Get().coreTextures.onInitialize();
+        ApplicationContext::Get().coreDescriptorSets.onInitialize();
         // ------- REPOSITORY INITIALIZATION
     }
 
     void VulkanContext::dispose() const {
-        context.pipelineService.disposeAll();
-        context.textureService.disposeAll();
-        context.meshService.disposeAll();
-        context.framebufferService.disposeAll();
-        vkDestroyDescriptorPool(context.vulkanContext.device.device, descriptorPool,
+        ApplicationContext::Get().pipelineService.disposeAll();
+        ApplicationContext::Get().textureService.disposeAll();
+        ApplicationContext::Get().meshService.disposeAll();
+        ApplicationContext::Get().framebufferService.disposeAll();
+        vkDestroyDescriptorPool(ApplicationContext::Get().vulkanContext.device.device, descriptorPool,
                                 nullptr);
-        vkDestroyCommandPool(context.vulkanContext.device.device, commandPool,
+        vkDestroyCommandPool(ApplicationContext::Get().vulkanContext.device.device, commandPool,
                              nullptr);
 
         vkDestroyDevice(device.device, nullptr);
@@ -324,7 +324,7 @@ namespace Metal {
         poolInfo.maxSets = 500;
 
         VulkanUtils::CheckVKResult(vkCreateDescriptorPool(device.device, &poolInfo,
-                                                          nullptr, &context.vulkanContext.descriptorPool));
+                                                          nullptr, &ApplicationContext::Get().vulkanContext.descriptorPool));
     }
 
     VkCommandBuffer VulkanContext::beginSingleTimeCommands() const {
@@ -364,16 +364,16 @@ namespace Metal {
                                     ImGui_ImplVulkanH_Frame *fd) const {
         VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         VkSubmitInfo info = {};
-        context.vulkanContext.pushCommandBuffer(fd->CommandBuffer);
+        ApplicationContext::Get().vulkanContext.pushCommandBuffer(fd->CommandBuffer);
         info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         info.waitSemaphoreCount = 1;
         info.pWaitSemaphores = &image_acquired_semaphore;
         info.pWaitDstStageMask = &wait_stage;
-        info.commandBufferCount = context.vulkanContext.getCommandBuffers().size();
-        info.pCommandBuffers = context.vulkanContext.getCommandBuffers().data();
+        info.commandBufferCount = ApplicationContext::Get().vulkanContext.getCommandBuffers().size();
+        info.pCommandBuffers = ApplicationContext::Get().vulkanContext.getCommandBuffers().data();
         info.signalSemaphoreCount = 1;
         info.pSignalSemaphores = &render_complete_semaphore;
         VulkanUtils::CheckVKResult(vkEndCommandBuffer(fd->CommandBuffer));
-        VulkanUtils::CheckVKResult(vkQueueSubmit(context.vulkanContext.graphicsQueue, 1, &info, fd->Fence));
+        VulkanUtils::CheckVKResult(vkQueueSubmit(ApplicationContext::Get().vulkanContext.graphicsQueue, 1, &info, fd->Fence));
     }
 }

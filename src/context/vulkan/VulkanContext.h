@@ -51,7 +51,7 @@ namespace Metal {
 
         std::vector<VkCommandBuffer> &getCommandBuffers() { return commandBuffers; }
 
-        explicit VulkanContext(ApplicationContext &context, bool debugMode);
+        explicit VulkanContext(bool debugMode);
 
         VkPhysicalDeviceProperties physicalDeviceProperties{};
         VkPhysicalDeviceMemoryProperties physicalDeviceMemoryProperties{};

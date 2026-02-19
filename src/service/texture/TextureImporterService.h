@@ -10,8 +10,8 @@ namespace Metal {
 
     class TextureImporterService final : public AbstractImporter {
     public:
-        explicit TextureImporterService(ApplicationContext &context)
-            : AbstractImporter(context) {
+        explicit TextureImporterService()
+            : AbstractImporter() {
         }
 
         std::vector<std::string> getSupportedTypes() override {

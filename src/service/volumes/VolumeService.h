@@ -12,8 +12,8 @@ namespace Metal {
 
         void registerVolumes();
     public:
-        explicit VolumeService(ApplicationContext &context)
-            : AbstractRuntimeComponent(context) {
+        explicit VolumeService()
+            : AbstractRuntimeComponent() {
         }
 
         void onSync() override;

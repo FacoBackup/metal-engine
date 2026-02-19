@@ -7,8 +7,8 @@ namespace Metal {
 
     class VoxelService final : public AbstractResourceService {
     public:
-        explicit VoxelService(ApplicationContext &context)
-            : AbstractResourceService(context) {
+        explicit VoxelService()
+            : AbstractResourceService() {
         }
 
         SVOInstance *create(const std::string &id);

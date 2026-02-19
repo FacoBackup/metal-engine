@@ -18,7 +18,7 @@ namespace Metal {
                 field.field->y = values[1];
                 field.field->z = values[2];
                 field.instance->registerChange();
-                field.instance->onUpdate(&field, *context);
+                field.instance->onUpdate(&field);
             }
         } else {
             ImGui::ColorButton("%s", ImVec4(field.field->x, field.field->y, field.field->z, 1.));

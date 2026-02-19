@@ -23,7 +23,7 @@ namespace Metal {
             if (file->type == field.resourceType) {
                 *field.field = file->getId();
                 field.instance->registerChange();
-                field.instance->onUpdate(&field, *context);
+                field.instance->onUpdate(&field);
                 open = false;
             }
         }));
@@ -44,7 +44,7 @@ namespace Metal {
             entry = nullptr;
             *field.field = "";
             field.instance->registerChange();
-            field.instance->onUpdate(&field, *context);
+            field.instance->onUpdate(&field);
         }
         ImGui::SameLine();
         if (entry != nullptr) {
@@ -72,7 +72,7 @@ namespace Metal {
 
     void ResourceField::onSync() {
         if (field.field->size() > 0 && (entry == nullptr || entry->getId() != *field.field)) {
-            entry = context->filesService.getResource(*field.field);
+            entry = ApplicationContext::Get().filesService.getResource(*field.field);
         }
         if (!field.disabled) {
             renderButton();

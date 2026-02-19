@@ -30,7 +30,7 @@ namespace Metal {
         }
 
         if (!scene || !scene->HasMeshes()) {
-            LOG_ERROR(context, "Error loading scene: " + std::string(importer.GetErrorString()));
+            LOG_ERROR("Error loading scene: " + std::string(importer.GetErrorString()));
             throw std::runtime_error("Error loading scene: " + std::string(importer.GetErrorString()));
         }
 
@@ -48,7 +48,7 @@ namespace Metal {
             throw std::runtime_error("Import cancelled");
         }
 
-        context.meshImporterService.persistAllMeshes(targetDir, scene, meshMap, meshMaterialMap, stopToken);
+        ApplicationContext::Get().meshImporterService.persistAllMeshes(targetDir, scene, meshMap, meshMaterialMap, stopToken);
 
         if (stopToken.stop_requested()) {
             throw std::runtime_error("Import cancelled");
@@ -58,7 +58,7 @@ namespace Metal {
         fs::path absolutePath = fs::absolute(pathToFile);
         fs::path directoryPath = absolutePath.parent_path();
 
-        context.materialImporterService.persistAllMaterials(targetDir, scene, materialsMap, directoryPath.string(),
+        ApplicationContext::Get().materialImporterService.persistAllMaterials(targetDir, scene, materialsMap, directoryPath.string(),
                                                             stopToken);
 
         if (stopToken.stop_requested()) {
@@ -72,7 +72,7 @@ namespace Metal {
             throw std::runtime_error("Import cancelled");
         }
 
-        DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_SCENE(sceneMetadata.getId()), sceneData)
+        DUMP_TEMPLATE(ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_SCENE(sceneMetadata.getId()), sceneData)
 
         return sceneMetadata.getId();
     }

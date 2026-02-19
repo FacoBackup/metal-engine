@@ -11,8 +11,8 @@ namespace Metal {
     struct FrameBufferAttachment;
 
     struct CoreDescriptorSets final : AbstractCoreRepository {
-        explicit CoreDescriptorSets(ApplicationContext &context)
-            : AbstractCoreRepository(context) {
+        explicit CoreDescriptorSets()
+            : AbstractCoreRepository() {
         }
 
         VkSampler vkImageSampler = VK_NULL_HANDLE;

@@ -21,7 +21,7 @@ namespace Metal {
         CommandBufferRecorder *postProcessing = nullptr;
 
     public:
-        explicit PassesService(ApplicationContext &context);
+        explicit PassesService();
 
         void onInitialize() override;
 

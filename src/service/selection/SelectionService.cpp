@@ -3,70 +3,55 @@
 #include "../../context/ApplicationContext.h"
 #include "../../repository/world/components/TransformComponent.h"
 
-namespace Metal
-{
-    void SelectionService::addSelected(EntityID entity) const
-    {
-        if (editorRepository.selected.empty() || entity == EMPTY_ENTITY)
-        {
+namespace Metal {
+    void SelectionService::addSelected(EntityID entity) const {
+        auto &editorRepository = ApplicationContext::Get().editorRepository;
+        if (editorRepository.selected.empty() || entity == EMPTY_ENTITY) {
             editorRepository.mainSelection = entity;
-            if (editorRepository.mainSelection == WorldRepository::ROOT_ID)
-            {
+            if (editorRepository.mainSelection == WorldRepository::ROOT_ID) {
                 editorRepository.mainSelection = EMPTY_ENTITY;
-            }
-            else if (editorRepository.mainSelection != EMPTY_ENTITY)
-            {
+            } else if (editorRepository.mainSelection != EMPTY_ENTITY) {
                 updatePrimitiveSelected();
             }
         }
-        if (entity != EMPTY_ENTITY)
-        {
+        if (entity != EMPTY_ENTITY) {
             editorRepository.selected.insert({entity, true});
         }
     }
 
-    void SelectionService::clearSelection() const
-    {
+    void SelectionService::clearSelection() const {
+        auto &editorRepository = ApplicationContext::Get().editorRepository;
         editorRepository.selected.clear();
         editorRepository.mainSelection = EMPTY_ENTITY;
         editorRepository.primitiveSelected = nullptr;
     }
 
-    void SelectionService::addAllSelected(const std::vector<EntityID>& all) const
-    {
+    void SelectionService::addAllSelected(const std::vector<EntityID> &all) const {
+        auto &editorRepository = ApplicationContext::Get().editorRepository;
         editorRepository.selected.clear();
         const EntityID first = all.size() > 0 ? all[0] : EMPTY_ENTITY;
         editorRepository.mainSelection = first;
         updatePrimitiveSelected();
-        for (auto a : all)
-        {
+        for (auto a: all) {
             editorRepository.selected.insert({a, true});
         }
     }
 
-    void SelectionService::updatePrimitiveSelected() const
-    {
-        Entity* entity = world.getEntity(editorRepository.mainSelection);
-        if (entity == nullptr)
-        {
+    void SelectionService::updatePrimitiveSelected() const {
+        auto &editorRepository = ApplicationContext::Get().editorRepository;
+        Entity *entity = ApplicationContext::Get().worldRepository.getEntity(editorRepository.mainSelection);
+        if (entity == nullptr) {
             return;
         }
-        auto& comp = entity->components;
-        for (auto a : comp)
-        {
-            if (a == ComponentTypes::TRANSFORM)
-            {
-                editorRepository.primitiveSelected = dynamic_cast<TransformComponent*>(context.worldRepository.
+        auto &comp = entity->components;
+        for (auto a: comp) {
+            if (a == ComponentTypes::TRANSFORM) {
+                editorRepository.primitiveSelected = dynamic_cast<TransformComponent *>(ApplicationContext::Get().
+                    worldRepository.
                     getComponent(ComponentTypes::TRANSFORM, editorRepository.mainSelection));
                 break;
             }
         }
     }
 
-    SelectionService::SelectionService(ApplicationContext& context)
-        : AbstractRuntimeComponent(context),
-          editorRepository(context.editorRepository),
-          world(context.worldRepository)
-    {
-    }
 } // Metal

@@ -25,19 +25,19 @@ namespace Metal {
 
         instance->indexCount = data->indices.size();
 
-        const bool rtEnabled = context.vulkanContext.rayTracingSupported;
+        const bool rtEnabled = ApplicationContext::Get().vulkanContext.rayTracingSupported;
         const VkBufferUsageFlags rtVertexFlags = rtEnabled
             ? (VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR)
             : 0;
         const VkBufferUsageFlags rtIndexFlags = rtVertexFlags;
 
-        instance->dataBuffer = context.bufferService.createBuffer(
+        instance->dataBuffer = ApplicationContext::Get().bufferService.createBuffer(
             sizeof(VertexData) * data->data.size(),
             VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | rtVertexFlags,
             data->data.data(),
             rtEnabled);
 
-        instance->indexBuffer = context.bufferService.createBuffer(
+        instance->indexBuffer = ApplicationContext::Get().bufferService.createBuffer(
             sizeof(unsigned int) * data->indices.size(),
             VK_BUFFER_USAGE_INDEX_BUFFER_BIT | rtIndexFlags,
             data->indices.data(),
@@ -49,7 +49,7 @@ namespace Metal {
     }
 
     MeshData *MeshService::stream(const std::string &id, const LevelOfDetail &levelOfDetail) const {
-        auto pathToFile = context.getAssetDirectory() + FORMAT_FILE_MESH(id, levelOfDetail);
+        auto pathToFile = ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_MESH(id, levelOfDetail);
         if (std::filesystem::exists(pathToFile)) {
             MeshData *data = new MeshData;
             PARSE_TEMPLATE(data->load, pathToFile)
@@ -59,17 +59,17 @@ namespace Metal {
     }
 
     EntityID MeshService::createMeshEntity(const std::string &name, const std::string &meshId) const {
-        const auto id = context.worldRepository.createEntity();
-        context.worldRepository.createComponent(id, ComponentTypes::ComponentType::MESH);
-        context.worldRepository.meshes[id].meshId = meshId;
-        context.worldRepository.getEntity(id)->name = name;
+        const auto id = ApplicationContext::Get().worldRepository.createEntity();
+        ApplicationContext::Get().worldRepository.createComponent(id, ComponentTypes::ComponentType::MESH);
+        ApplicationContext::Get().worldRepository.meshes[id].meshId = meshId;
+        ApplicationContext::Get().worldRepository.getEntity(id)->name = name;
         return id;
     }
 
     void MeshService::createSceneEntities(const std::string &id) const {
-        auto &repo = context.worldRepository;
+        auto &repo = ApplicationContext::Get().worldRepository;
         SceneData data;
-        auto pathToFile = context.getAssetDirectory() + FORMAT_FILE_SCENE(id);
+        auto pathToFile = ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_SCENE(id);
         std::ifstream os(pathToFile, std::ios::binary);
         cereal::BinaryInputArchive archive(os);
         data.load(archive);

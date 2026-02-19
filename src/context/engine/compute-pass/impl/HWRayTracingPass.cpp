@@ -7,13 +7,13 @@
 
 namespace Metal {
     bool HWRayTracingPass::shouldRun() {
-        if (!context.vulkanContext.rayTracingSupported) {
+        if (!ApplicationContext::Get().vulkanContext.rayTracingSupported) {
             return false;
         }
 
-        context.rayTracingService.onSync();
+        ApplicationContext::Get().rayTracingService.onSync();
 
-        if (!context.rayTracingService.isReady()) {
+        if (!ApplicationContext::Get().rayTracingService.isReady()) {
             return false;
         }
 
@@ -22,50 +22,50 @@ namespace Metal {
                     "rt/HWRayTracing.rgen",
                     "rt/HWRayTracing.rmiss",
                     "rt/HWRayTracing.rchit")
-                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.tlasDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferAlbedo.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferNormal.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get())
-                .addDescriptorSet(context.coreDescriptorSets.currentFrameDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.surfaceCacheImage.get())
-                .addDescriptorSet(context.coreDescriptorSets.lightData.get())
-                .addDescriptorSet(context.coreDescriptorSets.volumeData.get());
-            pipelineInstance = context.pipelineService.createPipeline(builder);
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.tlasDescriptor.get())
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.gBufferAlbedo.get())
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.gBufferNormal.get())
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.gBufferPosition.get())
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.currentFrameDescriptor.get())
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.surfaceCacheImage.get())
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.lightData.get())
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.volumeData.get());
+            pipelineInstance = ApplicationContext::Get().pipelineService.createPipeline(builder);
         }
 
         return true;
     }
 
     void HWRayTracingPass::onSync() {
-        bool surfaceCacheReset = context.engineContext.isGISettingsUpdated() || context.engineContext.
+        bool surfaceCacheReset = ApplicationContext::Get().engineContext.isGISettingsUpdated() || ApplicationContext::Get().engineContext.
                               isUpdateLights();
         if (surfaceCacheReset) {
-            clearTexture(context.coreTextures.giSurfaceCache->vkImage);
+            clearTexture(ApplicationContext::Get().coreTextures.giSurfaceCache->vkImage);
         }
 
-        if (context.engineRepository.enabledDenoiser) {
-            clearTexture(context.coreTextures.currentFrame->vkImage);
-            context.engineContext.resetPathTracerAccumulationCount();
-        } else if (isFirstRun || context.engineContext.isCameraUpdated() || surfaceCacheReset) {
-            clearTexture(context.coreTextures.currentFrame->vkImage);
-            context.engineContext.resetPathTracerAccumulationCount();
+        if (ApplicationContext::Get().engineRepository.enabledDenoiser) {
+            clearTexture(ApplicationContext::Get().coreTextures.currentFrame->vkImage);
+            ApplicationContext::Get().engineContext.resetPathTracerAccumulationCount();
+        } else if (isFirstRun || ApplicationContext::Get().engineContext.isCameraUpdated() || surfaceCacheReset) {
+            clearTexture(ApplicationContext::Get().coreTextures.currentFrame->vkImage);
+            ApplicationContext::Get().engineContext.resetPathTracerAccumulationCount();
             isFirstRun = false;
         }
 
-        startWriting(context.coreTextures.currentFrame->vkImage);
+        startWriting(ApplicationContext::Get().coreTextures.currentFrame->vkImage);
 
         // Trace rays
-        context.vulkanContext.vkCmdTraceRaysKHR(
+        ApplicationContext::Get().vulkanContext.vkCmdTraceRaysKHR(
             vkCommandBuffer,
             &pipelineInstance->raygenRegion,
             &pipelineInstance->missRegion,
             &pipelineInstance->hitRegion,
             &pipelineInstance->callableRegion,
-            context.coreTextures.currentFrame->width,
-            context.coreTextures.currentFrame->height,
+            ApplicationContext::Get().coreTextures.currentFrame->width,
+            ApplicationContext::Get().coreTextures.currentFrame->height,
             1);
 
-        endWriting(context.coreTextures.currentFrame->vkImage);
+        endWriting(ApplicationContext::Get().coreTextures.currentFrame->vkImage);
     }
 } // Metal

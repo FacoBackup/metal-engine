@@ -5,7 +5,7 @@
 
 namespace Metal {
     void AsyncTaskPanel::onSync() {
-        auto tasks = context->asyncTaskService.getActiveTasks();
+        auto tasks = ApplicationContext::Get().asyncTaskService.getActiveTasks();
         if (tasks.empty()) return;
 
         ImGui::SameLine();
@@ -53,7 +53,7 @@ namespace Metal {
 
                 ImGui::SameLine();
                 if (ImGui::Button((Icons::close + "##" + task->id).c_str(), ImVec2(UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE))) {
-                    context->asyncTaskService.endTask(task->id, true);
+                    ApplicationContext::Get().asyncTaskService.endTask(task->id, true);
                 }
                 ImGui::EndGroup();
             }

@@ -13,7 +13,7 @@ namespace Metal {
     }
 
     void GizmoPanel::onInitialize() {
-        editorRepository = &context->editorRepository;
+        editorRepository = &ApplicationContext::Get().editorRepository;
     }
 
     void GizmoPanel::onSync() {
@@ -22,7 +22,7 @@ namespace Metal {
             localSelected = nullptr;
             localChangeId = 0;
             if (editorRepository->mainSelection != EMPTY_ENTITY) {
-                context->selectionService.updatePrimitiveSelected();
+                ApplicationContext::Get().selectionService.updatePrimitiveSelected();
             }
             return;
         }
@@ -35,7 +35,7 @@ namespace Metal {
         }
 
         recomposeMatrix();
-        ImGuizmo::SetOrthographic(context->worldRepository.camera.isOrthographic);
+        ImGuizmo::SetOrthographic(ApplicationContext::Get().worldRepository.camera.isOrthographic);
         ImGuizmo::SetDrawlist();
         ImGuizmo::SetRect(position->x, position->y, size->x, size->y);
         Manipulate(
@@ -96,12 +96,12 @@ namespace Metal {
         localSelected->registerChange();
         localChangeId = localSelected->getChangeId();
         localSelected->forceTransform = true;
-        localSelected->onUpdate(nullptr, *context);
+        localSelected->onUpdate(nullptr);
     }
 
     void GizmoPanel::recomposeMatrix() {
-        viewMatrixCache = glm::value_ptr(context->worldRepository.camera.viewMatrix);
-        cacheProjection = context->worldRepository.camera.projectionMatrix;
+        viewMatrixCache = glm::value_ptr(ApplicationContext::Get().worldRepository.camera.viewMatrix);
+        cacheProjection = ApplicationContext::Get().worldRepository.camera.projectionMatrix;
         cacheProjection[1][1] *= -1;
         projectionMatrixCache = glm::value_ptr(cacheProjection);
     }

@@ -1,5 +1,5 @@
-#ifndef MATERIALDATA_H
-#define MATERIALDATA_H
+#ifndef MATERIAL_FILE_DATA_H
+#define MATERIAL_FILE_DATA_H
 #include <string>
 #include <glm/vec3.hpp>
 
@@ -7,7 +7,7 @@
 #include "../../util/serialization-definitions.h"
 
 namespace Metal {
-    struct MaterialData final : Inspectable {
+    struct MaterialFileData final : Inspectable {
         std::string albedo;
         std::string normal;
         std::string roughness;

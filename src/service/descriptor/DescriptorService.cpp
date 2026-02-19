@@ -9,8 +9,8 @@
 #include "../texture/TextureInstance.h"
 
 namespace Metal {
-    DescriptorService::DescriptorService(ApplicationContext &context)
-        : AbstractRuntimeComponent(context) {
+    DescriptorService::DescriptorService()
+        : AbstractRuntimeComponent() {
     }
 
     void DescriptorService::setImageDescriptor(const FrameBufferInstance *framebuffer,
@@ -20,9 +20,9 @@ namespace Metal {
             attachment->imageDescriptor = std::make_unique<DescriptorInstance>();
             attachment->imageDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
                 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
-                context.coreDescriptorSets.vkImageSampler,
+                ApplicationContext::Get().coreDescriptorSets.vkImageSampler,
                 attachment->vkImageView));
-            attachment->imageDescriptor->create(context.vulkanContext);
+            attachment->imageDescriptor->create();
         }
     }
 
@@ -35,7 +35,7 @@ namespace Metal {
                                                                              texture->vkSampler,
                                                                              texture->vkImageView
             ));
-            texture->imageDescriptor->create(context.vulkanContext);
+            texture->imageDescriptor->create();
         }
     }
 } // Metal

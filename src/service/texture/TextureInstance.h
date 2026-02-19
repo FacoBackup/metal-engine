@@ -20,14 +20,14 @@ namespace Metal {
         explicit TextureInstance(const std::string& id) : RuntimeResource(id) {
         }
 
-        void dispose(VulkanContext &context) override {
-            vkDestroyImage(context.device.device, vkImage, nullptr);
-            vkFreeMemory(context.device.device, vkImageMemory, nullptr);
-            vkDestroyImageView(context.device.device, vkImageView, nullptr);
-            vkDestroySampler(context.device.device, vkSampler, nullptr);
+        void dispose() override {
+            vkDestroyImage(ApplicationContext::Get().vulkanContext.device.device, vkImage, nullptr);
+            vkFreeMemory(ApplicationContext::Get().vulkanContext.device.device, vkImageMemory, nullptr);
+            vkDestroyImageView(ApplicationContext::Get().vulkanContext.device.device, vkImageView, nullptr);
+            vkDestroySampler(ApplicationContext::Get().vulkanContext.device.device, vkSampler, nullptr);
 
             if (imageDescriptor != nullptr) {
-                imageDescriptor->dispose(context);
+                imageDescriptor->dispose();
             }
         }
 

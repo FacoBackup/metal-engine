@@ -9,8 +9,8 @@ namespace Metal {
         VoxelDebugSettingsPushConstant settings{};
 
     public:
-        explicit VoxelVisualizerPass(ApplicationContext &context)
-            : AbstractRenderPass(context) {
+        explicit VoxelVisualizerPass()
+            : AbstractRenderPass() {
         }
 
         void onInitialize() override;

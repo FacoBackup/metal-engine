@@ -7,16 +7,16 @@
 
 namespace Metal {
     void GlobalSettingsPanel::onSync() {
-        auto &editorRepository = context->editorRepository;
+        auto &editorRepository = ApplicationContext::Get().editorRepository;
 
         //
         // if (ImGui::Button((Icons::play_arrow + "Export to video" + id + "video").c_str())) {
-        //     context->videoExporterService.exportToVideo();
+        //     ApplicationContext::Get().videoExporterService.exportToVideo();
         // }
         // ImGui::SameLine();
-        // if (context->engineRepository.isBaking) {
+        // if (ApplicationContext::Get().engineRepository.isBaking) {
         //     if (ImGui::Button((Icons::stop_circle + "Finish export" + id + "videoEx").c_str())) {
-        //         context->videoExporterService.finishExportToVideo();
+        //         ApplicationContext::Get().videoExporterService.finishExportToVideo();
         //     }
         //     ImGui::SameLine();
         // }
@@ -32,10 +32,10 @@ namespace Metal {
         int option = 0;
 
         if (ImGui::Combo((id + "##entities").c_str(), &option, ComponentTypes::NAMES)) {
-            auto id = context->worldRepository.createEntity();
-            context->worldRepository.createComponent(id, ComponentTypes::ValueOfIndex(option));
-            context->selectionService.clearSelection();
-            context->selectionService.addSelected(id);
+            auto id = ApplicationContext::Get().worldRepository.createEntity();
+            ApplicationContext::Get().worldRepository.createComponent(id, ComponentTypes::ValueOfIndex(option));
+            ApplicationContext::Get().selectionService.clearSelection();
+            ApplicationContext::Get().selectionService.addSelected(id);
         }
 
         cameraMode();
@@ -49,19 +49,19 @@ namespace Metal {
         ImGui::SameLine();
         if (UIUtil::ButtonSimple(Icons::center_focus_strong + "##centerCamera", UIUtil::ONLY_ICON_BUTTON_SIZE,
                                  UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            context->worldRepository.camera.position = {0, 0, 0};
-            context->worldRepository.camera.registerChange();
+            ApplicationContext::Get().worldRepository.camera.position = {0, 0, 0};
+            ApplicationContext::Get().worldRepository.camera.registerChange();
         }
         UIUtil::RenderTooltip("Center camera?");
 
         ImGui::SameLine();
         ImGui::SetNextItemWidth(75);
-        ImGui::DragFloat("##speedCamera", &context->worldRepository.camera.movementSensitivity, .1f,
+        ImGui::DragFloat("##speedCamera", &ApplicationContext::Get().worldRepository.camera.movementSensitivity, .1f,
                          .1f);
     }
 
     void GlobalSettingsPanel::shadingMode() {
-        auto &editorRepository = context->editorRepository;
+        auto &editorRepository = ApplicationContext::Get().editorRepository;
 
         UIUtil::DynamicSpacing(405);
 

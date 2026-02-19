@@ -11,8 +11,8 @@
 namespace Metal {
     class MaterialImporterService final : public AbstractResourceService {
     public:
-        explicit MaterialImporterService(ApplicationContext &context)
-            : AbstractResourceService(context) {
+        explicit MaterialImporterService()
+            : AbstractResourceService() {
         }
 
         void persistAllMaterials(const std::string &targetDir, const aiScene *scene,

@@ -21,8 +21,8 @@ namespace Metal {
         static glm::vec3 BlendColors(glm::vec3 &c1, glm::vec3 &c2, float t);
 
     public:
-        explicit LightService(ApplicationContext &context)
-            : AbstractRuntimeComponent(context) {
+        explicit LightService()
+            : AbstractRuntimeComponent() {
         }
 
         void onSync() override;

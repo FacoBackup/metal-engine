@@ -16,14 +16,14 @@ namespace Metal {
         return ComponentTypes::TRANSFORM;
     }
 
-    void TransformComponent::onUpdate(InspectableMember *member, ApplicationContext &context) {
-        bool isVolume = context.worldRepository.volumes.contains(entityId);
-        bool isLight = context.worldRepository.lights.contains(entityId);
+    void TransformComponent::onUpdate(InspectableMember *member) {
+        bool isVolume = ApplicationContext::Get().worldRepository.volumes.contains(entityId);
+        bool isLight = ApplicationContext::Get().worldRepository.lights.contains(entityId);
         if (isLight) {
-            context.engineContext.setUpdateLights(true);
+            ApplicationContext::Get().engineContext.setUpdateLights(true);
         }
         if (isVolume) {
-            context.engineContext.setUpdateVolumes(true);
+            ApplicationContext::Get().engineContext.setUpdateVolumes(true);
         }
         if (member != nullptr && member->name == ROTATION) {
             rotation = normalize(glm::quat(rotationEuler * (glm::pi<float>() / 180.f)));

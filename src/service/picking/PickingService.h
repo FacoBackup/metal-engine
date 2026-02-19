@@ -8,8 +8,8 @@
 namespace Metal {
     class PickingService final : public AbstractResourceService {
     public:
-        explicit PickingService(ApplicationContext &context)
-            : AbstractResourceService(context) {
+        explicit PickingService()
+            : AbstractResourceService() {
         }
 
         [[nodiscard]] std::optional<EntityID> pickEntityFromGBuffer(uint32_t pixelX, uint32_t pixelY) const;

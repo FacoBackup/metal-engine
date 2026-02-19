@@ -40,7 +40,7 @@ namespace Metal {
 
         if (UIUtil::ButtonSimple(Icons::format_paint + id, UIUtil::ONLY_ICON_BUTTON_SIZE,
                                  UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            context->filesService.createMaterial(filesContext.currentDirectory->absolutePath);
+            ApplicationContext::Get().filesService.createMaterial(filesContext.currentDirectory->absolutePath);
             FilesService::GetEntries(filesContext.currentDirectory);
         }
         UIUtil::RenderTooltip("Create material");

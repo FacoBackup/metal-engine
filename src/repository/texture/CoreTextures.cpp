@@ -8,16 +8,16 @@
 namespace Metal {
     void CoreTextures::onInitialize() {
 
-        giSurfaceCache = context.textureService.createForCompute(SURFACE_CACHE_RES, SURFACE_CACHE_RES);
+        giSurfaceCache = ApplicationContext::Get().textureService.createForCompute(SURFACE_CACHE_RES, SURFACE_CACHE_RES);
         giSurfaceCache->setAsNoDisposal();
 
-        previousFrame = context.textureService.createForCompute(context.vulkanContext.getWindowWidth() / context.engineRepository.shadingResInvScale, context.vulkanContext.getWindowHeight() / context.engineRepository.shadingResInvScale);
+        previousFrame = ApplicationContext::Get().textureService.createForCompute(ApplicationContext::Get().vulkanContext.getWindowWidth() / ApplicationContext::Get().engineRepository.shadingResInvScale, ApplicationContext::Get().vulkanContext.getWindowHeight() / ApplicationContext::Get().engineRepository.shadingResInvScale);
         previousFrame->setAsNoDisposal();
 
-        previousFrameMetadata = context.textureService.createForCompute(context.vulkanContext.getWindowWidth() / context.engineRepository.shadingResInvScale, context.vulkanContext.getWindowHeight() / context.engineRepository.shadingResInvScale);
+        previousFrameMetadata = ApplicationContext::Get().textureService.createForCompute(ApplicationContext::Get().vulkanContext.getWindowWidth() / ApplicationContext::Get().engineRepository.shadingResInvScale, ApplicationContext::Get().vulkanContext.getWindowHeight() / ApplicationContext::Get().engineRepository.shadingResInvScale);
         previousFrameMetadata->setAsNoDisposal();
 
-        currentFrame = context.textureService.createForCompute(context.vulkanContext.getWindowWidth() / context.engineRepository.shadingResInvScale, context.vulkanContext.getWindowHeight() / context.engineRepository.shadingResInvScale);
+        currentFrame = ApplicationContext::Get().textureService.createForCompute(ApplicationContext::Get().vulkanContext.getWindowWidth() / ApplicationContext::Get().engineRepository.shadingResInvScale, ApplicationContext::Get().vulkanContext.getWindowHeight() / ApplicationContext::Get().engineRepository.shadingResInvScale);
         currentFrame->setAsNoDisposal();
 
     }

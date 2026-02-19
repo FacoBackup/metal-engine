@@ -5,7 +5,7 @@
 #include "../../../util/ImageUtils.h"
 
 namespace Metal {
-    AbstractComputePass::AbstractComputePass(ApplicationContext &context) : AbstractPass(context, true) {
+    AbstractComputePass::AbstractComputePass() : AbstractPass(true) {
     }
 
     void AbstractComputePass::recordDispatch(const unsigned int groupX, const unsigned int groupY,

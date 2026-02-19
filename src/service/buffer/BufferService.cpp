@@ -5,16 +5,13 @@
 #include "BufferInstance.h"
 
 namespace Metal {
-    BufferService::BufferService(ApplicationContext &context) : AbstractRuntimeComponent(context),
-                                                                vulkanContext(context.vulkanContext) {
-    }
 
     std::shared_ptr<BufferInstance> BufferService::createBuffer(VkDeviceSize bufferSize,
                                                                 VkBufferUsageFlags usageFlags,
                                                                 VkMemoryPropertyFlags memoryPropertyFlags) const {
         std::shared_ptr<BufferInstance> buffer(new BufferInstance{bufferSize});
         createVkBuffer(usageFlags, memoryPropertyFlags, buffer);
-        vkMapMemory(vulkanContext.device.device, buffer->vkDeviceMemory, 0, bufferSize, 0, &buffer->mapped);
+        vkMapMemory(ApplicationContext::Get().vulkanContext.device.device, buffer->vkDeviceMemory, 0, bufferSize, 0, &buffer->mapped);
         return buffer;
     }
 
@@ -27,22 +24,22 @@ namespace Metal {
         createVkBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer);
 
-        vkMapMemory(vulkanContext.device.device, stagingBuffer->vkDeviceMemory, 0, dataSize, 0, &stagingBuffer->mapped);
+        vkMapMemory(ApplicationContext::Get().vulkanContext.device.device, stagingBuffer->vkDeviceMemory, 0, dataSize, 0, &stagingBuffer->mapped);
         memcpy(stagingBuffer->mapped, bufferData, dataSize);
-        vkUnmapMemory(vulkanContext.device.device, stagingBuffer->vkDeviceMemory);
+        vkUnmapMemory(ApplicationContext::Get().vulkanContext.device.device, stagingBuffer->vkDeviceMemory);
 
         createVkBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | usageFlags,
                        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, finalBuffer);
 
         copyBuffer(stagingBuffer, finalBuffer);
 
-        stagingBuffer->dispose(vulkanContext);
+        stagingBuffer->dispose();
         return finalBuffer;
     }
 
     unsigned int BufferService::findMemoryType(unsigned int typeFilter, VkMemoryPropertyFlags properties) const {
-        for (unsigned int i = 0; i < vulkanContext.physicalDeviceMemoryProperties.memoryTypeCount; i++) {
-            if ((typeFilter & (1 << i)) && (vulkanContext.physicalDeviceMemoryProperties.memoryTypes[i].propertyFlags &
+        for (unsigned int i = 0; i < ApplicationContext::Get().vulkanContext.physicalDeviceMemoryProperties.memoryTypeCount; i++) {
+            if ((typeFilter & (1 << i)) && (ApplicationContext::Get().vulkanContext.physicalDeviceMemoryProperties.memoryTypes[i].propertyFlags &
                                             properties) == properties) {
                 return i;
             }
@@ -59,31 +56,31 @@ namespace Metal {
         bufferInfo.usage = usage;
         bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-        VulkanUtils::CheckVKResult(vkCreateBuffer(vulkanContext.device.device, &bufferInfo, nullptr,
+        VulkanUtils::CheckVKResult(vkCreateBuffer(ApplicationContext::Get().vulkanContext.device.device, &bufferInfo, nullptr,
                                                   &buffer->vkBuffer));
 
         VkMemoryRequirements memRequirements;
-        vkGetBufferMemoryRequirements(vulkanContext.device.device, buffer->vkBuffer, &memRequirements);
+        vkGetBufferMemoryRequirements(ApplicationContext::Get().vulkanContext.device.device, buffer->vkBuffer, &memRequirements);
 
         VkMemoryAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         allocInfo.allocationSize = memRequirements.size;
         allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
 
-        VulkanUtils::CheckVKResult(vkAllocateMemory(vulkanContext.device.device, &allocInfo, nullptr,
+        VulkanUtils::CheckVKResult(vkAllocateMemory(ApplicationContext::Get().vulkanContext.device.device, &allocInfo, nullptr,
                                                     &buffer->vkDeviceMemory));
-        vkBindBufferMemory(vulkanContext.device.device, buffer->vkBuffer, buffer->vkDeviceMemory, 0);
+        vkBindBufferMemory(ApplicationContext::Get().vulkanContext.device.device, buffer->vkBuffer, buffer->vkDeviceMemory, 0);
     }
 
     void BufferService::copyBuffer(const std::shared_ptr<BufferInstance> &srcBuffer,
                                    const std::shared_ptr<BufferInstance> &dstBuffer) const {
-        VkCommandBuffer commandBuffer = vulkanContext.beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = ApplicationContext::Get().vulkanContext.beginSingleTimeCommands();
 
         VkBufferCopy copyRegion{};
         copyRegion.size = dstBuffer->dataSize;
         vkCmdCopyBuffer(commandBuffer, srcBuffer->vkBuffer, dstBuffer->vkBuffer, 1, &copyRegion);
 
-        vulkanContext.endSingleTimeCommands(commandBuffer);
+        ApplicationContext::Get().vulkanContext.endSingleTimeCommands(commandBuffer);
     }
 
     std::shared_ptr<BufferInstance> BufferService::createBuffer(VkDeviceSize bufferSize,
@@ -101,11 +98,11 @@ namespace Metal {
         }
         bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-        VulkanUtils::CheckVKResult(vkCreateBuffer(vulkanContext.device.device, &bufferInfo, nullptr,
+        VulkanUtils::CheckVKResult(vkCreateBuffer(ApplicationContext::Get().vulkanContext.device.device, &bufferInfo, nullptr,
                                                   &buffer->vkBuffer));
 
         VkMemoryRequirements memRequirements;
-        vkGetBufferMemoryRequirements(vulkanContext.device.device, buffer->vkBuffer, &memRequirements);
+        vkGetBufferMemoryRequirements(ApplicationContext::Get().vulkanContext.device.device, buffer->vkBuffer, &memRequirements);
 
         VkMemoryAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -119,12 +116,12 @@ namespace Metal {
             allocInfo.pNext = &allocFlagsInfo;
         }
 
-        VulkanUtils::CheckVKResult(vkAllocateMemory(vulkanContext.device.device, &allocInfo, nullptr,
+        VulkanUtils::CheckVKResult(vkAllocateMemory(ApplicationContext::Get().vulkanContext.device.device, &allocInfo, nullptr,
                                                     &buffer->vkDeviceMemory));
-        vkBindBufferMemory(vulkanContext.device.device, buffer->vkBuffer, buffer->vkDeviceMemory, 0);
+        vkBindBufferMemory(ApplicationContext::Get().vulkanContext.device.device, buffer->vkBuffer, buffer->vkDeviceMemory, 0);
 
         if (memoryPropertyFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) {
-            vkMapMemory(vulkanContext.device.device, buffer->vkDeviceMemory, 0, bufferSize, 0, &buffer->mapped);
+            vkMapMemory(ApplicationContext::Get().vulkanContext.device.device, buffer->vkDeviceMemory, 0, bufferSize, 0, &buffer->mapped);
         }
 
         return buffer;
@@ -138,9 +135,9 @@ namespace Metal {
         createVkBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer);
 
-        vkMapMemory(vulkanContext.device.device, stagingBuffer->vkDeviceMemory, 0, dataSize, 0, &stagingBuffer->mapped);
+        vkMapMemory(ApplicationContext::Get().vulkanContext.device.device, stagingBuffer->vkDeviceMemory, 0, dataSize, 0, &stagingBuffer->mapped);
         memcpy(stagingBuffer->mapped, bufferData, dataSize);
-        vkUnmapMemory(vulkanContext.device.device, stagingBuffer->vkDeviceMemory);
+        vkUnmapMemory(ApplicationContext::Get().vulkanContext.device.device, stagingBuffer->vkDeviceMemory);
 
         auto finalBuffer = createBuffer(dataSize,
                                         VK_BUFFER_USAGE_TRANSFER_DST_BIT | usageFlags,
@@ -148,7 +145,7 @@ namespace Metal {
                                         deviceAddress);
 
         copyBuffer(stagingBuffer, finalBuffer);
-        stagingBuffer->dispose(vulkanContext);
+        stagingBuffer->dispose();
         return finalBuffer;
     }
 } // Metal

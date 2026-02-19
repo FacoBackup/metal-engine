@@ -40,7 +40,7 @@ namespace Metal {
             stbi_image_free(textureData.data);
             return metadata.getId();
         } catch (std::exception &e) {
-            LOG_ERROR(context, std::string("Texture import failed: ") + e.what());
+            LOG_ERROR(std::string("Texture import failed: ") + e.what());
             throw std::runtime_error("Texture import failed");
         }
     }
@@ -100,7 +100,7 @@ namespace Metal {
             }
             return metadata.getId();
         } catch (std::exception &e) {
-            LOG_ERROR(context, std::string("Embedded texture import failed: ") + e.what());
+            LOG_ERROR(std::string("Embedded texture import failed: ") + e.what());
             return "";
         }
     }
@@ -125,7 +125,7 @@ namespace Metal {
             }
         }
 
-        if (!stbi_write_png((context.getAssetDirectory() + FORMAT_FILE_TEXTURE(fileId, levelOfDetail)).c_str(),
+        if (!stbi_write_png((ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_TEXTURE(fileId, levelOfDetail)).c_str(),
                             newWidth, newHeight, textureData.channels, resizedData,
                             newWidth * textureData.channels)) {
             delete[] resizedData;

@@ -14,7 +14,7 @@ namespace Metal {
 
     void ViewportHeaderPanel::onSync() {
         AbstractPanel *currentPanel;
-        if (context->editorRepository.editorMode == EditorMode::EditorMode::TRANSFORM) {
+        if (ApplicationContext::Get().editorRepository.editorMode == EditorMode::EditorMode::TRANSFORM) {
             currentPanel = gizmo;
         } else {
             currentPanel = paintGizmo;

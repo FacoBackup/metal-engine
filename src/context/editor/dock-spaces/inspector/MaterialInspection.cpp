@@ -5,7 +5,7 @@
 #include "../../../ApplicationContext.h"
 #include "../../../../util/UIUtil.h"
 #include "../../../../util/serialization-definitions.h"
-#include "../../../../service/material/MaterialData.h"
+#include "../../../../service/material/MaterialFileData.h"
 #include "../../../../enum/engine-definitions.h"
 
 namespace Metal {
@@ -15,19 +15,19 @@ namespace Metal {
     }
 
     void MaterialInspection::saveChanges() {
-        DUMP_TEMPLATE(context->getAssetDirectory() + FORMAT_FILE_MATERIAL(prevSelection), *data)
-        context->notificationService.pushMessage("Material was saved", NotificationSeverities::SUCCESS);
-        if (context->materialService.getResources().contains(prevSelection)) {
-            context->materialService.getResources().at(prevSelection)->dispose(context->vulkanContext);
-            context->materialService.getResources().erase(prevSelection);
+        DUMP_TEMPLATE(ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_MATERIAL(prevSelection), *data)
+        ApplicationContext::Get().notificationService.pushMessage("Material was saved", NotificationSeverities::SUCCESS);
+        if (ApplicationContext::Get().materialService.getResources().contains(prevSelection)) {
+            ApplicationContext::Get().materialService.getResources().at(prevSelection)->dispose();
+            ApplicationContext::Get().materialService.getResources().erase(prevSelection);
         }
     }
 
     void MaterialInspection::onSync() {
-        if (prevSelection != context->fileInspection.materialId) {
+        if (prevSelection != ApplicationContext::Get().fileInspection.materialId) {
             delete data;
-            data = context->materialService.stream(context->fileInspection.materialId);
-            prevSelection = context->fileInspection.materialId;
+            data = ApplicationContext::Get().materialService.stream(ApplicationContext::Get().fileInspection.materialId);
+            prevSelection = ApplicationContext::Get().fileInspection.materialId;
         }
         if (prevSelection.empty()) {
             return;

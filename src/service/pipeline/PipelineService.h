@@ -22,8 +22,8 @@ namespace Metal {
                                   PipelineInstance *pipeline) const;
 
     public:
-        explicit PipelineService(ApplicationContext &context)
-            : AbstractResourceService(context) {
+        explicit PipelineService()
+            : AbstractResourceService() {
         }
 
         PipelineInstance *createPipeline(PipelineBuilder &pipelineBuilder);

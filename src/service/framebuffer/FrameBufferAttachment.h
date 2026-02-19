@@ -12,7 +12,7 @@ namespace Metal {
         bool depth = false;
         const char *name = nullptr;
 
-        void dispose(const VulkanContext &context) const;
+        void dispose() const;
     };
 }
 

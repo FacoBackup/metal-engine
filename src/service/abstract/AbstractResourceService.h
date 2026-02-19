@@ -13,8 +13,6 @@ namespace Metal {
     protected:
         std::unordered_map<std::string, RuntimeResource *> resources{};
 
-        VulkanContext &vulkanContext;
-
         void registerResource(RuntimeResource *resource);
 
     public:
@@ -23,8 +21,6 @@ namespace Metal {
         }
 
         void disposeAll();
-
-        explicit AbstractResourceService(ApplicationContext &context);
     };
 } // Metal
 

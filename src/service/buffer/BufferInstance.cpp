@@ -7,11 +7,11 @@
 #include "../../util/VulkanUtils.h"
 
 namespace Metal {
-    void BufferInstance::dispose(const VulkanContext &context) const {
-        LOG_INFO_S("Disposing of buffer instance");
+    void BufferInstance::dispose() const {
+        LOG_INFO("Disposing of buffer instance");
 
-        vkDestroyBuffer(context.device.device, vkBuffer, nullptr);
-        vkFreeMemory(context.device.device, vkDeviceMemory, nullptr);
+        vkDestroyBuffer(ApplicationContext::Get().vulkanContext.device.device, vkBuffer, nullptr);
+        vkFreeMemory(ApplicationContext::Get().vulkanContext.device.device, vkDeviceMemory, nullptr);
     }
 
     void BufferInstance::update(void *newData) const {

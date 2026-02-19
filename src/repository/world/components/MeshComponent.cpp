@@ -17,8 +17,8 @@ namespace Metal {
         registerInt(parallaxLayers, "Material", "Parallax layers", 1);
     }
 
-    void MeshComponent::onUpdate(InspectableMember *member, ApplicationContext &context) {
-        context.engineContext.setGISettingsUpdated(true);
+    void MeshComponent::onUpdate(InspectableMember *member) {
+        ApplicationContext::Get().engineContext.setGISettingsUpdated(true);
         needsReVoxelization = true;
     }
 

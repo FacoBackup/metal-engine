@@ -12,13 +12,13 @@ namespace Metal {
     void InspectorPanel::onInitialize() {
         formPanel = new FormPanel();
         appendChild(formPanel);
-        repositories.push_back(&context->editorRepository);
-        repositories.push_back(&context->engineRepository);
-        repositories.push_back(&context->worldRepository.camera);
+        repositories.push_back(&ApplicationContext::Get().editorRepository);
+        repositories.push_back(&ApplicationContext::Get().engineRepository);
+        repositories.push_back(&ApplicationContext::Get().worldRepository.camera);
     }
 
     void InspectorPanel::onSync() {
-        const auto &editorRepository = context->editorRepository;
+        const auto &editorRepository = ApplicationContext::Get().editorRepository;
         tick();
         ImGui::Columns(2, (id + "inspectorColumns").c_str(), false);
         ImGui::SetColumnWidth(0, 30);
@@ -58,18 +58,18 @@ namespace Metal {
     }
 
     void InspectorPanel::tick() {
-        if (auto &editorRepository = context->editorRepository;
+        if (auto &editorRepository = ApplicationContext::Get().editorRepository;
             editorRepository.mainSelection != selectedId) {
             currentInspection = nullptr;
             additionalInspection.clear();
             selectedId = editorRepository.mainSelection;
 
             if (selectedId != EMPTY_ENTITY) {
-                selectedEntity = context->worldRepository.getEntity(selectedId);
+                selectedEntity = ApplicationContext::Get().worldRepository.getEntity(selectedId);
                 if (selectedEntity != nullptr) {
                     additionalInspection.push_back(selectedEntity);
-                    for (const auto &comp: context->worldRepository.getEntity(selectedId)->components) {
-                        additionalInspection.push_back(context->worldRepository.getComponent(comp, selectedId));
+                    for (const auto &comp: ApplicationContext::Get().worldRepository.getEntity(selectedId)->components) {
+                        additionalInspection.push_back(ApplicationContext::Get().worldRepository.getComponent(comp, selectedId));
                     }
                     currentInspection = additionalInspection[0];
                 }

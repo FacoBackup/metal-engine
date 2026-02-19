@@ -19,7 +19,7 @@ namespace Metal {
 
         ComponentTypes::ComponentType getType() override;
 
-        void onUpdate(InspectableMember *member, ApplicationContext &context) override;
+        void onUpdate(InspectableMember *member) override;
 
         SERIALIZE_TEMPLATE(albedo.x, albedo.y, albedo.z, entityId, density, scatteringAlbedo, g, samples)
     };

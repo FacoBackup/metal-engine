@@ -20,7 +20,7 @@ namespace Metal {
     struct WorldRepository final : AbstractRuntimeComponent{
         static constexpr EntityID ROOT_ID = 1;
 
-        explicit WorldRepository(ApplicationContext &context);
+        explicit WorldRepository();
 
         Camera camera{-(glm::pi<float>() / 4), glm::pi<float>() / 4, {10, 10, 10}};
         std::unordered_map<EntityID, Entity> entities{};

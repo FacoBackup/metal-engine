@@ -32,8 +32,8 @@ namespace Metal {
         void destroyAccelerationStructures();
 
     public:
-        explicit RayTracingService(ApplicationContext &context)
-            : AbstractRuntimeComponent(context) {
+        explicit RayTracingService()
+            : AbstractRuntimeComponent() {
         }
 
         void onSync() override;

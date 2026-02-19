@@ -3,10 +3,10 @@
 #include "../../../service/pipeline/PipelineInstance.h"
 
 namespace Metal {
-    AbstractPass::AbstractPass(ApplicationContext &context, bool isComputePass) : AbstractRuntimeComponent(context),
-        worldRepository(context.worldRepository),
+    AbstractPass::AbstractPass(bool isComputePass) : AbstractRuntimeComponent(),
+        worldRepository(ApplicationContext::Get().worldRepository),
         streamingRepository(
-            context.streamingRepository), isComputePass(isComputePass) {
+            ApplicationContext::Get().streamingRepository), isComputePass(isComputePass) {
     }
 
     void AbstractPass::recordPushConstant(const void *data) {

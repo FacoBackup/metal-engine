@@ -1,11 +1,11 @@
 #include "MaterialInstance.h"
 
 namespace Metal {
-    void MaterialInstance::dispose(VulkanContext &context) {
-        descriptorAlbedoTexture->dispose(context);
-        descriptorNormalTexture->dispose(context);
-        descriptorRoughnessTexture->dispose(context);
-        descriptorMetallicTexture->dispose(context);
-        descriptorHeightTexture->dispose(context);
+    void MaterialInstance::dispose() {
+        descriptorAlbedoTexture->dispose();
+        descriptorNormalTexture->dispose();
+        descriptorRoughnessTexture->dispose();
+        descriptorMetallicTexture->dispose();
+        descriptorHeightTexture->dispose();
     }
 } // Metal

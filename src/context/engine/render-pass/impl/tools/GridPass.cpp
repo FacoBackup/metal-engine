@@ -6,26 +6,26 @@
 namespace Metal {
     void GridPass::onInitialize() {
         PipelineBuilder gridPipelineBuilder = PipelineBuilder::Of(
-                    context.coreFrameBuffers.postProcessingFBO,
+                    ApplicationContext::Get().coreFrameBuffers.postProcessingFBO,
                     "QUAD.vert",
                     "tools/Grid.frag"
                 )
                 .setBlendEnabled()
                 .setPushConstantsSize(sizeof(GridPushConstant))
-                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get());
-        pipelineInstance = context.pipelineService.createPipeline(gridPipelineBuilder);
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.gBufferPosition.get());
+        pipelineInstance = ApplicationContext::Get().pipelineService.createPipeline(gridPipelineBuilder);
     }
 
     bool GridPass::shouldRun() {
-        return context.isDebugMode() && context.editorRepository.showGrid;
+        return ApplicationContext::Get().isDebugMode() && ApplicationContext::Get().editorRepository.showGrid;
     }
 
     void GridPass::onSync() {
-        pushConstant.scale = context.editorRepository.gridScale;
-        pushConstant.overlayObjects = context.editorRepository.gridOverlayObjects;
-        pushConstant.threshold = context.editorRepository.gridThreshold;
-        pushConstant.thickness = context.editorRepository.gridThickness;
+        pushConstant.scale = ApplicationContext::Get().editorRepository.gridScale;
+        pushConstant.overlayObjects = ApplicationContext::Get().editorRepository.gridOverlayObjects;
+        pushConstant.threshold = ApplicationContext::Get().editorRepository.gridThreshold;
+        pushConstant.thickness = ApplicationContext::Get().editorRepository.gridThickness;
         recordPushConstant(&pushConstant);
         recordDrawSimpleInstanced(3, 1);
     }

@@ -6,26 +6,26 @@
 namespace Metal {
     void VoxelVisualizerPass::onInitialize() {
         PipelineBuilder voxelVisualizerPipelineBuilder = PipelineBuilder::Of(
-                    context.coreFrameBuffers.postProcessingFBO,
+                    ApplicationContext::Get().coreFrameBuffers.postProcessingFBO,
                     "QUAD.vert",
                     "tools/VoxelDebugVisualizer.frag"
                 )
                 .setPushConstantsSize(sizeof(VoxelDebugSettingsPushConstant))
-                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.svoData.get())
-                .addDescriptorSet(context.coreDescriptorSets.surfaceCacheFragment.get());
-        pipelineInstance = context.pipelineService.createPipeline(voxelVisualizerPipelineBuilder);
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.svoData.get())
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.surfaceCacheFragment.get());
+        pipelineInstance = ApplicationContext::Get().pipelineService.createPipeline(voxelVisualizerPipelineBuilder);
     }
 
     bool VoxelVisualizerPass::shouldRun() {
-        return context.editorRepository.showVoxels;
+        return ApplicationContext::Get().editorRepository.showVoxels;
     }
 
     void VoxelVisualizerPass::onSync() {
-        settings.voxelDebugFlag = context.editorRepository.shadingMode;
-        settings.searchCountDivisor = context.editorRepository.voxelSearchCount;
-        settings.showRaySearchCount = context.editorRepository.showRaySearchCountVoxels;
-        settings.showRayTestCount = context.editorRepository.showRayTestCountVoxels;
+        settings.voxelDebugFlag = ApplicationContext::Get().editorRepository.shadingMode;
+        settings.searchCountDivisor = ApplicationContext::Get().editorRepository.voxelSearchCount;
+        settings.showRaySearchCount = ApplicationContext::Get().editorRepository.showRaySearchCountVoxels;
+        settings.showRayTestCount = ApplicationContext::Get().editorRepository.showRayTestCountVoxels;
         recordPushConstant(&settings);
         recordDrawSimpleInstanced(3, 1);
     }

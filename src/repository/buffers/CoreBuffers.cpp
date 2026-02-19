@@ -1,5 +1,6 @@
 #include "CoreBuffers.h"
 
+#include "../../context/ApplicationContext.h"
 #include "../../dto/buffers/GlobalDataUBO.h"
 #include "../../dto/buffers/TileInfoUBO.h"
 #include "../../dto/buffers/LightData.h"
@@ -10,6 +11,7 @@
 
 namespace Metal {
     void CoreBuffers::onInitialize() {
+        auto &bufferService = ApplicationContext::Get().bufferService;
         globalData = bufferService.createBuffer(sizeof(GlobalDataUBO),
                                                 VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
@@ -26,7 +28,7 @@ namespace Metal {
                                                 VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-        materialBuffer = bufferService.createBuffer(MAX_MATERIALS * sizeof(MaterialData),
+        materialBuffer = bufferService.createBuffer(MAX_MATERIALS * sizeof(MaterialFileData),
                                                 VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     }

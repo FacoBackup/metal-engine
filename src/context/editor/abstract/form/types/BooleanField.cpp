@@ -12,7 +12,7 @@ namespace Metal {
         if (!field.disabled) {
             if(ImGui::Checkbox(field.nameWithId.c_str(), field.field)){
                 field.instance->registerChange();
-                field.instance->onUpdate(&field, *context);
+                field.instance->onUpdate(&field);
             }
         } else {
             ImGui::Text("%s: %b", field.name.c_str(), *field.field);

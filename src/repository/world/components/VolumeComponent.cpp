@@ -14,7 +14,7 @@ namespace Metal {
         return ComponentTypes::VOLUME;
     }
 
-    void VolumeComponent::onUpdate(InspectableMember *member, ApplicationContext &context) {
-        context.engineContext.setUpdateVolumes(true);
+    void VolumeComponent::onUpdate(InspectableMember *member) {
+        ApplicationContext::Get().engineContext.setUpdateVolumes(true);
     }
 } // Metal

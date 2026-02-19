@@ -42,7 +42,7 @@ namespace Metal {
 
         const char *getTitle() override;
 
-        void onUpdate(InspectableMember *member, ApplicationContext &context) override;
+        void onUpdate(InspectableMember *member) override;
 
         SAVE_TEMPLATE(
             vsync,

@@ -8,8 +8,8 @@ namespace Metal {
         GridPushConstant pushConstant{};
 
     public:
-        explicit GridPass(ApplicationContext &context)
-            : AbstractRenderPass(context) {
+        explicit GridPass()
+            : AbstractRenderPass() {
         }
 
         void onInitialize() override;

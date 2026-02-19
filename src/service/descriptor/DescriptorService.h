@@ -11,7 +11,7 @@ namespace Metal {
 
     class DescriptorService final : public AbstractRuntimeComponent {
     public:
-        explicit DescriptorService(ApplicationContext &context);
+        explicit DescriptorService();
 
         void setImageDescriptor(const FrameBufferInstance *framebuffer, unsigned int attachmentIndex) const;
 

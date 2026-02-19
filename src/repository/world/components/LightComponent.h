@@ -20,7 +20,7 @@ namespace Metal {
 
         ComponentTypes::ComponentType getType() override;
 
-        void onUpdate(InspectableMember *member, ApplicationContext &context) override;
+        void onUpdate(InspectableMember *member) override;
 
         SERIALIZE_TEMPLATE(color.x, color.y, color.z, entityId, intensity, radiusSize, lightType)
     };

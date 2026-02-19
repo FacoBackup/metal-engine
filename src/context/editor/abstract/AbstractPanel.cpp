@@ -3,9 +3,8 @@
 
 namespace Metal {
     void AbstractPanel::appendChild(AbstractPanel *panel) {
-        panel->setContext(context);
         panel->onInitialize();
-        children.push_back(panel);
+        children.emplace_back(panel);
     }
 
     void AbstractPanel::onSyncChildren() const {
@@ -14,7 +13,7 @@ namespace Metal {
         }
     }
 
-    AbstractPanel::AbstractPanel(): id("##" + Util::uuidV4()) {
+    AbstractPanel::AbstractPanel() : id("##" + Util::uuidV4()) {
     }
 
     void AbstractPanel::removeAllChildren() {
@@ -23,12 +22,6 @@ namespace Metal {
             delete panel;
         }
         children.clear();
-    }
-
-    void AbstractPanel::setContext(ApplicationContext *context) {
-        if (this->context == nullptr) {
-            this->context = context;
-        }
     }
 
     std::vector<IPanel *> &AbstractPanel::getChildren() {

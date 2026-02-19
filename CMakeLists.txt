@@ -105,7 +105,6 @@ add_executable(
         src/repository/framebuffer/CoreFrameBuffers.cpp
         src/repository/framebuffer/CoreFrameBuffers.h
         src/repository/abstract/AbstractCoreRepository.h
-        src/repository/abstract/AbstractCoreRepository.cpp
         src/service/framebuffer/FrameBufferService.cpp
         src/service/framebuffer/FrameBufferService.h
         src/service/framebuffer/FrameBufferInstance.h
@@ -224,7 +223,7 @@ add_executable(
         src/service/voxel/impl/VoxelData.h
         src/service/mesh/SceneData.h
         src/service/mesh/EntityAssetData.h
-        src/service/material/MaterialData.h
+        src/service/material/MaterialFileData.h
         src/context/engine/render-pass/impl/PostProcessingPass.cpp
         src/context/engine/render-pass/impl/PostProcessingPass.h
         src/context/engine/compute-pass/impl/HWRayTracingPass.cpp
@@ -275,7 +274,7 @@ add_executable(
         src/service/material/MaterialInstance.h
         src/service/material/MaterialService.cpp
         src/service/material/MaterialService.h
-        src/service/material/MaterialData.cpp
+        src/service/material/MaterialFileData.cpp
         src/repository/inspection/FileInspectionRepository.cpp
         src/repository/inspection/FileInspectionRepository.h
         src/context/editor/dock-spaces/inspector/MaterialInspection.cpp
@@ -301,6 +300,7 @@ add_executable(
         src/service/volumes/VolumeService.h
         src/service/voxel/VoxelService.cpp
         src/service/voxel/VoxelService.h
+        src/service/framebuffer/FrameBufferInstance.cpp
 )
 
 

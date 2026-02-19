@@ -10,7 +10,7 @@ namespace Metal {
             return;
         char buffer[128];
         snprintf(buffer, sizeof(buffer), "[runtime] Error: VkResult = %d", err);
-        LOG_ERROR_S(buffer);
+        LOG_ERROR(buffer);
         if (err < VK_SUCCESS)
             abort();
     }
@@ -18,7 +18,7 @@ namespace Metal {
     void VulkanUtils::GLFWErrorCallback(int error, const char *description) {
         char buffer[1024];
         snprintf(buffer, sizeof(buffer), "GLFW Error %d: %s", error, description);
-        LOG_ERROR_S(buffer);
+        LOG_ERROR(buffer);
     }
 
     VkFormat VulkanUtils::GetValidDepthFormat(VkPhysicalDevice physicalDevice) {

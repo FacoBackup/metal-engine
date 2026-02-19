@@ -6,7 +6,7 @@
 
 namespace Metal {
     std::optional<EntityID> PickingService::pickEntityFromGBuffer(const uint32_t pixelX, const uint32_t pixelY) const {
-        auto *gBuffer = context.coreFrameBuffers.gBufferFBO;
+        auto *gBuffer = ApplicationContext::Get().coreFrameBuffers.gBufferFBO;
         if (!gBuffer || gBuffer->attachments.size() < 3) {
             return std::nullopt;
         }
@@ -18,11 +18,11 @@ namespace Metal {
         auto &attachment = gBuffer->attachments[2];
 
         constexpr VkDeviceSize imageSize = sizeof(float) * 4;
-        auto stagingBuffer = context.bufferService.createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+        auto stagingBuffer = ApplicationContext::Get().bufferService.createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                                                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-        VkCommandBuffer commandBuffer = context.vulkanContext.beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = ApplicationContext::Get().vulkanContext.beginSingleTimeCommands();
 
         VkImageMemoryBarrier barrier = {};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -60,14 +60,14 @@ namespace Metal {
         vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
                              0, 0, nullptr, 0, nullptr, 1, &barrier);
 
-        context.vulkanContext.endSingleTimeCommands(commandBuffer);
+        ApplicationContext::Get().vulkanContext.endSingleTimeCommands(commandBuffer);
 
         void *data = nullptr;
-        vkMapMemory(context.vulkanContext.device.device, stagingBuffer->vkDeviceMemory, 0, imageSize, 0, &data);
+        vkMapMemory(ApplicationContext::Get().vulkanContext.device.device, stagingBuffer->vkDeviceMemory, 0, imageSize, 0, &data);
         const auto *pixel = static_cast<const float *>(data);
         const float idValue = pixel[3];
-        vkUnmapMemory(context.vulkanContext.device.device, stagingBuffer->vkDeviceMemory);
-        stagingBuffer->dispose(context.vulkanContext);
+        vkUnmapMemory(ApplicationContext::Get().vulkanContext.device.device, stagingBuffer->vkDeviceMemory);
+        stagingBuffer->dispose();
 
         if (idValue <= 0.0f) {
             return std::nullopt;
@@ -75,7 +75,7 @@ namespace Metal {
 
         const unsigned int renderIndex = static_cast<unsigned int>(idValue + 0.5f) - 1;
 
-        for (const auto &pair: context.worldRepository.meshes) {
+        for (const auto &pair: ApplicationContext::Get().worldRepository.meshes) {
             const auto &mesh = pair.second;
             if (mesh.renderIndex == renderIndex) {
                 return mesh.getEntityId();

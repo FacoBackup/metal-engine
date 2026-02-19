@@ -40,7 +40,7 @@ namespace Metal {
 
         ImGui::PopStyleVar(3);
 
-        context->dockService.buildViews(windowId, this);
+        ApplicationContext::Get().dockService.buildViews(windowId, this);
 
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
         ImGui::DockSpace(windowId, CENTER, ImGuiDockNodeFlags_PassthruCentralNode);
@@ -74,20 +74,20 @@ namespace Metal {
     }
 
     void EditorPanel::onSync() {
-        context->themeService.onSync();
+        ApplicationContext::Get().themeService.onSync();
         renderDockSpaces();
         int usedIndices = 0;
-        for (int i = 0; i < context->notificationService.getNotifications().size(); i++) {
-            auto *notification = context->notificationService.getNotifications()[i];
+        for (int i = 0; i < ApplicationContext::Get().notificationService.getNotifications().size(); i++) {
+            auto *notification = ApplicationContext::Get().notificationService.getNotifications()[i];
             if (notification == nullptr) {
                 continue;
             }
             if (notification->displayTime < 0) {
-                notification->displayTime = context->engineContext.currentTimeMs;
+                notification->displayTime = ApplicationContext::Get().engineContext.currentTimeMs;
             }
-            if (context->engineContext.currentTimeMs - notification->displayTime > MESSAGE_DURATION) {
+            if (ApplicationContext::Get().engineContext.currentTimeMs - notification->displayTime > MESSAGE_DURATION) {
                 delete notification;
-                context->notificationService.getNotifications()[i] = nullptr;
+                ApplicationContext::Get().notificationService.getNotifications()[i] = nullptr;
                 continue;
             }
             ImGui::SetNextWindowPos(ImVec2(5, ImGui::GetMainViewport()->Size.y - 40 * (usedIndices + 1)));
@@ -107,7 +107,6 @@ namespace Metal {
     }
 
     void EditorPanel::onInitialize() {
-        headerPanel.setContext(context);
         headerPanel.onInitialize();
     }
 }

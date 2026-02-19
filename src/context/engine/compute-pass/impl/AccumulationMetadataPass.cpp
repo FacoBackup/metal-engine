@@ -7,20 +7,20 @@ namespace Metal {
     void AccumulationMetadataPass::onInitialize() {
         PipelineBuilder builder = PipelineBuilder::Of("AccumulationMetadata.comp")
                 .setPushConstantsSize(sizeof(DenoiserPushConstant))
-                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.currentFrameDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.previousFrameDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.previousFrameMetadataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferNormal.get());
-        pipelineInstance = context.pipelineService.createPipeline(builder);
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.currentFrameDescriptor.get())
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.previousFrameDescriptor.get())
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.previousFrameMetadataDescriptor.get())
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.gBufferPosition.get())
+                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.gBufferNormal.get());
+        pipelineInstance = ApplicationContext::Get().pipelineService.createPipeline(builder);
     }
 
     void AccumulationMetadataPass::onSync() {
-        syncWriting(context.coreTextures.currentFrame->vkImage);
-        pushConstant.diffWeight = context.engineRepository.denoiserDiffWeight;
+        syncWriting(ApplicationContext::Get().coreTextures.currentFrame->vkImage);
+        pushConstant.diffWeight = ApplicationContext::Get().engineRepository.denoiserDiffWeight;
         recordPushConstant(&pushConstant);
-        recordImageDispatch(context.coreTextures.currentFrame, 8, 8);
-        endWriting(context.coreTextures.currentFrame->vkImage);
+        recordImageDispatch(ApplicationContext::Get().coreTextures.currentFrame, 8, 8);
+        endWriting(ApplicationContext::Get().coreTextures.currentFrame->vkImage);
     }
 } // Metal

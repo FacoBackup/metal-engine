@@ -24,7 +24,7 @@ namespace Metal {
             return id;
         }
 
-        virtual void dispose(VulkanContext &context) {
+        virtual void dispose() {
             throw std::runtime_error("Not implemented");
         }
 

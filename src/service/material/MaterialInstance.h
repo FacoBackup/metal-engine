@@ -25,7 +25,7 @@ namespace Metal {
         bool useMetallicTexture{};
         bool useHeightTexture{};
 
-        void dispose(VulkanContext &context) override;
+        void dispose() override;
 
         std::vector<std::string> &getDependencies() override {
             return textures;

@@ -37,7 +37,7 @@ namespace Metal {
             layoutInfo.pPushConstantRanges = &pushConstantRange;
         }
 
-        VulkanUtils::CheckVKResult(vkCreatePipelineLayout(vulkanContext.device.device, &layoutInfo, nullptr,
+        VulkanUtils::CheckVKResult(vkCreatePipelineLayout(ApplicationContext::Get().vulkanContext.device.device, &layoutInfo, nullptr,
                                                           &pipeline->vkPipelineLayout));
     }
 
@@ -55,7 +55,7 @@ namespace Metal {
         auto *pipeline = new PipelineInstance();
         pipeline->isCompute = true;
         pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
-        VkShaderModule computeShaderModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.computeShader);
+        VkShaderModule computeShaderModule = ShaderUtil::CreateShaderModule(pipelineBuilder.computeShader);
         VkPipelineShaderStageCreateInfo computeShaderStageInfo{};
         computeShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         computeShaderStageInfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
@@ -69,7 +69,7 @@ namespace Metal {
         pipelineInfo.layout = pipeline->vkPipelineLayout;
         pipelineInfo.stage = computeShaderStageInfo;
 
-        if (vkCreateComputePipelines(vulkanContext.device.device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr,
+        if (vkCreateComputePipelines(ApplicationContext::Get().vulkanContext.device.device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr,
                                      &pipeline->vkPipeline) != VK_SUCCESS) {
             throw std::runtime_error("failed to create compute pipeline!");
         }
@@ -79,7 +79,7 @@ namespace Metal {
             pipeline->descriptorSets[i] = pipelineBuilder.descriptorSetsToBind[i]->vkDescriptorSet;
         }
 
-        vkDestroyShaderModule(vulkanContext.device.device, computeShaderModule, nullptr);
+        vkDestroyShaderModule(ApplicationContext::Get().vulkanContext.device.device, computeShaderModule, nullptr);
         return pipeline;
     }
 
@@ -88,8 +88,8 @@ namespace Metal {
 
         auto *pipeline = new PipelineInstance();
         pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
-        auto fragmentShaderModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.fragmentShader);
-        auto vertexShaderModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.vertexShader);
+        auto fragmentShaderModule = ShaderUtil::CreateShaderModule(pipelineBuilder.fragmentShader);
+        auto vertexShaderModule = ShaderUtil::CreateShaderModule(pipelineBuilder.vertexShader);
         registerResource(pipeline);
         createPipelineLayout(pipelineBuilder.descriptorSetsToBind, pipelineBuilder.pushConstantsSize, pipeline);
 
@@ -212,7 +212,7 @@ namespace Metal {
         pipelineInfo.subpass = 0;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-        VulkanUtils::CheckVKResult(vkCreateGraphicsPipelines(vulkanContext.device.device, VK_NULL_HANDLE, 1,
+        VulkanUtils::CheckVKResult(vkCreateGraphicsPipelines(ApplicationContext::Get().vulkanContext.device.device, VK_NULL_HANDLE, 1,
                                                              &pipelineInfo,
                                                              nullptr,
                                                              &pipeline->vkPipeline));
@@ -221,8 +221,8 @@ namespace Metal {
         for (int i = 0; i < pipelineBuilder.descriptorSetsToBind.size(); i++) {
             pipeline->descriptorSets[i] = pipelineBuilder.descriptorSetsToBind[i]->vkDescriptorSet;
         }
-        vkDestroyShaderModule(vulkanContext.device.device, fragmentShaderModule, nullptr);
-        vkDestroyShaderModule(vulkanContext.device.device, vertexShaderModule, nullptr);
+        vkDestroyShaderModule(ApplicationContext::Get().vulkanContext.device.device, fragmentShaderModule, nullptr);
+        vkDestroyShaderModule(ApplicationContext::Get().vulkanContext.device.device, vertexShaderModule, nullptr);
         return pipeline;
     }
 
@@ -239,9 +239,9 @@ namespace Metal {
         pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
 
         // Create shader modules
-        auto rayGenModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.rayGenShader);
-        auto missModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.missShader);
-        auto closestHitModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.closestHitShader);
+        auto rayGenModule = ShaderUtil::CreateShaderModule(pipelineBuilder.rayGenShader);
+        auto missModule = ShaderUtil::CreateShaderModule(pipelineBuilder.missShader);
+        auto closestHitModule = ShaderUtil::CreateShaderModule(pipelineBuilder.closestHitShader);
 
         // Shader stages: 0=raygen, 1=miss, 2=closesthit
         std::array<VkPipelineShaderStageCreateInfo, 3> shaderStages{};
@@ -298,12 +298,12 @@ namespace Metal {
         rtPipelineInfo.layout = pipeline->vkPipelineLayout;
 
         VulkanUtils::CheckVKResult(
-            vulkanContext.vkCreateRayTracingPipelinesKHR(
-                vulkanContext.device.device, VK_NULL_HANDLE, VK_NULL_HANDLE,
+            ApplicationContext::Get().vulkanContext.vkCreateRayTracingPipelinesKHR(
+                ApplicationContext::Get().vulkanContext.device.device, VK_NULL_HANDLE, VK_NULL_HANDLE,
                 1, &rtPipelineInfo, nullptr, &pipeline->vkPipeline));
 
         // Build Shader Binding Table
-        const auto &rtProps = vulkanContext.rayTracingPipelineProperties;
+        const auto &rtProps = ApplicationContext::Get().vulkanContext.rayTracingPipelineProperties;
         const uint32_t handleSize = rtProps.shaderGroupHandleSize;
         const uint32_t handleAlignment = rtProps.shaderGroupHandleAlignment;
         const uint32_t baseAlignment = rtProps.shaderGroupBaseAlignment;
@@ -313,14 +313,14 @@ namespace Metal {
         const uint32_t sbtSize = groupCount * handleSizeAligned;
         std::vector<uint8_t> shaderHandleStorage(sbtSize);
         VulkanUtils::CheckVKResult(
-            vulkanContext.vkGetRayTracingShaderGroupHandlesKHR(
-                vulkanContext.device.device, pipeline->vkPipeline,
+            ApplicationContext::Get().vulkanContext.vkGetRayTracingShaderGroupHandlesKHR(
+                ApplicationContext::Get().vulkanContext.device.device, pipeline->vkPipeline,
                 0, groupCount, sbtSize, shaderHandleStorage.data()));
 
         // Create SBT buffers - each needs baseAlignment
         auto createSBTBuffer = [&](uint32_t groupIndex) -> std::shared_ptr<BufferInstance> {
             const uint32_t sbtBufferSize = (handleSizeAligned + baseAlignment - 1) & ~(baseAlignment - 1);
-            auto buf = context.bufferService.createBuffer(
+            auto buf = ApplicationContext::Get().bufferService.createBuffer(
                 sbtBufferSize,
                 VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -334,7 +334,7 @@ namespace Metal {
         pipeline->hitSBT = createSBTBuffer(2);
 
         auto getAddr = [&](const std::shared_ptr<BufferInstance> &buf) {
-            return getBufferDeviceAddress(vulkanContext.device.device, buf->vkBuffer, vulkanContext.vkGetBufferDeviceAddressKHR);
+            return getBufferDeviceAddress(ApplicationContext::Get().vulkanContext.device.device, buf->vkBuffer, ApplicationContext::Get().vulkanContext.vkGetBufferDeviceAddressKHR);
         };
 
         pipeline->raygenRegion.deviceAddress = getAddr(pipeline->raygenSBT);
@@ -356,9 +356,9 @@ namespace Metal {
             pipeline->descriptorSets[i] = pipelineBuilder.descriptorSetsToBind[i]->vkDescriptorSet;
         }
 
-        vkDestroyShaderModule(vulkanContext.device.device, rayGenModule, nullptr);
-        vkDestroyShaderModule(vulkanContext.device.device, missModule, nullptr);
-        vkDestroyShaderModule(vulkanContext.device.device, closestHitModule, nullptr);
+        vkDestroyShaderModule(ApplicationContext::Get().vulkanContext.device.device, rayGenModule, nullptr);
+        vkDestroyShaderModule(ApplicationContext::Get().vulkanContext.device.device, missModule, nullptr);
+        vkDestroyShaderModule(ApplicationContext::Get().vulkanContext.device.device, closestHitModule, nullptr);
 
         return pipeline;
     }

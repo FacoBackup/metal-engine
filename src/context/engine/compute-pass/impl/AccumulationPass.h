@@ -9,8 +9,8 @@ namespace Metal {
         bool initialized = false;
 
     public:
-        explicit AccumulationPass(ApplicationContext &context)
-            : AbstractComputePass(context) {
+        explicit AccumulationPass()
+            : AbstractComputePass() {
         }
 
         void onSync() override;

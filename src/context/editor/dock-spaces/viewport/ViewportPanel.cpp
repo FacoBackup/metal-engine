@@ -19,20 +19,20 @@ namespace Metal {
     }
 
     void ViewportPanel::onSync() {
-        if (!context->engineRepository.isBaking) {
+        if (!ApplicationContext::Get().engineRepository.isBaking) {
             updateCamera();
             updateInputs();
         }
 
-        auto *framebuffer = context->coreFrameBuffers.postProcessingFBO;
-        context->descriptorService.setImageDescriptor(framebuffer, 0);
+        auto *framebuffer = ApplicationContext::Get().coreFrameBuffers.postProcessingFBO;
+        ApplicationContext::Get().descriptorService.setImageDescriptor(framebuffer, 0);
         ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet), ImVec2{size->x, size->y});
 
         const ImVec2 imageMin = ImGui::GetItemRectMin();
         const ImVec2 imageMax = ImGui::GetItemRectMax();
         handleViewportPicking(imageMin, imageMax);
 
-        if (context->editorRepository.editorMode == EditorMode::EditorMode::TRANSFORM) {
+        if (ApplicationContext::Get().editorRepository.editorMode == EditorMode::EditorMode::TRANSFORM) {
             gizmoPanel->onSync();
         }
         headerPanel->onSync();
@@ -60,7 +60,7 @@ namespace Metal {
             return;
         }
 
-        auto *gBuffer = context->coreFrameBuffers.gBufferFBO;
+        auto *gBuffer = ApplicationContext::Get().coreFrameBuffers.gBufferFBO;
         if (!gBuffer) {
             return;
         }
@@ -69,19 +69,19 @@ namespace Metal {
         const uint32_t pixelX = std::min(static_cast<uint32_t>(u * static_cast<float>(width)), width - 1);
         const uint32_t pixelY = std::min(static_cast<uint32_t>(v * static_cast<float>(height)), height - 1);
 
-        const auto picked = context->pickingService.pickEntityFromGBuffer(pixelX, pixelY);
-        context->selectionService.clearSelection();
-        context->selectionService.addSelected(picked.value_or(EMPTY_ENTITY));
+        const auto picked = ApplicationContext::Get().pickingService.pickEntityFromGBuffer(pixelX, pixelY);
+        ApplicationContext::Get().selectionService.clearSelection();
+        ApplicationContext::Get().selectionService.addSelected(picked.value_or(EMPTY_ENTITY));
     }
 
     void ViewportPanel::updateCamera() {
-        auto &worldRepository = context->worldRepository;
-        const auto &cameraService = context->cameraService;
+        auto &worldRepository = ApplicationContext::Get().worldRepository;
+        const auto &cameraService = ApplicationContext::Get().cameraService;
 
         if (ImGui::IsWindowHovered() && !ImGuizmo::IsUsing() && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
             cameraService.handleInput(isFirstMovement);
             if (const auto &io = ImGui::GetIO(); io.MouseWheel != 0) {
-                worldRepository.camera.movementSensitivity += io.MouseWheel * 100 * context->engineContext.deltaTime;
+                worldRepository.camera.movementSensitivity += io.MouseWheel * 100 * ApplicationContext::Get().engineContext.deltaTime;
                 worldRepository.camera.movementSensitivity =
                         std::max(.1f, worldRepository.camera.movementSensitivity);
             }
@@ -92,7 +92,7 @@ namespace Metal {
     }
 
     void ViewportPanel::updateInputs() const {
-        auto &repo = context->runtimeRepository;
+        auto &repo = ApplicationContext::Get().runtimeRepository;
         const ImVec2 windowSize = ImGui::GetWindowSize();
         size->x = windowSize.x;
         size->y = windowSize.y;

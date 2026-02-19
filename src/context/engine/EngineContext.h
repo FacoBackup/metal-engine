@@ -63,7 +63,7 @@ namespace Metal {
 
         void updateCurrentTime();
 
-        explicit EngineContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {
+        explicit EngineContext() : AbstractRuntimeComponent() {
         }
 
         long long currentTimeMs = 0;

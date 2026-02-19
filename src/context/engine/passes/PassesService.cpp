@@ -12,26 +12,26 @@
 #include "../render-pass/impl/tools/IconsPass.h"
 
 namespace Metal {
-    PassesService::PassesService(ApplicationContext &context) : AbstractRuntimeComponent(context) {
+    PassesService::PassesService() : AbstractRuntimeComponent() {
     }
 
     void PassesService::onInitialize() {
-        gBuffer = new CommandBufferRecorder(context.coreFrameBuffers.gBufferFBO, context);
-        compute = new CommandBufferRecorder(context);
-        postProcessing = new CommandBufferRecorder(context.coreFrameBuffers.postProcessingFBO, context);
+        gBuffer = new CommandBufferRecorder(ApplicationContext::Get().coreFrameBuffers.gBufferFBO);
+        compute = new CommandBufferRecorder();
+        postProcessing = new CommandBufferRecorder(ApplicationContext::Get().coreFrameBuffers.postProcessingFBO);
 
-        addPass(gBufferPasses, new GBufferGenPass(context));
+        addPass(gBufferPasses, new GBufferGenPass());
 
-        addPass(computePasses, new HWRayTracingPass(context));
-        addPass(computePasses, new AccumulationPass(context));
-        addPass(computePasses, new AccumulationMetadataPass(context));
+        addPass(computePasses, new HWRayTracingPass());
+        addPass(computePasses, new AccumulationPass());
+        addPass(computePasses, new AccumulationMetadataPass());
 
-        addPass(postProcessingPasses, new PostProcessingPass(context));
-        if (context.isDebugMode()) {
-            addPass(postProcessingPasses, new SelectedDotPass(context));
-            addPass(postProcessingPasses, new GridPass(context));
-            addPass(postProcessingPasses, new VoxelVisualizerPass(context));
-            addPass(postProcessingPasses, new IconsPass(context));
+        addPass(postProcessingPasses, new PostProcessingPass());
+        if (ApplicationContext::Get().isDebugMode()) {
+            addPass(postProcessingPasses, new SelectedDotPass());
+            addPass(postProcessingPasses, new GridPass());
+            addPass(postProcessingPasses, new VoxelVisualizerPass());
+            addPass(postProcessingPasses, new IconsPass());
         }
 
         for (auto *pass: allPasses) {
@@ -60,7 +60,7 @@ namespace Metal {
         postProcessingPasses.clear();
 
         for (auto &pass: allPasses) {
-            pass->getPipeline()->dispose(context.vulkanContext);
+            pass->getPipeline()->dispose();
             delete pass;
         }
         allPasses.clear();

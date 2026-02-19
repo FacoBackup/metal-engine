@@ -14,7 +14,7 @@ namespace Metal {
 
     class AbstractRenderPass : public AbstractPass {
     public:
-        explicit AbstractRenderPass(ApplicationContext &context);
+        explicit AbstractRenderPass();
 
         void recordDrawSimpleInstanced(unsigned int vertexCount, unsigned int instanceCount) const;
 

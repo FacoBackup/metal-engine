@@ -5,7 +5,7 @@
 
 namespace Metal {
     void PaintingSettingsPanel::onSync() {
-        auto &editorRepository = context->editorRepository;
+        auto &editorRepository = ApplicationContext::Get().editorRepository;
         auto addLabel = Icons::add + "Add";
         if (UIUtil::RenderOption(addLabel, editorRepository.brushModeAdd,
                                  ImGui::CalcTextSize(addLabel.c_str()).x + 8,

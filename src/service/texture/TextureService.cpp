@@ -16,7 +16,7 @@
 namespace Metal {
     void TextureService::copyBufferToImage(const VkBuffer &vkBuffer, const TextureInstance *image,
                                            const int layerCount) const {
-        VkCommandBuffer commandBuffer = context.vulkanContext.beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = ApplicationContext::Get().ApplicationContext::Get().vulkanContext.beginSingleTimeCommands();
 
         VkBufferImageCopy region{};
         region.bufferOffset = 0;
@@ -38,31 +38,31 @@ namespace Metal {
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             1,
             &region);
-        context.vulkanContext.endSingleTimeCommands(commandBuffer);
+        ApplicationContext::Get().ApplicationContext::Get().vulkanContext.endSingleTimeCommands(commandBuffer);
     }
 
     void TextureService::createImageWithInfo(const VkImageCreateInfo &imageInfo,
                                              VkMemoryPropertyFlagBits vkMemoryProperties,
                                              TextureInstance *image) const {
-        if (vkCreateImage(context.vulkanContext.device.device, &imageInfo, nullptr, &image->vkImage) != VK_SUCCESS) {
+        if (vkCreateImage(ApplicationContext::Get().ApplicationContext::Get().vulkanContext.device.device, &imageInfo, nullptr, &image->vkImage) != VK_SUCCESS) {
             throw std::runtime_error("failed to create image!");
         }
 
         VkMemoryRequirements memRequirements;
-        vkGetImageMemoryRequirements(context.vulkanContext.device.device, image->vkImage, &memRequirements);
+        vkGetImageMemoryRequirements(ApplicationContext::Get().ApplicationContext::Get().vulkanContext.device.device, image->vkImage, &memRequirements);
 
         VkMemoryAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         allocInfo.allocationSize = memRequirements.size;
-        allocInfo.memoryTypeIndex = context.bufferService.findMemoryType(
+        allocInfo.memoryTypeIndex = ApplicationContext::Get().bufferService.findMemoryType(
             memRequirements.memoryTypeBits, vkMemoryProperties);
 
-        if (vkAllocateMemory(context.vulkanContext.device.device, &allocInfo, nullptr, &image->vkImageMemory) !=
+        if (vkAllocateMemory(ApplicationContext::Get().ApplicationContext::Get().vulkanContext.device.device, &allocInfo, nullptr, &image->vkImageMemory) !=
             VK_SUCCESS) {
             throw std::runtime_error("failed to allocate image memory!");
         }
 
-        if (vkBindImageMemory(context.vulkanContext.device.device, image->vkImage, image->vkImageMemory, 0) !=
+        if (vkBindImageMemory(ApplicationContext::Get().ApplicationContext::Get().vulkanContext.device.device, image->vkImage, image->vkImageMemory, 0) !=
             VK_SUCCESS) {
             throw std::runtime_error("failed to bind image memory!");
         }
@@ -85,7 +85,7 @@ namespace Metal {
         samplerInfo.anisotropyEnable = VK_TRUE;
         samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 
-        vkCreateSampler(vulkanContext.device.device, &samplerInfo, nullptr, &image->vkSampler);
+        vkCreateSampler(ApplicationContext::Get().vulkanContext.device.device, &samplerInfo, nullptr, &image->vkSampler);
     }
 
     void TextureService::createImageView(VkFormat imageFormat, TextureInstance *image) const {
@@ -103,7 +103,7 @@ namespace Metal {
         imageViewInfo.subresourceRange.levelCount = image->mipLevels;
         imageViewInfo.image = image->vkImage;
 
-        vkCreateImageView(context.vulkanContext.device.device, &imageViewInfo, nullptr, &image->vkImageView);
+        vkCreateImageView(ApplicationContext::Get().ApplicationContext::Get().vulkanContext.device.device, &imageViewInfo, nullptr, &image->vkImageView);
     }
 
     void TextureService::createImage(VkFormat imageFormat, TextureInstance *image, const int width,
@@ -126,7 +126,7 @@ namespace Metal {
     }
 
     TextureData *TextureService::stream(const std::string &id, const LevelOfDetail &lod) const {
-        auto pathToFile = context.getAssetDirectory() + FORMAT_FILE_TEXTURE(id, lod);
+        auto pathToFile = ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_TEXTURE(id, lod);
         if (std::filesystem::exists(pathToFile)) {
             int width, height, channels;
             unsigned char *data = stbi_load(pathToFile.c_str(), &width, &height, &channels, 0);
@@ -152,9 +152,9 @@ namespace Metal {
                                ? static_cast<unsigned int>(std::floor(std::log2(std::max(image->width, image->height)))) + 1
                                : 1;
         image->vkFormat = imageFormat;
-        LOG_INFO(context, "Loading texture " + id + " from " + pathToImage);
-        LOG_INFO(context, "Texture data: Width " + std::to_string(image->width) + " Height " + std::to_string(image->height));
-        const std::shared_ptr<BufferInstance> stagingBuffer = context.bufferService.createBuffer(
+        LOG_INFO("Loading texture " + id + " from " + pathToImage);
+        LOG_INFO("Texture data: Width " + std::to_string(image->width) + " Height " + std::to_string(image->height));
+        const std::shared_ptr<BufferInstance> stagingBuffer = ApplicationContext::Get().bufferService.createBuffer(
             image->width * image->height * 4, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
         stagingBuffer->update(data);
@@ -174,7 +174,7 @@ namespace Metal {
 
     void TextureService::transitionImageLayout(const TextureInstance *image, VkImageLayout oldLayout,
                                                VkImageLayout newLayout) const {
-        VkCommandBuffer commandBuffer = context.vulkanContext.beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = ApplicationContext::Get().ApplicationContext::Get().vulkanContext.beginSingleTimeCommands();
         VkImageMemoryBarrier barrier{};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier.oldLayout = oldLayout;
@@ -225,19 +225,19 @@ namespace Metal {
             0, nullptr,
             1, &barrier);
 
-        context.vulkanContext.endSingleTimeCommands(commandBuffer);
+        ApplicationContext::Get().ApplicationContext::Get().vulkanContext.endSingleTimeCommands(commandBuffer);
     }
 
     void TextureService::generateMipmaps(const TextureInstance *image) const {
         VkFormatProperties formatProperties;
-        vkGetPhysicalDeviceFormatProperties(context.vulkanContext.physDevice.physical_device, image->vkFormat,
+        vkGetPhysicalDeviceFormatProperties(ApplicationContext::Get().ApplicationContext::Get().vulkanContext.physDevice.physical_device, image->vkFormat,
                                             &formatProperties);
 
         if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT)) {
             throw std::runtime_error("texture image format does not support linear blitting!");
         }
 
-        VkCommandBuffer commandBuffer = context.vulkanContext.beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = ApplicationContext::Get().ApplicationContext::Get().vulkanContext.beginSingleTimeCommands();
 
         VkImageMemoryBarrier barrier{};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -300,11 +300,11 @@ namespace Metal {
         vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0,
                              nullptr, 0, nullptr, 1, &barrier);
 
-        context.vulkanContext.endSingleTimeCommands(commandBuffer);
+        ApplicationContext::Get().ApplicationContext::Get().vulkanContext.endSingleTimeCommands(commandBuffer);
     }
 
     TextureInstance *TextureService::create(const std::string &id, const LevelOfDetail &lod) {
-        auto pathToFile = context.getAssetDirectory() + FORMAT_FILE_TEXTURE(id, lod);
+        auto pathToFile = ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_TEXTURE(id, lod);
         if (std::filesystem::exists(pathToFile)) {
             return loadTexture(id + lod.suffix, pathToFile, true, VK_FORMAT_R8G8B8A8_UNORM);
         }

@@ -9,15 +9,15 @@
 namespace Metal {
 
     SVOInstance* VoxelService::create(const std::string &id) {
-        // if (std::string fileName = context.getAssetDirectory() + FORMAT_FILE_SVO(id);
+        // if (std::string fileName = ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_SVO(id);
         //   std::filesystem::exists(fileName)) {
-        //     LOG_INFO(context, "Streaming SVO " + fileName);
+        //     LOG_INFO("Streaming SVO " + fileName);
         //     auto data = SparseVoxelOctreeData();
         //     PARSE_TEMPLATE(data.load, fileName)
         //
         //     auto *instance = new SVOInstance(id);
         //     registerResource(instance);
-        //     instance->voxelsBuffer = context.bufferService.createBuffer(
+        //     instance->voxelsBuffer = ApplicationContext::Get().bufferService.createBuffer(
         //         data.data.size() * sizeof(unsigned int),
         //         VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
         //         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |

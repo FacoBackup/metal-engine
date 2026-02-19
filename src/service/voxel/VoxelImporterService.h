@@ -12,8 +12,8 @@ namespace Metal {
     public:
         std::vector<std::string> getSupportedTypes() override;
 
-        explicit VoxelImporterService(ApplicationContext &context)
-            : AbstractImporter(context) {
+        explicit VoxelImporterService()
+            : AbstractImporter() {
         }
 
         void convertToSVO(const std::string &sourcePath, const std::string &outPath,

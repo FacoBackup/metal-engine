@@ -12,7 +12,7 @@ namespace Metal {
     }
 
     void ConsolePanel::onSync() {
-        LogService& logService = context->logService;
+        LogService& logService = ApplicationContext::Get().logService;
 
         // Header
         if (ImGui::Button("Clear")) {

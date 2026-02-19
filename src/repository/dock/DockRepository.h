@@ -16,7 +16,7 @@ namespace Metal {
         DockSpacePanel *dockPanelToRemove = nullptr;
         bool isInitialized = false;
 
-        explicit DockRepository(ApplicationContext &context);
+        explicit DockRepository();
     };
 } // Metal
 

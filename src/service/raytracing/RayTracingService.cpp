@@ -18,7 +18,7 @@ namespace Metal {
 
 
     void RayTracingService::onSync() {
-        if (!context.vulkanContext.rayTracingSupported) {
+        if (!ApplicationContext::Get().vulkanContext.rayTracingSupported) {
             return;
         }
         if (!needsRebuild) {
@@ -27,9 +27,9 @@ namespace Metal {
 
         // Collect all mesh entities that have loaded mesh instances
         bool hasMeshes = false;
-        for (auto &[entityId, meshComp]: context.worldRepository.meshes) {
+        for (auto &[entityId, meshComp]: ApplicationContext::Get().worldRepository.meshes) {
             if (meshComp.meshId.empty()) continue;
-            auto *instance = context.streamingRepository.streamMesh(meshComp.meshId, LevelOfDetail::LOD_0);
+            auto *instance = ApplicationContext::Get().streamingRepository.streamMesh(meshComp.meshId, LevelOfDetail::LOD_0);
             if (instance != nullptr && instance->dataBuffer != nullptr && instance->indexBuffer != nullptr) {
                 hasMeshes = true;
                 break;
@@ -46,19 +46,19 @@ namespace Metal {
 
         // Create/update TLAS descriptor
         if (tlas != VK_NULL_HANDLE) {
-            if (context.coreDescriptorSets.tlasDescriptor == nullptr) {
-                context.coreDescriptorSets.tlasDescriptor = std::make_unique<DescriptorInstance>();
-                context.coreDescriptorSets.tlasDescriptor->addLayoutBinding(
+            if (ApplicationContext::Get().coreDescriptorSets.tlasDescriptor == nullptr) {
+                ApplicationContext::Get().coreDescriptorSets.tlasDescriptor = std::make_unique<DescriptorInstance>();
+                ApplicationContext::Get().coreDescriptorSets.tlasDescriptor->addLayoutBinding(
                     DescriptorBinding::OfAccelerationStructure(
                         VK_SHADER_STAGE_RAYGEN_BIT_KHR, 0, tlas));
-                context.coreDescriptorSets.tlasDescriptor->create(context.vulkanContext);
+                ApplicationContext::Get().coreDescriptorSets.tlasDescriptor->create();
             } else {
                 // Update existing descriptor
                 std::vector<DescriptorBinding> bindings;
                 bindings.push_back(
                     DescriptorBinding::OfAccelerationStructure(
                         VK_SHADER_STAGE_RAYGEN_BIT_KHR, 0, tlas));
-                DescriptorInstance::Write(context.vulkanContext, context.coreDescriptorSets.tlasDescriptor->vkDescriptorSet, bindings);
+                DescriptorInstance::Write(ApplicationContext::Get().coreDescriptorSets.tlasDescriptor->vkDescriptorSet, bindings);
             }
             accelerationStructureBuilt = true;
             needsRebuild = false;
@@ -66,7 +66,7 @@ namespace Metal {
     }
 
     void RayTracingService::buildBLAS() {
-        auto &vulkan = context.vulkanContext;
+        auto &vulkan = ApplicationContext::Get().vulkanContext;
 
         // Gather all geometry from all mesh entities into a single BLAS
         // We combine all triangles into one BLAS with multiple geometries
@@ -74,9 +74,9 @@ namespace Metal {
         std::vector<VkAccelerationStructureBuildRangeInfoKHR> buildRangeInfos;
         std::vector<uint32_t> maxPrimitiveCounts;
 
-        for (auto &[entityId, meshComp]: context.worldRepository.meshes) {
+        for (auto &[entityId, meshComp]: ApplicationContext::Get().worldRepository.meshes) {
             if (meshComp.meshId.empty()) continue;
-            auto *instance = context.streamingRepository.streamMesh(meshComp.meshId, LevelOfDetail::LOD_0);
+            auto *instance = ApplicationContext::Get().streamingRepository.streamMesh(meshComp.meshId, LevelOfDetail::LOD_0);
             if (instance == nullptr || instance->dataBuffer == nullptr || instance->indexBuffer == nullptr) {
                 continue;
             }
@@ -131,7 +131,7 @@ namespace Metal {
             &sizeInfo);
 
         // Create BLAS buffer
-        blasBuffer = context.bufferService.createBuffer(
+        blasBuffer = ApplicationContext::Get().bufferService.createBuffer(
             sizeInfo.accelerationStructureSize,
             VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -147,7 +147,7 @@ namespace Metal {
             vulkan.vkCreateAccelerationStructureKHR(vulkan.device.device, &createInfo, nullptr, &blas));
 
         // Create scratch buffer
-        blasScratchBuffer = context.bufferService.createBuffer(
+        blasScratchBuffer = ApplicationContext::Get().bufferService.createBuffer(
             sizeInfo.buildScratchSize,
             VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -164,7 +164,7 @@ namespace Metal {
     }
 
     void RayTracingService::buildTLAS() {
-        auto &vulkan = context.vulkanContext;
+        auto &vulkan = ApplicationContext::Get().vulkanContext;
 
         if (blas == VK_NULL_HANDLE) return;
 
@@ -176,15 +176,15 @@ namespace Metal {
 
         // Create one TLAS instance per mesh entity with its transform
         std::vector<VkAccelerationStructureInstanceKHR> instances;
-        for (auto &[entityId, meshComp]: context.worldRepository.meshes) {
+        for (auto &[entityId, meshComp]: ApplicationContext::Get().worldRepository.meshes) {
             if (meshComp.meshId.empty()) continue;
-            auto *meshInstance = context.streamingRepository.streamMesh(meshComp.meshId, LevelOfDetail::LOD_0);
+            auto *meshInstance = ApplicationContext::Get().streamingRepository.streamMesh(meshComp.meshId, LevelOfDetail::LOD_0);
             if (meshInstance == nullptr || meshInstance->dataBuffer == nullptr) continue;
 
             // Get transform
             glm::mat4 model = glm::mat4(1.0f);
-            if (context.worldRepository.transforms.contains(entityId)) {
-                model = context.worldRepository.transforms[entityId].model;
+            if (ApplicationContext::Get().worldRepository.transforms.contains(entityId)) {
+                model = ApplicationContext::Get().worldRepository.transforms[entityId].model;
             }
 
             // Convert glm::mat4 to VkTransformMatrixKHR (3x4 row-major)
@@ -209,7 +209,7 @@ namespace Metal {
         if (instances.empty()) return;
 
         // Upload instances
-        instancesBuffer = context.bufferService.createBuffer(
+        instancesBuffer = ApplicationContext::Get().bufferService.createBuffer(
             sizeof(VkAccelerationStructureInstanceKHR) * instances.size(),
             VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
             instances.data(),
@@ -244,7 +244,7 @@ namespace Metal {
             &instanceCount,
             &sizeInfo);
 
-        tlasBuffer = context.bufferService.createBuffer(
+        tlasBuffer = ApplicationContext::Get().bufferService.createBuffer(
             sizeInfo.accelerationStructureSize,
             VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -258,7 +258,7 @@ namespace Metal {
         VulkanUtils::CheckVKResult(
             vulkan.vkCreateAccelerationStructureKHR(vulkan.device.device, &createInfo, nullptr, &tlas));
 
-        tlasScratchBuffer = context.bufferService.createBuffer(
+        tlasScratchBuffer = ApplicationContext::Get().bufferService.createBuffer(
             sizeInfo.buildScratchSize,
             VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -277,7 +277,7 @@ namespace Metal {
     }
 
     void RayTracingService::destroyAccelerationStructures() {
-        auto &vulkan = context.vulkanContext;
+        auto &vulkan = ApplicationContext::Get().vulkanContext;
 
         if (tlas != VK_NULL_HANDLE) {
             vulkan.vkDestroyAccelerationStructureKHR(vulkan.device.device, tlas, nullptr);

@@ -6,10 +6,10 @@
 #include "../framebuffer/FrameBufferInstance.h"
 
 namespace Metal {
-    void PipelineInstance::dispose(VulkanContext &context) {
-        LOG_INFO_S("Disposing of pipeline instance");
+    void PipelineInstance::dispose() {
+        LOG_INFO("Disposing of pipeline instance");
 
-        vkDestroyPipelineLayout(context.device.device, vkPipelineLayout, nullptr);
-        vkDestroyPipeline(context.device.device, vkPipeline, nullptr);
+        vkDestroyPipelineLayout(ApplicationContext::Get().vulkanContext.device.device, vkPipelineLayout, nullptr);
+        vkDestroyPipeline(ApplicationContext::Get().vulkanContext.device.device, vkPipeline, nullptr);
     }
 }

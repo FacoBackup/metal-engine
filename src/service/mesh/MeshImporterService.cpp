@@ -19,7 +19,7 @@ namespace Metal {
             metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.'));
         }
         DUMP_TEMPLATE(targetDir + '/' + metadata.getId() + FILE_METADATA, metadata)
-        DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_MESH(metadata.getId(), LevelOfDetail::LOD_0), mesh)
+        DUMP_TEMPLATE(ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_MESH(metadata.getId(), LevelOfDetail::LOD_0), mesh)
         simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_1);
         simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_2);
         simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_3);
@@ -30,7 +30,7 @@ namespace Metal {
                                                 std::unordered_map<unsigned int, std::string> &meshMap,
                                                 std::unordered_map<std::string, unsigned int> &meshMaterialMap,
                                                 const std::stop_token &stopToken) const {
-        LOG_INFO(context, "Processing meshes for scene...");
+        LOG_INFO("Processing meshes for scene...");
         for (unsigned int i = 0; i < scene->mNumMeshes; ++i) {
             if (stopToken.stop_requested()) return;
             aiMesh *assimpMesh = scene->mMeshes[i];
@@ -71,7 +71,7 @@ namespace Metal {
             std::string id = persistMesh(targetDir, meshData);
             meshMap.insert({i, id});
             meshMaterialMap.insert({id, assimpMesh->mMaterialIndex});
-            LOG_INFO(context, "Persisted mesh: " + meshData.name + " (" + id + ")");
+            LOG_INFO("Persisted mesh: " + meshData.name + " (" + id + ")");
         }
     }
 
@@ -104,6 +104,6 @@ namespace Metal {
         simplifiedMesh.data = mesh.data;
         simplifiedMesh.indices = std::move(simplifiedIndices);
 
-        DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_MESH(fileId, levelOfDetail), simplifiedMesh)
+        DUMP_TEMPLATE(ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_MESH(fileId, levelOfDetail), simplifiedMesh)
     }
 }

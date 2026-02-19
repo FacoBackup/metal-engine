@@ -67,8 +67,8 @@ namespace Metal {
     }
 
     void DockSpacePanel::renderHeader() {
-        DockRepository &dockRepository = context->dockRepository;
-        DockService &dockService = context->dockService;
+        DockRepository &dockRepository = ApplicationContext::Get().dockRepository;
+        DockService &dockService = ApplicationContext::Get().dockService;
 
         headerPadding.x = ImGui::GetStyle().FramePadding.x;
 

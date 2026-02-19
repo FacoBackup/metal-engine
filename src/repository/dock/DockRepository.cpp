@@ -1,7 +1,7 @@
 #include "DockRepository.h"
 
 namespace Metal {
-    DockRepository::DockRepository(ApplicationContext &context) : AbstractRuntimeComponent(context) {
+    DockRepository::DockRepository() : AbstractRuntimeComponent() {
         auto *rightUp = new DockDTO{&DockSpace::HIERARCHY};
         auto *rightDown = new DockDTO{&DockSpace::INSPECTOR};
         // auto *downLeft = new DockDTO{&DockSpace::CONSOLE};

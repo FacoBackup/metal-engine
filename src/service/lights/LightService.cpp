@@ -4,11 +4,11 @@
 
 namespace Metal {
     void LightService::registerLights() {
-        for (auto &entry: context.worldRepository.lights) {
-            if (context.worldRepository.hiddenEntities.contains(entry.first)) {
+        for (auto &entry: ApplicationContext::Get().worldRepository.lights) {
+            if (ApplicationContext::Get().worldRepository.hiddenEntities.contains(entry.first)) {
                 continue;
             }
-            auto &t = context.worldRepository.transforms.at(entry.first);
+            auto &t = ApplicationContext::Get().worldRepository.transforms.at(entry.first);
             auto &translation = t.translation;
             auto &l = entry.second;
 
@@ -26,12 +26,12 @@ namespace Metal {
     }
 
     void LightService::registerSun() {
-        if (context.engineRepository.atmosphereEnabled) {
+        if (ApplicationContext::Get().engineRepository.atmosphereEnabled) {
             items.push_back(LightData(
-                glm::vec4(sunColor, context.engineRepository.sunLightIntensity),
+                glm::vec4(sunColor, ApplicationContext::Get().engineRepository.sunLightIntensity),
                 sunPosition,
                 glm::vec3(0),
-                glm::vec3(context.engineRepository.sunRadius),
+                glm::vec3(ApplicationContext::Get().engineRepository.sunRadius),
                 LightVolumeTypes::SPHERE
             ));
         }
@@ -44,20 +44,20 @@ namespace Metal {
         registerLights();
 
         if (!items.empty()) {
-            context.coreBuffers.lightBuffer->update(items.data());
+            ApplicationContext::Get().coreBuffers.lightBuffer->update(items.data());
         }
     }
 
 
     void LightService::computeSunInfo() {
         sunPosition = glm::vec3(0,
-                                std::cos(context.engineRepository.elapsedTime),
-                                std::sin(context.engineRepository.elapsedTime)) * context.engineRepository
+                                std::cos(ApplicationContext::Get().engineRepository.elapsedTime),
+                                std::sin(ApplicationContext::Get().engineRepository.elapsedTime)) * ApplicationContext::Get().engineRepository
                       .sunDistance;
         sunColor = LightService::CalculateSunColor(
-            sunPosition.y / context.engineRepository.sunDistance,
-            context.engineRepository.nightColor, context.engineRepository.dawnColor,
-            context.engineRepository.middayColor);
+            sunPosition.y / ApplicationContext::Get().engineRepository.sunDistance,
+            ApplicationContext::Get().engineRepository.nightColor, ApplicationContext::Get().engineRepository.dawnColor,
+            ApplicationContext::Get().engineRepository.middayColor);
     }
 
     glm::vec3 LightService::CalculateSunColor(const float elevation, glm::vec3 &nightColor, glm::vec3 &dawnColor,

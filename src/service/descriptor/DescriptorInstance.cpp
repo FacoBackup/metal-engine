@@ -9,12 +9,12 @@
 #include "../../util/VulkanUtils.h"
 
 namespace Metal {
-    void DescriptorInstance::dispose(const VulkanContext &context) const {
-        LOG_INFO_S("Disposing of descriptor instance");
-        vkDestroyDescriptorSetLayout(context.device.device, vkDescriptorSetLayout, nullptr);
+    void DescriptorInstance::dispose() const {
+        LOG_INFO("Disposing of descriptor instance");
+        vkDestroyDescriptorSetLayout(ApplicationContext::Get().vulkanContext.device.device, vkDescriptorSetLayout, nullptr);
     }
 
-    void DescriptorInstance::Write(const VulkanContext &context, const VkDescriptorSet &vkDescriptorSet,
+    void DescriptorInstance::Write(const VkDescriptorSet &vkDescriptorSet,
                                    std::vector<DescriptorBinding> &bindings) {
         std::vector<VkWriteDescriptorSet> writeDescriptorSets;
         // These vectors will hold the Vk*Info objects so their memory remains valid.
@@ -81,7 +81,7 @@ namespace Metal {
             }
         }
 
-        vkUpdateDescriptorSets(context.device.device,
+        vkUpdateDescriptorSets(ApplicationContext::Get().vulkanContext.device.device,
                                static_cast<unsigned int>(writeDescriptorSets.size()),
                                writeDescriptorSets.data(),
                                0,
@@ -89,7 +89,7 @@ namespace Metal {
         bindings.clear();
     }
 
-    void DescriptorInstance::create(const VulkanContext &context) {
+    void DescriptorInstance::create() {
         if (bindings.empty()) {
             throw std::runtime_error("No descriptor layout sets were created");
         }
@@ -111,20 +111,20 @@ namespace Metal {
         layoutInfo.pBindings = descriptorSetLayoutBindings.data();
         layoutInfo.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT_EXT;
 
-        VulkanUtils::CheckVKResult(vkCreateDescriptorSetLayout(context.device.device, &layoutInfo,
+        VulkanUtils::CheckVKResult(vkCreateDescriptorSetLayout(ApplicationContext::Get().vulkanContext.device.device, &layoutInfo,
                                                                nullptr,
                                                                &vkDescriptorSetLayout));
 
         VkDescriptorSetAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        allocInfo.descriptorPool = context.descriptorPool; // Created during setup
+        allocInfo.descriptorPool = ApplicationContext::Get().vulkanContext.descriptorPool; // Created during setup
         allocInfo.descriptorSetCount = 1;
         allocInfo.pSetLayouts = &vkDescriptorSetLayout;
 
-        VulkanUtils::CheckVKResult(vkAllocateDescriptorSets(context.device.device, &allocInfo, &vkDescriptorSet));
+        VulkanUtils::CheckVKResult(vkAllocateDescriptorSets(ApplicationContext::Get().vulkanContext.device.device, &allocInfo, &vkDescriptorSet));
 
         // WRITE
-        Write(context, vkDescriptorSet, bindings);
+        Write(vkDescriptorSet, bindings);
     }
 
     void DescriptorInstance::addLayoutBinding(DescriptorBinding binding) {

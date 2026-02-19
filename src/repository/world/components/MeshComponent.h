@@ -21,7 +21,7 @@ namespace Metal {
 
         void registerFields() override;
 
-        void onUpdate(InspectableMember *member, ApplicationContext &context) override;
+        void onUpdate(InspectableMember *member) override;
 
         ComponentTypes::ComponentType getType() override;
 

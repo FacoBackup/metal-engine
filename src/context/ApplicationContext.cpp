@@ -8,8 +8,22 @@
 #include "../util/VulkanUtils.h"
 
 #include "../util/FileDialogUtil.h"
+#include <iostream>
 
 namespace Metal {
+    std::unique_ptr<ApplicationContext> ApplicationContext::CONTEXT = nullptr;
+
+    ApplicationContext &ApplicationContext::Get() {
+        if (CONTEXT == nullptr) {
+            throw std::runtime_error("Context not initialized");
+        }
+        return *CONTEXT;
+    }
+
+    void ApplicationContext::Init(bool debugMode) {
+        CONTEXT = std::make_unique<ApplicationContext>(debugMode);
+    }
+
     void ApplicationContext::updateRootPath(bool forceSelection) {
         std::string cachedPath;
         std::string cachePathFile = std::filesystem::current_path().string() + CACHED_PATH;
