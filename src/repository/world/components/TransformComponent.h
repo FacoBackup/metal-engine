@@ -15,6 +15,7 @@ namespace Metal {
         glm::vec3 rotationEuler = {0, 0, 0};
         glm::quat rotation = {0, 0, 0, 1};
         glm::vec3 scale{1, 1, 1};
+        glm::vec3 gizmoCenter{0, 0, 0};
         bool forceTransform = false;
         bool isStatic = true;
 
@@ -33,6 +34,7 @@ namespace Metal {
             rotation.x, rotation.y, rotation.z, rotation.w,
             rotationEuler.x, rotationEuler.y, rotationEuler.z,
             scale.x, scale.y, scale.z,
+            gizmoCenter.x, gizmoCenter.y, gizmoCenter.z,
             entityId
         )
     };

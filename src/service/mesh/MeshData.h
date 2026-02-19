@@ -11,15 +11,18 @@ namespace Metal {
         std::string name;
         std::vector<VertexData> data;
         std::vector<unsigned int> indices;
+        glm::vec3 gizmoCenter{};
 
         explicit MeshData(std::string name = "", const std::vector<VertexData> &data = {},
-                          const std::vector<unsigned int> &indices = {})
+                          const std::vector<unsigned int> &indices = {},
+                          const glm::vec3 &gizmoCenter = {})
             : name(std::move(name)),
               data(data),
-              indices(indices) {
+              indices(indices),
+              gizmoCenter(gizmoCenter) {
         }
 
-        SAVE_TEMPLATE(name, indices, data)
+        SAVE_TEMPLATE(name, indices, data, gizmoCenter.x, gizmoCenter.y, gizmoCenter.z)
     };
 } // Metal
 

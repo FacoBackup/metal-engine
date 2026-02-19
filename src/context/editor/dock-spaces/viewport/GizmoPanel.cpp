@@ -29,6 +29,11 @@ namespace Metal {
 
         if (editorRepository->primitiveSelected != localSelected || localSelected->getChangeId() != localChangeId) {
             cacheMatrixMat4 = glm::mat4(editorRepository->primitiveSelected->model);
+            
+            if (editorRepository->primitiveSelected != nullptr) {
+                cacheMatrixMat4 = glm::translate(cacheMatrixMat4, editorRepository->primitiveSelected->gizmoCenter);
+            }
+
             cacheMatrix = glm::value_ptr(cacheMatrixMat4);
             localSelected = editorRepository->primitiveSelected;
             localChangeId = localSelected->getChangeId();
@@ -77,6 +82,12 @@ namespace Metal {
 
     void GizmoPanel::decomposeMatrix() {
         glm::mat4 auxMat4 = glm::make_mat4(cacheMatrix);
+
+        // Remove gizmo offset using the selected TransformComponent
+        if (localSelected != nullptr) {
+            auxMat4 = glm::translate(auxMat4, -localSelected->gizmoCenter);
+        }
+
         glm::vec3 skew;
         glm::vec4 perspective;
 

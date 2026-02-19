@@ -13,6 +13,7 @@
 #include "../../context/ApplicationContext.h"
 #include "../../enum/LevelOfDetail.h"
 #include "../../repository/world/components/MeshComponent.h"
+#include "../../repository/world/components/TransformComponent.h"
 
 namespace Metal {
     MeshInstance *MeshService::create(const std::string &id, const LevelOfDetail &levelOfDetail) {
@@ -61,7 +62,16 @@ namespace Metal {
     EntityID MeshService::createMeshEntity(const std::string &name, const std::string &meshId) const {
         const auto id = ApplicationContext::Get().worldRepository.createEntity();
         ApplicationContext::Get().worldRepository.createComponent(id, ComponentTypes::ComponentType::MESH);
-        ApplicationContext::Get().worldRepository.meshes[id].meshId = meshId;
+        auto &mesh = ApplicationContext::Get().worldRepository.meshes[id];
+        mesh.meshId = meshId;
+
+        MeshData *data = stream(meshId, LevelOfDetail::LOD_0);
+        if (data != nullptr) {
+            auto &transform = ApplicationContext::Get().worldRepository.transforms[id];
+            transform.gizmoCenter = data->gizmoCenter;
+            delete data;
+        }
+
         ApplicationContext::Get().worldRepository.getEntity(id)->name = name;
         return id;
     }

@@ -34,7 +34,8 @@ namespace Metal {
         for (unsigned int i = 0; i < scene->mNumMeshes; ++i) {
             if (stopToken.stop_requested()) return;
             aiMesh *assimpMesh = scene->mMeshes[i];
-            MeshData meshData{assimpMesh->mName.data, {}, {}};
+            MeshData meshData{assimpMesh->mName.data, {}, {}, {}};
+            glm::vec3 center(0.0f);
             for (unsigned int j = 0; j < assimpMesh->mNumVertices; ++j) {
                 VertexData vertexData{};
                 vertexData.vertex = glm::vec3(
@@ -42,6 +43,7 @@ namespace Metal {
                     assimpMesh->mVertices[j].y,
                     assimpMesh->mVertices[j].z
                 );
+                center += vertexData.vertex;
                 if (assimpMesh->HasNormals()) {
                     vertexData.normal = glm::vec3(
                         assimpMesh->mNormals[j].x,
@@ -61,6 +63,9 @@ namespace Metal {
                 }
 
                 meshData.data.push_back(vertexData);
+            }
+            if (assimpMesh->mNumVertices > 0) {
+                meshData.gizmoCenter = center / static_cast<float>(assimpMesh->mNumVertices);
             }
             for (unsigned int j = 0; j < assimpMesh->mNumFaces; ++j) {
                 aiFace face = assimpMesh->mFaces[j];

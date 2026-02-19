@@ -1,5 +1,4 @@
 #include "MeshComponent.h"
-#include "../../../common/interface/Icons.h"
 #include "../../../context/ApplicationContext.h"
 #include "../../../enum/EntryType.h"
 
