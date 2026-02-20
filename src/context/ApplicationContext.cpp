@@ -13,7 +13,7 @@
 namespace Metal {
     std::unique_ptr<ApplicationContext> ApplicationContext::CONTEXT = nullptr;
 
-    ApplicationContext &ApplicationContext::Get() {
+    ApplicationContext &CTX {
         if (CONTEXT == nullptr) {
             throw std::runtime_error("Context not initialized");
         }

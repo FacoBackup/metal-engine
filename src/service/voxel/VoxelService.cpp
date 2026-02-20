@@ -9,7 +9,7 @@
 namespace Metal {
 
     SVOInstance* VoxelService::create(const std::string &id) {
-        // if (std::string fileName = ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_SVO(id);
+        // if (std::string fileName = CTX.getAssetDirectory() + FORMAT_FILE_SVO(id);
         //   std::filesystem::exists(fileName)) {
         //     LOG_INFO("Streaming SVO " + fileName);
         //     auto data = SparseVoxelOctreeData();
@@ -17,7 +17,7 @@ namespace Metal {
         //
         //     auto *instance = new SVOInstance(id);
         //     registerResource(instance);
-        //     instance->voxelsBuffer = ApplicationContext::Get().bufferService.createBuffer(
+        //     instance->voxelsBuffer = CTX.bufferService.createBuffer(
         //         data.data.size() * sizeof(unsigned int),
         //         VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
         //         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |

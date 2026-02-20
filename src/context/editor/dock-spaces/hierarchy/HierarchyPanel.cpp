@@ -10,19 +10,19 @@
 namespace Metal {
     void HierarchyPanel::onInitialize() {
         appendChild(headerPanel = new HierarchyHeaderPanel());
-        world = &ApplicationContext::Get().worldRepository;
-        editorRepository = &ApplicationContext::Get().editorRepository;
+        world = &CTX.worldRepository;
+        editorRepository = &CTX.editorRepository;
     }
 
     void HierarchyPanel::contextMenu() const {
         if (ImGui::BeginPopupContextItem((id + "contextMenu").c_str())) {
             if (ImGui::MenuItem("Delete")) {
                 std::vector<EntityID> entities;
-                for (auto &entry: ApplicationContext::Get().editorRepository.selected) {
+                for (auto &entry: CTX.editorRepository.selected) {
                     entities.push_back(entry.first);
                 }
-                ApplicationContext::Get().worldRepository.deleteEntities(entities);
-                ApplicationContext::Get().selectionService.clearSelection();
+                CTX.worldRepository.deleteEntities(entities);
+                CTX.selectionService.clearSelection();
             }
             ImGui::EndPopup();
         }
@@ -48,7 +48,7 @@ namespace Metal {
             renderNode(WorldRepository::ROOT_ID);
             ImGui::EndTable();
         }
-        if (!ApplicationContext::Get().editorRepository.selected.empty()) {
+        if (!CTX.editorRepository.selected.empty()) {
             contextMenu();
         }
     }
@@ -187,7 +187,7 @@ namespace Metal {
         if (UIUtil::ButtonSimple(
             (isVisible ? Icons::visibility : Icons::visibility_off) + (isPinned ? "##vpinned" : "##v") + idString +
             id, 20, 15)) {
-            ApplicationContext::Get().worldRepository.changeVisibility(node->getId(), !isVisible);
+            CTX.worldRepository.changeVisibility(node->getId(), !isVisible);
         }
         ImGui::PopStyleColor();
         ImGui::PopStyleVar(2);
@@ -196,9 +196,9 @@ namespace Metal {
     void HierarchyPanel::handleClick(const Entity *node) const {
         if (ImGui::IsItemClicked()) {
             if (const bool isMultiSelect = ImGui::IsKeyDown(ImGuiKey_LeftCtrl); !isMultiSelect) {
-                ApplicationContext::Get().selectionService.clearSelection();
+                CTX.selectionService.clearSelection();
             }
-            ApplicationContext::Get().selectionService.addSelected(node->getId());
+            CTX.selectionService.addSelected(node->getId());
         }
     }
 

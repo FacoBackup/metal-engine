@@ -4,12 +4,12 @@
 
 namespace Metal {
     void VolumeService::registerVolumes() {
-        for (auto &entry: ApplicationContext::Get().worldRepository.volumes) {
-            if (ApplicationContext::Get().worldRepository.hiddenEntities.contains(entry.first)) {
+        for (auto &entry: CTX.worldRepository.volumes) {
+            if (CTX.worldRepository.hiddenEntities.contains(entry.first)) {
                 continue;
             }
 
-            auto &t = ApplicationContext::Get().worldRepository.transforms.at(entry.first);
+            auto &t = CTX.worldRepository.transforms.at(entry.first);
             auto &translation = t.translation;
             auto &l = entry.second;
 
@@ -28,7 +28,7 @@ namespace Metal {
         registerVolumes();
 
         if (!items.empty()) {
-            ApplicationContext::Get().coreBuffers.volumesBuffer->update(items.data());
+            CTX.coreBuffers.volumesBuffer->update(items.data());
         }
     }
 } // Metal

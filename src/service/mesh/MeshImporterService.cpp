@@ -19,7 +19,7 @@ namespace Metal {
             metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.'));
         }
         DUMP_TEMPLATE(targetDir + '/' + metadata.getId() + FILE_METADATA, metadata)
-        DUMP_TEMPLATE(ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_MESH(metadata.getId(), LevelOfDetail::LOD_0), mesh)
+        DUMP_TEMPLATE(CTX.getAssetDirectory() + FORMAT_FILE_MESH(metadata.getId(), LevelOfDetail::LOD_0), mesh)
         simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_1);
         simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_2);
         simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_3);
@@ -109,6 +109,6 @@ namespace Metal {
         simplifiedMesh.data = mesh.data;
         simplifiedMesh.indices = std::move(simplifiedIndices);
 
-        DUMP_TEMPLATE(ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_MESH(fileId, levelOfDetail), simplifiedMesh)
+        DUMP_TEMPLATE(CTX.getAssetDirectory() + FORMAT_FILE_MESH(fileId, levelOfDetail), simplifiedMesh)
     }
 }

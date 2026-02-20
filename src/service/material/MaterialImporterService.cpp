@@ -32,7 +32,7 @@ namespace Metal {
                     try {
                         const unsigned int embeddedIndex = static_cast<unsigned int>(std::stoul(p.substr(1)));
                         if (scene && embeddedIndex < scene->mNumTextures) {
-                            return ApplicationContext::Get().textureImporter.importEmbeddedTexture(
+                            return CTX.textureImporter.importEmbeddedTexture(
                                 targetDir, scene->mTextures[embeddedIndex], nameHint);
                         }
                     } catch (...) {
@@ -47,7 +47,7 @@ namespace Metal {
                 }
                 resolved = resolved.lexically_normal();
                 try {
-                    return ApplicationContext::Get().textureImporter.importData(targetDir, resolved.string(), stopToken);
+                    return CTX.textureImporter.importData(targetDir, resolved.string(), stopToken);
                 } catch (std::exception &e) {
                     return "";
                 }
@@ -94,7 +94,7 @@ namespace Metal {
             }
             materialMap.insert({i, materialId});
 
-            DUMP_TEMPLATE(ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_MATERIAL(materialId), materialData)
+            DUMP_TEMPLATE(CTX.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialId), materialData)
             LOG_INFO("Persisted material: " + materialId);
         }
     }

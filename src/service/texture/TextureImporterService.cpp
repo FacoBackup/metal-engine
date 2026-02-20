@@ -125,7 +125,7 @@ namespace Metal {
             }
         }
 
-        if (!stbi_write_png((ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_TEXTURE(fileId, levelOfDetail)).c_str(),
+        if (!stbi_write_png((CTX.getAssetDirectory() + FORMAT_FILE_TEXTURE(fileId, levelOfDetail)).c_str(),
                             newWidth, newHeight, textureData.channels, resizedData,
                             newWidth * textureData.channels)) {
             delete[] resizedData;

@@ -11,7 +11,7 @@
 namespace Metal {
     void DescriptorInstance::dispose() const {
         LOG_INFO("Disposing of descriptor instance");
-        vkDestroyDescriptorSetLayout(ApplicationContext::Get().vulkanContext.device.device, vkDescriptorSetLayout, nullptr);
+        vkDestroyDescriptorSetLayout(CTX.vulkanContext.device.device, vkDescriptorSetLayout, nullptr);
     }
 
     void DescriptorInstance::Write(const VkDescriptorSet &vkDescriptorSet,
@@ -81,7 +81,7 @@ namespace Metal {
             }
         }
 
-        vkUpdateDescriptorSets(ApplicationContext::Get().vulkanContext.device.device,
+        vkUpdateDescriptorSets(CTX.vulkanContext.device.device,
                                static_cast<unsigned int>(writeDescriptorSets.size()),
                                writeDescriptorSets.data(),
                                0,
@@ -111,17 +111,17 @@ namespace Metal {
         layoutInfo.pBindings = descriptorSetLayoutBindings.data();
         layoutInfo.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT_EXT;
 
-        VulkanUtils::CheckVKResult(vkCreateDescriptorSetLayout(ApplicationContext::Get().vulkanContext.device.device, &layoutInfo,
+        VulkanUtils::CheckVKResult(vkCreateDescriptorSetLayout(CTX.vulkanContext.device.device, &layoutInfo,
                                                                nullptr,
                                                                &vkDescriptorSetLayout));
 
         VkDescriptorSetAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        allocInfo.descriptorPool = ApplicationContext::Get().vulkanContext.descriptorPool; // Created during setup
+        allocInfo.descriptorPool = CTX.vulkanContext.descriptorPool; // Created during setup
         allocInfo.descriptorSetCount = 1;
         allocInfo.pSetLayouts = &vkDescriptorSetLayout;
 
-        VulkanUtils::CheckVKResult(vkAllocateDescriptorSets(ApplicationContext::Get().vulkanContext.device.device, &allocInfo, &vkDescriptorSet));
+        VulkanUtils::CheckVKResult(vkAllocateDescriptorSets(CTX.vulkanContext.device.device, &allocInfo, &vkDescriptorSet));
 
         // WRITE
         Write(vkDescriptorSet, bindings);

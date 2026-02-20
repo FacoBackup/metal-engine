@@ -78,7 +78,7 @@ namespace Metal {
         shaderCreateInfo.codeSize = shaderModule->SPIRV.size() * sizeof(unsigned int);
         shaderCreateInfo.pCode = static_cast<const unsigned int *>(shaderModule->SPIRV.data());
 
-        VulkanUtils::CheckVKResult(vkCreateShaderModule(ApplicationContext::Get().vulkanContext.device.device, &shaderCreateInfo,
+        VulkanUtils::CheckVKResult(vkCreateShaderModule(CTX.vulkanContext.device.device, &shaderCreateInfo,
                                                         nullptr,
                                                         &shaderModule->vkShaderModule));
         glslang_program_delete(program);
@@ -161,9 +161,9 @@ namespace Metal {
     }
 
     VkShaderModule ShaderUtil::CreateShaderModule(const std::string &pFilename) {
-        const std::string basePath = ApplicationContext::Get().getShadersDirectory();
+        const std::string basePath = CTX.getShadersDirectory();
         std::string source = ProcessShader(BASE_PATH + pFilename);
-        if (ApplicationContext::Get().isDebugMode()) {
+        if (CTX.isDebugMode()) {
             source = "#define DEBUG\n" + source;
         }
         for (auto &entry: LightVolumeTypes::getEntries()) {
@@ -197,7 +197,7 @@ namespace Metal {
                     shaderCreateInfo.codeSize = shader.SPIRV.size() * sizeof(unsigned int);
                     shaderCreateInfo.pCode = static_cast<const unsigned int *>(shader.SPIRV.data());
 
-                    if (vkCreateShaderModule(ApplicationContext::Get().vulkanContext.device.device, &shaderCreateInfo,
+                    if (vkCreateShaderModule(CTX.vulkanContext.device.device, &shaderCreateInfo,
                                              nullptr, &shader.vkShaderModule) == VK_SUCCESS) {
                         needsCompilation = false;
                         LOG_INFO("Loaded cached shader: " + shaderName);

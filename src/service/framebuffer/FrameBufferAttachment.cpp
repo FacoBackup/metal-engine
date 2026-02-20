@@ -5,9 +5,9 @@
 
 namespace Metal {
     void FrameBufferAttachment::dispose() const {
-        vkDestroyImage(ApplicationContext::Get().vulkanContext.device.device, vkImage, nullptr);
-        vkDestroyImageView(ApplicationContext::Get().vulkanContext.device.device, vkImageView, nullptr);
-        vkFreeMemory(ApplicationContext::Get().vulkanContext.device.device, vkImageMemory, nullptr);
+        vkDestroyImage(CTX.vulkanContext.device.device, vkImage, nullptr);
+        vkDestroyImageView(CTX.vulkanContext.device.device, vkImageView, nullptr);
+        vkFreeMemory(CTX.vulkanContext.device.device, vkImageMemory, nullptr);
 
         if (imageDescriptor != nullptr) {
             imageDescriptor->dispose();

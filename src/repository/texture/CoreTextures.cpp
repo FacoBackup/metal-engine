@@ -8,16 +8,16 @@
 namespace Metal {
     void CoreTextures::onInitialize() {
 
-        giSurfaceCache = ApplicationContext::Get().textureService.createForCompute(SURFACE_CACHE_RES, SURFACE_CACHE_RES);
+        giSurfaceCache = CTX.textureService.createForCompute(SURFACE_CACHE_RES, SURFACE_CACHE_RES);
         giSurfaceCache->setAsNoDisposal();
 
-        previousFrame = ApplicationContext::Get().textureService.createForCompute(ApplicationContext::Get().vulkanContext.getWindowWidth() / ApplicationContext::Get().engineRepository.shadingResInvScale, ApplicationContext::Get().vulkanContext.getWindowHeight() / ApplicationContext::Get().engineRepository.shadingResInvScale);
+        previousFrame = CTX.textureService.createForCompute(CTX.vulkanContext.getWindowWidth() / CTX.engineRepository.shadingResInvScale, CTX.vulkanContext.getWindowHeight() / CTX.engineRepository.shadingResInvScale);
         previousFrame->setAsNoDisposal();
 
-        previousFrameMetadata = ApplicationContext::Get().textureService.createForCompute(ApplicationContext::Get().vulkanContext.getWindowWidth() / ApplicationContext::Get().engineRepository.shadingResInvScale, ApplicationContext::Get().vulkanContext.getWindowHeight() / ApplicationContext::Get().engineRepository.shadingResInvScale);
+        previousFrameMetadata = CTX.textureService.createForCompute(CTX.vulkanContext.getWindowWidth() / CTX.engineRepository.shadingResInvScale, CTX.vulkanContext.getWindowHeight() / CTX.engineRepository.shadingResInvScale);
         previousFrameMetadata->setAsNoDisposal();
 
-        currentFrame = ApplicationContext::Get().textureService.createForCompute(ApplicationContext::Get().vulkanContext.getWindowWidth() / ApplicationContext::Get().engineRepository.shadingResInvScale, ApplicationContext::Get().vulkanContext.getWindowHeight() / ApplicationContext::Get().engineRepository.shadingResInvScale);
+        currentFrame = CTX.textureService.createForCompute(CTX.vulkanContext.getWindowWidth() / CTX.engineRepository.shadingResInvScale, CTX.vulkanContext.getWindowHeight() / CTX.engineRepository.shadingResInvScale);
         currentFrame->setAsNoDisposal();
 
     }

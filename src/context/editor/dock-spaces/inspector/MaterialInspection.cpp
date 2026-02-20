@@ -15,19 +15,19 @@ namespace Metal {
     }
 
     void MaterialInspection::saveChanges() {
-        DUMP_TEMPLATE(ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_MATERIAL(prevSelection), *data)
-        ApplicationContext::Get().notificationService.pushMessage("Material was saved", NotificationSeverities::SUCCESS);
-        if (ApplicationContext::Get().materialService.getResources().contains(prevSelection)) {
-            ApplicationContext::Get().materialService.getResources().at(prevSelection)->dispose();
-            ApplicationContext::Get().materialService.getResources().erase(prevSelection);
+        DUMP_TEMPLATE(CTX.getAssetDirectory() + FORMAT_FILE_MATERIAL(prevSelection), *data)
+        CTX.notificationService.pushMessage("Material was saved", NotificationSeverities::SUCCESS);
+        if (CTX.materialService.getResources().contains(prevSelection)) {
+            CTX.materialService.getResources().at(prevSelection)->dispose();
+            CTX.materialService.getResources().erase(prevSelection);
         }
     }
 
     void MaterialInspection::onSync() {
-        if (prevSelection != ApplicationContext::Get().fileInspection.materialId) {
+        if (prevSelection != CTX.fileInspection.materialId) {
             delete data;
-            data = ApplicationContext::Get().materialService.stream(ApplicationContext::Get().fileInspection.materialId);
-            prevSelection = ApplicationContext::Get().fileInspection.materialId;
+            data = CTX.materialService.stream(CTX.fileInspection.materialId);
+            prevSelection = CTX.fileInspection.materialId;
         }
         if (prevSelection.empty()) {
             return;

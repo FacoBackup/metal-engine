@@ -10,8 +10,8 @@ namespace Metal {
     void BufferInstance::dispose() const {
         LOG_INFO("Disposing of buffer instance");
 
-        vkDestroyBuffer(ApplicationContext::Get().vulkanContext.device.device, vkBuffer, nullptr);
-        vkFreeMemory(ApplicationContext::Get().vulkanContext.device.device, vkDeviceMemory, nullptr);
+        vkDestroyBuffer(CTX.vulkanContext.device.device, vkBuffer, nullptr);
+        vkFreeMemory(CTX.vulkanContext.device.device, vkDeviceMemory, nullptr);
     }
 
     void BufferInstance::update(void *newData) const {

@@ -6,26 +6,26 @@
 namespace Metal {
     void GridPass::onInitialize() {
         PipelineBuilder gridPipelineBuilder = PipelineBuilder::Of(
-                    ApplicationContext::Get().coreFrameBuffers.postProcessingFBO,
+                    CTX.coreFrameBuffers.postProcessingFBO,
                     "QUAD.vert",
                     "tools/Grid.frag"
                 )
                 .setBlendEnabled()
                 .setPushConstantsSize(sizeof(GridPushConstant))
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.gBufferPosition.get());
-        pipelineInstance = ApplicationContext::Get().pipelineService.createPipeline(gridPipelineBuilder);
+                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.gBufferPosition.get());
+        pipelineInstance = CTX.pipelineService.createPipeline(gridPipelineBuilder);
     }
 
     bool GridPass::shouldRun() {
-        return ApplicationContext::Get().isDebugMode() && ApplicationContext::Get().editorRepository.showGrid;
+        return CTX.isDebugMode() && CTX.editorRepository.showGrid;
     }
 
     void GridPass::onSync() {
-        pushConstant.scale = ApplicationContext::Get().editorRepository.gridScale;
-        pushConstant.overlayObjects = ApplicationContext::Get().editorRepository.gridOverlayObjects;
-        pushConstant.threshold = ApplicationContext::Get().editorRepository.gridThreshold;
-        pushConstant.thickness = ApplicationContext::Get().editorRepository.gridThickness;
+        pushConstant.scale = CTX.editorRepository.gridScale;
+        pushConstant.overlayObjects = CTX.editorRepository.gridOverlayObjects;
+        pushConstant.threshold = CTX.editorRepository.gridThreshold;
+        pushConstant.thickness = CTX.editorRepository.gridThickness;
         recordPushConstant(&pushConstant);
         recordDrawSimpleInstanced(3, 1);
     }

@@ -12,8 +12,8 @@ namespace Metal {
     }
 
     void TransformService::traverse(const EntityID entityId, bool parentHasChanged) {
-        TransformComponent *st = ApplicationContext::Get().worldRepository.transforms.contains(entityId)
-                                     ? &ApplicationContext::Get().worldRepository.transforms.at(entityId)
+        TransformComponent *st = CTX.worldRepository.transforms.contains(entityId)
+                                     ? &CTX.worldRepository.transforms.at(entityId)
                                      : nullptr;
         if (st != nullptr && (st->isNotFrozen() || parentHasChanged)) {
             TransformComponent *parentTransform = findParent(st->getEntityId());
@@ -22,7 +22,7 @@ namespace Metal {
             parentHasChanged = true;
         }
 
-        for (auto child: ApplicationContext::Get().worldRepository.getEntity(entityId)->children) {
+        for (auto child: CTX.worldRepository.getEntity(entityId)->children) {
             traverse(child, parentHasChanged);
         }
     }
@@ -38,7 +38,7 @@ namespace Metal {
             return;
         }
         translation = glm::vec3(st->model[3]);
-        auto *previousTile = ApplicationContext::Get().worldGridRepository.getOrCreateTile(translation);
+        auto *previousTile = CTX.worldGridRepository.getOrCreateTile(translation);
 
         auxMat42 = glm::identity<glm::mat4>();
         auxMat42 = glm::translate(auxMat42, st->translation); // Translation
@@ -49,16 +49,16 @@ namespace Metal {
         st->freezeVersion();
 
         translation = glm::vec3(st->model[3]);
-        auto *newTile = ApplicationContext::Get().worldGridRepository.getOrCreateTile(translation);
+        auto *newTile = CTX.worldGridRepository.getOrCreateTile(translation);
 
-        ApplicationContext::Get().worldGridRepository.moveBetweenTiles(st->getEntityId(), previousTile, newTile);
+        CTX.worldGridRepository.moveBetweenTiles(st->getEntityId(), previousTile, newTile);
     }
 
     TransformComponent *TransformService::findParent(EntityID id) const {
         while (id != EMPTY_ENTITY && id != WorldRepository::ROOT_ID) {
-            id = ApplicationContext::Get().worldRepository.getEntity(id)->parent;
-            TransformComponent *t = ApplicationContext::Get().worldRepository.transforms.contains(id)
-                          ? &ApplicationContext::Get().worldRepository.transforms.at(id)
+            id = CTX.worldRepository.getEntity(id)->parent;
+            TransformComponent *t = CTX.worldRepository.transforms.contains(id)
+                          ? &CTX.worldRepository.transforms.at(id)
                           : nullptr;
             if (t != nullptr) {
                 return t;
@@ -68,7 +68,7 @@ namespace Metal {
     }
 
     float TransformService::getDistanceFromCamera(glm::vec3 &translation) {
-        distanceAux = ApplicationContext::Get().worldRepository.camera.position;
+        distanceAux = CTX.worldRepository.camera.position;
         return glm::length(distanceAux - translation);
     }
 } // Metal

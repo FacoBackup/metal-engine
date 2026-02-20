@@ -48,7 +48,7 @@ namespace Metal {
             throw std::runtime_error("Import cancelled");
         }
 
-        ApplicationContext::Get().meshImporterService.persistAllMeshes(targetDir, scene, meshMap, meshMaterialMap, stopToken);
+        CTX.meshImporterService.persistAllMeshes(targetDir, scene, meshMap, meshMaterialMap, stopToken);
 
         if (stopToken.stop_requested()) {
             throw std::runtime_error("Import cancelled");
@@ -58,7 +58,7 @@ namespace Metal {
         fs::path absolutePath = fs::absolute(pathToFile);
         fs::path directoryPath = absolutePath.parent_path();
 
-        ApplicationContext::Get().materialImporterService.persistAllMaterials(targetDir, scene, materialsMap, directoryPath.string(),
+        CTX.materialImporterService.persistAllMaterials(targetDir, scene, materialsMap, directoryPath.string(),
                                                             stopToken);
 
         if (stopToken.stop_requested()) {
@@ -72,7 +72,7 @@ namespace Metal {
             throw std::runtime_error("Import cancelled");
         }
 
-        DUMP_TEMPLATE(ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_SCENE(sceneMetadata.getId()), sceneData)
+        DUMP_TEMPLATE(CTX.getAssetDirectory() + FORMAT_FILE_SCENE(sceneMetadata.getId()), sceneData)
 
         return sceneMetadata.getId();
     }

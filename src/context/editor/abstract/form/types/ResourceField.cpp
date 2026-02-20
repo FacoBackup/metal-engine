@@ -72,7 +72,7 @@ namespace Metal {
 
     void ResourceField::onSync() {
         if (field.field->size() > 0 && (entry == nullptr || entry->getId() != *field.field)) {
-            entry = ApplicationContext::Get().filesService.getResource(*field.field);
+            entry = CTX.filesService.getResource(*field.field);
         }
         if (!field.disabled) {
             renderButton();

@@ -16,7 +16,7 @@
 namespace Metal {
     void TextureService::copyBufferToImage(const VkBuffer &vkBuffer, const TextureInstance *image,
                                            const int layerCount) const {
-        VkCommandBuffer commandBuffer = ApplicationContext::Get().ApplicationContext::Get().vulkanContext.beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = CTX.CTX.vulkanContext.beginSingleTimeCommands();
 
         VkBufferImageCopy region{};
         region.bufferOffset = 0;
@@ -38,31 +38,31 @@ namespace Metal {
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             1,
             &region);
-        ApplicationContext::Get().ApplicationContext::Get().vulkanContext.endSingleTimeCommands(commandBuffer);
+        CTX.CTX.vulkanContext.endSingleTimeCommands(commandBuffer);
     }
 
     void TextureService::createImageWithInfo(const VkImageCreateInfo &imageInfo,
                                              VkMemoryPropertyFlagBits vkMemoryProperties,
                                              TextureInstance *image) const {
-        if (vkCreateImage(ApplicationContext::Get().ApplicationContext::Get().vulkanContext.device.device, &imageInfo, nullptr, &image->vkImage) != VK_SUCCESS) {
+        if (vkCreateImage(CTX.CTX.vulkanContext.device.device, &imageInfo, nullptr, &image->vkImage) != VK_SUCCESS) {
             throw std::runtime_error("failed to create image!");
         }
 
         VkMemoryRequirements memRequirements;
-        vkGetImageMemoryRequirements(ApplicationContext::Get().ApplicationContext::Get().vulkanContext.device.device, image->vkImage, &memRequirements);
+        vkGetImageMemoryRequirements(CTX.CTX.vulkanContext.device.device, image->vkImage, &memRequirements);
 
         VkMemoryAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         allocInfo.allocationSize = memRequirements.size;
-        allocInfo.memoryTypeIndex = ApplicationContext::Get().bufferService.findMemoryType(
+        allocInfo.memoryTypeIndex = CTX.bufferService.findMemoryType(
             memRequirements.memoryTypeBits, vkMemoryProperties);
 
-        if (vkAllocateMemory(ApplicationContext::Get().ApplicationContext::Get().vulkanContext.device.device, &allocInfo, nullptr, &image->vkImageMemory) !=
+        if (vkAllocateMemory(CTX.CTX.vulkanContext.device.device, &allocInfo, nullptr, &image->vkImageMemory) !=
             VK_SUCCESS) {
             throw std::runtime_error("failed to allocate image memory!");
         }
 
-        if (vkBindImageMemory(ApplicationContext::Get().ApplicationContext::Get().vulkanContext.device.device, image->vkImage, image->vkImageMemory, 0) !=
+        if (vkBindImageMemory(CTX.CTX.vulkanContext.device.device, image->vkImage, image->vkImageMemory, 0) !=
             VK_SUCCESS) {
             throw std::runtime_error("failed to bind image memory!");
         }
@@ -85,7 +85,7 @@ namespace Metal {
         samplerInfo.anisotropyEnable = VK_TRUE;
         samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 
-        vkCreateSampler(ApplicationContext::Get().vulkanContext.device.device, &samplerInfo, nullptr, &image->vkSampler);
+        vkCreateSampler(CTX.vulkanContext.device.device, &samplerInfo, nullptr, &image->vkSampler);
     }
 
     void TextureService::createImageView(VkFormat imageFormat, TextureInstance *image) const {
@@ -103,7 +103,7 @@ namespace Metal {
         imageViewInfo.subresourceRange.levelCount = image->mipLevels;
         imageViewInfo.image = image->vkImage;
 
-        vkCreateImageView(ApplicationContext::Get().ApplicationContext::Get().vulkanContext.device.device, &imageViewInfo, nullptr, &image->vkImageView);
+        vkCreateImageView(CTX.CTX.vulkanContext.device.device, &imageViewInfo, nullptr, &image->vkImageView);
     }
 
     void TextureService::createImage(VkFormat imageFormat, TextureInstance *image, const int width,
@@ -126,7 +126,7 @@ namespace Metal {
     }
 
     TextureData *TextureService::stream(const std::string &id, const LevelOfDetail &lod) const {
-        auto pathToFile = ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_TEXTURE(id, lod);
+        auto pathToFile = CTX.getAssetDirectory() + FORMAT_FILE_TEXTURE(id, lod);
         if (std::filesystem::exists(pathToFile)) {
             int width, height, channels;
             unsigned char *data = stbi_load(pathToFile.c_str(), &width, &height, &channels, 0);
@@ -154,7 +154,7 @@ namespace Metal {
         image->vkFormat = imageFormat;
         LOG_INFO("Loading texture " + id + " from " + pathToImage);
         LOG_INFO("Texture data: Width " + std::to_string(image->width) + " Height " + std::to_string(image->height));
-        const std::shared_ptr<BufferInstance> stagingBuffer = ApplicationContext::Get().bufferService.createBuffer(
+        const std::shared_ptr<BufferInstance> stagingBuffer = CTX.bufferService.createBuffer(
             image->width * image->height * 4, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
         stagingBuffer->update(data);
@@ -174,7 +174,7 @@ namespace Metal {
 
     void TextureService::transitionImageLayout(const TextureInstance *image, VkImageLayout oldLayout,
                                                VkImageLayout newLayout) const {
-        VkCommandBuffer commandBuffer = ApplicationContext::Get().ApplicationContext::Get().vulkanContext.beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = CTX.CTX.vulkanContext.beginSingleTimeCommands();
         VkImageMemoryBarrier barrier{};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier.oldLayout = oldLayout;
@@ -225,19 +225,19 @@ namespace Metal {
             0, nullptr,
             1, &barrier);
 
-        ApplicationContext::Get().ApplicationContext::Get().vulkanContext.endSingleTimeCommands(commandBuffer);
+        CTX.CTX.vulkanContext.endSingleTimeCommands(commandBuffer);
     }
 
     void TextureService::generateMipmaps(const TextureInstance *image) const {
         VkFormatProperties formatProperties;
-        vkGetPhysicalDeviceFormatProperties(ApplicationContext::Get().ApplicationContext::Get().vulkanContext.physDevice.physical_device, image->vkFormat,
+        vkGetPhysicalDeviceFormatProperties(CTX.CTX.vulkanContext.physDevice.physical_device, image->vkFormat,
                                             &formatProperties);
 
         if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT)) {
             throw std::runtime_error("texture image format does not support linear blitting!");
         }
 
-        VkCommandBuffer commandBuffer = ApplicationContext::Get().ApplicationContext::Get().vulkanContext.beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = CTX.CTX.vulkanContext.beginSingleTimeCommands();
 
         VkImageMemoryBarrier barrier{};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -300,11 +300,11 @@ namespace Metal {
         vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0,
                              nullptr, 0, nullptr, 1, &barrier);
 
-        ApplicationContext::Get().ApplicationContext::Get().vulkanContext.endSingleTimeCommands(commandBuffer);
+        CTX.CTX.vulkanContext.endSingleTimeCommands(commandBuffer);
     }
 
     TextureInstance *TextureService::create(const std::string &id, const LevelOfDetail &lod) {
-        auto pathToFile = ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_TEXTURE(id, lod);
+        auto pathToFile = CTX.getAssetDirectory() + FORMAT_FILE_TEXTURE(id, lod);
         if (std::filesystem::exists(pathToFile)) {
             return loadTexture(id + lod.suffix, pathToFile, true, VK_FORMAT_R8G8B8A8_UNORM);
         }

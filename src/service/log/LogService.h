@@ -42,11 +42,11 @@ namespace Metal {
 
 }
 
-#define LOG_TRACE(msg) ApplicationContext::Get().logService.log(Metal::LogLevel::Trace, msg)
-#define LOG_DEBUG(msg) ApplicationContext::Get().logService.log(Metal::LogLevel::Debug, msg)
-#define LOG_INFO(msg)  ApplicationContext::Get().logService.log(Metal::LogLevel::Info, msg)
-#define LOG_WARN(msg)  ApplicationContext::Get().logService.log(Metal::LogLevel::Warn, msg)
-#define LOG_ERROR(msg) ApplicationContext::Get().logService.log(Metal::LogLevel::Error, msg)
-#define LOG_FATAL(msg) ApplicationContext::Get().logService.log(Metal::LogLevel::Fatal, msg)
+#define LOG_TRACE(msg) CTX.logService.log(Metal::LogLevel::Trace, msg)
+#define LOG_DEBUG(msg) CTX.logService.log(Metal::LogLevel::Debug, msg)
+#define LOG_INFO(msg)  CTX.logService.log(Metal::LogLevel::Info, msg)
+#define LOG_WARN(msg)  CTX.logService.log(Metal::LogLevel::Warn, msg)
+#define LOG_ERROR(msg) CTX.logService.log(Metal::LogLevel::Error, msg)
+#define LOG_FATAL(msg) CTX.logService.log(Metal::LogLevel::Fatal, msg)
 
 #endif

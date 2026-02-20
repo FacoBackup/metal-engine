@@ -41,7 +41,7 @@ namespace Metal {
 
         ImGui::PopStyleVar(3);
 
-        ApplicationContext::Get().dockService.buildViews(windowId, this);
+        CTX.dockService.buildViews(windowId, this);
 
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
         ImGui::DockSpace(windowId, CENTER, ImGuiDockNodeFlags_PassthruCentralNode);
@@ -75,20 +75,20 @@ namespace Metal {
     }
 
     void EditorPanel::onSync() {
-        ApplicationContext::Get().themeService.onSync();
+        CTX.themeService.onSync();
         renderDockSpaces();
         int usedIndices = 0;
-        for (int i = 0; i < ApplicationContext::Get().notificationService.getNotifications().size(); i++) {
-            auto *notification = ApplicationContext::Get().notificationService.getNotifications()[i];
+        for (int i = 0; i < CTX.notificationService.getNotifications().size(); i++) {
+            auto *notification = CTX.notificationService.getNotifications()[i];
             if (notification == nullptr) {
                 continue;
             }
             if (notification->displayTime < 0) {
-                notification->displayTime = ApplicationContext::Get().engineContext.currentTimeMs;
+                notification->displayTime = CTX.engineContext.currentTimeMs;
             }
-            if (ApplicationContext::Get().engineContext.currentTimeMs - notification->displayTime > MESSAGE_DURATION) {
+            if (CTX.engineContext.currentTimeMs - notification->displayTime > MESSAGE_DURATION) {
                 delete notification;
-                ApplicationContext::Get().notificationService.getNotifications()[i] = nullptr;
+                CTX.notificationService.getNotifications()[i] = nullptr;
                 continue;
             }
             ImGui::SetNextWindowPos(ImVec2(5, ImGui::GetMainViewport()->Size.y - 40 * (usedIndices + 1)));

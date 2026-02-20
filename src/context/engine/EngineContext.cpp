@@ -12,21 +12,21 @@
 
 namespace Metal {
     void EngineContext::resetPathTracerAccumulationCount() const {
-        ApplicationContext::Get().engineRepository.pathTracerAccumulationCount = 0;
+        CTX.engineRepository.pathTracerAccumulationCount = 0;
     }
 
     void EngineContext::onInitialize() {
-        ApplicationContext::Get().worldGridService.onSync();
-        ApplicationContext::Get().passesService.onInitialize();
+        CTX.worldGridService.onSync();
+        CTX.passesService.onInitialize();
     }
 
     void EngineContext::updateVoxelData() {
-        if (ApplicationContext::Get().worldGridRepository.hasMainTileChanged) {
+        if (CTX.worldGridRepository.hasMainTileChanged) {
             unsigned int i = 0;
             std::vector<DescriptorBinding> bindings{};
-            for (auto *tile: ApplicationContext::Get().worldGridRepository.getLoadedTiles()) {
+            for (auto *tile: CTX.worldGridRepository.getLoadedTiles()) {
                 if (tile != nullptr) {
-                    const auto *svo = ApplicationContext::Get().streamingRepository.streamSVO(tile->id);
+                    const auto *svo = CTX.streamingRepository.streamSVO(tile->id);
                     if (svo != nullptr) {
                         auto &b = bindings.emplace_back();
 
@@ -47,11 +47,11 @@ namespace Metal {
             }
 
             if (i > 0) {
-                DescriptorInstance::Write(ApplicationContext::Get().coreDescriptorSets.svoData->vkDescriptorSet,
+                DescriptorInstance::Write(CTX.coreDescriptorSets.svoData->vkDescriptorSet,
                                           bindings);
-                ApplicationContext::Get().coreBuffers.tileInfo->update(tileInfoUBO.tileCenterValid.data());
+                CTX.coreBuffers.tileInfo->update(tileInfoUBO.tileCenterValid.data());
             }
-            ApplicationContext::Get().worldGridRepository.hasMainTileChanged = false;
+            CTX.worldGridRepository.hasMainTileChanged = false;
         }
     }
 
@@ -72,34 +72,34 @@ namespace Metal {
     void EngineContext::onSync() {
         updateCurrentTime();
 
-        ApplicationContext::Get().transformService.onSync();
-        ApplicationContext::Get().worldGridService.onSync();
-        ApplicationContext::Get().streamingRepository.onSync();
-        ApplicationContext::Get().cameraService.onSync();
+        CTX.transformService.onSync();
+        CTX.worldGridService.onSync();
+        CTX.streamingRepository.onSync();
+        CTX.cameraService.onSync();
 
 
         updateVoxelData();
         if (updateLights) {
-            ApplicationContext::Get().lightService.onSync();
+            CTX.lightService.onSync();
         }
 
         if (updateVolumes) {
-            ApplicationContext::Get().volumeService.onSync();
+            CTX.volumeService.onSync();
         }
         updateGlobalData();
 
-        ApplicationContext::Get().passesService.onSync();
+        CTX.passesService.onSync();
 
         setUpdateLights(false);
         setCameraUpdated(false);
         setGISettingsUpdated(false);
 
-        ApplicationContext::Get().videoExporterService.onSync();
+        CTX.videoExporterService.onSync();
     }
 
     void EngineContext::updateGlobalData() {
-        auto &camera = ApplicationContext::Get().worldRepository.camera;
-        auto *fbo = ApplicationContext::Get().coreFrameBuffers.postProcessingFBO;
+        auto &camera = CTX.worldRepository.camera;
+        auto *fbo = CTX.coreFrameBuffers.postProcessingFBO;
         globalDataUBO.outputRes.x = fbo->bufferWidth;
         globalDataUBO.outputRes.y = fbo->bufferHeight;
         globalDataUBO.viewMatrix = camera.viewMatrix;
@@ -108,35 +108,35 @@ namespace Metal {
         globalDataUBO.invProj = camera.invProjectionMatrix;
         globalDataUBO.invView = camera.invViewMatrix;
         globalDataUBO.cameraWorldPosition = camera.position;
-        globalDataUBO.pathTracerMultiplier = ApplicationContext::Get().engineRepository.pathTracerMultiplier;
-        globalDataUBO.volumeCount = ApplicationContext::Get().volumeService.getCount();
-        globalDataUBO.lightsCount = ApplicationContext::Get().lightService.getCount();
-        globalDataUBO.volumeShadowSteps = ApplicationContext::Get().engineRepository.volumeShadowSteps;
-        globalDataUBO.isAtmosphereEnabled = ApplicationContext::Get().engineRepository.atmosphereEnabled;
+        globalDataUBO.pathTracerMultiplier = CTX.engineRepository.pathTracerMultiplier;
+        globalDataUBO.volumeCount = CTX.volumeService.getCount();
+        globalDataUBO.lightsCount = CTX.lightService.getCount();
+        globalDataUBO.volumeShadowSteps = CTX.engineRepository.volumeShadowSteps;
+        globalDataUBO.isAtmosphereEnabled = CTX.engineRepository.atmosphereEnabled;
 
-        globalDataUBO.enabledDenoiser = ApplicationContext::Get().engineRepository.enabledDenoiser;
-        globalDataUBO.multipleImportanceSampling = ApplicationContext::Get().engineRepository.multipleImportanceSampling;
-        globalDataUBO.pathTracerMaxSamples = ApplicationContext::Get().engineRepository.pathTracerMaxSamples;
-        globalDataUBO.pathTracerSamples = ApplicationContext::Get().engineRepository.pathTracerSamples;
-        globalDataUBO.pathTracerBounces = ApplicationContext::Get().engineRepository.pathTracerBounces;
-        globalDataUBO.giTileSubdivision = ApplicationContext::Get().engineRepository.giTileSubdivision;
-        globalDataUBO.giEmissiveFactor = ApplicationContext::Get().engineRepository.giEmissiveFactor;
+        globalDataUBO.enabledDenoiser = CTX.engineRepository.enabledDenoiser;
+        globalDataUBO.multipleImportanceSampling = CTX.engineRepository.multipleImportanceSampling;
+        globalDataUBO.pathTracerMaxSamples = CTX.engineRepository.pathTracerMaxSamples;
+        globalDataUBO.pathTracerSamples = CTX.engineRepository.pathTracerSamples;
+        globalDataUBO.pathTracerBounces = CTX.engineRepository.pathTracerBounces;
+        globalDataUBO.giTileSubdivision = CTX.engineRepository.giTileSubdivision;
+        globalDataUBO.giEmissiveFactor = CTX.engineRepository.giEmissiveFactor;
 
-        globalDataUBO.debugFlag = ShadingMode::IndexOfValue(ApplicationContext::Get().editorRepository.shadingMode);
+        globalDataUBO.debugFlag = ShadingMode::IndexOfValue(CTX.editorRepository.shadingMode);
         globalDataUBO.surfaceCacheWidth = SURFACE_CACHE_RES;
         globalDataUBO.surfaceCacheHeight = SURFACE_CACHE_RES;
-        ApplicationContext::Get().engineRepository.pathTracerAccumulationCount++;
-        globalDataUBO.pathTracerAccumulationCount = ApplicationContext::Get().engineRepository.pathTracerAccumulationCount;
+        CTX.engineRepository.pathTracerAccumulationCount++;
+        globalDataUBO.pathTracerAccumulationCount = CTX.engineRepository.pathTracerAccumulationCount;
         globalDataUBO.globalFrameCount++;
 
-        if (ApplicationContext::Get().engineRepository.incrementTime) {
-            ApplicationContext::Get().engineRepository.elapsedTime += .0005f * ApplicationContext::Get().engineRepository.elapsedTimeSpeed;
+        if (CTX.engineRepository.incrementTime) {
+            CTX.engineRepository.elapsedTime += .0005f * CTX.engineRepository.elapsedTimeSpeed;
             setGISettingsUpdated(true);
             updateLights = true;
         }
-        ApplicationContext::Get().lightService.computeSunInfo();
-        globalDataUBO.sunPosition = ApplicationContext::Get().lightService.getSunPosition();
-        globalDataUBO.sunColor = ApplicationContext::Get().lightService.getSunColor();
-        ApplicationContext::Get().coreBuffers.globalData->update(&globalDataUBO);
+        CTX.lightService.computeSunInfo();
+        globalDataUBO.sunPosition = CTX.lightService.getSunPosition();
+        globalDataUBO.sunColor = CTX.lightService.getSunColor();
+        CTX.coreBuffers.globalData->update(&globalDataUBO);
     }
 }

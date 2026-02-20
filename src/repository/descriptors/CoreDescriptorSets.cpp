@@ -8,7 +8,7 @@
 #include "../../service/framebuffer/FrameBufferAttachment.h"
 #include "../../service/texture/TextureInstance.h"
 
-#define G ApplicationContext::Get().coreFrameBuffers.gBufferFBO->attachments
+#define G CTX.coreFrameBuffers.gBufferFBO->attachments
 
 namespace Metal {
     void CoreDescriptorSets::createMaterialDescriptors() {
@@ -42,7 +42,7 @@ namespace Metal {
             // ONE FOR EACH ADJACENT TILE AND ONE FOR THE CENTER TILE
 
             svoData->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                                            0, ApplicationContext::Get().coreBuffers.tileInfo));
+                                                            0, CTX.coreBuffers.tileInfo));
             svoData->addLayoutBinding(
                 DescriptorBinding::Of(VK_SHADER_STAGE_ALL, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
             svoData->addLayoutBinding(
@@ -67,25 +67,25 @@ namespace Metal {
             lightData = std::make_unique<DescriptorInstance>();
             lightData->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
                                                                     VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0,
-                                                                    ApplicationContext::Get().coreBuffers.lightBuffer));
+                                                                    CTX.coreBuffers.lightBuffer));
             lightData->create();
         } {
             volumeData = std::make_unique<DescriptorInstance>();
             volumeData->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
                                                                     VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0,
-                                                                    ApplicationContext::Get().coreBuffers.volumesBuffer));
+                                                                    CTX.coreBuffers.volumesBuffer));
             volumeData->create();
         } {
             materialData = std::make_unique<DescriptorInstance>();
             materialData->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
                                                                     VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0,
-                                                                    ApplicationContext::Get().coreBuffers.materialBuffer));
+                                                                    CTX.coreBuffers.materialBuffer));
             materialData->create();
         } {
             globalDataDescriptor = std::make_unique<DescriptorInstance>();
             globalDataDescriptor->addLayoutBinding(
                 DescriptorBinding::Of(VK_SHADER_STAGE_ALL, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0,
-                                      ApplicationContext::Get().coreBuffers.globalData));
+                                      CTX.coreBuffers.globalData));
             globalDataDescriptor->create();
         }
     }
@@ -94,21 +94,21 @@ namespace Metal {
         gBufferAlbedo = std::make_unique<DescriptorInstance>();
         gBufferAlbedo->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
                                                               VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
-                                                              ApplicationContext::Get().coreDescriptorSets.vkImageSampler,
+                                                              CTX.coreDescriptorSets.vkImageSampler,
                                                               G[0]->vkImageView));
         gBufferAlbedo->create();
 
         gBufferNormal = std::make_unique<DescriptorInstance>();
         gBufferNormal->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
                                                               VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
-                                                              ApplicationContext::Get().coreDescriptorSets.vkImageSampler,
+                                                              CTX.coreDescriptorSets.vkImageSampler,
                                                               G[1]->vkImageView));
         gBufferNormal->create();
 
         gBufferPosition = std::make_unique<DescriptorInstance>();
         gBufferPosition->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
                                                                 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
-                                                                ApplicationContext::Get().coreDescriptorSets.vkImageSampler,
+                                                                CTX.coreDescriptorSets.vkImageSampler,
                                                                 G[2]->vkImageView));
         gBufferPosition->create();
     }
@@ -119,7 +119,7 @@ namespace Metal {
             surfaceCacheImage->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
                                                                           VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
                                                                           VK_NULL_HANDLE,
-                                                                          ApplicationContext::Get().coreTextures.giSurfaceCache->
+                                                                          CTX.coreTextures.giSurfaceCache->
                                                                           vkImageView));
             surfaceCacheImage->create();
         }
@@ -129,7 +129,7 @@ namespace Metal {
             previousFrameDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
                                                                             VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
                                                                             VK_NULL_HANDLE,
-                                                                            ApplicationContext::Get().coreTextures.previousFrame->
+                                                                            CTX.coreTextures.previousFrame->
                                                                             vkImageView));
             previousFrameDescriptor->create();
         }
@@ -139,7 +139,7 @@ namespace Metal {
             previousFrameMetadataDescriptor->addLayoutBinding(DescriptorBinding::Of(
                 VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
                 0, VK_NULL_HANDLE,
-                ApplicationContext::Get().coreTextures.previousFrameMetadata->vkImageView));
+                CTX.coreTextures.previousFrameMetadata->vkImageView));
             previousFrameMetadataDescriptor->create();
         }
 
@@ -148,25 +148,25 @@ namespace Metal {
             currentFrameDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
                                                                            VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
                                                                            VK_NULL_HANDLE,
-                                                                           ApplicationContext::Get().coreTextures.currentFrame->vkImageView));
+                                                                           CTX.coreTextures.currentFrame->vkImageView));
             currentFrameDescriptor->create();
         }
     }
 
     void CoreDescriptorSets::onInitialize() {
-        ApplicationContext::Get().framebufferService.createSampler(false, vkImageSampler);
+        CTX.framebufferService.createSampler(false, vkImageSampler);
 
         createBuffersDescriptors();
         createMaterialDescriptors();
         createGBufferDescriptors();
         createPathTracingDescriptors();
 
-        if (ApplicationContext::Get().isDebugMode()) {
+        if (CTX.isDebugMode()) {
             surfaceCacheFragment = std::make_unique<DescriptorInstance>();
             surfaceCacheFragment->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
                                                                          VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
-                                                                         ApplicationContext::Get().coreDescriptorSets.vkImageSampler,
-                                                                         ApplicationContext::Get().coreTextures.giSurfaceCache->
+                                                                         CTX.coreDescriptorSets.vkImageSampler,
+                                                                         CTX.coreTextures.giSurfaceCache->
                                                                          vkImageView));
             surfaceCacheFragment->create();
         }
@@ -176,8 +176,8 @@ namespace Metal {
             postProcessingDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
                                                                              VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                                              0,
-                                                                             ApplicationContext::Get().coreDescriptorSets.vkImageSampler,
-                                                                             ApplicationContext::Get().coreTextures.currentFrame->
+                                                                             CTX.coreDescriptorSets.vkImageSampler,
+                                                                             CTX.coreTextures.currentFrame->
                                                                              vkImageView));
             postProcessingDescriptor->create();
         }

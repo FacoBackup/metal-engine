@@ -5,8 +5,8 @@
 namespace Metal {
     void FrameBufferInstance::dispose() {
         LOG_INFO("Disposing framebuffer instance");
-        vkDestroyFramebuffer(ApplicationContext::Get().vulkanContext.device.device, vkFramebuffer, nullptr);
-        vkDestroyRenderPass(ApplicationContext::Get().vulkanContext.device.device, vkRenderPass, nullptr);
+        vkDestroyFramebuffer(CTX.vulkanContext.device.device, vkFramebuffer, nullptr);
+        vkDestroyRenderPass(CTX.vulkanContext.device.device, vkRenderPass, nullptr);
 
         for (int i = 0; i < attachments.size(); i++) {
             LOG_INFO("Disposing of attachment instance " + std::to_string(i));

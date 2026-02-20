@@ -5,7 +5,7 @@
 
 namespace Metal {
     void AsyncTaskPanel::onSync() {
-        auto tasks = ApplicationContext::Get().asyncTaskService.getActiveTasks();
+        auto tasks = CTX.asyncTaskService.getActiveTasks();
         if (tasks.empty()) {
             UIUtil::DynamicSpacing(90);
             return;
@@ -56,7 +56,7 @@ namespace Metal {
 
                 ImGui::SameLine();
                 if (ImGui::Button((Icons::close + "##" + task->id).c_str(), ImVec2(UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE))) {
-                    ApplicationContext::Get().asyncTaskService.endTask(task->id, true);
+                    CTX.asyncTaskService.endTask(task->id, true);
                 }
                 ImGui::EndGroup();
             }

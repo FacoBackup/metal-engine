@@ -5,19 +5,19 @@
 
 namespace Metal {
     void CameraService::onSync() {
-        camera = &ApplicationContext::Get().worldRepository.camera;
+        camera = &CTX.worldRepository.camera;
         if (camera != nullptr) {
             updateAspectRatio();
             if (camera->isNotFrozen()) {
                 updateMatrices();
-                ApplicationContext::Get().engineContext.setCameraUpdated(true);
+                CTX.engineContext.setCameraUpdated(true);
                 camera->freezeVersion();
             }
         }
     }
 
     void CameraService::updateAspectRatio() const {
-        const auto &runtimeRepository = ApplicationContext::Get().runtimeRepository;
+        const auto &runtimeRepository = CTX.runtimeRepository;
 
         const float prevAspect = camera->aspectRatio;
         camera->aspectRatio = runtimeRepository.viewportW / runtimeRepository.viewportH;
@@ -58,7 +58,7 @@ namespace Metal {
     }
 
     void CameraService::handleInputInternal() const {
-        const auto &runtimeRepository = ApplicationContext::Get().runtimeRepository;
+        const auto &runtimeRepository = CTX.runtimeRepository;
 
         glm::vec3 forward(
             -std::sin(camera->yaw) * std::cos(camera->pitch),
@@ -74,7 +74,7 @@ namespace Metal {
         right = glm::normalize(right);
 
         const float multiplier = 10 * camera->movementSensitivity *
-                                 ApplicationContext::Get().engineContext.deltaTime;
+                                 CTX.engineContext.deltaTime;
         if (runtimeRepository.leftPressed) {
             camera->position += right * multiplier;
             camera->registerChange();
@@ -116,7 +116,7 @@ namespace Metal {
     }
 
     void CameraService::updateDelta(const bool isFirstMovement) const {
-        const auto &runtimeRepository = ApplicationContext::Get().runtimeRepository;
+        const auto &runtimeRepository = CTX.runtimeRepository;
         const float mouseX = runtimeRepository.mouseX;
         const float mouseY = runtimeRepository.mouseY;
 

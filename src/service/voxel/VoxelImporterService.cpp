@@ -30,7 +30,7 @@ namespace Metal {
             metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.'));
 
 
-            std::string outPath = ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_VOLUME(metadata.getId());
+            std::string outPath = CTX.getAssetDirectory() + FORMAT_FILE_VOLUME(metadata.getId());
             convertToSVO(pathToFile, outPath, stopToken);
 
             DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(metadata.getId()), metadata)
@@ -52,7 +52,7 @@ namespace Metal {
             openvdb::initialize();
         });
 
-        auto *targetTile = ApplicationContext::Get().worldGridRepository.getTile(glm::vec3(0, 0, 0));
+        auto *targetTile = CTX.worldGridRepository.getTile(glm::vec3(0, 0, 0));
         int resolution = 12;
         auto builder = SparseVoxelOctreeBuilder(targetTile->boundingBox, 32);
 

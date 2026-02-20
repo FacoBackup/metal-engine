@@ -19,10 +19,10 @@ namespace Metal {
             UIUtil::DynamicSpacing(365);
             ImGui::SetNextItemWidth(100);
             if (ImGui::Combo((id + "##entities").c_str(), &option, ComponentTypes::NAMES)) {
-                auto id = ApplicationContext::Get().worldRepository.createEntity();
-                ApplicationContext::Get().worldRepository.createComponent(id, ComponentTypes::ValueOfIndex(option));
-                ApplicationContext::Get().selectionService.clearSelection();
-                ApplicationContext::Get().selectionService.addSelected(id);
+                auto id = CTX.worldRepository.createEntity();
+                CTX.worldRepository.createComponent(id, ComponentTypes::ValueOfIndex(option));
+                CTX.selectionService.clearSelection();
+                CTX.selectionService.addSelected(id);
             }
             ImGui::SameLine();
 
@@ -40,8 +40,8 @@ namespace Metal {
         if (UIUtil::ButtonSimple(Icons::center_focus_strong + id + "centerCamera",
                                  UIUtil::ONLY_ICON_BUTTON_SIZE,
                                  UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            ApplicationContext::Get().worldRepository.camera.position = {0, 0, 0};
-            ApplicationContext::Get().worldRepository.camera.registerChange();
+            CTX.worldRepository.camera.position = {0, 0, 0};
+            CTX.worldRepository.camera.registerChange();
         }
         UIUtil::RenderTooltip("Center camera?");
 
@@ -51,19 +51,19 @@ namespace Metal {
         static float speedValues[] = {0.1f, 0.5f, 1.0f, 2.0f, 5.0f, 10.0f};
         int currentSpeedIndex = 2;
         for (int i = 0; i < 6; i++) {
-            if (ApplicationContext::Get().worldRepository.camera.movementSensitivity == speedValues[i]) {
+            if (CTX.worldRepository.camera.movementSensitivity == speedValues[i]) {
                 currentSpeedIndex = i;
                 break;
             }
         }
         if (ImGui::Combo((id + "speedCamera").c_str(), &currentSpeedIndex, speeds, IM_ARRAYSIZE(speeds))) {
-            ApplicationContext::Get().worldRepository.camera.movementSensitivity = speedValues[currentSpeedIndex];
+            CTX.worldRepository.camera.movementSensitivity = speedValues[currentSpeedIndex];
         }
         UIUtil::RenderTooltip("Camera speed");
     }
 
     void ViewportHeaderPanel::shadingMode() {
-        auto &editorRepository = ApplicationContext::Get().editorRepository;
+        auto &editorRepository = CTX.editorRepository;
         ImGui::SetNextItemWidth(150);
         shadingModelOption = IndexOfValue(editorRepository.shadingMode);
 

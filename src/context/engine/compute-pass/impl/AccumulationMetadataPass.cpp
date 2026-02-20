@@ -7,20 +7,20 @@ namespace Metal {
     void AccumulationMetadataPass::onInitialize() {
         PipelineBuilder builder = PipelineBuilder::Of("AccumulationMetadata.comp")
                 .setPushConstantsSize(sizeof(DenoiserPushConstant))
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.currentFrameDescriptor.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.previousFrameDescriptor.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.previousFrameMetadataDescriptor.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.gBufferPosition.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.gBufferNormal.get());
-        pipelineInstance = ApplicationContext::Get().pipelineService.createPipeline(builder);
+                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.currentFrameDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.previousFrameDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.previousFrameMetadataDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.gBufferPosition.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.gBufferNormal.get());
+        pipelineInstance = CTX.pipelineService.createPipeline(builder);
     }
 
     void AccumulationMetadataPass::onSync() {
-        syncWriting(ApplicationContext::Get().coreTextures.currentFrame->vkImage);
-        pushConstant.diffWeight = ApplicationContext::Get().engineRepository.denoiserDiffWeight;
+        syncWriting(CTX.coreTextures.currentFrame->vkImage);
+        pushConstant.diffWeight = CTX.engineRepository.denoiserDiffWeight;
         recordPushConstant(&pushConstant);
-        recordImageDispatch(ApplicationContext::Get().coreTextures.currentFrame, 8, 8);
-        endWriting(ApplicationContext::Get().coreTextures.currentFrame->vkImage);
+        recordImageDispatch(CTX.coreTextures.currentFrame, 8, 8);
+        endWriting(CTX.coreTextures.currentFrame->vkImage);
     }
 } // Metal

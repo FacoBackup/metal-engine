@@ -13,11 +13,11 @@ namespace Metal {
     void CommandBufferRecorder::createCommandBuffer() {
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo.commandPool = ApplicationContext::Get().vulkanContext.commandPool;
+        allocInfo.commandPool = CTX.vulkanContext.commandPool;
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
         allocInfo.commandBufferCount = MAX_FRAMES_IN_FLIGHT;
         VulkanUtils::CheckVKResult(
-            vkAllocateCommandBuffers(ApplicationContext::Get().vulkanContext.device.device, &allocInfo,
+            vkAllocateCommandBuffers(CTX.vulkanContext.device.device, &allocInfo,
                                      _commandBuffers.data()));
     }
 
@@ -72,7 +72,7 @@ namespace Metal {
 
     void CommandBufferRecorder::recordCommands(
         const std::vector<AbstractPass *> &passes) const {
-        auto vkCommandBuffer = _commandBuffers[ApplicationContext::Get().getFrameIndex()];
+        auto vkCommandBuffer = _commandBuffers[CTX.getFrameIndex()];
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         vkBeginCommandBuffer(vkCommandBuffer, &beginInfo);
@@ -88,7 +88,7 @@ namespace Metal {
         }
 
         vkEndCommandBuffer(vkCommandBuffer);
-        ApplicationContext::Get().vulkanContext.pushCommandBuffer(vkCommandBuffer);
+        CTX.vulkanContext.pushCommandBuffer(vkCommandBuffer);
     }
 
     void CommandBufferRecorder::RecordCommandsInternal(

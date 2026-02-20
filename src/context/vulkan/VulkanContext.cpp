@@ -163,7 +163,7 @@ namespace Metal {
     }
 
     void VulkanContext::createPresentMode() {
-         VkPresentModeKHR presentModes = !ApplicationContext::Get().engineRepository.vsync ? VK_PRESENT_MODE_IMMEDIATE_KHR : VK_PRESENT_MODE_FIFO_KHR;
+         VkPresentModeKHR presentModes = !CTX.engineRepository.vsync ? VK_PRESENT_MODE_IMMEDIATE_KHR : VK_PRESENT_MODE_FIFO_KHR;
         imguiVulkanWindow.PresentMode = ImGui_ImplVulkanH_SelectPresentMode(
             physDevice.physical_device, imguiVulkanWindow.Surface,
             &presentModes,
@@ -255,12 +255,12 @@ namespace Metal {
         imguiVulkanWindow.ClearValue.color.float32[2] = 0;
         imguiVulkanWindow.ClearValue.color.float32[3] = 1;
 
-        this->window = ApplicationContext::Get().glfwContext.getWindow();
+        this->window = CTX.glfwContext.getWindow();
         vkb::InstanceBuilder instanceBuilder;
 
         // ------- CORE INITIALIZATION
         // ----- INSTANCE AND EXTENSIONS
-        addExtensions(instanceBuilder, ApplicationContext::Get().glfwContext.getInstanceExtensions());
+        addExtensions(instanceBuilder, CTX.glfwContext.getInstanceExtensions());
         auto vkbResult = instanceBuilder
                 .set_app_name(ENGINE_NAME)
                 .set_engine_name(ENGINE_NAME)
@@ -285,21 +285,21 @@ namespace Metal {
         // ------- CORE INITIALIZATION
 
         // ------- REPOSITORY INITIALIZATION
-        ApplicationContext::Get().coreBuffers.onInitialize();
-        ApplicationContext::Get().coreFrameBuffers.onInitialize();
-        ApplicationContext::Get().coreTextures.onInitialize();
-        ApplicationContext::Get().coreDescriptorSets.onInitialize();
+        CTX.coreBuffers.onInitialize();
+        CTX.coreFrameBuffers.onInitialize();
+        CTX.coreTextures.onInitialize();
+        CTX.coreDescriptorSets.onInitialize();
         // ------- REPOSITORY INITIALIZATION
     }
 
     void VulkanContext::dispose() const {
-        ApplicationContext::Get().pipelineService.disposeAll();
-        ApplicationContext::Get().textureService.disposeAll();
-        ApplicationContext::Get().meshService.disposeAll();
-        ApplicationContext::Get().framebufferService.disposeAll();
-        vkDestroyDescriptorPool(ApplicationContext::Get().vulkanContext.device.device, descriptorPool,
+        CTX.pipelineService.disposeAll();
+        CTX.textureService.disposeAll();
+        CTX.meshService.disposeAll();
+        CTX.framebufferService.disposeAll();
+        vkDestroyDescriptorPool(CTX.vulkanContext.device.device, descriptorPool,
                                 nullptr);
-        vkDestroyCommandPool(ApplicationContext::Get().vulkanContext.device.device, commandPool,
+        vkDestroyCommandPool(CTX.vulkanContext.device.device, commandPool,
                              nullptr);
 
         vkDestroyDevice(device.device, nullptr);
@@ -324,7 +324,7 @@ namespace Metal {
         poolInfo.maxSets = 500;
 
         VulkanUtils::CheckVKResult(vkCreateDescriptorPool(device.device, &poolInfo,
-                                                          nullptr, &ApplicationContext::Get().vulkanContext.descriptorPool));
+                                                          nullptr, &CTX.vulkanContext.descriptorPool));
     }
 
     VkCommandBuffer VulkanContext::beginSingleTimeCommands() const {
@@ -364,16 +364,16 @@ namespace Metal {
                                     ImGui_ImplVulkanH_Frame *fd) const {
         VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         VkSubmitInfo info = {};
-        ApplicationContext::Get().vulkanContext.pushCommandBuffer(fd->CommandBuffer);
+        CTX.vulkanContext.pushCommandBuffer(fd->CommandBuffer);
         info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         info.waitSemaphoreCount = 1;
         info.pWaitSemaphores = &image_acquired_semaphore;
         info.pWaitDstStageMask = &wait_stage;
-        info.commandBufferCount = ApplicationContext::Get().vulkanContext.getCommandBuffers().size();
-        info.pCommandBuffers = ApplicationContext::Get().vulkanContext.getCommandBuffers().data();
+        info.commandBufferCount = CTX.vulkanContext.getCommandBuffers().size();
+        info.pCommandBuffers = CTX.vulkanContext.getCommandBuffers().data();
         info.signalSemaphoreCount = 1;
         info.pSignalSemaphores = &render_complete_semaphore;
         VulkanUtils::CheckVKResult(vkEndCommandBuffer(fd->CommandBuffer));
-        VulkanUtils::CheckVKResult(vkQueueSubmit(ApplicationContext::Get().vulkanContext.graphicsQueue, 1, &info, fd->Fence));
+        VulkanUtils::CheckVKResult(vkQueueSubmit(CTX.vulkanContext.graphicsQueue, 1, &info, fd->Fence));
     }
 }

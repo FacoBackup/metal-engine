@@ -12,7 +12,7 @@ namespace Metal {
     }
 
     void ConsolePanel::onSync() {
-        LogService& logService = ApplicationContext::Get().logService;
+        LogService& logService = CTX.logService;
 
         // Header
         if (ImGui::Button("Clear")) {

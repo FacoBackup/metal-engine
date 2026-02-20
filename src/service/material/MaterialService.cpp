@@ -21,14 +21,14 @@ namespace Metal {
     bool MaterialService::streamAndWrite(std::string &id,
                                          MaterialInstance *instance,
                                          std::unique_ptr<DescriptorInstance> &descriptor) const {
-        auto *texture = ApplicationContext::Get().textureService.create(id, LevelOfDetail::LOD_0);
+        auto *texture = CTX.textureService.create(id, LevelOfDetail::LOD_0);
         if (texture == nullptr) {
             return false;
         }
         auto &ref = descriptor->bindings.emplace_back();
         ref.bindingPoint = 0;
         ref.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        ref.sampler = ApplicationContext::Get().coreDescriptorSets.vkImageSampler;
+        ref.sampler = CTX.coreDescriptorSets.vkImageSampler;
         ref.view = texture->vkImageView;
         instance->textures.push_back(id);
         return true;
@@ -93,7 +93,7 @@ namespace Metal {
     }
 
     MaterialFileData *MaterialService::stream(const std::string &id) const {
-        auto pathToFile = ApplicationContext::Get().getAssetDirectory() + FORMAT_FILE_MATERIAL(id);
+        auto pathToFile = CTX.getAssetDirectory() + FORMAT_FILE_MATERIAL(id);
         if (std::filesystem::exists(pathToFile)) {
             MaterialFileData *data = new MaterialFileData;
             PARSE_TEMPLATE(data->load, pathToFile);

@@ -15,6 +15,6 @@ namespace Metal {
     }
 
     void VolumeComponent::onUpdate(InspectableMember *member) {
-        ApplicationContext::Get().engineContext.setUpdateVolumes(true);
+        CTX.engineContext.setUpdateVolumes(true);
     }
 } // Metal

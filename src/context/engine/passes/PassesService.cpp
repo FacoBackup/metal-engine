@@ -16,9 +16,9 @@ namespace Metal {
     }
 
     void PassesService::onInitialize() {
-        gBuffer = new CommandBufferRecorder(ApplicationContext::Get().coreFrameBuffers.gBufferFBO);
+        gBuffer = new CommandBufferRecorder(CTX.coreFrameBuffers.gBufferFBO);
         compute = new CommandBufferRecorder();
-        postProcessing = new CommandBufferRecorder(ApplicationContext::Get().coreFrameBuffers.postProcessingFBO);
+        postProcessing = new CommandBufferRecorder(CTX.coreFrameBuffers.postProcessingFBO);
 
         addPass(gBufferPasses, new GBufferGenPass());
 
@@ -27,7 +27,7 @@ namespace Metal {
         addPass(computePasses, new AccumulationMetadataPass());
 
         addPass(postProcessingPasses, new PostProcessingPass());
-        if (ApplicationContext::Get().isDebugMode()) {
+        if (CTX.isDebugMode()) {
             addPass(postProcessingPasses, new SelectedDotPass());
             addPass(postProcessingPasses, new GridPass());
             addPass(postProcessingPasses, new VoxelVisualizerPass());

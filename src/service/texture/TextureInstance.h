@@ -21,10 +21,10 @@ namespace Metal {
         }
 
         void dispose() override {
-            vkDestroyImage(ApplicationContext::Get().vulkanContext.device.device, vkImage, nullptr);
-            vkFreeMemory(ApplicationContext::Get().vulkanContext.device.device, vkImageMemory, nullptr);
-            vkDestroyImageView(ApplicationContext::Get().vulkanContext.device.device, vkImageView, nullptr);
-            vkDestroySampler(ApplicationContext::Get().vulkanContext.device.device, vkSampler, nullptr);
+            vkDestroyImage(CTX.vulkanContext.device.device, vkImage, nullptr);
+            vkFreeMemory(CTX.vulkanContext.device.device, vkImageMemory, nullptr);
+            vkDestroyImageView(CTX.vulkanContext.device.device, vkImageView, nullptr);
+            vkDestroySampler(CTX.vulkanContext.device.device, vkSampler, nullptr);
 
             if (imageDescriptor != nullptr) {
                 imageDescriptor->dispose();

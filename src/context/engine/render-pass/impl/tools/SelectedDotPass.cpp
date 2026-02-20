@@ -8,7 +8,7 @@
 namespace Metal {
     void SelectedDotPass::onInitialize() {
         PipelineBuilder builder = PipelineBuilder::Of(
-                    ApplicationContext::Get().coreFrameBuffers.postProcessingFBO,
+                    CTX.coreFrameBuffers.postProcessingFBO,
                     "tools/SelectedDot.vert",
                     "tools/SelectedDot.frag"
                 )
@@ -16,17 +16,17 @@ namespace Metal {
                 .setPrepareForMesh()
                 .setCullMode(VK_CULL_MODE_BACK_BIT)
                 .setPushConstantsSize(sizeof(MeshPushConstant))
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.gBufferPosition.get());
-        pipelineInstance = ApplicationContext::Get().pipelineService.createPipeline(builder);
+                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.gBufferPosition.get());
+        pipelineInstance = CTX.pipelineService.createPipeline(builder);
     }
 
     bool SelectedDotPass::shouldRun() {
-        return !ApplicationContext::Get().editorRepository.selected.empty();
+        return !CTX.editorRepository.selected.empty();
     }
 
     void SelectedDotPass::onSync() {
-        for (const auto &pair: ApplicationContext::Get().editorRepository.selected) {
+        for (const auto &pair: CTX.editorRepository.selected) {
             if (!pair.second) {
                 continue;
             }
@@ -49,10 +49,10 @@ namespace Metal {
             }
 
             pushConstant.model = worldRepository.transforms[entityId].model;
-            pushConstant.albedoEmissive.x = ApplicationContext::Get().editorRepository.selectionColor.x;
-            pushConstant.albedoEmissive.y = ApplicationContext::Get().editorRepository.selectionColor.y;
-            pushConstant.albedoEmissive.z = ApplicationContext::Get().editorRepository.selectionColor.z;
-            pushConstant.albedoEmissive.w = ApplicationContext::Get().editorRepository.selectionOutlineThickness;
+            pushConstant.albedoEmissive.x = CTX.editorRepository.selectionColor.x;
+            pushConstant.albedoEmissive.y = CTX.editorRepository.selectionColor.y;
+            pushConstant.albedoEmissive.z = CTX.editorRepository.selectionColor.z;
+            pushConstant.albedoEmissive.w = CTX.editorRepository.selectionOutlineThickness;
             pushConstant.renderIndex = mesh.renderIndex;
             pushConstant.roughnessFactor = 0;
             pushConstant.metallicFactor = 0;

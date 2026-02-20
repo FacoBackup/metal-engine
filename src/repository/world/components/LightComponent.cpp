@@ -17,7 +17,7 @@ namespace Metal {
     }
 
     void LightComponent::onUpdate(InspectableMember *member) {
-        ApplicationContext::Get().engineContext.setUpdateLights(true);
+        CTX.engineContext.setUpdateLights(true);
         if (member != nullptr) {
             if (lightType == 0) {
                 lightTypeLabel = "Sphere";

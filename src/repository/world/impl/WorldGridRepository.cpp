@@ -4,7 +4,7 @@
 
 namespace Metal {
     bool WorldGridRepository::updateLoadedTiles() {
-        if (auto *center = getOrCreateTile(ApplicationContext::Get().worldRepository.camera.position);
+        if (auto *center = getOrCreateTile(CTX.worldRepository.camera.position);
             currentTile != center || prevSize != tiles.size()) {
             hasMainTileChanged = true;
             currentTile = center;
@@ -107,7 +107,7 @@ namespace Metal {
 
     void WorldGridRepository::moveBetweenTiles(const EntityID entityId, WorldTile *previousWorldTile,
                                                WorldTile *newWorldTile) const {
-        auto *entity = ApplicationContext::Get().worldRepository.getEntity(entityId);
+        auto *entity = CTX.worldRepository.getEntity(entityId);
         entity->registerChange();
         entity->freezeVersion();
         if (!entity->onTile.empty()) {

@@ -6,26 +6,26 @@
 namespace Metal {
     void VoxelVisualizerPass::onInitialize() {
         PipelineBuilder voxelVisualizerPipelineBuilder = PipelineBuilder::Of(
-                    ApplicationContext::Get().coreFrameBuffers.postProcessingFBO,
+                    CTX.coreFrameBuffers.postProcessingFBO,
                     "QUAD.vert",
                     "tools/VoxelDebugVisualizer.frag"
                 )
                 .setPushConstantsSize(sizeof(VoxelDebugSettingsPushConstant))
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.svoData.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.surfaceCacheFragment.get());
-        pipelineInstance = ApplicationContext::Get().pipelineService.createPipeline(voxelVisualizerPipelineBuilder);
+                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.svoData.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.surfaceCacheFragment.get());
+        pipelineInstance = CTX.pipelineService.createPipeline(voxelVisualizerPipelineBuilder);
     }
 
     bool VoxelVisualizerPass::shouldRun() {
-    return ApplicationContext::Get().editorRepository.showRaySearchCountVoxels || ApplicationContext::Get().editorRepository.showRayTestCountVoxels;
+    return CTX.editorRepository.showRaySearchCountVoxels || CTX.editorRepository.showRayTestCountVoxels;
     }
 
     void VoxelVisualizerPass::onSync() {
-        settings.voxelDebugFlag = ApplicationContext::Get().editorRepository.shadingMode;
-        settings.searchCountDivisor = ApplicationContext::Get().editorRepository.voxelSearchCount;
-        settings.showRaySearchCount = ApplicationContext::Get().editorRepository.showRaySearchCountVoxels;
-        settings.showRayTestCount = ApplicationContext::Get().editorRepository.showRayTestCountVoxels;
+        settings.voxelDebugFlag = CTX.editorRepository.shadingMode;
+        settings.searchCountDivisor = CTX.editorRepository.voxelSearchCount;
+        settings.showRaySearchCount = CTX.editorRepository.showRaySearchCountVoxels;
+        settings.showRayTestCount = CTX.editorRepository.showRayTestCountVoxels;
         recordPushConstant(&settings);
         recordDrawSimpleInstanced(3, 1);
     }

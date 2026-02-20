@@ -97,14 +97,14 @@ namespace Metal {
 
     void WorldRepository::deleteEntities(const std::vector<EntityID> &entities) {
         deleteRecursively(entities);
-        ApplicationContext::Get().engineContext.setUpdateLights(true);
-        ApplicationContext::Get().engineContext.setUpdateVolumes(true);
+        CTX.engineContext.setUpdateLights(true);
+        CTX.engineContext.setUpdateVolumes(true);
     }
 
     void WorldRepository::changeVisibility(EntityID entity, bool isVisible) {
         changeVisibilityRecursively(entity, isVisible);
-        ApplicationContext::Get().engineContext.setUpdateLights(true);
-        ApplicationContext::Get().engineContext.setUpdateVolumes(true);
+        CTX.engineContext.setUpdateLights(true);
+        CTX.engineContext.setUpdateVolumes(true);
     }
 
     void WorldRepository::changeVisibilityRecursively(EntityID entity, const bool isVisible) {
@@ -136,7 +136,7 @@ namespace Metal {
                 lights.at(entity).setEntityId(entity);
                 getEntity(entity)->components.push_back(ComponentTypes::LIGHT);
                 createComponent(entity, ComponentTypes::TRANSFORM);
-                ApplicationContext::Get().engineContext.setUpdateLights(true);
+                CTX.engineContext.setUpdateLights(true);
                 break;
             }
             case ComponentTypes::VOLUME: {
@@ -144,15 +144,15 @@ namespace Metal {
                 volumes.at(entity).setEntityId(entity);
                 getEntity(entity)->components.push_back(ComponentTypes::VOLUME);
                 createComponent(entity, ComponentTypes::TRANSFORM);
-                ApplicationContext::Get().engineContext.setUpdateVolumes(true);
+                CTX.engineContext.setUpdateVolumes(true);
                 break;
             }
             case ComponentTypes::TRANSFORM: {
                 transforms.emplace(entity, TransformComponent{});
                 transforms.at(entity).setEntityId(entity);
                 getEntity(entity)->components.push_back(ComponentTypes::TRANSFORM);
-                ApplicationContext::Get().worldGridRepository.getCurrentTile()->entities.push_back(entity);
-                entities.at(entity).onTile = ApplicationContext::Get().worldGridRepository.getCurrentTile()->id;
+                CTX.worldGridRepository.getCurrentTile()->entities.push_back(entity);
+                entities.at(entity).onTile = CTX.worldGridRepository.getCurrentTile()->id;
                 break;
             }
             default:

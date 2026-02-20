@@ -10,10 +10,10 @@
 int main(int, char **) {
     Metal::ApplicationContext::Init(true);
 
-    if (!Metal::ApplicationContext::Get().isValidContext()) {
+    if (!CTX.isValidContext()) {
         printf("GLFW: Vulkan Not Supported\n");
         return 1;
     }
-    Metal::ApplicationContext::Get().start();
+    CTX.start();
     return 0;
 }

@@ -4,9 +4,9 @@
 
 namespace Metal {
     AbstractPass::AbstractPass(bool isComputePass) : AbstractRuntimeComponent(),
-        worldRepository(ApplicationContext::Get().worldRepository),
+        worldRepository(CTX.worldRepository),
         streamingRepository(
-            ApplicationContext::Get().streamingRepository), isComputePass(isComputePass) {
+            CTX.streamingRepository), isComputePass(isComputePass) {
     }
 
     void AbstractPass::recordPushConstant(const void *data) {

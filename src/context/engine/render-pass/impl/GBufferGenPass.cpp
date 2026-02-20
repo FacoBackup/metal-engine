@@ -11,21 +11,21 @@
 namespace Metal {
     void GBufferGenPass::onInitialize() {
         PipelineBuilder gBufferPipelineBuilder = PipelineBuilder::Of(
-                    ApplicationContext::Get().coreFrameBuffers.gBufferFBO,
+                    CTX.coreFrameBuffers.gBufferFBO,
                     "GBufferGen.vert",
                     "GBufferGen.frag"
                 )
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.materialAlbedo.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.materialNormal.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.materialRoughness.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.materialMetallic.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.materialHeight.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.materialAlbedo.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.materialNormal.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.materialRoughness.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.materialMetallic.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.materialHeight.get())
                 .setPrepareForMesh()
                 .setDepthTest()
                 .setCullMode(VK_CULL_MODE_BACK_BIT)
                 .setPushConstantsSize(sizeof(MeshPushConstant));
-        pipelineInstance = ApplicationContext::Get().pipelineService.createPipeline(gBufferPipelineBuilder);
+        pipelineInstance = CTX.pipelineService.createPipeline(gBufferPipelineBuilder);
     }
 
     void GBufferGenPass::onSync() {

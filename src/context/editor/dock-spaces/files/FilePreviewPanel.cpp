@@ -28,7 +28,7 @@ namespace Metal {
         ImGui::Separator();
 
         if (selected->type == EntryType::TEXTURE) {
-            auto *texture = ApplicationContext::Get().streamingRepository.streamTexture(selected->getId(), LevelOfDetail::LOD_3);
+            auto *texture = CTX.streamingRepository.streamTexture(selected->getId(), LevelOfDetail::LOD_3);
             if (texture != nullptr) {
                 float availWidth = ImGui::GetContentRegionAvail().x;
                 float availHeight = ImGui::GetContentRegionAvail().y;
@@ -49,10 +49,10 @@ namespace Metal {
                 float offsetX = (availWidth - renderWidth) * 0.5f;
                 if (offsetX > 0) ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offsetX);
 
-                ApplicationContext::Get().guiContext.renderImage(texture, renderWidth, renderHeight);
+                CTX.guiContext.renderImage(texture, renderWidth, renderHeight);
             }
         } else if (selected->type == EntryType::MATERIAL) {
-            ApplicationContext::Get().fileInspection.materialId = selected->getId();
+            CTX.fileInspection.materialId = selected->getId();
             materialInspection->onSync();
         } else {
             ImGui::Text("File has no preview");

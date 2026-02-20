@@ -18,11 +18,11 @@ namespace Metal {
         ImGui::SetNextWindowBgAlpha(.4f);
         if (ImGui::Begin(id.c_str(), &UIUtil::OPEN, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar |
             ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse)) {
-            const auto &positionCamera = ApplicationContext::Get().worldRepository.camera.position;
+            const auto &positionCamera = CTX.worldRepository.camera.position;
             ImGui::Text("Current tile: %i %i | N of tiles: %i",
-                        ApplicationContext::Get().worldGridRepository.getCurrentTile()->x,
-                        ApplicationContext::Get().worldGridRepository.getCurrentTile()->z,
-                        ApplicationContext::Get().worldGridRepository.getTiles().size());
+                        CTX.worldGridRepository.getCurrentTile()->x,
+                        CTX.worldGridRepository.getCurrentTile()->z,
+                        CTX.worldGridRepository.getTiles().size());
             ImGui::SameLine();
             ImGui::TextColored(RED, "X: %i", static_cast<int>(positionCamera.x));
             ImGui::SameLine();
@@ -32,10 +32,10 @@ namespace Metal {
             ImGui::SameLine();
 
             ImGui::Text(
-                "Yaw: %i", static_cast<int>(ApplicationContext::Get().worldRepository.camera.yaw * TO_DEG));
+                "Yaw: %i", static_cast<int>(CTX.worldRepository.camera.yaw * TO_DEG));
             ImGui::SameLine();
             ImGui::Text("Pitch: %i",
-                        static_cast<int>(ApplicationContext::Get().worldRepository.camera.pitch * TO_DEG));
+                        static_cast<int>(CTX.worldRepository.camera.pitch * TO_DEG));
         }
         ImGui::PopStyleVar();
         ImGui::End();

@@ -15,7 +15,7 @@ namespace Metal {
     }
 
     void GuiContext::renderImage(TextureInstance *texture, const float sizeX, const float sizeY) const {
-        ApplicationContext::Get().descriptorService.setImageDescriptor(texture);
+        CTX.descriptorService.setImageDescriptor(texture);
         ImGui::Image(reinterpret_cast<ImTextureID>(texture->imageDescriptor->vkDescriptorSet), ImVec2{sizeX, sizeY});
     }
 
@@ -63,19 +63,19 @@ namespace Metal {
         io.ConfigWindowsResizeFromEdges = true;
 
         // Setup Platform/Renderer backends
-        ImGui_ImplGlfw_InitForVulkan(ApplicationContext::Get().glfwContext.getWindow(), true);
+        ImGui_ImplGlfw_InitForVulkan(CTX.glfwContext.getWindow(), true);
         ImGui_ImplVulkan_InitInfo init_info = {};
-        init_info.Instance = ApplicationContext::Get().vulkanContext.instance.instance;
-        init_info.PhysicalDevice = ApplicationContext::Get().vulkanContext.physDevice.physical_device;
-        init_info.Device = ApplicationContext::Get().vulkanContext.device.device;
-        init_info.QueueFamily = ApplicationContext::Get().vulkanContext.queueFamily;
-        init_info.Queue = ApplicationContext::Get().vulkanContext.graphicsQueue;
-        init_info.PipelineCache = ApplicationContext::Get().vulkanContext.pipelineCache;
-        init_info.DescriptorPool = ApplicationContext::Get().vulkanContext.descriptorPool;
-        init_info.RenderPass = ApplicationContext::Get().vulkanContext.imguiVulkanWindow.RenderPass;
+        init_info.Instance = CTX.vulkanContext.instance.instance;
+        init_info.PhysicalDevice = CTX.vulkanContext.physDevice.physical_device;
+        init_info.Device = CTX.vulkanContext.device.device;
+        init_info.QueueFamily = CTX.vulkanContext.queueFamily;
+        init_info.Queue = CTX.vulkanContext.graphicsQueue;
+        init_info.PipelineCache = CTX.vulkanContext.pipelineCache;
+        init_info.DescriptorPool = CTX.vulkanContext.descriptorPool;
+        init_info.RenderPass = CTX.vulkanContext.imguiVulkanWindow.RenderPass;
         init_info.Subpass = 0;
         init_info.MinImageCount = MAX_FRAMES_IN_FLIGHT;
-        init_info.ImageCount = ApplicationContext::Get().vulkanContext.imguiVulkanWindow.ImageCount;
+        init_info.ImageCount = CTX.vulkanContext.imguiVulkanWindow.ImageCount;
         init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
         init_info.Allocator = nullptr;
         init_info.CheckVkResultFn = VulkanUtils::CheckVKResult;
@@ -139,13 +139,13 @@ namespace Metal {
     }
 
     void GuiContext::dispose() const {
-        const VkResult err = vkDeviceWaitIdle(ApplicationContext::Get().vulkanContext.device.device);
+        const VkResult err = vkDeviceWaitIdle(CTX.vulkanContext.device.device);
         VulkanUtils::CheckVKResult(err);
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
-        ImGui_ImplVulkanH_DestroyWindow(ApplicationContext::Get().vulkanContext.instance, ApplicationContext::Get().vulkanContext.device.device,
-                                        &ApplicationContext::Get().glfwContext.getGUIWindow(),
+        ImGui_ImplVulkanH_DestroyWindow(CTX.vulkanContext.instance, CTX.vulkanContext.device.device,
+                                        &CTX.glfwContext.getGUIWindow(),
                                         nullptr);
     }
 

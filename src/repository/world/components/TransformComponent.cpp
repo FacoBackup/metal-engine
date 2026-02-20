@@ -17,13 +17,13 @@ namespace Metal {
     }
 
     void TransformComponent::onUpdate(InspectableMember *member) {
-        bool isVolume = ApplicationContext::Get().worldRepository.volumes.contains(entityId);
-        bool isLight = ApplicationContext::Get().worldRepository.lights.contains(entityId);
+        bool isVolume = CTX.worldRepository.volumes.contains(entityId);
+        bool isLight = CTX.worldRepository.lights.contains(entityId);
         if (isLight) {
-            ApplicationContext::Get().engineContext.setUpdateLights(true);
+            CTX.engineContext.setUpdateLights(true);
         }
         if (isVolume) {
-            ApplicationContext::Get().engineContext.setUpdateVolumes(true);
+            CTX.engineContext.setUpdateVolumes(true);
         }
         if (member != nullptr && member->name == ROTATION) {
             rotation = normalize(glm::quat(rotationEuler * (glm::pi<float>() / 180.f)));

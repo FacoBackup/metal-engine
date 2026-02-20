@@ -5,7 +5,7 @@
 
 namespace Metal {
     void SelectionService::addSelected(EntityID entity) const {
-        auto &editorRepository = ApplicationContext::Get().editorRepository;
+        auto &editorRepository = CTX.editorRepository;
         if (editorRepository.selected.empty() || entity == EMPTY_ENTITY) {
             editorRepository.mainSelection = entity;
             if (editorRepository.mainSelection == WorldRepository::ROOT_ID) {
@@ -20,14 +20,14 @@ namespace Metal {
     }
 
     void SelectionService::clearSelection() const {
-        auto &editorRepository = ApplicationContext::Get().editorRepository;
+        auto &editorRepository = CTX.editorRepository;
         editorRepository.selected.clear();
         editorRepository.mainSelection = EMPTY_ENTITY;
         editorRepository.primitiveSelected = nullptr;
     }
 
     void SelectionService::addAllSelected(const std::vector<EntityID> &all) const {
-        auto &editorRepository = ApplicationContext::Get().editorRepository;
+        auto &editorRepository = CTX.editorRepository;
         editorRepository.selected.clear();
         const EntityID first = all.size() > 0 ? all[0] : EMPTY_ENTITY;
         editorRepository.mainSelection = first;
@@ -38,15 +38,15 @@ namespace Metal {
     }
 
     void SelectionService::updatePrimitiveSelected() const {
-        auto &editorRepository = ApplicationContext::Get().editorRepository;
-        Entity *entity = ApplicationContext::Get().worldRepository.getEntity(editorRepository.mainSelection);
+        auto &editorRepository = CTX.editorRepository;
+        Entity *entity = CTX.worldRepository.getEntity(editorRepository.mainSelection);
         if (entity == nullptr) {
             return;
         }
         auto &comp = entity->components;
         for (auto a: comp) {
             if (a == ComponentTypes::TRANSFORM) {
-                editorRepository.primitiveSelected = dynamic_cast<TransformComponent *>(ApplicationContext::Get().
+                editorRepository.primitiveSelected = dynamic_cast<TransformComponent *>(CTX.
                     worldRepository.
                     getComponent(ComponentTypes::TRANSFORM, editorRepository.mainSelection));
                 break;

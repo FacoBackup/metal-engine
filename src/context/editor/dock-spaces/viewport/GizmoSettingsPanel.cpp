@@ -5,7 +5,7 @@
 
 namespace Metal {
     void GizmoSettingsPanel::onInitialize() {
-        editorRepository = &ApplicationContext::Get().editorRepository;
+        editorRepository = &CTX.editorRepository;
     }
 
     void GizmoSettingsPanel::onSync() {

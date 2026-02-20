@@ -37,7 +37,7 @@ namespace Metal {
             layoutInfo.pPushConstantRanges = &pushConstantRange;
         }
 
-        VulkanUtils::CheckVKResult(vkCreatePipelineLayout(ApplicationContext::Get().vulkanContext.device.device, &layoutInfo, nullptr,
+        VulkanUtils::CheckVKResult(vkCreatePipelineLayout(CTX.vulkanContext.device.device, &layoutInfo, nullptr,
                                                           &pipeline->vkPipelineLayout));
     }
 
@@ -69,7 +69,7 @@ namespace Metal {
         pipelineInfo.layout = pipeline->vkPipelineLayout;
         pipelineInfo.stage = computeShaderStageInfo;
 
-        if (vkCreateComputePipelines(ApplicationContext::Get().vulkanContext.device.device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr,
+        if (vkCreateComputePipelines(CTX.vulkanContext.device.device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr,
                                      &pipeline->vkPipeline) != VK_SUCCESS) {
             throw std::runtime_error("failed to create compute pipeline!");
         }
@@ -79,7 +79,7 @@ namespace Metal {
             pipeline->descriptorSets[i] = pipelineBuilder.descriptorSetsToBind[i]->vkDescriptorSet;
         }
 
-        vkDestroyShaderModule(ApplicationContext::Get().vulkanContext.device.device, computeShaderModule, nullptr);
+        vkDestroyShaderModule(CTX.vulkanContext.device.device, computeShaderModule, nullptr);
         return pipeline;
     }
 
@@ -212,7 +212,7 @@ namespace Metal {
         pipelineInfo.subpass = 0;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-        VulkanUtils::CheckVKResult(vkCreateGraphicsPipelines(ApplicationContext::Get().vulkanContext.device.device, VK_NULL_HANDLE, 1,
+        VulkanUtils::CheckVKResult(vkCreateGraphicsPipelines(CTX.vulkanContext.device.device, VK_NULL_HANDLE, 1,
                                                              &pipelineInfo,
                                                              nullptr,
                                                              &pipeline->vkPipeline));
@@ -221,8 +221,8 @@ namespace Metal {
         for (int i = 0; i < pipelineBuilder.descriptorSetsToBind.size(); i++) {
             pipeline->descriptorSets[i] = pipelineBuilder.descriptorSetsToBind[i]->vkDescriptorSet;
         }
-        vkDestroyShaderModule(ApplicationContext::Get().vulkanContext.device.device, fragmentShaderModule, nullptr);
-        vkDestroyShaderModule(ApplicationContext::Get().vulkanContext.device.device, vertexShaderModule, nullptr);
+        vkDestroyShaderModule(CTX.vulkanContext.device.device, fragmentShaderModule, nullptr);
+        vkDestroyShaderModule(CTX.vulkanContext.device.device, vertexShaderModule, nullptr);
         return pipeline;
     }
 
@@ -298,12 +298,12 @@ namespace Metal {
         rtPipelineInfo.layout = pipeline->vkPipelineLayout;
 
         VulkanUtils::CheckVKResult(
-            ApplicationContext::Get().vulkanContext.vkCreateRayTracingPipelinesKHR(
-                ApplicationContext::Get().vulkanContext.device.device, VK_NULL_HANDLE, VK_NULL_HANDLE,
+            CTX.vulkanContext.vkCreateRayTracingPipelinesKHR(
+                CTX.vulkanContext.device.device, VK_NULL_HANDLE, VK_NULL_HANDLE,
                 1, &rtPipelineInfo, nullptr, &pipeline->vkPipeline));
 
         // Build Shader Binding Table
-        const auto &rtProps = ApplicationContext::Get().vulkanContext.rayTracingPipelineProperties;
+        const auto &rtProps = CTX.vulkanContext.rayTracingPipelineProperties;
         const uint32_t handleSize = rtProps.shaderGroupHandleSize;
         const uint32_t handleAlignment = rtProps.shaderGroupHandleAlignment;
         const uint32_t baseAlignment = rtProps.shaderGroupBaseAlignment;
@@ -313,14 +313,14 @@ namespace Metal {
         const uint32_t sbtSize = groupCount * handleSizeAligned;
         std::vector<uint8_t> shaderHandleStorage(sbtSize);
         VulkanUtils::CheckVKResult(
-            ApplicationContext::Get().vulkanContext.vkGetRayTracingShaderGroupHandlesKHR(
-                ApplicationContext::Get().vulkanContext.device.device, pipeline->vkPipeline,
+            CTX.vulkanContext.vkGetRayTracingShaderGroupHandlesKHR(
+                CTX.vulkanContext.device.device, pipeline->vkPipeline,
                 0, groupCount, sbtSize, shaderHandleStorage.data()));
 
         // Create SBT buffers - each needs baseAlignment
         auto createSBTBuffer = [&](uint32_t groupIndex) -> std::shared_ptr<BufferInstance> {
             const uint32_t sbtBufferSize = (handleSizeAligned + baseAlignment - 1) & ~(baseAlignment - 1);
-            auto buf = ApplicationContext::Get().bufferService.createBuffer(
+            auto buf = CTX.bufferService.createBuffer(
                 sbtBufferSize,
                 VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -334,7 +334,7 @@ namespace Metal {
         pipeline->hitSBT = createSBTBuffer(2);
 
         auto getAddr = [&](const std::shared_ptr<BufferInstance> &buf) {
-            return getBufferDeviceAddress(ApplicationContext::Get().vulkanContext.device.device, buf->vkBuffer, ApplicationContext::Get().vulkanContext.vkGetBufferDeviceAddressKHR);
+            return getBufferDeviceAddress(CTX.vulkanContext.device.device, buf->vkBuffer, CTX.vulkanContext.vkGetBufferDeviceAddressKHR);
         };
 
         pipeline->raygenRegion.deviceAddress = getAddr(pipeline->raygenSBT);
@@ -356,9 +356,9 @@ namespace Metal {
             pipeline->descriptorSets[i] = pipelineBuilder.descriptorSetsToBind[i]->vkDescriptorSet;
         }
 
-        vkDestroyShaderModule(ApplicationContext::Get().vulkanContext.device.device, rayGenModule, nullptr);
-        vkDestroyShaderModule(ApplicationContext::Get().vulkanContext.device.device, missModule, nullptr);
-        vkDestroyShaderModule(ApplicationContext::Get().vulkanContext.device.device, closestHitModule, nullptr);
+        vkDestroyShaderModule(CTX.vulkanContext.device.device, rayGenModule, nullptr);
+        vkDestroyShaderModule(CTX.vulkanContext.device.device, missModule, nullptr);
+        vkDestroyShaderModule(CTX.vulkanContext.device.device, closestHitModule, nullptr);
 
         return pipeline;
     }

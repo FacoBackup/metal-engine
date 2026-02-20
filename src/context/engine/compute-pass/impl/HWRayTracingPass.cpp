@@ -7,13 +7,13 @@
 
 namespace Metal {
     bool HWRayTracingPass::shouldRun() {
-        if (!ApplicationContext::Get().vulkanContext.rayTracingSupported) {
+        if (!CTX.vulkanContext.rayTracingSupported) {
             return false;
         }
 
-        ApplicationContext::Get().rayTracingService.onSync();
+        CTX.rayTracingService.onSync();
 
-        if (!ApplicationContext::Get().rayTracingService.isReady()) {
+        if (!CTX.rayTracingService.isReady()) {
             return false;
         }
 
@@ -22,50 +22,50 @@ namespace Metal {
                     "rt/HWRayTracing.rgen",
                     "rt/HWRayTracing.rmiss",
                     "rt/HWRayTracing.rchit")
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.tlasDescriptor.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.gBufferAlbedo.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.gBufferNormal.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.gBufferPosition.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.currentFrameDescriptor.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.surfaceCacheImage.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.lightData.get())
-                .addDescriptorSet(ApplicationContext::Get().coreDescriptorSets.volumeData.get());
-            pipelineInstance = ApplicationContext::Get().pipelineService.createPipeline(builder);
+                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.tlasDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.gBufferAlbedo.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.gBufferNormal.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.gBufferPosition.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.currentFrameDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.surfaceCacheImage.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.lightData.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.volumeData.get());
+            pipelineInstance = CTX.pipelineService.createPipeline(builder);
         }
 
         return true;
     }
 
     void HWRayTracingPass::onSync() {
-        bool surfaceCacheReset = ApplicationContext::Get().engineContext.isGISettingsUpdated() || ApplicationContext::Get().engineContext.
+        bool surfaceCacheReset = CTX.engineContext.isGISettingsUpdated() || CTX.engineContext.
                               isUpdateLights();
         if (surfaceCacheReset) {
-            clearTexture(ApplicationContext::Get().coreTextures.giSurfaceCache->vkImage);
+            clearTexture(CTX.coreTextures.giSurfaceCache->vkImage);
         }
 
-        if (ApplicationContext::Get().engineRepository.enabledDenoiser) {
-            clearTexture(ApplicationContext::Get().coreTextures.currentFrame->vkImage);
-            ApplicationContext::Get().engineContext.resetPathTracerAccumulationCount();
-        } else if (isFirstRun || ApplicationContext::Get().engineContext.isCameraUpdated() || surfaceCacheReset) {
-            clearTexture(ApplicationContext::Get().coreTextures.currentFrame->vkImage);
-            ApplicationContext::Get().engineContext.resetPathTracerAccumulationCount();
+        if (CTX.engineRepository.enabledDenoiser) {
+            clearTexture(CTX.coreTextures.currentFrame->vkImage);
+            CTX.engineContext.resetPathTracerAccumulationCount();
+        } else if (isFirstRun || CTX.engineContext.isCameraUpdated() || surfaceCacheReset) {
+            clearTexture(CTX.coreTextures.currentFrame->vkImage);
+            CTX.engineContext.resetPathTracerAccumulationCount();
             isFirstRun = false;
         }
 
-        startWriting(ApplicationContext::Get().coreTextures.currentFrame->vkImage);
+        startWriting(CTX.coreTextures.currentFrame->vkImage);
 
         // Trace rays
-        ApplicationContext::Get().vulkanContext.vkCmdTraceRaysKHR(
+        CTX.vulkanContext.vkCmdTraceRaysKHR(
             vkCommandBuffer,
             &pipelineInstance->raygenRegion,
             &pipelineInstance->missRegion,
             &pipelineInstance->hitRegion,
             &pipelineInstance->callableRegion,
-            ApplicationContext::Get().coreTextures.currentFrame->width,
-            ApplicationContext::Get().coreTextures.currentFrame->height,
+            CTX.coreTextures.currentFrame->width,
+            CTX.coreTextures.currentFrame->height,
             1);
 
-        endWriting(ApplicationContext::Get().coreTextures.currentFrame->vkImage);
+        endWriting(CTX.coreTextures.currentFrame->vkImage);
     }
 } // Metal

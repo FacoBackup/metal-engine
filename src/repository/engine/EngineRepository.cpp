@@ -43,12 +43,12 @@ namespace Metal {
 
     void EngineRepository::onUpdate(InspectableMember *member) {
         if (member != nullptr && member->name == LEVEL_OF_DETAIL) {
-            ApplicationContext::Get().worldGridRepository.hasMainTileChanged = true;
+            CTX.worldGridRepository.hasMainTileChanged = true;
         }
         if (member != nullptr && (member->group == PATH_TRACER || member->group == ATMOSPHERE || member->group
                                   == SUN)) {
-            ApplicationContext::Get().engineContext.setGISettingsUpdated(true);
-            ApplicationContext::Get().engineContext.setUpdateLights(true);
+            CTX.engineContext.setGISettingsUpdated(true);
+            CTX.engineContext.setUpdateLights(true);
         }
     }
 

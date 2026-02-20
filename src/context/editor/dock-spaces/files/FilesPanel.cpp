@@ -23,18 +23,18 @@ namespace Metal {
             auto files = FileDialogUtil::PickFiles({
                 {
                     "Files",
-                    ApplicationContext::Get().fileImporterService.collectCompatibleFiles().c_str(),
+                    CTX.fileImporterService.collectCompatibleFiles().c_str(),
                 }
             });
             for (const std::string &file: files) {
-                ApplicationContext::Get().fileImporterService.importFile(filesContext.currentDirectory->absolutePath, file);
+                CTX.fileImporterService.importFile(filesContext.currentDirectory->absolutePath, file);
             }
             FilesService::GetEntries(filesContext.currentDirectory);
         };
     }
 
     void FilesPanel::onInitialize() {
-        filesContext.setCurrentDirectory(ApplicationContext::Get().filesService.getRoot());
+        filesContext.setCurrentDirectory(CTX.filesService.getRoot());
         appendChild(filesHeader = new FilesHeader(filesContext, getActionLabel(), onAction()));
         previewPanel = new FilePreviewPanel(filesContext);
         appendChild(previewPanel);
@@ -323,7 +323,7 @@ namespace Metal {
 
             if (!ImGui::IsMouseDown(ImGuiMouseButton_Left) && onDrag != nullptr && fileEntry->type ==
                 EntryType::DIRECTORY) {
-                ApplicationContext::Get().filesService.Move(onDrag, fileEntry);
+                CTX.filesService.Move(onDrag, fileEntry);
                 onDrag = nullptr;
             }
         }
@@ -358,7 +358,7 @@ namespace Metal {
     }
 
     void FilesPanel::deleteSelected() const {
-        ApplicationContext::Get().filesService.deleteFiles(filesContext.selected);
+        CTX.filesService.deleteFiles(filesContext.selected);
         FilesService::GetEntries(filesContext.currentDirectory);
     }
 
@@ -381,15 +381,15 @@ namespace Metal {
     void FilesPanel::openResource(FileEntry *root) {
         switch (root->type) {
             case EntryType::MESH: {
-                ApplicationContext::Get().meshService.createMeshEntity(root->name, root->getId());
+                CTX.meshService.createMeshEntity(root->name, root->getId());
                 break;
             }
             case EntryType::SCENE: {
-                ApplicationContext::Get().meshService.createSceneEntities(root->getId());
+                CTX.meshService.createSceneEntities(root->getId());
                 break;
             }
             case EntryType::VOLUME: {
-                ApplicationContext::Get().voxelService.create(root->getId());
+                CTX.voxelService.create(root->getId());
                 break;
             }
             case EntryType::DIRECTORY: {

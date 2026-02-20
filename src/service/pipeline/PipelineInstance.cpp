@@ -9,7 +9,7 @@ namespace Metal {
     void PipelineInstance::dispose() {
         LOG_INFO("Disposing of pipeline instance");
 
-        vkDestroyPipelineLayout(ApplicationContext::Get().vulkanContext.device.device, vkPipelineLayout, nullptr);
-        vkDestroyPipeline(ApplicationContext::Get().vulkanContext.device.device, vkPipeline, nullptr);
+        vkDestroyPipelineLayout(CTX.vulkanContext.device.device, vkPipelineLayout, nullptr);
+        vkDestroyPipeline(CTX.vulkanContext.device.device, vkPipeline, nullptr);
     }
 }
