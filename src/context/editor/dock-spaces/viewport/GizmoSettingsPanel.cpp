@@ -11,11 +11,7 @@ namespace Metal {
     void GizmoSettingsPanel::onSync() {
         gizmoMode();
         ImGui::SameLine();
-        ImGui::Separator();
-        ImGui::SameLine();
         gizmoSelection();
-        ImGui::SameLine();
-        ImGui::Separator();
         ImGui::SameLine();
         gizmoGrid();
     }

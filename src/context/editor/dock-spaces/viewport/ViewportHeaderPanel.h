@@ -6,15 +6,13 @@
 
 namespace Metal {
     class ViewportHeaderPanel final : public AbstractPanel {
-        static constexpr int FLAGS = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove |
+        static constexpr int FLAGS = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground |
                                      ImGuiWindowFlags_NoCollapse;
-        static constexpr ImVec2 PADDING{2, 2};
-
         AbstractPanel *gizmo = nullptr;
         int shadingModelOption = 0;
 
     public:
-        static constexpr float HEIGHT = 25;
+        static constexpr float HEIGHT = 28;
 
         void onInitialize() override;
 

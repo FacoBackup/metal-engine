@@ -26,7 +26,6 @@ namespace Metal {
             return;
         }
 
-        dock->selectedOption = selectedSpace->index;
         const auto it = views.find(selectedSpace->index);
         if (it == views.end()) {
             auto *newView = selectedSpace->getPanel();
@@ -95,18 +94,15 @@ namespace Metal {
 
         if (ImGui::BeginMenuBar()) {
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, headerPadding);
-            if (ImGui::BeginTabBar((id + "dockTabs").c_str())) {
+            if (ImGui::BeginTabBar((id + "dockTabs").c_str(), ImGuiTabBarFlags_AutoSelectNewTabs)) {
                 for (auto *space: dock->dockSpaces) {
                     if (space == nullptr) {
                         continue;
                     }
-                    const std::string label = space->icon + " " + space->name + "##" + id +
+                    const std::string label = space->icon + " " + space->name + id +
                                               std::to_string(space->index);
-                    ImGuiTabItemFlags flags = ImGuiTabItemFlags_None;
-                    if (dock->selectedOption == space->index) {
-                        flags = ImGuiTabItemFlags_SetSelected;
-                    }
-                    if (ImGui::BeginTabItem(label.c_str(), nullptr, flags)) {
+
+                    if (ImGui::BeginTabItem(label.c_str(), nullptr)) {
                         if (dock->selectedOption != space->index) {
                             dock->selectedOption = space->index;
                             initializeView();
@@ -114,35 +110,40 @@ namespace Metal {
                         ImGui::EndTabItem();
                     }
                 }
+                ImGui::SetNextItemWidth(23);
+                if (ImGui::TabItemButton((Icons::add.c_str() + id + "addTab").c_str(),
+                                         ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoReorder)) {
+                    ImGui::OpenPopup((id + "NewTabDropdown").c_str());
+                }
+
+                if (ImGui::BeginPopup((id + "NewTabDropdown").c_str())) {
+                    ImGui::Text("New Tab");
+                    ImGui::Separator();
+                    for (int i = 0; i <= 4; i++) {
+                        DockSpace *option = DockSpace::GetOption(i);
+                        if (option == nullptr) {
+                            continue;
+                        }
+                        const bool exists = hasDockSpace(option->index);
+                        const std::string label = option->icon + " " + option->name;
+                        if (ImGui::MenuItem(label.c_str(), nullptr, false, !exists)) {
+                            dock->dockSpaces.emplace_back(option);
+                            dock->selectedOption = option->index;
+                            initializeView();
+                        }
+                    }
+                    ImGui::EndPopup();
+                }
+
                 ImGui::EndTabBar();
             }
             ImGui::PopStyleVar();
-
-            if (ImGui::BeginPopupContextWindow((id + "dockTabsContext").c_str(),
-                                               ImGuiPopupFlags_MouseButtonRight)) {
-                ImGui::Text("New Tab");
-                ImGui::Separator();
-                for (int i = 0; i <= 4; i++) {
-                    DockSpace *option = DockSpace::GetOption(i);
-                    if (option == nullptr) {
-                        continue;
-                    }
-                    const bool exists = hasDockSpace(option->index);
-                    const std::string label = option->icon + " " + option->name;
-                    if (ImGui::MenuItem(label.c_str(), nullptr, false, !exists)) {
-                        dock->dockSpaces.emplace_back(option);
-                        dock->selectedOption = option->index;
-                        initializeView();
-                    }
-                }
-                ImGui::EndPopup();
-            }
             ImGui::EndMenuBar();
         }
     }
 
     DockSpace *DockSpacePanel::getSelectedDockSpace() const {
-        if ( dock->dockSpaces.empty()) {
+        if (dock->dockSpaces.empty()) {
             return nullptr;
         }
 

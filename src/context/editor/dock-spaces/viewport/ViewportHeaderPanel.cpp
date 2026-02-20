@@ -10,24 +10,29 @@ namespace Metal {
     }
 
     void ViewportHeaderPanel::onSync() {
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
+        if (ImGui::BeginChild(id.c_str(), ImVec2(0, HEIGHT), false, FLAGS)) {
+            ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPosX() + 2, ImGui::GetCursorPosY() + 4));
+            gizmo->onSync();
+            ImGui::SameLine();
+            int option = 0;
+            UIUtil::DynamicSpacing(365);
+            ImGui::SetNextItemWidth(100);
+            if (ImGui::Combo((id + "##entities").c_str(), &option, ComponentTypes::NAMES)) {
+                auto id = ApplicationContext::Get().worldRepository.createEntity();
+                ApplicationContext::Get().worldRepository.createComponent(id, ComponentTypes::ValueOfIndex(option));
+                ApplicationContext::Get().selectionService.clearSelection();
+                ApplicationContext::Get().selectionService.addSelected(id);
+            }
+            ImGui::SameLine();
 
-        gizmo->onSync();
-        ImGui::SameLine();
-        int option = 0;
-        UIUtil::DynamicSpacing(385);
-        ImGui::SetNextItemWidth(100);
-        if (ImGui::Combo((id + "##entities").c_str(), &option, ComponentTypes::NAMES)) {
-            auto id = ApplicationContext::Get().worldRepository.createEntity();
-            ApplicationContext::Get().worldRepository.createComponent(id, ComponentTypes::ValueOfIndex(option));
-            ApplicationContext::Get().selectionService.clearSelection();
-            ApplicationContext::Get().selectionService.addSelected(id);
+            cameraMode();
+            ImGui::SameLine();
+
+            shadingMode();
         }
-        ImGui::SameLine();
-
-        cameraMode();
-        ImGui::SameLine();
-
-        shadingMode();
+        ImGui::EndChild();
+        ImGui::PopStyleVar();
     }
 
 
@@ -41,20 +46,55 @@ namespace Metal {
         UIUtil::RenderTooltip("Center camera?");
 
         ImGui::SameLine();
-        ImGui::SetNextItemWidth(75);
-        ImGui::DragFloat((id + "speedCamera").c_str(),
-                         &ApplicationContext::Get().worldRepository.camera.movementSensitivity, .1f,
-                         .1f);
+        ImGui::SetNextItemWidth(65);
+        static const char *speeds[] = {"0.1", "0.5", "1.0", "2.0", "5.0", "10.0"};
+        static float speedValues[] = {0.1f, 0.5f, 1.0f, 2.0f, 5.0f, 10.0f};
+        int currentSpeedIndex = 2;
+        for (int i = 0; i < 6; i++) {
+            if (ApplicationContext::Get().worldRepository.camera.movementSensitivity == speedValues[i]) {
+                currentSpeedIndex = i;
+                break;
+            }
+        }
+        if (ImGui::Combo((id + "speedCamera").c_str(), &currentSpeedIndex, speeds, IM_ARRAYSIZE(speeds))) {
+            ApplicationContext::Get().worldRepository.camera.movementSensitivity = speedValues[currentSpeedIndex];
+        }
         UIUtil::RenderTooltip("Camera speed");
-
     }
 
     void ViewportHeaderPanel::shadingMode() {
         auto &editorRepository = ApplicationContext::Get().editorRepository;
         ImGui::SetNextItemWidth(150);
         shadingModelOption = IndexOfValue(editorRepository.shadingMode);
-        if (ImGui::Combo((id + "shadingMode").c_str(), &shadingModelOption, ShadingMode::Names)) {
-            editorRepository.shadingMode = ShadingMode::ValueOfIndex(shadingModelOption);
+
+        static const std::string names[] = {
+            Icons::lightbulb + " Lit",
+            Icons::image + " Albedo",
+            Icons::gradient + " Normal",
+            Icons::texture + " Roughness",
+            Icons::blur_on + " Metallic",
+            Icons::contrast + " Occlusion",
+            Icons::casino + " Random",
+            Icons::layers + " Depth",
+            Icons::grid_on + " UV",
+            Icons::place + " Position",
+            Icons::highlight + " Lighting only",
+            Icons::wb_incandescent + " Emission",
+            Icons::ipublic + " Global Illumination"
+        };
+
+        if (ImGui::BeginCombo((id + "shadingMode").c_str(), names[shadingModelOption].c_str())) {
+            for (int i = 0; i < IM_ARRAYSIZE(names); i++) {
+                const bool is_selected = (shadingModelOption == i);
+                if (ImGui::Selectable(names[i].c_str(), is_selected)) {
+                    shadingModelOption = i;
+                    editorRepository.shadingMode = ShadingMode::ValueOfIndex(shadingModelOption);
+                }
+                if (is_selected) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
         }
     }
 } // Metal
