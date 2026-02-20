@@ -52,7 +52,7 @@
 #include "../service/raytracing/RayTracingService.h"
 #include "editor/EditorPanel.h"
 #include "gui/GuiContext.h"
-
+#define CTX Metal::ApplicationContext::Get()
 namespace Metal {
     class ApplicationContext {
         static std::unique_ptr<ApplicationContext> CONTEXT;

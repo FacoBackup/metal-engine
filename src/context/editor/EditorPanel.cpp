@@ -2,6 +2,7 @@
 #include "../../util/UIUtil.h"
 #include "../../context/ApplicationContext.h"
 #include "../../dto/Notification.h"
+#include "dock-spaces/header/EditorHeaderPanel.h"
 
 namespace Metal {
     int EditorPanel::FLAGS = ImGuiWindowFlags_NoDocking |
@@ -14,7 +15,7 @@ namespace Metal {
     const char *EditorPanel::NAME = "##main_window";
     const char *EditorPanel::NAME_HEADER = "##header_window";
     ImVec2 EditorPanel::CENTER(0.0f, 0.0f);
-    float EditorPanel::HEADER_HEIGHT = 58;
+    float EditorPanel::HEADER_HEIGHT = 25;
 
 
     void EditorPanel::renderDockSpaces() {
@@ -63,7 +64,7 @@ namespace Metal {
         ImGui::Begin(NAME_HEADER, &UIUtil::OPEN, FLAGS | ImGuiWindowFlags_NoScrollbar);
         ImGui::PopStyleVar(3);
 
-        headerPanel.onSync();
+        headerPanel->onSync();
         ImGui::End();
     }
 
@@ -107,6 +108,7 @@ namespace Metal {
     }
 
     void EditorPanel::onInitialize() {
-        headerPanel.onInitialize();
+        headerPanel = new EditorHeaderPanel();
+        headerPanel->onInitialize();
     }
 }

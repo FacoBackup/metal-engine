@@ -18,7 +18,7 @@ namespace Metal {
     }
 
     bool VoxelVisualizerPass::shouldRun() {
-        return ApplicationContext::Get().editorRepository.showVoxels;
+    return ApplicationContext::Get().editorRepository.showRaySearchCountVoxels || ApplicationContext::Get().editorRepository.showRayTestCountVoxels;
     }
 
     void VoxelVisualizerPass::onSync() {

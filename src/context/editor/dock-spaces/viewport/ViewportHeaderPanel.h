@@ -8,17 +8,21 @@ namespace Metal {
     class ViewportHeaderPanel final : public AbstractPanel {
         static constexpr int FLAGS = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove |
                                      ImGuiWindowFlags_NoCollapse;
-        static constexpr ImVec2 PADDING{4, 4};
+        static constexpr ImVec2 PADDING{2, 2};
 
-        AbstractPanel *paintGizmo = nullptr;
         AbstractPanel *gizmo = nullptr;
+        int shadingModelOption = 0;
 
     public:
-        static constexpr float HEIGHT = 24;
+        static constexpr float HEIGHT = 25;
 
         void onInitialize() override;
 
         void onSync() override;
+
+        void cameraMode() const;
+
+        void shadingMode();
     };
 } // Metal
 

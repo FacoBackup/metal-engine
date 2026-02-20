@@ -6,8 +6,11 @@
 namespace Metal {
     void AsyncTaskPanel::onSync() {
         auto tasks = ApplicationContext::Get().asyncTaskService.getActiveTasks();
-        if (tasks.empty()) return;
-
+        if (tasks.empty()) {
+            UIUtil::DynamicSpacing(90);
+            return;
+        }
+        UIUtil::DynamicSpacing(250);
         ImGui::SameLine();
 
         float time = (float)ImGui::GetTime();

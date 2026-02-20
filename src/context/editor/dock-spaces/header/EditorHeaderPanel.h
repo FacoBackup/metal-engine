@@ -5,15 +5,11 @@
 
 namespace Metal {
     class EditorHeaderPanel final : public AbstractPanel {
-        AbstractPanel *globalSettings = nullptr;
-        AbstractPanel *projectInfo = nullptr;
         AbstractPanel *asyncTask = nullptr;
 
         void renderFileTab();
 
         static void framerate();
-
-        void hotKeys();
 
     public:
         void onInitialize() override;

@@ -55,12 +55,8 @@ add_executable(
         src/util/UIUtil.h
         src/context/editor/dock-spaces/header/EditorHeaderPanel.cpp
         src/context/editor/dock-spaces/header/EditorHeaderPanel.h
-        src/context/editor/dock-spaces/header/GlobalSettingsPanel.cpp
-        src/context/editor/dock-spaces/header/GlobalSettingsPanel.h
         src/context/editor/dock-spaces/header/AsyncTaskPanel.cpp
         src/context/editor/dock-spaces/header/AsyncTaskPanel.h
-        src/context/editor/dock-spaces/header/ProjectInfoPanel.cpp
-        src/context/editor/dock-spaces/header/ProjectInfoPanel.h
         src/common/interface/Icons.h
         src/service/dock/DockService.cpp
         src/service/dock/DockService.h
@@ -174,7 +170,6 @@ add_executable(
         src/repository/world/components/MeshComponent.h
         src/repository/world/components/TransformComponent.h
         src/enum/ShadingMode.h
-        src/enum/EditorMode.h
         src/context/editor/dock-spaces/hierarchy/HierarchyHeaderPanel.cpp
         src/context/editor/dock-spaces/hierarchy/HierarchyHeaderPanel.h
         src/service/selection/SelectionService.cpp
@@ -205,8 +200,6 @@ add_executable(
         src/context/editor/dock-spaces/viewport/ViewportHeaderPanel.h
         src/context/editor/dock-spaces/viewport/GizmoSettingsPanel.cpp
         src/context/editor/dock-spaces/viewport/GizmoSettingsPanel.h
-        src/context/editor/dock-spaces/viewport/PaintingSettingsPanel.cpp
-        src/context/editor/dock-spaces/viewport/PaintingSettingsPanel.h
         src/context/editor/abstract/form/types/QuatField.cpp
         src/context/editor/abstract/form/types/QuatField.h
         src/service/transform/TransformService.cpp

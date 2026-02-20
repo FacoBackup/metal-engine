@@ -31,15 +31,14 @@ namespace Metal {
 
         auto *framebuffer = ApplicationContext::Get().coreFrameBuffers.postProcessingFBO;
         ApplicationContext::Get().descriptorService.setImageDescriptor(framebuffer, 0);
-        ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet), viewportSize);
+        ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet),
+                     viewportSize);
 
         const ImVec2 imageMin = ImGui::GetItemRectMin();
         const ImVec2 imageMax = ImGui::GetItemRectMax();
         handleViewportPicking(imageMin, imageMax);
 
-        if (ApplicationContext::Get().editorRepository.editorMode == EditorMode::EditorMode::TRANSFORM) {
-            gizmoPanel->onSync();
-        }
+        gizmoPanel->onSync();
         cameraPanel->onSync();
     }
 
@@ -85,7 +84,8 @@ namespace Metal {
         if (ImGui::IsWindowHovered() && !ImGuizmo::IsUsing() && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
             cameraService.handleInput(isFirstMovement);
             if (const auto &io = ImGui::GetIO(); io.MouseWheel != 0) {
-                worldRepository.camera.movementSensitivity += io.MouseWheel * 100 * ApplicationContext::Get().engineContext.deltaTime;
+                worldRepository.camera.movementSensitivity += io.MouseWheel * 100 * ApplicationContext::Get().
+                        engineContext.deltaTime;
                 worldRepository.camera.movementSensitivity =
                         std::max(.1f, worldRepository.camera.movementSensitivity);
             }

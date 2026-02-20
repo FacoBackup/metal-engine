@@ -3,7 +3,6 @@
 
 #include "imgui.h"
 #include "abstract/AbstractPanel.h"
-#include "dock-spaces/header/EditorHeaderPanel.h"
 
 namespace Metal {
     class EditorPanel final : public AbstractPanel {
@@ -13,7 +12,7 @@ namespace Metal {
         static ImVec2 CENTER;
         static float HEADER_HEIGHT;
         ImGuiID windowId = 0;
-        EditorHeaderPanel headerPanel;
+        AbstractPanel *headerPanel = nullptr;
 
         static void SetWindowStyle();
 

@@ -27,7 +27,6 @@ namespace Metal {
         }
 
         dock->selectedOption = selectedSpace->index;
-
         const auto it = views.find(selectedSpace->index);
         if (it == views.end()) {
             auto *newView = selectedSpace->getPanel();
@@ -92,10 +91,6 @@ namespace Metal {
     }
 
     void DockSpacePanel::renderHeader() {
-        DockRepository &dockRepository = ApplicationContext::Get().dockRepository;
-        DockService &dockService = ApplicationContext::Get().dockService;
-        DockSpace *selectedSpace = getSelectedDockSpace();
-
         headerPadding.x = ImGui::GetStyle().FramePadding.x;
 
         if (ImGui::BeginMenuBar()) {
@@ -138,7 +133,6 @@ namespace Metal {
                         dock->dockSpaces.emplace_back(option);
                         dock->selectedOption = option->index;
                         initializeView();
-                        selectedSpace = option;
                     }
                 }
                 ImGui::EndPopup();
@@ -148,7 +142,7 @@ namespace Metal {
     }
 
     DockSpace *DockSpacePanel::getSelectedDockSpace() const {
-        if (dock->dockSpaces.empty()) {
+        if ( dock->dockSpaces.empty()) {
             return nullptr;
         }
 

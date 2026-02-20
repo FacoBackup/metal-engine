@@ -8,7 +8,6 @@
 
 #include "../../util/serialization-definitions.h"
 #include "../../enum/engine-definitions.h"
-#include "../../enum/EditorMode.h"
 #include "../../enum/ShadingMode.h"
 #include "../../common/inspection/Inspectable.h"
 
@@ -16,7 +15,6 @@ namespace Metal {
     struct TransformComponent;
 
     struct EditorRepository final : Inspectable {
-        bool showVoxels = false;
         bool showRaySearchCountVoxels = true;
         bool showRayTestCountVoxels = true;
         int voxelSearchCount = 32;
@@ -51,7 +49,6 @@ namespace Metal {
         EntityID mainSelection = EMPTY_ENTITY;
         std::unordered_map<EntityID, bool> selected{};
         std::vector<EntityID> copied{};
-        EditorMode::EditorMode editorMode = EditorMode::EditorMode::TRANSFORM;
         ShadingMode::ShadingMode shadingMode = ShadingMode::ShadingMode::LIT;
         bool brushModeAdd = true;
         float brushRadius = 10;
@@ -89,7 +86,6 @@ namespace Metal {
             mainSelection,
             selected,
             copied,
-            editorMode,
             shadingMode,
             brushModeAdd,
             brushRadius,
