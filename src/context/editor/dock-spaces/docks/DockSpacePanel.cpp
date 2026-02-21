@@ -1,12 +1,14 @@
 #include "DockSpacePanel.h"
 
 #include <string>
+#include <iostream>
 
 #include "AbstractDockPanel.h"
 #include "../../../../context/ApplicationContext.h"
 #include "../../../../common/interface/Icons.h"
 #include "../../../../repository/dock/DockDTO.h"
 #include "../../../../util/UIUtil.h"
+#include "../../../../service/log/LogService.h"
 
 namespace Metal {
     const ImVec2 DockSpacePanel::DEFAULT{-1.f, -1.f};
@@ -30,7 +32,7 @@ namespace Metal {
         if (it == views.end()) {
             auto *newView = selectedSpace->getPanel();
             newView->size = &size;
-            newView->dock = dock;
+            newView->dock = selectedSpace;
             newView->position = &position;
             appendChild(newView);
             views.emplace(selectedSpace->index, newView);
@@ -38,7 +40,7 @@ namespace Metal {
         } else {
             view = it->second;
             view->size = &size;
-            view->dock = dock;
+            view->dock = selectedSpace;
             view->position = &position;
         }
 
@@ -64,7 +66,21 @@ namespace Metal {
         beforeWindow();
         if (ImGui::Begin(dock->internalId.c_str(), &UIUtil::OPEN, FLAGS)) {
             if (view != nullptr) {
-                view->isWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+                const bool isHovered = ImGui::IsWindowFocused(ImGuiHoveredFlags_RootAndChildWindows);
+                if (isHovered) {
+                    CTX.editorRepository.focusedShortcuts = view->getShortcuts();
+                    CTX.editorRepository.focusedWindowName = view->dock->name;
+                }
+
+                view->isWindowFocused = isHovered;
+                if (view->isWindowFocused) {
+                    for (const auto &shortcut: CTX.editorRepository.focusedShortcuts) {
+                        if (ImGui::IsKeyChordPressed(shortcut.keyChord)) {
+                            LOG_INFO("Action called: " + shortcut.name);
+                            shortcut.callback();
+                        }
+                    }
+                }
             }
             sizeInternal = ImGui::GetWindowSize();
             size.x = sizeInternal.x;

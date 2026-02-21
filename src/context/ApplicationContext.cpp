@@ -125,6 +125,7 @@ namespace Metal {
             DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository), worldRepository)
             notificationService.pushMessage("Project saved", NotificationSeverities::SUCCESS);
         } catch (const std::exception &e) {
+            LOG_ERROR(e.what());
             notificationService.pushMessage("Could not save project", NotificationSeverities::ERROR);
         }
     }

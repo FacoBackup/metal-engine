@@ -18,9 +18,6 @@ namespace Metal {
 
 
     void RayTracingService::onSync() {
-        if (!CTX.vulkanContext.rayTracingSupported) {
-            return;
-        }
         if (!needsRebuild) {
             return;
         }

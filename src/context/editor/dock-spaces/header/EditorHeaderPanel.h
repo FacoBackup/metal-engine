@@ -9,6 +9,8 @@ namespace Metal {
 
         void renderFileTab();
 
+        void renderShortcuts();
+
         static void framerate();
 
     public:

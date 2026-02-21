@@ -5,9 +5,6 @@
 namespace Metal {
     class IconsPass final : public AbstractRenderPass {
     public:
-        explicit IconsPass()
-            : AbstractRenderPass() {
-        }
 
         void onInitialize() override;
 

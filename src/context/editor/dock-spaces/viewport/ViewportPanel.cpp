@@ -16,6 +16,26 @@ namespace Metal {
         appendChild(headerPanel = new ViewportHeaderPanel());
         appendChild(gizmoPanel = new GizmoPanel(position, size));
         appendChild(cameraPanel = new CameraPositionPanel());
+
+        shortcuts = {
+                ShortcutDTO("Delete", ImGuiKey_Delete, [this]() {
+                    std::vector<EntityID> entities;
+                    for (auto &entry: CTX.editorRepository.selected) {
+                        entities.push_back(entry.first);
+                    }
+                    CTX.worldRepository.deleteEntities(entities);
+                    CTX.selectionService.clearSelection();
+                }),
+                ShortcutDTO("Select All", ImGuiMod_Ctrl | ImGuiKey_A, [this]() {
+                    std::vector<EntityID> entities;
+                    for (auto &entry: CTX.worldRepository.entities) {
+                        if (entry.first != WorldRepository::ROOT_ID) {
+                            entities.push_back(entry.first);
+                        }
+                    }
+                    CTX.selectionService.addAllSelected(entities);
+                })
+        };
     }
 
     void ViewportPanel::onSync() {

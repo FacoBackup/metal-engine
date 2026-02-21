@@ -11,7 +11,8 @@ namespace Metal {
                     "tools/Icon.frag"
                 )
                 .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.lightData.get());
+                .addDescriptorSet(CTX.coreDescriptorSets.lightData.get())
+                .setBlendEnabled();
         pipelineInstance = CTX.pipelineService.createPipeline(iconPipelineBuilder);
     }
 

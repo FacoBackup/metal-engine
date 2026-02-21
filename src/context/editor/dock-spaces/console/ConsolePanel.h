@@ -8,8 +8,8 @@ namespace Metal {
     class ConsolePanel final : public AbstractDockPanel {
     public:
         void onSync() override;
-        explicit ConsolePanel();
 
+        explicit ConsolePanel();
     private:
         ImGuiTextFilter filter;
         bool autoScroll = true;

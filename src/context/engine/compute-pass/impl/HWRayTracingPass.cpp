@@ -7,10 +7,6 @@
 
 namespace Metal {
     bool HWRayTracingPass::shouldRun() {
-        if (!CTX.vulkanContext.rayTracingSupported) {
-            return false;
-        }
-
         CTX.rayTracingService.onSync();
 
         if (!CTX.rayTracingService.isReady()) {

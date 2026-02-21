@@ -67,7 +67,6 @@ namespace Metal {
         VmaAllocator allocator = VK_NULL_HANDLE;
         VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
         VkCommandPool commandPool = VK_NULL_HANDLE;
-        bool rayTracingSupported = false;
         VkPhysicalDeviceRayTracingPipelinePropertiesKHR rayTracingPipelineProperties{};
 
         PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR = nullptr;

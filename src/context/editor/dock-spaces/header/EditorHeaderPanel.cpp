@@ -44,8 +44,9 @@ namespace Metal {
                 ImGui::EndMenu();
             }
 
+            UIUtil::LargeSpacing();
+            renderShortcuts();
             UIUtil::Spacing();
-
 
             asyncTask->onSync();
 
@@ -60,4 +61,40 @@ namespace Metal {
         ImGui::Text("%i ms | %i fps", 1000 / framerate, framerate);
     }
 
+    void EditorHeaderPanel::renderShortcuts() {
+        auto &shortcuts = CTX.editorRepository.focusedShortcuts;
+        if (shortcuts.empty()) return;
+        ImGui::Text(CTX.editorRepository.focusedWindowName.c_str());
+        ImGui::SameLine();
+        std::string label;
+        for (size_t i = 0; i < std::min(shortcuts.size(), size_t(3)); ++i) {
+            if (i > 0) label += " | ";
+            label += UIUtil::GetKeyChordName(shortcuts[i].keyChord);
+        }
+
+        if (ImGui::Button(label.c_str())) {
+            ImGui::OpenPopup("AllShortcutsPopup");
+        }
+
+        if (ImGui::BeginPopup("AllShortcutsPopup")) {
+            if (ImGui::BeginTable("ShortcutsTable", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp)) {
+                ImGui::TableSetupColumn("Key");
+                ImGui::TableSetupColumn("Action");
+                ImGui::TableHeadersRow();
+
+                for (const auto &shortcut: shortcuts) {
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::TextUnformatted(UIUtil::GetKeyChordName(shortcut.keyChord).c_str());
+                    ImGui::TableNextColumn();
+                    if (ImGui::Selectable(shortcut.name.c_str(), false, ImGuiSelectableFlags_SpanAllColumns)) {
+                        shortcut.callback();
+                        ImGui::CloseCurrentPopup();
+                    }
+                }
+                ImGui::EndTable();
+            }
+            ImGui::EndPopup();
+        }
+    }
 }

@@ -12,6 +12,26 @@ namespace Metal {
         appendChild(headerPanel = new HierarchyHeaderPanel());
         world = &CTX.worldRepository;
         editorRepository = &CTX.editorRepository;
+
+        shortcuts = {
+                ShortcutDTO("Delete", ImGuiKey_Delete, [this]() {
+                    std::vector<EntityID> entities;
+                    for (auto &entry: CTX.editorRepository.selected) {
+                        entities.push_back(entry.first);
+                    }
+                    CTX.worldRepository.deleteEntities(entities);
+                    CTX.selectionService.clearSelection();
+                }),
+                ShortcutDTO("Select All", ImGuiMod_Ctrl | ImGuiKey_A, [this]() {
+                    std::vector<EntityID> entities;
+                    for (auto &entry: world->entities) {
+                        if (entry.first != WorldRepository::ROOT_ID) {
+                            entities.push_back(entry.first);
+                        }
+                    }
+                    CTX.selectionService.addAllSelected(entities);
+                })
+        };
     }
 
     void HierarchyPanel::contextMenu() const {
@@ -109,8 +129,8 @@ namespace Metal {
             if (comp == ComponentTypes::MESH) {
                 return ComponentTypes::IconOf(ComponentTypes::MESH);
             }
-            if (comp == ComponentTypes::LIGHT) {
-                return ComponentTypes::IconOf(ComponentTypes::LIGHT);
+            if (comp == ComponentTypes::SPHERE_LIGHT) {
+                return ComponentTypes::IconOf(ComponentTypes::SPHERE_LIGHT);
             }
             if (comp == ComponentTypes::VOLUME) {
                 return ComponentTypes::IconOf(ComponentTypes::VOLUME);

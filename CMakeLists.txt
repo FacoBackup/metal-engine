@@ -71,8 +71,6 @@ add_executable(
         src/service/theme/ThemeService.h
         src/repository/editor/EditorRepository.h
         src/enum/engine-definitions.h
-        src/context/editor/dock-spaces/metrics/MetricsPanel.cpp
-        src/context/editor/dock-spaces/metrics/MetricsPanel.h
         src/context/editor/dock-spaces/files/FilesPanel.cpp
         src/context/editor/dock-spaces/files/FilesPanel.h
         src/context/editor/dock-spaces/files/FilePreviewPanel.cpp
@@ -251,6 +249,9 @@ add_executable(
         src/dto/buffers/LightData.h
         src/repository/world/components/LightComponent.cpp
         src/repository/world/components/LightComponent.h
+        src/repository/world/components/SphereLightComponent.cpp
+        src/repository/world/components/SphereLightComponent.h
+        src/repository/world/components/PlaneLightComponent.h
         src/context/engine/render-pass/impl/tools/IconsPass.cpp
         src/context/engine/render-pass/impl/tools/IconsPass.h
         src/repository/editor/EditorRepository.cpp
@@ -271,7 +272,7 @@ add_executable(
         src/repository/inspection/FileInspectionRepository.h
         src/context/editor/dock-spaces/inspector/MaterialInspection.cpp
         src/context/editor/dock-spaces/inspector/MaterialInspection.h
-        src/enum/LightVolumeType.h
+        src/enum/LightType.h
         src/context/engine/compute-pass/impl/AccumulationMetadataPass.cpp
         src/context/engine/compute-pass/impl/AccumulationMetadataPass.h
         src/context/engine/compute-pass/impl/AccumulationPass.cpp

@@ -1,5 +1,7 @@
 #include "LightService.h"
 #include "../../context/ApplicationContext.h"
+#include "../../repository/world/components/SphereLightComponent.h"
+#include "../../repository/world/components/PlaneLightComponent.h"
 #include "../buffer/BufferInstance.h"
 
 namespace Metal {
@@ -10,29 +12,23 @@ namespace Metal {
             }
             auto &t = CTX.worldRepository.transforms.at(entry.first);
             auto &translation = t.translation;
-            auto &l = entry.second;
+            auto &l = *entry.second;
+            const auto lightType = l.getLightType();
 
             glm::vec3 normal(0.0f, 1.0f, 0.0f);
             glm::vec3 rotatedNormal = t.rotation * normal;
+
+            float radiusOrScale = 0;
+            if (lightType == LightTypes::SPHERE) {
+                radiusOrScale = static_cast<SphereLightComponent&>(l).radiusSize;
+            }
 
             items.push_back(LightData(
                 glm::vec4(l.color, l.intensity),
                 translation,
                 glm::normalize(rotatedNormal),
-                l.lightType == LightVolumeTypes::LightVolumeType::SPHERE ? glm::vec3(l.radiusSize) : glm::vec3(t.scale),
-                l.lightType
-            ));
-        }
-    }
-
-    void LightService::registerSun() {
-        if (CTX.engineRepository.atmosphereEnabled) {
-            items.push_back(LightData(
-                glm::vec4(sunColor, CTX.engineRepository.sunLightIntensity),
-                sunPosition,
-                glm::vec3(0),
-                glm::vec3(CTX.engineRepository.sunRadius),
-                LightVolumeTypes::SPHERE
+                lightType == LightTypes::SPHERE ? glm::vec3(radiusOrScale) : glm::vec3(t.scale),
+                lightType
             ));
         }
     }
@@ -40,7 +36,6 @@ namespace Metal {
     void LightService::onSync() {
         items.clear();
 
-        registerSun();
         registerLights();
 
         if (!items.empty()) {

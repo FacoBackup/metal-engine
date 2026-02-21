@@ -47,8 +47,8 @@ namespace Metal {
                 return meshes.contains(entity) ? &meshes.find(entity)->second : nullptr;
             case ComponentTypes::TRANSFORM:
                 return transforms.contains(entity) ? &transforms.find(entity)->second : nullptr;
-            case ComponentTypes::LIGHT:
-                return lights.contains(entity) ? &lights.find(entity)->second : nullptr;
+            case ComponentTypes::SPHERE_LIGHT:
+                return lights.contains(entity) ? lights.find(entity)->second.get() : nullptr;
             case ComponentTypes::VOLUME:
                 return volumes.contains(entity) ? &volumes.find(entity)->second : nullptr;
             default:
@@ -131,10 +131,18 @@ namespace Metal {
                 createComponent(entity, ComponentTypes::TRANSFORM);
                 break;
             }
-            case ComponentTypes::LIGHT: {
-                lights.emplace(entity, LightComponent{});
-                lights.at(entity).setEntityId(entity);
-                getEntity(entity)->components.push_back(ComponentTypes::LIGHT);
+            case ComponentTypes::SPHERE_LIGHT: {
+                lights.emplace(entity, std::make_unique<SphereLightComponent>());
+                lights.at(entity)->setEntityId(entity);
+                getEntity(entity)->components.push_back(ComponentTypes::SPHERE_LIGHT);
+                createComponent(entity, ComponentTypes::TRANSFORM);
+                CTX.engineContext.setUpdateLights(true);
+                break;
+            }
+            case ComponentTypes::PLANE_LIGHT: {
+                lights.emplace(entity, std::make_unique<PlaneLightComponent>());
+                lights.at(entity)->setEntityId(entity);
+                getEntity(entity)->components.push_back(ComponentTypes::PLANE_LIGHT);
                 createComponent(entity, ComponentTypes::TRANSFORM);
                 CTX.engineContext.setUpdateLights(true);
                 break;

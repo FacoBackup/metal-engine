@@ -26,23 +26,18 @@ namespace Metal {
 
         instance->indexCount = data->indices.size();
 
-        const bool rtEnabled = CTX.vulkanContext.rayTracingSupported;
-        const VkBufferUsageFlags rtVertexFlags = rtEnabled
-            ? (VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR)
-            : 0;
+        const VkBufferUsageFlags rtVertexFlags = (VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR);
         const VkBufferUsageFlags rtIndexFlags = rtVertexFlags;
 
         instance->dataBuffer = CTX.bufferService.createBuffer(
             sizeof(VertexData) * data->data.size(),
             VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | rtVertexFlags,
-            data->data.data(),
-            rtEnabled);
+            data->data.data());
 
         instance->indexBuffer = CTX.bufferService.createBuffer(
             sizeof(unsigned int) * data->indices.size(),
             VK_BUFFER_USAGE_INDEX_BUFFER_BIT | rtIndexFlags,
-            data->indices.data(),
-            rtEnabled);
+            data->indices.data());
 
         delete data;
 

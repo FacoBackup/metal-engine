@@ -6,7 +6,7 @@
 
 namespace Metal {
     VulkanContext::VulkanContext(bool debugMode) : AbstractRuntimeComponent(),
-        debugMode(debugMode) {
+                                                   debugMode(debugMode) {
     }
 
     void VulkanContext::createSwapChain() {
@@ -60,11 +60,9 @@ namespace Metal {
         rtPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
         rtPipelineFeatures.rayTracingPipeline = VK_TRUE;
 
-        if (rayTracingSupported) {
-            deviceBuilder.add_pNext(&bufferDeviceAddressFeatures);
-            deviceBuilder.add_pNext(&accelFeatures);
-            deviceBuilder.add_pNext(&rtPipelineFeatures);
-        }
+        deviceBuilder.add_pNext(&bufferDeviceAddressFeatures);
+        deviceBuilder.add_pNext(&accelFeatures);
+        deviceBuilder.add_pNext(&rtPipelineFeatures);
 
         auto deviceResult = deviceBuilder.build();
         if (!deviceResult) {
@@ -72,42 +70,40 @@ namespace Metal {
         }
         device = deviceResult.value();
 
-        if (rayTracingSupported) {
-            vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(
-                vkGetDeviceProcAddr(device.device, "vkGetBufferDeviceAddressKHR"));
-            vkCreateAccelerationStructureKHR = reinterpret_cast<PFN_vkCreateAccelerationStructureKHR>(
-                vkGetDeviceProcAddr(device.device, "vkCreateAccelerationStructureKHR"));
-            vkDestroyAccelerationStructureKHR = reinterpret_cast<PFN_vkDestroyAccelerationStructureKHR>(
-                vkGetDeviceProcAddr(device.device, "vkDestroyAccelerationStructureKHR"));
-            vkGetAccelerationStructureBuildSizesKHR = reinterpret_cast<PFN_vkGetAccelerationStructureBuildSizesKHR>(
-                vkGetDeviceProcAddr(device.device, "vkGetAccelerationStructureBuildSizesKHR"));
-            vkCmdBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(
-                vkGetDeviceProcAddr(device.device, "vkCmdBuildAccelerationStructuresKHR"));
-            vkGetAccelerationStructureDeviceAddressKHR = reinterpret_cast<PFN_vkGetAccelerationStructureDeviceAddressKHR>(
-                vkGetDeviceProcAddr(device.device, "vkGetAccelerationStructureDeviceAddressKHR"));
-            vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(
-                vkGetDeviceProcAddr(device.device, "vkCreateRayTracingPipelinesKHR"));
-            vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(
-                vkGetDeviceProcAddr(device.device, "vkGetRayTracingShaderGroupHandlesKHR"));
-            vkCmdTraceRaysKHR = reinterpret_cast<PFN_vkCmdTraceRaysKHR>(
-                vkGetDeviceProcAddr(device.device, "vkCmdTraceRaysKHR"));
+        vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(
+            vkGetDeviceProcAddr(device.device, "vkGetBufferDeviceAddressKHR"));
+        vkCreateAccelerationStructureKHR = reinterpret_cast<PFN_vkCreateAccelerationStructureKHR>(
+            vkGetDeviceProcAddr(device.device, "vkCreateAccelerationStructureKHR"));
+        vkDestroyAccelerationStructureKHR = reinterpret_cast<PFN_vkDestroyAccelerationStructureKHR>(
+            vkGetDeviceProcAddr(device.device, "vkDestroyAccelerationStructureKHR"));
+        vkGetAccelerationStructureBuildSizesKHR = reinterpret_cast<PFN_vkGetAccelerationStructureBuildSizesKHR>(
+            vkGetDeviceProcAddr(device.device, "vkGetAccelerationStructureBuildSizesKHR"));
+        vkCmdBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(
+            vkGetDeviceProcAddr(device.device, "vkCmdBuildAccelerationStructuresKHR"));
+        vkGetAccelerationStructureDeviceAddressKHR = reinterpret_cast<PFN_vkGetAccelerationStructureDeviceAddressKHR>(
+            vkGetDeviceProcAddr(device.device, "vkGetAccelerationStructureDeviceAddressKHR"));
+        vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(
+            vkGetDeviceProcAddr(device.device, "vkCreateRayTracingPipelinesKHR"));
+        vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(
+            vkGetDeviceProcAddr(device.device, "vkGetRayTracingShaderGroupHandlesKHR"));
+        vkCmdTraceRaysKHR = reinterpret_cast<PFN_vkCmdTraceRaysKHR>(
+            vkGetDeviceProcAddr(device.device, "vkCmdTraceRaysKHR"));
 
-            rayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
-            VkPhysicalDeviceProperties2 deviceProperties2{};
-            deviceProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-            deviceProperties2.pNext = &rayTracingPipelineProperties;
-            vkGetPhysicalDeviceProperties2(physDevice.physical_device, &deviceProperties2);
-        }
+        rayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
+        VkPhysicalDeviceProperties2 deviceProperties2{};
+        deviceProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+        deviceProperties2.pNext = &rayTracingPipelineProperties;
+        vkGetPhysicalDeviceProperties2(physDevice.physical_device, &deviceProperties2);
     }
 
     void VulkanContext::createPhysicalDevice() {
         vkb::PhysicalDeviceSelector physDeviceSelector(instance);
-        
+
         auto physicalDeviceResult = physDeviceSelector
                 .set_surface(surface)
                 .require_present()
                 .select();
-        
+
         if (!physicalDeviceResult) {
             throw std::runtime_error("Failed to create physical device " + physicalDeviceResult.error().message());
         }
@@ -127,7 +123,8 @@ namespace Metal {
         vkGetPhysicalDeviceFeatures(physDevice.physical_device, &supportedFeatures);
 
         if (!supportedFeatures.tessellationShader) features.tessellationShader = VK_FALSE;
-        if (!supportedFeatures.shaderStorageImageWriteWithoutFormat) features.shaderStorageImageWriteWithoutFormat = VK_FALSE;
+        if (!supportedFeatures.shaderStorageImageWriteWithoutFormat)
+            features.shaderStorageImageWriteWithoutFormat = VK_FALSE;
         if (!supportedFeatures.fragmentStoresAndAtomics) features.fragmentStoresAndAtomics = VK_FALSE;
         if (!supportedFeatures.shaderInt64) features.shaderInt64 = VK_FALSE;
         if (!supportedFeatures.multiDrawIndirect) features.multiDrawIndirect = VK_FALSE;
@@ -140,7 +137,9 @@ namespace Metal {
         }
 
         vkGetPhysicalDeviceProperties(physDevice.physical_device, &physicalDeviceProperties);
-        LOG_INFO("MAX SAMPLERS " + std::to_string(physicalDeviceProperties.limits.maxDescriptorSetSamplers) + " " + std::to_string(physicalDeviceProperties.limits.maxPerStageDescriptorSampledImages));
+        LOG_INFO(
+            "MAX SAMPLERS " + std::to_string(physicalDeviceProperties.limits.maxDescriptorSetSamplers) + " " + std::
+            to_string(physicalDeviceProperties.limits.maxPerStageDescriptorSampledImages));
         vkGetPhysicalDeviceMemoryProperties(physDevice.physical_device, &physicalDeviceMemoryProperties);
         if (!physDevice.enable_extension_if_present("VK_KHR_timeline_semaphore")) {
             throw std::runtime_error("Failed to enable core extension");
@@ -149,21 +148,23 @@ namespace Metal {
         physDevice.enable_extension_if_present(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
         // Ray tracing extensions
-        rayTracingSupported =
-            physDevice.enable_extension_if_present(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) &&
-            physDevice.enable_extension_if_present(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME) &&
-            physDevice.enable_extension_if_present(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME) &&
-            physDevice.enable_extension_if_present(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
+        bool rayTracingSupported =
+                physDevice.enable_extension_if_present(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) &&
+                physDevice.enable_extension_if_present(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME) &&
+                physDevice.enable_extension_if_present(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME) &&
+                physDevice.enable_extension_if_present(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
 
         if (rayTracingSupported) {
             LOG_INFO("Ray tracing extensions enabled");
         } else {
-            LOG_INFO("Ray tracing extensions NOT supported");
+            throw std::runtime_error("Ray tracing extensions NOT supported");
         }
     }
 
     void VulkanContext::createPresentMode() {
-         VkPresentModeKHR presentModes = !CTX.engineRepository.vsync ? VK_PRESENT_MODE_IMMEDIATE_KHR : VK_PRESENT_MODE_FIFO_KHR;
+        VkPresentModeKHR presentModes = !CTX.engineRepository.vsync
+                                            ? VK_PRESENT_MODE_IMMEDIATE_KHR
+                                            : VK_PRESENT_MODE_FIFO_KHR;
         imguiVulkanWindow.PresentMode = ImGui_ImplVulkanH_SelectPresentMode(
             physDevice.physical_device, imguiVulkanWindow.Surface,
             &presentModes,
@@ -189,9 +190,7 @@ namespace Metal {
         allocatorInfo.physicalDevice = physDevice.physical_device;
         allocatorInfo.device = device.device;
         allocatorInfo.instance = instance.instance;
-        if (rayTracingSupported) {
-            allocatorInfo.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
-        }
+        allocatorInfo.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
         vmaCreateAllocator(&allocatorInfo, &allocator);
     }
 
@@ -265,7 +264,7 @@ namespace Metal {
                 .set_app_name(ENGINE_NAME)
                 .set_engine_name(ENGINE_NAME)
                 .require_api_version(1, 2, 0)
-                        .enable_extension(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME)
+                .enable_extension(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME)
                 .build();
         if (!vkbResult) {
             throw std::runtime_error("Failed to create runtime instance.");

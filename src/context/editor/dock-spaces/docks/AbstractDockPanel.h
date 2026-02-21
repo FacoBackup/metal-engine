@@ -2,20 +2,28 @@
 #define METAL_ENGINE_ABSTRACTDOCKPANEL_H
 
 #include <glm/vec2.hpp>
+#include <vector>
 
 #include "../../abstract/AbstractPanel.h"
+#include "../../../../dto/ShortcutDTO.h"
 
 struct ImVec2;
 
 namespace Metal {
-    struct DockDTO;
+    struct DockSpace;
 
     class AbstractDockPanel : public AbstractPanel {
     public:
         bool isWindowFocused = false;
         ImVec2 *position = nullptr;
         glm::vec2 *size = nullptr;
-        DockDTO *dock = nullptr;
+        DockSpace *dock = nullptr;
+
+        std::vector<ShortcutDTO> shortcuts;
+
+        const std::vector<ShortcutDTO> &getShortcuts() {
+            return shortcuts;
+        }
     };
 }
 

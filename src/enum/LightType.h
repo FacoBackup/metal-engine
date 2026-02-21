@@ -2,8 +2,8 @@
 #define LIGHTTYPE_H
 #include <unordered_map>
 
-namespace Metal::LightVolumeTypes{
-    enum LightVolumeType {
+namespace Metal::LightTypes{
+    enum LightType {
         SPHERE,
         PLANE
     };

@@ -8,7 +8,7 @@ struct Light {
     uint itemType;
 };
 
-layout(set = LIGHT_SET, binding = 0) uniform Lights {
-    Light items[MAX_LIGHTS];
+layout(set = LIGHT_SET, binding = 0) readonly buffer Lights {
+    Light items[];
 } lightBuffer;
 #endif

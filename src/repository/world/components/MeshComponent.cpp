@@ -1,6 +1,8 @@
 #include "MeshComponent.h"
 #include "../../../context/ApplicationContext.h"
 #include "../../../enum/EntryType.h"
+#include "../../../service/mesh/MeshData.h"
+#include "../../../enum/LevelOfDetail.h"
 
 namespace Metal {
     void MeshComponent::registerFields() {
@@ -17,6 +19,13 @@ namespace Metal {
     }
 
     void MeshComponent::onUpdate(InspectableMember *member) {
+        if (member != nullptr && member->name == "meshId") {
+            MeshData *data = CTX.meshService.stream(meshId, LevelOfDetail::LOD_0);
+            if (data != nullptr) {
+                CTX.worldRepository.transforms.at(entityId).gizmoCenter = data->gizmoCenter;
+                delete data;
+            }
+        }
         CTX.engineContext.setGISettingsUpdated(true);
         needsReVoxelization = true;
     }

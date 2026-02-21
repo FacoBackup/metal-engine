@@ -4,8 +4,6 @@
 #include "../../service/buffer/BufferInstance.h"
 #include "../../service/descriptor/DescriptorBinding.h"
 #include "../../service/voxel/SVOInstance.h"
-#include "../../enum/LevelOfDetail.h"
-#include "../../enum/LightVolumeType.h"
 #include "../../service/camera/Camera.h"
 #include "../../service/framebuffer/FrameBufferInstance.h"
 #include "../../service/texture/TextureInstance.h"

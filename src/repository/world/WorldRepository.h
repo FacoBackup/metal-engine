@@ -1,6 +1,7 @@
 #ifndef WORLDREPOSITORY_H
 #define WORLDREPOSITORY_H
 
+#include <memory>
 #include <unordered_map>
 #include <vector>
 #include <glm/ext/scalar_constants.hpp>
@@ -12,6 +13,8 @@
 #include "../../enum/ComponentType.h"
 #include "../../util/serialization-definitions.h"
 #include "components/LightComponent.h"
+#include "components/SphereLightComponent.h"
+#include "components/PlaneLightComponent.h"
 #include "components/MeshComponent.h"
 #include "components/TransformComponent.h"
 #include "components/VolumeComponent.h"
@@ -26,7 +29,7 @@ namespace Metal {
         std::unordered_map<EntityID, Entity> entities{};
         std::unordered_map<EntityID, MeshComponent> meshes{};
         std::unordered_map<EntityID, TransformComponent> transforms{};
-        std::unordered_map<EntityID, LightComponent> lights{};
+        std::unordered_map<EntityID, std::unique_ptr<LightComponent>> lights{};
         std::unordered_map<EntityID, VolumeComponent> volumes{};
         std::unordered_map<EntityID, bool> culled{};
         std::unordered_map<EntityID, bool> hiddenEntities{};

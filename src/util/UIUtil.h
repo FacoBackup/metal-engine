@@ -77,6 +77,22 @@ namespace Metal::UIUtil {
         ImGui::SameLine();
     }
 
+    static std::string GetKeyChordName(ImGuiKeyChord keyChord) {
+        std::string result;
+        if (keyChord & ImGuiMod_Ctrl) result += "Ctrl+";
+        if (keyChord & ImGuiMod_Shift) result += "Shift+";
+        if (keyChord & ImGuiMod_Alt) result += "Alt+";
+        if (keyChord & ImGuiMod_Super) result += "Super+";
+
+        const ImGuiKey key = static_cast<ImGuiKey>(keyChord & ~ImGuiMod_Mask_);
+        if (key != ImGuiKey_None) {
+            result += ImGui::GetKeyName(key);
+        } else if (!result.empty() && result.back() == '+') {
+            result.pop_back();
+        }
+        return result;
+    }
+
     static std::string GetEntryIcon(const EntryType::EntryType type) {
         switch (type) {
             case EntryType::MESH:

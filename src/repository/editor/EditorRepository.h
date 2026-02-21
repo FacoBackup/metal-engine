@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <glm/vec3.hpp>
 
+#include "../../dto/ShortcutDTO.h"
 #include "../../util/serialization-definitions.h"
 #include "../../enum/engine-definitions.h"
 #include "../../enum/ShadingMode.h"
@@ -15,8 +16,8 @@ namespace Metal {
     struct TransformComponent;
 
     struct EditorRepository final : Inspectable {
-        bool showRaySearchCountVoxels = true;
-        bool showRayTestCountVoxels = true;
+        bool showRaySearchCountVoxels = false;
+        bool showRayTestCountVoxels = false;
         int voxelSearchCount = 32;
 
         ImVec4 accent{};
@@ -49,6 +50,8 @@ namespace Metal {
         EntityID mainSelection = EMPTY_ENTITY;
         std::unordered_map<EntityID, bool> selected{};
         std::vector<EntityID> copied{};
+        std::string focusedWindowName{};
+        std::vector<ShortcutDTO> focusedShortcuts{};
         ShadingMode::ShadingMode shadingMode = ShadingMode::ShadingMode::LIT;
         bool brushModeAdd = true;
         float brushRadius = 10;

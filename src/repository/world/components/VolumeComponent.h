@@ -5,7 +5,7 @@
 #include "../../../util/serialization-definitions.h"
 #include <glm/vec3.hpp>
 
-#include "../../../enum/LightVolumeType.h"
+#include "../../../enum/LightType.h"
 
 namespace Metal {
     struct VolumeComponent final : AbstractComponent {

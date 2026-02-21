@@ -38,6 +38,22 @@ namespace Metal {
         appendChild(filesHeader = new FilesHeader(filesContext, getActionLabel(), onAction()));
         previewPanel = new FilePreviewPanel(filesContext);
         appendChild(previewPanel);
+
+        shortcuts = {
+                ShortcutDTO("Cut", ImGuiMod_Ctrl | ImGuiKey_X, [this]() {
+                    cutSelected();
+                }),
+                ShortcutDTO("Paste", ImGuiMod_Ctrl | ImGuiKey_V, [this]() {
+                    pasteSelected();
+                }),
+                ShortcutDTO("Delete", ImGuiKey_Delete, [this]() {
+                    deleteSelected();
+                }),
+                ShortcutDTO("Select All", ImGuiMod_Ctrl | ImGuiKey_A, [this]() {
+                    selectAll();
+                }),
+                ShortcutDTO("Import File", ImGuiMod_Ctrl | ImGuiKey_I, onAction())
+        };
     }
 
     void FilesPanel::contextMenu() {

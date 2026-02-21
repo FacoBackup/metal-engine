@@ -9,7 +9,7 @@
 #include "../context/ApplicationContext.h"
 #include "FilesUtil.h"
 #include "../service/log/LogService.h"
-#include "../enum/LightVolumeType.h"
+#include "../enum/LightType.h"
 #include "glslang/Include/glslang_c_interface.h"
 #include "glslang/Public/resource_limits_c.h"
 #define BASE_PATH "../resources/shaders/"
@@ -166,7 +166,7 @@ namespace Metal {
         if (CTX.isDebugMode()) {
             source = "#define DEBUG\n" + source;
         }
-        for (auto &entry: LightVolumeTypes::getEntries()) {
+        for (auto &entry: LightTypes::getEntries()) {
             source = "#define " + entry.first + " " + std::to_string(entry.second) + "\n" + source;
         }
         source = "#define TILE_SIZE " + std::to_string(TILE_SIZE) + std::string("\n") + source;
