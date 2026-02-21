@@ -10,8 +10,8 @@
 namespace Metal {
     class FileImporterService final : public AbstractRuntimeComponent {
     public:
-        explicit FileImporterService(ApplicationContext &context)
-            : AbstractRuntimeComponent(context) {
+        explicit FileImporterService()
+            : AbstractRuntimeComponent() {
         }
 
         using LoadingTask = std::function<void(const std::stop_token &)>;

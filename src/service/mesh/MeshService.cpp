@@ -6,13 +6,14 @@
 
 #include "../../context/vulkan/VulkanContext.h"
 #include "../../util/FilesUtil.h"
+#include "../../util/serialization-definitions.h"
 
-#include <cereal/archives/binary.hpp>
 #include <fstream>
 
 #include "../../context/ApplicationContext.h"
 #include "../../enum/LevelOfDetail.h"
 #include "../../repository/world/components/MeshComponent.h"
+#include "../../repository/world/components/TransformComponent.h"
 
 namespace Metal {
     MeshInstance *MeshService::create(const std::string &id, const LevelOfDetail &levelOfDetail) {
@@ -24,16 +25,19 @@ namespace Metal {
         registerResource(instance);
 
         instance->indexCount = data->indices.size();
+        instance->vertexCount = data->data.size();
 
-        instance->dataBuffer = context.bufferService.createBuffer(
+        instance->dataBuffer = CTX.bufferService.createBuffer(
             sizeof(VertexData) * data->data.size(),
-            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-            data->data.data());
+            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
+            data->data.data(),
+            true);
 
-        instance->indexBuffer = context.bufferService.createBuffer(
+        instance->indexBuffer = CTX.bufferService.createBuffer(
             sizeof(unsigned int) * data->indices.size(),
-            VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-            data->indices.data());
+            VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
+            data->indices.data(),
+            true);
 
         delete data;
 
@@ -41,30 +45,38 @@ namespace Metal {
     }
 
     MeshData *MeshService::stream(const std::string &id, const LevelOfDetail &levelOfDetail) const {
-        auto pathToFile = context.getAssetDirectory() + FORMAT_FILE_MESH(id, levelOfDetail);
+        auto pathToFile = CTX.getAssetDirectory() + FORMAT_FILE_MESH(id, levelOfDetail);
         if (std::filesystem::exists(pathToFile)) {
-            MeshData *data = new MeshData;
-            PARSE_TEMPLATE(data->load, pathToFile)
+            auto *data = new MeshData;
+            PARSE_TEMPLATE(*data, pathToFile)
             return data;
         }
         return nullptr;
     }
 
     EntityID MeshService::createMeshEntity(const std::string &name, const std::string &meshId) const {
-        const auto id = context.worldRepository.createEntity();
-        context.worldRepository.createComponent(id, ComponentTypes::ComponentType::MESH);
-        context.worldRepository.meshes[id].meshId = meshId;
-        context.worldRepository.getEntity(id)->name = name;
+        const auto id = CTX.worldRepository.createEntity();
+        CTX.worldRepository.createComponent(id, ComponentTypes::ComponentType::MESH);
+        const auto entity = static_cast<entt::entity>(id);
+        auto &mesh = CTX.worldRepository.registry.get<MeshComponent>(entity);
+        mesh.meshId = meshId;
+
+        MeshData *data = stream(meshId, LevelOfDetail::LOD_0);
+        if (data != nullptr) {
+            auto &transform = CTX.worldRepository.registry.get<TransformComponent>(entity);
+            transform.gizmoCenter = data->gizmoCenter;
+            delete data;
+        }
+
+        CTX.worldRepository.getEntity(id)->name = name;
         return id;
     }
 
     void MeshService::createSceneEntities(const std::string &id) const {
-        auto &repo = context.worldRepository;
+        auto &repo = CTX.worldRepository;
         SceneData data;
-        auto pathToFile = context.getAssetDirectory() + FORMAT_FILE_SCENE(id);
-        std::ifstream os(pathToFile, std::ios::binary);
-        cereal::BinaryInputArchive archive(os);
-        data.load(archive);
+        auto pathToFile = CTX.getAssetDirectory() + FORMAT_FILE_SCENE(id);
+        PARSE_TEMPLATE(data, pathToFile)
 
         std::unordered_map<int, EntityID> entities;
 
@@ -75,7 +87,7 @@ namespace Metal {
                 const auto entityId = repo.createEntity();
                 entities.insert({entity.id, entityId});
                 repo.getEntity(entityId)->name = entity.name;
-                repo.getEntity(entityId)->isContainer = true;
+                repo.getEntity(entityId)->initialize(true);
             }
         }
 
@@ -83,9 +95,7 @@ namespace Metal {
             if (entity.parentEntity < 0 || !entities.contains(entity.parentEntity)) {
                 continue;
             }
-            repo.linkEntities(repo.getEntity(entities.at(entity.parentEntity)), repo.getEntity(entities.at(entity.id)));
+            repo.linkEntities(entities.at(entity.parentEntity), entities.at(entity.id));
         }
-
-        context.engineContext.dispatchSceneVoxelization();
     }
 } // Metal

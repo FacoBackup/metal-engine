@@ -3,43 +3,45 @@
 #include "../../../../../context/ApplicationContext.h"
 #include "../../../../../enum/LevelOfDetail.h"
 #include "../../../../../repository/world/components/TransformComponent.h"
+#include "../../../../../dto/push-constant/SelectedDotPushConstant.h"
 #include "../../../../../service/pipeline/PipelineBuilder.h"
 
 namespace Metal {
     void SelectedDotPass::onInitialize() {
         PipelineBuilder builder = PipelineBuilder::Of(
-                    context.coreFrameBuffers.postProcessingFBO,
+                    CTX.coreFrameBuffers.postProcessingFBO,
                     "tools/SelectedDot.vert",
                     "tools/SelectedDot.frag"
                 )
                 .setBlendEnabled()
                 .setPrepareForMesh()
                 .setCullMode(VK_CULL_MODE_BACK_BIT)
-                .setPushConstantsSize(sizeof(MeshPushConstant))
-                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get());
-        pipelineInstance = context.pipelineService.createPipeline(builder);
+                .setPushConstantsSize(sizeof(SelectedDotPushConstant))
+                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.gBufferPosition.get());
+        pipelineInstance = CTX.pipelineService.createPipeline(builder);
     }
 
     bool SelectedDotPass::shouldRun() {
-        return !context.editorRepository.selected.empty();
+        return !CTX.editorRepository.selected.empty();
     }
 
     void SelectedDotPass::onSync() {
-        for (const auto &pair: context.editorRepository.selected) {
+        for (const auto &pair: CTX.editorRepository.selected) {
             if (!pair.second) {
                 continue;
             }
             const EntityID entityId = pair.first;
-            if (!worldRepository.meshes.contains(entityId) || !worldRepository.transforms.contains(entityId)) {
+            const auto entity = static_cast<entt::entity>(entityId);
+            if (!worldRepository.registry.all_of<MeshComponent>(entity) || !worldRepository.registry.all_of<TransformComponent>(entity)) {
                 continue;
             }
 
-            const auto &mesh = worldRepository.meshes[entityId];
+            const auto &mesh = worldRepository.registry.get<MeshComponent>(entity);
             if (mesh.meshId.empty()) {
                 continue;
             }
-            if (worldRepository.hiddenEntities.contains(mesh.getEntityId())) {
+            if (worldRepository.hiddenEntities.contains(entityId)) {
                 continue;
             }
 
@@ -48,21 +50,12 @@ namespace Metal {
                 continue;
             }
 
-            pushConstant.model = worldRepository.transforms[entityId].model;
-            pushConstant.albedoEmissive.x = context.editorRepository.selectionColor.x;
-            pushConstant.albedoEmissive.y = context.editorRepository.selectionColor.y;
-            pushConstant.albedoEmissive.z = context.editorRepository.selectionColor.z;
-            pushConstant.albedoEmissive.w = context.editorRepository.selectionOutlineThickness;
+            pushConstant.model = worldRepository.registry.get<TransformComponent>(entity).model;
+            pushConstant.selectionColor.x = CTX.editorRepository.selectionColor.x;
+            pushConstant.selectionColor.y = CTX.editorRepository.selectionColor.y;
+            pushConstant.selectionColor.z = CTX.editorRepository.selectionColor.z;
+            pushConstant.selectionColor.w = CTX.editorRepository.selectionOutlineThickness;
             pushConstant.renderIndex = mesh.renderIndex;
-            pushConstant.roughnessFactor = 0;
-            pushConstant.metallicFactor = 0;
-            pushConstant.useAlbedoTexture = 0;
-            pushConstant.useNormalTexture = 0;
-            pushConstant.useRoughnessTexture = 0;
-            pushConstant.useMetallicTexture = 0;
-            pushConstant.useHeightTexture = 0;
-            pushConstant.parallaxHeightScale = 0;
-            pushConstant.parallaxLayers = 0;
 
             recordPushConstant(&pushConstant);
             recordDrawMesh(meshInstance);

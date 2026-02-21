@@ -3,9 +3,9 @@
 
 namespace Metal {
     enum DockPosition {
-        CENTER,
-        LEFT,
-        RIGHT,
+        TOP,
+        RIGHT_BOTTOM,
+        RIGHT_TOP,
         BOTTOM
     };
 }

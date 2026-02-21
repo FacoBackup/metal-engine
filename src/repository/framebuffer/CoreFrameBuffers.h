@@ -10,8 +10,8 @@ namespace Metal {
         FrameBufferInstance *gBufferFBO = nullptr;
         FrameBufferInstance *postProcessingFBO = nullptr;
 
-        explicit CoreFrameBuffers(ApplicationContext &context)
-            : AbstractCoreRepository(context) {
+        explicit CoreFrameBuffers()
+            : AbstractCoreRepository() {
         }
 
         void onInitialize() override;

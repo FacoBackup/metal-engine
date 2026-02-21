@@ -22,41 +22,40 @@ namespace Metal {
 
     void VideoExporterService::exportToVideo() {
         if (isFirstBakeLoop) {
-            frameOutputDirectory = context.getRootDirectory() + "/video-frames";
+            frameOutputDirectory = CTX.getRootDirectory() + "/video-frames";
             std::error_code error;
             std::filesystem::remove_all(frameOutputDirectory, error);
             FilesUtil::MkDir(frameOutputDirectory);
 
-            context.engineRepository.isBaking = true;
+            CTX.engineRepository.isBaking = true;
             isFirstBakeLoop = false;
-            context.notificationService.pushMessage("Starting baking process", NotificationSeverities::SUCCESS);
-            context.engineContext.dispatchSceneVoxelization();
+            CTX.notificationService.pushMessage("Starting baking process", NotificationSeverities::SUCCESS);
             frameCount = 0;
         } else {
-            context.notificationService.pushMessage("Baking already started", NotificationSeverities::WARNING);
+            CTX.notificationService.pushMessage("Baking already started", NotificationSeverities::WARNING);
         }
     }
 
     void VideoExporterService::finishExportToVideo() {
-        if (!context.engineRepository.isBaking) {
+        if (!CTX.engineRepository.isBaking) {
             return;
         }
 
-        context.engineRepository.isBaking = false;
+        CTX.engineRepository.isBaking = false;
         isFirstBakeLoop = true;
-        context.notificationService.pushMessage("Finishing baking process", NotificationSeverities::SUCCESS);
+        CTX.notificationService.pushMessage("Finishing baking process", NotificationSeverities::SUCCESS);
 
         if (!frameOutputDirectory.empty()) {
-            const std::string outputPath = context.getVideoOutputPath();
+            const std::string outputPath = CTX.getVideoOutputPath();
             const std::string framePattern = (std::filesystem::path(frameOutputDirectory) / "frame_%06d.png").string();
             const std::string command = "ffmpeg -y -framerate 30 -i \"" + framePattern +
                                         "\" -c:v libx264 -pix_fmt yuv420p \"" + outputPath + "\"";
             const int result = std::system(command.c_str());
             if (result != 0) {
-                context.notificationService.pushMessage("FFmpeg failed to assemble video",
+                CTX.notificationService.pushMessage("FFmpeg failed to assemble video",
                                                         NotificationSeverities::ERROR);
             } else {
-                context.notificationService.pushMessage("Video export finished", NotificationSeverities::SUCCESS);
+                CTX.notificationService.pushMessage("Video export finished", NotificationSeverities::SUCCESS);
             }
         }
 
@@ -64,19 +63,19 @@ namespace Metal {
     }
 
     void VideoExporterService::onSync() {
-        if (!context.engineRepository.isBaking || context.voxelizationService.isExecutingVoxelization()) {
+        if (!CTX.engineRepository.isBaking) {
             return;
         }
 
-        if (context.engineRepository.maxVideoFrames == frameCount) {
+        if (CTX.engineRepository.maxVideoFrames == frameCount) {
             finishExportToVideo();
             return;
         }
 
-        if (context.engineRepository.pathTracerAccumulationCount >= context.engineRepository.pathTracerMaxSamples) {
-            LOG_DEBUG_S("Starting frame write " + std::to_string(frameCount));
+        if (CTX.engineRepository.pathTracerAccumulationCount >= CTX.engineRepository.pathTracerMaxSamples) {
+            LOG_DEBUG("Starting frame write " + std::to_string(frameCount));
 
-            auto *finalFrame = context.coreFrameBuffers.postProcessingFBO;
+            auto *finalFrame = CTX.coreFrameBuffers.postProcessingFBO;
             if (!finalFrame || finalFrame->attachments.empty()) return;
 
             auto &attachment = finalFrame->attachments[0];
@@ -84,11 +83,11 @@ namespace Metal {
             const auto height = finalFrame->bufferHeight;
 
             VkDeviceSize imageSize = width * height * 4;
-            auto stagingBuffer = context.bufferService.createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+            auto stagingBuffer = CTX.bufferService.createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                                                                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                                     VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-            VkCommandBuffer commandBuffer = context.vulkanContext.beginSingleTimeCommands();
+            VkCommandBuffer commandBuffer = CTX.vulkanContext.beginSingleTimeCommands();
 
             VkImageMemoryBarrier barrier = {};
             barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -126,26 +125,26 @@ namespace Metal {
             vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
                                  0, 0, nullptr, 0, nullptr, 1, &barrier);
 
-            context.vulkanContext.endSingleTimeCommands(commandBuffer);
+            CTX.vulkanContext.endSingleTimeCommands(commandBuffer);
 
             void *data;
-            vkMapMemory(context.vulkanContext.device.device, stagingBuffer->vkDeviceMemory, 0, imageSize, 0, &data);
+            vkMapMemory(CTX.vulkanContext.device.device, stagingBuffer->vkDeviceMemory, 0, imageSize, 0, &data);
 
             std::ostringstream frameName;
             frameName << frameOutputDirectory << "/frame_" << std::setw(6) << std::setfill('0') << frameCount
                       << ".png";
             if (!stbi_write_png(frameName.str().c_str(), static_cast<int>(width), static_cast<int>(height), 4, data,
                                 static_cast<int>(width * 4))) {
-                context.notificationService.pushMessage("Failed to write PNG frame",
+                CTX.notificationService.pushMessage("Failed to write PNG frame",
                                                         NotificationSeverities::ERROR);
             }
 
-            vkUnmapMemory(context.vulkanContext.device.device, stagingBuffer->vkDeviceMemory);
-            stagingBuffer->dispose(context.vulkanContext);
+            vkUnmapMemory(CTX.vulkanContext.device.device, stagingBuffer->vkDeviceMemory);
+            stagingBuffer->dispose();
 
             frameCount++;
 
-            context.engineRepository.pathTracerAccumulationCount = 0;
+            CTX.engineRepository.pathTracerAccumulationCount = 0;
         }
     }
 } // Metal

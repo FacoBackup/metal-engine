@@ -7,7 +7,6 @@
 #include "../../../../context/ApplicationContext.h"
 #include "../../../../service/descriptor/DescriptorInstance.h"
 #include "../../../../service/framebuffer/FrameBufferInstance.h"
-#include "../../../../service/texture/TextureInstance.h"
 #include "../../../../service/camera/Camera.h"
 
 #include <algorithm>
@@ -17,26 +16,51 @@ namespace Metal {
         appendChild(headerPanel = new ViewportHeaderPanel());
         appendChild(gizmoPanel = new GizmoPanel(position, size));
         appendChild(cameraPanel = new CameraPositionPanel());
+
+        shortcuts = {
+                ShortcutDTO("Delete", ImGuiKey_Delete, [this]() {
+                    std::vector<EntityID> entities;
+                    for (auto &entry: CTX.editorRepository.selected) {
+                        entities.push_back(entry.first);
+                    }
+                    CTX.worldRepository.deleteEntities(entities);
+                    CTX.selectionService.clearSelection();
+                }),
+                ShortcutDTO("Select All", ImGuiMod_Ctrl | ImGuiKey_A, [this]() {
+                    std::vector<EntityID> entities;
+                    auto& storage = CTX.worldRepository.registry.storage<entt::entity>();
+                    for (auto it = storage.begin(); it != storage.end(); ++it) {
+                        auto entity = *it;
+                        if (static_cast<EntityID>(entity) != WorldRepository::ROOT_ID && CTX.worldRepository.registry.all_of<EntityComponent>(entity)) {
+                            entities.push_back(static_cast<EntityID>(entity));
+                        }
+                    }
+                    CTX.selectionService.addAllSelected(entities);
+                })
+        };
     }
 
     void ViewportPanel::onSync() {
-        if (!context->engineRepository.isBaking) {
+        if (!CTX.engineRepository.isBaking) {
             updateCamera();
             updateInputs();
         }
 
-        auto *framebuffer = context->coreFrameBuffers.postProcessingFBO;
-        context->descriptorService.setImageDescriptor(framebuffer, 0);
-        ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet), ImVec2{size->x, size->y});
+        headerPanel->onSync();
+
+        const float tabHeight = ImGui::GetFrameHeightWithSpacing();
+        const ImVec2 viewportSize{size->x, size->y - tabHeight - ViewportHeaderPanel::HEIGHT};
+
+        auto *framebuffer = CTX.coreFrameBuffers.postProcessingFBO;
+        CTX.descriptorService.setImageDescriptor(framebuffer, 0);
+        ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet),
+                     viewportSize);
 
         const ImVec2 imageMin = ImGui::GetItemRectMin();
         const ImVec2 imageMax = ImGui::GetItemRectMax();
         handleViewportPicking(imageMin, imageMax);
 
-        if (context->editorRepository.editorMode == EditorMode::EditorMode::TRANSFORM) {
-            gizmoPanel->onSync();
-        }
-        headerPanel->onSync();
+        gizmoPanel->onSync();
         cameraPanel->onSync();
     }
 
@@ -61,7 +85,7 @@ namespace Metal {
             return;
         }
 
-        auto *gBuffer = context->coreFrameBuffers.gBufferFBO;
+        auto *gBuffer = CTX.coreFrameBuffers.gBufferFBO;
         if (!gBuffer) {
             return;
         }
@@ -70,19 +94,20 @@ namespace Metal {
         const uint32_t pixelX = std::min(static_cast<uint32_t>(u * static_cast<float>(width)), width - 1);
         const uint32_t pixelY = std::min(static_cast<uint32_t>(v * static_cast<float>(height)), height - 1);
 
-        const auto picked = context->pickingService.pickEntityFromGBuffer(pixelX, pixelY);
-        context->selectionService.clearSelection();
-        context->selectionService.addSelected(picked.value_or(EMPTY_ENTITY));
+        const auto picked = CTX.pickingService.pickEntityFromGBuffer(pixelX, pixelY);
+        CTX.selectionService.clearSelection();
+        CTX.selectionService.addSelected(picked.value_or(EMPTY_ENTITY));
     }
 
     void ViewportPanel::updateCamera() {
-        auto &worldRepository = context->worldRepository;
-        const auto &cameraService = context->cameraService;
+        auto &worldRepository = CTX.worldRepository;
+        const auto &cameraService = CTX.cameraService;
 
         if (ImGui::IsWindowHovered() && !ImGuizmo::IsUsing() && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
             cameraService.handleInput(isFirstMovement);
             if (const auto &io = ImGui::GetIO(); io.MouseWheel != 0) {
-                worldRepository.camera.movementSensitivity += io.MouseWheel * 100 * context->engineContext.deltaTime;
+                worldRepository.camera.movementSensitivity += io.MouseWheel * 100 * CTX.
+                        engineContext.deltaTime;
                 worldRepository.camera.movementSensitivity =
                         std::max(.1f, worldRepository.camera.movementSensitivity);
             }
@@ -93,7 +118,7 @@ namespace Metal {
     }
 
     void ViewportPanel::updateInputs() const {
-        auto &repo = context->runtimeRepository;
+        auto &repo = CTX.runtimeRepository;
         const ImVec2 windowSize = ImGui::GetWindowSize();
         size->x = windowSize.x;
         size->y = windowSize.y;

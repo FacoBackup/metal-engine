@@ -11,6 +11,9 @@
 #include "../../../../../common/inspection/Inspectable.h"
 
 namespace Metal {
+    constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoDocking |
+                                       ImGuiWindowFlags_NoSavedSettings;
+
     ResourceField::ResourceField(InspectedField<std::string> &field) : field(field) {
     }
 
@@ -23,10 +26,10 @@ namespace Metal {
             if (file->type == field.resourceType) {
                 *field.field = file->getId();
                 field.instance->registerChange();
-                field.instance->onUpdate(&field, *context);
+                field.instance->onUpdate(&field);
                 open = false;
             }
-        }));
+        }, field.resourceType));
     }
 
     void ResourceField::renderButton() {
@@ -44,7 +47,7 @@ namespace Metal {
             entry = nullptr;
             *field.field = "";
             field.instance->registerChange();
-            field.instance->onUpdate(&field, *context);
+            field.instance->onUpdate(&field);
         }
         ImGui::SameLine();
         if (entry != nullptr) {
@@ -61,18 +64,18 @@ namespace Metal {
         }
         ImVec2 size = ImVec2(ImGui::GetMainViewport()->Size.x / 2,
                              ImGui::GetMainViewport()->Size.y / 2);
-        ImGui::SetNextWindowSize(size);
+        ImGui::SetNextWindowSize(size, ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x - size.x,
-                                       ImGui::GetWindowPos().y));
-        if (ImGui::Begin(field.nameWithId.c_str(), nullptr, flags)) {
+                                       ImGui::GetWindowPos().y), ImGuiCond_FirstUseEver);
+        if (ImGui::Begin(field.nameWithId.c_str(), &open, flags)) {
             onSyncChildren();
-            ImGui::End();
         }
+        ImGui::End();
     }
 
     void ResourceField::onSync() {
         if (field.field->size() > 0 && (entry == nullptr || entry->getId() != *field.field)) {
-            entry = context->filesService.getResource(*field.field);
+            entry = CTX.filesService.getResource(*field.field);
         }
         if (!field.disabled) {
             renderButton();

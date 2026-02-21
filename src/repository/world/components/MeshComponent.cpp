@@ -1,7 +1,8 @@
 #include "MeshComponent.h"
-#include "../../../common/interface/Icons.h"
 #include "../../../context/ApplicationContext.h"
 #include "../../../enum/EntryType.h"
+#include "../../../service/mesh/MeshData.h"
+#include "../../../enum/LevelOfDetail.h"
 
 namespace Metal {
     void MeshComponent::registerFields() {
@@ -17,8 +18,18 @@ namespace Metal {
         registerInt(parallaxLayers, "Material", "Parallax layers", 1);
     }
 
-    void MeshComponent::onUpdate(InspectableMember *member, ApplicationContext &context) {
-        context.engineContext.setGISettingsUpdated(true);
+    void MeshComponent::onUpdate(InspectableMember *member) {
+        if (member != nullptr && member->name == "meshId") {
+            MeshData *data = CTX.meshService.stream(meshId, LevelOfDetail::LOD_0);
+            if (data != nullptr) {
+                const auto e = static_cast<entt::entity>(entityId);
+                if (CTX.worldRepository.registry.all_of<TransformComponent>(e)) {
+                    CTX.worldRepository.registry.get<TransformComponent>(e).gizmoCenter = data->gizmoCenter;
+                }
+                delete data;
+            }
+        }
+        CTX.engineContext.setGISettingsUpdated(true);
         needsReVoxelization = true;
     }
 

@@ -25,8 +25,8 @@ namespace Metal {
         TimePoint sinceLastCleanup;
 
     public:
-        explicit StreamingRepository(ApplicationContext &context)
-            : AbstractRuntimeComponent(context) {
+        explicit StreamingRepository()
+            : AbstractRuntimeComponent() {
         }
 
         MeshInstance *streamMesh(const std::string &id, const LevelOfDetail &lod);

@@ -3,10 +3,10 @@
 #include "../../../service/pipeline/PipelineInstance.h"
 
 namespace Metal {
-    AbstractPass::AbstractPass(ApplicationContext &context, bool isComputePass) : AbstractRuntimeComponent(context),
-        worldRepository(context.worldRepository),
+    AbstractPass::AbstractPass(bool isComputePass) : AbstractRuntimeComponent(),
+        worldRepository(CTX.worldRepository),
         streamingRepository(
-            context.streamingRepository), isComputePass(isComputePass) {
+            CTX.streamingRepository), isComputePass(isComputePass) {
     }
 
     void AbstractPass::recordPushConstant(const void *data) {
@@ -50,6 +50,9 @@ namespace Metal {
     }
 
     VkPipelineBindPoint AbstractPass::getBindingPoint() const {
+        if (pipelineInstance != nullptr && pipelineInstance->isRayTracing) {
+            return VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR;
+        }
         if (isComputePass) {
             return VK_PIPELINE_BIND_POINT_COMPUTE;
         }

@@ -8,16 +8,16 @@
 namespace Metal {
     void CoreTextures::onInitialize() {
 
-        giSurfaceCache = context.textureService.createForCompute(SURFACE_CACHE_RES, SURFACE_CACHE_RES);
+        giSurfaceCache = CTX.textureService.createForCompute(SURFACE_CACHE_RES, SURFACE_CACHE_RES);
         giSurfaceCache->setAsNoDisposal();
 
-        previousFrame = context.textureService.createForCompute(context.vulkanContext.getWindowWidth() / context.engineRepository.shadingResInvScale, context.vulkanContext.getWindowHeight() / context.engineRepository.shadingResInvScale);
+        previousFrame = CTX.textureService.createForCompute(CTX.vulkanContext.getWindowWidth() / CTX.engineRepository.shadingResInvScale, CTX.vulkanContext.getWindowHeight() / CTX.engineRepository.shadingResInvScale);
         previousFrame->setAsNoDisposal();
 
-        previousFrameMetadata = context.textureService.createForCompute(context.vulkanContext.getWindowWidth() / context.engineRepository.shadingResInvScale, context.vulkanContext.getWindowHeight() / context.engineRepository.shadingResInvScale);
+        previousFrameMetadata = CTX.textureService.createForCompute(CTX.vulkanContext.getWindowWidth() / CTX.engineRepository.shadingResInvScale, CTX.vulkanContext.getWindowHeight() / CTX.engineRepository.shadingResInvScale);
         previousFrameMetadata->setAsNoDisposal();
 
-        currentFrame = context.textureService.createForCompute(context.vulkanContext.getWindowWidth() / context.engineRepository.shadingResInvScale, context.vulkanContext.getWindowHeight() / context.engineRepository.shadingResInvScale);
+        currentFrame = CTX.textureService.createForCompute(CTX.vulkanContext.getWindowWidth() / CTX.engineRepository.shadingResInvScale, CTX.vulkanContext.getWindowHeight() / CTX.engineRepository.shadingResInvScale);
         currentFrame->setAsNoDisposal();
 
     }

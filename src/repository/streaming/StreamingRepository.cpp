@@ -13,9 +13,9 @@
 #define MAX_TRIES 5
 #define DISPOSAL(R)\
 for (auto it = R.begin(); it != R.end();) {\
-    if (lastUse.contains(it->second->getId()) && !it->second->isNoDisposal() && (lastUse.at(it->second->getId()) - context.engineContext.currentTimeMs) >= MAX_TIMEOUT) {\
-        LOG_INFO(context, "Disposing of " + it->first + " Since last use: " + std::to_string(lastUse.at(it->second->getId()) - context.engineContext.currentTimeMs));\
-        it->second->dispose(context.vulkanContext);\
+    if (lastUse.contains(it->second->getId()) && !it->second->isNoDisposal() && (lastUse.at(it->second->getId()) - CTX.engineContext.currentTimeMs) >= MAX_TIMEOUT) {\
+        LOG_INFO("Disposing of " + it->first + " Since last use: " + std::to_string(lastUse.at(it->second->getId()) - CTX.engineContext.currentTimeMs));\
+        it->second->dispose();\
         auto newIt = R.erase(it);\
         delete it->second;\
         it = newIt;\
@@ -27,7 +27,7 @@ for (auto it = R.begin(); it != R.end();) {\
 #define STREAM(T, V)\
 if (!id.empty() && T.getResources().contains(id + lod.suffix)) {\
     auto *e = T.getResources().at(id + lod.suffix);\
-    lastUse.emplace(e->getId(), context.engineContext.currentTimeMs);\
+    lastUse.emplace(e->getId(), CTX.engineContext.currentTimeMs);\
     return dynamic_cast<V*>(e);\
 }\
 if (!tries.contains(id)) {\
@@ -35,13 +35,13 @@ if (!tries.contains(id)) {\
 }\
 tries[id]++;\
 if (tries[id] < MAX_TRIES) {\
-    LOG_INFO(context, "Streaming " + id);\
+    LOG_INFO("Streaming " + id);\
     auto *instance = T.create(id, lod);\
     if (instance != nullptr) {\
         tries[id] = 0;\
         for(auto &dep : instance->getDependencies()){\
             if (lastUse.contains(dep)) {\
-                lastUse[dep] = context.engineContext.currentTimeMs;\
+                lastUse[dep] = CTX.engineContext.currentTimeMs;\
             }\
         }\
     }\
@@ -54,7 +54,7 @@ return nullptr;
 #define STREAM_NO_LOD(T, V)\
 if (!id.empty() && T.getResources().contains(id)) {\
 auto *e = T.getResources().at(id);\
-lastUse.emplace(e->getId(), context.engineContext.currentTimeMs);\
+lastUse.emplace(e->getId(), CTX.engineContext.currentTimeMs);\
 return dynamic_cast<V*>(e);\
 }\
 if (!tries.contains(id)) {\
@@ -62,13 +62,13 @@ tries[id] = 0;\
 }\
 tries[id]++;\
 if (tries[id] < MAX_TRIES) {\
-LOG_INFO(context, "Streaming " + id);\
+LOG_INFO("Streaming " + id);\
 auto *instance = T.create(id);\
 if (instance != nullptr) {\
     tries[id] = 0;\
     for(auto &dep : instance->getDependencies()){\
         if (lastUse.contains(dep)) {\
-            lastUse[dep] = context.engineContext.currentTimeMs;\
+            lastUse[dep] = CTX.engineContext.currentTimeMs;\
         }\
     }\
 }\
@@ -78,28 +78,28 @@ return nullptr;
 
 namespace Metal {
     MaterialInstance *StreamingRepository::streamMaterial(const std::string &id) {
-        STREAM_NO_LOD(context.materialService, MaterialInstance)
+        STREAM_NO_LOD(CTX.materialService, MaterialInstance)
     }
 
     SVOInstance *StreamingRepository::streamSVO(const std::string &id) {
-        STREAM_NO_LOD(context.svoService, SVOInstance)
+        STREAM_NO_LOD(CTX.voxelService, SVOInstance)
     }
 
     MeshInstance *StreamingRepository::streamMesh(const std::string &id, const LevelOfDetail &lod) {
-        STREAM(context.meshService, MeshInstance)
+        STREAM(CTX.meshService, MeshInstance)
     }
 
     TextureInstance *StreamingRepository::streamTexture(const std::string &id, const LevelOfDetail &lod) {
-        STREAM(context.textureService, TextureInstance)
+        STREAM(CTX.textureService, TextureInstance)
     }
 
     void StreamingRepository::onSync() {
-        if ((context.engineContext.currentTime - sinceLastCleanup).count() >= MAX_TIMEOUT) {
-            sinceLastCleanup = context.engineContext.currentTime;
-            DISPOSAL(context.meshService.getResources())
-            DISPOSAL(context.textureService.getResources())
-            DISPOSAL(context.svoService.getResources())
-            DISPOSAL(context.materialService.getResources())
+        if ((CTX.engineContext.currentTime - sinceLastCleanup).count() >= MAX_TIMEOUT) {
+            sinceLastCleanup = CTX.engineContext.currentTime;
+            DISPOSAL(CTX.meshService.getResources())
+            DISPOSAL(CTX.textureService.getResources())
+            DISPOSAL(CTX.voxelService.getResources())
+            DISPOSAL(CTX.materialService.getResources())
         }
     }
 }

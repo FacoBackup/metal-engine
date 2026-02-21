@@ -16,19 +16,27 @@ namespace Metal {
         TileInfoUBO tileInfoUBO{};
         long long start = -1;
         bool cameraUpdated = true;
-        bool lightVolumeDataNeedsUpdate = true;
+        bool updateLights = true;
+        bool updateVolumes = true;
         bool giSettingsUpdated = true;
-        std::string voxelizationRequestId;
 
     public:
         GlobalDataUBO &getGlobalDataUBO() { return globalDataUBO; }
 
-        void setLightVolumeDataNeedsUpdate(const bool val) {
-            lightVolumeDataNeedsUpdate = val;
+        void setUpdateLights(const bool val) {
+            updateLights = val;
         }
 
-        [[nodiscard]] bool isLightingDataUpdated() const {
-            return lightVolumeDataNeedsUpdate;
+        [[nodiscard]] bool isUpdateLights() const {
+            return updateLights;
+        }
+
+        void setUpdateVolumes(const bool val) {
+            updateVolumes = val;
+        }
+
+        [[nodiscard]] bool isUpdateVolumes() const {
+            return updateVolumes;
         }
 
         void setCameraUpdated(const bool val) {
@@ -43,7 +51,7 @@ namespace Metal {
             giSettingsUpdated = val;
         }
 
-        void resetPathTracerAccumulationCount();
+        void resetPathTracerAccumulationCount() const;
 
         bool isGISettingsUpdated() const {
             return giSettingsUpdated;
@@ -51,17 +59,11 @@ namespace Metal {
 
         void onInitialize() override;
 
-        void updateVoxelData();
+        void updateTileData();
 
         void updateCurrentTime();
 
-        void dispatchSceneVoxelization();
-
-        std::string getVoxelizationRequestId() {
-            return voxelizationRequestId;
-        }
-
-        explicit EngineContext(ApplicationContext &context) : AbstractRuntimeComponent(context) {
+        explicit EngineContext() : AbstractRuntimeComponent() {
         }
 
         long long currentTimeMs = 0;

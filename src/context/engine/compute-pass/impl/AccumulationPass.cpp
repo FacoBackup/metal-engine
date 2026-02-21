@@ -7,20 +7,20 @@ namespace Metal {
     void AccumulationPass::onInitialize() {
         PipelineBuilder shadingPipelineBuilder = PipelineBuilder::Of("PathTracerAccumulation.comp")
                 .setPushConstantsSize(sizeof(AccumulationPushConstant))
-                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get())
-                .addDescriptorSet(context.coreDescriptorSets.currentFrameDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.previousFrameDescriptor.get());
-        pipelineInstance = context.pipelineService.createPipeline(shadingPipelineBuilder);
+                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.gBufferPosition.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.currentFrameDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.previousFrameDescriptor.get());
+        pipelineInstance = CTX.pipelineService.createPipeline(shadingPipelineBuilder);
     }
 
     void AccumulationPass::onSync() {
-        syncWriting(context.coreTextures.currentFrame->vkImage);
+        syncWriting(CTX.coreTextures.currentFrame->vkImage);
         if (initialized) {
             recordPushConstant(&pushConstant);
-            recordImageDispatch(context.coreTextures.currentFrame, 8, 8);
+            recordImageDispatch(CTX.coreTextures.currentFrame, 8, 8);
         }
         initialized = true;
-        pushConstant.previousFrameProjView = context.engineContext.getGlobalDataUBO().projView;
+        pushConstant.previousFrameProjView = CTX.engineContext.getGlobalDataUBO().projView;
     }
 } // Metal

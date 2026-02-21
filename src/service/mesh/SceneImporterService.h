@@ -8,7 +8,7 @@
 #include <stop_token>
 
 namespace Metal {
-    struct MaterialData;
+    struct MaterialFileData;
     struct LevelOfDetail;
     struct MeshData;
     struct SceneData;
@@ -21,8 +21,8 @@ namespace Metal {
                                 const std::stop_token &stopToken);
 
     public:
-        explicit SceneImporterService(ApplicationContext &context)
-            : AbstractImporter(context) {
+        explicit SceneImporterService()
+            : AbstractImporter() {
         }
 
         std::string importData(const std::string &targetDir, const std::string &pathToFile, const std::stop_token &stopToken) override;

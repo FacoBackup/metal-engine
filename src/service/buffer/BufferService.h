@@ -11,8 +11,6 @@ namespace Metal {
     class VulkanContext;
 
     class BufferService final : public AbstractRuntimeComponent {
-        VulkanContext &vulkanContext;
-
         void copyBuffer(const std::shared_ptr<BufferInstance> &srcBuffer,
                         const std::shared_ptr<BufferInstance> &dstBuffer) const;
 
@@ -20,8 +18,6 @@ namespace Metal {
                             const std::shared_ptr<BufferInstance> &buffer) const;
 
     public:
-        explicit BufferService(ApplicationContext &context);
-
         [[nodiscard]] unsigned int findMemoryType(unsigned int typeFilter, VkMemoryPropertyFlags properties) const;
 
         [[nodiscard]] std::shared_ptr<BufferInstance> createBuffer(VkDeviceSize bufferSize,
@@ -31,6 +27,16 @@ namespace Metal {
         std::shared_ptr<BufferInstance> createBuffer(VkDeviceSize dataSize,
                                                      VkBufferUsageFlags usageFlags,
                                                      const void *bufferData) const;
+
+        std::shared_ptr<BufferInstance> createBuffer(VkDeviceSize dataSize,
+                                                     VkBufferUsageFlags usageFlags,
+                                                     const void *bufferData,
+                                                     bool deviceAddress) const;
+
+        [[nodiscard]] std::shared_ptr<BufferInstance> createBuffer(VkDeviceSize bufferSize,
+                                                                   VkBufferUsageFlags usageFlags,
+                                                                   VkMemoryPropertyFlags memoryPropertyFlags,
+                                                                   bool deviceAddress) const;
     };
 } // Metal
 

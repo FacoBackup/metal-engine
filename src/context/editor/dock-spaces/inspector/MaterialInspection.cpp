@@ -1,11 +1,9 @@
 #include "MaterialInspection.h"
 
-#include <cereal/archives/binary.hpp>
-
 #include "../../../ApplicationContext.h"
 #include "../../../../util/UIUtil.h"
 #include "../../../../util/serialization-definitions.h"
-#include "../../../../service/material/MaterialData.h"
+#include "../../../../service/material/MaterialFileData.h"
 #include "../../../../enum/engine-definitions.h"
 
 namespace Metal {
@@ -15,31 +13,50 @@ namespace Metal {
     }
 
     void MaterialInspection::saveChanges() {
-        DUMP_TEMPLATE(context->getAssetDirectory() + FORMAT_FILE_MATERIAL(prevSelection), *data)
-        context->notificationService.pushMessage("Material was saved", NotificationSeverities::SUCCESS);
-        if (context->materialService.getResources().contains(prevSelection)) {
-            context->materialService.getResources().at(prevSelection)->dispose(context->vulkanContext);
-            context->materialService.getResources().erase(prevSelection);
+        data->freezeVersion();
+        DUMP_TEMPLATE(CTX.getAssetDirectory() + FORMAT_FILE_MATERIAL(prevSelection), *data)
+        CTX.notificationService.pushMessage("Material was saved", NotificationSeverities::SUCCESS);
+        if (CTX.materialService.getResources().contains(prevSelection)) {
+            CTX.materialService.getResources().at(prevSelection)->dispose();
+            CTX.materialService.getResources().erase(prevSelection);
         }
     }
 
     void MaterialInspection::onSync() {
-        if (prevSelection != context->fileInspection.materialId) {
+        if (prevSelection != CTX.fileInspection.materialId) {
             delete data;
-            data = context->materialService.stream(context->fileInspection.materialId);
-            prevSelection = context->fileInspection.materialId;
+            data = CTX.materialService.stream(CTX.fileInspection.materialId);
+            prevSelection = CTX.fileInspection.materialId;
         }
         if (prevSelection.empty()) {
             return;
+        }
+        ImGui::Spacing();
+        bool changed = data->isNotFrozen();
+        if (changed) {
+            ImGui::PushStyleColor(ImGuiCol_Button, CTX.editorRepository.accent); // Orange-ish
+        }
+        if (ImGui::Button(("Save" + id + "save1").c_str())) {
+            saveChanges();
+        }
+        if (changed) {
+            ImGui::PopStyleColor();
         }
         ImGui::Spacing();
 
         formPanel->setInspection(data);
         formPanel->onSync();
 
-        if(data->isNotFrozen()) {
+        ImGui::Spacing();
+        changed = data->isNotFrozen();
+        if (changed) {
+            ImGui::PushStyleColor(ImGuiCol_Button, CTX.editorRepository.accent); // Orange-ish
+        }
+        if (ImGui::Button(("Save" + id + "save").c_str())) {
             saveChanges();
-            data->freezeVersion();
+        }
+        if (changed) {
+            ImGui::PopStyleColor();
         }
     }
 } // Metal

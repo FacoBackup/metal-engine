@@ -28,10 +28,10 @@ namespace Metal {
         ImGui::Separator();
 
         if (selected->type == EntryType::TEXTURE) {
-            auto *texture = context->streamingRepository.streamTexture(selected->getId(), LevelOfDetail::LOD_3);
+            auto *texture = CTX.streamingRepository.streamTexture(selected->getId(), LevelOfDetail::LOD_3);
             if (texture != nullptr) {
                 float availWidth = ImGui::GetContentRegionAvail().x;
-                float availHeight = ImGui::GetContentRegionAvail().y;
+                float availHeight = ImGui::GetContentRegionAvail().y * 0.6f; // reserve space for table
 
                 float imgWidth = (float)texture->width;
                 float imgHeight = (float)texture->height;
@@ -45,17 +45,54 @@ namespace Metal {
                     renderWidth = renderHeight * aspectRatio;
                 }
 
-                // Center the image in the remaining space
                 float offsetX = (availWidth - renderWidth) * 0.5f;
                 if (offsetX > 0) ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offsetX);
 
-                context->guiContext.renderImage(texture, renderWidth, renderHeight);
+                CTX.guiContext.renderImage(texture, renderWidth, renderHeight);
+                ImGui::Separator();
             }
         } else if (selected->type == EntryType::MATERIAL) {
-            context->fileInspection.materialId = selected->getId();
+            CTX.fileInspection.materialId = selected->getId();
             materialInspection->onSync();
-        } else {
-            ImGui::Text("File has no preview");
+            ImGui::Separator();
+        }
+
+        if (ImGui::BeginTable((id + "metadata").c_str(), 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+            ImGui::TableSetupColumn("Property");
+            ImGui::TableSetupColumn("Value");
+            ImGui::TableHeadersRow();
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn(); ImGui::Text("Name");
+            ImGui::TableNextColumn(); ImGui::Text("%s", selected->name.c_str());
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn(); ImGui::Text("ID");
+            ImGui::TableNextColumn(); ImGui::Text("%s", selected->getId().c_str());
+
+            const char *typeLabel = "";
+            switch (selected->type) {
+                case EntryType::SCENE: typeLabel = "Scene"; break;
+                case EntryType::MESH: typeLabel = "Mesh"; break;
+                case EntryType::TEXTURE: typeLabel = "Texture"; break;
+                case EntryType::VOLUME: typeLabel = "Volume"; break;
+                case EntryType::MATERIAL: typeLabel = "Material"; break;
+                case EntryType::DIRECTORY: typeLabel = "Directory"; break;
+                default: typeLabel = "Unknown"; break;
+            }
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn(); ImGui::Text("Type");
+            ImGui::TableNextColumn(); ImGui::Text("%s", typeLabel);
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn(); ImGui::Text("Size");
+            ImGui::TableNextColumn(); ImGui::Text("%s", selected->formattedSize.c_str());
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn(); ImGui::Text("Date");
+            ImGui::TableNextColumn(); ImGui::Text("%s", selected->formattedDate.c_str());
+
+            ImGui::EndTable();
         }
     }
 }

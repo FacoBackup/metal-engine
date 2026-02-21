@@ -9,7 +9,7 @@ namespace Metal {
         ImGui::SameLine();
         if (UIUtil::ButtonSimple(Icons::inventory_2 + "##hierarchyAdd" + id, UIUtil::ONLY_ICON_BUTTON_SIZE,
                                  UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            context->worldRepository.createEntity();
+            CTX.worldRepository.createEntity();
         }
         UIUtil::RenderTooltip("Create folder");
     }

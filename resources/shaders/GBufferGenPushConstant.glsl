@@ -3,14 +3,9 @@ layout(push_constant) uniform Push {
     vec4 albedoEmissive;
 
     uint renderIndex;
+    uint materialIndex;
     float roughnessFactor;
     float metallicFactor;
-
-    uint useAlbedoTexture;
-    uint useNormalTexture;
-    uint useRoughnessTexture;
-    uint useMetallicTexture;
-    uint useHeightTexture;
 
     float parallaxHeightScale;
     int parallaxLayers;

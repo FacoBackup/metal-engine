@@ -12,7 +12,7 @@ namespace Metal {
             ImGui::Text("%s", field.name.c_str());
             if (ImGui::DragInt(id.c_str(), field.field, .01f, field.min.value(), field.max.value())) {
                 field.instance->registerChange();
-                field.instance->onUpdate(&field, *context);
+                field.instance->onUpdate(&field);
             }
         }
     }

@@ -14,7 +14,7 @@ namespace Metal {
             if (ImGui::InputText(field.id.c_str(), buffer, sizeof(buffer))) {
                 *field.field = buffer;
                 field.instance->registerChange();
-field.instance->onUpdate(&field, *context);
+field.instance->onUpdate(&field);
             }
         } else {
             ImGui::Text("%s: %s", field.name.c_str(), field.field->c_str());

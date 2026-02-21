@@ -5,14 +5,14 @@
 
 namespace Metal {
     void WorldGridService::addMissingTiles() {
-        const int numberOfTiles = context.engineRepository.numberOfTiles;
+        const int numberOfTiles = CTX.engineRepository.numberOfTiles;
         if (const int squared = numberOfTiles * numberOfTiles;
-            squared > context.worldGridRepository.getTiles().size()) {
-            LOG_INFO(context, "Adding missing tiles " + std::to_string(squared) + " " + std::to_string(context.worldGridRepository.getTiles().size()));
+            squared > CTX.worldGridRepository.getTiles().size()) {
+            LOG_INFO("Adding missing tiles " + std::to_string(squared) + " " + std::to_string(CTX.worldGridRepository.getTiles().size()));
             const int half = numberOfTiles / 2;
             for (int x = -half; x < half; x++) {
                 for (int z = -half; z < half; z++) {
-                    context.worldGridRepository.createIfAbsent(x, z);
+                    CTX.worldGridRepository.createIfAbsent(x, z);
                     changed = true;
                 }
             }
@@ -24,19 +24,19 @@ namespace Metal {
     }
 
     void WorldGridService::removeExtraTiles() {
-        const int numberOfTiles = context.engineRepository.numberOfTiles;
+        const int numberOfTiles = CTX.engineRepository.numberOfTiles;
         if (const int squared = numberOfTiles * numberOfTiles;
-            squared < context.worldGridRepository.getTiles().size()) {
-            LOG_INFO(context, "Removing extra tiles " + std::to_string(context.worldGridRepository.getTiles().size()) + " " + std::to_string(squared));
+            squared < CTX.worldGridRepository.getTiles().size()) {
+            LOG_INFO("Removing extra tiles " + std::to_string(CTX.worldGridRepository.getTiles().size()) + " " + std::to_string(squared));
 
             const int min = -numberOfTiles;
-            for (auto it = context.worldGridRepository.getTiles().begin();
-                 it != context.worldGridRepository.getTiles().end();) {
+            for (auto it = CTX.worldGridRepository.getTiles().begin();
+                 it != CTX.worldGridRepository.getTiles().end();) {
                 auto &tile = it->second;
                 if (IsTileOutsideBounds(&tile, numberOfTiles / 2, min)) {
-                    LOG_INFO(context, "Removing tile " + tile.id);
+                    LOG_INFO("Removing tile " + tile.id);
                     // TODO - ADD DISPOSAL OF THINGS RATED TO THE TILE LIKE TERRAIN, FOLIAGE, MATERIALS AND VOXELS
-                    it = context.worldGridRepository.getTiles().erase(it);
+                    it = CTX.worldGridRepository.getTiles().erase(it);
                     changed = true;
                 } else {
                     ++it;
@@ -46,16 +46,16 @@ namespace Metal {
     }
 
     void WorldGridService::onSync() {
-        if (!context.worldGridRepository.updateLoadedTiles()) {
+        if (!CTX.worldGridRepository.updateLoadedTiles()) {
             return;
         }
-        prevTile = context.worldGridRepository.getCurrentTile();
+        prevTile = CTX.worldGridRepository.getCurrentTile();
         addMissingTiles();
         removeExtraTiles();
         if (changed) {
             changed = false;
-            for (auto &tile: context.worldGridRepository.getTiles()) {
-                context.worldGridRepository.updateAdjacentTiles(&tile.second);
+            for (auto &tile: CTX.worldGridRepository.getTiles()) {
+                CTX.worldGridRepository.updateAdjacentTiles(&tile.second);
             }
         }
     }

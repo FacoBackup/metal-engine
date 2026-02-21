@@ -26,7 +26,7 @@ namespace Metal {
         samplerCreateInfo.maxAnisotropy = 8;
         samplerCreateInfo.anisotropyEnable = VK_TRUE;
         samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
-        VulkanUtils::CheckVKResult(vkCreateSampler(vulkanContext.device.device, &samplerCreateInfo, nullptr,
+        VulkanUtils::CheckVKResult(vkCreateSampler(CTX.vulkanContext.device.device, &samplerCreateInfo, nullptr,
                                                    &vkImageSampler));
     }
 
@@ -41,7 +41,7 @@ namespace Metal {
     }
 
     void FrameBufferService::createDepthAttachment(FrameBufferInstance *framebuffer) const {
-        VkFormat depthFormat = VulkanUtils::GetValidDepthFormat(vulkanContext.physDevice.physical_device);
+        VkFormat depthFormat = VulkanUtils::GetValidDepthFormat(CTX.vulkanContext.physDevice.physical_device);
         const auto att = createAttachmentInternal("Depth attachment", depthFormat,
                                                   VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, framebuffer);
         att->depth = true;
@@ -91,20 +91,20 @@ namespace Metal {
         image.initialLayout = layout;
         image.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-        VulkanUtils::CheckVKResult(vkCreateImage(vulkanContext.device.device, &image, nullptr, &attachment->vkImage));
+        VulkanUtils::CheckVKResult(vkCreateImage(CTX.vulkanContext.device.device, &image, nullptr, &attachment->vkImage));
 
         VkMemoryAllocateInfo memAlloc{};
         VkMemoryRequirements memReqs;
-        vkGetImageMemoryRequirements(vulkanContext.device.device, attachment->vkImage, &memReqs);
+        vkGetImageMemoryRequirements(CTX.vulkanContext.device.device, attachment->vkImage, &memReqs);
         memAlloc.allocationSize = memReqs.size;
-        memAlloc.memoryTypeIndex = VulkanUtils::GetMemTypeIndex(vulkanContext.physicalDeviceMemoryProperties,
+        memAlloc.memoryTypeIndex = VulkanUtils::GetMemTypeIndex(CTX.vulkanContext.physicalDeviceMemoryProperties,
                                                                 memReqs.memoryTypeBits,
                                                                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-        VulkanUtils::CheckVKResult(vkAllocateMemory(vulkanContext.device.device, &memAlloc, nullptr,
+        VulkanUtils::CheckVKResult(vkAllocateMemory(CTX.vulkanContext.device.device, &memAlloc, nullptr,
                                                     &attachment->vkImageMemory));
         VulkanUtils::CheckVKResult(
-            vkBindImageMemory(vulkanContext.device.device, attachment->vkImage, attachment->vkImageMemory, 0));
+            vkBindImageMemory(CTX.vulkanContext.device.device, attachment->vkImage, attachment->vkImageMemory, 0));
 
         VkImageViewCreateInfo imageView{};
         imageView.viewType = VK_IMAGE_VIEW_TYPE_2D;
@@ -116,7 +116,7 @@ namespace Metal {
         imageView.subresourceRange.baseArrayLayer = 0;
         imageView.subresourceRange.layerCount = 1;
         imageView.image = attachment->vkImage;
-        VulkanUtils::CheckVKResult(vkCreateImageView(vulkanContext.device.device, &imageView, nullptr,
+        VulkanUtils::CheckVKResult(vkCreateImageView(CTX.vulkanContext.device.device, &imageView, nullptr,
                                                      &attachment->vkImageView));
         return attachment;
     }
@@ -140,10 +140,10 @@ namespace Metal {
             attachmentDescription.format = fbAttachment->format;
 
             if (fbAttachment->depth) {
-                LOG_INFO(context, "Depth Attachment " + std::to_string(i));
+                LOG_INFO("Depth Attachment " + std::to_string(i));
                 depthRef = new VkAttachmentReference{i, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL};
             } else {
-                LOG_INFO(context, "Color Attachment " + std::to_string(i));
+                LOG_INFO("Color Attachment " + std::to_string(i));
                 VkAttachmentReference &colorRef = colorReferences.emplace_back();
                 colorRef.attachment = i;
                 colorRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
@@ -185,7 +185,7 @@ namespace Metal {
         renderPassInfo.dependencyCount = dependencies.size();
         renderPassInfo.pDependencies = dependencies.data();
 
-        VulkanUtils::CheckVKResult(vkCreateRenderPass(vulkanContext.device.device,
+        VulkanUtils::CheckVKResult(vkCreateRenderPass(CTX.vulkanContext.device.device,
                                                       &renderPassInfo,
                                                       nullptr,
                                                       &framebuffer->vkRenderPass));
@@ -214,7 +214,7 @@ namespace Metal {
         framebufferInfo.height = framebuffer->bufferHeight;
         framebufferInfo.layers = 1;
 
-        vkCreateFramebuffer(vulkanContext.device.device, &framebufferInfo, nullptr,
+        vkCreateFramebuffer(CTX.vulkanContext.device.device, &framebufferInfo, nullptr,
                             &framebuffer->vkFramebuffer);
     }
 } // Metal

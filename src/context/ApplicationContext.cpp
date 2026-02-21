@@ -2,14 +2,28 @@
 
 #include <imgui_impl_glfw.h>
 #include <nfd.h>
-#include <cereal/archives/binary.hpp>
 
 #include "../util/FilesUtil.h"
 #include "../util/VulkanUtils.h"
+#include "../util/serialization-definitions.h"
 
 #include "../util/FileDialogUtil.h"
+#include <iostream>
 
 namespace Metal {
+    std::unique_ptr<ApplicationContext> ApplicationContext::CONTEXT = nullptr;
+
+    ApplicationContext &CTX {
+        if (CONTEXT == nullptr) {
+            throw std::runtime_error("Context not initialized");
+        }
+        return *CONTEXT;
+    }
+
+    void ApplicationContext::Init(bool debugMode) {
+        CONTEXT = std::make_unique<ApplicationContext>(debugMode);
+    }
+
     void ApplicationContext::updateRootPath(bool forceSelection) {
         std::string cachedPath;
         std::string cachePathFile = std::filesystem::current_path().string() + CACHED_PATH;
@@ -26,10 +40,10 @@ namespace Metal {
         } else {
             rootDirectory = cachedPath;
         }
-        PARSE_TEMPLATE(editorRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(EditorRepository))
-        PARSE_TEMPLATE(engineRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(EngineRepository))
-        PARSE_TEMPLATE(worldGridRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldGridRepository))
-        PARSE_TEMPLATE(worldRepository.load, rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository))
+        PARSE_TEMPLATE(editorRepository, rootDirectory + "/" + HASH_OF_CLASS_NAME(EditorRepository) + ".json")
+        PARSE_TEMPLATE(engineRepository, rootDirectory + "/" + HASH_OF_CLASS_NAME(EngineRepository) + ".json")
+        PARSE_TEMPLATE(worldGridRepository, rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldGridRepository) + ".json")
+        PARSE_TEMPLATE(worldRepository, rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository) + ".json")
 
 
         FilesUtil::MkDir(getShadersDirectory());
@@ -105,12 +119,13 @@ namespace Metal {
 
     void ApplicationContext::save() {
         try {
-            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(EditorRepository), editorRepository)
-            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(EngineRepository), engineRepository)
-            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldGridRepository), worldGridRepository)
-            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository), worldRepository)
+            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(EditorRepository) + ".json", editorRepository)
+            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(EngineRepository) + ".json", engineRepository)
+            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldGridRepository) + ".json", worldGridRepository)
+            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository) + ".json", worldRepository)
             notificationService.pushMessage("Project saved", NotificationSeverities::SUCCESS);
         } catch (const std::exception &e) {
+            LOG_ERROR(e.what());
             notificationService.pushMessage("Could not save project", NotificationSeverities::ERROR);
         }
     }

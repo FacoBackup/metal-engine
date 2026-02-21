@@ -9,14 +9,6 @@ namespace Metal {
     class PipelineService;
 
     class AbstractCoreRepository : public AbstractRuntimeComponent {
-    public:
-        explicit AbstractCoreRepository(ApplicationContext &context);
-
-    protected:
-        VulkanContext &vulkanContext;
-        FrameBufferService &framebufferService;
-        BufferService &bufferService;
-        PipelineService &pipelineService;
     };
 
 

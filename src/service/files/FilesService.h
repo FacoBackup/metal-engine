@@ -13,8 +13,8 @@ namespace Metal {
         FileEntry *root = nullptr;
 
     public:
-        explicit FilesService(ApplicationContext &context)
-            : AbstractRuntimeComponent(context) {
+        explicit FilesService()
+            : AbstractRuntimeComponent() {
         }
 
         FileEntry *getRoot() {

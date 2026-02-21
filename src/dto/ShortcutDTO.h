@@ -1,0 +1,20 @@
+#ifndef METAL_ENGINE_SHORTCUTDTO_H
+#define METAL_ENGINE_SHORTCUTDTO_H
+
+#include <string>
+#include <functional>
+#include <vector>
+#include <imgui.h>
+
+namespace Metal {
+    struct ShortcutDTO {
+        std::string name;
+        ImGuiKeyChord keyChord;
+        std::function<void()> callback;
+
+        ShortcutDTO(std::string name, ImGuiKeyChord keyChord, std::function<void()> callback)
+            : name(std::move(name)), keyChord(keyChord), callback(std::move(callback)) {}
+    };
+}
+
+#endif

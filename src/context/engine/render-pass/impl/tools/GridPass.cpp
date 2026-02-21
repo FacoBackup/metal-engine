@@ -6,26 +6,26 @@
 namespace Metal {
     void GridPass::onInitialize() {
         PipelineBuilder gridPipelineBuilder = PipelineBuilder::Of(
-                    context.coreFrameBuffers.postProcessingFBO,
+                    CTX.coreFrameBuffers.postProcessingFBO,
                     "QUAD.vert",
                     "tools/Grid.frag"
                 )
                 .setBlendEnabled()
                 .setPushConstantsSize(sizeof(GridPushConstant))
-                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get());
-        pipelineInstance = context.pipelineService.createPipeline(gridPipelineBuilder);
+                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.gBufferPosition.get());
+        pipelineInstance = CTX.pipelineService.createPipeline(gridPipelineBuilder);
     }
 
     bool GridPass::shouldRun() {
-        return context.isDebugMode() && context.editorRepository.showGrid;
+        return CTX.isDebugMode() && CTX.editorRepository.showGrid;
     }
 
     void GridPass::onSync() {
-        pushConstant.scale = context.editorRepository.gridScale;
-        pushConstant.overlayObjects = context.editorRepository.gridOverlayObjects;
-        pushConstant.threshold = context.editorRepository.gridThreshold;
-        pushConstant.thickness = context.editorRepository.gridThickness;
+        pushConstant.scale = CTX.editorRepository.gridScale;
+        pushConstant.overlayObjects = CTX.editorRepository.gridOverlayObjects;
+        pushConstant.threshold = CTX.editorRepository.gridThreshold;
+        pushConstant.thickness = CTX.editorRepository.gridThickness;
         recordPushConstant(&pushConstant);
         recordDrawSimpleInstanced(3, 1);
     }

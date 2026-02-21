@@ -4,36 +4,28 @@
 #include "../../service/buffer/BufferInstance.h"
 #include "../../service/descriptor/DescriptorBinding.h"
 #include "../../service/voxel/SVOInstance.h"
-#include "../../enum/LevelOfDetail.h"
-#include "../../enum/LightVolumeType.h"
 #include "../../service/camera/Camera.h"
 #include "../../service/framebuffer/FrameBufferInstance.h"
 #include "../../service/texture/TextureInstance.h"
 
 namespace Metal {
-    void EngineContext::resetPathTracerAccumulationCount() {
-        context.engineRepository.pathTracerAccumulationCount = 0;
+    void EngineContext::resetPathTracerAccumulationCount() const {
+        CTX.engineRepository.pathTracerAccumulationCount = 0;
     }
 
     void EngineContext::onInitialize() {
-        context.worldGridService.onSync();
-        context.passesService.onInitialize();
+        CTX.worldGridService.onSync();
+        CTX.passesService.onInitialize();
     }
 
-    void EngineContext::updateVoxelData() {
-        if (context.worldGridRepository.hasMainTileChanged) {
+    void EngineContext::updateTileData() {
+        if (CTX.worldGridRepository.hasMainTileChanged) {
             unsigned int i = 0;
             std::vector<DescriptorBinding> bindings{};
-            for (auto *tile: context.worldGridRepository.getLoadedTiles()) {
+            for (auto *tile: CTX.worldGridRepository.getLoadedTiles()) {
                 if (tile != nullptr) {
-                    const auto *svo = context.streamingRepository.streamSVO(tile->id);
+                    const auto *svo = CTX.streamingRepository.streamSVO(tile->id);
                     if (svo != nullptr) {
-                        auto &b = bindings.emplace_back();
-
-                        b.bindingPoint = i + 1;
-                        b.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-                        b.bufferInstance = svo->voxelsBuffer;
-
                         tileInfoUBO.tileCenterValid[i] = glm::vec4(tile->x, 0,
                                                                    tile->z, 1);
                         tileInfoUBO.voxelBufferOffset[i] = svo->voxelBufferOffset;
@@ -47,11 +39,9 @@ namespace Metal {
             }
 
             if (i > 0) {
-                DescriptorInstance::Write(context.vulkanContext, context.coreDescriptorSets.svoData->vkDescriptorSet,
-                                          bindings);
-                context.coreBuffers.tileInfo->update(tileInfoUBO.tileCenterValid.data());
+                CTX.coreBuffers.tileInfo->update(tileInfoUBO.tileCenterValid.data());
             }
-            context.worldGridRepository.hasMainTileChanged = false;
+            CTX.worldGridRepository.hasMainTileChanged = false;
         }
     }
 
@@ -69,38 +59,38 @@ namespace Metal {
         }
     }
 
-    void EngineContext::dispatchSceneVoxelization() {
-        voxelizationRequestId = Util::uuidV4();
-    }
-
     void EngineContext::onSync() {
         updateCurrentTime();
 
-        context.transformService.onSync();
-        context.worldGridService.onSync();
-        context.streamingRepository.onSync();
-        context.cameraService.onSync();
-        context.voxelizationService.onSync();
+        CTX.transformService.onSync();
+        CTX.worldGridService.onSync();
+        CTX.streamingRepository.onSync();
+        CTX.cameraService.onSync();
 
 
-        updateVoxelData();
-        if (lightVolumeDataNeedsUpdate) {
-            context.lightVolumesService.update();
+        updateTileData();
+        if (updateLights) {
+            CTX.lightService.onSync();
         }
+
+        if (updateVolumes) {
+            CTX.volumeService.onSync();
+        }
+        CTX.rayTracingService.onSync();
         updateGlobalData();
 
-        context.passesService.onSync();
+        CTX.passesService.onSync();
 
-        setLightVolumeDataNeedsUpdate(false);
+        setUpdateLights(false);
         setCameraUpdated(false);
         setGISettingsUpdated(false);
 
-        context.videoExporterService.onSync();
+        CTX.videoExporterService.onSync();
     }
 
     void EngineContext::updateGlobalData() {
-        auto &camera = context.worldRepository.camera;
-        auto *fbo = context.coreFrameBuffers.postProcessingFBO;
+        auto &camera = CTX.worldRepository.camera;
+        auto *fbo = CTX.coreFrameBuffers.postProcessingFBO;
         globalDataUBO.outputRes.x = fbo->bufferWidth;
         globalDataUBO.outputRes.y = fbo->bufferHeight;
         globalDataUBO.viewMatrix = camera.viewMatrix;
@@ -109,35 +99,35 @@ namespace Metal {
         globalDataUBO.invProj = camera.invProjectionMatrix;
         globalDataUBO.invView = camera.invViewMatrix;
         globalDataUBO.cameraWorldPosition = camera.position;
-        globalDataUBO.pathTracerMultiplier = context.engineRepository.pathTracerMultiplier;
-        globalDataUBO.lightVolumeCount = context.lightVolumesService.getLightVolumeCount();
-        globalDataUBO.volumesOffset = context.lightVolumesService.getVolumesOffset();
-        globalDataUBO.volumeShadowSteps = context.engineRepository.volumeShadowSteps;
-        globalDataUBO.isAtmosphereEnabled = context.engineRepository.atmosphereEnabled;
+        globalDataUBO.pathTracerMultiplier = CTX.engineRepository.pathTracerMultiplier;
+        globalDataUBO.volumeCount = CTX.volumeService.getCount();
+        globalDataUBO.lightsCount = CTX.lightService.getCount();
+        globalDataUBO.volumeShadowSteps = CTX.engineRepository.volumeShadowSteps;
+        globalDataUBO.isAtmosphereEnabled = CTX.engineRepository.atmosphereEnabled;
 
-        globalDataUBO.enabledDenoiser = context.engineRepository.enabledDenoiser;
-        globalDataUBO.multipleImportanceSampling = context.engineRepository.multipleImportanceSampling;
-        globalDataUBO.pathTracerMaxSamples = context.engineRepository.pathTracerMaxSamples;
-        globalDataUBO.pathTracerSamples = context.engineRepository.pathTracerSamples;
-        globalDataUBO.pathTracerBounces = context.engineRepository.pathTracerBounces;
-        globalDataUBO.giTileSubdivision = context.engineRepository.giTileSubdivision;
-        globalDataUBO.giEmissiveFactor = context.engineRepository.giEmissiveFactor;
+        globalDataUBO.enabledDenoiser = CTX.engineRepository.enabledDenoiser;
+        globalDataUBO.multipleImportanceSampling = CTX.engineRepository.multipleImportanceSampling;
+        globalDataUBO.pathTracerMaxSamples = CTX.engineRepository.pathTracerMaxSamples;
+        globalDataUBO.pathTracerSamples = CTX.engineRepository.pathTracerSamples;
+        globalDataUBO.pathTracerBounces = CTX.engineRepository.pathTracerBounces;
+        globalDataUBO.giTileSubdivision = CTX.engineRepository.giTileSubdivision;
+        globalDataUBO.giEmissiveFactor = CTX.engineRepository.giEmissiveFactor;
 
-        globalDataUBO.debugFlag = ShadingMode::IndexOfValue(context.editorRepository.shadingMode);
+        globalDataUBO.debugFlag = ShadingMode::IndexOfValue(CTX.editorRepository.shadingMode);
         globalDataUBO.surfaceCacheWidth = SURFACE_CACHE_RES;
         globalDataUBO.surfaceCacheHeight = SURFACE_CACHE_RES;
-        context.engineRepository.pathTracerAccumulationCount++;
-        globalDataUBO.pathTracerAccumulationCount = context.engineRepository.pathTracerAccumulationCount;
+        CTX.engineRepository.pathTracerAccumulationCount++;
+        globalDataUBO.pathTracerAccumulationCount = CTX.engineRepository.pathTracerAccumulationCount;
         globalDataUBO.globalFrameCount++;
 
-        if (context.engineRepository.incrementTime) {
-            context.engineRepository.elapsedTime += .0005f * context.engineRepository.elapsedTimeSpeed;
+        if (CTX.engineRepository.incrementTime) {
+            CTX.engineRepository.elapsedTime += .0005f * CTX.engineRepository.elapsedTimeSpeed;
             setGISettingsUpdated(true);
-            lightVolumeDataNeedsUpdate = true;
+            updateLights = true;
         }
-        context.lightVolumesService.computeSunInfo();
-        globalDataUBO.sunPosition = context.lightVolumesService.getSunPosition();
-        globalDataUBO.sunColor = context.lightVolumesService.getSunColor();
-        context.coreBuffers.globalData->update(&globalDataUBO);
+        CTX.lightService.computeSunInfo();
+        globalDataUBO.sunPosition = CTX.lightService.getSunPosition();
+        globalDataUBO.sunColor = CTX.lightService.getSunColor();
+        CTX.coreBuffers.globalData->update(&globalDataUBO);
     }
 }

@@ -55,16 +55,11 @@ add_executable(
         src/util/UIUtil.h
         src/context/editor/dock-spaces/header/EditorHeaderPanel.cpp
         src/context/editor/dock-spaces/header/EditorHeaderPanel.h
-        src/context/editor/dock-spaces/header/GlobalSettingsPanel.cpp
-        src/context/editor/dock-spaces/header/GlobalSettingsPanel.h
         src/context/editor/dock-spaces/header/AsyncTaskPanel.cpp
         src/context/editor/dock-spaces/header/AsyncTaskPanel.h
-        src/context/editor/dock-spaces/header/ProjectInfoPanel.cpp
-        src/context/editor/dock-spaces/header/ProjectInfoPanel.h
         src/common/interface/Icons.h
         src/service/dock/DockService.cpp
         src/service/dock/DockService.h
-        src/repository/dock/DockRepository.cpp
         src/repository/dock/DockRepository.h
         src/repository/dock/DockDTO.h
         src/repository/dock/DockSpace.h
@@ -76,10 +71,10 @@ add_executable(
         src/service/theme/ThemeService.h
         src/repository/editor/EditorRepository.h
         src/enum/engine-definitions.h
-        src/context/editor/dock-spaces/metrics/MetricsPanel.cpp
-        src/context/editor/dock-spaces/metrics/MetricsPanel.h
         src/context/editor/dock-spaces/files/FilesPanel.cpp
         src/context/editor/dock-spaces/files/FilesPanel.h
+        src/context/editor/dock-spaces/files/FilesListPanel.cpp
+        src/context/editor/dock-spaces/files/FilesListPanel.h
         src/context/editor/dock-spaces/files/FilePreviewPanel.cpp
         src/context/editor/dock-spaces/files/FilePreviewPanel.h
         src/context/editor/dock-spaces/console/ConsolePanel.cpp
@@ -105,7 +100,6 @@ add_executable(
         src/repository/framebuffer/CoreFrameBuffers.cpp
         src/repository/framebuffer/CoreFrameBuffers.h
         src/repository/abstract/AbstractCoreRepository.h
-        src/repository/abstract/AbstractCoreRepository.cpp
         src/service/framebuffer/FrameBufferService.cpp
         src/service/framebuffer/FrameBufferService.h
         src/service/framebuffer/FrameBufferInstance.h
@@ -170,18 +164,17 @@ add_executable(
         src/service/camera/Camera.cpp
         src/repository/world/WorldRepository.cpp
         src/repository/world/WorldRepository.h
-        src/repository/world/impl/Entity.h
+        src/repository/world/impl/EntityComponent.h
         src/enum/ComponentType.h
         src/repository/world/impl/AbstractComponent.h
         src/repository/world/components/MeshComponent.h
         src/repository/world/components/TransformComponent.h
         src/enum/ShadingMode.h
-        src/enum/EditorMode.h
         src/context/editor/dock-spaces/hierarchy/HierarchyHeaderPanel.cpp
         src/context/editor/dock-spaces/hierarchy/HierarchyHeaderPanel.h
         src/service/selection/SelectionService.cpp
         src/service/selection/SelectionService.h
-        src/repository/world/impl/Entity.cpp
+        src/repository/world/impl/EntityComponent.cpp
         src/repository/world/components/TransformComponent.cpp
         src/repository/world/components/MeshComponent.cpp
         src/context/editor/abstract/form/types/ResourceField.cpp
@@ -207,8 +200,6 @@ add_executable(
         src/context/editor/dock-spaces/viewport/ViewportHeaderPanel.h
         src/context/editor/dock-spaces/viewport/GizmoSettingsPanel.cpp
         src/context/editor/dock-spaces/viewport/GizmoSettingsPanel.h
-        src/context/editor/dock-spaces/viewport/PaintingSettingsPanel.cpp
-        src/context/editor/dock-spaces/viewport/PaintingSettingsPanel.h
         src/context/editor/abstract/form/types/QuatField.cpp
         src/context/editor/abstract/form/types/QuatField.h
         src/service/transform/TransformService.cpp
@@ -222,17 +213,15 @@ add_executable(
         src/service/voxel/impl/OctreeNode.cpp
         src/service/voxel/impl/OctreeNode.h
         src/service/voxel/impl/VoxelData.h
-        src/service/voxel/VoxelizationService.cpp
-        src/service/voxel/VoxelizationService.h
-        src/service/voxel/impl/VoxelizerService.cpp
-        src/service/voxel/impl/VoxelizerService.h
         src/service/mesh/SceneData.h
         src/service/mesh/EntityAssetData.h
-        src/service/material/MaterialData.h
+        src/service/material/MaterialFileData.h
         src/context/engine/render-pass/impl/PostProcessingPass.cpp
         src/context/engine/render-pass/impl/PostProcessingPass.h
-        src/context/engine/compute-pass/impl/PathTracerPass.cpp
-        src/context/engine/compute-pass/impl/PathTracerPass.h
+        src/context/engine/compute-pass/impl/HWRayTracingPass.cpp
+        src/context/engine/compute-pass/impl/HWRayTracingPass.h
+        src/service/raytracing/RayTracingService.cpp
+        src/service/raytracing/RayTracingService.h
         src/service/pipeline/PipelineBuilder.h
         src/service/framebuffer/FrameBufferAttachment.cpp
         src/repository/engine/EngineRepository.cpp
@@ -246,14 +235,9 @@ add_executable(
         src/service/notification/AsyncTaskService.h
         src/dto/Notification.h
         src/enum/NotificationSeverity.h
-        src/service/voxel/impl/Triangle.h
         src/service/voxel/impl/SparseVoxelOctreeData.h
-        src/context/engine/render-pass/impl/tools/VoxelVisualizerPass.cpp
-        src/context/engine/render-pass/impl/tools/VoxelVisualizerPass.h
         src/context/engine/render-pass/impl/tools/SelectedDotPass.cpp
         src/context/engine/render-pass/impl/tools/SelectedDotPass.h
-        src/service/voxel/SVOService.cpp
-        src/service/voxel/SVOService.h
         src/service/picking/PickingService.cpp
         src/service/picking/PickingService.h
         src/service/voxel/SVOInstance.cpp
@@ -262,9 +246,12 @@ add_executable(
         src/service/world/WorldGridService.cpp
         src/service/world/WorldGridService.h
         src/dto/buffers/TileInfoUBO.h
-        src/dto/buffers/LightVolumeData.h
+        src/dto/buffers/LightData.h
         src/repository/world/components/LightComponent.cpp
         src/repository/world/components/LightComponent.h
+        src/repository/world/components/SphereLightComponent.cpp
+        src/repository/world/components/SphereLightComponent.h
+        src/repository/world/components/PlaneLightComponent.h
         src/context/engine/render-pass/impl/tools/IconsPass.cpp
         src/context/engine/render-pass/impl/tools/IconsPass.h
         src/repository/editor/EditorRepository.cpp
@@ -276,32 +263,37 @@ add_executable(
         src/context/engine/passes/PassesService.cpp
         src/context/engine/passes/PassesService.h
         src/util/ImageUtils.h
-        src/service/material/MaterialInstance.cpp
         src/service/material/MaterialInstance.h
         src/service/material/MaterialService.cpp
         src/service/material/MaterialService.h
-        src/service/material/MaterialData.cpp
+        src/service/material/MaterialFileData.cpp
         src/repository/inspection/FileInspectionRepository.cpp
         src/repository/inspection/FileInspectionRepository.h
         src/context/editor/dock-spaces/inspector/MaterialInspection.cpp
         src/context/editor/dock-spaces/inspector/MaterialInspection.h
-        src/service/voxel/VoxelizationRequest.h
-        src/enum/LightVolumeType.h
+        src/enum/LightType.h
         src/context/engine/compute-pass/impl/AccumulationMetadataPass.cpp
         src/context/engine/compute-pass/impl/AccumulationMetadataPass.h
         src/context/engine/compute-pass/impl/AccumulationPass.cpp
         src/context/engine/compute-pass/impl/AccumulationPass.h
-        src/service/lights/LightVolumeService.cpp
-        src/service/lights/LightVolumeService.h
+        src/service/lights/LightService.cpp
+        src/service/lights/LightService.h
         src/repository/world/components/VolumeComponent.cpp
         src/repository/world/components/VolumeComponent.h
         src/service/descriptor/DescriptorBinding.h
         src/service/exporter/VideoExporterService.cpp
         src/service/exporter/VideoExporterService.h
         src/service/notification/AsyncTask.h
-        src/service/voxel/VolumeImporterService.cpp
-        src/service/voxel/VolumeImporterService.h
-        src/service/voxel/impl/SnapshotWorldTile.h
+        src/service/voxel/VoxelImporterService.cpp
+        src/service/voxel/VoxelImporterService.h
+        src/dto/buffers/MaterialData.h
+        src/dto/buffers/VolumeData.h
+        src/service/volumes/VolumeService.cpp
+        src/service/volumes/VolumeService.h
+        src/service/voxel/VoxelService.cpp
+        src/service/voxel/VoxelService.h
+        src/service/framebuffer/FrameBufferInstance.cpp
+        src/util/Serializable.cpp
 )
 
 

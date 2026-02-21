@@ -2,6 +2,7 @@
 #include "../../util/UIUtil.h"
 #include "../../context/ApplicationContext.h"
 #include "../../dto/Notification.h"
+#include "dock-spaces/header/EditorHeaderPanel.h"
 
 namespace Metal {
     int EditorPanel::FLAGS = ImGuiWindowFlags_NoDocking |
@@ -14,7 +15,7 @@ namespace Metal {
     const char *EditorPanel::NAME = "##main_window";
     const char *EditorPanel::NAME_HEADER = "##header_window";
     ImVec2 EditorPanel::CENTER(0.0f, 0.0f);
-    float EditorPanel::HEADER_HEIGHT = 58;
+    float EditorPanel::HEADER_HEIGHT = 25;
 
 
     void EditorPanel::renderDockSpaces() {
@@ -40,7 +41,7 @@ namespace Metal {
 
         ImGui::PopStyleVar(3);
 
-        context->dockService.buildViews(windowId, this);
+        CTX.dockService.buildViews(windowId, this);
 
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
         ImGui::DockSpace(windowId, CENTER, ImGuiDockNodeFlags_PassthruCentralNode);
@@ -63,7 +64,7 @@ namespace Metal {
         ImGui::Begin(NAME_HEADER, &UIUtil::OPEN, FLAGS | ImGuiWindowFlags_NoScrollbar);
         ImGui::PopStyleVar(3);
 
-        headerPanel.onSync();
+        headerPanel->onSync();
         ImGui::End();
     }
 
@@ -74,20 +75,20 @@ namespace Metal {
     }
 
     void EditorPanel::onSync() {
-        context->themeService.onSync();
+        CTX.themeService.onSync();
         renderDockSpaces();
         int usedIndices = 0;
-        for (int i = 0; i < context->notificationService.getNotifications().size(); i++) {
-            auto *notification = context->notificationService.getNotifications()[i];
+        for (int i = 0; i < CTX.notificationService.getNotifications().size(); i++) {
+            auto *notification = CTX.notificationService.getNotifications()[i];
             if (notification == nullptr) {
                 continue;
             }
             if (notification->displayTime < 0) {
-                notification->displayTime = context->engineContext.currentTimeMs;
+                notification->displayTime = CTX.engineContext.currentTimeMs;
             }
-            if (context->engineContext.currentTimeMs - notification->displayTime > MESSAGE_DURATION) {
+            if (CTX.engineContext.currentTimeMs - notification->displayTime > MESSAGE_DURATION) {
                 delete notification;
-                context->notificationService.getNotifications()[i] = nullptr;
+                CTX.notificationService.getNotifications()[i] = nullptr;
                 continue;
             }
             ImGui::SetNextWindowPos(ImVec2(5, ImGui::GetMainViewport()->Size.y - 40 * (usedIndices + 1)));
@@ -107,7 +108,7 @@ namespace Metal {
     }
 
     void EditorPanel::onInitialize() {
-        headerPanel.setContext(context);
-        headerPanel.onInitialize();
+        headerPanel = new EditorHeaderPanel();
+        headerPanel->onInitialize();
     }
 }

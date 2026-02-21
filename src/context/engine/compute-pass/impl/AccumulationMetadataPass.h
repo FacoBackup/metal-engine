@@ -7,8 +7,8 @@ namespace Metal {
     class AccumulationMetadataPass final : public AbstractComputePass {
         DenoiserPushConstant pushConstant{};
     public:
-        explicit AccumulationMetadataPass(ApplicationContext &context)
-            : AbstractComputePass(context) {
+        explicit AccumulationMetadataPass()
+            : AbstractComputePass() {
         }
 
         void onInitialize() override;

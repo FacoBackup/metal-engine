@@ -17,8 +17,8 @@ namespace Metal {
         glm::mat4x4 auxMat42{};
 
     public:
-        explicit TransformService(ApplicationContext &context)
-            : AbstractRuntimeComponent(context) {
+        explicit TransformService()
+            : AbstractRuntimeComponent() {
         }
 
         void onSync() override;

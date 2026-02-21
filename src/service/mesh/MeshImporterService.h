@@ -14,8 +14,8 @@ namespace Metal {
 
     class MeshImporterService final : public AbstractResourceService {
     public:
-        explicit MeshImporterService(ApplicationContext &context)
-            : AbstractResourceService(context) {
+        explicit MeshImporterService()
+            : AbstractResourceService() {
         }
 
         void persistAllMeshes(const std::string &targetDir, const aiScene *scene,
@@ -24,7 +24,7 @@ namespace Metal {
                               const std::stop_token &stopToken = {}) const;
 
     private:
-        void simplifyMesh(const std::string &fileId, const MeshData &mesh, const LevelOfDetail &levelOfDetail) const;
+        size_t simplifyMesh(const std::string &fileId, const MeshData &mesh, const LevelOfDetail &levelOfDetail) const;
 
         [[nodiscard]] std::string persistMesh(const std::string &targetDir, const MeshData &mesh) const;
     };

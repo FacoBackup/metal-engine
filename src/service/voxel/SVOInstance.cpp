@@ -4,7 +4,7 @@
 #include "../descriptor/DescriptorInstance.h"
 
 namespace Metal {
-    void SVOInstance::dispose(VulkanContext &context) {
-        voxelsBuffer->dispose(context);
+    void SVOInstance::dispose() {
+        voxelsBuffer->dispose();
     }
 } // Metal

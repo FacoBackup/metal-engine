@@ -16,7 +16,7 @@ namespace Metal {
         explicit SVOInstance(const std::string &id) : RuntimeResource(id) {
         }
 
-        void dispose(VulkanContext &context) override;
+        void dispose() override;
     };
 } // Metal
 

@@ -38,7 +38,7 @@ namespace Metal {
     public:
         void handleInput(bool isFirstMovement) const;
 
-        explicit CameraService(ApplicationContext &context);
+        explicit CameraService();
 
         void onSync() override;
     };

@@ -3,11 +3,13 @@
 
 #include <imgui.h>
 #include <glm/vec2.hpp>
+#include <unordered_map>
 
 #include "../../abstract/AbstractPanel.h"
 
 namespace Metal {
     struct DockDTO;
+    struct DockSpace;
     class AbstractDockPanel;
 
     class DockSpacePanel final : public AbstractPanel {
@@ -21,12 +23,16 @@ namespace Metal {
         DockSpacePanel *mainWindow = nullptr;
         DockDTO *dock = nullptr;
         AbstractDockPanel *view = nullptr;
+        std::unordered_map<int, AbstractDockPanel *> views{};
         ImVec2 headerPadding{0, 3};
+
+        DockSpace *getSelectedDockSpace() const;
+
+        bool hasDockSpace(int index) const;
 
     public:
         static constexpr int FLAGS = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_MenuBar;
-        static constexpr int FLAGS_CENTER = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar;
-        static const ImVec2 DEFAULT;
+                static const ImVec2 DEFAULT;
         static const ImVec2 MAX_SIZE;
         static const ImVec2 PIVOT;
         static const float FRAME_SIZE;
@@ -42,6 +48,8 @@ namespace Metal {
         void onInitialize() override;
 
         void initializeView();
+
+        void handleShortcut() const;
 
         void onSync() override;
 

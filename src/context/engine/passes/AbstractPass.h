@@ -21,7 +21,7 @@ namespace Metal {
         StreamingRepository &streamingRepository;
         PipelineInstance *pipelineInstance = nullptr;
 
-        explicit AbstractPass(ApplicationContext &context, bool isComputePass);
+        explicit AbstractPass(bool isComputePass);
 
         void recordPushConstant(const void *data);
 

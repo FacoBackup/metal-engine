@@ -44,77 +44,87 @@
 #include "../service/notification/AsyncTaskService.h"
 #include "../service/log/LogService.h"
 #include "../service/transform/TransformService.h"
-#include "../service/voxel/SVOService.h"
 #include "../service/picking/PickingService.h"
-#include "../service/lights/LightVolumeService.h"
-#include "../service/voxel/VoxelizationService.h"
-#include "../service/voxel/impl/VoxelizerService.h"
-#include "../service/voxel/VolumeImporterService.h"
+#include "../service/volumes/VolumeService.h"
+#include "../service/voxel/VoxelImporterService.h"
+#include "../service/voxel/VoxelService.h"
+#include "../service/lights/LightService.h"
+#include "../service/raytracing/RayTracingService.h"
 #include "editor/EditorPanel.h"
 #include "gui/GuiContext.h"
-
+#define CTX Metal::ApplicationContext::Get()
 namespace Metal {
     class ApplicationContext {
+        static std::unique_ptr<ApplicationContext> CONTEXT;
         bool debugMode;
         EditorPanel editorPanel;
         std::string rootDirectory;
 
     public:
-        VideoExporterService videoExporterService{*this, true};
-        EngineContext engineContext{*this};
-        PassesService passesService{*this};
-        VulkanContext vulkanContext{*this, debugMode};
-        GuiContext guiContext{*this};
-        GLFWContext glfwContext{*this};
+        explicit ApplicationContext(bool debug_mode)
+            : debugMode(debug_mode) {
+        }
+
+        VideoExporterService videoExporterService{ true};
+        EngineContext engineContext{};
+        PassesService passesService{};
+        VulkanContext vulkanContext{ debugMode};
+        GuiContext guiContext{};
+        GLFWContext glfwContext{};
 
         // // ----------- CORE REPOSITORIES
-        CoreFrameBuffers coreFrameBuffers{*this};
-        CoreBuffers coreBuffers{*this};
-        CoreDescriptorSets coreDescriptorSets{*this};
-        CoreTextures coreTextures{*this};
+        CoreFrameBuffers coreFrameBuffers{};
+        CoreBuffers coreBuffers{};
+        CoreDescriptorSets coreDescriptorSets{};
+        CoreTextures coreTextures{};
         // ----------- CORE REPOSITORIES
 
         // ----------- Services
         NotificationService notificationService;
         AsyncTaskService asyncTaskService;
-        LogService logService{*this};
-        MeshService meshService{*this};
-        MaterialService materialService{*this};
-        TextureService textureService{*this};
-        FrameBufferService framebufferService{*this};
-        PipelineService pipelineService{*this};
-        BufferService bufferService{*this};
-        DescriptorService descriptorService{*this};
-        ThemeService themeService{*this};
-        DockService dockService{*this};
-        SelectionService selectionService{*this};
-        SceneImporterService sceneImporterService{*this};
-        MeshImporterService meshImporterService{*this};
-        MaterialImporterService materialImporterService{*this};
-        TextureImporterService textureImporter{*this};
-        FilesService filesService{*this};
-        FileImporterService fileImporterService{*this};
-        CameraService cameraService{*this};
-        VoxelizationService voxelizationService{*this};
-        VoxelizerService voxelizerService{*this};
-        SVOService svoService{*this};
-        VolumeImporterService volumeImporterService{*this};
-        PickingService pickingService{*this};
-        WorldGridService worldGridService{*this};
-        TransformService transformService{*this};
-        LightVolumeService lightVolumesService{*this};
+        LogService logService{};
+        MeshService meshService{};
+        MaterialService materialService{};
+        TextureService textureService{};
+        FrameBufferService framebufferService{};
+        PipelineService pipelineService{};
+        BufferService bufferService{};
+        DescriptorService descriptorService{};
+        ThemeService themeService{};
+        DockService dockService{};
+        SelectionService selectionService{};
+        SceneImporterService sceneImporterService{};
+        MeshImporterService meshImporterService{};
+        MaterialImporterService materialImporterService{};
+        TextureImporterService textureImporter{};
+        FilesService filesService{};
+        FileImporterService fileImporterService{};
+        CameraService cameraService{};
+        PickingService pickingService{};
+        WorldGridService worldGridService{};
+        TransformService transformService{};
+        LightService lightService{};
+        VolumeService volumeService{};
+        RayTracingService rayTracingService{};
+        VoxelImporterService voxelImporterService{};
+        VoxelService voxelService{};
         // ----------- Services
 
         // ----------- Repository
         FileInspectionRepository fileInspection{};
-        WorldGridRepository worldGridRepository{*this};
-        WorldRepository worldRepository{*this};
+        WorldGridRepository worldGridRepository{};
+        WorldRepository worldRepository{};
         RuntimeRepository runtimeRepository{};
-        StreamingRepository streamingRepository{*this};
+        StreamingRepository streamingRepository{};
         EngineRepository engineRepository{};
-        DockRepository dockRepository{*this};
+        DockRepository dockRepository{};
         EditorRepository editorRepository{};
         // ----------- Repository
+
+
+        static ApplicationContext &Get();
+
+        static void Init(bool debugMode);
 
         [[nodiscard]] bool isDebugMode() const { return debugMode; }
 
@@ -149,10 +159,6 @@ namespace Metal {
         void start();
 
         void save();
-
-        explicit ApplicationContext(const bool debugMode): debugMode(debugMode) {
-            editorPanel.setContext(this);
-        }
     };
 }
 

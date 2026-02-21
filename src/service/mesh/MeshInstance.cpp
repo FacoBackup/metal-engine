@@ -6,11 +6,11 @@
 #include "../buffer/BufferInstance.h"
 
 namespace Metal {
-    void MeshInstance::dispose(VulkanContext &context) {
-        LOG_INFO_S("Disposing of mesh instance");
+    void MeshInstance::dispose() {
+        LOG_INFO("Disposing of mesh instance");
 
-        indexBuffer->dispose(context);
-        dataBuffer->dispose(context);
+        indexBuffer->dispose();
+        dataBuffer->dispose();
 
         indexBuffer = nullptr;
         dataBuffer = nullptr;

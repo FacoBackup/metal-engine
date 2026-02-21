@@ -1,39 +1,32 @@
 #include "EditorHeaderPanel.h"
-#include "GlobalSettingsPanel.h"
-#include "ProjectInfoPanel.h"
 #include "AsyncTaskPanel.h"
 #include "../../../../util/UIUtil.h"
 #include "../../../../context/ApplicationContext.h"
 
 namespace Metal {
     void EditorHeaderPanel::onSync() {
-        hotKeys();
         renderFileTab();
         ImGui::Dummy(ImVec2(0, UIUtil::ONLY_ICON_BUTTON_SIZE));
         ImGui::Dummy(ImVec2(2, 0));
-        ImGui::SameLine();
-        globalSettings->onSync();
         ImGui::Separator();
     }
 
     void EditorHeaderPanel::onInitialize() {
-        appendChild(globalSettings = new GlobalSettingsPanel());
-        appendChild(projectInfo = new ProjectInfoPanel());
         appendChild(asyncTask = new AsyncTaskPanel());
     }
 
     void EditorHeaderPanel::renderFileTab() {
         if (ImGui::BeginMainMenuBar()) {
             if (UIUtil::ButtonSimple(Icons::save, UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-                context->save();
+                CTX.save();
             }
             ImGui::SameLine();
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Open", "Ctrl+O")) {
-                    context->updateRootPath(true); // TODO - CLEAR APPLICATION STATE
+                    CTX.updateRootPath(true); // TODO - CLEAR APPLICATION STATE
                 }
                 if (ImGui::MenuItem("Save", "Ctrl+S")) {
-                    context->save();
+                    CTX.save();
                 }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Exit")) {
@@ -44,33 +37,17 @@ namespace Metal {
 
             // Create an "Edit" menu
             if (ImGui::BeginMenu("Edit")) {
-                if (ImGui::MenuItem("Undo", "Ctrl+Z")) {
-                    // Action for "Undo"
-                }
-                if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false)) {
-                    // Action for "Redo", disabled here
-                }
-                ImGui::Separator();
-                if (ImGui::MenuItem("Cut", "Ctrl+X")) {
-                    // Action for "Cut"
-                }
-                if (ImGui::MenuItem("Copy", "Ctrl+C")) {
-                    // Action for "Copy"
-                }
-                if (ImGui::MenuItem("Paste", "Ctrl+V")) {
-                    // Action for "Paste"
-                }
-                ImGui::Separator();
                 if (ImGui::MenuItem("Compile shaders")) {
-                    context->passesService.dispose();
-                    context->passesService.onInitialize();
+                    CTX.passesService.dispose();
+                    CTX.passesService.onInitialize();
                 }
                 ImGui::EndMenu();
             }
 
+            UIUtil::LargeSpacing();
+            renderShortcuts();
             UIUtil::Spacing();
 
-            projectInfo->onSync();
             asyncTask->onSync();
 
             framerate();
@@ -84,7 +61,40 @@ namespace Metal {
         ImGui::Text("%i ms | %i fps", 1000 / framerate, framerate);
     }
 
-    void EditorHeaderPanel::hotKeys() {
-        // TODO
+    void EditorHeaderPanel::renderShortcuts() {
+        auto &shortcuts = CTX.editorRepository.focusedShortcuts;
+        if (shortcuts.empty()) return;
+        ImGui::Text(CTX.editorRepository.focusedWindowName.c_str());
+        ImGui::SameLine();
+        std::string label;
+        for (size_t i = 0; i < std::min(shortcuts.size(), size_t(3)); ++i) {
+            if (i > 0) label += " | ";
+            label += UIUtil::GetKeyChordName(shortcuts[i].keyChord);
+        }
+
+        if (ImGui::Button(label.c_str())) {
+            ImGui::OpenPopup("AllShortcutsPopup");
+        }
+
+        if (ImGui::BeginPopup("AllShortcutsPopup")) {
+            if (ImGui::BeginTable("ShortcutsTable", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp)) {
+                ImGui::TableSetupColumn("Key");
+                ImGui::TableSetupColumn("Action");
+                ImGui::TableHeadersRow();
+
+                for (const auto &shortcut: shortcuts) {
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::TextUnformatted(UIUtil::GetKeyChordName(shortcut.keyChord).c_str());
+                    ImGui::TableNextColumn();
+                    if (ImGui::Selectable(shortcut.name.c_str(), false, ImGuiSelectableFlags_SpanAllColumns)) {
+                        shortcut.callback();
+                        ImGui::CloseCurrentPopup();
+                    }
+                }
+                ImGui::EndTable();
+            }
+            ImGui::EndPopup();
+        }
     }
 }

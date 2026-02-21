@@ -13,11 +13,11 @@ namespace Metal {
         VkDescriptorSet vkDescriptorSet = VK_NULL_HANDLE;
         std::vector<DescriptorBinding> bindings;
 
-        void dispose(const VulkanContext &context) const;
+        void dispose() const;
 
-        static void Write(const VulkanContext &context, const VkDescriptorSet &vkDescriptorSet, std::vector<DescriptorBinding> &bindings);
+        static void Write(const VkDescriptorSet &vkDescriptorSet, std::vector<DescriptorBinding> &bindings);
 
-        void create(const VulkanContext &context);
+        void create();
 
         void addLayoutBinding(DescriptorBinding binding);
     };

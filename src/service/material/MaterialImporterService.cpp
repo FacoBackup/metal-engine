@@ -1,14 +1,13 @@
 #include "MaterialImporterService.h"
 #include "../../context/ApplicationContext.h"
-#include "MaterialData.h"
+#include "MaterialFileData.h"
 #include "../../dto/file/EntryMetadata.h"
 #include "../../enum/engine-definitions.h"
 #include "../../util/FilesUtil.h"
 #include <assimp/material.h>
 
 #include <filesystem>
-
-#include <cereal/archives/binary.hpp>
+#include "../../util/serialization-definitions.h"
 
 namespace Metal {
     void MaterialImporterService::persistAllMaterials(const std::string &targetDir, const aiScene *scene,
@@ -16,11 +15,11 @@ namespace Metal {
                                                       const std::string &rootDirectory,
                                                       const std::stop_token &stopToken) const {
         namespace fs = std::filesystem;
-        LOG_INFO(context, "Processing materials for scene...");
+        LOG_INFO("Processing materials for scene...");
         for (unsigned int i = 0; i < scene->mNumMaterials; ++i) {
             if (stopToken.stop_requested()) return;
             const aiMaterial *material = scene->mMaterials[i];
-            auto materialData = MaterialData{};
+            auto materialData = MaterialFileData{};
 
             const auto importAssimpTexture = [&
                     ](const aiString &assimpPath, const std::string &nameHint) -> std::string {
@@ -32,7 +31,7 @@ namespace Metal {
                     try {
                         const unsigned int embeddedIndex = static_cast<unsigned int>(std::stoul(p.substr(1)));
                         if (scene && embeddedIndex < scene->mNumTextures) {
-                            return context.textureImporter.importEmbeddedTexture(
+                            return CTX.textureImporter.importEmbeddedTexture(
                                 targetDir, scene->mTextures[embeddedIndex], nameHint);
                         }
                     } catch (...) {
@@ -47,7 +46,7 @@ namespace Metal {
                 }
                 resolved = resolved.lexically_normal();
                 try {
-                    return context.textureImporter.importData(targetDir, resolved.string(), stopToken);
+                    return CTX.textureImporter.importData(targetDir, resolved.string(), stopToken);
                 } catch (std::exception &e) {
                     return "";
                 }
@@ -80,7 +79,7 @@ namespace Metal {
             // If we didn't import any textures, don't create/persist a material at all.
             if (materialData.albedo.empty() && materialData.normal.empty() && materialData.roughness.empty() &&
                 materialData.metallic.empty() && materialData.height.empty()) {
-                LOG_INFO(context, "Skipping material " + std::to_string(i) + ": no textures associated");
+                LOG_INFO("Skipping material " + std::to_string(i) + ": no textures associated");
                 continue;
             }
 
@@ -89,13 +88,17 @@ namespace Metal {
                 EntryMetadata materialMetadata{};
                 materialMetadata.type = EntryType::MATERIAL;
                 materialMetadata.name = "Material " + std::to_string(i);
+
+                std::string materialBlobPath = CTX.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialMetadata.getId());
+                DUMP_TEMPLATE(materialBlobPath, materialData)
+                materialMetadata.size = fs::file_size(materialBlobPath);
+
                 DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(materialMetadata.getId()), materialMetadata)
                 materialId = materialMetadata.getId();
             }
             materialMap.insert({i, materialId});
 
-            DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialId), materialData)
-            LOG_INFO(context, "Persisted material: " + materialId);
+            LOG_INFO("Persisted material: " + materialId);
         }
     }
 }

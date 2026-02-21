@@ -13,12 +13,16 @@ namespace Metal {
         const char *vertexShader = nullptr;
         const char *fragmentShader = nullptr;
         const char *computeShader = nullptr;
+        const char *rayGenShader = nullptr;
+        const char *missShader = nullptr;
+        const char *closestHitShader = nullptr;
         std::vector<DescriptorInstance *> descriptorSetsToBind{};
         unsigned int pushConstantsSize = 0;
         bool blendEnabled = false;
         bool prepareForMesh = false;
         bool depthTest = false;
         bool useStrip = false;
+        bool isRayTracing = false;
 
         static PipelineBuilder Of(FrameBufferInstance *frameBuffer, const char *vertexShader,
                                   const char *fragmentShader) {
@@ -32,6 +36,15 @@ namespace Metal {
         static PipelineBuilder Of(const char *computeShader) {
             PipelineBuilder d{};
             d.computeShader = computeShader;
+            return d;
+        }
+
+        static PipelineBuilder OfRayTracing(const char *rayGen, const char *miss, const char *closestHit) {
+            PipelineBuilder d{};
+            d.rayGenShader = rayGen;
+            d.missShader = miss;
+            d.closestHitShader = closestHit;
+            d.isRayTracing = true;
             return d;
         }
 

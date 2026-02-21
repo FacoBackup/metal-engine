@@ -10,8 +10,8 @@ namespace Metal {
 
     class TextureImporterService final : public AbstractImporter {
     public:
-        explicit TextureImporterService(ApplicationContext &context)
-            : AbstractImporter(context) {
+        explicit TextureImporterService()
+            : AbstractImporter() {
         }
 
         std::vector<std::string> getSupportedTypes() override {
@@ -23,7 +23,7 @@ namespace Metal {
         std::string importEmbeddedTexture(const std::string &targetDir, const ::aiTexture *texture,
                                           const std::string &nameHint) const;
 
-        void reduceImage(const std::string &fileId,
+        size_t reduceImage(const std::string &fileId,
                          const TextureData &textureData, const LevelOfDetail &levelOfDetail) const;
     };
 }

@@ -2,36 +2,34 @@
 #include "../../../context/ApplicationContext.h"
 #include "./CommandBufferRecorder.h"
 #include "../compute-pass/impl/AccumulationPass.h"
-#include "../compute-pass/impl/PathTracerPass.h"
+#include "../compute-pass/impl/HWRayTracingPass.h"
 #include "../compute-pass/impl/AccumulationMetadataPass.h"
 #include "../render-pass/impl/GBufferGenPass.h"
 #include "../render-pass/impl/PostProcessingPass.h"
 #include "../render-pass/impl/tools/SelectedDotPass.h"
 #include "../render-pass/impl/tools/GridPass.h"
-#include "../render-pass/impl/tools/VoxelVisualizerPass.h"
 #include "../render-pass/impl/tools/IconsPass.h"
 
 namespace Metal {
-    PassesService::PassesService(ApplicationContext &context) : AbstractRuntimeComponent(context) {
+    PassesService::PassesService() : AbstractRuntimeComponent() {
     }
 
     void PassesService::onInitialize() {
-        gBuffer = new CommandBufferRecorder(context.coreFrameBuffers.gBufferFBO, context);
-        compute = new CommandBufferRecorder(context);
-        postProcessing = new CommandBufferRecorder(context.coreFrameBuffers.postProcessingFBO, context);
+        gBuffer = new CommandBufferRecorder(CTX.coreFrameBuffers.gBufferFBO);
+        compute = new CommandBufferRecorder();
+        postProcessing = new CommandBufferRecorder(CTX.coreFrameBuffers.postProcessingFBO);
 
-        addPass(gBufferPasses, new GBufferGenPass(context));
+        addPass(gBufferPasses, new GBufferGenPass());
 
-        addPass(computePasses, new PathTracerPass(context));
-        addPass(computePasses, new AccumulationPass(context));
-        addPass(computePasses, new AccumulationMetadataPass(context));
+        addPass(computePasses, new HWRayTracingPass());
+        addPass(computePasses, new AccumulationPass());
+        addPass(computePasses, new AccumulationMetadataPass());
 
-        addPass(postProcessingPasses, new PostProcessingPass(context));
-        addPass(postProcessingPasses, new SelectedDotPass(context));
-        if (context.isDebugMode()) {
-            addPass(postProcessingPasses, new GridPass(context));
-            addPass(postProcessingPasses, new VoxelVisualizerPass(context));
-            addPass(postProcessingPasses, new IconsPass(context));
+        addPass(postProcessingPasses, new PostProcessingPass());
+        if (CTX.isDebugMode()) {
+            addPass(postProcessingPasses, new SelectedDotPass());
+            addPass(postProcessingPasses, new GridPass());
+            addPass(postProcessingPasses, new IconsPass());
         }
 
         for (auto *pass: allPasses) {
@@ -60,7 +58,7 @@ namespace Metal {
         postProcessingPasses.clear();
 
         for (auto &pass: allPasses) {
-            pass->getPipeline()->dispose(context.vulkanContext);
+            pass->getPipeline()->dispose();
             delete pass;
         }
         allPasses.clear();

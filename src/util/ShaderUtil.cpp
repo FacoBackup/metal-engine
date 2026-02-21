@@ -9,7 +9,7 @@
 #include "../context/ApplicationContext.h"
 #include "FilesUtil.h"
 #include "../service/log/LogService.h"
-#include "../enum/LightVolumeType.h"
+#include "../enum/LightType.h"
 #include "glslang/Include/glslang_c_interface.h"
 #include "glslang/Public/resource_limits_c.h"
 #define BASE_PATH "../resources/shaders/"
@@ -18,22 +18,23 @@ namespace Metal {
     void ShaderUtil::CheckShaderCompilation(glslang_shader_t *shader) {
         const char *infoLog = glslang_shader_get_info_log(shader);
         const char *debugLog = glslang_shader_get_info_debug_log(shader);
+        const char *shaderCode = glslang_shader_get_preprocessed_code(shader);
 
         if (infoLog && strlen(infoLog) > 0) {
-            LOG_ERROR_S("Shader Info Log: " + std::string(infoLog));
+            LOG_ERROR("Shader Info Log: " + std::string(infoLog) + "\n\n" + std::string(shaderCode));
         }
         if (debugLog && strlen(debugLog) > 0) {
-            LOG_DEBUG_S("Shader Debug Log: " + std::string(debugLog));
+            LOG_DEBUG("Shader Debug Log: " + std::string(debugLog));
         }
     }
 
-    bool ShaderUtil::CompileShader(const VulkanContext &context, glslang_stage_t stage, const char *pShaderCode,
+    bool ShaderUtil::CompileShader(glslang_stage_t stage, const char *pShaderCode,
                                    ShaderModule *shaderModule) {
         const glslang_input_t input = {
             .language = GLSLANG_SOURCE_GLSL,
             .stage = stage,
             .client = GLSLANG_CLIENT_VULKAN,
-            .client_version = GLSLANG_TARGET_VULKAN_1_1,
+            .client_version = GLSLANG_TARGET_VULKAN_1_2,
             .target_language = GLSLANG_TARGET_SPV,
             .target_language_version = GLSLANG_TARGET_SPV_1_6,
             .code = pShaderCode,
@@ -68,7 +69,7 @@ namespace Metal {
 
         if (const char *spirv_messages = glslang_program_SPIRV_get_messages(program)) {
             if (strlen(spirv_messages) > 0) {
-                LOG_DEBUG_S("SPIR-V message: " + std::string(spirv_messages));
+                LOG_DEBUG("SPIR-V message: " + std::string(spirv_messages));
             }
         }
 
@@ -77,7 +78,7 @@ namespace Metal {
         shaderCreateInfo.codeSize = shaderModule->SPIRV.size() * sizeof(unsigned int);
         shaderCreateInfo.pCode = static_cast<const unsigned int *>(shaderModule->SPIRV.data());
 
-        VulkanUtils::CheckVKResult(vkCreateShaderModule(context.device.device, &shaderCreateInfo,
+        VulkanUtils::CheckVKResult(vkCreateShaderModule(CTX.vulkanContext.device.device, &shaderCreateInfo,
                                                         nullptr,
                                                         &shaderModule->vkShaderModule));
         glslang_program_delete(program);
@@ -112,6 +113,18 @@ namespace Metal {
         if (s.ends_with(".tese")) {
             return GLSLANG_STAGE_TESSEVALUATION;
         }
+
+        if (s.ends_with(".rgen")) {
+            return GLSLANG_STAGE_RAYGEN;
+        }
+
+        if (s.ends_with(".rmiss")) {
+            return GLSLANG_STAGE_MISS;
+        }
+
+        if (s.ends_with(".rchit")) {
+            return GLSLANG_STAGE_CLOSESTHIT;
+        }
         throw std::runtime_error("Unknown shader stage in file");
     }
 
@@ -131,7 +144,7 @@ namespace Metal {
                 FilesUtil::ReadFile((BASE_PATH + includeFile).c_str(), source);
                 result.replace(match.position(0), match.length(0), source);
             } catch (const std::exception &e) {
-                LOG_ERROR_S("Error loading included shader: " + std::string(e.what()));
+                LOG_ERROR("Error loading included shader: " + std::string(e.what()));
                 return "";
             }
         }
@@ -147,17 +160,16 @@ namespace Metal {
         return ProcessIncludes(source);
     }
 
-    VkShaderModule ShaderUtil::CreateShaderModule(const ApplicationContext &context, const std::string &pFilename) {
-        const std::string basePath = context.getShadersDirectory();
+    VkShaderModule ShaderUtil::CreateShaderModule(const std::string &pFilename) {
+        const std::string basePath = CTX.getShadersDirectory();
         std::string source = ProcessShader(BASE_PATH + pFilename);
-        if (context.isDebugMode()) {
+        if (CTX.isDebugMode()) {
             source = "#define DEBUG\n" + source;
         }
-        for (auto &entry: LightVolumeTypes::getEntries()) {
+        for (auto &entry: LightTypes::getEntries()) {
             source = "#define " + entry.first + " " + std::to_string(entry.second) + "\n" + source;
         }
         source = "#define TILE_SIZE " + std::to_string(TILE_SIZE) + std::string("\n") + source;
-        source = "#define MAX_LIGHT_VOLUMES " + std::to_string(MAX_LIGHT_VOLUMES) + std::string("\n") + source;
         source = "#define PI_2 6.28318530718\n" + source;
         source = "#define PI 3.14159265\n" + source;
 
@@ -182,10 +194,10 @@ namespace Metal {
                     shaderCreateInfo.codeSize = shader.SPIRV.size() * sizeof(unsigned int);
                     shaderCreateInfo.pCode = static_cast<const unsigned int *>(shader.SPIRV.data());
 
-                    if (vkCreateShaderModule(context.vulkanContext.device.device, &shaderCreateInfo,
+                    if (vkCreateShaderModule(CTX.vulkanContext.device.device, &shaderCreateInfo,
                                              nullptr, &shader.vkShaderModule) == VK_SUCCESS) {
                         needsCompilation = false;
-                        LOG_INFO(context, "Loaded cached shader: " + shaderName);
+                        LOG_INFO("Loaded cached shader: " + shaderName);
                     }
                 } catch (...) {
                     needsCompilation = true;
@@ -196,8 +208,8 @@ namespace Metal {
         if (needsCompilation) {
             const glslang_stage_t shaderStage = ShaderStageFromFilename(pFilename.c_str());
             glslang_initialize_process();
-            LOG_INFO(context, "Compiling shader: " + shaderName);
-            if (CompileShader(context.vulkanContext, shaderStage, source.c_str(), &shader)) {
+            LOG_INFO("Compiling shader: " + shaderName);
+            if (CompileShader(shaderStage, source.c_str(), &shader)) {
                 FilesUtil::WriteBinaryFile(binaryFilename.c_str(), shader.SPIRV.data(),
                                            shader.SPIRV.size() * sizeof(unsigned int));
                 FilesUtil::WriteFile(hashFilename.c_str(), std::to_string(sourceHash).c_str());

@@ -4,105 +4,121 @@
 #include "../../enum/ComponentType.h"
 
 namespace Metal {
-    WorldRepository::WorldRepository(ApplicationContext &context): AbstractRuntimeComponent(context) {
-        entities.emplace(ROOT_ID, Entity{});
-        entities.at(ROOT_ID).initialize(lastId, true);
-
-        auto *emplace = getEntity(lastId);
-        emplace->name = "Scene";
+    WorldRepository::WorldRepository(): AbstractRuntimeComponent() {
+        const auto root = registry.create(static_cast<entt::entity>(ROOT_ID));
+        auto &entity = registry.emplace<EntityComponent>(root);
+        entity.initialize(true);
+        entity.name = "Scene";
+        registry.emplace<HierarchyComponent>(root);
     }
 
     EntityID WorldRepository::createEntity(std::string name, const bool container) {
-        lastId++;
-        entities.emplace(lastId, Entity{});
-        auto *emplace = getEntity(lastId);
-        emplace->initialize(lastId, container);
-        emplace->name = std::move(name);
-        emplace->parent = ROOT_ID;
-        getEntity(emplace->parent)->children.push_back(emplace->getId());
-        return lastId;
+        const auto entity = registry.create();
+        auto &entityComp = registry.emplace<EntityComponent>(entity);
+        entityComp.initialize(container);
+        entityComp.name = std::move(name);
+
+        registry.emplace<HierarchyComponent>(entity);
+        linkEntities(ROOT_ID, static_cast<EntityID>(entity));
+
+        return static_cast<EntityID>(entity);
     }
 
-    void WorldRepository::linkEntities(const Entity *parentEntity, Entity *child) {
-        auto *parent = getEntity(child->parent);
-        parent->children.erase(
-            std::ranges::remove(parent->children, child->getId()).begin(),
-            parent->children.end());
+    void WorldRepository::linkEntities(EntityID parentId, EntityID childId) {
+        const auto child = static_cast<entt::entity>(childId);
+        auto &childHierarchy = registry.get<HierarchyComponent>(child);
 
-        const EntityID id = parentEntity != nullptr ? parentEntity->getId() : ROOT_ID;
-        getEntity(id)->children.push_back(child->getId());
-        child->parent = id;
+        if (childHierarchy.parent != EMPTY_ENTITY) {
+            const auto oldParent = static_cast<entt::entity>(childHierarchy.parent);
+            if (registry.valid(oldParent)) {
+                auto &oldParentHierarchy = registry.get<HierarchyComponent>(oldParent);
+                oldParentHierarchy.children.erase(
+                    std::ranges::remove(oldParentHierarchy.children, childId).begin(),
+                    oldParentHierarchy.children.end());
+            }
+        }
+
+        const auto newParent = static_cast<entt::entity>(parentId);
+        if (registry.valid(newParent)) {
+            auto &newParentHierarchy = registry.get<HierarchyComponent>(newParent);
+            newParentHierarchy.children.push_back(childId);
+            childHierarchy.parent = parentId;
+        }
     }
 
-    Entity *WorldRepository::getEntity(const EntityID node) {
-        if (entities.contains(node)) {
-            return &entities.find(node)->second;
+    EntityComponent *WorldRepository::getEntity(const EntityID node) {
+        const auto entity = static_cast<entt::entity>(node);
+        if (registry.valid(entity)) {
+            return &registry.get<EntityComponent>(entity);
         }
         return nullptr;
     }
 
-    Inspectable *WorldRepository::getComponent(ComponentTypes::ComponentType comp, EntityID entity) {
+    Inspectable *WorldRepository::getComponent(ComponentTypes::ComponentType comp, EntityID entityId) {
+        const auto entity = static_cast<entt::entity>(entityId);
+        if (!registry.valid(entity)) return nullptr;
+
         switch (comp) {
             case ComponentTypes::MESH:
-                return meshes.contains(entity) ? &meshes.find(entity)->second : nullptr;
+                return registry.all_of<MeshComponent>(entity) ? &registry.get<MeshComponent>(entity) : nullptr;
             case ComponentTypes::TRANSFORM:
-                return transforms.contains(entity) ? &transforms.find(entity)->second : nullptr;
-            case ComponentTypes::LIGHT:
-                return lights.contains(entity) ? &lights.find(entity)->second : nullptr;
+                return registry.all_of<TransformComponent>(entity) ? &registry.get<TransformComponent>(entity) : nullptr;
+            case ComponentTypes::SPHERE_LIGHT:
+            case ComponentTypes::PLANE_LIGHT:
+                return registry.all_of<std::unique_ptr<LightComponent>>(entity)
+                           ? registry.get<std::unique_ptr<LightComponent>>(entity).get()
+                           : nullptr;
             case ComponentTypes::VOLUME:
-                return volumes.contains(entity) ? &volumes.find(entity)->second : nullptr;
+                return registry.all_of<VolumeComponent>(entity) ? &registry.get<VolumeComponent>(entity) : nullptr;
             default:
                 return nullptr;
         }
     }
 
     void WorldRepository::deleteRecursively(const std::vector<EntityID> &entities) {
-        for (EntityID entity: entities) {
-            if (lights.contains(entity)) {
-                lights.erase(entity);
+        for (EntityID entityId: entities) {
+            const auto entity = static_cast<entt::entity>(entityId);
+            if (!registry.valid(entity)) continue;
+
+            if (hiddenEntities.contains(entityId)) {
+                hiddenEntities.erase(entityId);
             }
-            if (volumes.contains(entity)) {
-                volumes.erase(entity);
+            if (culled.contains(entityId)) {
+                culled.erase(entityId);
             }
-            if (transforms.contains(entity)) {
-                transforms.erase(entity);
-            }
-            if (meshes.contains(entity)) {
-                meshes.erase(entity);
-            }
-            if (hiddenEntities.contains(entity)) {
-                hiddenEntities.erase(entity);
-            }
-            if (culled.contains(entity)) {
-                culled.erase(entity);
-            }
-            if (this->entities.contains(entity)) {
-                auto &currentEntity = this->entities.at(entity);
-                if (currentEntity.children.size() > 0) {
-                    std::vector<EntityID> newEntities = currentEntity.children;
-                    deleteRecursively(newEntities);
+
+            if (registry.all_of<HierarchyComponent>(entity)) {
+                auto &hierarchy = registry.get<HierarchyComponent>(entity);
+                if (!hierarchy.children.empty()) {
+                    std::vector<EntityID> childrenToDelete = hierarchy.children;
+                    deleteRecursively(childrenToDelete);
                 }
 
-                auto parentId = currentEntity.parent;
-                if (this->entities.contains(parentId)) {
-                    auto &parent = this->entities.at(parentId);
-                    parent.children.erase(
-                        std::ranges::remove(parent.children, entity).begin(),
-                        parent.children.end());
+                auto parentId = hierarchy.parent;
+                const auto parent = static_cast<entt::entity>(parentId);
+                if (registry.valid(parent) && registry.all_of<HierarchyComponent>(parent)) {
+                    auto &parentHierarchy = registry.get<HierarchyComponent>(parent);
+                    parentHierarchy.children.erase(
+                        std::ranges::remove(parentHierarchy.children, entityId).begin(),
+                        parentHierarchy.children.end());
                 }
-                this->entities.erase(entity);
             }
+            registry.destroy(entity);
         }
     }
 
     void WorldRepository::deleteEntities(const std::vector<EntityID> &entities) {
         deleteRecursively(entities);
-        context.engineContext.setLightVolumeDataNeedsUpdate(true);
+        CTX.engineContext.setUpdateLights(true);
+        CTX.engineContext.setUpdateVolumes(true);
+        CTX.rayTracingService.markDirty();
     }
 
     void WorldRepository::changeVisibility(EntityID entity, bool isVisible) {
         changeVisibilityRecursively(entity, isVisible);
-        context.engineContext.setLightVolumeDataNeedsUpdate(true);
+        CTX.engineContext.setUpdateLights(true);
+        CTX.engineContext.setUpdateVolumes(true);
+        CTX.rayTracingService.markDirty();
     }
 
     void WorldRepository::changeVisibilityRecursively(EntityID entity, const bool isVisible) {
@@ -112,49 +128,143 @@ namespace Metal {
             hiddenEntities.insert({entity, true});
         }
 
-        for (const auto child: getEntity(entity)->children) {
-            changeVisibilityRecursively(child, isVisible);
+        const auto e = static_cast<entt::entity>(entity);
+        if (registry.valid(e) && registry.all_of<HierarchyComponent>(e)) {
+            for (const auto child: registry.get<HierarchyComponent>(e).children) {
+                changeVisibilityRecursively(child, isVisible);
+            }
         }
     }
 
-    void WorldRepository::createComponent(const EntityID entity, ComponentTypes::ComponentType type) {
-        if (!entities.contains(entity)) {
+    void WorldRepository::createComponent(const EntityID entityId, ComponentTypes::ComponentType type) {
+        const auto entity = static_cast<entt::entity>(entityId);
+        if (!registry.valid(entity)) {
             return;
         }
         switch (type) {
             case ComponentTypes::MESH: {
-                meshes.emplace(entity, MeshComponent{});
-                meshes.at(entity).setEntityId(entity);
-                getEntity(entity)->components.push_back(ComponentTypes::MESH);
-                createComponent(entity, ComponentTypes::TRANSFORM);
+                auto &mesh = registry.emplace_or_replace<MeshComponent>(entity);
+                mesh.setEntityId(entityId);
+                createComponent(entityId, ComponentTypes::TRANSFORM);
+                CTX.rayTracingService.markDirty();
                 break;
             }
-            case ComponentTypes::LIGHT: {
-                lights.emplace(entity, LightComponent{});
-                lights.at(entity).setEntityId(entity);
-                getEntity(entity)->components.push_back(ComponentTypes::LIGHT);
-                createComponent(entity, ComponentTypes::TRANSFORM);
-                context.engineContext.setLightVolumeDataNeedsUpdate(true);
+            case ComponentTypes::SPHERE_LIGHT: {
+                auto light = std::make_unique<SphereLightComponent>();
+                light->setEntityId(entityId);
+                registry.emplace_or_replace<std::unique_ptr<LightComponent>>(entity, std::move(light));
+                createComponent(entityId, ComponentTypes::TRANSFORM);
+                CTX.engineContext.setUpdateLights(true);
+                break;
+            }
+            case ComponentTypes::PLANE_LIGHT: {
+                auto light = std::make_unique<PlaneLightComponent>();
+                light->setEntityId(entityId);
+                registry.emplace_or_replace<std::unique_ptr<LightComponent>>(entity, std::move(light));
+                createComponent(entityId, ComponentTypes::TRANSFORM);
+                CTX.engineContext.setUpdateLights(true);
                 break;
             }
             case ComponentTypes::VOLUME: {
-                volumes.emplace(entity, VolumeComponent{});
-                volumes.at(entity).setEntityId(entity);
-                getEntity(entity)->components.push_back(ComponentTypes::VOLUME);
-                createComponent(entity, ComponentTypes::TRANSFORM);
-                context.engineContext.setLightVolumeDataNeedsUpdate(true);
+                auto &vol = registry.emplace_or_replace<VolumeComponent>(entity);
+                vol.setEntityId(entityId);
+                createComponent(entityId, ComponentTypes::TRANSFORM);
+                CTX.engineContext.setUpdateVolumes(true);
                 break;
             }
             case ComponentTypes::TRANSFORM: {
-                transforms.emplace(entity, TransformComponent{});
-                transforms.at(entity).setEntityId(entity);
-                getEntity(entity)->components.push_back(ComponentTypes::TRANSFORM);
-                context.worldGridRepository.getCurrentTile()->entities.push_back(entity);
-                entities.at(entity).onTile = context.worldGridRepository.getCurrentTile()->id;
+                if (!registry.all_of<TransformComponent>(entity)) {
+                    auto &trans = registry.emplace<TransformComponent>(entity);
+                    trans.setEntityId(entityId);
+                    CTX.worldGridRepository.getCurrentTile()->entities.push_back(entityId);
+                    registry.get<EntityComponent>(entity).onTile = CTX.worldGridRepository.getCurrentTile()->id;
+                }
                 break;
             }
             default:
                 break;
+        }
+    }
+
+    nlohmann::json WorldRepository::toJson() const {
+        nlohmann::json j;
+        j["camera"] = camera.toJson();
+
+        nlohmann::json entitiesJson;
+        for (auto entity : registry.view<entt::entity>()) {
+            const auto id = static_cast<EntityID>(entity);
+            nlohmann::json ej;
+
+            if (registry.all_of<EntityComponent>(entity)) {
+                ej["entity"] = registry.get<EntityComponent>(entity).toJson();
+            }
+            if (registry.all_of<HierarchyComponent>(entity)) {
+                auto &h = registry.get<HierarchyComponent>(entity);
+                ej["hierarchy"] = {{"parent", h.parent}, {"children", h.children}};
+            }
+            if (registry.all_of<MeshComponent>(entity)) {
+                ej["mesh"] = registry.get<MeshComponent>(entity).toJson();
+            }
+            if (registry.all_of<TransformComponent>(entity)) {
+                ej["transform"] = registry.get<TransformComponent>(entity).toJson();
+            }
+            if (registry.all_of<std::unique_ptr<LightComponent>>(entity)) {
+                ej["light"] = registry.get<std::unique_ptr<LightComponent>>(entity)->toJson();
+            }
+            if (registry.all_of<VolumeComponent>(entity)) {
+                ej["volume"] = registry.get<VolumeComponent>(entity).toJson();
+            }
+            entitiesJson[std::to_string(id)] = ej;
+        }
+        j["registry"] = entitiesJson;
+        j["hiddenEntities"] = hiddenEntities;
+        return j;
+    }
+
+    void WorldRepository::fromJson(const nlohmann::json &j) {
+        if (j.contains("camera")) camera.fromJson(j.at("camera"));
+
+        registry.clear();
+        if (j.contains("registry")) {
+            for (auto const &[key, val]: j.at("registry").items()) {
+                const auto id = static_cast<EntityID>(std::stoull(key));
+                const auto entity = registry.create(static_cast<entt::entity>(id));
+
+                if (val.contains("entity")) {
+                    registry.emplace<EntityComponent>(entity).fromJson(val.at("entity"));
+                }
+                if (val.contains("hierarchy")) {
+                    auto &h = registry.emplace<HierarchyComponent>(entity);
+                    h.parent = val.at("hierarchy").at("parent").get<EntityID>();
+                    h.children = val.at("hierarchy").at("children").get<std::vector<EntityID>>();
+                }
+                if (val.contains("mesh")) {
+                    registry.emplace<MeshComponent>(entity).fromJson(val.at("mesh"));
+                }
+                if (val.contains("transform")) {
+                    registry.emplace<TransformComponent>(entity).fromJson(val.at("transform"));
+                }
+                if (val.contains("light")) {
+                    auto &lj = val.at("light");
+                    std::string type = lj.at("lightType").get<std::string>();
+                    if (type == "SPHERE") {
+                        auto light = std::make_unique<SphereLightComponent>();
+                        light->fromJson(lj);
+                        registry.emplace<std::unique_ptr<LightComponent>>(entity, std::move(light));
+                    } else if (type == "PLANE") {
+                        auto light = std::make_unique<PlaneLightComponent>();
+                        light->fromJson(lj);
+                        registry.emplace<std::unique_ptr<LightComponent>>(entity, std::move(light));
+                    }
+                }
+                if (val.contains("volume")) {
+                    registry.emplace<VolumeComponent>(entity).fromJson(val.at("volume"));
+                }
+            }
+        }
+
+        if (j.contains("hiddenEntities")) {
+            hiddenEntities = j.at("hiddenEntities").get<std::unordered_map<EntityID, bool>>();
         }
     }
 } // Metal

@@ -9,10 +9,15 @@ namespace Metal {
         for (bool & i : levelFilter) {
             i = true;
         }
+        shortcuts = {
+                ShortcutDTO("Clear Logs", ImGuiMod_Ctrl | ImGuiKey_L, [this]() {
+                    CTX.logService.clear();
+                })
+        };
     }
 
     void ConsolePanel::onSync() {
-        LogService& logService = context->logService;
+        LogService& logService = CTX.logService;
 
         // Header
         if (ImGui::Button("Clear")) {

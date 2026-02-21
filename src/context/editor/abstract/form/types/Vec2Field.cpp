@@ -16,7 +16,7 @@ namespace Metal {
                 field.field->x = values[0];
                 field.field->y = values[1];
                 field.instance->registerChange();
-                field.instance->onUpdate(&field, *context);
+                field.instance->onUpdate(&field);
             }
         } else {
             ImGui::Text("%s: <%f, %f>", field.name.c_str(), field.field->x, field.field->y);

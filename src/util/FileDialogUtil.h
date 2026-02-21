@@ -14,7 +14,7 @@ namespace Metal:: FileDialogUtil {
 
         nfdresult_t result = NFD::OpenDialogMultiple(outPaths, filtersToApply.data(), filtersToApply.size());
         if (result == NFD_OKAY) {
-            LOG_INFO_S("Successfully picked files");
+            LOG_INFO("Successfully picked files");
 
             nfdpathsetsize_t numPaths;
             NFD::PathSet::Count(outPaths, numPaths);

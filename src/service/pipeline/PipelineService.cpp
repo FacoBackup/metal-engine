@@ -10,6 +10,7 @@
 #include "../mesh/VertexData.h"
 #include "../descriptor/DescriptorInstance.h"
 #include "../framebuffer/FrameBufferAttachment.h"
+#include "../buffer/BufferInstance.h"
 
 namespace Metal {
     void PipelineService::createPipelineLayout(const std::vector<DescriptorInstance *> &descriptorSetsToBind,
@@ -25,20 +26,25 @@ namespace Metal {
 
         if (pushConstantsSize > 0) {
             VkPushConstantRange pushConstantRange{};
-            pushConstantRange.stageFlags = pipeline->isCompute
-                                               ? VK_SHADER_STAGE_COMPUTE_BIT
-                                               : VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+            pushConstantRange.stageFlags = pipeline->isRayTracing
+                                               ? (VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_MISS_BIT_KHR)
+                                               : pipeline->isCompute
+                                                     ? VK_SHADER_STAGE_COMPUTE_BIT
+                                                     : VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
             pushConstantRange.offset = 0;
             pushConstantRange.size = pushConstantsSize;
             layoutInfo.pushConstantRangeCount = 1;
             layoutInfo.pPushConstantRanges = &pushConstantRange;
         }
 
-        VulkanUtils::CheckVKResult(vkCreatePipelineLayout(vulkanContext.device.device, &layoutInfo, nullptr,
+        VulkanUtils::CheckVKResult(vkCreatePipelineLayout(CTX.vulkanContext.device.device, &layoutInfo, nullptr,
                                                           &pipeline->vkPipelineLayout));
     }
 
     PipelineInstance *PipelineService::createPipeline(PipelineBuilder &pipelineBuilder) {
+        if (pipelineBuilder.isRayTracing) {
+            return createRayTracingPipeline(pipelineBuilder);
+        }
         if (pipelineBuilder.computeShader != nullptr) {
             return createComputePipeline(pipelineBuilder);
         }
@@ -49,7 +55,7 @@ namespace Metal {
         auto *pipeline = new PipelineInstance();
         pipeline->isCompute = true;
         pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
-        VkShaderModule computeShaderModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.computeShader);
+        VkShaderModule computeShaderModule = ShaderUtil::CreateShaderModule(pipelineBuilder.computeShader);
         VkPipelineShaderStageCreateInfo computeShaderStageInfo{};
         computeShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         computeShaderStageInfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
@@ -63,7 +69,7 @@ namespace Metal {
         pipelineInfo.layout = pipeline->vkPipelineLayout;
         pipelineInfo.stage = computeShaderStageInfo;
 
-        if (vkCreateComputePipelines(vulkanContext.device.device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr,
+        if (vkCreateComputePipelines(CTX.vulkanContext.device.device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr,
                                      &pipeline->vkPipeline) != VK_SUCCESS) {
             throw std::runtime_error("failed to create compute pipeline!");
         }
@@ -73,7 +79,7 @@ namespace Metal {
             pipeline->descriptorSets[i] = pipelineBuilder.descriptorSetsToBind[i]->vkDescriptorSet;
         }
 
-        vkDestroyShaderModule(vulkanContext.device.device, computeShaderModule, nullptr);
+        vkDestroyShaderModule(CTX.vulkanContext.device.device, computeShaderModule, nullptr);
         return pipeline;
     }
 
@@ -82,8 +88,8 @@ namespace Metal {
 
         auto *pipeline = new PipelineInstance();
         pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
-        auto fragmentShaderModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.fragmentShader);
-        auto vertexShaderModule = ShaderUtil::CreateShaderModule(context, pipelineBuilder.vertexShader);
+        auto fragmentShaderModule = ShaderUtil::CreateShaderModule(pipelineBuilder.fragmentShader);
+        auto vertexShaderModule = ShaderUtil::CreateShaderModule(pipelineBuilder.vertexShader);
         registerResource(pipeline);
         createPipelineLayout(pipelineBuilder.descriptorSetsToBind, pipelineBuilder.pushConstantsSize, pipeline);
 
@@ -206,7 +212,7 @@ namespace Metal {
         pipelineInfo.subpass = 0;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-        VulkanUtils::CheckVKResult(vkCreateGraphicsPipelines(vulkanContext.device.device, VK_NULL_HANDLE, 1,
+        VulkanUtils::CheckVKResult(vkCreateGraphicsPipelines(CTX.vulkanContext.device.device, VK_NULL_HANDLE, 1,
                                                              &pipelineInfo,
                                                              nullptr,
                                                              &pipeline->vkPipeline));
@@ -215,8 +221,145 @@ namespace Metal {
         for (int i = 0; i < pipelineBuilder.descriptorSetsToBind.size(); i++) {
             pipeline->descriptorSets[i] = pipelineBuilder.descriptorSetsToBind[i]->vkDescriptorSet;
         }
-        vkDestroyShaderModule(vulkanContext.device.device, fragmentShaderModule, nullptr);
-        vkDestroyShaderModule(vulkanContext.device.device, vertexShaderModule, nullptr);
+        vkDestroyShaderModule(CTX.vulkanContext.device.device, fragmentShaderModule, nullptr);
+        vkDestroyShaderModule(CTX.vulkanContext.device.device, vertexShaderModule, nullptr);
+        return pipeline;
+    }
+
+    static VkDeviceAddress getBufferDeviceAddress(VkDevice device, VkBuffer buffer, PFN_vkGetBufferDeviceAddressKHR fn) {
+        VkBufferDeviceAddressInfo info{};
+        info.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
+        info.buffer = buffer;
+        return fn(device, &info);
+    }
+
+    PipelineInstance *PipelineService::createRayTracingPipeline(const PipelineBuilder &pipelineBuilder) const {
+        auto *pipeline = new PipelineInstance();
+        pipeline->isRayTracing = true;
+        pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
+
+        // Create shader modules
+        auto rayGenModule = ShaderUtil::CreateShaderModule(pipelineBuilder.rayGenShader);
+        auto missModule = ShaderUtil::CreateShaderModule(pipelineBuilder.missShader);
+        auto closestHitModule = ShaderUtil::CreateShaderModule(pipelineBuilder.closestHitShader);
+
+        // Shader stages: 0=raygen, 1=miss, 2=closesthit
+        std::array<VkPipelineShaderStageCreateInfo, 3> shaderStages{};
+        shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        shaderStages[0].stage = VK_SHADER_STAGE_RAYGEN_BIT_KHR;
+        shaderStages[0].module = rayGenModule;
+        shaderStages[0].pName = "main";
+
+        shaderStages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        shaderStages[1].stage = VK_SHADER_STAGE_MISS_BIT_KHR;
+        shaderStages[1].module = missModule;
+        shaderStages[1].pName = "main";
+
+        shaderStages[2].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        shaderStages[2].stage = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
+        shaderStages[2].module = closestHitModule;
+        shaderStages[2].pName = "main";
+
+        // Shader groups
+        std::array<VkRayTracingShaderGroupCreateInfoKHR, 3> shaderGroups{};
+        // Raygen group
+        shaderGroups[0].sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
+        shaderGroups[0].type = VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR;
+        shaderGroups[0].generalShader = 0;
+        shaderGroups[0].closestHitShader = VK_SHADER_UNUSED_KHR;
+        shaderGroups[0].anyHitShader = VK_SHADER_UNUSED_KHR;
+        shaderGroups[0].intersectionShader = VK_SHADER_UNUSED_KHR;
+
+        // Miss group
+        shaderGroups[1].sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
+        shaderGroups[1].type = VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR;
+        shaderGroups[1].generalShader = 1;
+        shaderGroups[1].closestHitShader = VK_SHADER_UNUSED_KHR;
+        shaderGroups[1].anyHitShader = VK_SHADER_UNUSED_KHR;
+        shaderGroups[1].intersectionShader = VK_SHADER_UNUSED_KHR;
+
+        // Closest hit group
+        shaderGroups[2].sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
+        shaderGroups[2].type = VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR;
+        shaderGroups[2].generalShader = VK_SHADER_UNUSED_KHR;
+        shaderGroups[2].closestHitShader = 2;
+        shaderGroups[2].anyHitShader = VK_SHADER_UNUSED_KHR;
+        shaderGroups[2].intersectionShader = VK_SHADER_UNUSED_KHR;
+
+        createPipelineLayout(pipelineBuilder.descriptorSetsToBind, pipelineBuilder.pushConstantsSize, pipeline);
+
+        VkRayTracingPipelineCreateInfoKHR rtPipelineInfo{};
+        rtPipelineInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_KHR;
+        rtPipelineInfo.stageCount = shaderStages.size();
+        rtPipelineInfo.pStages = shaderStages.data();
+        rtPipelineInfo.groupCount = shaderGroups.size();
+        rtPipelineInfo.pGroups = shaderGroups.data();
+        rtPipelineInfo.maxPipelineRayRecursionDepth = 1;
+        rtPipelineInfo.layout = pipeline->vkPipelineLayout;
+
+        VulkanUtils::CheckVKResult(
+            CTX.vulkanContext.vkCreateRayTracingPipelinesKHR(
+                CTX.vulkanContext.device.device, VK_NULL_HANDLE, VK_NULL_HANDLE,
+                1, &rtPipelineInfo, nullptr, &pipeline->vkPipeline));
+
+        // Build Shader Binding Table
+        const auto &rtProps = CTX.vulkanContext.rayTracingPipelineProperties;
+        const uint32_t handleSize = rtProps.shaderGroupHandleSize;
+        const uint32_t handleAlignment = rtProps.shaderGroupHandleAlignment;
+        const uint32_t baseAlignment = rtProps.shaderGroupBaseAlignment;
+        const uint32_t handleSizeAligned = (handleSize + handleAlignment - 1) & ~(handleAlignment - 1);
+
+        const uint32_t groupCount = 3;
+        const uint32_t sbtSize = groupCount * handleSizeAligned;
+        std::vector<uint8_t> shaderHandleStorage(sbtSize);
+        VulkanUtils::CheckVKResult(
+            CTX.vulkanContext.vkGetRayTracingShaderGroupHandlesKHR(
+                CTX.vulkanContext.device.device, pipeline->vkPipeline,
+                0, groupCount, sbtSize, shaderHandleStorage.data()));
+
+        // Create SBT buffers - each needs baseAlignment
+        auto createSBTBuffer = [&](uint32_t groupIndex) -> std::shared_ptr<BufferInstance> {
+            const uint32_t sbtBufferSize = (handleSizeAligned + baseAlignment - 1) & ~(baseAlignment - 1);
+            auto buf = CTX.bufferService.createBuffer(
+                sbtBufferSize,
+                VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                true);
+            memcpy(buf->mapped, shaderHandleStorage.data() + groupIndex * handleSizeAligned, handleSize);
+            return buf;
+        };
+
+        pipeline->raygenSBT = createSBTBuffer(0);
+        pipeline->missSBT = createSBTBuffer(1);
+        pipeline->hitSBT = createSBTBuffer(2);
+
+        auto getAddr = [&](const std::shared_ptr<BufferInstance> &buf) {
+            return getBufferDeviceAddress(CTX.vulkanContext.device.device, buf->vkBuffer, CTX.vulkanContext.vkGetBufferDeviceAddressKHR);
+        };
+
+        pipeline->raygenRegion.deviceAddress = getAddr(pipeline->raygenSBT);
+        pipeline->raygenRegion.stride = handleSizeAligned;
+        pipeline->raygenRegion.size = handleSizeAligned;
+
+        pipeline->missRegion.deviceAddress = getAddr(pipeline->missSBT);
+        pipeline->missRegion.stride = handleSizeAligned;
+        pipeline->missRegion.size = handleSizeAligned;
+
+        pipeline->hitRegion.deviceAddress = getAddr(pipeline->hitSBT);
+        pipeline->hitRegion.stride = handleSizeAligned;
+        pipeline->hitRegion.size = handleSizeAligned;
+
+        pipeline->callableRegion = {}; // unused
+
+        pipeline->descriptorSets.resize(pipelineBuilder.descriptorSetsToBind.size());
+        for (size_t i = 0; i < pipelineBuilder.descriptorSetsToBind.size(); i++) {
+            pipeline->descriptorSets[i] = pipelineBuilder.descriptorSetsToBind[i]->vkDescriptorSet;
+        }
+
+        vkDestroyShaderModule(CTX.vulkanContext.device.device, rayGenModule, nullptr);
+        vkDestroyShaderModule(CTX.vulkanContext.device.device, missModule, nullptr);
+        vkDestroyShaderModule(CTX.vulkanContext.device.device, closestHitModule, nullptr);
+
         return pipeline;
     }
 } // Metal

@@ -12,7 +12,7 @@ namespace Metal {
 
     class CommandBufferRecorder final {
         std::array<VkCommandBuffer, MAX_FRAMES_IN_FLIGHT> _commandBuffers{};
-        ApplicationContext &context;
+        ;
         VkViewport viewport{};
         VkRect2D scissor{};
         VkRenderPassBeginInfo renderPassInfo{};
@@ -26,12 +26,11 @@ namespace Metal {
         void createRenderPassInfo(const FrameBufferInstance *frameBuffer, bool clearBuffer);
 
     public:
-        explicit CommandBufferRecorder(FrameBufferInstance *frameBuffer, ApplicationContext &applicationContext,
-                                       bool clearBuffer = true);
+        explicit CommandBufferRecorder(FrameBufferInstance *frameBuffer, bool clearBuffer = true);
+
+        explicit CommandBufferRecorder();
 
         void createCommandBuffer();
-
-        explicit CommandBufferRecorder(ApplicationContext &applicationContext);
 
         void recordCommands(const std::vector<AbstractPass *> &passes) const;
     };

@@ -1,5 +1,5 @@
 #include "TransformService.h"
-
+#include <entt/entt.hpp>
 #include <iostream>
 #include <glm/gtc/quaternion.hpp>
 
@@ -12,8 +12,9 @@ namespace Metal {
     }
 
     void TransformService::traverse(const EntityID entityId, bool parentHasChanged) {
-        TransformComponent *st = context.worldRepository.transforms.contains(entityId)
-                                     ? &context.worldRepository.transforms.at(entityId)
+        const auto entity = static_cast<entt::entity>(entityId);
+        TransformComponent *st = CTX.worldRepository.registry.all_of<TransformComponent>(entity)
+                                     ? &CTX.worldRepository.registry.get<TransformComponent>(entity)
                                      : nullptr;
         if (st != nullptr && (st->isNotFrozen() || parentHasChanged)) {
             TransformComponent *parentTransform = findParent(st->getEntityId());
@@ -22,8 +23,12 @@ namespace Metal {
             parentHasChanged = true;
         }
 
-        for (auto child: context.worldRepository.getEntity(entityId)->children) {
-            traverse(child, parentHasChanged);
+        const auto e = static_cast<entt::entity>(entityId);
+        if (CTX.worldRepository.registry.all_of<HierarchyComponent>(e)) {
+            const auto &hierarchy = CTX.worldRepository.registry.get<HierarchyComponent>(e);
+            for (auto child: hierarchy.children) {
+                traverse(child, parentHasChanged);
+            }
         }
     }
 
@@ -34,11 +39,11 @@ namespace Metal {
             auxMat4 = glm::identity<glm::mat4>();
         }
         if (!st->forceTransform && st->isStatic) {
-            LOG_WARN(context, "Entity will not be transformed because it is set to static " + std::to_string(st->getEntityId()));
+            LOG_WARN("Entity will not be transformed because it is set to static " + std::to_string(st->getEntityId()));
             return;
         }
         translation = glm::vec3(st->model[3]);
-        auto *previousTile = context.worldGridRepository.getOrCreateTile(translation);
+        auto *previousTile = CTX.worldGridRepository.getOrCreateTile(translation);
 
         auxMat42 = glm::identity<glm::mat4>();
         auxMat42 = glm::translate(auxMat42, st->translation); // Translation
@@ -49,16 +54,21 @@ namespace Metal {
         st->freezeVersion();
 
         translation = glm::vec3(st->model[3]);
-        auto *newTile = context.worldGridRepository.getOrCreateTile(translation);
+        auto *newTile = CTX.worldGridRepository.getOrCreateTile(translation);
 
-        context.worldGridRepository.moveBetweenTiles(st->getEntityId(), previousTile, newTile);
+        CTX.worldGridRepository.moveBetweenTiles(st->getEntityId(), previousTile, newTile);
+        CTX.rayTracingService.markDirty();
     }
 
     TransformComponent *TransformService::findParent(EntityID id) const {
         while (id != EMPTY_ENTITY && id != WorldRepository::ROOT_ID) {
-            id = context.worldRepository.getEntity(id)->parent;
-            TransformComponent *t = context.worldRepository.transforms.contains(id)
-                          ? &context.worldRepository.transforms.at(id)
+            const auto e = static_cast<entt::entity>(id);
+            if (!CTX.worldRepository.registry.valid(e)) break;
+            const auto &hierarchy = CTX.worldRepository.registry.get<HierarchyComponent>(e);
+            id = hierarchy.parent;
+            const auto parent = static_cast<entt::entity>(id);
+            TransformComponent *t = (CTX.worldRepository.registry.valid(parent) && CTX.worldRepository.registry.all_of<TransformComponent>(parent))
+                          ? &CTX.worldRepository.registry.get<TransformComponent>(parent)
                           : nullptr;
             if (t != nullptr) {
                 return t;
@@ -68,7 +78,7 @@ namespace Metal {
     }
 
     float TransformService::getDistanceFromCamera(glm::vec3 &translation) {
-        distanceAux = context.worldRepository.camera.position;
+        distanceAux = CTX.worldRepository.camera.position;
         return glm::length(distanceAux - translation);
     }
 } // Metal

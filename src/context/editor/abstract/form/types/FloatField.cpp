@@ -13,7 +13,7 @@ namespace Metal {
             if (ImGui::DragFloat(id.c_str(), field.field, field.incrementF.value(), field.minF.value(),
                                  field.maxF.value())) {
                 field.instance->registerChange();
-                field.instance->onUpdate(&field, *context);
+                field.instance->onUpdate(&field);
             }
         }
     }

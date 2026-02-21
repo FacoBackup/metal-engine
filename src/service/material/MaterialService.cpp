@@ -1,13 +1,15 @@
 #include "MaterialService.h"
 
 #include "../../enum/engine-definitions.h"
-#include "MaterialData.h"
+#include "MaterialFileData.h"
 
 #include "../../context/vulkan/VulkanContext.h"
 #include "../../util/FilesUtil.h"
+#include "../../util/serialization-definitions.h"
 
-#include <cereal/archives/binary.hpp>
 #include <fstream>
+#include "../../dto/buffers/MaterialData.h"
+#include "../buffer/BufferInstance.h"
 
 #include "MaterialInstance.h"
 #include "../../context/ApplicationContext.h"
@@ -18,87 +20,102 @@
 #include "../../service/framebuffer/FrameBufferInstance.h"
 
 namespace Metal {
-    bool MaterialService::streamAndWrite(std::string &id,
-                                         MaterialInstance *instance,
-                                         std::unique_ptr<DescriptorInstance> &descriptor) const {
-        auto *texture = context.textureService.create(id, LevelOfDetail::LOD_0);
-        if (texture == nullptr) {
-            return false;
-        }
-        auto &ref = descriptor->bindings.emplace_back();
-        ref.bindingPoint = 0;
-        ref.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        ref.sampler = context.coreDescriptorSets.vkImageSampler;
-        ref.view = texture->vkImageView;
-        instance->textures.push_back(id);
-        return true;
-    }
-
     MaterialInstance *MaterialService::create(const std::string &id) {
-        MaterialData *data = stream(id);
+        MaterialFileData *data = stream(id);
         if (data == nullptr) {
             return nullptr;
         }
 
         auto *instance = new MaterialInstance(id);
+        instance->materialIndex = nextMaterialIndex++;
         registerResource(instance);
-        instance->descriptorAlbedoTexture = std::make_unique<DescriptorInstance>();
-        instance->descriptorNormalTexture = std::make_unique<DescriptorInstance>();
-        instance->descriptorRoughnessTexture = std::make_unique<DescriptorInstance>();
-        instance->descriptorMetallicTexture = std::make_unique<DescriptorInstance>();
-        instance->descriptorHeightTexture = std::make_unique<DescriptorInstance>();
+        MaterialData materialData{};
+        materialData.albedo = data->albedoColor;
+        materialData.roughness = data->roughnessFactor;
+        materialData.metallic = data->metallicFactor;
+        materialData.isEmissive = data->isEmissive ? 1 : 0;
 
-        instance->descriptorAlbedoTexture->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
-            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-            0));
-        instance->descriptorNormalTexture->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
-            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-            0));
-        instance->descriptorRoughnessTexture->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
-            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-            0));
-        instance->descriptorMetallicTexture->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
-            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-            0));
-        instance->descriptorHeightTexture->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
-            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-            0));
+        materialData.useAlbedoTexture = !data->albedo.empty();
+        materialData.useNormalTexture = !data->normal.empty();
+        materialData.useRoughnessTexture = !data->roughness.empty();
+        materialData.useMetallicTexture = !data->metallic.empty();
+        materialData.useAoTexture = !data->ao.empty();
+        materialData.useHeightTexture = !data->height.empty();
 
-        instance->descriptorAlbedoTexture->create(vulkanContext);
-        instance->descriptorNormalTexture->create(vulkanContext);
-        instance->descriptorRoughnessTexture->create(vulkanContext);
-        instance->descriptorMetallicTexture->create(vulkanContext);
-        instance->descriptorHeightTexture->create(vulkanContext);
+        materialData.albedoTextureId = 0;
+        materialData.normalTextureId = 0;
+        materialData.roughnessTextureId = 0;
+        materialData.metallicTextureId = 0;
+        materialData.aoTextureId = 0;
+        materialData.heightTextureId = 0;
 
-        instance->useAlbedoTexture = streamAndWrite(data->albedo, instance, instance->descriptorAlbedoTexture);
-        instance->useNormalTexture = streamAndWrite(data->normal, instance, instance->descriptorNormalTexture);
-        instance->useRoughnessTexture = streamAndWrite(data->roughness, instance, instance->descriptorRoughnessTexture);
-        instance->useMetallicTexture = streamAndWrite(data->metallic, instance, instance->descriptorMetallicTexture);
-        instance->useHeightTexture = streamAndWrite(data->height, instance, instance->descriptorHeightTexture);
+        if (!data->albedo.empty()) {
+            auto *tex = CTX.textureService.create(data->albedo, LevelOfDetail::LOD_0);
+            if (tex != nullptr) {
+                materialData.albedoTextureId = CTX.textureService.getTextureIndex(
+                    data->albedo + LevelOfDetail::LOD_0.suffix);
+            }
+        }
+        if (!data->normal.empty()) {
+            auto *tex = CTX.textureService.create(data->normal, LevelOfDetail::LOD_0);
+            if (tex != nullptr) {
+                materialData.normalTextureId = CTX.textureService.getTextureIndex(
+                    data->normal + LevelOfDetail::LOD_0.suffix);
+            }
+        }
+        if (!data->roughness.empty()) {
+            auto *tex = CTX.textureService.create(data->roughness, LevelOfDetail::LOD_0);
+            if (tex != nullptr) {
+                materialData.roughnessTextureId = CTX.textureService.getTextureIndex(
+                    data->roughness + LevelOfDetail::LOD_0.suffix);
+            }
+        }
+        if (!data->metallic.empty()) {
+            auto *tex = CTX.textureService.create(data->metallic, LevelOfDetail::LOD_0);
+            if (tex != nullptr) {
+                materialData.metallicTextureId = CTX.textureService.getTextureIndex(
+                    data->metallic + LevelOfDetail::LOD_0.suffix);
+            }
+        }
+        if (!data->height.empty()) {
+            auto *tex = CTX.textureService.create(data->height, LevelOfDetail::LOD_0);
+            if (tex != nullptr) {
+                materialData.heightTextureId = CTX.textureService.getTextureIndex(
+                    data->height + LevelOfDetail::LOD_0.suffix);
+            }
+        }
 
-        DescriptorInstance::Write(vulkanContext, instance->descriptorAlbedoTexture->vkDescriptorSet,
-                                  instance->descriptorAlbedoTexture->bindings);
-        DescriptorInstance::Write(vulkanContext, instance->descriptorNormalTexture->vkDescriptorSet,
-                                  instance->descriptorNormalTexture->bindings);
-        DescriptorInstance::Write(vulkanContext, instance->descriptorRoughnessTexture->vkDescriptorSet,
-                                  instance->descriptorRoughnessTexture->bindings);
-        DescriptorInstance::Write(vulkanContext, instance->descriptorMetallicTexture->vkDescriptorSet,
-                                  instance->descriptorMetallicTexture->bindings);
-        DescriptorInstance::Write(vulkanContext, instance->descriptorHeightTexture->vkDescriptorSet,
-                                  instance->descriptorHeightTexture->bindings);
+        materials[instance->materialIndex] = materialData;
+
+        auto *materialBuffer = CTX.coreBuffers.materialBuffer.get();
+        materialBuffer->update(materials.data());
 
         delete data;
 
         return instance;
     }
 
-    MaterialData *MaterialService::stream(const std::string &id) const {
-        auto pathToFile = context.getAssetDirectory() + FORMAT_FILE_MATERIAL(id);
+    MaterialFileData *MaterialService::stream(const std::string &id) const {
+        auto pathToFile = CTX.getAssetDirectory() + FORMAT_FILE_MATERIAL(id);
         if (std::filesystem::exists(pathToFile)) {
-            MaterialData *data = new MaterialData;
-            PARSE_TEMPLATE(data->load, pathToFile);
+            auto *data = new MaterialFileData;
+            PARSE_TEMPLATE(*data, pathToFile);
             return data;
         }
         return nullptr;
+    }
+
+    unsigned int MaterialService::getMaterialIndex(const std::string &id) {
+        if (id.empty()) {
+            return 0;
+        }
+        if (resources.contains(id)) {
+            return dynamic_cast<MaterialInstance *>(resources.at(id))->materialIndex;
+        }
+        auto *instance = create(id);
+        if (instance != nullptr) {
+            return instance->materialIndex;
+        }
+        return 0;
     }
 } // Metal

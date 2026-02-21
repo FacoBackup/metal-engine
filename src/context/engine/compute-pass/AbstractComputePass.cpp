@@ -1,10 +1,11 @@
 #include "AbstractComputePass.h"
 #include "../../../context/ApplicationContext.h"
+#include "../../../service/pipeline/PipelineInstance.h"
 #include "../../../service/texture/TextureInstance.h"
 #include "../../../util/ImageUtils.h"
 
 namespace Metal {
-    AbstractComputePass::AbstractComputePass(ApplicationContext &context) : AbstractPass(context, true) {
+    AbstractComputePass::AbstractComputePass() : AbstractPass(true) {
     }
 
     void AbstractComputePass::recordDispatch(const unsigned int groupX, const unsigned int groupY,
@@ -73,9 +74,14 @@ namespace Metal {
         VkImageMemoryBarrier write2ReadBarrier = ImageUtils::writeToReadOnlyBarrier(
             vkImage);
 
+        VkPipelineStageFlags writeStage = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+        if (pipelineInstance != nullptr && pipelineInstance->isRayTracing) {
+            writeStage = VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR;
+        }
+
         vkCmdPipelineBarrier(
             vkCommandBuffer,
-            VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+            writeStage,
             VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
             0,
             0, nullptr,
@@ -87,10 +93,15 @@ namespace Metal {
         VkImageMemoryBarrier transferToGeneral = ImageUtils::ReadOnlyToGeneralBarrier(
             vkImage);
 
+        VkPipelineStageFlags writeStage = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+        if (pipelineInstance != nullptr && pipelineInstance->isRayTracing) {
+            writeStage = VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR;
+        }
+
         vkCmdPipelineBarrier(
             vkCommandBuffer,
             VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT | VK_PIPELINE_STAGE_TRANSFER_BIT,
-            VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+            writeStage,
             0,
             0, nullptr,
             0, nullptr,
@@ -109,10 +120,15 @@ namespace Metal {
         barrier.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
         barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
 
+        VkPipelineStageFlags writeStage = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+        if (pipelineInstance != nullptr && pipelineInstance->isRayTracing) {
+            writeStage = VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR;
+        }
+
         vkCmdPipelineBarrier(
             vkCommandBuffer,
-            VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-            VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+            writeStage,
+            writeStage,
             0,
             0, nullptr,
             0, nullptr,

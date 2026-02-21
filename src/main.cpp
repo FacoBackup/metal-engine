@@ -8,12 +8,12 @@
 #include "context/ApplicationContext.h"
 
 int main(int, char **) {
-    Metal::ApplicationContext context{ true};
+    Metal::ApplicationContext::Init(true);
 
-    if (!context.isValidContext()) {
+    if (!CTX.isValidContext()) {
         printf("GLFW: Vulkan Not Supported\n");
         return 1;
     }
-    context.start();
+    CTX.start();
     return 0;
 }

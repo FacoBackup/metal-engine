@@ -19,7 +19,7 @@ namespace Metal {
         ImFont *largeIconsFont = nullptr;
 
     public:
-        explicit GuiContext(ApplicationContext &context);
+        explicit GuiContext();
 
         [[ nodiscard]] ImFont *getLargeIconsFont() const {
             return largeIconsFont;

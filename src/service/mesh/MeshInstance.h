@@ -9,11 +9,12 @@ namespace Metal {
         explicit MeshInstance(const std::string &id): RuntimeResource(id) {
         }
 
-        void dispose(VulkanContext &context) override;
+        void dispose() override;
 
         std::shared_ptr<BufferInstance> dataBuffer = nullptr;
         std::shared_ptr<BufferInstance> indexBuffer = nullptr;
         unsigned int indexCount = 0;
+        unsigned int vertexCount = 0;
 
     };
 } // Metal

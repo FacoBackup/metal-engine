@@ -10,7 +10,7 @@
 #include <format>
 #include <fstream>
 #include <iostream>
-#include <cereal/archives/binary.hpp>
+#include "../../util/serialization-definitions.h"
 
 #include "../../enum/LevelOfDetail.h"
 
@@ -18,32 +18,21 @@ namespace fs = std::filesystem;
 
 #define DELETE_F(F)\
 std::filesystem::remove_all(entry.second->absolutePath);\
-std::filesystem::remove_all(context.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_0));\
-std::filesystem::remove_all(context.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_1));\
-std::filesystem::remove_all(context.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_2));\
-std::filesystem::remove_all(context.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_3));
+std::filesystem::remove_all(CTX.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_0));\
+std::filesystem::remove_all(CTX.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_1));\
+std::filesystem::remove_all(CTX.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_2));\
+std::filesystem::remove_all(CTX.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_3));
 
 #define DELETE_S(F)\
 std::filesystem::remove_all(entry.second->absolutePath);\
-std::filesystem::remove_all(context.getAssetDirectory() + F(entry.second->getId()));
+std::filesystem::remove_all(CTX.getAssetDirectory() + F(entry.second->getId()));
 
 #define DATA \
-        auto fileSizeInBytes = fs::file_size(entry.path());\
-        std::string fileSize;\
-        if (fileSizeInBytes >= 1'000'000'000) {\
-        fileSize = std::to_string(fileSizeInBytes / 1'000'000'000.0) + " GB";\
-        } else if (fileSizeInBytes >= 1'000'000) {\
-        fileSize = std::to_string(fileSizeInBytes / 1'000'000.0) + " MB";\
-        } else if (fileSizeInBytes >= 1'000) {\
-        fileSize = std::to_string(fileSizeInBytes / 1'000.0) + " KB";\
-        } else {\
-        fileSize = std::to_string(fileSizeInBytes) + " Bytes";\
-        }\
         std::filesystem::file_time_type ftime = last_write_time(entry);
 
 namespace Metal {
     void FilesService::onInitialize() {
-        root = new FileEntry(nullptr, context.getAssetRefDirectory(), "", "");
+        root = new FileEntry(nullptr, CTX.getAssetRefDirectory(), "");
         root->type = EntryType::DIRECTORY;
         root->name = "Files";
         GetEntries(root);
@@ -56,13 +45,13 @@ namespace Metal {
                     entry.path().filename().string() == id + FILE_METADATA) {
                     DATA
                     auto sys_tp = std::chrono::file_clock::to_utc(ftime);
-                        std::string dateStr = std::format("{:%Y-%m-%d %H:%M}", sys_tp);
+                    std::string dateStr = std::format("{:%Y-%m-%d %H:%M}", sys_tp);
                     auto child = std::make_unique<FileEntry>(
                         root,
                         absolute(entry.path()).string(),
-                        dateStr,
-                        fileSize);
-                    PARSE_TEMPLATE(child->load, child->absolutePath.c_str())
+                        dateStr);
+                    PARSE_TEMPLATE(*child, child->absolutePath.c_str())
+                    child->formattedSize = FilesUtil::FormatSize(child->size);
                     return child;
                 }
             }
@@ -115,8 +104,8 @@ namespace Metal {
         materialMetadata.type = EntryType::MATERIAL;
         materialMetadata.name = "New Material";
         DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(materialMetadata.getId()), materialMetadata)
-        MaterialData data{};
-        DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialMetadata.getId()), data)
+        MaterialFileData data{};
+        DUMP_TEMPLATE(CTX.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialMetadata.getId()), data)
     }
 
     void FilesService::Move(FileEntry *toMove, FileEntry *targetDir) {
@@ -130,8 +119,8 @@ namespace Metal {
         try {
             fs::rename(sourcePath, targetPath);
         } catch (const fs::filesystem_error& e) {
-            LOG_ERROR_S("Could not move file");
-            context.notificationService.pushMessage("Could not move entry", NotificationSeverities::ERROR);
+            LOG_ERROR("Could not move file");
+            CTX.notificationService.pushMessage("Could not move entry", NotificationSeverities::ERROR);
             return;
         }
 
@@ -162,15 +151,14 @@ namespace Metal {
                     auto &child = root->children.emplace_back(new FileEntry(
                         root,
                         fs::absolute(entry.path()).string(),
-                        dateStr,
-                        fileSize));
-                    PARSE_TEMPLATE(child->load, child->absolutePath.c_str())
+                        dateStr));
+                    PARSE_TEMPLATE(*child, child->absolutePath.c_str())
+                    child->formattedSize = FilesUtil::FormatSize(child->size);
                 }
             } else {
                 auto &child = root->children.emplace_back(new FileEntry(
                     root,
                     fs::absolute(entry.path()).string(),
-                    "",
                     ""));
 
                 child->name = entry.path().filename().string();

@@ -6,17 +6,18 @@
 namespace Metal {
     void IconsPass::onInitialize() {
         PipelineBuilder iconPipelineBuilder = PipelineBuilder::Of(
-                    context.coreFrameBuffers.postProcessingFBO,
+                    CTX.coreFrameBuffers.postProcessingFBO,
                     "QUAD.vert",
                     "tools/Icon.frag"
                 )
-                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.lightVolumeData.get());
-        pipelineInstance = context.pipelineService.createPipeline(iconPipelineBuilder);
+                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.lightData.get())
+                .setBlendEnabled();
+        pipelineInstance = CTX.pipelineService.createPipeline(iconPipelineBuilder);
     }
 
     bool IconsPass::shouldRun() {
-        return context.isDebugMode() && context.editorRepository.showIcons;
+        return CTX.isDebugMode() && CTX.editorRepository.showIcons;
     }
 
     void IconsPass::onSync() {

@@ -7,8 +7,7 @@
 #include "../../util/FilesUtil.h"
 #include "../../context/ApplicationContext.h"
 #include <meshoptimizer.h>
-
-#include <cereal/archives/binary.hpp>
+#include "../../util/serialization-definitions.h"
 
 namespace Metal {
     std::string MeshImporterService::persistMesh(const std::string &targetDir, const MeshData &mesh) const {
@@ -18,11 +17,16 @@ namespace Metal {
         if (metadata.name.find_last_of('.') != std::string::npos) {
             metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.'));
         }
+
+        std::string lod0Path = CTX.getAssetDirectory() + FORMAT_FILE_MESH(metadata.getId(), LevelOfDetail::LOD_0);
+        DUMP_TEMPLATE(lod0Path, mesh)
+        metadata.size += fs::file_size(lod0Path);
+
+        metadata.size += simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_1);
+        metadata.size += simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_2);
+        metadata.size += simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_3);
+
         DUMP_TEMPLATE(targetDir + '/' + metadata.getId() + FILE_METADATA, metadata)
-        DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_MESH(metadata.getId(), LevelOfDetail::LOD_0), mesh)
-        simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_1);
-        simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_2);
-        simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_3);
         return metadata.getId();
     }
 
@@ -30,11 +34,12 @@ namespace Metal {
                                                 std::unordered_map<unsigned int, std::string> &meshMap,
                                                 std::unordered_map<std::string, unsigned int> &meshMaterialMap,
                                                 const std::stop_token &stopToken) const {
-        LOG_INFO(context, "Processing meshes for scene...");
+        LOG_INFO("Processing meshes for scene...");
         for (unsigned int i = 0; i < scene->mNumMeshes; ++i) {
             if (stopToken.stop_requested()) return;
             aiMesh *assimpMesh = scene->mMeshes[i];
-            MeshData meshData{assimpMesh->mName.data, {}, {}};
+            MeshData meshData{assimpMesh->mName.data, {}, {}, {}};
+            glm::vec3 center(0.0f);
             for (unsigned int j = 0; j < assimpMesh->mNumVertices; ++j) {
                 VertexData vertexData{};
                 vertexData.vertex = glm::vec3(
@@ -42,6 +47,7 @@ namespace Metal {
                     assimpMesh->mVertices[j].y,
                     assimpMesh->mVertices[j].z
                 );
+                center += vertexData.vertex;
                 if (assimpMesh->HasNormals()) {
                     vertexData.normal = glm::vec3(
                         assimpMesh->mNormals[j].x,
@@ -62,6 +68,9 @@ namespace Metal {
 
                 meshData.data.push_back(vertexData);
             }
+            if (assimpMesh->mNumVertices > 0) {
+                meshData.gizmoCenter = center / static_cast<float>(assimpMesh->mNumVertices);
+            }
             for (unsigned int j = 0; j < assimpMesh->mNumFaces; ++j) {
                 aiFace face = assimpMesh->mFaces[j];
                 for (unsigned int k = 0; k < face.mNumIndices; ++k) {
@@ -71,11 +80,11 @@ namespace Metal {
             std::string id = persistMesh(targetDir, meshData);
             meshMap.insert({i, id});
             meshMaterialMap.insert({id, assimpMesh->mMaterialIndex});
-            LOG_INFO(context, "Persisted mesh: " + meshData.name + " (" + id + ")");
+            LOG_INFO("Persisted mesh: " + meshData.name + " (" + id + ")");
         }
     }
 
-    void MeshImporterService::simplifyMesh(const std::string &fileId, const MeshData &mesh,
+    size_t MeshImporterService::simplifyMesh(const std::string &fileId, const MeshData &mesh,
                                             const LevelOfDetail &levelOfDetail) const {
         size_t vertexCount = mesh.data.size();
         size_t indexCount = mesh.indices.size();
@@ -104,6 +113,8 @@ namespace Metal {
         simplifiedMesh.data = mesh.data;
         simplifiedMesh.indices = std::move(simplifiedIndices);
 
-        DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_MESH(fileId, levelOfDetail), simplifiedMesh)
+        std::string lodPath = CTX.getAssetDirectory() + FORMAT_FILE_MESH(fileId, levelOfDetail);
+        DUMP_TEMPLATE(lodPath, simplifiedMesh)
+        return fs::file_size(lodPath);
     }
 }

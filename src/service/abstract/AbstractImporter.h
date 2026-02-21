@@ -13,8 +13,8 @@ namespace Metal {
             return {};
         }
 
-        explicit AbstractImporter(ApplicationContext &context)
-            : AbstractRuntimeComponent(context) {
+        explicit AbstractImporter()
+            : AbstractRuntimeComponent() {
         }
 
         virtual std::string importData(const std::string &targetDir, const std::string &pathToFile,

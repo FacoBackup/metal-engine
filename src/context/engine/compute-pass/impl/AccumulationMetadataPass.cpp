@@ -7,20 +7,20 @@ namespace Metal {
     void AccumulationMetadataPass::onInitialize() {
         PipelineBuilder builder = PipelineBuilder::Of("AccumulationMetadata.comp")
                 .setPushConstantsSize(sizeof(DenoiserPushConstant))
-                .addDescriptorSet(context.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.currentFrameDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.previousFrameDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.previousFrameMetadataDescriptor.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferPosition.get())
-                .addDescriptorSet(context.coreDescriptorSets.gBufferNormal.get());
-        pipelineInstance = context.pipelineService.createPipeline(builder);
+                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.currentFrameDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.previousFrameDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.previousFrameMetadataDescriptor.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.gBufferPosition.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.gBufferNormal.get());
+        pipelineInstance = CTX.pipelineService.createPipeline(builder);
     }
 
     void AccumulationMetadataPass::onSync() {
-        syncWriting(context.coreTextures.currentFrame->vkImage);
-        pushConstant.diffWeight = context.engineRepository.denoiserDiffWeight;
+        syncWriting(CTX.coreTextures.currentFrame->vkImage);
+        pushConstant.diffWeight = CTX.engineRepository.denoiserDiffWeight;
         recordPushConstant(&pushConstant);
-        recordImageDispatch(context.coreTextures.currentFrame, 8, 8);
-        endWriting(context.coreTextures.currentFrame->vkImage);
+        recordImageDispatch(CTX.coreTextures.currentFrame, 8, 8);
+        endWriting(CTX.coreTextures.currentFrame->vkImage);
     }
 } // Metal

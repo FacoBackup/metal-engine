@@ -9,23 +9,14 @@
 
 namespace Metal {
     struct MaterialInstance final : RuntimeResource {
-        explicit MaterialInstance(const std::string &id): RuntimeResource(id) {
+        explicit MaterialInstance(const std::string &id) : RuntimeResource(id) {
         }
 
-        std::unique_ptr<DescriptorInstance> descriptorAlbedoTexture = nullptr;
-        std::unique_ptr<DescriptorInstance> descriptorNormalTexture = nullptr;
-        std::unique_ptr<DescriptorInstance> descriptorRoughnessTexture = nullptr;
-        std::unique_ptr<DescriptorInstance> descriptorMetallicTexture = nullptr;
-        std::unique_ptr<DescriptorInstance> descriptorHeightTexture = nullptr;
         std::vector<std::string> textures{};
+        unsigned int materialIndex = 0;
 
-        bool useAlbedoTexture{};
-        bool useNormalTexture{};
-        bool useRoughnessTexture{};
-        bool useMetallicTexture{};
-        bool useHeightTexture{};
-
-        void dispose(VulkanContext &context) override;
+        void dispose() override {
+        }
 
         std::vector<std::string> &getDependencies() override {
             return textures;

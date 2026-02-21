@@ -11,7 +11,6 @@ namespace Metal {
 
     class AbstractPanel : public IPanel {
     protected:
-        ApplicationContext *context = nullptr;
         std::vector<IPanel *> children;
         const std::string id;
 
@@ -25,8 +24,6 @@ namespace Metal {
         void appendChild(AbstractPanel *panel);
 
         void removeAllChildren() override;
-
-        void setContext(ApplicationContext *context);
 
         virtual void onRemove() {
         }

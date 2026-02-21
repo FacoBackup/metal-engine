@@ -11,30 +11,28 @@ namespace Metal {
     struct FrameBufferAttachment;
 
     struct CoreDescriptorSets final : AbstractCoreRepository {
-        explicit CoreDescriptorSets(ApplicationContext &context)
-            : AbstractCoreRepository(context) {
+        explicit CoreDescriptorSets()
+            : AbstractCoreRepository() {
         }
 
         VkSampler vkImageSampler = VK_NULL_HANDLE;
         std::unique_ptr<DescriptorInstance> globalDataDescriptor = nullptr;
-        std::unique_ptr<DescriptorInstance> materialAlbedo = nullptr;
-        std::unique_ptr<DescriptorInstance> materialNormal = nullptr;
-        std::unique_ptr<DescriptorInstance> materialRoughness = nullptr;
-        std::unique_ptr<DescriptorInstance> materialMetallic = nullptr;
-        std::unique_ptr<DescriptorInstance> materialHeight = nullptr;
         std::unique_ptr<DescriptorInstance> postProcessingDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> surfaceCacheFragment = nullptr;
         std::unique_ptr<DescriptorInstance> gBufferAlbedo = nullptr;
         std::unique_ptr<DescriptorInstance> gBufferNormal = nullptr;
         std::unique_ptr<DescriptorInstance> gBufferPosition = nullptr;
-        std::unique_ptr<DescriptorInstance> giSurfaceCacheCompute = nullptr;
+        std::unique_ptr<DescriptorInstance> surfaceCacheImage = nullptr;
         std::unique_ptr<DescriptorInstance> previousFrameDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> previousFrameMetadataDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> currentFrameDescriptor = nullptr;
-        std::unique_ptr<DescriptorInstance> svoData = nullptr;
-        std::unique_ptr<DescriptorInstance> lightVolumeData = nullptr;
+        std::unique_ptr<DescriptorInstance> lightData = nullptr;
+        std::unique_ptr<DescriptorInstance> volumeData = nullptr;
+        std::unique_ptr<DescriptorInstance> materialData = nullptr;
+        std::unique_ptr<DescriptorInstance> textureArray = nullptr;
+        std::unique_ptr<DescriptorInstance> tlasDescriptor = nullptr;
 
-        void createMaterialDescriptors();
+        void createTextureArrayDescriptor();
 
         void createBuffersDescriptors();
 

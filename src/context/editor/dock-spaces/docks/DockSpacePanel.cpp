@@ -1,10 +1,14 @@
 #include "DockSpacePanel.h"
 
+#include <string>
+#include <iostream>
+
 #include "AbstractDockPanel.h"
 #include "../../../../context/ApplicationContext.h"
 #include "../../../../common/interface/Icons.h"
 #include "../../../../repository/dock/DockDTO.h"
 #include "../../../../util/UIUtil.h"
+#include "../../../../service/log/LogService.h"
 
 namespace Metal {
     const ImVec2 DockSpacePanel::DEFAULT{-1.f, -1.f};
@@ -18,17 +22,56 @@ namespace Metal {
     }
 
     void DockSpacePanel::initializeView() {
-        removeAllChildren();
-        view = dock->description->getPanel();
-        view->size = &size;
-        view->dock = dock;
-        view->position = &position;
-        padding.x = static_cast<float>(dock->description->paddingX);
-        padding.y = static_cast<float>(dock->description->paddingY);
-        appendChild(view);
+        DockSpace *selectedSpace = getSelectedDockSpace();
+        if (selectedSpace == nullptr) {
+            view = nullptr;
+            return;
+        }
+
+        const auto it = views.find(selectedSpace->index);
+        if (it == views.end()) {
+            auto *newView = selectedSpace->getPanel();
+            newView->size = &size;
+            newView->dock = selectedSpace;
+            newView->position = &position;
+            appendChild(newView);
+            views.emplace(selectedSpace->index, newView);
+            view = newView;
+        } else {
+            view = it->second;
+            view->size = &size;
+            view->dock = selectedSpace;
+            view->position = &position;
+        }
+
+        padding.x = static_cast<float>(selectedSpace->paddingX);
+        padding.y = static_cast<float>(selectedSpace->paddingY);
+    }
+
+    void DockSpacePanel::handleShortcut() const {
+        if (view != nullptr) {
+            const bool isHovered = ImGui::IsWindowFocused(ImGuiHoveredFlags_RootAndChildWindows);
+            if (isHovered) {
+                CTX.editorRepository.focusedShortcuts = view->getShortcuts();
+                CTX.editorRepository.focusedWindowName = view->dock->name;
+            }
+
+            view->isWindowFocused = isHovered;
+            if (view->isWindowFocused) {
+                for (const auto &shortcut: CTX.editorRepository.focusedShortcuts) {
+                    if (ImGui::IsKeyChordPressed(shortcut.keyChord)) {
+                        LOG_INFO("Action called: " + shortcut.name);
+                        shortcut.callback();
+                    }
+                }
+            }
+        }
     }
 
     void DockSpacePanel::onSync() {
+        if (view == nullptr) {
+            initializeView();
+        }
         ImGui::SetNextWindowSizeConstraints(MIN_SIZE, MAX_SIZE);
         if (padding.x != DEFAULT.x || padding.y != DEFAULT.y) {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, padding);
@@ -41,8 +84,8 @@ namespace Metal {
             sizeInitialized = true;
         }
         beforeWindow();
-        if (ImGui::Begin(dock->internalId.c_str(), &UIUtil::OPEN, (dock->direction != CENTER ? FLAGS : FLAGS_CENTER))) {
-            view->isWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+        if (ImGui::Begin(dock->internalId.c_str(), &UIUtil::OPEN, FLAGS)) {
+            handleShortcut();
             sizeInternal = ImGui::GetWindowSize();
             size.x = sizeInternal.x;
             size.y = sizeInternal.y;
@@ -51,10 +94,10 @@ namespace Metal {
             dock->sizeY = size.y;
 
             position = ImGui::GetWindowPos();
-            if (dock->direction != CENTER) {
-                renderHeader();
+            renderHeader();
+            if (view != nullptr) {
+                view->onSync();
             }
-            view->onSync();
         }
         ImGui::End();
 
@@ -67,58 +110,84 @@ namespace Metal {
     }
 
     void DockSpacePanel::renderHeader() {
-        DockRepository &dockRepository = context->dockRepository;
-        DockService &dockService = context->dockService;
-
         headerPadding.x = ImGui::GetStyle().FramePadding.x;
 
         if (ImGui::BeginMenuBar()) {
-            int &selected = dock->selectedOption;
-            ImGui::SetNextItemWidth(ImGui::CalcTextSize(DockSpace::GetOption(selected)->name.c_str()).x + 30);
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, headerPadding);
-            if (ImGui::Combo(id.c_str(), &selected, DockSpace::OPTIONS)) {
-                dock->description = DockSpace::GetOption(selected);
-                initializeView();
-            }
-            ImGui::PopStyleVar();
+            const bool isFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+            ImGui::PushStyleColor(ImGuiCol_TabActive,
+                                  isFocused ? CTX.editorRepository.accent : CTX.themeService.palette0);
 
-            if (dock->direction != CENTER) {
-                UIUtil::DynamicSpacing(55);
-                if (UIUtil::ButtonSimple(
-                    (isDownDirection ? Icons::horizontal_split : Icons::vertical_split) + id + "splitView",
-                    UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-                    auto *dto = new DockDTO(dock->description);
-                    dto->origin = dock;
-                    dto->splitDir = isDownDirection ? ImGuiDir_Down : ImGuiDir_Right;
-                    dto->sizeRatioForNodeAtDir = .5f;
-                    dto->outAtOppositeDir = dock;
-                    switch (dock->direction) {
-                        case LEFT:
-                            dockRepository.left.insert(
-                                dockRepository.left.begin() + Util::indexOf(dockRepository.left, dock) + 1, dto);
-                            break;
-                        case RIGHT:
-                            dockRepository.right.insert(
-                                dockRepository.right.begin() + Util::indexOf(dockRepository.right, dock) + 1, dto);
-                            break;
-                        case BOTTOM:
-                            dockRepository.bottom.insert(
-                                dockRepository.bottom.begin() + Util::indexOf(dockRepository.bottom, dock) + 1,
-                                dto);
-                            break;
-                        default:
-                            break;
+            if (ImGui::BeginTabBar((id + "dockTabs").c_str(), ImGuiTabBarFlags_AutoSelectNewTabs)) {
+                for (auto *space: dock->dockSpaces) {
+                    if (space == nullptr) {
+                        continue;
                     }
-                    dockRepository.isInitialized = false;
+                    const std::string label = space->icon + " " + space->name + id +
+                                              std::to_string(space->index);
+
+                    if (ImGui::BeginTabItem(label.c_str(), nullptr)) {
+                        if (dock->selectedOption != space->index) {
+                            dock->selectedOption = space->index;
+                            initializeView();
+                        }
+                        ImGui::EndTabItem();
+                    }
+                }
+                ImGui::SetNextItemWidth(23);
+                if (ImGui::TabItemButton((Icons::add.c_str() + id + "addTab").c_str(),
+                                         ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoReorder)) {
+                    ImGui::OpenPopup((id + "NewTabDropdown").c_str());
                 }
 
-                if (UIUtil::ButtonSimple(Icons::close + id + "removeView", UIUtil::ONLY_ICON_BUTTON_SIZE,
-                                         UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-                    dockService.prepareForRemoval(dock, this);
+                if (ImGui::BeginPopup((id + "NewTabDropdown").c_str())) {
+                    ImGui::Text("New Tab");
+                    ImGui::Separator();
+                    for (int i = 0; i <= 4; i++) {
+                        DockSpace *option = DockSpace::GetOption(i);
+                        if (option == nullptr) {
+                            continue;
+                        }
+                        const bool exists = hasDockSpace(option->index);
+                        const std::string label = option->icon + " " + option->name;
+                        if (ImGui::MenuItem(label.c_str(), nullptr, false, !exists)) {
+                            dock->dockSpaces.emplace_back(option);
+                            dock->selectedOption = option->index;
+                            initializeView();
+                        }
+                    }
+                    ImGui::EndPopup();
                 }
+
+                ImGui::EndTabBar();
             }
+            ImGui::PopStyleColor();
+            ImGui::PopStyleVar();
             ImGui::EndMenuBar();
         }
+    }
+
+    DockSpace *DockSpacePanel::getSelectedDockSpace() const {
+        if (dock->dockSpaces.empty()) {
+            return nullptr;
+        }
+
+        for (auto *space: dock->dockSpaces) {
+            if (space != nullptr && space->index == dock->selectedOption) {
+                return space;
+            }
+        }
+
+        return dock->dockSpaces.front();
+    }
+
+    bool DockSpacePanel::hasDockSpace(const int index) const {
+        for (auto *space: dock->dockSpaces) {
+            if (space != nullptr && space->index == index) {
+                return true;
+            }
+        }
+        return false;
     }
 
     void DockSpacePanel::beforeWindow() const {

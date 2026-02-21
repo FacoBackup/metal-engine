@@ -5,13 +5,12 @@
 #include <vulkan/vulkan_core.h>
 
 #include "../service/pipeline/ShaderModule.h"
-#include "../context/ApplicationContext.h"
 
 namespace Metal {
     class ShaderUtil final {
         static void CheckShaderCompilation(glslang_shader_t *shader);
 
-        static bool CompileShader(const VulkanContext &context, glslang_stage_t stage, const char *pShaderCode,
+        static bool CompileShader(glslang_stage_t stage, const char *pShaderCode,
                                   ShaderModule *shaderModule);
 
         static glslang_stage_t ShaderStageFromFilename(const char *pFilename);
@@ -21,7 +20,7 @@ namespace Metal {
         static std::string ProcessShader(const std::string &file);
 
     public:
-        static VkShaderModule CreateShaderModule(const ApplicationContext &context, const std::string &pFilename);
+        static VkShaderModule CreateShaderModule(const std::string &pFilename);
     };
 } // Metal
 

@@ -7,17 +7,17 @@
 namespace Metal {
     void PostProcessingPass::onInitialize() {
         PipelineBuilder ppPipelineBuilder = PipelineBuilder::Of(
-                    context.coreFrameBuffers.postProcessingFBO,
+                    CTX.coreFrameBuffers.postProcessingFBO,
                     "QUAD.vert",
                     "PostProcessing.frag"
                 )
                 .setPushConstantsSize(sizeof(PostProcessingPushConstant))
-                .addDescriptorSet(context.coreDescriptorSets.postProcessingDescriptor.get());
-        pipelineInstance = context.pipelineService.createPipeline(ppPipelineBuilder);
+                .addDescriptorSet(CTX.coreDescriptorSets.postProcessingDescriptor.get());
+        pipelineInstance = CTX.pipelineService.createPipeline(ppPipelineBuilder);
     }
 
     void PostProcessingPass::onSync() {
-        auto &camera = context.worldRepository.camera;
+        auto &camera = CTX.worldRepository.camera;
         pushConstant.distortionIntensity = camera.distortionIntensity;
         pushConstant.chromaticAberrationIntensity = camera.chromaticAberrationIntensity;
         pushConstant.distortionEnabled = camera.distortionEnabled;

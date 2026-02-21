@@ -10,13 +10,9 @@ namespace Metal {
     void AbstractResourceService::disposeAll() {
         for (auto it = resources.begin(); it != resources.end();) {
             auto *r = it->second;
-            r->dispose(vulkanContext);
+            r->dispose();
             it = resources.erase(it); // Erase and update the iterator
             delete r; // Delete the resource after erasing
         }
-    }
-
-    AbstractResourceService::AbstractResourceService(ApplicationContext &context)
-        : AbstractRuntimeComponent(context), vulkanContext(context.vulkanContext) {
     }
 }

@@ -27,8 +27,8 @@ namespace Metal {
         void createVKFrameBuffer(FrameBufferInstance *framebuffer) const;
 
     public:
-        explicit FrameBufferService(ApplicationContext &context)
-            : AbstractResourceService(context) {
+        explicit FrameBufferService()
+            : AbstractResourceService() {
         }
 
         void createSampler(bool linear, VkSampler &vkImageSampler);

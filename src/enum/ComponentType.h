@@ -6,18 +6,22 @@ namespace Metal::ComponentTypes {
     enum ComponentType {
         MESH,
         TRANSFORM,
-        LIGHT,
+        SPHERE_LIGHT,
+        PLANE_LIGHT,
         VOLUME
     };
 
-    static constexpr const char *NAMES = "Add Entity\0Mesh\0Light\0Volume\0";
+    static constexpr const char *NAMES = "Add Entity\0Mesh\0Sphere Light\0Plane Light\0Volume\0";
 
     static ComponentType ValueOfIndex(const int option) {
         if (option == 1) {
-            return ComponentType::MESH;
+            return MESH;
         }
         if (option == 2) {
-            return LIGHT;
+            return SPHERE_LIGHT;
+        }
+        if (option == 3) {
+            return PLANE_LIGHT;
         }
         return VOLUME;
     }
@@ -27,8 +31,10 @@ namespace Metal::ComponentTypes {
             return "Mesh Component";
         if (mode == TRANSFORM)
             return "Transformation Component";
-        if (mode == LIGHT)
-            return "Light Component";
+        if (mode == SPHERE_LIGHT)
+            return "Sphere Light Component";
+        if (mode == PLANE_LIGHT)
+            return "Plane Light Component";
         if (mode == VOLUME)
             return "Volume Component";
         return nullptr;
@@ -39,7 +45,7 @@ namespace Metal::ComponentTypes {
             return Icons::view_in_ar.c_str();
         if (mode == TRANSFORM)
             return Icons::transform.c_str();
-        if (mode == LIGHT)
+        if (mode == SPHERE_LIGHT || mode == PLANE_LIGHT)
             return Icons::lightbulb.c_str();
         if (mode == VOLUME)
             return Icons::blur_on.c_str();

@@ -12,8 +12,8 @@ namespace Metal {
         void cleanupFFmpeg();
 
     public:
-        VideoExporterService(ApplicationContext &context, bool is_first_bake_loop)
-            : AbstractRuntimeComponent(context),
+        VideoExporterService(bool is_first_bake_loop)
+            : AbstractRuntimeComponent(),
               isFirstBakeLoop(is_first_bake_loop) {
         }
 

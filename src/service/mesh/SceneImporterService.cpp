@@ -12,7 +12,7 @@
 #include "../../dto/file/EntryMetadata.h"
 #include "../../enum/engine-definitions.h"
 #include "../../context/ApplicationContext.h"
-#include <cereal/archives/binary.hpp>
+#include "../../util/serialization-definitions.h"
 
 namespace Metal {
     std::string SceneImporterService::importData(const std::string &targetDir, const std::string &pathToFile,
@@ -30,7 +30,7 @@ namespace Metal {
         }
 
         if (!scene || !scene->HasMeshes()) {
-            LOG_ERROR(context, "Error loading scene: " + std::string(importer.GetErrorString()));
+            LOG_ERROR("Error loading scene: " + std::string(importer.GetErrorString()));
             throw std::runtime_error("Error loading scene: " + std::string(importer.GetErrorString()));
         }
 
@@ -39,7 +39,9 @@ namespace Metal {
         sceneMetadata.type = EntryType::SCENE;
         sceneMetadata.name = sceneData.name =
                              scene->mName.length > 0 ? scene->mName.data : scene->mRootNode->mName.data;
-        DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(sceneMetadata.getId()), sceneMetadata)
+
+        std::string sceneBlobPath = CTX.getAssetDirectory() + FORMAT_FILE_SCENE(sceneMetadata.getId());
+
 
         std::unordered_map<unsigned int, std::string> meshMap{};
         std::unordered_map<std::string, unsigned int> meshMaterialMap{};
@@ -48,7 +50,7 @@ namespace Metal {
             throw std::runtime_error("Import cancelled");
         }
 
-        context.meshImporterService.persistAllMeshes(targetDir, scene, meshMap, meshMaterialMap, stopToken);
+        CTX.meshImporterService.persistAllMeshes(targetDir, scene, meshMap, meshMaterialMap, stopToken);
 
         if (stopToken.stop_requested()) {
             throw std::runtime_error("Import cancelled");
@@ -58,7 +60,7 @@ namespace Metal {
         fs::path absolutePath = fs::absolute(pathToFile);
         fs::path directoryPath = absolutePath.parent_path();
 
-        context.materialImporterService.persistAllMaterials(targetDir, scene, materialsMap, directoryPath.string(),
+        CTX.materialImporterService.persistAllMaterials(targetDir, scene, materialsMap, directoryPath.string(),
                                                             stopToken);
 
         if (stopToken.stop_requested()) {
@@ -71,8 +73,9 @@ namespace Metal {
         if (stopToken.stop_requested()) {
             throw std::runtime_error("Import cancelled");
         }
-
-        DUMP_TEMPLATE(context.getAssetDirectory() + FORMAT_FILE_SCENE(sceneMetadata.getId()), sceneData)
+        DUMP_TEMPLATE(sceneBlobPath, sceneData)
+        sceneMetadata.size = fs::file_size(sceneBlobPath);
+        DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(sceneMetadata.getId()), sceneMetadata)
 
         return sceneMetadata.getId();
     }

@@ -12,28 +12,28 @@ namespace Metal {
         runAsync("Import file: " + fileName,
                  [this, targetDir, file, fileName](const std::stop_token &token) {
                      try {
-                         LOG_INFO(context, "Starting file processing: " + fileName);
-                         if (context.sceneImporterService.isCompatible(file)) {
-                             context.sceneImporterService.importData(targetDir,
+                         LOG_INFO("Starting file processing: " + fileName);
+                         if (CTX.sceneImporterService.isCompatible(file)) {
+                             CTX.sceneImporterService.importData(targetDir,
                                                                      file, token);
-                         } else if (context.textureImporter.isCompatible(file)) {
-                             context.textureImporter.importData(targetDir, file, token);
-                         } else if (context.volumeImporterService.isCompatible(file)) {
-                             context.volumeImporterService.importData(targetDir, file, token);
+                         } else if (CTX.textureImporter.isCompatible(file)) {
+                             CTX.textureImporter.importData(targetDir, file, token);
+                         } else if (CTX.voxelImporterService.isCompatible(file)) {
+                             CTX.voxelImporterService.importData(targetDir, file, token);
                          }
 
-                         LOG_INFO(context, "Successfully imported file: " + fileName);
-                         context.notificationService.pushMessage("Successfully imported file: "  + fileName,
+                         LOG_INFO("Successfully imported file: " + fileName);
+                         CTX.notificationService.pushMessage("Successfully imported file: "  + fileName,
                                                                  NotificationSeverities::SUCCESS);
                      } catch (std::exception &e) {
-                         context.notificationService.pushMessage(e.what(), NotificationSeverities::ERROR);
+                         CTX.notificationService.pushMessage(e.what(), NotificationSeverities::ERROR);
                      }
                  });
     }
 
     std::string FileImporterService::runAsync(const std::string &taskName, const LoadingTask &task) const {
         std::stop_source stopSource;
-        std::string taskId = context.asyncTaskService.registerTask(taskName, [stopSource]() mutable {
+        std::string taskId = CTX.asyncTaskService.registerTask(taskName, [stopSource]() mutable {
             stopSource.request_stop();
         });
 
@@ -41,11 +41,11 @@ namespace Metal {
             try {
                 task(stopToken);
             } catch (const std::exception &e) {
-                LOG_ERROR(context, std::string("Loading task failed: ") + e.what());
+                LOG_ERROR(std::string("Loading task failed: ") + e.what());
             } catch (...) {
-                LOG_ERROR(context, "Loading task failed with unknown error.");
+                LOG_ERROR("Loading task failed with unknown error.");
             }
-            context.asyncTaskService.endTask(taskId, stopToken.stop_requested());
+            CTX.asyncTaskService.endTask(taskId, stopToken.stop_requested());
         }).detach();
 
         return taskId;
@@ -53,13 +53,13 @@ namespace Metal {
 
     std::string FileImporterService::collectCompatibleFiles() const {
         std::string outStr = "";
-        for (std::string type: context.sceneImporterService.getSupportedTypes()) {
+        for (std::string type: CTX.sceneImporterService.getSupportedTypes()) {
             outStr += type + ",";
         };
-        for (std::string type: context.textureImporter.getSupportedTypes()) {
+        for (std::string type: CTX.textureImporter.getSupportedTypes()) {
             outStr += type + ",";
         };
-        for (std::string type: context.volumeImporterService.getSupportedTypes()) {
+        for (std::string type: CTX.voxelImporterService.getSupportedTypes()) {
             outStr += type + ",";
         };
         return outStr;

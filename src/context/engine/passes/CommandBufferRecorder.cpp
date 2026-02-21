@@ -10,19 +10,19 @@
 #include "../../../util/VulkanUtils.h"
 
 namespace Metal {
-
     void CommandBufferRecorder::createCommandBuffer() {
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo.commandPool = context.vulkanContext.commandPool;
+        allocInfo.commandPool = CTX.vulkanContext.commandPool;
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
         allocInfo.commandBufferCount = MAX_FRAMES_IN_FLIGHT;
         VulkanUtils::CheckVKResult(
-            vkAllocateCommandBuffers(context.vulkanContext.device.device, &allocInfo, _commandBuffers.data()));
+            vkAllocateCommandBuffers(CTX.vulkanContext.device.device, &allocInfo,
+                                     _commandBuffers.data()));
     }
+
     CommandBufferRecorder::CommandBufferRecorder(FrameBufferInstance *frameBuffer,
-                                                   ApplicationContext &applicationContext,
-                                                   const bool clearBuffer): context(applicationContext) {
+                                                 const bool clearBuffer) {
         createRenderPassInfo(frameBuffer, clearBuffer);
 
         viewport.width = static_cast<float>(frameBuffer->bufferWidth);
@@ -39,7 +39,7 @@ namespace Metal {
         computePassMode = false;
     }
 
-    CommandBufferRecorder::CommandBufferRecorder(ApplicationContext &applicationContext) : context(applicationContext) {
+    CommandBufferRecorder::CommandBufferRecorder() {
         createCommandBuffer();
         computePassMode = true;
     }
@@ -72,7 +72,7 @@ namespace Metal {
 
     void CommandBufferRecorder::recordCommands(
         const std::vector<AbstractPass *> &passes) const {
-        auto vkCommandBuffer = _commandBuffers[context.getFrameIndex()];
+        auto vkCommandBuffer = _commandBuffers[CTX.getFrameIndex()];
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         vkBeginCommandBuffer(vkCommandBuffer, &beginInfo);
@@ -88,7 +88,7 @@ namespace Metal {
         }
 
         vkEndCommandBuffer(vkCommandBuffer);
-        context.vulkanContext.pushCommandBuffer(vkCommandBuffer);
+        CTX.vulkanContext.pushCommandBuffer(vkCommandBuffer);
     }
 
     void CommandBufferRecorder::RecordCommandsInternal(

@@ -8,13 +8,13 @@
 #include "BoundingBox.h"
 #include "../../../enum/engine-definitions.h"
 #include "../../../service/voxel/impl/SparseVoxelOctreeBuilder.h"
-#include "../../../util/serialization-definitions.h"
+#include "../../../util/Serializable.h"
 #define TILE_SIZE 64
 
 #define TILE_ID(x, z) (std::to_string(x) + "_" + std::to_string(z))
 
 namespace Metal {
-    struct WorldTile final {
+    struct WorldTile final : Serializable {
         std::array<std::string, 8> adjacentTiles{};
         int x;
         int z;
@@ -64,16 +64,29 @@ namespace Metal {
             updateTiles(adjacentWorldTile, "");
         }
 
-        SERIALIZE_TEMPLATE(
-            adjacentTiles,
-            x,
-            z,
-            id,
-            loaded,
-            entities,
-            boundingBox,
-            normalizedDistance
-        )
+        nlohmann::json toJson() const override {
+            nlohmann::json j;
+            j["adjacentTiles"] = adjacentTiles;
+            j["x"] = x;
+            j["z"] = z;
+            j["id"] = id;
+            j["loaded"] = loaded;
+            j["entities"] = entities;
+            j["boundingBox"] = boundingBox.toJson();
+            j["normalizedDistance"] = normalizedDistance;
+            return j;
+        }
+
+        void fromJson(const nlohmann::json& j) override {
+            adjacentTiles = j.at("adjacentTiles").get<std::array<std::string, 8>>();
+            x = j.at("x").get<int>();
+            z = j.at("z").get<int>();
+            id = j.at("id").get<std::string>();
+            loaded = j.at("loaded").get<bool>();
+            entities = j.at("entities").get<std::vector<EntityID>>();
+            boundingBox.fromJson(j.at("boundingBox"));
+            normalizedDistance = j.at("normalizedDistance").get<int>();
+        }
     };
 } // Metal
 

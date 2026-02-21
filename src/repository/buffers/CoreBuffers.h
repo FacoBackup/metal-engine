@@ -8,15 +8,17 @@ namespace Metal {
     struct BufferInstance;
 
     struct CoreBuffers final : AbstractCoreRepository {
-        explicit CoreBuffers(ApplicationContext &context)
-            : AbstractCoreRepository(context) {
+        explicit CoreBuffers()
+            : AbstractCoreRepository() {
         }
 
         void onInitialize() override;
 
         std::shared_ptr<BufferInstance> globalData = nullptr;
         std::shared_ptr<BufferInstance> tileInfo = nullptr;
-        std::shared_ptr<BufferInstance> lightVolumeBuffer = nullptr;
+        std::shared_ptr<BufferInstance> lightBuffer = nullptr;
+        std::shared_ptr<BufferInstance> volumesBuffer = nullptr;
+        std::shared_ptr<BufferInstance> materialBuffer = nullptr;
     };
 } // Metal
 

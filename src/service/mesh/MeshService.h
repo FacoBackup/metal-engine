@@ -10,15 +10,15 @@ namespace Metal {
 
     class MeshService final : public AbstractResourceService {
     public:
-        explicit MeshService(ApplicationContext &context)
-            : AbstractResourceService(context) {
+        explicit MeshService()
+            : AbstractResourceService() {
         }
 
         MeshInstance *create(const std::string &id, const LevelOfDetail &levelOfDetail);
 
         MeshData *stream(const std::string &id, const LevelOfDetail &levelOfDetail) const;
 
-        [[nodiscard]] EntityID createMeshEntity(const std::string &name, const std::string &meshId) const;
+        EntityID createMeshEntity(const std::string &name, const std::string &meshId) const;
 
         void createSceneEntities(const std::string &id) const;
     };

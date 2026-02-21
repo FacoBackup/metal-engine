@@ -13,7 +13,7 @@ namespace Metal {
     }
 
     void GizmoPanel::onInitialize() {
-        editorRepository = &context->editorRepository;
+        editorRepository = &CTX.editorRepository;
     }
 
     void GizmoPanel::onSync() {
@@ -22,20 +22,25 @@ namespace Metal {
             localSelected = nullptr;
             localChangeId = 0;
             if (editorRepository->mainSelection != EMPTY_ENTITY) {
-                context->selectionService.updatePrimitiveSelected();
+                CTX.selectionService.updatePrimitiveSelected();
             }
             return;
         }
 
         if (editorRepository->primitiveSelected != localSelected || localSelected->getChangeId() != localChangeId) {
             cacheMatrixMat4 = glm::mat4(editorRepository->primitiveSelected->model);
+            
+            if (editorRepository->primitiveSelected != nullptr) {
+                cacheMatrixMat4 = glm::translate(cacheMatrixMat4, editorRepository->primitiveSelected->gizmoCenter);
+            }
+
             cacheMatrix = glm::value_ptr(cacheMatrixMat4);
             localSelected = editorRepository->primitiveSelected;
             localChangeId = localSelected->getChangeId();
         }
 
         recomposeMatrix();
-        ImGuizmo::SetOrthographic(context->worldRepository.camera.isOrthographic);
+        ImGuizmo::SetOrthographic(CTX.worldRepository.camera.isOrthographic);
         ImGuizmo::SetDrawlist();
         ImGuizmo::SetRect(position->x, position->y, size->x, size->y);
         Manipulate(
@@ -77,6 +82,12 @@ namespace Metal {
 
     void GizmoPanel::decomposeMatrix() {
         glm::mat4 auxMat4 = glm::make_mat4(cacheMatrix);
+
+        // Remove gizmo offset using the selected TransformComponent
+        if (localSelected != nullptr) {
+            auxMat4 = glm::translate(auxMat4, -localSelected->gizmoCenter);
+        }
+
         glm::vec3 skew;
         glm::vec4 perspective;
 
@@ -96,12 +107,12 @@ namespace Metal {
         localSelected->registerChange();
         localChangeId = localSelected->getChangeId();
         localSelected->forceTransform = true;
-        localSelected->onUpdate(nullptr, *context);
+        localSelected->onUpdate(nullptr);
     }
 
     void GizmoPanel::recomposeMatrix() {
-        viewMatrixCache = glm::value_ptr(context->worldRepository.camera.viewMatrix);
-        cacheProjection = context->worldRepository.camera.projectionMatrix;
+        viewMatrixCache = glm::value_ptr(CTX.worldRepository.camera.viewMatrix);
+        cacheProjection = CTX.worldRepository.camera.projectionMatrix;
         cacheProjection[1][1] *= -1;
         projectionMatrixCache = glm::value_ptr(cacheProjection);
     }
