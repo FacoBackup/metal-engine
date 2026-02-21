@@ -14,6 +14,7 @@ namespace Metal {
         std::shared_ptr<BufferInstance> dataBuffer = nullptr;
         std::shared_ptr<BufferInstance> indexBuffer = nullptr;
         unsigned int indexCount = 0;
+        unsigned int vertexCount = 0;
 
     };
 } // Metal

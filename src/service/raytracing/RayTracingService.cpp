@@ -7,6 +7,7 @@
 #include "../mesh/VertexData.h"
 #include "../../util/VulkanUtils.h"
 #include "../../enum/LevelOfDetail.h"
+#include <cstddef>
 
 namespace Metal {
     static VkDeviceAddress getDeviceAddress(const VulkanContext &ctx, VkBuffer buffer) {
@@ -16,18 +17,17 @@ namespace Metal {
         return ctx.vkGetBufferDeviceAddressKHR(ctx.device.device, &info);
     }
 
-
     void RayTracingService::onSync() {
         if (!needsRebuild) {
             return;
         }
-        
-        // Collect all mesh entities that have loaded mesh instances
+
         bool hasMeshes = false;
-        for (auto entity : CTX.worldRepository.registry.storage<entt::entity>()) {
-            if (!CTX.worldRepository.registry.all_of<MeshComponent>(entity)) continue;
+        auto view = CTX.worldRepository.registry.view<MeshComponent, TransformComponent>();
+
+        for (auto entity: view) {
             if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
-            auto &meshComp = CTX.worldRepository.registry.get<MeshComponent>(entity);
+            auto &meshComp = view.get<MeshComponent>(entity);
             if (meshComp.meshId.empty()) continue;
             auto *instance = CTX.streamingRepository.streamMesh(meshComp.meshId, LevelOfDetail::LOD_0);
             if (instance != nullptr && instance->dataBuffer != nullptr && instance->indexBuffer != nullptr) {
@@ -44,7 +44,6 @@ namespace Metal {
         buildBLAS();
         buildTLAS();
 
-        // Create/update TLAS descriptor
         if (tlas != VK_NULL_HANDLE) {
             if (CTX.coreDescriptorSets.tlasDescriptor == nullptr) {
                 CTX.coreDescriptorSets.tlasDescriptor = std::make_unique<DescriptorInstance>();
@@ -53,7 +52,6 @@ namespace Metal {
                         VK_SHADER_STAGE_RAYGEN_BIT_KHR, 0, tlas));
                 CTX.coreDescriptorSets.tlasDescriptor->create();
             } else {
-                // Update existing descriptor
                 std::vector<DescriptorBinding> bindings;
                 bindings.push_back(
                     DescriptorBinding::OfAccelerationStructure(
@@ -68,22 +66,25 @@ namespace Metal {
     void RayTracingService::buildBLAS() {
         auto &vulkan = CTX.vulkanContext;
 
-        // Gather all geometry from all mesh entities into a single BLAS
-        // We combine all triangles into one BLAS with multiple geometries
-        std::vector<VkAccelerationStructureGeometryKHR> geometries;
-        std::vector<VkAccelerationStructureBuildRangeInfoKHR> buildRangeInfos;
-        std::vector<uint32_t> maxPrimitiveCounts;
+        std::unordered_map<std::string, MeshInstance *> uniqueMeshes;
 
-        for (auto entity : CTX.worldRepository.registry.storage<entt::entity>()) {
-            if (!CTX.worldRepository.registry.all_of<MeshComponent>(entity)) continue;
+        auto view = CTX.worldRepository.registry.view<MeshComponent, TransformComponent>();
+
+        for (auto entity: view) {
             if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
-            auto &meshComp = CTX.worldRepository.registry.get<MeshComponent>(entity);
+            auto &meshComp = view.get<MeshComponent>(entity);
             if (meshComp.meshId.empty()) continue;
+            if (uniqueMeshes.contains(meshComp.meshId)) continue;
             auto *instance = CTX.streamingRepository.streamMesh(meshComp.meshId, LevelOfDetail::LOD_0);
             if (instance == nullptr || instance->dataBuffer == nullptr || instance->indexBuffer == nullptr) {
                 continue;
             }
+            uniqueMeshes[meshComp.meshId] = instance;
+        }
 
+        if (uniqueMeshes.empty()) return;
+
+        for (auto &[meshId, instance]: uniqueMeshes) {
             VkDeviceAddress vertexAddress = getDeviceAddress(vulkan, instance->dataBuffer->vkBuffer);
             VkDeviceAddress indexAddress = getDeviceAddress(vulkan, instance->indexBuffer->vkBuffer);
 
@@ -93,111 +94,104 @@ namespace Metal {
             geometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
             geometry.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
             geometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-            geometry.geometry.triangles.vertexData.deviceAddress = vertexAddress;
+            geometry.geometry.triangles.vertexData.deviceAddress = vertexAddress + offsetof(VertexData, vertex);
             geometry.geometry.triangles.vertexStride = sizeof(VertexData);
-            geometry.geometry.triangles.maxVertex = static_cast<uint32_t>(instance->dataBuffer->dataSize / sizeof(VertexData)) - 1;
+            geometry.geometry.triangles.maxVertex = instance->vertexCount - 1;
             geometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
             geometry.geometry.triangles.indexData.deviceAddress = indexAddress;
-            geometry.geometry.triangles.transformData.deviceAddress = 0; // identity
-
-            geometries.push_back(geometry);
+            geometry.geometry.triangles.transformData.deviceAddress = 0;
 
             uint32_t primitiveCount = instance->indexCount / 3;
-            maxPrimitiveCounts.push_back(primitiveCount);
+
+            VkAccelerationStructureBuildGeometryInfoKHR buildInfo{};
+            buildInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
+            buildInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+            buildInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
+            buildInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR;
+            buildInfo.geometryCount = 1;
+            buildInfo.pGeometries = &geometry;
+
+            VkAccelerationStructureBuildSizesInfoKHR sizeInfo{};
+            sizeInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
+            vulkan.vkGetAccelerationStructureBuildSizesKHR(
+                vulkan.device.device,
+                VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
+                &buildInfo,
+                &primitiveCount,
+                &sizeInfo);
+
+            BLASEntry entry;
+            entry.buffer = CTX.bufferService.createBuffer(
+                sizeInfo.accelerationStructureSize,
+                VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
+                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                true);
+
+            VkAccelerationStructureCreateInfoKHR createInfo{};
+            createInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
+            createInfo.buffer = entry.buffer->vkBuffer;
+            createInfo.size = sizeInfo.accelerationStructureSize;
+            createInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+            VulkanUtils::CheckVKResult(
+                vulkan.vkCreateAccelerationStructureKHR(vulkan.device.device, &createInfo, nullptr,
+                                                        &entry.accelerationStructure));
+
+            entry.scratchBuffer = CTX.bufferService.createBuffer(
+                sizeInfo.buildScratchSize,
+                VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                true);
+
+            buildInfo.dstAccelerationStructure = entry.accelerationStructure;
+            buildInfo.scratchData.deviceAddress = getDeviceAddress(vulkan, entry.scratchBuffer->vkBuffer);
 
             VkAccelerationStructureBuildRangeInfoKHR rangeInfo{};
             rangeInfo.primitiveCount = primitiveCount;
             rangeInfo.primitiveOffset = 0;
             rangeInfo.firstVertex = 0;
             rangeInfo.transformOffset = 0;
-            buildRangeInfos.push_back(rangeInfo);
+            const VkAccelerationStructureBuildRangeInfoKHR *pRangeInfo = &rangeInfo;
+
+            VkCommandBuffer cmd = vulkan.beginSingleTimeCommands();
+            vulkan.vkCmdBuildAccelerationStructuresKHR(cmd, 1, &buildInfo, &pRangeInfo);
+            vulkan.endSingleTimeCommands(cmd);
+
+            blasEntries[meshId] = std::move(entry);
         }
-
-        if (geometries.empty()) return;
-
-        // Get build sizes
-        VkAccelerationStructureBuildGeometryInfoKHR buildInfo{};
-        buildInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
-        buildInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
-        buildInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
-        buildInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR;
-        buildInfo.geometryCount = static_cast<uint32_t>(geometries.size());
-        buildInfo.pGeometries = geometries.data();
-
-        VkAccelerationStructureBuildSizesInfoKHR sizeInfo{};
-        sizeInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
-        vulkan.vkGetAccelerationStructureBuildSizesKHR(
-            vulkan.device.device,
-            VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
-            &buildInfo,
-            maxPrimitiveCounts.data(),
-            &sizeInfo);
-
-        // Create BLAS buffer
-        blasBuffer = CTX.bufferService.createBuffer(
-            sizeInfo.accelerationStructureSize,
-            VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
-            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-            true);
-
-        // Create BLAS
-        VkAccelerationStructureCreateInfoKHR createInfo{};
-        createInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
-        createInfo.buffer = blasBuffer->vkBuffer;
-        createInfo.size = sizeInfo.accelerationStructureSize;
-        createInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
-        VulkanUtils::CheckVKResult(
-            vulkan.vkCreateAccelerationStructureKHR(vulkan.device.device, &createInfo, nullptr, &blas));
-
-        // Create scratch buffer
-        blasScratchBuffer = CTX.bufferService.createBuffer(
-            sizeInfo.buildScratchSize,
-            VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-            true);
-
-        buildInfo.dstAccelerationStructure = blas;
-        buildInfo.scratchData.deviceAddress = getDeviceAddress(vulkan, blasScratchBuffer->vkBuffer);
-
-        // Build BLAS
-        VkCommandBuffer cmd = vulkan.beginSingleTimeCommands();
-        const VkAccelerationStructureBuildRangeInfoKHR *pBuildRangeInfos = buildRangeInfos.data();
-        vulkan.vkCmdBuildAccelerationStructuresKHR(cmd, 1, &buildInfo, &pBuildRangeInfos);
-        vulkan.endSingleTimeCommands(cmd);
     }
 
     void RayTracingService::buildTLAS() {
         auto &vulkan = CTX.vulkanContext;
 
-        if (blas == VK_NULL_HANDLE) return;
+        if (blasEntries.empty()) return;
 
-        // Get BLAS device address
-        VkAccelerationStructureDeviceAddressInfoKHR addressInfo{};
-        addressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
-        addressInfo.accelerationStructure = blas;
-        VkDeviceAddress blasAddress = vulkan.vkGetAccelerationStructureDeviceAddressKHR(vulkan.device.device, &addressInfo);
-
-        // Create one TLAS instance per mesh entity with its transform
         std::vector<VkAccelerationStructureInstanceKHR> instances;
-        for (auto entity : CTX.worldRepository.registry.storage<entt::entity>()) {
-            if (!CTX.worldRepository.registry.all_of<MeshComponent>(entity)) continue;
-            if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
-            auto &meshComp = CTX.worldRepository.registry.get<MeshComponent>(entity);
-            if (meshComp.meshId.empty()) continue;
-            auto *meshInstance = CTX.streamingRepository.streamMesh(meshComp.meshId, LevelOfDetail::LOD_0);
-            if (meshInstance == nullptr || meshInstance->dataBuffer == nullptr) continue;
+        auto view = CTX.worldRepository.registry.view<MeshComponent, TransformComponent>();
 
-            // Get transform
+        for (entt::entity entity: view) {
+            if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
+            auto &meshComp = view.get<MeshComponent>(entity);
+            if (meshComp.meshId.empty()) continue;
+
+            auto it = blasEntries.find(meshComp.meshId);
+            if (it == blasEntries.end()) continue;
+            LOG_INFO("Building BVH for " + std::to_string(static_cast<unsigned int>(entity)));
+
+            VkAccelerationStructureDeviceAddressInfoKHR addressInfo{};
+            addressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
+            addressInfo.accelerationStructure = it->second.accelerationStructure;
+            VkDeviceAddress blasAddress = vulkan.vkGetAccelerationStructureDeviceAddressKHR(
+                vulkan.device.device, &addressInfo);
+
             glm::mat4 model = glm::mat4(1.0f);
             if (CTX.worldRepository.registry.all_of<TransformComponent>(entity)) {
                 model = CTX.worldRepository.registry.get<TransformComponent>(entity).model;
             }
 
-            // Convert glm::mat4 to VkTransformMatrixKHR (3x4 row-major)
             VkTransformMatrixKHR transform{};
             for (int row = 0; row < 3; row++) {
                 for (int col = 0; col < 4; col++) {
-                    transform.matrix[row][col] = model[col][row]; // glm is column-major
+                    transform.matrix[row][col] = model[col][row];
                 }
             }
 
@@ -214,7 +208,6 @@ namespace Metal {
 
         if (instances.empty()) return;
 
-        // Upload instances
         instancesBuffer = CTX.bufferService.createBuffer(
             sizeof(VkAccelerationStructureInstanceKHR) * instances.size(),
             VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
@@ -289,16 +282,17 @@ namespace Metal {
             vulkan.vkDestroyAccelerationStructureKHR(vulkan.device.device, tlas, nullptr);
             tlas = VK_NULL_HANDLE;
         }
-        if (blas != VK_NULL_HANDLE) {
-            vulkan.vkDestroyAccelerationStructureKHR(vulkan.device.device, blas, nullptr);
-            blas = VK_NULL_HANDLE;
-        }
 
-        blasBuffer = nullptr;
+        for (auto &[meshId, entry]: blasEntries) {
+            if (entry.accelerationStructure != VK_NULL_HANDLE) {
+                vulkan.vkDestroyAccelerationStructureKHR(vulkan.device.device, entry.accelerationStructure, nullptr);
+            }
+        }
+        blasEntries.clear();
+
         tlasBuffer = nullptr;
         instancesBuffer = nullptr;
-        blasScratchBuffer = nullptr;
         tlasScratchBuffer = nullptr;
         accelerationStructureBuilt = false;
     }
-} // Metal
+}

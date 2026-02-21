@@ -319,7 +319,7 @@ namespace Metal {
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         poolInfo.poolSizeCount = sizes.size();
         poolInfo.pPoolSizes = sizes.data();
-        poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+        poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT | VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
         poolInfo.maxSets = 500;
 
         VulkanUtils::CheckVKResult(vkCreateDescriptorPool(device.device, &poolInfo,

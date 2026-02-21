@@ -2,6 +2,9 @@
 #define RAYTRACINGSERVICE_H
 
 #include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
 #include <vulkan/vulkan.h>
 #include "../../common/AbstractRuntimeComponent.h"
 
@@ -9,17 +12,21 @@ namespace Metal {
     struct BufferInstance;
 
     class RayTracingService final : public AbstractRuntimeComponent {
-        // BLAS
-        VkAccelerationStructureKHR blas = VK_NULL_HANDLE;
-        std::shared_ptr<BufferInstance> blasBuffer = nullptr;
+        struct BLASEntry {
+            VkAccelerationStructureKHR accelerationStructure = VK_NULL_HANDLE;
+            std::shared_ptr<BufferInstance> buffer = nullptr;
+            std::shared_ptr<BufferInstance> scratchBuffer = nullptr;
+        };
+
+        // One BLAS per unique mesh ID
+        std::unordered_map<std::string, BLASEntry> blasEntries;
 
         // TLAS
         VkAccelerationStructureKHR tlas = VK_NULL_HANDLE;
         std::shared_ptr<BufferInstance> tlasBuffer = nullptr;
         std::shared_ptr<BufferInstance> instancesBuffer = nullptr;
 
-        // Scratch buffers (kept alive)
-        std::shared_ptr<BufferInstance> blasScratchBuffer = nullptr;
+        // Scratch buffer for TLAS
         std::shared_ptr<BufferInstance> tlasScratchBuffer = nullptr;
 
         bool accelerationStructureBuilt = false;

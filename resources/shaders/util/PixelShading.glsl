@@ -77,6 +77,7 @@ vec3 calculateIndirectLighting(float roughness, vec3 normal, vec3 currentPositio
     float localRoughness = roughness;
     vec3 localRayDir = rayDir;
 
+    uint samples = 0;
     for (uint j = 0; j < globalData.pathTracerBounces; j++){
         vec3 diffuseRayDir = normalize(bounceInfo.hitNormal + RandomUnitVector());
         vec3 specularRayDir = reflect(localRayDir, bounceInfo.hitNormal);
@@ -84,6 +85,7 @@ vec3 calculateIndirectLighting(float roughness, vec3 normal, vec3 currentPositio
         specularRayDir = normalize(mix(specularRayDir, diffuseRayDir, localRoughness * localRoughness));
         localRayDir = mix(diffuseRayDir, specularRayDir, 1. - localRoughness);
 
+        payload.hit = true;
         traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xFF, 0, 0, 0, bounceInfo.currentPosition, 0.001, localRayDir, 1000.0, 0);
 
         if (!payload.hit) {
@@ -91,6 +93,7 @@ vec3 calculateIndirectLighting(float roughness, vec3 normal, vec3 currentPositio
                 bounceInfo.albedo = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), localRayDir, 2.0f) * 0.05f;
                 bounceInfo.isEmissive = true;
                 fetchSurfaceCacheRadiance(bounceInfo);
+                samples++;
             }
             break;
         }
@@ -103,8 +106,9 @@ vec3 calculateIndirectLighting(float roughness, vec3 normal, vec3 currentPositio
         bounceInfo.currentPosition = payload.hitPosition;
 
         fetchSurfaceCacheRadiance(bounceInfo);
+        samples++;
     }
-    return bounceInfo.indirectLight / globalData.pathTracerBounces;
+    return samples > 0 ? bounceInfo.indirectLight / samples : vec3(0);
 }
 
 vec3 calculatePixelColor( vec3 rayDirection, in vec2 texCoords, MaterialInfo material, SurfaceInteraction interaction) {

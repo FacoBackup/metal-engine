@@ -17,10 +17,13 @@ namespace Metal {
     void DescriptorInstance::Write(const VkDescriptorSet &vkDescriptorSet,
                                    std::vector<DescriptorBinding> &bindings) {
         std::vector<VkWriteDescriptorSet> writeDescriptorSets;
-        // These vectors will hold the Vk*Info objects so their memory remains valid.
         std::vector<VkDescriptorBufferInfo> bufferInfos;
         std::vector<std::vector<VkDescriptorImageInfo>> imageInfosPool;
         std::vector<VkWriteDescriptorSetAccelerationStructureKHR> asInfos;
+
+        bufferInfos.reserve(bindings.size());
+        asInfos.reserve(bindings.size());
+        imageInfosPool.reserve(bindings.size());
 
         for (auto &binding: bindings) {
             if (binding.accelerationStructure != VK_NULL_HANDLE) {

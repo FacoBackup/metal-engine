@@ -200,6 +200,7 @@ vec3 lightSample(const in Light light, const in SurfaceInteraction interaction, 
                 lightPdf = 1. / (TWO_PI * (1. - cosThetaMax));
             }
 
+            payload.hit = true;
             vec3 visibility = visibilityTest(light, interaction.point, wi);
             return light.color.rgb * visibility;
         }
@@ -227,6 +228,7 @@ vec3 lightSample(const in Light light, const in SurfaceInteraction interaction, 
             lightPdf = distSq / (cosTheta * lightArea);
 
             if (cosTheta > 0.0) {
+                payload.hit = true;
                 vec3 visibility = visibilityTest(light, interaction.point, wi);
                 return light.color.rgb * visibility;
             }
@@ -486,6 +488,7 @@ vec3 calculateDirectLight(const in Light light, const in SurfaceInteraction inte
             lightPdf = light_pdf(light, interaction);
             if (lightPdf < EPSILON) return Ld;
             weight = powerHeuristic(1., scatteringPdf, 1., lightPdf);
+            payload.hit = true;
             Li *= visibilityTest(light, interaction.point, wi);
             isBlack = dot(Li, Li) == 0.;
             if (!isBlack) {

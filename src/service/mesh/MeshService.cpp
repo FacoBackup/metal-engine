@@ -25,19 +25,19 @@ namespace Metal {
         registerResource(instance);
 
         instance->indexCount = data->indices.size();
-
-        const VkBufferUsageFlags rtVertexFlags = (VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR);
-        const VkBufferUsageFlags rtIndexFlags = rtVertexFlags;
+        instance->vertexCount = data->data.size();
 
         instance->dataBuffer = CTX.bufferService.createBuffer(
             sizeof(VertexData) * data->data.size(),
-            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | rtVertexFlags,
-            data->data.data());
+            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
+            data->data.data(),
+            true);
 
         instance->indexBuffer = CTX.bufferService.createBuffer(
             sizeof(unsigned int) * data->indices.size(),
-            VK_BUFFER_USAGE_INDEX_BUFFER_BIT | rtIndexFlags,
-            data->indices.data());
+            VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
+            data->indices.data(),
+            true);
 
         delete data;
 
