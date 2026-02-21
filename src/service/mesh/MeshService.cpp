@@ -57,12 +57,13 @@ namespace Metal {
     EntityID MeshService::createMeshEntity(const std::string &name, const std::string &meshId) const {
         const auto id = CTX.worldRepository.createEntity();
         CTX.worldRepository.createComponent(id, ComponentTypes::ComponentType::MESH);
-        auto &mesh = CTX.worldRepository.meshes[id];
+        const auto entity = static_cast<entt::entity>(id);
+        auto &mesh = CTX.worldRepository.registry.get<MeshComponent>(entity);
         mesh.meshId = meshId;
 
         MeshData *data = stream(meshId, LevelOfDetail::LOD_0);
         if (data != nullptr) {
-            auto &transform = CTX.worldRepository.transforms[id];
+            auto &transform = CTX.worldRepository.registry.get<TransformComponent>(entity);
             transform.gizmoCenter = data->gizmoCenter;
             delete data;
         }
@@ -86,7 +87,7 @@ namespace Metal {
                 const auto entityId = repo.createEntity();
                 entities.insert({entity.id, entityId});
                 repo.getEntity(entityId)->name = entity.name;
-                repo.getEntity(entityId)->isContainer = true;
+                repo.getEntity(entityId)->initialize(true);
             }
         }
 
@@ -94,7 +95,7 @@ namespace Metal {
             if (entity.parentEntity < 0 || !entities.contains(entity.parentEntity)) {
                 continue;
             }
-            repo.linkEntities(repo.getEntity(entities.at(entity.parentEntity)), repo.getEntity(entities.at(entity.id)));
+            repo.linkEntities(entities.at(entity.parentEntity), entities.at(entity.id));
         }
     }
 } // Metal

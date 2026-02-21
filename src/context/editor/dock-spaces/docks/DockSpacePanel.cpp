@@ -114,6 +114,10 @@ namespace Metal {
 
         if (ImGui::BeginMenuBar()) {
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, headerPadding);
+            const bool isFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+            ImGui::PushStyleColor(ImGuiCol_TabActive,
+                                  isFocused ? CTX.editorRepository.accent : CTX.themeService.palette0);
+
             if (ImGui::BeginTabBar((id + "dockTabs").c_str(), ImGuiTabBarFlags_AutoSelectNewTabs)) {
                 for (auto *space: dock->dockSpaces) {
                     if (space == nullptr) {
@@ -157,6 +161,7 @@ namespace Metal {
 
                 ImGui::EndTabBar();
             }
+            ImGui::PopStyleColor();
             ImGui::PopStyleVar();
             ImGui::EndMenuBar();
         }

@@ -1,4 +1,6 @@
 #include "TransformComponent.h"
+#include "VolumeComponent.h"
+#include "LightComponent.h"
 #include "../../../common/interface/Icons.h"
 #include "../../../context/ApplicationContext.h"
 
@@ -17,8 +19,9 @@ namespace Metal {
     }
 
     void TransformComponent::onUpdate(InspectableMember *member) {
-        bool isVolume = CTX.worldRepository.volumes.contains(entityId);
-        bool isLight = CTX.worldRepository.lights.contains(entityId);
+        const auto e = static_cast<entt::entity>(entityId);
+        bool isVolume = CTX.worldRepository.registry.all_of<VolumeComponent>(e);
+        bool isLight = CTX.worldRepository.registry.all_of<std::unique_ptr<LightComponent>>(e);
         if (isLight) {
             CTX.engineContext.setUpdateLights(true);
         }

@@ -31,15 +31,16 @@ namespace Metal {
                 continue;
             }
             const EntityID entityId = pair.first;
-            if (!worldRepository.meshes.contains(entityId) || !worldRepository.transforms.contains(entityId)) {
+            const auto entity = static_cast<entt::entity>(entityId);
+            if (!worldRepository.registry.all_of<MeshComponent>(entity) || !worldRepository.registry.all_of<TransformComponent>(entity)) {
                 continue;
             }
 
-            const auto &mesh = worldRepository.meshes[entityId];
+            const auto &mesh = worldRepository.registry.get<MeshComponent>(entity);
             if (mesh.meshId.empty()) {
                 continue;
             }
-            if (worldRepository.hiddenEntities.contains(mesh.getEntityId())) {
+            if (worldRepository.hiddenEntities.contains(entityId)) {
                 continue;
             }
 
@@ -48,7 +49,7 @@ namespace Metal {
                 continue;
             }
 
-            pushConstant.model = worldRepository.transforms[entityId].model;
+            pushConstant.model = worldRepository.registry.get<TransformComponent>(entity).model;
             pushConstant.albedoEmissive.x = CTX.editorRepository.selectionColor.x;
             pushConstant.albedoEmissive.y = CTX.editorRepository.selectionColor.y;
             pushConstant.albedoEmissive.z = CTX.editorRepository.selectionColor.z;

@@ -14,10 +14,18 @@ namespace Metal {
         gizmoSelection();
         ImGui::SameLine();
         gizmoGrid();
+        UIUtil::Spacing();
+        if (selectedEntityId != editorRepository->mainSelection && CTX.worldRepository.registry.all_of(
+                static_cast<entt::basic_registry<>::entity_type>(editorRepository->mainSelection))) {
+            selectedEntity = CTX.worldRepository.getEntity(editorRepository->mainSelection);
+            selectedEntityId = editorRepository->mainSelection;
+        }
+        if (selectedEntity != nullptr) {
+            ImGui::Text(selectedEntity->name.c_str());
+        }
     }
 
     void GizmoSettingsPanel::gizmoGrid() const {
-
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, SPACING);
         ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, SPACING);
         renderSnapTranslate();
@@ -73,7 +81,6 @@ namespace Metal {
             editorRepository->gizmoType = ImGuizmo::OPERATION::SCALE;
         }
         UIUtil::RenderTooltip("Scale");
-
     }
 
     void GizmoSettingsPanel::renderSnapTranslate() const {

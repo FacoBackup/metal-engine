@@ -19,8 +19,8 @@ namespace Metal {
 
         constexpr VkDeviceSize imageSize = sizeof(float) * 4;
         auto stagingBuffer = CTX.bufferService.createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-                                                                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                                                                VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+                                                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                                            VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
         VkCommandBuffer commandBuffer = CTX.vulkanContext.beginSingleTimeCommands();
 
@@ -75,10 +75,11 @@ namespace Metal {
 
         const unsigned int renderIndex = static_cast<unsigned int>(idValue + 0.5f) - 1;
 
-        for (const auto &pair: CTX.worldRepository.meshes) {
-            const auto &mesh = pair.second;
+        auto view = CTX.worldRepository.registry.view<MeshComponent, TransformComponent>();
+        for (auto entity: view) {
+            auto &mesh = view.get<MeshComponent>(entity);
             if (mesh.renderIndex == renderIndex) {
-                return mesh.getEntityId();
+                return static_cast<EntityID>(entity);
             }
         }
 

@@ -1,5 +1,5 @@
 #include "TransformService.h"
-
+#include <entt/entt.hpp>
 #include <iostream>
 #include <glm/gtc/quaternion.hpp>
 
@@ -12,8 +12,9 @@ namespace Metal {
     }
 
     void TransformService::traverse(const EntityID entityId, bool parentHasChanged) {
-        TransformComponent *st = CTX.worldRepository.transforms.contains(entityId)
-                                     ? &CTX.worldRepository.transforms.at(entityId)
+        const auto entity = static_cast<entt::entity>(entityId);
+        TransformComponent *st = CTX.worldRepository.registry.all_of<TransformComponent>(entity)
+                                     ? &CTX.worldRepository.registry.get<TransformComponent>(entity)
                                      : nullptr;
         if (st != nullptr && (st->isNotFrozen() || parentHasChanged)) {
             TransformComponent *parentTransform = findParent(st->getEntityId());
@@ -22,8 +23,12 @@ namespace Metal {
             parentHasChanged = true;
         }
 
-        for (auto child: CTX.worldRepository.getEntity(entityId)->children) {
-            traverse(child, parentHasChanged);
+        const auto e = static_cast<entt::entity>(entityId);
+        if (CTX.worldRepository.registry.all_of<HierarchyComponent>(e)) {
+            const auto &hierarchy = CTX.worldRepository.registry.get<HierarchyComponent>(e);
+            for (auto child: hierarchy.children) {
+                traverse(child, parentHasChanged);
+            }
         }
     }
 
@@ -56,9 +61,13 @@ namespace Metal {
 
     TransformComponent *TransformService::findParent(EntityID id) const {
         while (id != EMPTY_ENTITY && id != WorldRepository::ROOT_ID) {
-            id = CTX.worldRepository.getEntity(id)->parent;
-            TransformComponent *t = CTX.worldRepository.transforms.contains(id)
-                          ? &CTX.worldRepository.transforms.at(id)
+            const auto e = static_cast<entt::entity>(id);
+            if (!CTX.worldRepository.registry.valid(e)) break;
+            const auto &hierarchy = CTX.worldRepository.registry.get<HierarchyComponent>(e);
+            id = hierarchy.parent;
+            const auto parent = static_cast<entt::entity>(id);
+            TransformComponent *t = (CTX.worldRepository.registry.valid(parent) && CTX.worldRepository.registry.all_of<TransformComponent>(parent))
+                          ? &CTX.worldRepository.registry.get<TransformComponent>(parent)
                           : nullptr;
             if (t != nullptr) {
                 return t;

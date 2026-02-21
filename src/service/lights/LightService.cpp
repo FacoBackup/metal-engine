@@ -1,4 +1,5 @@
 #include "LightService.h"
+#include <entt/entt.hpp>
 #include "../../context/ApplicationContext.h"
 #include "../../repository/world/components/SphereLightComponent.h"
 #include "../../repository/world/components/PlaneLightComponent.h"
@@ -6,13 +7,14 @@
 
 namespace Metal {
     void LightService::registerLights() {
-        for (auto &entry: CTX.worldRepository.lights) {
-            if (CTX.worldRepository.hiddenEntities.contains(entry.first)) {
+        auto view = CTX.worldRepository.registry.view<std::unique_ptr<LightComponent>, TransformComponent>();
+        for (auto [entity, l_ptr, t]: view.each()) {
+            const auto entityId = static_cast<EntityID>(entity);
+            if (CTX.worldRepository.hiddenEntities.contains(entityId)) {
                 continue;
             }
-            auto &t = CTX.worldRepository.transforms.at(entry.first);
             auto &translation = t.translation;
-            auto &l = *entry.second;
+            auto &l = *l_ptr;
             const auto lightType = l.getLightType();
 
             glm::vec3 normal(0.0f, 1.0f, 0.0f);

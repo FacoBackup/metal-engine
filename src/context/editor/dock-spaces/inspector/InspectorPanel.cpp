@@ -4,17 +4,22 @@
 #include "../../../../util/UIUtil.h"
 #include "../../../../common/inspection/Inspectable.h"
 #include "../../../../context/ApplicationContext.h"
-#include "../../../../repository/world/impl/Entity.h"
-#include "../../../../repository/world/impl/AbstractComponent.h"
+#include "../../../../repository/world/impl/EntityComponent.h"
+#include "../../../../repository/world/components/VolumeComponent.h"
+#include "../../../../repository/world/components/LightComponent.h"
 #include "../../../../service/camera/Camera.h"
 
 namespace Metal {
+
     void InspectorPanel::onInitialize() {
         formPanel = new FormPanel();
         appendChild(formPanel);
-        repositories.push_back(&CTX.editorRepository);
-        repositories.push_back(&CTX.engineRepository);
-        repositories.push_back(&CTX.worldRepository.camera);
+        Inspectable* editorRepo = &CTX.editorRepository;
+        Inspectable* engineRepo = &CTX.engineRepository;
+        Inspectable* cameraRepo = &CTX.worldRepository.camera;
+        repositories.push_back(editorRepo);
+        repositories.push_back(engineRepo);
+        repositories.push_back(cameraRepo);
     }
 
     void InspectorPanel::onSync() {
@@ -65,12 +70,26 @@ namespace Metal {
             selectedId = editorRepository.mainSelection;
 
             if (selectedId != EMPTY_ENTITY) {
-                selectedEntity = CTX.worldRepository.getEntity(selectedId);
+                auto &repo = CTX.worldRepository;
+                const auto entity = static_cast<entt::entity>(selectedId);
+
+                selectedEntity = repo.getEntity(selectedId);
                 if (selectedEntity != nullptr) {
                     additionalInspection.push_back(selectedEntity);
-                    for (const auto &comp: CTX.worldRepository.getEntity(selectedId)->components) {
-                        additionalInspection.push_back(CTX.worldRepository.getComponent(comp, selectedId));
+
+                    if (repo.registry.all_of<MeshComponent>(entity)) {
+                        additionalInspection.push_back((Inspectable*)&repo.registry.get<MeshComponent>(entity));
                     }
+                    if (repo.registry.all_of<TransformComponent>(entity)) {
+                        additionalInspection.push_back((Inspectable*)&repo.registry.get<TransformComponent>(entity));
+                    }
+                    if (repo.registry.all_of<std::unique_ptr<LightComponent>>(entity)) {
+                        additionalInspection.push_back((Inspectable*)repo.registry.get<std::unique_ptr<LightComponent>>(entity).get());
+                    }
+                    if (repo.registry.all_of<VolumeComponent>(entity)) {
+                        additionalInspection.push_back((Inspectable*)&repo.registry.get<VolumeComponent>(entity));
+                    }
+
                     currentInspection = additionalInspection[0];
                 }
             } else {

@@ -1,17 +1,18 @@
 #include "VolumeService.h"
 #include "../../context/ApplicationContext.h"
+#include "../../repository/world/components/VolumeComponent.h"
 #include "../buffer/BufferInstance.h"
 
 namespace Metal {
     void VolumeService::registerVolumes() {
-        for (auto &entry: CTX.worldRepository.volumes) {
-            if (CTX.worldRepository.hiddenEntities.contains(entry.first)) {
+        auto view = CTX.worldRepository.registry.view<VolumeComponent, TransformComponent>();
+        for (auto [entity, l, t]: view.each()) {
+            const auto entityId = static_cast<EntityID>(entity);
+            if (CTX.worldRepository.hiddenEntities.contains(entityId)) {
                 continue;
             }
 
-            auto &t = CTX.worldRepository.transforms.at(entry.first);
             auto &translation = t.translation;
-            auto &l = entry.second;
 
             items.push_back(VolumeData(
                 glm::vec4(l.albedo, l.samples),

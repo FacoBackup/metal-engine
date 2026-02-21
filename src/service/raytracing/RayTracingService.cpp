@@ -24,7 +24,9 @@ namespace Metal {
 
         // Collect all mesh entities that have loaded mesh instances
         bool hasMeshes = false;
-        for (auto &[entityId, meshComp]: CTX.worldRepository.meshes) {
+        for (auto entity : CTX.worldRepository.registry.storage<entt::entity>()) {
+            if (!CTX.worldRepository.registry.all_of<MeshComponent>(entity)) continue;
+            auto &meshComp = CTX.worldRepository.registry.get<MeshComponent>(entity);
             if (meshComp.meshId.empty()) continue;
             auto *instance = CTX.streamingRepository.streamMesh(meshComp.meshId, LevelOfDetail::LOD_0);
             if (instance != nullptr && instance->dataBuffer != nullptr && instance->indexBuffer != nullptr) {
@@ -71,7 +73,9 @@ namespace Metal {
         std::vector<VkAccelerationStructureBuildRangeInfoKHR> buildRangeInfos;
         std::vector<uint32_t> maxPrimitiveCounts;
 
-        for (auto &[entityId, meshComp]: CTX.worldRepository.meshes) {
+        for (auto entity : CTX.worldRepository.registry.storage<entt::entity>()) {
+            if (!CTX.worldRepository.registry.all_of<MeshComponent>(entity)) continue;
+            auto &meshComp = CTX.worldRepository.registry.get<MeshComponent>(entity);
             if (meshComp.meshId.empty()) continue;
             auto *instance = CTX.streamingRepository.streamMesh(meshComp.meshId, LevelOfDetail::LOD_0);
             if (instance == nullptr || instance->dataBuffer == nullptr || instance->indexBuffer == nullptr) {
@@ -173,15 +177,17 @@ namespace Metal {
 
         // Create one TLAS instance per mesh entity with its transform
         std::vector<VkAccelerationStructureInstanceKHR> instances;
-        for (auto &[entityId, meshComp]: CTX.worldRepository.meshes) {
+        for (auto entity : CTX.worldRepository.registry.storage<entt::entity>()) {
+            if (!CTX.worldRepository.registry.all_of<MeshComponent>(entity)) continue;
+            auto &meshComp = CTX.worldRepository.registry.get<MeshComponent>(entity);
             if (meshComp.meshId.empty()) continue;
             auto *meshInstance = CTX.streamingRepository.streamMesh(meshComp.meshId, LevelOfDetail::LOD_0);
             if (meshInstance == nullptr || meshInstance->dataBuffer == nullptr) continue;
 
             // Get transform
             glm::mat4 model = glm::mat4(1.0f);
-            if (CTX.worldRepository.transforms.contains(entityId)) {
-                model = CTX.worldRepository.transforms[entityId].model;
+            if (CTX.worldRepository.registry.all_of<TransformComponent>(entity)) {
+                model = CTX.worldRepository.registry.get<TransformComponent>(entity).model;
             }
 
             // Convert glm::mat4 to VkTransformMatrixKHR (3x4 row-major)

@@ -28,9 +28,11 @@ namespace Metal {
                 }),
                 ShortcutDTO("Select All", ImGuiMod_Ctrl | ImGuiKey_A, [this]() {
                     std::vector<EntityID> entities;
-                    for (auto &entry: CTX.worldRepository.entities) {
-                        if (entry.first != WorldRepository::ROOT_ID) {
-                            entities.push_back(entry.first);
+                    auto& storage = CTX.worldRepository.registry.storage<entt::entity>();
+                    for (auto it = storage.begin(); it != storage.end(); ++it) {
+                        auto entity = *it;
+                        if (static_cast<EntityID>(entity) != WorldRepository::ROOT_ID && CTX.worldRepository.registry.all_of<EntityComponent>(entity)) {
+                            entities.push_back(static_cast<EntityID>(entity));
                         }
                     }
                     CTX.selectionService.addAllSelected(entities);

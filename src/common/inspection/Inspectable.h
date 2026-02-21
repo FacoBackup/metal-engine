@@ -18,18 +18,37 @@ namespace Metal
 namespace Metal {
     class Inspectable
     {
-        const std::string uniqueIdentifier = Util::uuidV4();
+        std::string uniqueIdentifier = Util::uuidV4();
         std::vector<std::shared_ptr<InspectableMember>> fields{};
         bool fieldsRegistered = false;
         unsigned long changes = 0;
         unsigned long frozenVersion = 99999;
+
+    public:
+        Inspectable& operator=(const Inspectable& other) {
+            if (this != &other) {
+                uniqueIdentifier = other.uniqueIdentifier;
+                fields = other.fields;
+                fieldsRegistered = other.fieldsRegistered;
+                changes = other.changes;
+                frozenVersion = other.frozenVersion;
+            }
+            return *this;
+        }
+
+        Inspectable(const Inspectable& other)
+            : uniqueIdentifier(other.uniqueIdentifier),
+              fields(other.fields),
+              fieldsRegistered(other.fieldsRegistered),
+              changes(other.changes),
+              frozenVersion(other.frozenVersion) {}
 
     protected:
         virtual void registerFields()
         {
         }
 
-        void registerFloat(float& v, std::string group, std::string name, float min = std::numeric_limits<float>::min(),
+        void registerFloat(float& v, std::string group, std::string name, float min = std::numeric_limits<float>::lowest(),
                            float max = std::numeric_limits<float>::max(),
                            bool disabled = false, float increment = .01);
 
@@ -48,22 +67,22 @@ namespace Metal {
 
         void registerVec2(glm::vec2& v,
                           std::string group, std::string name,
-                          float min = std::numeric_limits<float>::min(), float max = std::numeric_limits<float>::max(),
+                          float min = std::numeric_limits<float>::lowest(), float max = std::numeric_limits<float>::max(),
                           bool disabled = false, float increment = .01);
 
         void registerVec3(glm::vec3& v,
                           std::string group, std::string name,
-                          float min = std::numeric_limits<float>::min(), float max = std::numeric_limits<float>::max(),
+                          float min = std::numeric_limits<float>::lowest(), float max = std::numeric_limits<float>::max(),
                           bool disabled = false, float increment = .01);
 
         void registerVec4(glm::vec4& v,
                           std::string group, std::string name,
-                          float min = std::numeric_limits<float>::min(), float max = std::numeric_limits<float>::max(),
+                          float min = std::numeric_limits<float>::lowest(), float max = std::numeric_limits<float>::max(),
                           bool disabled = false, float increment = .01);
 
         void registerQuat(glm::quat& v,
                           std::string group, std::string name,
-                          float min = std::numeric_limits<float>::min(), float max = std::numeric_limits<float>::max(),
+                          float min = std::numeric_limits<float>::lowest(), float max = std::numeric_limits<float>::max(),
                           bool disabled = false, float increment = .01);
 
         void registerColor(glm::vec3& v,

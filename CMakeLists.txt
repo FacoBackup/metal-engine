@@ -164,7 +164,7 @@ add_executable(
         src/service/camera/Camera.cpp
         src/repository/world/WorldRepository.cpp
         src/repository/world/WorldRepository.h
-        src/repository/world/impl/Entity.h
+        src/repository/world/impl/EntityComponent.h
         src/enum/ComponentType.h
         src/repository/world/impl/AbstractComponent.h
         src/repository/world/components/MeshComponent.h
@@ -174,7 +174,7 @@ add_executable(
         src/context/editor/dock-spaces/hierarchy/HierarchyHeaderPanel.h
         src/service/selection/SelectionService.cpp
         src/service/selection/SelectionService.h
-        src/repository/world/impl/Entity.cpp
+        src/repository/world/impl/EntityComponent.cpp
         src/repository/world/components/TransformComponent.cpp
         src/repository/world/components/MeshComponent.cpp
         src/context/editor/abstract/form/types/ResourceField.cpp

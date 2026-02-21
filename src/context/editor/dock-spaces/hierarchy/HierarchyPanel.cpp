@@ -4,7 +4,7 @@
 #include "../../../../common/interface/Icons.h"
 #include "../../../../util/UIUtil.h"
 #include "../../../../context/ApplicationContext.h"
-#include "../../../../repository/world/impl/Entity.h"
+#include "../../../../repository/world/impl/EntityComponent.h"
 #include "../../../../enum/ComponentType.h"
 
 namespace Metal {
@@ -14,23 +14,25 @@ namespace Metal {
         editorRepository = &CTX.editorRepository;
 
         shortcuts = {
-                ShortcutDTO("Delete", ImGuiKey_Delete, [this]() {
-                    std::vector<EntityID> entities;
-                    for (auto &entry: CTX.editorRepository.selected) {
-                        entities.push_back(entry.first);
+            ShortcutDTO("Delete", ImGuiKey_Delete, [this]() {
+                std::vector<EntityID> entities;
+                for (auto &entry: CTX.editorRepository.selected) {
+                    entities.push_back(entry.first);
+                }
+                CTX.worldRepository.deleteEntities(entities);
+                CTX.selectionService.clearSelection();
+            }),
+            ShortcutDTO("Select All", ImGuiMod_Ctrl | ImGuiKey_A, [this]() {
+                std::vector<EntityID> entities;
+                auto& storage = world->registry.storage<entt::entity>();
+                for (auto it = storage.begin(); it != storage.end(); ++it) {
+                    auto entity = *it;
+                    if (static_cast<EntityID>(entity) != WorldRepository::ROOT_ID && world->registry.all_of<EntityComponent>(entity)) {
+                        entities.push_back(static_cast<EntityID>(entity));
                     }
-                    CTX.worldRepository.deleteEntities(entities);
-                    CTX.selectionService.clearSelection();
-                }),
-                ShortcutDTO("Select All", ImGuiMod_Ctrl | ImGuiKey_A, [this]() {
-                    std::vector<EntityID> entities;
-                    for (auto &entry: world->entities) {
-                        if (entry.first != WorldRepository::ROOT_ID) {
-                            entities.push_back(entry.first);
-                        }
-                    }
-                    CTX.selectionService.addAllSelected(entities);
-                })
+                }
+                CTX.selectionService.addAllSelected(entities);
+            })
         };
     }
 
@@ -74,107 +76,115 @@ namespace Metal {
     }
 
     bool HierarchyPanel::renderNode(const EntityID entityId) {
-        Entity *node = world->getEntity(entityId);
+        EntityComponent *node = world->getEntity(entityId);
         if (node == nullptr || (isOnSearch &&
-                                searchMatch.contains(node->getId()) &&
-                                searchMatchWith.contains(node->getId()) &&
-                                strcmp(searchMatchWith[node->getId()].c_str(), headerPanel->search) == 0)) {
+                                searchMatch.contains(entityId) &&
+                                searchMatchWith.contains(entityId) &&
+                                strcmp(searchMatchWith[entityId].c_str(), headerPanel->search) == 0)) {
             return false;
         }
 
-        const bool isSearchMatch = matchSearch(node);
+        const bool isSearchMatch = matchSearch(entityId);
         ImGui::TableNextRow();
         if (editorRepository->selected.contains(entityId)) {
             ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, editorRepository->accentU32);
             ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, editorRepository->accentU32);
         }
         ImGui::TableNextColumn();
-        const int flags = getFlags(node);
+        const int flags = getFlags(entityId);
         bool open;
 
         if (world->culled.contains(entityId) || world->hiddenEntities.contains(entityId)) {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(node->color.x, node->color.y, node->color.z, .5));
-            open = isOpen(node, flags);
+            open = isOpen(entityId, flags);
             ImGui::PopStyleColor();
         } else {
             rowColor.x = node->color.x;
             rowColor.y = node->color.y;
             rowColor.z = node->color.z;
             ImGui::PushStyleColor(ImGuiCol_Text, rowColor);
-            open = isOpen(node, flags);
+            open = isOpen(entityId, flags);
             ImGui::PopStyleColor();
         }
 
-        if (node->getId() != WorldRepository::ROOT_ID) {
-            handleDragDrop(node);
-            renderEntityColumns(node, false);
+        if (entityId != WorldRepository::ROOT_ID) {
+            handleDragDrop(entityId);
+            renderEntityColumns(entityId, false);
         }
 
         if (open) {
-            opened.insert({node->getId(), ImGuiTreeNodeFlags_DefaultOpen});
-            renderEntityChildren(node);
+            opened.insert({entityId, ImGuiTreeNodeFlags_DefaultOpen});
+            renderEntityChildren(entityId);
         } else {
-            opened.insert({node->getId(), ImGuiTreeNodeFlags_None});
+            opened.insert({entityId, ImGuiTreeNodeFlags_None});
         }
 
         return isSearchMatch;
     }
 
-    bool HierarchyPanel::isOpen(Entity *node, const int flags) const {
-        return ImGui::TreeNodeEx(getNodeLabel(node, true).c_str(), flags);
+    bool HierarchyPanel::isOpen(const EntityID entityId, const int flags) const {
+        return ImGui::TreeNodeEx(getNodeLabel(entityId, true).c_str(), flags);
     }
 
-    const char *HierarchyPanel::GetIcon(const Metal::Entity *node) {
-        for (const auto comp: node->components) {
-            if (comp == ComponentTypes::MESH) {
-                return ComponentTypes::IconOf(ComponentTypes::MESH);
-            }
-            if (comp == ComponentTypes::SPHERE_LIGHT) {
-                return ComponentTypes::IconOf(ComponentTypes::SPHERE_LIGHT);
-            }
-            if (comp == ComponentTypes::VOLUME) {
-                return ComponentTypes::IconOf(ComponentTypes::VOLUME);
-            }
+    const char *HierarchyPanel::GetIcon(const EntityID entityId) const {
+        const auto entity = static_cast<entt::entity>(entityId);
+        if (world->registry.all_of<MeshComponent>(entity)) {
+            return ComponentTypes::IconOf(ComponentTypes::MESH);
+        }
+        if (world->registry.all_of<std::unique_ptr<LightComponent>>(entity)) {
+            return ComponentTypes::IconOf(ComponentTypes::SPHERE_LIGHT);
+        }
+        if (world->registry.all_of<VolumeComponent>(entity)) {
+            return ComponentTypes::IconOf(ComponentTypes::VOLUME);
         }
         return Icons::inventory_2.c_str();
     }
 
-    std::string HierarchyPanel::getNodeLabel(Entity *node, const bool addId) const {
+    std::string HierarchyPanel::getNodeLabel(const EntityID entityId, const bool addId) const {
+        const auto node = world->getEntity(entityId);
         return std::format("{}{}##{}{}",
-                           GetIcon(node),
+                           GetIcon(entityId),
                            node->name,
-                           node->getId(),
+                           entityId,
                            addId ? id : "");
     }
 
-    bool HierarchyPanel::matchSearch(const Entity *node) {
+    bool HierarchyPanel::matchSearch(const EntityID entityId) {
         bool isSearchMatch = false;
+        const auto node = world->getEntity(entityId);
         if (isOnSearch) {
             isSearchMatch = node->name.find(headerPanel->search) != std::string::npos;
             if (isSearchMatch) {
-                searchMatch.insert({node->getId(), true});
+                searchMatch.insert({entityId, true});
             } else {
-                searchMatch.erase(node->getId());
+                searchMatch.erase(entityId);
             }
-            searchMatchWith.insert({node->getId(), headerPanel->search});
+            searchMatchWith.insert({entityId, headerPanel->search});
         } else {
-            searchMatch.erase(node->getId());
-            searchMatchWith.erase(node->getId());
+            searchMatch.erase(entityId);
+            searchMatchWith.erase(entityId);
         }
         return isSearchMatch;
     }
 
-    void HierarchyPanel::renderEntityChildren(const Entity *node) {
+    void HierarchyPanel::renderEntityChildren(const EntityID entityId) {
+        const auto entity = static_cast<entt::entity>(entityId);
+        if (!world->registry.all_of<HierarchyComponent>(entity)) {
+            ImGui::TreePop();
+            return;
+        }
+
+        const auto &hierarchy = world->registry.get<HierarchyComponent>(entity);
         if (isOnSearch) {
-            for (const auto child: node->children) {
-                if (searchMatch.contains(node->getId()) || renderNode(child)) {
-                    searchMatch.insert({node->getId(), true});
+            for (const auto child: hierarchy.children) {
+                if (searchMatch.contains(entityId) || renderNode(child)) {
+                    searchMatch.insert({entityId, true});
                 } else {
-                    searchMatch.erase(node->getId());
+                    searchMatch.erase(entityId);
                 }
             }
         } else {
-            for (const auto child: node->children) {
+            for (const auto child: hierarchy.children) {
                 renderNode(child);
             }
         }
@@ -182,57 +192,58 @@ namespace Metal {
         ImGui::TreePop();
     }
 
-    int HierarchyPanel::getFlags(const Entity *node) {
+    int HierarchyPanel::getFlags(const EntityID entityId) {
         int flags = ImGuiTreeNodeFlags_SpanFullWidth;
         if (isOnSearch) {
             flags |= ImGuiTreeNodeFlags_DefaultOpen;
         }
 
-        if (opened.contains(node->getId())) {
-            flags |= opened[node->getId()];
+        if (opened.contains(entityId)) {
+            flags |= opened[entityId];
         }
         return flags;
     }
 
-    void HierarchyPanel::renderEntityColumns(const Entity *node, const bool isPinned) const {
-        const auto idString = std::to_string(node->getId());
-        handleClick(node);
+    void HierarchyPanel::renderEntityColumns(const EntityID entityId, const bool isPinned) const {
+        const auto idString = std::to_string(entityId);
+        handleClick(entityId);
         ImGui::TableNextColumn();
 
         ImGui::PushStyleColor(ImGuiCol_Button, TRANSPARENT);
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, PADDING);
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0);
 
-        bool isVisible = !world->hiddenEntities.contains(node->getId());
+        bool isVisible = !world->hiddenEntities.contains(entityId);
         if (UIUtil::ButtonSimple(
             (isVisible ? Icons::visibility : Icons::visibility_off) + (isPinned ? "##vpinned" : "##v") + idString +
             id, 20, 15)) {
-            CTX.worldRepository.changeVisibility(node->getId(), !isVisible);
+            CTX.worldRepository.changeVisibility(entityId, !isVisible);
         }
         ImGui::PopStyleColor();
         ImGui::PopStyleVar(2);
     }
 
-    void HierarchyPanel::handleClick(const Entity *node) const {
+    void HierarchyPanel::handleClick(const EntityID entityId) const {
         if (ImGui::IsItemClicked()) {
             if (const bool isMultiSelect = ImGui::IsKeyDown(ImGuiKey_LeftCtrl); !isMultiSelect) {
                 CTX.selectionService.clearSelection();
             }
-            CTX.selectionService.addSelected(node->getId());
+            CTX.selectionService.addSelected(entityId);
         }
     }
 
-    void HierarchyPanel::handleDragDrop(Entity *node) {
+    void HierarchyPanel::handleDragDrop(const EntityID entityId) {
+        const auto node = world->getEntity(entityId);
         if (ImGui::BeginDragDropSource()) {
             ImGui::SetDragDropPayload(id.c_str(), id.c_str(), sizeof(id.c_str()));
-            onDrag = node;
+            onDrag = entityId;
             ImGui::Text("Dragging Node %s", node->getTitle());
             ImGui::EndDragDropSource();
         }
 
         if (ImGui::BeginDragDropTarget()) {
             if (strcmp(static_cast<const char *>(ImGui::AcceptDragDropPayload(id.c_str())->Data), id.c_str())) {
-                world->linkEntities(node, onDrag);
+                world->linkEntities(entityId, onDrag);
             }
             ImGui::EndDragDropTarget();
         }

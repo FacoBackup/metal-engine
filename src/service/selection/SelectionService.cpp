@@ -39,18 +39,16 @@ namespace Metal {
 
     void SelectionService::updatePrimitiveSelected() const {
         auto &editorRepository = CTX.editorRepository;
-        Entity *entity = CTX.worldRepository.getEntity(editorRepository.mainSelection);
-        if (entity == nullptr) {
+        auto &repo = CTX.worldRepository;
+        const auto entityId = editorRepository.mainSelection;
+        const auto entity = static_cast<entt::entity>(entityId);
+
+        if (entityId == EMPTY_ENTITY || !repo.registry.valid(entity)) {
             return;
         }
-        auto &comp = entity->components;
-        for (auto a: comp) {
-            if (a == ComponentTypes::TRANSFORM) {
-                editorRepository.primitiveSelected = dynamic_cast<TransformComponent *>(CTX.
-                    worldRepository.
-                    getComponent(ComponentTypes::TRANSFORM, editorRepository.mainSelection));
-                break;
-            }
+
+        if (repo.registry.all_of<TransformComponent>(entity)) {
+            editorRepository.primitiveSelected = &repo.registry.get<TransformComponent>(entity);
         }
     }
 

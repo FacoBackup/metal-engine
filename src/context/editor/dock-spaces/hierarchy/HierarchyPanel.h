@@ -11,7 +11,8 @@ namespace Metal {
     struct EditorRepository;
     struct WorldRepository;
     struct AbstractComponent;
-    class Entity;
+    struct EntityComponent;
+    struct HierarchyComponent;
     class HierarchyHeaderPanel;
 
     class HierarchyPanel final : public AbstractDockPanel {
@@ -21,7 +22,7 @@ namespace Metal {
                                             | ImGuiTableFlags_NoBordersInBody;
         HierarchyHeaderPanel *headerPanel = nullptr;
         ImVec4 rowColor = ImVec4(0, 0, 0, 1);
-        Entity *onDrag = nullptr;
+        EntityID onDrag = EMPTY_ENTITY;
         bool isOnSearch = false;
         std::unordered_map<EntityID, std::string> searchMatchWith{};
         std::unordered_map<EntityID, bool> searchMatch{};
@@ -39,23 +40,23 @@ namespace Metal {
 
         bool renderNode(EntityID entityId);
 
-        bool isOpen(Entity *node, int flags) const;
+        bool isOpen(EntityID entityId, int flags) const;
 
-        static const char *GetIcon(const Metal::Entity *node);
+        const char *GetIcon(EntityID entityId) const;
 
-        std::string getNodeLabel(Entity *node, bool addId) const;
+        std::string getNodeLabel(EntityID entityId, bool addId) const;
 
-        bool matchSearch(const Entity *node);
+        bool matchSearch(EntityID entityId);
 
-        void renderEntityChildren(const Entity *node);
+        void renderEntityChildren(EntityID entityId);
 
-        int getFlags(const Entity *node);
+        int getFlags(EntityID entityId);
 
-        void renderEntityColumns(const Entity *node, bool isPinned) const;
+        void renderEntityColumns(EntityID entityId, bool isPinned) const;
 
-        void handleClick(const Entity *node) const;
+        void handleClick(EntityID entityId) const;
 
-        void handleDragDrop(Entity *node);
+        void handleDragDrop(EntityID entityId);
     };
 } // Metal
 
