@@ -191,8 +191,8 @@ add_executable(
         src/context/editor/abstract/form/types/StringField.h
         src/context/editor/abstract/form/types/ResourceFilesPanel.h
         src/context/editor/abstract/form/types/ResourceFilesPanel.cpp
-        src/repository/streaming/StreamingRepository.cpp
-        src/repository/streaming/StreamingRepository.h
+        src/repository/streaming/StreamingService.cpp
+        src/repository/streaming/StreamingService.h
         src/enum/ResourceType.h
         src/context/editor/dock-spaces/viewport/GizmoPanel.cpp
         src/context/editor/dock-spaces/viewport/GizmoPanel.h

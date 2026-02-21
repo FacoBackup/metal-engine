@@ -4,10 +4,12 @@
 
 namespace Metal {
     void AbstractResourceService::registerResource(RuntimeResource *resource) {
+        std::lock_guard<std::mutex> lock(resourceMutex);
         resources[resource->getId()] = resource;
     }
 
     void AbstractResourceService::disposeAll() {
+        std::lock_guard<std::mutex> lock(resourceMutex);
         for (auto it = resources.begin(); it != resources.end();) {
             auto *r = it->second;
             r->dispose();

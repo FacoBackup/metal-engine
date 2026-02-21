@@ -7,6 +7,7 @@
 #include "../../context/vulkan/VulkanContext.h"
 #include "../../util/FilesUtil.h"
 #include "../../util/serialization-definitions.h"
+#include <cereal/archives/binary.hpp>
 
 #include <fstream>
 
@@ -48,7 +49,9 @@ namespace Metal {
         auto pathToFile = CTX.getAssetDirectory() + FORMAT_FILE_MESH(id, levelOfDetail);
         if (std::filesystem::exists(pathToFile)) {
             auto *data = new MeshData;
-            PARSE_TEMPLATE(*data, pathToFile)
+            std::ifstream input(pathToFile, std::ios::binary);
+            cereal::BinaryInputArchive archive(input);
+            archive(*data);
             return data;
         }
         return nullptr;

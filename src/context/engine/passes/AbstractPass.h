@@ -7,7 +7,7 @@
 namespace Metal {
     struct WorldRepository;
     struct MeshInstance;
-    class StreamingRepository;
+    class StreamingService;
     struct CoreFrameBuffers;
     struct PipelineInstance;
     struct CoreBuffers;
@@ -18,7 +18,7 @@ namespace Metal {
     public:
         VkCommandBuffer vkCommandBuffer = VK_NULL_HANDLE;
         WorldRepository &worldRepository;
-        StreamingRepository &streamingRepository;
+        StreamingService &streamingRepository;
         PipelineInstance *pipelineInstance = nullptr;
 
         explicit AbstractPass(bool isComputePass);

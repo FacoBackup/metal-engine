@@ -19,13 +19,13 @@ namespace Metal {
     struct TextureInstance;
     struct MaterialInstance;
 
-    class StreamingRepository final : public AbstractRuntimeComponent {
+    class StreamingService final : public AbstractRuntimeComponent {
         std::unordered_map<std::string, unsigned int> tries{};
         std::unordered_map<std::string, long long> lastUse{};
         TimePoint sinceLastCleanup;
 
     public:
-        explicit StreamingRepository()
+        explicit StreamingService()
             : AbstractRuntimeComponent() {
         }
 

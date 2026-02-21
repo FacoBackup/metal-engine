@@ -7,7 +7,7 @@
 namespace Metal {
     struct WorldRepository;
     struct MeshInstance;
-    class StreamingRepository;
+    class StreamingService;
     struct CoreFrameBuffers;
     struct PipelineInstance;
     struct CoreBuffers;

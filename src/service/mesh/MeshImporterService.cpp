@@ -6,6 +6,7 @@
 #include "../../enum/LevelOfDetail.h"
 #include "../../util/FilesUtil.h"
 #include "../../context/ApplicationContext.h"
+#include <cereal/archives/binary.hpp>
 #include <meshoptimizer.h>
 #include "../../util/serialization-definitions.h"
 
@@ -19,7 +20,11 @@ namespace Metal {
         }
 
         std::string lod0Path = CTX.getAssetDirectory() + FORMAT_FILE_MESH(metadata.getId(), LevelOfDetail::LOD_0);
-        DUMP_TEMPLATE(lod0Path, mesh)
+        {
+            std::ofstream output(lod0Path, std::ios::binary);
+            cereal::BinaryOutputArchive archive(output);
+            archive(mesh);
+        }
         metadata.size += fs::file_size(lod0Path);
 
         metadata.size += simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_1);
@@ -114,7 +119,11 @@ namespace Metal {
         simplifiedMesh.indices = std::move(simplifiedIndices);
 
         std::string lodPath = CTX.getAssetDirectory() + FORMAT_FILE_MESH(fileId, levelOfDetail);
-        DUMP_TEMPLATE(lodPath, simplifiedMesh)
+        {
+            std::ofstream output(lodPath, std::ios::binary);
+            cereal::BinaryOutputArchive archive(output);
+            archive(simplifiedMesh);
+        }
         return fs::file_size(lodPath);
     }
 }

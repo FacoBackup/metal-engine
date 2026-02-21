@@ -55,6 +55,18 @@ namespace Metal {
         return vulkanContext.imguiVulkanWindow.FrameIndex;
     }
 
+    void ApplicationContext::dispose() {
+        NFD_Quit();
+        try {
+            asyncTaskService.endAll();
+            guiContext.dispose();
+            vulkanContext.dispose();
+            glfwContext.dispose();
+        } catch (std::exception &e) {
+            std::cerr << e.what() << std::endl;
+        }
+    }
+
     void ApplicationContext::start() {
         NFD_Init();
 
@@ -106,15 +118,7 @@ namespace Metal {
                     glfwContext.presentFrame();
             }
         }
-        NFD_Quit();
-        try {
-            asyncTaskService.endAll();
-            guiContext.dispose();
-            vulkanContext.dispose();
-            glfwContext.dispose();
-        } catch (std::exception &e) {
-            std::cerr << e.what() << std::endl;
-        }
+        dispose();
     }
 
     void ApplicationContext::save() {
