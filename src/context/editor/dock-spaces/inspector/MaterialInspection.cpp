@@ -1,7 +1,5 @@
 #include "MaterialInspection.h"
 
-#include <cereal/archives/binary.hpp>
-
 #include "../../../ApplicationContext.h"
 #include "../../../../util/UIUtil.h"
 #include "../../../../util/serialization-definitions.h"

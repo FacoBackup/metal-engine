@@ -2,22 +2,21 @@
 #define PLANELIGHTCOMPONENT_H
 
 #include "LightComponent.h"
-
-#include <cereal/types/polymorphic.hpp>
+#include "../../../util/Serializable.h"
 
 namespace Metal {
     struct PlaneLightComponent final : LightComponent {
         LightTypes::LightType getLightType() override { return LightTypes::PLANE; }
 
-        SERIALIZE_TEMPLATE(entityId, color.x, color.y, color.z, intensity)
+        nlohmann::json toJson() const override {
+            nlohmann::json j = LightComponent::toJson();
+            j["lightType"] = "PLANE";
+            return j;
+        }
+
+        void fromJson(const nlohmann::json &j) override {
+            LightComponent::fromJson(j);
+        }
     };
 } // Metal
-
-CEREAL_REGISTER_TYPE(Metal::PlaneLightComponent)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(Metal::LightComponent, Metal::PlaneLightComponent)
-
-#include <cereal/archives/binary.hpp>
-#include <cereal/archives/xml.hpp>
-#include <cereal/archives/json.hpp>
-
 #endif //PLANELIGHTCOMPONENT_H

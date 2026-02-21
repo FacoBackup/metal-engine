@@ -5,8 +5,8 @@
 
 #include "../../context/vulkan/VulkanContext.h"
 #include "../../util/FilesUtil.h"
+#include "../../util/serialization-definitions.h"
 
-#include <cereal/archives/binary.hpp>
 #include <fstream>
 
 #include "MaterialInstance.h"
@@ -95,8 +95,8 @@ namespace Metal {
     MaterialFileData *MaterialService::stream(const std::string &id) const {
         auto pathToFile = CTX.getAssetDirectory() + FORMAT_FILE_MATERIAL(id);
         if (std::filesystem::exists(pathToFile)) {
-            MaterialFileData *data = new MaterialFileData;
-            PARSE_TEMPLATE(data->load, pathToFile);
+            auto *data = new MaterialFileData;
+            PARSE_TEMPLATE(*data, pathToFile);
             return data;
         }
         return nullptr;

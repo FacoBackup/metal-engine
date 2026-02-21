@@ -7,8 +7,7 @@
 #include "../../util/FilesUtil.h"
 #include "../../context/ApplicationContext.h"
 #include <meshoptimizer.h>
-
-#include <cereal/archives/binary.hpp>
+#include "../../util/serialization-definitions.h"
 
 namespace Metal {
     std::string MeshImporterService::persistMesh(const std::string &targetDir, const MeshData &mesh) const {

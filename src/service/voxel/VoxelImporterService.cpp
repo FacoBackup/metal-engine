@@ -1,8 +1,7 @@
 #include "VoxelImporterService.h"
 
 #include <filesystem>
-
-#include <cereal/archives/binary.hpp>
+#include "../../util/serialization-definitions.h"
 
 #include "../../context/ApplicationContext.h"
 #include "../../dto/file/EntryMetadata.h"

@@ -13,10 +13,6 @@ namespace Metal {
 
     class FilesPanel : public AbstractDockPanel {
     protected:
-        static constexpr int CARD_SIZE = 90;
-        static constexpr int TEXT_OFFSET = 28;
-        static constexpr ImVec2 TEXTURE_SIZE{CARD_SIZE - 15, CARD_SIZE - TEXT_OFFSET - 4};
-
         FilesContext filesContext{nullptr};
         bool isSomethingHovered = false;
         FileEntry *onDrag = nullptr;

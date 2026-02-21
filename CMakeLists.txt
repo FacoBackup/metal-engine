@@ -294,6 +294,7 @@ add_executable(
         src/service/voxel/VoxelService.cpp
         src/service/voxel/VoxelService.h
         src/service/framebuffer/FrameBufferInstance.cpp
+        src/util/Serializable.cpp
 )
 
 

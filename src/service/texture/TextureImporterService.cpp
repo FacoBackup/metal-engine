@@ -4,7 +4,7 @@
 #include "../../../dependencies/stb/stb_image_write.h"
 #include <assimp/texture.h>
 #include <filesystem>
-#include <cereal/archives/binary.hpp>
+#include "../../util/serialization-definitions.h"
 
 #include "../../dto/file/EntryMetadata.h"
 #include "../../enum/EntryType.h"

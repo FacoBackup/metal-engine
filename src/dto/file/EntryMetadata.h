@@ -4,10 +4,10 @@
 #include <string>
 #include "../../util/Util.h"
 #include "../../enum/EntryType.h"
-#include  "../../util/serialization-definitions.h"
+#include "../../util/Serializable.h"
 
 namespace Metal {
-    struct EntryMetadata {
+    struct EntryMetadata : Serializable {
     protected:
         std::string id = Util::uuidV4();
 
@@ -19,7 +19,19 @@ namespace Metal {
             return id;
         }
 
-        SAVE_TEMPLATE(name, id, type)
+        nlohmann::json toJson() const override {
+            nlohmann::json j;
+            j["name"] = name;
+            j["id"] = id;
+            j["type"] = (int)type;
+            return j;
+        }
+
+        void fromJson(const nlohmann::json& j) override {
+            name = j.at("name").get<std::string>();
+            id = j.at("id").get<std::string>();
+            type = (EntryType::EntryType)j.at("type").get<int>();
+        }
     };
 }
 #endif //FILEMETADATA_H

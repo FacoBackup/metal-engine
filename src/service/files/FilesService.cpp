@@ -10,7 +10,7 @@
 #include <format>
 #include <fstream>
 #include <iostream>
-#include <cereal/archives/binary.hpp>
+#include "../../util/serialization-definitions.h"
 
 #include "../../enum/LevelOfDetail.h"
 
@@ -62,7 +62,7 @@ namespace Metal {
                         absolute(entry.path()).string(),
                         dateStr,
                         fileSize);
-                    PARSE_TEMPLATE(child->load, child->absolutePath.c_str())
+                    PARSE_TEMPLATE(*child, child->absolutePath.c_str())
                     return child;
                 }
             }
@@ -164,7 +164,7 @@ namespace Metal {
                         fs::absolute(entry.path()).string(),
                         dateStr,
                         fileSize));
-                    PARSE_TEMPLATE(child->load, child->absolutePath.c_str())
+                    PARSE_TEMPLATE(*child, child->absolutePath.c_str())
                 }
             } else {
                 auto &child = root->children.emplace_back(new FileEntry(

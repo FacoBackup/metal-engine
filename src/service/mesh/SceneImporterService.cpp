@@ -12,7 +12,7 @@
 #include "../../dto/file/EntryMetadata.h"
 #include "../../enum/engine-definitions.h"
 #include "../../context/ApplicationContext.h"
-#include <cereal/archives/binary.hpp>
+#include "../../util/serialization-definitions.h"
 
 namespace Metal {
     std::string SceneImporterService::importData(const std::string &targetDir, const std::string &pathToFile,

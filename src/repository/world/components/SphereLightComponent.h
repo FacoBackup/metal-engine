@@ -3,8 +3,6 @@
 
 #include "LightComponent.h"
 
-#include <cereal/types/polymorphic.hpp>
-
 namespace Metal {
     struct SphereLightComponent final : LightComponent {
         float radiusSize = 1;
@@ -13,15 +11,18 @@ namespace Metal {
 
         void registerFields() override;
 
-        SERIALIZE_TEMPLATE(entityId, color.x, color.y, color.z, intensity, radiusSize)
+        nlohmann::json toJson() const override {
+            nlohmann::json j = LightComponent::toJson();
+            j["radiusSize"] = radiusSize;
+            j["lightType"] = "SPHERE";
+            return j;
+        }
+
+        void fromJson(const nlohmann::json& j) override {
+            LightComponent::fromJson(j);
+            radiusSize = j.at("radiusSize").get<float>();
+        }
     };
 } // Metal
-
-CEREAL_REGISTER_TYPE(Metal::SphereLightComponent)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(Metal::LightComponent, Metal::SphereLightComponent)
-
-#include <cereal/archives/binary.hpp>
-#include <cereal/archives/xml.hpp>
-#include <cereal/archives/json.hpp>
 
 #endif //SPHERELIGHTCOMPONENT_H

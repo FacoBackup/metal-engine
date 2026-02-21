@@ -7,8 +7,7 @@
 #include <assimp/material.h>
 
 #include <filesystem>
-
-#include <cereal/archives/binary.hpp>
+#include "../../util/serialization-definitions.h"
 
 namespace Metal {
     void MaterialImporterService::persistAllMaterials(const std::string &targetDir, const aiScene *scene,
