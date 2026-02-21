@@ -49,6 +49,8 @@ namespace Metal {
 
         void initializeView();
 
+        void handleShortcut() const;
+
         void onSync() override;
 
         [[nodiscard]] AbstractDockPanel *getView() const;

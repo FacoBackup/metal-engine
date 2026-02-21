@@ -48,6 +48,26 @@ namespace Metal {
         padding.y = static_cast<float>(selectedSpace->paddingY);
     }
 
+    void DockSpacePanel::handleShortcut() const {
+        if (view != nullptr) {
+            const bool isHovered = ImGui::IsWindowFocused(ImGuiHoveredFlags_RootAndChildWindows);
+            if (isHovered) {
+                CTX.editorRepository.focusedShortcuts = view->getShortcuts();
+                CTX.editorRepository.focusedWindowName = view->dock->name;
+            }
+
+            view->isWindowFocused = isHovered;
+            if (view->isWindowFocused) {
+                for (const auto &shortcut: CTX.editorRepository.focusedShortcuts) {
+                    if (ImGui::IsKeyChordPressed(shortcut.keyChord)) {
+                        LOG_INFO("Action called: " + shortcut.name);
+                        shortcut.callback();
+                    }
+                }
+            }
+        }
+    }
+
     void DockSpacePanel::onSync() {
         if (view == nullptr) {
             initializeView();
@@ -65,23 +85,7 @@ namespace Metal {
         }
         beforeWindow();
         if (ImGui::Begin(dock->internalId.c_str(), &UIUtil::OPEN, FLAGS)) {
-            if (view != nullptr) {
-                const bool isHovered = ImGui::IsWindowFocused(ImGuiHoveredFlags_RootAndChildWindows);
-                if (isHovered) {
-                    CTX.editorRepository.focusedShortcuts = view->getShortcuts();
-                    CTX.editorRepository.focusedWindowName = view->dock->name;
-                }
-
-                view->isWindowFocused = isHovered;
-                if (view->isWindowFocused) {
-                    for (const auto &shortcut: CTX.editorRepository.focusedShortcuts) {
-                        if (ImGui::IsKeyChordPressed(shortcut.keyChord)) {
-                            LOG_INFO("Action called: " + shortcut.name);
-                            shortcut.callback();
-                        }
-                    }
-                }
-            }
+            handleShortcut();
             sizeInternal = ImGui::GetWindowSize();
             size.x = sizeInternal.x;
             size.y = sizeInternal.y;
