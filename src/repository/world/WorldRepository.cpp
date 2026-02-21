@@ -111,12 +111,14 @@ namespace Metal {
         deleteRecursively(entities);
         CTX.engineContext.setUpdateLights(true);
         CTX.engineContext.setUpdateVolumes(true);
+        CTX.rayTracingService.markDirty();
     }
 
     void WorldRepository::changeVisibility(EntityID entity, bool isVisible) {
         changeVisibilityRecursively(entity, isVisible);
         CTX.engineContext.setUpdateLights(true);
         CTX.engineContext.setUpdateVolumes(true);
+        CTX.rayTracingService.markDirty();
     }
 
     void WorldRepository::changeVisibilityRecursively(EntityID entity, const bool isVisible) {
@@ -144,6 +146,7 @@ namespace Metal {
                 auto &mesh = registry.emplace_or_replace<MeshComponent>(entity);
                 mesh.setEntityId(entityId);
                 createComponent(entityId, ComponentTypes::TRANSFORM);
+                CTX.rayTracingService.markDirty();
                 break;
             }
             case ComponentTypes::SPHERE_LIGHT: {

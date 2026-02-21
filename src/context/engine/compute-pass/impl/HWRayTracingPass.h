@@ -7,10 +7,6 @@ namespace Metal {
         bool isFirstRun = true;
 
     public:
-        explicit HWRayTracingPass()
-            : AbstractComputePass() {
-        }
-
         bool shouldRun() override;
 
         void onSync() override;

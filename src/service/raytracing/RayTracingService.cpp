@@ -21,11 +21,12 @@ namespace Metal {
         if (!needsRebuild) {
             return;
         }
-
+        
         // Collect all mesh entities that have loaded mesh instances
         bool hasMeshes = false;
         for (auto entity : CTX.worldRepository.registry.storage<entt::entity>()) {
             if (!CTX.worldRepository.registry.all_of<MeshComponent>(entity)) continue;
+            if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
             auto &meshComp = CTX.worldRepository.registry.get<MeshComponent>(entity);
             if (meshComp.meshId.empty()) continue;
             auto *instance = CTX.streamingRepository.streamMesh(meshComp.meshId, LevelOfDetail::LOD_0);
@@ -75,6 +76,7 @@ namespace Metal {
 
         for (auto entity : CTX.worldRepository.registry.storage<entt::entity>()) {
             if (!CTX.worldRepository.registry.all_of<MeshComponent>(entity)) continue;
+            if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
             auto &meshComp = CTX.worldRepository.registry.get<MeshComponent>(entity);
             if (meshComp.meshId.empty()) continue;
             auto *instance = CTX.streamingRepository.streamMesh(meshComp.meshId, LevelOfDetail::LOD_0);
@@ -179,6 +181,7 @@ namespace Metal {
         std::vector<VkAccelerationStructureInstanceKHR> instances;
         for (auto entity : CTX.worldRepository.registry.storage<entt::entity>()) {
             if (!CTX.worldRepository.registry.all_of<MeshComponent>(entity)) continue;
+            if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
             auto &meshComp = CTX.worldRepository.registry.get<MeshComponent>(entity);
             if (meshComp.meshId.empty()) continue;
             auto *meshInstance = CTX.streamingRepository.streamMesh(meshComp.meshId, LevelOfDetail::LOD_0);

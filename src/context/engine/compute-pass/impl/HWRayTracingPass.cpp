@@ -7,8 +7,6 @@
 
 namespace Metal {
     bool HWRayTracingPass::shouldRun() {
-        CTX.rayTracingService.onSync();
-
         if (!CTX.rayTracingService.isReady()) {
             return false;
         }

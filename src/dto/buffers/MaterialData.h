@@ -9,11 +9,18 @@ namespace Metal {
         alignas(16) glm::vec3 albedo{};
         alignas(4) float roughness {};
         alignas(4) float metallic {};
-        alignas(4) unsigned int albedoTexture {};
-        alignas(4) unsigned int normalTexture {};
-        alignas(4) unsigned int roughnessTexture {};
-        alignas(4) unsigned int metallicTexture {};
-        alignas(4) unsigned int aoTexture {};
+
+        alignas(4) bool useAlbedoTexture {};
+        alignas(4) bool useNormalTexture {};
+        alignas(4) bool useRoughnessTexture {};
+        alignas(4) bool useMetallicTexture {};
+        alignas(4) bool useAoTexture {};
+
+        alignas(4) unsigned int albedoTextureId {};
+        alignas(4) unsigned int normalTextureId {};
+        alignas(4) unsigned int roughnessTextureId {};
+        alignas(4) unsigned int metallicTextureId {};
+        alignas(4) unsigned int aoTextureId {};
     };
 }
 
