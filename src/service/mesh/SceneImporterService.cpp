@@ -39,7 +39,9 @@ namespace Metal {
         sceneMetadata.type = EntryType::SCENE;
         sceneMetadata.name = sceneData.name =
                              scene->mName.length > 0 ? scene->mName.data : scene->mRootNode->mName.data;
-        DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(sceneMetadata.getId()), sceneMetadata)
+
+        std::string sceneBlobPath = CTX.getAssetDirectory() + FORMAT_FILE_SCENE(sceneMetadata.getId());
+
 
         std::unordered_map<unsigned int, std::string> meshMap{};
         std::unordered_map<std::string, unsigned int> meshMaterialMap{};
@@ -71,8 +73,9 @@ namespace Metal {
         if (stopToken.stop_requested()) {
             throw std::runtime_error("Import cancelled");
         }
-
-        DUMP_TEMPLATE(CTX.getAssetDirectory() + FORMAT_FILE_SCENE(sceneMetadata.getId()), sceneData)
+        DUMP_TEMPLATE(sceneBlobPath, sceneData)
+        sceneMetadata.size = fs::file_size(sceneBlobPath);
+        DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(sceneMetadata.getId()), sceneMetadata)
 
         return sceneMetadata.getId();
     }

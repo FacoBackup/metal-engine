@@ -30,12 +30,13 @@ namespace Metal {
                 throw std::runtime_error("Failed to load image: " + pathToFile);
             }
             const auto textureData = TextureData{width, height, channels, data};
-            DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(metadata.getId()), metadata)
 
-            reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_0);
-            reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_1);
-            reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_2);
-            reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_3);
+            metadata.size += reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_0);
+            metadata.size += reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_1);
+            metadata.size += reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_2);
+            metadata.size += reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_3);
+
+            DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(metadata.getId()), metadata)
 
             stbi_image_free(textureData.data);
             return metadata.getId();
@@ -90,10 +91,12 @@ namespace Metal {
             }
 
             const auto textureData = TextureData{width, height, channels, data};
-            reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_0);
-            reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_1);
-            reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_2);
-            reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_3);
+            metadata.size += reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_0);
+            metadata.size += reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_1);
+            metadata.size += reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_2);
+            metadata.size += reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_3);
+
+            DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(metadata.getId()), metadata)
 
             if (texture->mHeight == 0) {
                 stbi_image_free(data);
@@ -105,7 +108,7 @@ namespace Metal {
         }
     }
 
-    void TextureImporterService::reduceImage(const std::string &fileId,
+    size_t TextureImporterService::reduceImage(const std::string &fileId,
                                              const TextureData &textureData, const LevelOfDetail &levelOfDetail) const {
         const int newWidth = std::max(1, textureData.width / levelOfDetail.level);
         const int newHeight = std::max(1, textureData.height / levelOfDetail.level);
@@ -125,7 +128,8 @@ namespace Metal {
             }
         }
 
-        if (!stbi_write_png((CTX.getAssetDirectory() + FORMAT_FILE_TEXTURE(fileId, levelOfDetail)).c_str(),
+        std::string texturePath = CTX.getAssetDirectory() + FORMAT_FILE_TEXTURE(fileId, levelOfDetail);
+        if (!stbi_write_png(texturePath.c_str(),
                             newWidth, newHeight, textureData.channels, resizedData,
                             newWidth * textureData.channels)) {
             delete[] resizedData;
@@ -133,5 +137,6 @@ namespace Metal {
         }
 
         delete[] resizedData;
+        return fs::file_size(texturePath);
     }
 } // Metal

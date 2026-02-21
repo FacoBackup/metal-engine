@@ -73,6 +73,8 @@ add_executable(
         src/enum/engine-definitions.h
         src/context/editor/dock-spaces/files/FilesPanel.cpp
         src/context/editor/dock-spaces/files/FilesPanel.h
+        src/context/editor/dock-spaces/files/FilesListPanel.cpp
+        src/context/editor/dock-spaces/files/FilesListPanel.h
         src/context/editor/dock-spaces/files/FilePreviewPanel.cpp
         src/context/editor/dock-spaces/files/FilePreviewPanel.h
         src/context/editor/dock-spaces/console/ConsolePanel.cpp

@@ -14,11 +14,9 @@ namespace Metal {
         std::vector<FileEntry *> children{};
         FileEntry *parent = nullptr;
 
-        FileEntry(FileEntry *parent, std::string absolute_path, std::string formatted_date,
-                  std::string formatted_size)
+        FileEntry(FileEntry *parent, std::string absolute_path, std::string formatted_date)
             : absolutePath(std::move(absolute_path)),
               formattedDate(std::move(formatted_date)),
-              formattedSize(std::move(formatted_size)),
               parent(parent) {
         }
     };

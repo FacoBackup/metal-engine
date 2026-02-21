@@ -30,7 +30,7 @@ namespace Metal {
 
 
             std::string outPath = CTX.getAssetDirectory() + FORMAT_FILE_VOLUME(metadata.getId());
-            convertToSVO(pathToFile, outPath, stopToken);
+            metadata.size = convertToSVO(pathToFile, outPath, stopToken);
 
             DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(metadata.getId()), metadata)
             LOG_INFO("Imported volume: " + metadata.name + " (" + metadata.getId() + ")");
@@ -45,7 +45,7 @@ namespace Metal {
         return std::vector<std::string>{"vdb"};
     }
 
-    void VoxelImporterService::convertToSVO(const std::string &sourcePath, const std::string &outPath, const std::stop_token &stopToken) const {
+    size_t VoxelImporterService::convertToSVO(const std::string &sourcePath, const std::string &outPath, const std::stop_token &stopToken) const {
         static std::once_flag openvdbInitOnce;
         std::call_once(openvdbInitOnce, []() {
             openvdb::initialize();
@@ -65,14 +65,14 @@ namespace Metal {
             }
 
             if (stopToken.stop_requested()) {
-                return;
+                return 0;
             }
 
             for (const auto &gridPtr: *gridsPtr) {
                 if (auto floatGrid = openvdb::gridPtrCast<openvdb::FloatGrid>(gridPtr)) {
                     for (auto iter = floatGrid->beginValueOn(); iter; ++iter) {
                         if (stopToken.stop_requested()) {
-                            return;
+                            return 0;
                         }
                         const openvdb::Coord xyz = iter.getCoord();
                         const openvdb::Vec3d worldPos = floatGrid->transform().indexToWorld(xyz);
@@ -91,7 +91,7 @@ namespace Metal {
             throw std::runtime_error("VDB conversion failed: " + std::string(e.what()));
         }
 
-        serialize(builder, outPath);
+        return serialize(builder, outPath);
     }
 
     void VoxelImporterService::FillStorage(SparseVoxelOctreeBuilder &builder, unsigned int &bufferIndex,
@@ -131,7 +131,7 @@ namespace Metal {
         bufferIndex++;
     }
 
-    void VoxelImporterService::serialize(SparseVoxelOctreeBuilder &builder, const std::string &filePath) const {
+    size_t VoxelImporterService::serialize(SparseVoxelOctreeBuilder &builder, const std::string &filePath) const {
         SparseVoxelOctreeData data{};
         data.data.resize(builder.getVoxelQuantity() + builder.getLeafVoxelQuantity() * 2);
         data.voxelBufferOffset = builder.getVoxelQuantity();
@@ -142,6 +142,7 @@ namespace Metal {
         FillStorage(builder, bufferIndex, materialBufferIndex, data, &builder.getRoot());
 
         DUMP_TEMPLATE(filePath, data)
+        return fs::file_size(filePath);
     }
 
 } // Metal

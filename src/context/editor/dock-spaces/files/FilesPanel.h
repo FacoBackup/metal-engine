@@ -20,6 +20,7 @@ namespace Metal {
         std::unordered_set<std::string> loadedDirectoryPaths{};
         FilePreviewPanel *previewPanel = nullptr;
         AbstractPanel *filesHeader = nullptr;
+        AbstractPanel *filesListPanel = nullptr;
         float previewWidth = 200.0f;
 
     public:

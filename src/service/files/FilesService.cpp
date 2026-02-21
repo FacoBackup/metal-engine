@@ -28,22 +28,11 @@ std::filesystem::remove_all(entry.second->absolutePath);\
 std::filesystem::remove_all(CTX.getAssetDirectory() + F(entry.second->getId()));
 
 #define DATA \
-        auto fileSizeInBytes = fs::file_size(entry.path());\
-        std::string fileSize;\
-        if (fileSizeInBytes >= 1'000'000'000) {\
-        fileSize = std::to_string(fileSizeInBytes / 1'000'000'000.0) + " GB";\
-        } else if (fileSizeInBytes >= 1'000'000) {\
-        fileSize = std::to_string(fileSizeInBytes / 1'000'000.0) + " MB";\
-        } else if (fileSizeInBytes >= 1'000) {\
-        fileSize = std::to_string(fileSizeInBytes / 1'000.0) + " KB";\
-        } else {\
-        fileSize = std::to_string(fileSizeInBytes) + " Bytes";\
-        }\
         std::filesystem::file_time_type ftime = last_write_time(entry);
 
 namespace Metal {
     void FilesService::onInitialize() {
-        root = new FileEntry(nullptr, CTX.getAssetRefDirectory(), "", "");
+        root = new FileEntry(nullptr, CTX.getAssetRefDirectory(), "");
         root->type = EntryType::DIRECTORY;
         root->name = "Files";
         GetEntries(root);
@@ -56,13 +45,13 @@ namespace Metal {
                     entry.path().filename().string() == id + FILE_METADATA) {
                     DATA
                     auto sys_tp = std::chrono::file_clock::to_utc(ftime);
-                        std::string dateStr = std::format("{:%Y-%m-%d %H:%M}", sys_tp);
+                    std::string dateStr = std::format("{:%Y-%m-%d %H:%M}", sys_tp);
                     auto child = std::make_unique<FileEntry>(
                         root,
                         absolute(entry.path()).string(),
-                        dateStr,
-                        fileSize);
+                        dateStr);
                     PARSE_TEMPLATE(*child, child->absolutePath.c_str())
+                    child->formattedSize = FilesUtil::FormatSize(child->size);
                     return child;
                 }
             }
@@ -162,15 +151,14 @@ namespace Metal {
                     auto &child = root->children.emplace_back(new FileEntry(
                         root,
                         fs::absolute(entry.path()).string(),
-                        dateStr,
-                        fileSize));
+                        dateStr));
                     PARSE_TEMPLATE(*child, child->absolutePath.c_str())
+                    child->formattedSize = FilesUtil::FormatSize(child->size);
                 }
             } else {
                 auto &child = root->children.emplace_back(new FileEntry(
                     root,
                     fs::absolute(entry.path()).string(),
-                    "",
                     ""));
 
                 child->name = entry.path().filename().string();

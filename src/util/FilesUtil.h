@@ -1,6 +1,7 @@
 #ifndef FILESUTIL_H
 #define FILESUTIL_H
 #include <filesystem>
+#include <format>
 #include "../dto/file/FileEntry.h"
 
 namespace fs = std::filesystem;
@@ -57,6 +58,19 @@ namespace Metal::FilesUtil {
             return;
         }
         std::filesystem::create_directory(pathToDir);
+    }
+
+    static std::string FormatSize(size_t sizeInBytes) {
+        if (sizeInBytes >= 1'000'000'000) {
+            return std::format("{:.2f} GB", sizeInBytes / 1'000'000'000.0);
+        }
+        if (sizeInBytes >= 1'000'000) {
+            return std::format("{:.2f} MB", sizeInBytes / 1'000'000.0);
+        }
+        if (sizeInBytes >= 1'000) {
+            return std::format("{:.2f} KB", sizeInBytes / 1'000.0);
+        }
+        return std::to_string(sizeInBytes) + " Bytes";
     }
 } // Metal
 #endif

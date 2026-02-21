@@ -17,11 +17,16 @@ namespace Metal {
         if (metadata.name.find_last_of('.') != std::string::npos) {
             metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.'));
         }
+
+        std::string lod0Path = CTX.getAssetDirectory() + FORMAT_FILE_MESH(metadata.getId(), LevelOfDetail::LOD_0);
+        DUMP_TEMPLATE(lod0Path, mesh)
+        metadata.size += fs::file_size(lod0Path);
+
+        metadata.size += simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_1);
+        metadata.size += simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_2);
+        metadata.size += simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_3);
+
         DUMP_TEMPLATE(targetDir + '/' + metadata.getId() + FILE_METADATA, metadata)
-        DUMP_TEMPLATE(CTX.getAssetDirectory() + FORMAT_FILE_MESH(metadata.getId(), LevelOfDetail::LOD_0), mesh)
-        simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_1);
-        simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_2);
-        simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_3);
         return metadata.getId();
     }
 
@@ -79,7 +84,7 @@ namespace Metal {
         }
     }
 
-    void MeshImporterService::simplifyMesh(const std::string &fileId, const MeshData &mesh,
+    size_t MeshImporterService::simplifyMesh(const std::string &fileId, const MeshData &mesh,
                                             const LevelOfDetail &levelOfDetail) const {
         size_t vertexCount = mesh.data.size();
         size_t indexCount = mesh.indices.size();
@@ -108,6 +113,8 @@ namespace Metal {
         simplifiedMesh.data = mesh.data;
         simplifiedMesh.indices = std::move(simplifiedIndices);
 
-        DUMP_TEMPLATE(CTX.getAssetDirectory() + FORMAT_FILE_MESH(fileId, levelOfDetail), simplifiedMesh)
+        std::string lodPath = CTX.getAssetDirectory() + FORMAT_FILE_MESH(fileId, levelOfDetail);
+        DUMP_TEMPLATE(lodPath, simplifiedMesh)
+        return fs::file_size(lodPath);
     }
 }

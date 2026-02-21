@@ -23,7 +23,7 @@ namespace Metal {
         std::string importEmbeddedTexture(const std::string &targetDir, const ::aiTexture *texture,
                                           const std::string &nameHint) const;
 
-        void reduceImage(const std::string &fileId,
+        size_t reduceImage(const std::string &fileId,
                          const TextureData &textureData, const LevelOfDetail &levelOfDetail) const;
     };
 }

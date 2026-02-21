@@ -2,6 +2,7 @@
 
 
 #include "FilesHeader.h"
+#include "FilesListPanel.h"
 #include "../../../../common/interface/Icons.h"
 #include "../../../../context/ApplicationContext.h"
 #include "../../../../service/mesh/SceneData.h"
@@ -36,6 +37,8 @@ namespace Metal {
     void FilesPanel::onInitialize() {
         filesContext.setCurrentDirectory(CTX.filesService.getRoot());
         appendChild(filesHeader = new FilesHeader(filesContext, getActionLabel(), onAction()));
+        filesListPanel = new FilesListPanel(filesContext);
+        appendChild(filesListPanel);
         previewPanel = new FilePreviewPanel(filesContext);
         appendChild(previewPanel);
 
@@ -106,42 +109,10 @@ namespace Metal {
                 ImGui::TableNextRow();
                 ImGui::TableNextColumn();
 
-
                 ImGui::BeginChild((id + "files_list_in_table").c_str(), ImVec2(0, 0),
                                   ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar);
                 {
-                    isSomethingHovered = ImGui::IsWindowHovered();
-                    if (ImGui::IsWindowFocused()) {
-                        filesContext.selected.clear();
-                    }
-                    updateDragStart();
-                    handleDrag();
-
-                    constexpr ImGuiTableFlags tableFlags = ImGuiTableFlags_RowBg |
-                                                           ImGuiTableFlags_BordersInnerV |
-                                                           ImGuiTableFlags_Resizable |
-                                                           ImGuiTableFlags_SizingStretchProp |
-                                                           ImGuiTableFlags_ScrollY;
-
-                    ImGui::PushStyleVar(ImGuiStyleVar_CellPadding,
-                                        ImVec2(ImGui::GetStyle().CellPadding.x, 2.0f));
-                    if (ImGui::BeginTable((id + "entries").c_str(), 4, tableFlags)) {
-                        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
-                        ImGui::TableSetupColumn("Date");
-                        ImGui::TableSetupColumn("Type");
-                        ImGui::TableSetupColumn("Size");
-                        ImGui::TableHeadersRow();
-
-                        for (auto *child: filesContext.currentDirectory->children) {
-                            renderTreeItem(child);
-                        }
-
-                        ImGui::EndTable();
-                    }
-                    ImGui::PopStyleVar();
-
-                    contextMenu();
-                    clearDragOnMouseUp();
+                    filesListPanel->onSync();
                 }
                 ImGui::EndChild();
                 ImGui::TableNextColumn();
@@ -154,42 +125,7 @@ namespace Metal {
                 ImGui::EndTable();
             }
         } else {
-            bool renderTree = ImGui::BeginChild((id + "files_list").c_str(), ImVec2(0, 0));
-            if (renderTree) {
-                isSomethingHovered = ImGui::IsWindowHovered();
-                if (ImGui::IsWindowFocused()) {
-                    filesContext.selected.clear();
-                }
-                updateDragStart();
-                handleDrag();
-
-                constexpr ImGuiTableFlags tableFlags = ImGuiTableFlags_RowBg |
-                                                       ImGuiTableFlags_BordersInnerV |
-                                                       ImGuiTableFlags_Resizable |
-                                                       ImGuiTableFlags_SizingStretchProp |
-                                                       ImGuiTableFlags_ScrollY;
-
-                ImGui::PushStyleVar(ImGuiStyleVar_CellPadding,
-                                    ImVec2(ImGui::GetStyle().CellPadding.x, 2.0f));
-                if (ImGui::BeginTable((id + "entries").c_str(), 4, tableFlags)) {
-                    ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
-                    ImGui::TableSetupColumn("Date");
-                    ImGui::TableSetupColumn("Type");
-                    ImGui::TableSetupColumn("Size");
-                    ImGui::TableHeadersRow();
-
-                    for (auto *child: filesContext.currentDirectory->children) {
-                        renderTreeItem(child);
-                    }
-
-                    ImGui::EndTable();
-                }
-                ImGui::PopStyleVar();
-
-                contextMenu();
-                clearDragOnMouseUp();
-            }
-            ImGui::EndChild();
+            filesListPanel->onSync();
         }
     }
 

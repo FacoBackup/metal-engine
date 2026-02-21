@@ -14,6 +14,7 @@ namespace Metal {
     public:
         std::string name;
         EntryType::EntryType type = EntryType::NONE;
+        size_t size = 0;
 
         std::string getId() {
             return id;
@@ -24,6 +25,7 @@ namespace Metal {
             j["name"] = name;
             j["id"] = id;
             j["type"] = (int)type;
+            j["size"] = size;
             return j;
         }
 
@@ -31,6 +33,9 @@ namespace Metal {
             name = j.at("name").get<std::string>();
             id = j.at("id").get<std::string>();
             type = (EntryType::EntryType)j.at("type").get<int>();
+            if (j.contains("size")) {
+                size = j.at("size").get<size_t>();
+            }
         }
     };
 }

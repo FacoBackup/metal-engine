@@ -24,7 +24,7 @@ namespace Metal {
                               const std::stop_token &stopToken = {}) const;
 
     private:
-        void simplifyMesh(const std::string &fileId, const MeshData &mesh, const LevelOfDetail &levelOfDetail) const;
+        size_t simplifyMesh(const std::string &fileId, const MeshData &mesh, const LevelOfDetail &levelOfDetail) const;
 
         [[nodiscard]] std::string persistMesh(const std::string &targetDir, const MeshData &mesh) const;
     };

@@ -12,11 +12,7 @@ namespace Metal {
     public:
         std::vector<std::string> getSupportedTypes() override;
 
-        explicit VoxelImporterService()
-            : AbstractImporter() {
-        }
-
-        void convertToSVO(const std::string &sourcePath, const std::string &outPath,
+        size_t convertToSVO(const std::string &sourcePath, const std::string &outPath,
                           const std::stop_token &stopToken) const;
 
         static void FillStorage(SparseVoxelOctreeBuilder &builder, unsigned int &bufferIndex,
@@ -25,7 +21,7 @@ namespace Metal {
 
         static void PutData(unsigned int &bufferIndex, OctreeNode *node);
 
-        void serialize(SparseVoxelOctreeBuilder &builder, const std::string &filePath) const;
+        size_t serialize(SparseVoxelOctreeBuilder &builder, const std::string &filePath) const;
 
         std::string importData(const std::string &targetDir, const std::string &pathToFile,
                                const std::stop_token &stopToken) override;

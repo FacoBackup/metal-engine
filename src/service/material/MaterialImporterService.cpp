@@ -88,12 +88,16 @@ namespace Metal {
                 EntryMetadata materialMetadata{};
                 materialMetadata.type = EntryType::MATERIAL;
                 materialMetadata.name = "Material " + std::to_string(i);
+
+                std::string materialBlobPath = CTX.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialMetadata.getId());
+                DUMP_TEMPLATE(materialBlobPath, materialData)
+                materialMetadata.size = fs::file_size(materialBlobPath);
+
                 DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(materialMetadata.getId()), materialMetadata)
                 materialId = materialMetadata.getId();
             }
             materialMap.insert({i, materialId});
 
-            DUMP_TEMPLATE(CTX.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialId), materialData)
             LOG_INFO("Persisted material: " + materialId);
         }
     }
