@@ -54,7 +54,8 @@ namespace Metal {
         ImGui::Spacing();
 
         ImGui::NextColumn();
-        if (ImGui::BeginChild((id + "form").c_str())) {
+        ImGui::BeginChild((id + "form").c_str());
+        {
             formPanel->setInspection(currentInspection);
             formPanel->onSync();
         }

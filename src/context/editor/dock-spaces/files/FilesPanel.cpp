@@ -37,66 +37,37 @@ namespace Metal {
     void FilesPanel::onInitialize() {
         filesContext.setCurrentDirectory(CTX.filesService.getRoot());
         appendChild(filesHeader = new FilesHeader(filesContext, getActionLabel(), onAction()));
-        filesListPanel = new FilesListPanel(filesContext);
+        filesListPanel = new FilesListPanel(
+            filesContext, [
+                this](FileEntry *entry) {
+                openResource(entry);
+            },
+            getTypeFilter());
         appendChild(filesListPanel);
         previewPanel = new FilePreviewPanel(filesContext);
         appendChild(previewPanel);
 
         shortcuts = {
-                ShortcutDTO("Cut", ImGuiMod_Ctrl | ImGuiKey_X, [this]() {
-                    cutSelected();
-                }),
-                ShortcutDTO("Paste", ImGuiMod_Ctrl | ImGuiKey_V, [this]() {
-                    pasteSelected();
-                }),
-                ShortcutDTO("Delete", ImGuiKey_Delete, [this]() {
-                    deleteSelected();
-                }),
-                ShortcutDTO("Select All", ImGuiMod_Ctrl | ImGuiKey_A, [this]() {
-                    selectAll();
-                }),
-                ShortcutDTO("Import File", ImGuiMod_Ctrl | ImGuiKey_I, onAction())
+            ShortcutDTO("Cut", ImGuiMod_Ctrl | ImGuiKey_X, [this]() {
+                cutSelected();
+            }),
+            ShortcutDTO("Paste", ImGuiMod_Ctrl | ImGuiKey_V, [this]() {
+                pasteSelected();
+            }),
+            ShortcutDTO("Delete", ImGuiKey_Delete, [this]() {
+                deleteSelected();
+            }),
+            ShortcutDTO("Select All", ImGuiMod_Ctrl | ImGuiKey_A, [this]() {
+                selectAll();
+            }),
+            ShortcutDTO("Import File", ImGuiMod_Ctrl | ImGuiKey_I, onAction())
         };
     }
 
-    void FilesPanel::contextMenu() {
-        if (ImGui::BeginPopupContextItem((id + "contextMenu").c_str())) {
-            if (ImGui::MenuItem("Cut")) {
-                cutSelected();
-            }
-            if (ImGui::MenuItem("Paste")) {
-                pasteSelected();
-            }
-            if (ImGui::MenuItem("Delete")) {
-                deleteSelected();
-            }
-            ImGui::Separator();
-            if (ImGui::MenuItem("Select all")) {
-                selectAll();
-            }
-            ImGui::EndPopup();
-        }
-
-        if (isSomethingHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
-            ImGui::OpenPopup((id + "contextMenu").c_str());
-        }
-    }
-
-    void FilesPanel::handleDrag() const {
-        if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && onDrag != nullptr) {
-            UIUtil::AUX_VEC2 = ImGui::GetMousePos();
-            UIUtil::AUX_VEC2.x += 10;
-            UIUtil::AUX_VEC2.y += 10;
-            ImGui::SetNextWindowPos(UIUtil::AUX_VEC2);
-            ImGui::Begin((onDrag->getId() + "drag").c_str(), &UIUtil::OPEN,
-                         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
-            ImGui::Text("Dragging Node %s", onDrag->name.c_str());
-            ImGui::End();
-        }
-    }
-
     void FilesPanel::onSync() {
-        filesHeader->onSync();
+        if (renderHeader()) {
+            filesHeader->onSync();
+        }
         ImGui::Separator();
 
         if (renderPreview()) {
@@ -137,147 +108,28 @@ namespace Metal {
         ImGui::SetCursorPosY((windowHeight - LARGE_FONT_SIZE * 2) * 0.5f);
     }
 
-    void FilesPanel::updateDragStart() {
-        if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && startDrag.x == -1) {
-            startDrag = ImGui::GetMousePos();
-        }
-    }
-
-    void FilesPanel::clearDragOnMouseUp() {
-        if (!ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-            startDrag = ImVec2(-1, -1);
-            onDrag = nullptr;
-        }
-    }
-
-    void FilesPanel::renderTreeItem(FileEntry *entry) {
-        if (entry == nullptr) {
-            return;
-        }
-
-        const bool isDirectory = entry->type == EntryType::DIRECTORY;
-        const bool passesFilter = filesContext.filterType == EntryType::NONE || entry->type == filesContext.filterType;
-        if (!isDirectory && !passesFilter) {
-            return;
-        }
-
-
-        const float rowHeight = ImGui::GetTextLineHeight() + ImGui::GetStyle().CellPadding.y * 2.0f;
-
-        ImGui::TableNextRow(ImGuiTableRowFlags_None, rowHeight);
-        ImGui::TableNextColumn();
-
-        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_AllowItemOverlap;
-        if (!isDirectory) {
-            flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-        }
-
-        const bool isSelected = filesContext.selected.contains(entry->getId());
-
-        const bool isCut = filesContext.toCut.contains(entry->getId());
-        if (isCut) {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-        }
-
-        const std::string label = entry->name + id + entry->getId();
-
-
-        const ImVec2 cursorPos = ImGui::GetCursorPos();
-        ImGuiSelectableFlags selectableFlags = ImGuiSelectableFlags_SpanAllColumns |
-                                               ImGuiSelectableFlags_AllowItemOverlap |
-                                               ImGuiSelectableFlags_AllowDoubleClick;
-        ImGui::Selectable((id + "row_" + entry->getId()).c_str(), isSelected, selectableFlags, ImVec2(0.0f, rowHeight));
-
-        entry->isHovered = ImGui::IsItemHovered();
-        isSomethingHovered = isSomethingHovered || entry->isHovered;
-        onClick(entry);
-        handleDragDrop(entry);
-
-
-        ImGui::SetCursorPos(cursorPos);
-
-        bool open = false;
-        const std::string icon = UIUtil::GetEntryIcon(entry->type);
-        ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(0, 0, 0, 0));
-        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(0, 0, 0, 0));
-        ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32(0, 0, 0, 0));
-
-        if (isDirectory) {
-            open = ImGui::TreeNodeEx((icon + label).c_str(), flags);
-        } else {
-            ImGui::TreeNodeEx((icon + label).c_str(), flags);
-        }
-
-        ImGui::PopStyleColor(3);
-
-        if (isCut) {
-            ImGui::PopStyleColor();
-        }
-
-        UIUtil::RenderTooltip(entry->name);
-
-        ImGui::TableNextColumn();
-        if (!isDirectory) {
-            ImGui::TextUnformatted(entry->formattedDate.c_str());
-            ImGui::SetItemAllowOverlap();
-        }
-
-        ImGui::TableNextColumn();
-        if (isDirectory) {
-            ImGui::TextUnformatted("Directory");
-            ImGui::SetItemAllowOverlap();
-        } else {
-            const char *typeLabel = "";
-            switch (entry->type) {
-                case EntryType::SCENE: typeLabel = "Scene";
-                    break;
-                case EntryType::MESH: typeLabel = "Mesh";
-                    break;
-                case EntryType::TEXTURE: typeLabel = "Texture";
-                    break;
-                case EntryType::VOLUME: typeLabel = "Volume";
-                    break;
-                case EntryType::MATERIAL: typeLabel = "Material";
-                    break;
-                default: typeLabel = "";
-                    break;
+    void FilesPanel::openResource(FileEntry *root) {
+        switch (root->type) {
+            case EntryType::MESH: {
+                CTX.meshService.createMeshEntity(root->name, root->getId());
+                break;
             }
-            ImGui::TextUnformatted(typeLabel);
-            ImGui::SetItemAllowOverlap();
-        }
-
-        ImGui::TableNextColumn();
-        if (!isDirectory) {
-            ImGui::TextUnformatted(entry->formattedSize.c_str());
-            ImGui::SetItemAllowOverlap();
-        }
-
-        if (isDirectory && open) {
-            if (!loadedDirectoryPaths.contains(entry->absolutePath)) {
-                FilesService::GetEntries(entry);
-                loadedDirectoryPaths.insert(entry->absolutePath);
+            case EntryType::SCENE: {
+                CTX.meshService.createSceneEntities(root->getId());
+                break;
             }
-
-            for (auto *child: entry->children) {
-                renderTreeItem(child);
+            case EntryType::VOLUME: {
+                CTX.voxelService.create(root->getId());
+                break;
             }
-            ImGui::TreePop();
-        }
-    }
-
-    void FilesPanel::handleDragDrop(FileEntry *fileEntry) {
-        if (fileEntry != nullptr && fileEntry->isHovered && onDrag != fileEntry && startDrag.x >= 0) {
-            if (onDrag == nullptr && ImGui::IsMouseDown(ImGuiMouseButton_Left) &&
-                abs(startDrag.x - ImGui::GetMousePos().x) >= 3 &&
-                abs(startDrag.y - ImGui::GetMousePos().y) >= 3) {
-                onDrag = fileEntry;
+            case EntryType::DIRECTORY: {
+                filesContext.setCurrentDirectory(root);
+                FilesService::GetEntries(root);
+                filesContext.selected.clear();
+                break;
             }
-
-            if (!ImGui::IsMouseDown(ImGuiMouseButton_Left) && onDrag != nullptr && fileEntry->type ==
-                EntryType::DIRECTORY) {
-                CTX.filesService.Move(onDrag, fileEntry);
-                onDrag = nullptr;
-            }
+            default:
+                break;
         }
     }
 
@@ -312,46 +164,5 @@ namespace Metal {
     void FilesPanel::deleteSelected() const {
         CTX.filesService.deleteFiles(filesContext.selected);
         FilesService::GetEntries(filesContext.currentDirectory);
-    }
-
-    void FilesPanel::onClick(FileEntry *root) {
-        if (root->isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-            if (!ImGui::IsKeyDown(ImGuiKey_LeftCtrl)) {
-                filesContext.selected.clear();
-            }
-            if (filesContext.selected.contains(root->getId()) && ImGui::IsKeyDown(ImGuiKey_LeftCtrl)) {
-                filesContext.selected.erase(root->getId());
-            } else {
-                filesContext.selected[root->getId()] = root;
-            }
-        }
-        if (root->isHovered && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-            openResource(root);
-        }
-    }
-
-    void FilesPanel::openResource(FileEntry *root) {
-        switch (root->type) {
-            case EntryType::MESH: {
-                CTX.meshService.createMeshEntity(root->name, root->getId());
-                break;
-            }
-            case EntryType::SCENE: {
-                CTX.meshService.createSceneEntities(root->getId());
-                break;
-            }
-            case EntryType::VOLUME: {
-                CTX.voxelService.create(root->getId());
-                break;
-            }
-            case EntryType::DIRECTORY: {
-                filesContext.setCurrentDirectory(root);
-                FilesService::GetEntries(root);
-                filesContext.selected.clear();
-                break;
-            }
-            default:
-                break;
-        }
     }
 }

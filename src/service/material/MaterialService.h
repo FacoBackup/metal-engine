@@ -4,20 +4,24 @@
 #include "MaterialInstance.h"
 #include "../../service/abstract/AbstractResourceService.h"
 
+#include "../../enum/engine-definitions.h"
+#include <vector>
+#include "../../dto/buffers/MaterialData.h"
+
 namespace Metal {
     class MaterialService final : public AbstractResourceService {
+        unsigned int nextMaterialIndex = 1;
+        std::vector<MaterialData> materials {MAX_MATERIALS};
     public:
         explicit MaterialService()
             : AbstractResourceService() {
         }
 
-        bool streamAndWrite(std::string &id,
-                            MaterialInstance *instance,
-                            std::unique_ptr<DescriptorInstance> &descriptor) const;
-
         MaterialInstance *create(const std::string &id);
 
         MaterialFileData *stream(const std::string &id) const;
+
+        unsigned int getMaterialIndex(const std::string &id);
     };
 } // Metal
 

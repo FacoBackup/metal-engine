@@ -2,16 +2,19 @@
 
 layout (set = 1, binding = 0) uniform sampler2D gBufferPositionIndex;
 
-layout (location = 0) flat in uint renderIndex;
 layout (location = 0) out vec4 outColor;
 
-#include "../GBufferGenPushConstant.glsl"
+layout (push_constant) uniform Push {
+    mat4 model;
+    vec4 selectionColor; // xyz: color, w: thickness
+    uint renderIndex;
+} push;
 
 void main() {
     vec2 uv = gl_FragCoord.xy / vec2(globalData.outputRes);
     uint currentIndex = uint(abs(texture(gBufferPositionIndex, uv).a));
 
-    int thickness = int(push.albedoEmissive.a);
+    int thickness = int(push.selectionColor.a);
     bool isBoundary = false;
 
     ivec2 pixel = ivec2(gl_FragCoord.xy);
@@ -33,7 +36,7 @@ void main() {
             vec2 neighborUv = vec2(neighborPixel) / vec2(globalData.outputRes);
             uint neighborIndex = uint(abs(texture(gBufferPositionIndex, neighborUv).a));
 
-            if (neighborIndex != renderIndex) {
+            if (neighborIndex != push.renderIndex + 1) {
                 isBoundary = true;
                 break;
             }
@@ -41,10 +44,10 @@ void main() {
         if (isBoundary)
         break;
     }
-
-    if (isBoundary) {
-        outColor = vec4(push.albedoEmissive.rgb, 1.0);
-    } else {
+    bool isDiff = currentIndex != (push.renderIndex + 1);
+    if (isBoundary && !isDiff) {
+        outColor = vec4(push.selectionColor.rgb, 1.0);
+    } else  {
         int dotSpacing = 10;
         int dotRadius = 2;
 
@@ -55,9 +58,11 @@ void main() {
         if (dist >= dotRadius) {
             discard;
         }
-        outColor = vec4(push.albedoEmissive.rgb, 1.0);
+        outColor = vec4(push.selectionColor.rgb, 1.0);
+
+        if (isDiff) {
+            outColor.a = .5;
+        }
     }
 
-    if (currentIndex != renderIndex)
-    outColor.a = .5;
 }

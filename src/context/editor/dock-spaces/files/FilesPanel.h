@@ -14,10 +14,6 @@ namespace Metal {
     class FilesPanel : public AbstractDockPanel {
     protected:
         FilesContext filesContext{nullptr};
-        bool isSomethingHovered = false;
-        FileEntry *onDrag = nullptr;
-        ImVec2 startDrag{-1, -1};
-        std::unordered_set<std::string> loadedDirectoryPaths{};
         FilePreviewPanel *previewPanel = nullptr;
         AbstractPanel *filesHeader = nullptr;
         AbstractPanel *filesListPanel = nullptr;
@@ -34,21 +30,9 @@ namespace Metal {
 
         void onInitialize() override;
 
-        void contextMenu();
-
-        void handleDrag() const;
-
-        void handleDragDrop(FileEntry *fileEntry);
-
         void onSync() override;
 
         static void SetIconPos(const char *text);
-
-        void updateDragStart();
-
-        void clearDragOnMouseUp();
-
-        void renderTreeItem(FileEntry *entry);
 
         void pasteSelected();
 
@@ -60,9 +44,13 @@ namespace Metal {
 
         void deleteSelected() const;
 
-        void onClick(FileEntry *root);
+        virtual EntryType::EntryType getTypeFilter() {
+            return EntryType::NONE;
+        }
 
         virtual void openResource(FileEntry *root);
+
+        virtual bool renderHeader() { return true; }
     };
 } // Metal
 

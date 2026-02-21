@@ -19,7 +19,7 @@ namespace Metal {
         std::vector<VkWriteDescriptorSet> writeDescriptorSets;
         // These vectors will hold the Vk*Info objects so their memory remains valid.
         std::vector<VkDescriptorBufferInfo> bufferInfos;
-        std::vector<VkDescriptorImageInfo> imageInfos;
+        std::vector<std::vector<VkDescriptorImageInfo>> imageInfosPool;
         std::vector<VkWriteDescriptorSetAccelerationStructureKHR> asInfos;
 
         for (auto &binding: bindings) {
@@ -64,8 +64,10 @@ namespace Metal {
                 imageInfo.imageView = binding.view;
                 imageInfo.imageLayout = binding.layout;
                 imageInfo.sampler = binding.sampler;
-                // Store the image info in the vector.
+                
+                std::vector<VkDescriptorImageInfo> imageInfos;
                 imageInfos.push_back(imageInfo);
+                imageInfosPool.push_back(imageInfos);
 
                 VkWriteDescriptorSet descriptorWrite{};
                 descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -73,9 +75,8 @@ namespace Metal {
                 descriptorWrite.dstBinding = binding.bindingPoint;
                 descriptorWrite.dstArrayElement = 0;
                 descriptorWrite.descriptorType = binding.descriptorType;
-                descriptorWrite.descriptorCount = 1;
-                // Use the address of the element in the vector.
-                descriptorWrite.pImageInfo = &imageInfos.back();
+                descriptorWrite.descriptorCount = binding.descriptorCount;
+                descriptorWrite.pImageInfo = imageInfosPool.back().data();
 
                 writeDescriptorSets.push_back(descriptorWrite);
             }
@@ -95,14 +96,27 @@ namespace Metal {
         }
         // CREATE
         std::vector<VkDescriptorSetLayoutBinding> descriptorSetLayoutBindings;
+        std::vector<VkDescriptorBindingFlags> bindingFlags;
+
         for (auto &binding: bindings) {
             VkDescriptorSetLayoutBinding &samplerLayoutBinding = descriptorSetLayoutBindings.emplace_back();
             samplerLayoutBinding.binding = binding.bindingPoint;
             samplerLayoutBinding.descriptorType = binding.descriptorType;
-            samplerLayoutBinding.descriptorCount = 1;
+            samplerLayoutBinding.descriptorCount = binding.descriptorCount;
             samplerLayoutBinding.stageFlags = binding.stageFlags;
             samplerLayoutBinding.pImmutableSamplers = nullptr;
+
+            if (binding.descriptorCount > 1) {
+                bindingFlags.push_back(VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT);
+            } else {
+                bindingFlags.push_back(0);
+            }
         }
+
+        VkDescriptorSetLayoutBindingFlagsCreateInfo flagsInfo{};
+        flagsInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO;
+        flagsInfo.bindingCount = bindingFlags.size();
+        flagsInfo.pBindingFlags = bindingFlags.data();
 
         VkDescriptorSetLayoutCreateInfo layoutInfo{};
 
@@ -110,6 +124,7 @@ namespace Metal {
         layoutInfo.bindingCount = descriptorSetLayoutBindings.size();
         layoutInfo.pBindings = descriptorSetLayoutBindings.data();
         layoutInfo.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT_EXT;
+        layoutInfo.pNext = &flagsInfo;
 
         VulkanUtils::CheckVKResult(vkCreateDescriptorSetLayout(CTX.vulkanContext.device.device, &layoutInfo,
                                                                nullptr,

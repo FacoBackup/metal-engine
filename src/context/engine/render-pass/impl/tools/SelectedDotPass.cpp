@@ -3,6 +3,7 @@
 #include "../../../../../context/ApplicationContext.h"
 #include "../../../../../enum/LevelOfDetail.h"
 #include "../../../../../repository/world/components/TransformComponent.h"
+#include "../../../../../dto/push-constant/SelectedDotPushConstant.h"
 #include "../../../../../service/pipeline/PipelineBuilder.h"
 
 namespace Metal {
@@ -15,7 +16,7 @@ namespace Metal {
                 .setBlendEnabled()
                 .setPrepareForMesh()
                 .setCullMode(VK_CULL_MODE_BACK_BIT)
-                .setPushConstantsSize(sizeof(MeshPushConstant))
+                .setPushConstantsSize(sizeof(SelectedDotPushConstant))
                 .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
                 .addDescriptorSet(CTX.coreDescriptorSets.gBufferPosition.get());
         pipelineInstance = CTX.pipelineService.createPipeline(builder);
@@ -50,20 +51,11 @@ namespace Metal {
             }
 
             pushConstant.model = worldRepository.registry.get<TransformComponent>(entity).model;
-            pushConstant.albedoEmissive.x = CTX.editorRepository.selectionColor.x;
-            pushConstant.albedoEmissive.y = CTX.editorRepository.selectionColor.y;
-            pushConstant.albedoEmissive.z = CTX.editorRepository.selectionColor.z;
-            pushConstant.albedoEmissive.w = CTX.editorRepository.selectionOutlineThickness;
+            pushConstant.selectionColor.x = CTX.editorRepository.selectionColor.x;
+            pushConstant.selectionColor.y = CTX.editorRepository.selectionColor.y;
+            pushConstant.selectionColor.z = CTX.editorRepository.selectionColor.z;
+            pushConstant.selectionColor.w = CTX.editorRepository.selectionOutlineThickness;
             pushConstant.renderIndex = mesh.renderIndex;
-            pushConstant.roughnessFactor = 0;
-            pushConstant.metallicFactor = 0;
-            pushConstant.useAlbedoTexture = 0;
-            pushConstant.useNormalTexture = 0;
-            pushConstant.useRoughnessTexture = 0;
-            pushConstant.useMetallicTexture = 0;
-            pushConstant.useHeightTexture = 0;
-            pushConstant.parallaxHeightScale = 0;
-            pushConstant.parallaxLayers = 0;
 
             recordPushConstant(&pushConstant);
             recordDrawMesh(meshInstance);

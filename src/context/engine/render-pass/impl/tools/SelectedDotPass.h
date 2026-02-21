@@ -2,17 +2,13 @@
 #define SELECTEDDOTPASS_H
 
 #include "../../AbstractRenderPass.h"
-#include "../../../../../dto/push-constant/MeshPushConstant.h"
+#include "../../../../../dto/push-constant/SelectedDotPushConstant.h"
 
 namespace Metal {
     class SelectedDotPass final : public AbstractRenderPass {
-        MeshPushConstant pushConstant{};
+        SelectedDotPushConstant pushConstant{};
 
     public:
-        explicit SelectedDotPass()
-            : AbstractRenderPass() {
-        }
-
         void onInitialize() override;
 
         bool shouldRun() override;

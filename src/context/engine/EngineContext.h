@@ -59,7 +59,7 @@ namespace Metal {
 
         void onInitialize() override;
 
-        void updateVoxelData();
+        void updateTileData();
 
         void updateCurrentTime();
 

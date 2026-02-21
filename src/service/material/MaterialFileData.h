@@ -4,6 +4,7 @@
 
 #include "../../common/inspection/Inspectable.h"
 #include "../../util/Serializable.h"
+#include <glm/glm.hpp>
 
 namespace Metal {
     struct MaterialFileData final : Inspectable, Serializable {
@@ -11,7 +12,12 @@ namespace Metal {
         std::string normal;
         std::string roughness;
         std::string metallic;
+        std::string ao;
         std::string height;
+        glm::vec3 albedoColor;
+        float roughnessFactor;
+        float metallicFactor;
+        bool isEmissive;
 
         void registerFields() override;
 
@@ -19,23 +25,9 @@ namespace Metal {
 
         const char *getTitle() override;
 
-        nlohmann::json toJson() const override {
-            nlohmann::json j;
-            j["albedo"] = albedo;
-            j["normal"] = normal;
-            j["roughness"] = roughness;
-            j["metallic"] = metallic;
-            j["height"] = height;
-            return j;
-        }
+        nlohmann::json toJson() const override;
 
-        void fromJson(const nlohmann::json& j) override {
-            albedo = j.at("albedo").get<std::string>();
-            normal = j.at("normal").get<std::string>();
-            roughness = j.at("roughness").get<std::string>();
-            metallic = j.at("metallic").get<std::string>();
-            height = j.at("height").get<std::string>();
-        }
+        void fromJson(const nlohmann::json &j) override;
     };
 }
 

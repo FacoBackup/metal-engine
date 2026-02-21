@@ -203,7 +203,7 @@ namespace Metal {
 
             VkAccelerationStructureInstanceKHR instance{};
             instance.transform = transform;
-            instance.instanceCustomIndex = 0;
+            instance.instanceCustomIndex = CTX.materialService.getMaterialIndex(meshComp.materialId);
             instance.mask = 0xFF;
             instance.instanceShaderBindingTableRecordOffset = 0;
             instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;

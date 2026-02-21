@@ -9,20 +9,23 @@
 #include <algorithm>
 
 namespace Metal {
-
     void FilesListPanel::ensureCache() {
         if (!filesContext.currentDirectory) return;
-        if (lastDir != filesContext.currentDirectory || lastChildrenCount != filesContext.currentDirectory->children.size()) {
-            cachedSorted = filesContext.currentDirectory->children; // copy pointers
+        auto &children = filesContext.currentDirectory->children;
+        if (lastDir != filesContext.currentDirectory || lastChildrenCount != children.size()) {
+            cachedSorted.clear();
+            for (auto *child: children) {
+                cachedSorted.push_back(child);
+            }
             lastDir = filesContext.currentDirectory;
-            lastChildrenCount = filesContext.currentDirectory->children.size();
+            lastChildrenCount = children.size();
             applySort();
         }
     }
 
     void FilesListPanel::applySort() {
         if (!lastDir) return;
-        std::sort(cachedSorted.begin(), cachedSorted.end(), [&](FileEntry* a, FileEntry* b){
+        std::sort(cachedSorted.begin(), cachedSorted.end(), [&](FileEntry *a, FileEntry *b) {
             const bool aIsDir = a->type == EntryType::DIRECTORY;
             const bool bIsDir = b->type == EntryType::DIRECTORY;
             // Always put directories first
@@ -40,7 +43,9 @@ namespace Metal {
                     break;
                 case 3: // Size
                 default:
-                    if (a->size < b->size) cmp = -1; else if (a->size > b->size) cmp = 1; else cmp = 0;
+                    if (a->size < b->size) cmp = -1;
+                    else if (a->size > b->size) cmp = 1;
+                    else cmp = 0;
                     break;
             }
             if (!sortAscending) cmp = -cmp;
@@ -102,30 +107,7 @@ namespace Metal {
             }
         }
         if (root->isHovered && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-            switch (root->type) {
-                case EntryType::MESH: {
-                    CTX.meshService.createMeshEntity(root->name, root->getId());
-                    break;
-                }
-                case EntryType::SCENE: {
-                    CTX.meshService.createSceneEntities(root->getId());
-                    break;
-                }
-                case EntryType::VOLUME: {
-                    CTX.voxelService.create(root->getId());
-                    break;
-                }
-                case EntryType::DIRECTORY: {
-                    filesContext.setCurrentDirectory(root);
-                    FilesService::GetEntries(root);
-                    cachedSorted.clear();
-                    lastDir = nullptr;
-                    filesContext.selected.clear();
-                    break;
-                }
-                default:
-                    break;
-            }
+            onDoubleClick(root);
         }
     }
 
@@ -163,7 +145,8 @@ namespace Metal {
         ImGuiSelectableFlags selectableFlags = ImGuiSelectableFlags_SpanAllColumns |
                                                ImGuiSelectableFlags_AllowItemOverlap |
                                                ImGuiSelectableFlags_AllowDoubleClick;
-        ImGui::Selectable((id + std::string("row_") + entry->getId()).c_str(), isSelected, selectableFlags, ImVec2(0.0f, rowHeight));
+        ImGui::Selectable((id + std::string("row_") + entry->getId()).c_str(), isSelected, selectableFlags,
+                          ImVec2(0.0f, rowHeight));
 
         entry->isHovered = ImGui::IsItemHovered();
         isSomethingHovered = isSomethingHovered || entry->isHovered;
@@ -205,12 +188,18 @@ namespace Metal {
         } else {
             const char *typeLabel = "";
             switch (entry->type) {
-                case EntryType::SCENE: typeLabel = "Scene"; break;
-                case EntryType::MESH: typeLabel = "Mesh"; break;
-                case EntryType::TEXTURE: typeLabel = "Texture"; break;
-                case EntryType::VOLUME: typeLabel = "Volume"; break;
-                case EntryType::MATERIAL: typeLabel = "Material"; break;
-                default: typeLabel = ""; break;
+                case EntryType::SCENE: typeLabel = "Scene";
+                    break;
+                case EntryType::MESH: typeLabel = "Mesh";
+                    break;
+                case EntryType::TEXTURE: typeLabel = "Texture";
+                    break;
+                case EntryType::VOLUME: typeLabel = "Volume";
+                    break;
+                case EntryType::MATERIAL: typeLabel = "Material";
+                    break;
+                default: typeLabel = "";
+                    break;
             }
             ImGui::TextUnformatted(typeLabel);
             ImGui::SetItemAllowOverlap();
@@ -236,7 +225,6 @@ namespace Metal {
     }
 
     void FilesListPanel::onSync() {
-        // Outer child region similar to original implementation
         bool renderTree = ImGui::BeginChild((id + std::string("files_list")).c_str(), ImVec2(0, 0));
         if (renderTree) {
             isSomethingHovered = ImGui::IsWindowHovered();
@@ -246,7 +234,6 @@ namespace Metal {
             updateDragStart();
             handleDrag();
 
-            // Setup sortable table
             constexpr ImGuiTableFlags tableFlags = ImGuiTableFlags_RowBg |
                                                    ImGuiTableFlags_BordersInnerV |
                                                    ImGuiTableFlags_Resizable |
@@ -263,9 +250,9 @@ namespace Metal {
                 ImGui::TableSetupColumn("Size");
                 ImGui::TableHeadersRow();
 
-                if (ImGuiTableSortSpecs* sortSpecs = ImGui::TableGetSortSpecs()) {
+                if (ImGuiTableSortSpecs *sortSpecs = ImGui::TableGetSortSpecs()) {
                     if (sortSpecs->SpecsCount > 0 && sortSpecs->SpecsDirty) {
-                        const ImGuiTableColumnSortSpecs& s = sortSpecs->Specs[0];
+                        const ImGuiTableColumnSortSpecs &s = sortSpecs->Specs[0];
                         sortColumn = s.ColumnIndex;
                         sortAscending = (s.SortDirection != ImGuiSortDirection_Descending);
                         applySort();
@@ -274,8 +261,10 @@ namespace Metal {
                 }
 
                 ensureCache();
-                // Render using cachedSorted
                 for (auto *child: cachedSorted) {
+                    if (typeFilter != EntryType::NONE && child->type != typeFilter) {
+                        continue;
+                    }
                     renderTreeItem(child);
                 }
 
@@ -283,26 +272,18 @@ namespace Metal {
             }
             ImGui::PopStyleVar();
 
-            // Context menu: keep simple here (Cut/Paste/Delete/Select all)
             if (ImGui::BeginPopupContextItem((id + std::string("contextMenu")).c_str())) {
                 if (ImGui::MenuItem("Cut")) {
                     filesContext.toCut.clear();
                     filesContext.toCut = filesContext.selected;
-                    FilesService::GetEntries(filesContext.currentDirectory);
-                    cachedSorted.clear();
-                    lastDir = nullptr;
                 }
                 if (ImGui::MenuItem("Paste")) {
                     filesContext.toCut.clear();
                     FilesService::GetEntries(filesContext.currentDirectory);
-                    cachedSorted.clear();
-                    lastDir = nullptr;
                 }
                 if (ImGui::MenuItem("Delete")) {
                     CTX.filesService.deleteFiles(filesContext.selected);
                     FilesService::GetEntries(filesContext.currentDirectory);
-                    cachedSorted.clear();
-                    lastDir = nullptr;
                 }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Select all")) {

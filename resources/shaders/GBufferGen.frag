@@ -1,16 +1,15 @@
+#extension GL_EXT_nonuniform_qualifier: enable
 #include "./GlobalDataBuffer.glsl"
 #include "./GBufferGenPushConstant.glsl"
 #include "./GBufferUtil.glsl"
+#define MATERIAL_SET 1
+#include "./MaterialBuffer.glsl"
 
-layout(location = 0) in vec3 inPosition;
-layout(location = 1) in vec3 inNormal;
-layout(location = 2) in vec2 inUV;
+layout (location = 0) in vec3 inPosition;
+layout (location = 1) in vec3 inNormal;
+layout (location = 2) in vec2 inUV;
 
-layout(set = 1, binding = 0) uniform sampler2D albedoEmissiveSampler;
-layout(set = 2, binding = 0) uniform sampler2D normalSampler;
-layout(set = 3, binding = 0) uniform sampler2D roughnessSampler;
-layout(set = 4, binding = 0) uniform sampler2D metallicSampler;
-layout(set = 5, binding = 0) uniform sampler2D heightMapSampler;
+layout (set = 2, binding = 0) uniform sampler2D textureArray[];
 
 layout (location = 0) out vec4 outMaterialA;
 layout (location = 1) out vec4 outMaterialB;
@@ -20,6 +19,8 @@ layout (location = 2) out vec4 outMaterialC;
 #include "./DebugFlags.glsl"
 #endif
 
+bool hasMaterial() { return push.materialIndex != 0u; }
+
 float encode(float depthFunc, float val) {
     return log2(max(0.000001, val)) * depthFunc * 0.5;
 }
@@ -28,7 +29,7 @@ mat3 computeTBN(vec3 worldPosition, vec2 initialUV, vec3 normalVec, bool isDecal
     if (isDecalPass) {
         vec3 N = abs(normalVec);
         vec3 T = vec3(0., 0., 1.);
-        if (N.z > N.x && N.z > N.y){
+        if (N.z > N.x && N.z > N.y) {
             T = vec3(1., 0., 0.);
         }
 
@@ -51,7 +52,7 @@ mat3 computeTBN(vec3 worldPosition, vec2 initialUV, vec3 normalVec, bool isDecal
 }
 
 #define PARALLAX_THRESHOLD 200.
-vec2 parallaxOcclusionMapping(vec2 initialUV, vec3 worldSpacePosition, float heightScale, int layers, float distanceFromCamera, mat3 TBN) {
+vec2 parallaxOcclusionMapping(vec2 initialUV, vec3 worldSpacePosition, float heightScale, int layers, float distanceFromCamera, mat3 TBN, uint heightTextureIndex) {
     if (distanceFromCamera > PARALLAX_THRESHOLD) return initialUV;
     mat3 transposed = transpose(TBN);
     vec3 viewDirection = normalize(transposed * (globalData.cameraWorldPosition.xyz - worldSpacePosition.xyz));
@@ -62,16 +63,16 @@ vec2 parallaxOcclusionMapping(vec2 initialUV, vec3 worldSpacePosition, float hei
     vec2 deltaTexCoords = P / fLayers;
 
     vec2 currentUVs = initialUV;
-    float currentDepthMapValue = texture(heightMapSampler, currentUVs).r;
+    float currentDepthMapValue = texture(textureArray[nonuniformEXT(heightTextureIndex)], currentUVs).r;
     while (currentLayerDepth < currentDepthMapValue) {
         currentUVs -= deltaTexCoords;
-        currentDepthMapValue = texture(heightMapSampler, currentUVs).r;
+        currentDepthMapValue = texture(textureArray[nonuniformEXT(heightTextureIndex)], currentUVs).r;
         currentLayerDepth += layerDepth;
     }
 
     vec2 prevTexCoords = currentUVs + deltaTexCoords;
     float afterDepth = currentDepthMapValue - currentLayerDepth;
-    float beforeDepth = texture(heightMapSampler, prevTexCoords).r - currentLayerDepth + layerDepth;
+    float beforeDepth = texture(textureArray[nonuniformEXT(heightTextureIndex)], prevTexCoords).r - currentLayerDepth + layerDepth;
 
     float weight = afterDepth / (afterDepth - beforeDepth);
     return prevTexCoords * weight + currentUVs * (1.0 - weight);
@@ -89,41 +90,54 @@ vec3 randomColor(int seed) {
 }
 #endif
 
-void main () {
+void main() {
     bool isDecalPass = false;// TODO - MOVE TO PUSH CONSTANT
     vec2 localUV = inUV;
     vec3 N = normalize(inNormal);
     mat3 TBN = computeTBN(inPosition, localUV, N, isDecalPass);
     vec3 W = inPosition;
 
-    if (push.useHeightTexture == 1){
-        vec3 V = globalData.cameraWorldPosition.xyz - inPosition;
-        float distanceFromCamera = length(V);
-        localUV = parallaxOcclusionMapping(localUV, W, push.parallaxHeightScale, push.parallaxLayers, distanceFromCamera, TBN);
-    }
-
     float metallic = push.metallicFactor;
     float roughness = push.roughnessFactor;
     outMaterialA = vec4(push.albedoEmissive.rgb, gl_FragCoord.z);
     outMaterialB = vec4(N, 0);
     outMaterialC = vec4(inPosition, push.renderIndex + 1);
-    if (push.useAlbedoTexture == 1){
-        outMaterialA.rgb = texture(albedoEmissiveSampler, localUV).rgb;
+    bool isEmissive = push.albedoEmissive.a > 0;
+    if (hasMaterial()) {
+        MaterialData mat = materialBuffer.items[push.materialIndex];
+        isEmissive = mat.isEmissive == 1u;
+
+        if (mat.useHeightTexture == 1u) {
+            vec3 V = globalData.cameraWorldPosition.xyz - inPosition;
+            float distanceFromCamera = length(V);
+            localUV = parallaxOcclusionMapping(inUV, inPosition, push.parallaxHeightScale, push.parallaxLayers, distanceFromCamera, TBN, mat.heightTexture);
+        }
+
+        if (mat.useAlbedoTexture == 1u) {
+            outMaterialA.rgb = texture(textureArray[nonuniformEXT(mat.albedoTexture)], localUV).rgb;
+        } else {
+            outMaterialA.rgb = mat.albedo;
+        }
+
+        if (mat.useNormalTexture == 1u) {
+            vec3 nrm = texture(textureArray[nonuniformEXT(mat.normalTexture)], localUV).rgb * 2.0 - 1.0;
+            outMaterialB.rgb = vec3(normalize(TBN * nrm));
+        }
+
+        if (mat.useRoughnessTexture == 1u) {
+            roughness = texture(textureArray[nonuniformEXT(mat.roughnessTexture)], localUV).r;
+        } else {
+            roughness = mat.roughness;
+        }
+
+        if (mat.useMetallicTexture == 1u) {
+            metallic = texture(textureArray[nonuniformEXT(mat.metallicTexture)], localUV).r;
+        } else {
+            metallic = mat.metallic;
+        }
     }
 
-    if (push.useNormalTexture == 1){
-        outMaterialB.rgb = vec3(normalize(TBN * (texture(normalSampler, localUV).rgb * 2 - 1)));
-    }
-
-    if (push.useRoughnessTexture == 1){
-        roughness = texture(roughnessSampler, localUV).r;
-    }
-
-    if (push.useMetallicTexture == 1){
-        metallic = texture(metallicSampler, localUV).r;
-    }
-
-    outMaterialA.a *= push.albedoEmissive.a > 0 ? -1 : 1;
+    outMaterialA.a *= isEmissive ? -1 : 1;
     outMaterialB.a = compressRoughnessMetallic(metallic, roughness);
 
     #ifdef DEBUG

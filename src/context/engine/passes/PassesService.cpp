@@ -8,7 +8,6 @@
 #include "../render-pass/impl/PostProcessingPass.h"
 #include "../render-pass/impl/tools/SelectedDotPass.h"
 #include "../render-pass/impl/tools/GridPass.h"
-#include "../render-pass/impl/tools/VoxelVisualizerPass.h"
 #include "../render-pass/impl/tools/IconsPass.h"
 
 namespace Metal {
@@ -30,7 +29,6 @@ namespace Metal {
         if (CTX.isDebugMode()) {
             addPass(postProcessingPasses, new SelectedDotPass());
             addPass(postProcessingPasses, new GridPass());
-            addPass(postProcessingPasses, new VoxelVisualizerPass());
             addPass(postProcessingPasses, new IconsPass());
         }
 

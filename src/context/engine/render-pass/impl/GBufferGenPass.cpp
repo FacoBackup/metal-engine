@@ -6,6 +6,8 @@
 #include "../../../../repository/world/components/TransformComponent.h"
 #include "../../../../service//framebuffer/FrameBufferInstance.h"
 
+#include "../../../../service/material/MaterialService.h"
+#include "../../../../service/material/MaterialInstance.h"
 #include "../../../../service/pipeline/PipelineBuilder.h"
 
 namespace Metal {
@@ -16,11 +18,8 @@ namespace Metal {
                     "GBufferGen.frag"
                 )
                 .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.materialAlbedo.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.materialNormal.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.materialRoughness.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.materialMetallic.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.materialHeight.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.materialData.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.textureArray.get())
                 .setPrepareForMesh()
                 .setDepthTest()
                 .setCullMode(VK_CULL_MODE_BACK_BIT)
@@ -30,18 +29,16 @@ namespace Metal {
 
     void GBufferGenPass::onSync() {
         unsigned int renderIndex = 0;
-        auto view = worldRepository.registry.view<MeshComponent, TransformComponent>();
-        for (auto entity : view) {
-            auto &mesh = view.get<MeshComponent>(entity);
+        for (auto entity: worldRepository.registry.storage<entt::entity>()) {
+            if (!worldRepository.registry.all_of<MeshComponent, TransformComponent>(entity)) continue;
+            auto &mesh = worldRepository.registry.get<MeshComponent>(entity);
             if (!mesh.meshId.empty()) {
                 if (worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) {
                     continue;
                 }
                 const auto *meshInstance = streamingRepository.streamMesh(mesh.meshId, LevelOfDetail::LOD_0);
                 if (meshInstance != nullptr) {
-                    const auto *materialInstance = streamingRepository.streamMaterial(mesh.materialId);
-
-                    mPushConstant.model = view.get<TransformComponent>(entity).model;
+                    mPushConstant.model = worldRepository.registry.get<TransformComponent>(entity).model;
                     mPushConstant.renderIndex = mesh.renderIndex = renderIndex;
 
                     mPushConstant.albedoEmissive = glm::vec4(mesh.albedoColor,
@@ -51,34 +48,7 @@ namespace Metal {
                     mPushConstant.parallaxLayers = mesh.parallaxLayers;
                     mPushConstant.parallaxHeightScale = mesh.parallaxHeightScale;
 
-                    if (materialInstance != nullptr) {
-                        mPushConstant.useAlbedoTexture = materialInstance->useAlbedoTexture ? 1 : 0;
-                        if (mPushConstant.useAlbedoTexture) {
-                            bindSingleDescriptorSet(1, materialInstance->descriptorAlbedoTexture->vkDescriptorSet);
-                        }
-                        mPushConstant.useNormalTexture = materialInstance->useNormalTexture ? 1 : 0;
-                        if (mPushConstant.useNormalTexture) {
-                            bindSingleDescriptorSet(2, materialInstance->descriptorNormalTexture->vkDescriptorSet);
-                        }
-                        mPushConstant.useRoughnessTexture = materialInstance->useRoughnessTexture ? 1 : 0;
-                        if (mPushConstant.useRoughnessTexture) {
-                            bindSingleDescriptorSet(3, materialInstance->descriptorRoughnessTexture->vkDescriptorSet);
-                        }
-                        mPushConstant.useMetallicTexture = materialInstance->useMetallicTexture ? 1 : 0;
-                        if (mPushConstant.useMetallicTexture) {
-                            bindSingleDescriptorSet(4, materialInstance->descriptorMetallicTexture->vkDescriptorSet);
-                        }
-                        mPushConstant.useHeightTexture = materialInstance->useHeightTexture ? 1 : 0;
-                        if (mPushConstant.useHeightTexture) {
-                            bindSingleDescriptorSet(5, materialInstance->descriptorHeightTexture->vkDescriptorSet);
-                        }
-                    } else {
-                        mPushConstant.useAlbedoTexture = 0;
-                        mPushConstant.useNormalTexture = 0;
-                        mPushConstant.useRoughnessTexture = 0;
-                        mPushConstant.useMetallicTexture = 0;
-                        mPushConstant.useHeightTexture = 0;
-                    }
+                    mPushConstant.materialIndex = CTX.materialService.getMaterialIndex(mesh.materialId);
 
                     renderIndex++;
                     recordPushConstant(&mPushConstant);

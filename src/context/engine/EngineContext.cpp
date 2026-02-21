@@ -18,7 +18,7 @@ namespace Metal {
         CTX.passesService.onInitialize();
     }
 
-    void EngineContext::updateVoxelData() {
+    void EngineContext::updateTileData() {
         if (CTX.worldGridRepository.hasMainTileChanged) {
             unsigned int i = 0;
             std::vector<DescriptorBinding> bindings{};
@@ -26,12 +26,6 @@ namespace Metal {
                 if (tile != nullptr) {
                     const auto *svo = CTX.streamingRepository.streamSVO(tile->id);
                     if (svo != nullptr) {
-                        auto &b = bindings.emplace_back();
-
-                        b.bindingPoint = i + 1;
-                        b.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-                        b.bufferInstance = svo->voxelsBuffer;
-
                         tileInfoUBO.tileCenterValid[i] = glm::vec4(tile->x, 0,
                                                                    tile->z, 1);
                         tileInfoUBO.voxelBufferOffset[i] = svo->voxelBufferOffset;
@@ -45,8 +39,6 @@ namespace Metal {
             }
 
             if (i > 0) {
-                DescriptorInstance::Write(CTX.coreDescriptorSets.svoData->vkDescriptorSet,
-                                          bindings);
                 CTX.coreBuffers.tileInfo->update(tileInfoUBO.tileCenterValid.data());
             }
             CTX.worldGridRepository.hasMainTileChanged = false;
@@ -76,7 +68,7 @@ namespace Metal {
         CTX.cameraService.onSync();
 
 
-        updateVoxelData();
+        updateTileData();
         if (updateLights) {
             CTX.lightService.onSync();
         }

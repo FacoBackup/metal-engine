@@ -236,8 +236,6 @@ add_executable(
         src/dto/Notification.h
         src/enum/NotificationSeverity.h
         src/service/voxel/impl/SparseVoxelOctreeData.h
-        src/context/engine/render-pass/impl/tools/VoxelVisualizerPass.cpp
-        src/context/engine/render-pass/impl/tools/VoxelVisualizerPass.h
         src/context/engine/render-pass/impl/tools/SelectedDotPass.cpp
         src/context/engine/render-pass/impl/tools/SelectedDotPass.h
         src/service/picking/PickingService.cpp
@@ -265,7 +263,6 @@ add_executable(
         src/context/engine/passes/PassesService.cpp
         src/context/engine/passes/PassesService.h
         src/util/ImageUtils.h
-        src/service/material/MaterialInstance.cpp
         src/service/material/MaterialInstance.h
         src/service/material/MaterialService.cpp
         src/service/material/MaterialService.h

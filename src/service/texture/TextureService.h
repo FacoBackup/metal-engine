@@ -12,6 +12,9 @@ namespace Metal {
     struct TextureInstance;
 
     class TextureService final : public AbstractResourceService {
+        unsigned int nextTextureIndex = 1;
+        std::unordered_map<std::string, unsigned int> textureIndices{};
+
         void copyBufferToImage(const VkBuffer &vkBuffer, const TextureInstance *image, int layerCount) const;
 
         void createImageWithInfo(const VkImageCreateInfo &imageInfo, VkMemoryPropertyFlagBits vkMemoryProperties,
@@ -42,6 +45,8 @@ namespace Metal {
         TextureInstance *create(const std::string &id, const LevelOfDetail &lod);
 
         TextureInstance *createForCompute(unsigned int width, unsigned int height);
+
+        unsigned int getTextureIndex(const std::string &id);
     };
 } // Metal
 

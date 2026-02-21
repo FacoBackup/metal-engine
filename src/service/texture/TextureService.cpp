@@ -306,7 +306,11 @@ namespace Metal {
     TextureInstance *TextureService::create(const std::string &id, const LevelOfDetail &lod) {
         auto pathToFile = CTX.getAssetDirectory() + FORMAT_FILE_TEXTURE(id, lod);
         if (std::filesystem::exists(pathToFile)) {
-            return loadTexture(id + lod.suffix, pathToFile, true, VK_FORMAT_R8G8B8A8_UNORM);
+            auto *instance = loadTexture(id + lod.suffix, pathToFile, true, VK_FORMAT_R8G8B8A8_UNORM);
+            if (instance != nullptr) {
+                getTextureIndex(id + lod.suffix);
+            }
+            return instance;
         }
         return nullptr;
     }
@@ -338,5 +342,36 @@ namespace Metal {
                               VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
         return image;
+    }
+
+    unsigned int TextureService::getTextureIndex(const std::string &id) {
+        if (id.empty()) return 0;
+        if (textureIndices.contains(id)) return textureIndices[id];
+
+        if (resources.contains(id)) {
+            auto *texture = dynamic_cast<TextureInstance *>(resources.at(id));
+            unsigned int index = nextTextureIndex++;
+            textureIndices[id] = index;
+
+            // Update bindless descriptor set
+            VkWriteDescriptorSet write{};
+            write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            write.dstSet = CTX.coreDescriptorSets.textureArray->vkDescriptorSet;
+            write.dstBinding = 0;
+            write.dstArrayElement = index;
+            write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            write.descriptorCount = 1;
+
+            VkDescriptorImageInfo imageInfo{};
+            imageInfo.sampler = CTX.coreDescriptorSets.vkImageSampler;
+            imageInfo.imageView = texture->vkImageView;
+            imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            write.pImageInfo = &imageInfo;
+
+            vkUpdateDescriptorSets(CTX.vulkanContext.device.device, 1, &write, 0, nullptr);
+
+            return index;
+        }
+        return 0;
     }
 } // Metal

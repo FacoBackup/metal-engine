@@ -11,7 +11,8 @@ namespace Metal {
 
     void ViewportHeaderPanel::onSync() {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
-        if (ImGui::BeginChild(id.c_str(), ImVec2(0, HEIGHT), false, FLAGS)) {
+        ImGui::BeginChild(id.c_str(), ImVec2(0, HEIGHT), false, FLAGS);
+        {
             ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPosX() + 2, ImGui::GetCursorPosY() + 4));
             gizmo->onSync();
             ImGui::SameLine();

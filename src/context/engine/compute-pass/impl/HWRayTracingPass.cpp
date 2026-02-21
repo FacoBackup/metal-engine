@@ -24,7 +24,9 @@ namespace Metal {
                 .addDescriptorSet(CTX.coreDescriptorSets.currentFrameDescriptor.get())
                 .addDescriptorSet(CTX.coreDescriptorSets.surfaceCacheImage.get())
                 .addDescriptorSet(CTX.coreDescriptorSets.lightData.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.volumeData.get());
+                .addDescriptorSet(CTX.coreDescriptorSets.volumeData.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.materialData.get())
+                .addDescriptorSet(CTX.coreDescriptorSets.textureArray.get());
             pipelineInstance = CTX.pipelineService.createPipeline(builder);
         }
 

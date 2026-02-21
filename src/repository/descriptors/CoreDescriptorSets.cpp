@@ -11,59 +11,8 @@
 #define G CTX.coreFrameBuffers.gBufferFBO->attachments
 
 namespace Metal {
-    void CoreDescriptorSets::createMaterialDescriptors() {
-        materialAlbedo = std::make_unique<DescriptorInstance>();
-        materialNormal = std::make_unique<DescriptorInstance>();
-        materialRoughness = std::make_unique<DescriptorInstance>();
-        materialMetallic = std::make_unique<DescriptorInstance>();
-        materialHeight = std::make_unique<DescriptorInstance>();
-
-        materialAlbedo->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                               VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0));
-        materialNormal->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                               VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0));
-        materialRoughness->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                                  VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0));
-        materialMetallic->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                                 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0));
-        materialHeight->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                               VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0));
-
-        materialAlbedo->create();
-        materialNormal->create();
-        materialRoughness->create();
-        materialMetallic->create();
-        materialHeight->create();
-    }
-
     void CoreDescriptorSets::createBuffersDescriptors() {
-    {
-            svoData = std::make_unique<DescriptorInstance>();
-            // ONE FOR EACH ADJACENT TILE AND ONE FOR THE CENTER TILE
-
-            svoData->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                                            0, CTX.coreBuffers.tileInfo));
-            svoData->addLayoutBinding(
-                DescriptorBinding::Of(VK_SHADER_STAGE_ALL, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
-            svoData->addLayoutBinding(
-                DescriptorBinding::Of(VK_SHADER_STAGE_ALL, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 2));
-            svoData->addLayoutBinding(
-                DescriptorBinding::Of(VK_SHADER_STAGE_ALL, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 3));
-            svoData->addLayoutBinding(
-                DescriptorBinding::Of(VK_SHADER_STAGE_ALL, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 4));
-            svoData->addLayoutBinding(
-                DescriptorBinding::Of(VK_SHADER_STAGE_ALL, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 5));
-            svoData->addLayoutBinding(
-                DescriptorBinding::Of(VK_SHADER_STAGE_ALL, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 6));
-            svoData->addLayoutBinding(
-                DescriptorBinding::Of(VK_SHADER_STAGE_ALL, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 7));
-            svoData->addLayoutBinding(
-                DescriptorBinding::Of(VK_SHADER_STAGE_ALL, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 8));
-            svoData->addLayoutBinding(
-                DescriptorBinding::Of(VK_SHADER_STAGE_ALL, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 9));
-
-            svoData->create();
-        } {
+     {
             lightData = std::make_unique<DescriptorInstance>();
             lightData->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
                                                                     VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0,
@@ -88,6 +37,14 @@ namespace Metal {
                                       CTX.coreBuffers.globalData));
             globalDataDescriptor->create();
         }
+    }
+
+    void CoreDescriptorSets::createTextureArrayDescriptor() {
+        textureArray = std::make_unique<DescriptorInstance>();
+        textureArray->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
+                                                            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
+                                                            vkImageSampler, VK_NULL_HANDLE, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1000));
+        textureArray->create();
     }
 
     void CoreDescriptorSets::createGBufferDescriptors() {
@@ -157,7 +114,7 @@ namespace Metal {
         CTX.framebufferService.createSampler(false, vkImageSampler);
 
         createBuffersDescriptors();
-        createMaterialDescriptors();
+        createTextureArrayDescriptor();
         createGBufferDescriptors();
         createPathTracingDescriptors();
 

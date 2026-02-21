@@ -11,6 +11,9 @@
 #include "../../../../../common/inspection/Inspectable.h"
 
 namespace Metal {
+    constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoDocking |
+                                       ImGuiWindowFlags_NoSavedSettings;
+
     ResourceField::ResourceField(InspectedField<std::string> &field) : field(field) {
     }
 
@@ -26,7 +29,7 @@ namespace Metal {
                 field.instance->onUpdate(&field);
                 open = false;
             }
-        }));
+        }, field.resourceType));
     }
 
     void ResourceField::renderButton() {
@@ -61,13 +64,13 @@ namespace Metal {
         }
         ImVec2 size = ImVec2(ImGui::GetMainViewport()->Size.x / 2,
                              ImGui::GetMainViewport()->Size.y / 2);
-        ImGui::SetNextWindowSize(size);
+        ImGui::SetNextWindowSize(size, ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x - size.x,
-                                       ImGui::GetWindowPos().y));
-        if (ImGui::Begin(field.nameWithId.c_str(), nullptr, flags)) {
+                                       ImGui::GetWindowPos().y), ImGuiCond_FirstUseEver);
+        if (ImGui::Begin(field.nameWithId.c_str(), &open, flags)) {
             onSyncChildren();
-            ImGui::End();
         }
+        ImGui::End();
     }
 
     void ResourceField::onSync() {
