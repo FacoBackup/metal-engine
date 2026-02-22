@@ -1,4 +1,4 @@
-#include "MaterialInspection.h"
+#include "MaterialEditPanel.h"
 
 #include "../../../ApplicationContext.h"
 #include "../../../../util/UIUtil.h"
@@ -7,12 +7,13 @@
 #include "../../../../enum/engine-definitions.h"
 
 namespace Metal {
-    void MaterialInspection::onInitialize() {
+    void MaterialEditPanel::onInitialize() {
         formPanel = new FormPanel();
         appendChild(formPanel);
     }
 
-    void MaterialInspection::saveChanges() {
+    void MaterialEditPanel::saveChanges() {
+        CTX.engineContext.setGISettingsUpdated(true);
         data->freezeVersion();
         DUMP_TEMPLATE(CTX.getAssetDirectory() + FORMAT_FILE_MATERIAL(prevSelection), *data)
         CTX.notificationService.pushMessage("Material was saved", NotificationSeverities::SUCCESS);
@@ -22,7 +23,7 @@ namespace Metal {
         }
     }
 
-    void MaterialInspection::onSync() {
+    void MaterialEditPanel::onSync() {
         if (prevSelection != CTX.fileInspection.materialId) {
             delete data;
             data = CTX.materialService.stream(CTX.fileInspection.materialId);

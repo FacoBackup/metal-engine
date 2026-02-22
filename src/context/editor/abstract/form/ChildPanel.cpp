@@ -10,26 +10,24 @@ namespace Metal {
 
     void ChildPanel::onSync() {
         ImGui::PushStyleColor(ImGuiCol_ChildBg, CTX.themeService.palette0);
-        if (ImGui::BeginChild(fixedId.c_str(),  ImVec2(0, 0), ImGuiChildFlags_Border)) {
-            if (!title.empty()) {
-                ImGui::Text(title.c_str());
-                ImGui::Separator();
-            }
-            onSyncChildren();
+        if (!title.empty()) {
+            ImGui::Spacing();
+            ImGui::Text(title.c_str());
+            ImGui::Separator();
         }
-        ImGui::EndChild();
+        onSyncChildren();
 
         ImGui::PopStyleColor();
     }
 
-    void ChildPanel::onSyncChildren() const {
-        for (int i = 0; i < children.size(); i++) {
-            children[i]->onSync();
+    bool ChildPanel::isVisible() const {
+        if (!filter || filter->empty()) return true;
 
-            if (i < children.size() - 1) {
-                ImGui::Dummy(ImVec2(0, 4));
-                ImGui::Separator();
+        for (const auto panel: children) {
+            if (auto abstractPanel = dynamic_cast<AbstractFormFieldPanel *>(panel)) {
+                if (abstractPanel->isVisible()) return true;
             }
         }
+        return false;
     }
 }

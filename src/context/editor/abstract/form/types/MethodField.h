@@ -2,13 +2,13 @@
 #ifndef METAL_ENGINE_METHODFIELD_H
 #define METAL_ENGINE_METHODFIELD_H
 
-#include "../../AbstractPanel.h"
+#include "../AbstractFormFieldPanel.h"
 #include "../../../../../common/inspection/InspectedMethod.h"
 
 
 namespace Metal {
 
-    class MethodField : public AbstractPanel {
+    class MethodField : public AbstractFormFieldPanel {
         InspectedMethod &method;
 
     public:
@@ -16,6 +16,7 @@ namespace Metal {
 
         void onSync() override;
 
+        bool isVisible() const override;
     };
 
 } // Metal

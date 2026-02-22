@@ -1,5 +1,5 @@
 #include "StringField.h"
-
+#include <algorithm>
 #include <imgui.h>
 #include "../../../../../common/inspection/Inspectable.h"
 
@@ -19,5 +19,12 @@ field.instance->onUpdate(&field);
         } else {
             ImGui::Text("%s: %s", field.name.c_str(), field.field->c_str());
         }
+    }
+
+    bool StringField::isVisible() const {
+        if (!filter || filter->empty()) return true;
+        std::string lowerName = field.name;
+        std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
+        return lowerName.find(*filter) != std::string::npos;
     }
 } // Metal

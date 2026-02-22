@@ -14,20 +14,20 @@ namespace Metal {
             return;
         }
         ImGui::PushStyleColor(ImGuiCol_Header, CTX.themeService.neutralPalette);
-        if (ImGui::CollapsingHeader(fixedId.c_str())) {
+        if (ImGui::CollapsingHeader(fixedId.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
             onSyncChildren();
         }
         ImGui::PopStyleColor();
     }
 
-    void AccordionPanel::onSyncChildren() const {
-        for (int i = 0; i < children.size(); i++) {
-            children[i]->onSync();
+    bool AccordionPanel::isVisible() const {
+        if (!filter || filter->empty()) return true;
 
-            if (i < children.size() - 1) {
-                ImGui::Dummy(ImVec2(0, 4));
-                ImGui::Separator();
+        for (const auto panel : children) {
+            if (auto abstractPanel = dynamic_cast<AbstractFormFieldPanel*>(panel)) {
+                if (abstractPanel->isVisible()) return true;
             }
         }
+        return false;
     }
 }

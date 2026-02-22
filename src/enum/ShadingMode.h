@@ -15,11 +15,12 @@ namespace Metal::ShadingMode {
         POSITION,
         LIGHTING_ONLY,
         EMISSIVE,
-        GI
+        SURFACE_CACHE,
+        SURFACE_CACHE_SAMPLES
     };
 
     static auto Names =
-            "Lit\0Albedo\0Normal\0Roughness\0Metallic\0Occlusion\0Random\0Depth\0UV\0Position\0Lighting only\0Emission\0Global Illumination\0";
+            "Lit\0Albedo\0Normal\0Roughness\0Metallic\0Occlusion\0Random\0Depth\0UV\0Position\0Lighting only\0Emission\0Surface cache\0Surface cache samples\0";
 
     static ShadingMode ValueOfIndex(const int option) {
         if (option == 0) {
@@ -59,9 +60,12 @@ namespace Metal::ShadingMode {
             return ShadingMode::EMISSIVE;
         }
         if (option == 12) {
-            return ShadingMode::GI;
+            return ShadingMode::SURFACE_CACHE;
         }
-        return ShadingMode::GI;
+        if (option == 13) {
+            return ShadingMode::SURFACE_CACHE_SAMPLES;
+        }
+        return ShadingMode::RANDOM;
     }
 
     static int IndexOfValue(const ShadingMode mode) {
@@ -101,10 +105,13 @@ namespace Metal::ShadingMode {
         if (mode == ShadingMode::EMISSIVE) {
             return 11;
         }
-        if (mode == ShadingMode::GI) {
+        if (mode == ShadingMode::SURFACE_CACHE) {
             return 12;
         }
-        return 12;
+        if (mode == ShadingMode::SURFACE_CACHE_SAMPLES) {
+            return 13;
+        }
+        return 6;
     }
 }
 

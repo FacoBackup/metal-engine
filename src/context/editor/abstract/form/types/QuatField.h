@@ -1,11 +1,11 @@
 #ifndef QUATFIELD_H
 #define QUATFIELD_H
 #include <glm/fwd.hpp>
-#include "../../AbstractPanel.h"
+#include "../AbstractFormFieldPanel.h"
 #include "../../../../../common/inspection/InspectedField.h"
 
 namespace Metal {
-    class QuatField final : public AbstractPanel {
+    class QuatField final : public AbstractFormFieldPanel {
         InspectedField<glm::quat> &field;
         float values[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 
@@ -13,6 +13,8 @@ namespace Metal {
         explicit QuatField(InspectedField<glm::quat> &field);
 
         void onSync() override;
+
+        bool isVisible() const override;
     };
 } // Metal
 

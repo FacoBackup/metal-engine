@@ -5,11 +5,11 @@
 #include "FilesContext.h"
 
 namespace Metal {
-    class MaterialInspection;
+    class MaterialEditPanel;
 
     class FilePreviewPanel final : public AbstractPanel {
         FilesContext &filesContext;
-        MaterialInspection *materialInspection = nullptr;
+        MaterialEditPanel *materialInspection = nullptr;
 
     public:
         explicit FilePreviewPanel(FilesContext &filesContext);

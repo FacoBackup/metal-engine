@@ -1,10 +1,10 @@
 #ifndef ACCORDION_H
 #define ACCORDION_H
 
-#include "../AbstractPanel.h"
+#include "AbstractFormFieldPanel.h"
 
 namespace Metal {
-    class AccordionPanel final : public AbstractPanel {
+    class AccordionPanel final : public AbstractFormFieldPanel {
         std::string fixedId = id;
         std::string title;
 
@@ -14,7 +14,7 @@ namespace Metal {
 
         void onSync() override;
 
-        void onSyncChildren() const override;
+        bool isVisible() const override;
     };
 }
 

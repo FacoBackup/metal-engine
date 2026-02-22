@@ -6,7 +6,7 @@
 namespace Metal {
     struct MaterialFileData;
 
-    class MaterialInspection final : public AbstractPanel {
+    class MaterialEditPanel final : public AbstractPanel {
         std::string prevSelection;
         MaterialFileData *data = nullptr;
         FormPanel *formPanel = nullptr;

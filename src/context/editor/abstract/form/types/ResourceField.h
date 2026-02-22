@@ -3,14 +3,14 @@
 
 #include <memory>
 
-#include "../../AbstractPanel.h"
+#include "../AbstractFormFieldPanel.h"
 #include "../../../../../common/inspection/InspectedField.h"
 #include "imgui.h"
 
 namespace Metal {
     struct FileEntry;
 
-    class ResourceField final : public AbstractPanel {
+    class ResourceField final : public AbstractFormFieldPanel {
         InspectedField<std::string> &field;
         std::unique_ptr<FileEntry> entry = nullptr;
         mutable bool open = false;
@@ -22,9 +22,13 @@ namespace Metal {
 
         void renderModal() const;
 
+        void onSyncChildren() const override;
+
         explicit ResourceField(InspectedField<std::string> &field);
 
         void onSync() override;
+
+        bool isVisible() const override;
     };
 } // Metal
 

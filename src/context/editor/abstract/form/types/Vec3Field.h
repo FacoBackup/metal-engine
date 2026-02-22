@@ -3,12 +3,12 @@
 
 #include <glm/vec3.hpp>
 
-#include "../../AbstractPanel.h"
+#include "../AbstractFormFieldPanel.h"
 #include "../../../../../common/inspection/InspectedField.h"
 
 
 namespace Metal {
-    class Vec3Field final : public AbstractPanel {
+    class Vec3Field final : public AbstractFormFieldPanel {
         InspectedField<glm::vec3> &field;
         float values[3] = {0.0f, 0.0f, 0.0f};
 
@@ -16,6 +16,8 @@ namespace Metal {
         explicit Vec3Field(InspectedField<glm::vec3> &field);
 
         void onSync() override;
+
+        bool isVisible() const override;
     };
 } // Metal
 

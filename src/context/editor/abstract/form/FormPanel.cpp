@@ -3,7 +3,6 @@
 #include "ChildPanel.h"
 #include "../../../../enum/FieldType.h"
 #include "../../../../common/inspection/Inspectable.h"
-#include "../../../../context/gui/GuiContext.h"
 #include "types/IntField.h"
 #include "types/FloatField.h"
 #include "types/BooleanField.h"
@@ -20,60 +19,59 @@ namespace Metal {
     void FormPanel::processFields(Inspectable *inspection) {
         std::unordered_map<std::string, ChildPanel *> groups{};
         const auto rootPanel = new AccordionPanel();
+        rootPanel->setFilter(&searchFilter);
         appendChild(rootPanel);
         rootPanel->setTitle(std::string(inspection->getIcon()) + " " + inspection->getTitle());
         for (const auto &field: inspection->getFields()) {
             if (!groups.contains(field->group)) {
                 const auto panel = new ChildPanel();
+                panel->setFilter(&searchFilter);
                 groups[field->group] = panel;
                 rootPanel->appendChild(panel);
             }
             ChildPanel *group = groups[field->group];
             group->setTitle(field->group);
+            AbstractFormFieldPanel *fieldPanel = nullptr;
             switch (field->type) {
                 case STRING:
-                    group->appendChild(new StringField{dynamic_cast<InspectedField<std::string> &>(*field)});
+                    fieldPanel = new StringField{dynamic_cast<InspectedField<std::string> &>(*field)};
                     break;
                 case INT:
-                    group->appendChild(new IntField{dynamic_cast<InspectedField<int> &>(*field)});
+                    fieldPanel = new IntField{dynamic_cast<InspectedField<int> &>(*field)};
                     break;
                 case FLOAT:
-                    group->appendChild(new FloatField{dynamic_cast<InspectedField<float> &>(*field)});
+                    fieldPanel = new FloatField{dynamic_cast<InspectedField<float> &>(*field)};
                     break;
                 case BOOLEAN:
-                    group->appendChild(new BooleanField{dynamic_cast<InspectedField<bool> &>(*field)});
+                    fieldPanel = new BooleanField{dynamic_cast<InspectedField<bool> &>(*field)};
                     break;
                 case METHOD:
-                    group->appendChild(new MethodField{dynamic_cast<InspectedMethod &>(*field)});
-                default:
+                    fieldPanel = new MethodField{dynamic_cast<InspectedMethod &>(*field)};
                     break;
                 case VECTOR2:
-                    group->appendChild(new Vec2Field{dynamic_cast<InspectedField<glm::vec2> &>(*field)});
+                    fieldPanel = new Vec2Field{dynamic_cast<InspectedField<glm::vec2> &>(*field)};
                     break;
                 case VECTOR3:
-                    group->appendChild(new Vec3Field{dynamic_cast<InspectedField<glm::vec3> &>(*field)});
+                    fieldPanel = new Vec3Field{dynamic_cast<InspectedField<glm::vec3> &>(*field)};
                     break;
                 case VECTOR4:
-                    group->appendChild(new Vec4Field{dynamic_cast<InspectedField<glm::vec4> &>(*field)});
+                    fieldPanel = new Vec4Field{dynamic_cast<InspectedField<glm::vec4> &>(*field)};
                     break;
                 case QUAT:
-                    group->appendChild(new QuatField{dynamic_cast<InspectedField<glm::quat> &>(*field)});
+                    fieldPanel = new QuatField{dynamic_cast<InspectedField<glm::quat> &>(*field)};
                     break;
                 case COLOR:
-                    group->appendChild(new ColorField{dynamic_cast<InspectedField<glm::vec3> &>(*field)});
+                    fieldPanel = new ColorField{dynamic_cast<InspectedField<glm::vec3> &>(*field)};
                     break;
                 case RESOURCE:
-                    group->appendChild(new ResourceField{dynamic_cast<InspectedField<std::string> &>(*field)});
+                    fieldPanel = new ResourceField{dynamic_cast<InspectedField<std::string> &>(*field)};
                     break;
-                    //                    case OPTIONS:
-                    //                        group->appendChild(new OptionsField(field, changeHandler));
-                    //                        break;
-                    //                    case LIST:
-                    //                        break;
-                    //                    case COMPOSITE:
-                    //                        break;
-                    //                    case CUSTOM:
-                    //                        break;
+                default:
+                    break;
+            }
+            if (fieldPanel) {
+                fieldPanel->setFilter(&searchFilter);
+                group->appendChild(fieldPanel);
             }
         }
     }
@@ -90,7 +88,15 @@ namespace Metal {
     }
 
     void FormPanel::onSync() {
-        onSyncChildren();
+        if (ImGui::InputTextWithHint((id + "Search").c_str(), "Search...", searchBuffer, IM_ARRAYSIZE(searchBuffer))) {
+            searchFilter = searchBuffer;
+            std::transform(searchFilter.begin(), searchFilter.end(), searchFilter.begin(), ::tolower);
+        }
+        for (const auto panel: children) {
+            if (dynamic_cast<AbstractFormFieldPanel *>(panel)->isVisible()) {
+                panel->onSync();
+            }
+        }
     }
 
     void FormPanel::resetForm() {

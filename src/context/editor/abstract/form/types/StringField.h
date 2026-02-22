@@ -1,12 +1,12 @@
 #ifndef STRINGFIELD_H
 #define STRINGFIELD_H
 
-#include "../../AbstractPanel.h"
+#include "../AbstractFormFieldPanel.h"
 #include "../../../../../common/inspection/InspectedField.h"
 
 
 namespace Metal {
-    class StringField final : public AbstractPanel {
+    class StringField final : public AbstractFormFieldPanel {
         char buffer[512];
         InspectedField<std::string> &field;
 
@@ -14,6 +14,8 @@ namespace Metal {
         explicit StringField(InspectedField<std::string> &field);
 
         void onSync() override;
+
+        bool isVisible() const override;
     };
 } // Metal
 

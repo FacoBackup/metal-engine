@@ -1,16 +1,18 @@
 #ifndef METAL_ENGINE_BOOLEANFIELD_H
 #define METAL_ENGINE_BOOLEANFIELD_H
 
-#include "../../AbstractPanel.h"
+#include "../AbstractFormFieldPanel.h"
 #include "../../../../../common/inspection/InspectedField.h"
 
 namespace Metal {
-    class BooleanField final : public AbstractPanel {
+    class BooleanField final : public AbstractFormFieldPanel {
         InspectedField<bool> &field;
     public:
         explicit BooleanField(InspectedField<bool> &field);
 
         void onSync() override;
+
+        bool isVisible() const override;
     };
 
 } // Metal

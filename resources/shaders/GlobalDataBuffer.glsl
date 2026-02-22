@@ -13,7 +13,6 @@ layout(set = 0, binding = 0) uniform GlobalDataBlock {
     uint volumeShadowSteps;
     bool isAtmosphereEnabled;
 
-// GI
     bool enabledDenoiser;
     bool multipleImportanceSampling;
     uint pathTracerMaxSamples;

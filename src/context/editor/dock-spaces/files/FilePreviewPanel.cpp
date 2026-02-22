@@ -5,14 +5,14 @@
 #include "../../../../context/ApplicationContext.h"
 #include "../../../../common/interface/Icons.h"
 #include "../../../../service/texture/TextureInstance.h"
-#include "../inspector/MaterialInspection.h"
+#include "../inspector/MaterialEditPanel.h"
 
 namespace Metal {
     FilePreviewPanel::FilePreviewPanel(FilesContext &filesContext) : filesContext(filesContext) {
     }
 
     void FilePreviewPanel::onInitialize() {
-        materialInspection = new MaterialInspection();
+        materialInspection = new MaterialEditPanel();
         appendChild(materialInspection);
     }
 

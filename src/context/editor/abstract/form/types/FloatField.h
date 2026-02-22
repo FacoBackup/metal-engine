@@ -1,13 +1,13 @@
 #ifndef METAL_ENGINE_FLOATFIELD_H
 #define METAL_ENGINE_FLOATFIELD_H
 
-#include "../../AbstractPanel.h"
+#include "../AbstractFormFieldPanel.h"
 #include "../../../../../common/inspection/InspectedField.h"
 
 
 namespace Metal {
 
-    class FloatField final : public AbstractPanel {
+    class FloatField final : public AbstractFormFieldPanel {
         InspectedField<float> &field;
     public:
 
@@ -15,6 +15,7 @@ namespace Metal {
 
         void onSync() override;
 
+        bool isVisible() const override;
     };
 
 } // Metal

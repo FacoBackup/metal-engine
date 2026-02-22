@@ -1,5 +1,5 @@
 #include "ResourceField.h"
-
+#include <algorithm>
 #include <imgui.h>
 #include <iostream>
 
@@ -73,6 +73,10 @@ namespace Metal {
         ImGui::End();
     }
 
+    void ResourceField::onSyncChildren() const {
+        AbstractPanel::onSyncChildren();
+    }
+
     void ResourceField::onSync() {
         if (field.field->size() > 0 && (entry == nullptr || entry->getId() != *field.field)) {
             entry = CTX.filesService.getResource(*field.field);
@@ -83,5 +87,12 @@ namespace Metal {
         } else {
             ImGui::Text("%s: %s", field.name.c_str(), (entry != nullptr ? entry->name.c_str() : "(None)"));
         }
+    }
+
+    bool ResourceField::isVisible() const {
+        if (!filter || filter->empty()) return true;
+        std::string lowerName = field.name;
+        std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
+        return lowerName.find(*filter) != std::string::npos;
     }
 } // Metal

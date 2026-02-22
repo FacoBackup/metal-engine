@@ -10,4 +10,5 @@
 #define POSITION 9
 #define LIGHTING_ONLY 10
 #define EMISSIVE 11
-#define GI 12
+#define SURFACE_CACHE  12
+#define SURFACE_CACHE_SAMPLES 13

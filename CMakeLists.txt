@@ -269,8 +269,8 @@ add_executable(
         src/service/material/MaterialFileData.cpp
         src/repository/inspection/FileInspectionRepository.cpp
         src/repository/inspection/FileInspectionRepository.h
-        src/context/editor/dock-spaces/inspector/MaterialInspection.cpp
-        src/context/editor/dock-spaces/inspector/MaterialInspection.h
+        src/context/editor/dock-spaces/inspector/MaterialEditPanel.cpp
+        src/context/editor/dock-spaces/inspector/MaterialEditPanel.h
         src/enum/LightType.h
         src/context/engine/compute-pass/impl/AccumulationMetadataPass.cpp
         src/context/engine/compute-pass/impl/AccumulationMetadataPass.h
