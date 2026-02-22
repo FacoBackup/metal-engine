@@ -13,6 +13,8 @@ namespace Metal {
 
         void registerLights();
 
+        void registerSun();
+
         static glm::vec3 CalculateSunColor(float elevation, glm::vec3 &nightColor, glm::vec3 &dawnColor,
                                            glm::vec3 &middayColor);
 

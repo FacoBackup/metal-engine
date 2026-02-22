@@ -1,4 +1,5 @@
 #include <imgui_impl_glfw.h>
+#include <mutex>
 #include "GLFWContext.h"
 #include "../ApplicationContext.h"
 #include "../../util/VulkanUtils.h"
@@ -67,7 +68,11 @@ namespace Metal {
         info.swapchainCount = 1;
         info.pSwapchains = &wd.Swapchain;
         info.pImageIndices = &wd.FrameIndex;
-        VkResult err = vkQueuePresentKHR(CTX.vulkanContext.graphicsQueue, &info);
+        VkResult err;
+        {
+            std::lock_guard<std::mutex> lock(CTX.vulkanContext.queueMutex);
+            err = vkQueuePresentKHR(CTX.vulkanContext.graphicsQueue, &info);
+        }
         if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR) {
             swapChainRebuild = true;
             return;

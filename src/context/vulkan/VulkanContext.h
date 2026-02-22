@@ -69,7 +69,8 @@ namespace Metal {
         VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
         VkCommandPool commandPool = VK_NULL_HANDLE;
         VkPhysicalDeviceRayTracingPipelinePropertiesKHR rayTracingPipelineProperties{};
-        mutable std::mutex singleTimeCommandMutex;
+        mutable std::mutex queueMutex;
+        mutable std::mutex commandPoolMutex;
 
         PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR = nullptr;
         PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR = nullptr;

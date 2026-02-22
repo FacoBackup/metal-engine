@@ -327,6 +327,7 @@ namespace Metal {
     }
 
     VkCommandBuffer VulkanContext::beginSingleTimeCommands() const {
+        std::lock_guard<std::mutex> lock(commandPoolMutex);
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -352,10 +353,16 @@ namespace Metal {
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &commandBuffer;
 
-        vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
-        vkQueueWaitIdle(graphicsQueue);
+        {
+            std::lock_guard<std::mutex> lock(queueMutex);
+            vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+            vkQueueWaitIdle(graphicsQueue);
+        }
 
-        vkFreeCommandBuffers(device.device, commandPool, 1, &commandBuffer);
+        {
+            std::lock_guard<std::mutex> lock(commandPoolMutex);
+            vkFreeCommandBuffers(device.device, commandPool, 1, &commandBuffer);
+        }
     }
 
 
@@ -373,6 +380,9 @@ namespace Metal {
         info.signalSemaphoreCount = 1;
         info.pSignalSemaphores = &render_complete_semaphore;
         VulkanUtils::CheckVKResult(vkEndCommandBuffer(fd->CommandBuffer));
-        VulkanUtils::CheckVKResult(vkQueueSubmit(CTX.vulkanContext.graphicsQueue, 1, &info, fd->Fence));
+        {
+            std::lock_guard<std::mutex> lock(CTX.vulkanContext.queueMutex);
+            VulkanUtils::CheckVKResult(vkQueueSubmit(CTX.vulkanContext.graphicsQueue, 1, &info, fd->Fence));
+        }
     }
 }

@@ -57,7 +57,9 @@ namespace Metal {
         auto *newTile = CTX.worldGridRepository.getOrCreateTile(translation);
 
         CTX.worldGridRepository.moveBetweenTiles(st->getEntityId(), previousTile, newTile);
-        CTX.rayTracingService.markDirty();
+        if (CTX.worldRepository.registry.all_of<MeshComponent>(static_cast<entt::basic_registry<>::entity_type>(st->getEntityId()))) {
+            CTX.rayTracingService.markDirty();
+        }
     }
 
     TransformComponent *TransformService::findParent(EntityID id) const {

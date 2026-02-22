@@ -2,7 +2,6 @@
 #include <entt/entt.hpp>
 #include "../../context/ApplicationContext.h"
 #include "../../repository/world/components/SphereLightComponent.h"
-#include "../../repository/world/components/PlaneLightComponent.h"
 #include "../buffer/BufferInstance.h"
 
 namespace Metal {
@@ -22,7 +21,7 @@ namespace Metal {
 
             float radiusOrScale = 0;
             if (lightType == LightTypes::SPHERE) {
-                radiusOrScale = static_cast<SphereLightComponent&>(l).radiusSize;
+                radiusOrScale = static_cast<SphereLightComponent &>(l).radiusSize;
             }
 
             items.push_back(LightData(
@@ -35,9 +34,22 @@ namespace Metal {
         }
     }
 
+    void LightService::registerSun() {
+        if (CTX.engineRepository.atmosphereEnabled) {
+            items.push_back(LightData(
+                glm::vec4(sunColor, CTX.engineRepository.sunLightIntensity),
+                sunPosition,
+                glm::vec3(0),
+                glm::vec3(CTX.engineRepository.sunRadius),
+                LightTypes::SPHERE
+            ));
+        }
+    }
+
     void LightService::onSync() {
         items.clear();
 
+        registerSun();
         registerLights();
 
         if (!items.empty()) {
@@ -58,7 +70,7 @@ namespace Metal {
     }
 
     glm::vec3 LightService::CalculateSunColor(const float elevation, glm::vec3 &nightColor, glm::vec3 &dawnColor,
-                                                    glm::vec3 &middayColor) {
+                                              glm::vec3 &middayColor) {
         if (elevation <= -0.1f) {
             return nightColor;
         }
