@@ -46,9 +46,9 @@ namespace Metal {
         PARSE_TEMPLATE(worldRepository, rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository) + ".json")
 
 
-        FilesUtil::MkDir(getShadersDirectory());
-        FilesUtil::MkDir(getAssetRefDirectory());
-        FilesUtil::MkDir(getAssetDirectory());
+        FilesUtil::CreateDirectory(getShadersDirectory());
+        FilesUtil::CreateDirectory(getAssetRefDirectory());
+        FilesUtil::CreateDirectory(getAssetDirectory());
     }
 
     unsigned int ApplicationContext::getFrameIndex() const {

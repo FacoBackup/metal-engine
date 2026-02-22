@@ -7,19 +7,19 @@
 #include <thread>
 
 namespace Metal {
-    void FileImporterService::importFile(const std::string &targetDir, const std::string &file) const {
+    void FileImporterService::importFile(const std::string &targetDir, const std::string &file, const std::shared_ptr<ImportSettingsDTO> &settings) const {
         std::string fileName = file.substr(file.find_last_of(std::filesystem::path::preferred_separator) + 1);
         runAsync("Import file: " + fileName,
-                 [this, targetDir, file, fileName](const std::stop_token &token) {
+                 [this, targetDir, file, fileName, settings](const std::stop_token &token) {
                      try {
                          LOG_INFO("Starting file processing: " + fileName);
                          if (CTX.sceneImporterService.isCompatible(file)) {
                              CTX.sceneImporterService.importData(targetDir,
-                                                                     file, token);
+                                                                     file, settings, token);
                          } else if (CTX.textureImporter.isCompatible(file)) {
-                             CTX.textureImporter.importData(targetDir, file, token);
+                             CTX.textureImporter.importData(targetDir, file, settings, token);
                          } else if (CTX.voxelImporterService.isCompatible(file)) {
-                             CTX.voxelImporterService.importData(targetDir, file, token);
+                             CTX.voxelImporterService.importData(targetDir, file, settings, token);
                          }
 
                          LOG_INFO("Successfully imported file: " + fileName);

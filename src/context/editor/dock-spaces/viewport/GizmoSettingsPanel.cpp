@@ -90,7 +90,7 @@ namespace Metal {
             editorRepository->gizmoUseSnapTranslate = !editorRepository->gizmoUseSnapTranslate;
         }
         ImGui::SameLine();
-        ImGui::SetNextItemWidth(35);
+        ImGui::SetNextItemWidth(50);
         if (ImGui::Combo((id + "translateSnapAngle").c_str(), &editorRepository->gizmoSnapTranslateOption,
                          SNAP_TRANSLATE_OPTIONS)) {
             editorRepository->gizmoSnapTranslate = SNAP_TRANSLATE_OPTIONS_A[editorRepository->gizmoSnapTranslateOption];
@@ -103,7 +103,7 @@ namespace Metal {
             editorRepository->gizmoUseSnapRotate = !editorRepository->gizmoUseSnapRotate;
         }
         ImGui::SameLine();
-        ImGui::SetNextItemWidth(35);
+        ImGui::SetNextItemWidth(50);
         if (ImGui::Combo((id + "rotateSnapAngle").c_str(), &editorRepository->gizmoSnapRotateOption,
                          SNAP_ROTATE_OPTIONS)) {
             editorRepository->gizmoSnapRotate = SNAP_ROTATE_OPTIONS_A[editorRepository->gizmoSnapRotateOption];
@@ -116,7 +116,7 @@ namespace Metal {
             editorRepository->gizmoUseSnapScale = !editorRepository->gizmoUseSnapScale;
         }
         ImGui::SameLine();
-        ImGui::SetNextItemWidth(35);
+        ImGui::SetNextItemWidth(50);
         if (ImGui::Combo((id + "scaleSnapAngle").c_str(), &editorRepository->gizmoSnapScaleOption, SNAP_SCALE_OPTIONS,
                          ImGuiComboFlags_NoArrowButton)) {
             editorRepository->gizmoSnapScale = SNAP_SCALE_OPTIONS[editorRepository->gizmoSnapScaleOption];

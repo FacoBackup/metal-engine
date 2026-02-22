@@ -6,7 +6,7 @@
 #include "ResourceFilesPanel.h"
 #include "../../../../../common/interface/Icons.h"
 #include "../../../../../util/UIUtil.h"
-#include "../../../../../dto/file/FileEntry.h"
+#include "../../../../../dto/file/FSEntry.h"
 #include "../../../../../context/ApplicationContext.h"
 #include "../../../../../common/inspection/Inspectable.h"
 
@@ -18,7 +18,7 @@ namespace Metal {
     }
 
     void ResourceField::onInitialize() {
-        appendChild(new ResourceFilesPanel([this](FileEntry *file) {
+        appendChild(new ResourceFilesPanel([this](FSEntry *file) {
             if (file == nullptr) {
                 open = false;
                 return;

@@ -7,20 +7,20 @@
 
 
 namespace Metal {
-    struct FileEntry;
+    struct FSEntry;
 
     struct FilesContext final {
-        FileEntry *currentDirectory = nullptr;
-        std::unordered_map<std::string, FileEntry *> selected{};
-        std::unordered_map<std::string, FileEntry *> toCut{};
+        FSEntry *currentDirectory = nullptr;
+        std::unordered_map<std::string, FSEntry *> selected{};
+        std::unordered_map<std::string, FSEntry *> toCut{};
         std::string pathToCurrentDirectory;
         EntryType::EntryType filterType = EntryType::NONE;
 
-        explicit FilesContext(FileEntry *currentDirectory)
+        explicit FilesContext(FSEntry *currentDirectory)
             : currentDirectory(currentDirectory) {
         }
 
-        void setCurrentDirectory(FileEntry *entry);
+        void setCurrentDirectory(FSEntry *entry);
     };
 }
 #endif //FILESCONTEXT_H

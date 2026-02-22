@@ -1,5 +1,5 @@
 #include "FilesService.h"
-#include "../../dto/file/FileEntry.h"
+#include "../../dto/file/FSEntry.h"
 #include "../../enum/EntryType.h"
 #include "../../enum/engine-definitions.h"
 #include "../../util/FilesUtil.h"
@@ -32,13 +32,13 @@ std::filesystem::remove_all(CTX.getAssetDirectory() + F(entry.second->getId()));
 
 namespace Metal {
     void FilesService::onInitialize() {
-        root = new FileEntry(nullptr, CTX.getAssetRefDirectory(), "");
+        root = new FSEntry(nullptr, CTX.getAssetRefDirectory(), "");
         root->type = EntryType::DIRECTORY;
         root->name = "Files";
         GetEntries(root);
     }
 
-    std::unique_ptr<FileEntry> FilesService::getResource(const std::string &id) {
+    std::unique_ptr<FSEntry> FilesService::getResource(const std::string &id) {
         try {
             for (const auto &entry: fs::recursive_directory_iterator(root->absolutePath)) {
                 if (entry.is_regular_file() &&
@@ -46,7 +46,7 @@ namespace Metal {
                     DATA
                     auto sys_tp = std::chrono::file_clock::to_utc(ftime);
                     std::string dateStr = std::format("{:%Y-%m-%d %H:%M}", sys_tp);
-                    auto child = std::make_unique<FileEntry>(
+                    auto child = std::make_unique<FSEntry>(
                         root,
                         absolute(entry.path()).string(),
                         dateStr);
@@ -61,12 +61,12 @@ namespace Metal {
         return nullptr;
     }
 
-    void FilesService::deleteFiles(const std::unordered_map<std::string, FileEntry *> &selected) {
+    void FilesService::deleteFiles(const std::unordered_map<std::string, FSEntry *> &selected) {
         for (auto &entry: selected) {
             switch (entry.second->type) {
                 case EntryType::DIRECTORY: {
                     FilesService::GetEntries(entry.second);
-                    std::unordered_map<std::string, FileEntry *> files;
+                    std::unordered_map<std::string, FSEntry *> files;
                     for (auto *f: entry.second->children) {
                         files.insert({f->getId(), f});
                     }
@@ -99,16 +99,37 @@ namespace Metal {
         }
     }
 
-    void FilesService::createMaterial(std::string targetDir) const {
+    void FilesService::createMaterial(const std::string &targetDir, FSEntry *currentDirectory) const {
         EntryMetadata materialMetadata{};
         materialMetadata.type = EntryType::MATERIAL;
-        materialMetadata.name = "New Material";
+        int count = 0;
+        for (FSEntry *child: currentDirectory->children) {
+            if (child->type == EntryType::MATERIAL && child->name == "New Material (" + std::to_string(count) + ")") {
+                count++;
+            }
+        }
+        materialMetadata.name = "New Material (" + std::to_string(count+1) + ")";
+
         DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(materialMetadata.getId()), materialMetadata)
         MaterialFileData data{};
         DUMP_TEMPLATE(CTX.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialMetadata.getId()), data)
     }
 
-    void FilesService::Move(FileEntry *toMove, FileEntry *targetDir) {
+    void FilesService::CreateDirectory(FSEntry *currentDirectory) {
+        int count = 0;
+        for (FSEntry *child: currentDirectory->children) {
+            if (child->type == EntryType::DIRECTORY && child->name == "New Directory (" + std::to_string(count) + ")") {
+                count++;
+            }
+        }
+        std::string pathToDir = currentDirectory->absolutePath + '/' + "New Directory (" + std::to_string(count + 1) + ")";
+        if (std::filesystem::exists(pathToDir)) {
+            return;
+        }
+        std::filesystem::create_directory(pathToDir);
+    }
+
+    void FilesService::Move(FSEntry *toMove, FSEntry *targetDir) {
         if (!targetDir || targetDir->type != EntryType::DIRECTORY) {
             return;
         }
@@ -118,7 +139,7 @@ namespace Metal {
 
         try {
             fs::rename(sourcePath, targetPath);
-        } catch (const fs::filesystem_error& e) {
+        } catch (const fs::filesystem_error &e) {
             LOG_ERROR("Could not move file");
             CTX.notificationService.pushMessage("Could not move entry", NotificationSeverities::ERROR);
             return;
@@ -127,7 +148,7 @@ namespace Metal {
         toMove->absolutePath = targetPath.string();
 
         if (toMove->parent) {
-            auto& oldChildren = toMove->parent->children;
+            auto &oldChildren = toMove->parent->children;
             oldChildren.erase(std::remove(oldChildren.begin(), oldChildren.end(), toMove),
                               oldChildren.end());
         }
@@ -136,7 +157,7 @@ namespace Metal {
         targetDir->children.push_back(toMove);
     }
 
-    void FilesService::GetEntries(FileEntry *root) {
+    void FilesService::GetEntries(FSEntry *root) {
         if (root->type != EntryType::DIRECTORY) {
             return;
         }
@@ -148,7 +169,7 @@ namespace Metal {
                     DATA
                     auto sys_tp = std::chrono::file_clock::to_utc(ftime);
                     std::string dateStr = std::format("{:%Y-%m-%d %H:%M}", sys_tp);
-                    auto &child = root->children.emplace_back(new FileEntry(
+                    auto &child = root->children.emplace_back(new FSEntry(
                         root,
                         fs::absolute(entry.path()).string(),
                         dateStr));
@@ -156,7 +177,7 @@ namespace Metal {
                     child->formattedSize = FilesUtil::FormatSize(child->size);
                 }
             } else {
-                auto &child = root->children.emplace_back(new FileEntry(
+                auto &child = root->children.emplace_back(new FSEntry(
                     root,
                     fs::absolute(entry.path()).string(),
                     ""));

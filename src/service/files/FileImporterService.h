@@ -5,6 +5,7 @@
 #include <stop_token>
 #include <string>
 
+#include "../../dto/file/ImportSettingsDTO.h"
 #include "../../common/AbstractRuntimeComponent.h"
 
 namespace Metal {
@@ -16,7 +17,7 @@ namespace Metal {
 
         using LoadingTask = std::function<void(const std::stop_token &)>;
 
-        void importFile(const std::string &targetDir, const std::string &file) const;
+        void importFile(const std::string &targetDir, const std::string &file, const std::shared_ptr<ImportSettingsDTO> &settings) const;
 
         std::string runAsync(const std::string &taskName, const LoadingTask &task) const;
 

@@ -1,7 +1,7 @@
 #include "ResourceFilesPanel.h"
 
 #include "../../../../../common/interface/Icons.h"
-#include "../../../../../dto/file/FileEntry.h"
+#include "../../../../../dto/file/FSEntry.h"
 #include "../../../../../service/files/FilesService.h"
 
 namespace Metal {
@@ -15,7 +15,7 @@ namespace Metal {
         return Icons::close + "Close";
     }
 
-    void ResourceFilesPanel::openResource(FileEntry *root) {
+    void ResourceFilesPanel::openResource(FSEntry *root) {
         if (root->type == EntryType::DIRECTORY) {
             filesContext.setCurrentDirectory(root);
             FilesService::GetEntries(root);

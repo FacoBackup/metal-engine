@@ -8,11 +8,11 @@
 #include "imgui.h"
 
 namespace Metal {
-    struct FileEntry;
+    struct FSEntry;
 
     class ResourceField final : public AbstractFormFieldPanel {
         InspectedField<std::string> &field;
-        std::unique_ptr<FileEntry> entry = nullptr;
+        std::unique_ptr<FSEntry> entry = nullptr;
         mutable bool open = false;
 
     public:

@@ -1,10 +1,10 @@
 #include "FilesContext.h"
 
-#include "../../../../dto/file/FileEntry.h"
+#include "../../../../dto/file/FSEntry.h"
 #include <memory>
 
 namespace Metal {
-    void FilesContext::setCurrentDirectory(FileEntry *entry) {
+    void FilesContext::setCurrentDirectory(FSEntry *entry) {
         currentDirectory = entry;
 
         auto *root = currentDirectory;

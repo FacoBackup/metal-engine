@@ -57,12 +57,13 @@ namespace Metal {
         return nullptr;
     }
 
-    EntityID MeshService::createMeshEntity(const std::string &name, const std::string &meshId) const {
+    EntityID MeshService::createMeshEntity(const std::string &name, const std::string &meshId, const std::string &materialId) const {
         const auto id = CTX.worldRepository.createEntity();
         CTX.worldRepository.createComponent(id, ComponentTypes::ComponentType::MESH);
         const auto entity = static_cast<entt::entity>(id);
         auto &mesh = CTX.worldRepository.registry.get<MeshComponent>(entity);
         mesh.meshId = meshId;
+        mesh.materialId = materialId;
 
         MeshData *data = stream(meshId, LevelOfDetail::LOD_0);
         if (data != nullptr) {
@@ -85,7 +86,7 @@ namespace Metal {
 
         for (auto &entity: data.entities) {
             if (!entity.meshId.empty()) {
-                entities.insert({entity.id, createMeshEntity(entity.name, entity.meshId)});
+                entities.insert({entity.id, createMeshEntity(entity.name, entity.meshId, entity.materialId)});
             } else {
                 const auto entityId = repo.createEntity();
                 entities.insert({entity.id, entityId});

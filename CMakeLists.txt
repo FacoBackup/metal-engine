@@ -127,12 +127,12 @@ add_executable(
         src/service/mesh/MeshInstance.cpp
         src/service/mesh/MeshInstance.h
         src/util/FilesUtil.h
-        src/dto/file/FileEntry.h
+        src/dto/file/FSEntry.h
         src/enum/EntryType.h
         src/context/editor/dock-spaces/files/FilesContext.h
         src/util/FileDialogUtil.h
-        src/context/editor/dock-spaces/files/FilesHeader.cpp
-        src/context/editor/dock-spaces/files/FilesHeader.h
+        src/context/editor/dock-spaces/files/FilesHeaderPanel.cpp
+        src/context/editor/dock-spaces/files/FilesHeaderPanel.h
         src/service/material/MaterialImporterService.cpp
         src/service/material/MaterialImporterService.h
         src/service/mesh/MeshImporterService.cpp
@@ -294,6 +294,7 @@ add_executable(
         src/util/Serializable.cpp
         src/context/editor/abstract/form/ChildPanel.cpp
         src/context/editor/abstract/form/ChildPanel.h
+        src/dto/file/SceneImportSettingsDTO.h
 )
 
 

@@ -24,15 +24,19 @@ namespace Metal {
             }),
             ShortcutDTO("Select All", ImGuiMod_Ctrl | ImGuiKey_A, [this]() {
                 std::vector<EntityID> entities;
-                auto& storage = world->registry.storage<entt::entity>();
+                auto &storage = world->registry.storage<entt::entity>();
                 for (auto it = storage.begin(); it != storage.end(); ++it) {
                     auto entity = *it;
-                    if (static_cast<EntityID>(entity) != WorldRepository::ROOT_ID && world->registry.all_of<EntityComponent>(entity)) {
+                    if (static_cast<EntityID>(entity) != WorldRepository::ROOT_ID && world->registry.all_of<
+                            EntityComponent>(entity)) {
                         entities.push_back(static_cast<EntityID>(entity));
                     }
                 }
                 CTX.selectionService.addAllSelected(entities);
-            })
+            }),
+            ShortcutDTO("Save", ImGuiMod_Ctrl | ImGuiKey_S, [] {
+                CTX.save();
+            }),
         };
     }
 
@@ -131,7 +135,7 @@ namespace Metal {
         if (world->registry.all_of<MeshComponent>(entity)) {
             return ComponentTypes::IconOf(ComponentTypes::MESH);
         }
-        if (world->registry.all_of<std::unique_ptr<LightComponent>>(entity)) {
+        if (world->registry.all_of<std::unique_ptr<LightComponent> >(entity)) {
             return ComponentTypes::IconOf(ComponentTypes::SPHERE_LIGHT);
         }
         if (world->registry.all_of<VolumeComponent>(entity)) {

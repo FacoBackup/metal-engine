@@ -42,7 +42,9 @@ namespace Metal {
         recomposeMatrix();
         ImGuizmo::SetOrthographic(CTX.worldRepository.camera.isOrthographic);
         ImGuizmo::SetDrawlist();
-        ImGuizmo::SetRect(position->x, position->y, size->x, size->y);
+        ImVec2 viewportMin = ImGui::GetItemRectMin();
+        ImVec2 viewportSize = ImGui::GetItemRectSize();
+        ImGuizmo::SetRect(viewportMin.x, viewportMin.y, viewportSize.x, viewportSize.y);
         Manipulate(
             viewMatrixCache,
             projectionMatrixCache,
@@ -113,7 +115,13 @@ namespace Metal {
     void GizmoPanel::recomposeMatrix() {
         viewMatrixCache = glm::value_ptr(CTX.worldRepository.camera.viewMatrix);
         cacheProjection = CTX.worldRepository.camera.projectionMatrix;
+
         cacheProjection[1][1] *= -1;
+
+        // Convert depth range from [0, 1] (Vulkan) to [-1, 1] (ImGuizmo/OpenGL)
+        cacheProjection[2][2] = cacheProjection[2][2] * 2.0f - cacheProjection[2][3];
+        cacheProjection[3][2] = cacheProjection[3][2] * 2.0f - cacheProjection[3][3];
+
         projectionMatrixCache = glm::value_ptr(cacheProjection);
     }
 } // Metal

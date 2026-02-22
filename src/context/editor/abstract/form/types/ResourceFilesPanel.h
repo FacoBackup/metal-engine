@@ -6,11 +6,11 @@
 
 namespace Metal {
     class ResourceFilesPanel final : public FilesPanel {
-        std::function<void (FileEntry *)> callback;
+        std::function<void (FSEntry *)> callback;
         EntryType::EntryType typeFilter;
 
     public:
-        explicit ResourceFilesPanel(const std::function<void (FileEntry *)> &callback,
+        explicit ResourceFilesPanel(const std::function<void (FSEntry *)> &callback,
                                     EntryType::EntryType type) : callback(callback), typeFilter(type) {
         }
 
@@ -30,7 +30,7 @@ namespace Metal {
             return false;
         }
 
-        void openResource(FileEntry *root) override;
+        void openResource(FSEntry *root) override;
     };
 } // Metal
 

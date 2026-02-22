@@ -34,7 +34,8 @@ namespace Metal {
                             return CTX.textureImporter.importEmbeddedTexture(
                                 targetDir, scene->mTextures[embeddedIndex], nameHint);
                         }
-                    } catch (...) {
+                    } catch (std::exception &e) {
+                        LOG_ERROR("Failed to import texture: " + std::string(e.what()));
                         return "";
                     }
                     return "";
@@ -46,8 +47,9 @@ namespace Metal {
                 }
                 resolved = resolved.lexically_normal();
                 try {
-                    return CTX.textureImporter.importData(targetDir, resolved.string(), stopToken);
+                    return CTX.textureImporter.importData(targetDir, resolved.string(), nullptr, stopToken);
                 } catch (std::exception &e) {
+                    LOG_ERROR("Failed to import texture " + resolved.string() + ": " + e.what());
                     return "";
                 }
             };

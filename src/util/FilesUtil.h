@@ -2,7 +2,7 @@
 #define FILESUTIL_H
 #include <filesystem>
 #include <format>
-#include "../dto/file/FileEntry.h"
+#include "../dto/file/FSEntry.h"
 
 namespace fs = std::filesystem;
 
@@ -53,7 +53,7 @@ namespace Metal::FilesUtil {
         file.close();
     }
 
-    static void MkDir(const std::string &pathToDir) {
+    static void CreateDirectory(const std::string &pathToDir) {
         if (std::filesystem::exists(pathToDir)) {
             return;
         }

@@ -70,7 +70,7 @@ namespace Metal {
             if (option >= 0 && option < entries.size()) {
                 return entries[option].value;
             }
-            return RANDOM;
+            return LIT;
         }
 
         static inline int IndexOfValue(const ShadingMode mode) {
@@ -79,7 +79,7 @@ namespace Metal {
                     return i;
                 }
             }
-            return 6; // RANDOM
+            return 0; // RANDOM
         }
     };
 }

@@ -18,25 +18,42 @@ namespace Metal {
         appendChild(cameraPanel = new CameraPositionPanel());
 
         shortcuts = {
-                ShortcutDTO("Delete", ImGuiKey_Delete, [this]() {
-                    std::vector<EntityID> entities;
-                    for (auto &entry: CTX.editorRepository.selected) {
-                        entities.push_back(entry.first);
+            ShortcutDTO("Change shading mode", ImGuiKey_Q, []() {
+                CTX.editorRepository.shadingMode = ShadingModes::ValueOfIndex(
+                    ShadingModes::IndexOfValue(CTX.editorRepository.shadingMode) + 1);
+            }),
+            ShortcutDTO("Translate", ImGuiKey_1, []() {
+                CTX.editorRepository.gizmoType = ImGuizmo::OPERATION::TRANSLATE;
+            }),
+            ShortcutDTO("Scale", ImGuiKey_2, []() {
+                CTX.editorRepository.gizmoType = ImGuizmo::OPERATION::SCALE;
+            }),
+            ShortcutDTO("Rotate", ImGuiKey_3, []() {
+                CTX.editorRepository.gizmoType = ImGuizmo::OPERATION::ROTATE;
+            }),
+            ShortcutDTO("Delete", ImGuiKey_Delete, [this]() {
+                std::vector<EntityID> entities;
+                for (auto &entry: CTX.editorRepository.selected) {
+                    entities.push_back(entry.first);
+                }
+                CTX.worldRepository.deleteEntities(entities);
+                CTX.selectionService.clearSelection();
+            }),
+            ShortcutDTO("Select All", ImGuiMod_Ctrl | ImGuiKey_A, [this]() {
+                std::vector<EntityID> entities;
+                auto &storage = CTX.worldRepository.registry.storage<entt::entity>();
+                for (auto it = storage.begin(); it != storage.end(); ++it) {
+                    auto entity = *it;
+                    if (static_cast<EntityID>(entity) != WorldRepository::ROOT_ID && CTX.worldRepository.registry.all_of
+                        <EntityComponent>(entity)) {
+                        entities.push_back(static_cast<EntityID>(entity));
                     }
-                    CTX.worldRepository.deleteEntities(entities);
-                    CTX.selectionService.clearSelection();
-                }),
-                ShortcutDTO("Select All", ImGuiMod_Ctrl | ImGuiKey_A, [this]() {
-                    std::vector<EntityID> entities;
-                    auto& storage = CTX.worldRepository.registry.storage<entt::entity>();
-                    for (auto it = storage.begin(); it != storage.end(); ++it) {
-                        auto entity = *it;
-                        if (static_cast<EntityID>(entity) != WorldRepository::ROOT_ID && CTX.worldRepository.registry.all_of<EntityComponent>(entity)) {
-                            entities.push_back(static_cast<EntityID>(entity));
-                        }
-                    }
-                    CTX.selectionService.addAllSelected(entities);
-                })
+                }
+                CTX.selectionService.addAllSelected(entities);
+            }),
+            ShortcutDTO("Save", ImGuiMod_Ctrl | ImGuiKey_S, [] {
+                CTX.save();
+            })
         };
     }
 

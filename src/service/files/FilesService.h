@@ -7,31 +7,33 @@
 #include "../../common/AbstractRuntimeComponent.h"
 
 namespace Metal {
-    struct FileEntry;
+    struct FSEntry;
 
     class FilesService final : public AbstractRuntimeComponent {
-        FileEntry *root = nullptr;
+        FSEntry *root = nullptr;
 
     public:
         explicit FilesService()
             : AbstractRuntimeComponent() {
         }
 
-        FileEntry *getRoot() {
+        FSEntry *getRoot() {
             return root;
         }
 
         void onInitialize() override;
 
-        std::unique_ptr<FileEntry> getResource(const std::string &id);
+        std::unique_ptr<FSEntry> getResource(const std::string &id);
 
-        void deleteFiles(const std::unordered_map<std::string, FileEntry *> &files_context);
+        void deleteFiles(const std::unordered_map<std::string, FSEntry *> &files_context);
 
-        void createMaterial(std::string targetDir) const;
+        void createMaterial(const std::string &targetDir, FSEntry *currentDirectory) const;
 
-        void Move(FileEntry *toMove, FileEntry *targetDir);
+        void Move(FSEntry *toMove, FSEntry *targetDir);
 
-        static void GetEntries(FileEntry *root);
+        static void CreateDirectory(FSEntry *currentDirectory);
+
+        static void GetEntries(FSEntry *root);
     };
 } // Metal
 

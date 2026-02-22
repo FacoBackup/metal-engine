@@ -4,7 +4,7 @@
 #include "FilesContext.h"
 #include "../../../../util/UIUtil.h"
 #include "../../../../context/ApplicationContext.h"
-#include "../../../../dto/file//FileEntry.h"
+#include "../../../../dto/file//FSEntry.h"
 #include "../../../../service/files/FilesService.h"
 #include <algorithm>
 
@@ -25,7 +25,7 @@ namespace Metal {
 
     void FilesListPanel::applySort() {
         if (!lastDir) return;
-        std::sort(cachedSorted.begin(), cachedSorted.end(), [&](FileEntry *a, FileEntry *b) {
+        std::sort(cachedSorted.begin(), cachedSorted.end(), [&](FSEntry *a, FSEntry *b) {
             const bool aIsDir = a->type == EntryType::DIRECTORY;
             const bool bIsDir = b->type == EntryType::DIRECTORY;
             // Always put directories first
@@ -79,7 +79,7 @@ namespace Metal {
         }
     }
 
-    void FilesListPanel::handleDragDrop(FileEntry *fileEntry) {
+    void FilesListPanel::handleDragDrop(FSEntry *fileEntry) {
         if (fileEntry != nullptr && fileEntry->isHovered && onDrag != fileEntry && startDrag.x >= 0) {
             if (onDrag == nullptr && ImGui::IsMouseDown(ImGuiMouseButton_Left) &&
                 abs(startDrag.x - ImGui::GetMousePos().x) >= 3 &&
@@ -95,7 +95,7 @@ namespace Metal {
         }
     }
 
-    void FilesListPanel::onClick(FileEntry *root) {
+    void FilesListPanel::onClick(FSEntry *root) {
         if (root->isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
             if (!ImGui::IsKeyDown(ImGuiKey_LeftCtrl)) {
                 filesContext.selected.clear();
@@ -111,7 +111,7 @@ namespace Metal {
         }
     }
 
-    void FilesListPanel::renderTreeItem(FileEntry *entry) {
+    void FilesListPanel::renderTreeItem(FSEntry *entry) {
         if (entry == nullptr) {
             return;
         }

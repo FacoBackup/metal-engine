@@ -9,23 +9,23 @@
 #include <unordered_set>
 
 namespace Metal {
-    struct FileEntry;
+    struct FSEntry;
 
     class FilesListPanel final : public AbstractPanel {
         FilesContext &filesContext;
-        std::vector<FileEntry *> cachedSorted{};
-        FileEntry *lastDir = nullptr;
+        std::vector<FSEntry *> cachedSorted{};
+        FSEntry *lastDir = nullptr;
         size_t lastChildrenCount = 0;
         bool sortAscending = true;
         int sortColumn = 0; // 0-Name,1-Date,2-Type,3-Size
         EntryType::EntryType typeFilter;
 
         bool isSomethingHovered = false;
-        FileEntry *onDrag = nullptr;
+        FSEntry *onDrag = nullptr;
         ImVec2 startDrag{-1, -1};
         std::unordered_set<std::string> loadedDirectoryPaths{};
 
-        std::function<void(FileEntry *)> onDoubleClick;
+        std::function<void(FSEntry *)> onDoubleClick;
 
         void ensureCache();
 
@@ -38,14 +38,14 @@ namespace Metal {
 
         void handleDrag() const;
 
-        void handleDragDrop(FileEntry *fileEntry);
+        void handleDragDrop(FSEntry *fileEntry);
 
-        void onClick(FileEntry *root);
+        void onClick(FSEntry *root);
 
-        void renderTreeItem(FileEntry *entry);
+        void renderTreeItem(FSEntry *entry);
 
     public:
-        explicit FilesListPanel(FilesContext &ctx, std::function<void(FileEntry *)> onDoubleClick,
+        explicit FilesListPanel(FilesContext &ctx, std::function<void(FSEntry *)> onDoubleClick,
                                 EntryType::EntryType typeFilter)
             : filesContext(ctx), typeFilter(typeFilter), onDoubleClick(std::move(onDoubleClick)) {
         }

@@ -18,7 +18,7 @@ namespace Metal {
 
         MeshData *stream(const std::string &id, const LevelOfDetail &levelOfDetail) const;
 
-        EntityID createMeshEntity(const std::string &name, const std::string &meshId) const;
+        EntityID createMeshEntity(const std::string &name, const std::string &meshId, const std::string &materialId) const;
 
         void createSceneEntities(const std::string &id) const;
     };

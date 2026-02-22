@@ -4,41 +4,27 @@
 #include "../CreateRay.glsl"
 
 struct BounceInfo {
-    vec3 albedo;
-    bool isEmissive;
-    vec3 hitNormal;
-    vec3 currentPosition;
+    MaterialInfo material;
+    SurfaceInteraction interaction;
     vec3 throughput;
     vec3 indirectLight;
 };
-
-void evaluateLightSimplified(in Light l, in BounceInfo bounceInfo, inout vec3 throughput, inout vec3 indirectLight) {
-    float bias = max(.05, 1e-4 * length(bounceInfo.currentPosition.xyz));
-    vec3 localHitPosition = bounceInfo.currentPosition.xyz + bounceInfo.hitNormal * bias;
-    vec3 lightDir = normalize(l.position - localHitPosition);
-
-    vec3 visibility = visibilityTest(l, bounceInfo.currentPosition.xyz, lightDir);
-    float NdotL = max(dot(bounceInfo.hitNormal, lightDir), 0.0);
-    vec3 lightColorContribution = l.color.rgb * l.color.a * bounceInfo.albedo * visibility / PI;
-    vec3 lightContribution = lightColorContribution * NdotL / distanceSq(l.position, localHitPosition);
-    indirectLight += throughput * lightContribution;
-}
 
 void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo)
 {
     // ----------------------------------------------------
     // 1. Emissive bypass
     // ----------------------------------------------------
-    if (bounceInfo.isEmissive)
+    if (bounceInfo.material.isEmissive)
     {
-        vec3 emission = bounceInfo.albedo * globalData.giEmissiveFactor;
+        vec3 emission = bounceInfo.material.baseColor * globalData.giEmissiveFactor;
         bounceInfo.indirectLight += bounceInfo.throughput * emission;
         return;
     }
 
     ivec2 coord = ivec2(
-    worldToSurfaceCacheHash(bounceInfo.currentPosition) *
-    vec2(globalData.surfaceCacheWidth, globalData.surfaceCacheHeight)
+        worldToSurfaceCacheHash(bounceInfo.interaction.point) *
+        vec2(globalData.surfaceCacheWidth, globalData.surfaceCacheHeight)
     );
 
     vec4 cacheData = imageLoad(surfaceCacheImage, coord);
@@ -63,12 +49,17 @@ void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo)
     // 3. Otherwise compute fresh lighting
     // ----------------------------------------------------
     vec3 directRadiance = vec3(0);
-    vec3 lT = vec3(1);
 
     for (int i = 0; i < globalData.lightsCount; ++i)
     {
         Light l = lightBuffer.items[i];
-        evaluateLightSimplified(l, bounceInfo, lT, directRadiance);
+        l.color.rgb *= l.color.a;
+
+        vec3 wi;
+        vec3 f;
+        float scatteringPdf;
+
+        directRadiance += calculateDirectLight(l, bounceInfo.interaction, bounceInfo.material, wi, f, scatteringPdf);
     }
 
     bounceInfo.indirectLight += bounceInfo.throughput * directRadiance;
@@ -86,46 +77,50 @@ void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo)
     }
 }
 
-vec3 calculateIndirectLighting(float roughness, vec3 normal, vec3 currentPosition, vec3 rayDir) {
+vec3 calculateIndirectLighting(MaterialInfo material, SurfaceInteraction interaction) {
     if (globalData.pathTracerBounces == 0) return vec3(0);
 
     BounceInfo bounceInfo;
     bounceInfo.indirectLight = vec3(0);
     bounceInfo.throughput = vec3(1);
-    bounceInfo.currentPosition = currentPosition;
-    bounceInfo.hitNormal = normal;
-
-    float localRoughness = roughness;
-    vec3 localRayDir = rayDir;
+    bounceInfo.material = material;
+    bounceInfo.interaction = interaction;
 
     for (uint j = 0; j < globalData.pathTracerBounces; j++) {
-        vec3 wiLocal = cosineSampleHemisphere(vec2(random(), random()));
-        vec3 tangent, binormal;
-        createBasis(bounceInfo.hitNormal, tangent, binormal);
-        vec3 diffuseRayDir = wiLocal.x * tangent + wiLocal.y * binormal + wiLocal.z * bounceInfo.hitNormal;
+        vec3 wi;
+        float pdf;
+        vec3 X = vec3(0.), Y = vec3(0.);
+        directionOfAnisotropicity(bounceInfo.interaction.normal, X, Y);
+        bounceInfo.interaction.tangent = X;
+        bounceInfo.interaction.binormal = Y;
 
-        vec3 specularRayDir = reflect(localRayDir, bounceInfo.hitNormal);
+        vec3 f = bsdfSample(wi, -bounceInfo.interaction.incomingRayDir, X, Y, pdf, bounceInfo.interaction, bounceInfo.material);
+        f *= abs(dot(wi, bounceInfo.interaction.normal));
 
-        specularRayDir = normalize(mix(specularRayDir, diffuseRayDir, localRoughness * localRoughness));
-        localRayDir = mix(diffuseRayDir, specularRayDir, 1. - localRoughness);
+        if (pdf < EPSILON || dot(f, f) < EPSILON) break;
+
+        bounceInfo.throughput *= f / pdf;
+
+        float bias = max(.05, 1e-4 * length(bounceInfo.interaction.point));
+        vec3 rayOrigin = bounceInfo.interaction.point + bounceInfo.interaction.normal * bias;
 
         payload.hit = true;
-        traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xFF, 0, 0, 0, bounceInfo.currentPosition, 0.001, localRayDir, 1000.0, 0);
+        traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xFF, 0, 0, 0, rayOrigin, 0.001, wi, 1000.0, 0);
 
         if (!payload.hit) {
             if (globalData.isAtmosphereEnabled) {
-                bounceInfo.albedo = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), localRayDir, 2.0f) * 0.05f;
-                bounceInfo.isEmissive = true;
+                bounceInfo.material.baseColor = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), wi, 2.0f) * 0.05f;
+                bounceInfo.material.isEmissive = true;
+                bounceInfo.interaction.point = rayOrigin + wi * 1000.0; // Placeholder point for atmosphere
                 fetchSurfaceCacheRadiance(bounceInfo);
             }
             break;
         }
 
-        bounceInfo.albedo = payload.material.baseColor;
-        bounceInfo.isEmissive = payload.material.isEmissive;
-        bounceInfo.hitNormal = payload.hitNormal;
-        bounceInfo.currentPosition = payload.hitPosition;
-        localRoughness = payload.material.roughness;
+        bounceInfo.material = payload.material;
+        bounceInfo.interaction.normal = payload.hitNormal;
+        bounceInfo.interaction.point = payload.hitPosition;
+        bounceInfo.interaction.incomingRayDir = wi;
 
         fetchSurfaceCacheRadiance(bounceInfo);
     }
@@ -165,14 +160,12 @@ vec3 calculatePixelColor(vec3 rayDirection, in vec2 texCoords, MaterialInfo mate
 
         L += Ld;
 
-        if (scatteringPdf > EPSILON && dot(f, f) > EPSILON) {
-            beta *= f / scatteringPdf;
+        if (globalData.pathTracerBounces > 0 && globalData.pathTracerMultiplier > 0) {
+            L += beta * calculateIndirectLighting(material, interaction) * globalData.pathTracerMultiplier;
         }
 
-        if (globalData.pathTracerBounces > 0 && globalData.pathTracerMultiplier > 0) {
-            float bias = max(.05, 1e-4 * length(interaction.point));
-            vec3 point = interaction.point + bias * interaction.normal;
-            L += (material.baseColor / PI) * calculateIndirectLighting(material.roughness, interaction.normal, point, rayDirection) * globalData.pathTracerMultiplier;
+        if (scatteringPdf > EPSILON && dot(f, f) > EPSILON) {
+            beta *= f / scatteringPdf;
         }
     }
 
