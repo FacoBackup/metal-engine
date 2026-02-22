@@ -23,6 +23,7 @@ void evaluateLightSimplified(in Light l, in BounceInfo bounceInfo, inout vec3 th
     vec3 lightContribution = lightColorContribution * NdotL / distanceSq(l.position, localHitPosition);
     indirectLight += throughput * lightContribution;
 }
+
 void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo)
 {
     // ----------------------------------------------------
@@ -158,7 +159,8 @@ vec3 calculatePixelColor(vec3 rayDirection, in vec2 texCoords, MaterialInfo mate
         vec3 Ld = vec3(0);
         for (uint i = 0; i < globalData.lightsCount; i++) {
             Light l = lightBuffer.items[i];
-            Ld += beta * calculateDirectLight(l, interaction, material, wi, f, scatteringPdf) * l.color.a;
+            l.color.rgb *= l.color.a;
+            Ld += beta * calculateDirectLight(l, interaction, material, wi, f, scatteringPdf) ;
         }
 
         L += Ld;

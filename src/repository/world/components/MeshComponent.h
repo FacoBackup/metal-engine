@@ -10,10 +10,6 @@ namespace Metal {
         std::string meshId;
         std::string materialId;
 
-        glm::vec3 albedoColor{1, 1, 1};
-        bool emissiveSurface = false;
-        float roughnessFactor = 1;
-        float metallicFactor = 0;
         int parallaxLayers = 16;
         unsigned int renderIndex = 0;
         float parallaxHeightScale = 1;

@@ -5,11 +5,8 @@
 namespace Metal {
     struct MeshPushConstant final {
         glm::mat4x4 model;
-        glm::vec4 albedoEmissive;
         alignas(4) unsigned int renderIndex;
         alignas(4) unsigned int materialIndex = 0;
-        alignas(4) float roughnessFactor;
-        alignas(4) float metallicFactor;
 
         alignas(4) float parallaxHeightScale;
         alignas(4) int parallaxLayers;

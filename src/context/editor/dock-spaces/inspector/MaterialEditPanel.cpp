@@ -28,6 +28,7 @@ namespace Metal {
             delete data;
             data = CTX.materialService.stream(CTX.fileInspection.materialId);
             prevSelection = CTX.fileInspection.materialId;
+            formPanel->resetForm();
         }
         if (prevSelection.empty()) {
             return;

@@ -21,10 +21,6 @@ namespace Metal {
                                 const std::stop_token &stopToken);
 
     public:
-        explicit SceneImporterService()
-            : AbstractImporter() {
-        }
-
         std::string importData(const std::string &targetDir, const std::string &pathToFile, const std::stop_token &stopToken) override;
 
         std::vector<std::string> getSupportedTypes() override;

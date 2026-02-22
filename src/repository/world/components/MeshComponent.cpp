@@ -9,11 +9,6 @@ namespace Metal {
         registerResourceSelection(meshId, "", "Mesh", EntryType::MESH);
         registerResourceSelection(materialId, "", "Material", EntryType::MATERIAL);
 
-        registerBool(emissiveSurface, "", "Is emissive surface?");
-
-        registerColor(albedoColor, "Material", "Albedo Color");
-        registerFloat(roughnessFactor, "Material", "Roughness Factor", 0, 1, false, .001);
-        registerFloat(metallicFactor, "Material", "Metallic Factor", 0, 1, false, .001);
         registerFloat(parallaxHeightScale, "Material", "Parallax height scale", 0);
         registerInt(parallaxLayers, "Material", "Parallax layers", 1);
     }
@@ -43,10 +38,6 @@ namespace Metal {
         j["materialId"] = materialId;
         j["parallaxHeightScale"] = parallaxHeightScale;
         j["parallaxLayers"] = parallaxLayers;
-        j["emissiveSurface"] = emissiveSurface;
-        j["albedoColor"] = {albedoColor.x, albedoColor.y, albedoColor.z};
-        j["roughnessFactor"] = roughnessFactor;
-        j["metallicFactor"] = metallicFactor;
         return j;
     }
 
@@ -56,11 +47,5 @@ namespace Metal {
         materialId = j.at("materialId").get<std::string>();
         parallaxHeightScale = j.at("parallaxHeightScale").get<float>();
         parallaxLayers = j.at("parallaxLayers").get<int>();
-        emissiveSurface = j.at("emissiveSurface").get<bool>();
-        albedoColor.x = j.at("albedoColor")[0].get<float>();
-        albedoColor.y = j.at("albedoColor")[1].get<float>();
-        albedoColor.z = j.at("albedoColor")[2].get<float>();
-        roughnessFactor = j.at("roughnessFactor").get<float>();
-        metallicFactor = j.at("metallicFactor").get<float>();
     }
 }
