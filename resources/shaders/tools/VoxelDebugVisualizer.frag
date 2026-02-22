@@ -2,7 +2,6 @@
 #include "../CreateRay.glsl"
 #define DEBUG_VOXELS
 #include "../util/RayTracer.glsl"
-#include "../DebugFlags.glsl"
 
 layout(location = 0) in vec2 texCoords;
 layout(location = 0) out vec4 finalColor;

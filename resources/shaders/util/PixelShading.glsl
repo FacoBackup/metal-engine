@@ -1,14 +1,7 @@
 #include "../util/HWRayTracingUtil.glsl"
 #include "../Atmosphere.glsl"
 
-vec3 createRay(in vec2 texCoords, in mat4 invProjectionMatrix, in mat4 invViewMatrix) {
-    vec2 pxNDS = texCoords * 2. - 1.;
-    vec4 pointNDSH = vec4(pxNDS, 0.0, 1.0); // Ensure point is at far plane
-    vec4 dirEye = invProjectionMatrix * pointNDSH;
-    dirEye.w = 0.0;
-    vec3 dirWorld = normalize((invViewMatrix * dirEye).xyz);
-    return dirWorld;
-}
+#include "../CreateRay.glsl"
 
 struct BounceInfo {
     vec3 albedo;
@@ -41,18 +34,26 @@ void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo){
         previousCacheData = imageLoad(surfaceCacheImage, coord);
     }
 
-    if (previousCacheData.a == 1){
-        vec3 lIndirect = vec3(0);
-        vec3 lT = vec3(1);
+    if (previousCacheData.a < globalData.pathTracerMaxSamples){
+        if (bounceInfo.isEmissive){
+            vec3 scaledAlbedo = bounceInfo.albedo * globalData.giEmissiveFactor;
+            bounceInfo.indirectLight += bounceInfo.throughput * scaledAlbedo;
+            bounceInfo.throughput *= scaledAlbedo;
 
-        for (int i = 0; i < globalData.lightsCount; ++i) {
-            Light l = lightBuffer.items[i];
-            evaluateLightSimplified(l, bounceInfo, lT, lIndirect);
+            imageStore(surfaceCacheImage, coord, vec4(bounceInfo.throughput * scaledAlbedo, previousCacheData.a + 1));
+        } else {
+            vec3 lIndirect = vec3(0);
+            vec3 lT = vec3(1);
+
+            for (int i = 0; i < globalData.lightsCount; ++i) {
+                Light l = lightBuffer.items[i];
+                evaluateLightSimplified(l, bounceInfo, lT, lIndirect);
+            }
+
+            imageStore(surfaceCacheImage, coord, vec4(lIndirect, previousCacheData.a + 1));
+            bounceInfo.indirectLight += lIndirect;
+            bounceInfo.throughput *= lT;
         }
-
-        imageStore(surfaceCacheImage, coord, vec4(lIndirect, 0));
-        bounceInfo.indirectLight += lIndirect;
-        bounceInfo.throughput *= lT;
     } else {
         if (bounceInfo.isEmissive){
             vec3 scaledAlbedo = bounceInfo.albedo * globalData.giEmissiveFactor;

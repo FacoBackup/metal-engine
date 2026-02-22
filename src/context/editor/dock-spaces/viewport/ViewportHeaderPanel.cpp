@@ -66,30 +66,16 @@ namespace Metal {
     void ViewportHeaderPanel::shadingMode() {
         auto &editorRepository = CTX.editorRepository;
         ImGui::SetNextItemWidth(150);
-        shadingModelOption = IndexOfValue(editorRepository.shadingMode);
+        shadingModelOption = ShadingModes::IndexOfValue(editorRepository.shadingMode);
 
-        static const std::string names[] = {
-            Icons::lightbulb + " Lit",
-            Icons::image + " Albedo",
-            Icons::gradient + " Normal",
-            Icons::texture + " Roughness",
-            Icons::blur_on + " Metallic",
-            Icons::contrast + " Occlusion",
-            Icons::casino + " Random",
-            Icons::layers + " Depth",
-            Icons::grid_on + " UV",
-            Icons::place + " Position",
-            Icons::highlight + " Lighting only",
-            Icons::wb_incandescent + " Emission",
-            Icons::ipublic + " Global Illumination"
-        };
-
-        if (ImGui::BeginCombo((id + "shadingMode").c_str(), names[shadingModelOption].c_str())) {
-            for (int i = 0; i < IM_ARRAYSIZE(names); i++) {
+        auto currentEntry = ShadingModes::entries[shadingModelOption];
+        if (ImGui::BeginCombo((id + "shadingMode").c_str(), (currentEntry.icon + " " + currentEntry.label).c_str())) {
+            for (int i = 0; i < ShadingModes::entries.size(); i++) {
                 const bool is_selected = (shadingModelOption == i);
-                if (ImGui::Selectable(names[i].c_str(), is_selected)) {
+                auto entry = ShadingModes::entries[i];
+                if (ImGui::Selectable((entry.icon + " " + entry.label).c_str(), is_selected)) {
                     shadingModelOption = i;
-                    editorRepository.shadingMode = ShadingMode::ValueOfIndex(shadingModelOption);
+                    editorRepository.shadingMode = ShadingModes::ValueOfIndex(shadingModelOption);
                 }
                 if (is_selected) {
                     ImGui::SetItemDefaultFocus();

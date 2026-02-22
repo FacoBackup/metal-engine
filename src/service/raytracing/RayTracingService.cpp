@@ -129,7 +129,6 @@ namespace Metal {
                 meshComp.freezeVersion();
                 transformComp.freezeVersion();
             }
-
             buildTask = std::async(std::launch::async,
                                    [this, m = std::move(meshes), e = std::move(entities)]() mutable {
                                        asyncBuild(std::move(m), std::move(e));

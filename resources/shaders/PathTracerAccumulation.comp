@@ -1,10 +1,6 @@
 layout(local_size_x = 8, local_size_y = 8) in;
 #include "./GlobalDataBuffer.glsl"
 
-#ifdef DEBUG
-#include "./DebugFlags.glsl"
-#endif
-
 layout(push_constant) uniform Push {
     mat4 prevProjView;
 } push;

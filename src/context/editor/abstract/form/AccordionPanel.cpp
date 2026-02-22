@@ -13,11 +13,19 @@ namespace Metal {
             onSyncChildren();
             return;
         }
+
         ImGui::PushStyleColor(ImGuiCol_Header, CTX.themeService.neutralPalette);
-        if (ImGui::CollapsingHeader(fixedId.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
-            onSyncChildren();
-        }
+        bool open = ImGui::CollapsingHeader(fixedId.c_str(), ImGuiTreeNodeFlags_None);
         ImGui::PopStyleColor();
+
+        if (open) {
+            ImGui::Spacing();
+            ImGui::Indent(15.0f);
+            onSyncChildren();
+            ImGui::Unindent(15.0f);
+            ImGui::Spacing();
+            ImGui::Separator();
+        }
     }
 
     bool AccordionPanel::isVisible() const {

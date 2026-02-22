@@ -15,10 +15,6 @@ layout (location = 0) out vec4 outMaterialA;
 layout (location = 1) out vec4 outMaterialB;
 layout (location = 2) out vec4 outMaterialC;
 
-#ifdef DEBUG
-#include "./DebugFlags.glsl"
-#endif
-
 bool hasMaterial() { return push.materialIndex != 0u; }
 
 float encode(float depthFunc, float val) {

@@ -24,9 +24,6 @@ layout (location = 0) rayPayloadEXT RayPayload payload;
 
 
 #include "../GBufferUtil.glsl"
-#ifdef DEBUG
-#include "../DebugFlags.glsl"
-#endif
 
 void main() {
     vec2 pixelCenter = vec2(gl_LaunchIDEXT.xy) + vec2(0.5);
@@ -57,7 +54,7 @@ void main() {
         interaction.anyHit = true;
 
         #ifdef DEBUG
-        if (globalData.debugFlag != LIT && globalData.debugFlag != SURFACE_CACHE_SAMPLES) {
+        if (globalData.debugFlag != LIT && globalData.debugFlag != SURFACE_CACHE_SAMPLES && globalData.debugFlag != SURFACE_CACHE) {
             bool shouldReturn = true;
             if (globalData.debugFlag == NORMAL) {
                 finalColor = interaction.normal;
@@ -89,7 +86,7 @@ void main() {
         #endif
 
         if (material.isEmissive) {
-           finalColor = materialA.rgb;
+            finalColor = materialA.rgb;
         } else {
             state = uint(uint(gl_LaunchIDEXT.x) * uint(1973) + uint(gl_LaunchIDEXT.y) * uint(9277) + uint(globalData.globalFrameCount) * uint(26699)) | uint(1);
             texCoords = (vec2(gl_LaunchIDEXT.xy) + vec2(random(), random())) / vec2(gl_LaunchSizeEXT.xy);
@@ -109,8 +106,8 @@ void main() {
         #ifdef DEBUG
         if (globalData.debugFlag == SURFACE_CACHE_SAMPLES || globalData.debugFlag == SURFACE_CACHE) {
             ivec2 coord = ivec2(worldToSurfaceCacheHash(interaction.point) * vec2(globalData.surfaceCacheWidth, globalData.surfaceCacheHeight));
-            finalColor = imageLoad(surfaceCacheImage, coord).rgb;
-            imageStore(outputImage, ivec2(gl_LaunchIDEXT.xy), vec4(finalColor, 1));
+            vec4 imm = imageLoad(surfaceCacheImage, coord);
+            imageStore(outputImage, ivec2(gl_LaunchIDEXT.xy), globalData.debugFlag == SURFACE_CACHE ? vec4(imm.rgb, 1) : vec4(imm.a / float(globalData.pathTracerMaxSamples), 0, 0, 1));
             return;
         }
         #endif
@@ -121,8 +118,6 @@ void main() {
     if (volumetricColor.a > 0.001) {
         finalColor = volumetricColor.rgb * volumetricColor.a + finalColor * (1.0 - volumetricColor.a);
     }
-
-
 
     imageStore(outputImage, ivec2(gl_LaunchIDEXT.xy), vec4(finalColor, finalData));
 }

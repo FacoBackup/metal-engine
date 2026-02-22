@@ -2,10 +2,6 @@ layout(local_size_x = 8, local_size_y = 8) in;
 
 #include "./GlobalDataBuffer.glsl"
 
-#ifdef DEBUG
-#include "./DebugFlags.glsl"
-#endif
-
 
 layout(set = 1, binding = 0, rgba32f) uniform image2D currentFrameImage;// Color + surface ID
 layout(set = 2, binding = 0, rgba32f) uniform image2D previousFrameImage;// Color + acuumulation count

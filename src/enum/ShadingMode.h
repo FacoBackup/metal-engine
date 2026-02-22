@@ -1,7 +1,12 @@
 #ifndef SHADINGMODE_H
 #define SHADINGMODE_H
+#include <unordered_map>
+#include <string>
+#include <vector>
 
-namespace Metal::ShadingMode {
+#include "../common/interface/Icons.h"
+
+namespace Metal {
     enum ShadingMode {
         LIT,
         ALBEDO,
@@ -19,100 +24,64 @@ namespace Metal::ShadingMode {
         SURFACE_CACHE_SAMPLES
     };
 
-    static auto Names =
-            "Lit\0Albedo\0Normal\0Roughness\0Metallic\0Occlusion\0Random\0Depth\0UV\0Position\0Lighting only\0Emission\0Surface cache\0Surface cache samples\0";
+    class ShadingModes {
+    public:
+        struct Entry {
+            std::string name;
+            std::string label;
+            std::string icon;
+            ShadingMode value;
+        };
 
-    static ShadingMode ValueOfIndex(const int option) {
-        if (option == 0) {
-            return ShadingMode::LIT;
-        }
-        if (option == 1) {
-            return ShadingMode::ALBEDO;
-        }
-        if (option == 2) {
-            return ShadingMode::NORMAL;
-        }
-        if (option == 3) {
-            return ShadingMode::ROUGHNESS;
-        }
-        if (option == 4) {
-            return ShadingMode::METALLIC;
-        }
-        if (option == 5) {
-            return ShadingMode::AO;
-        }
-        if (option == 6) {
-            return ShadingMode::RANDOM;
-        }
-        if (option == 7) {
-            return ShadingMode::DEPTH;
-        }
-        if (option == 8) {
-            return ShadingMode::UV;
-        }
-        if (option == 9) {
-            return ShadingMode::POSITION;
-        }
-        if (option == 10) {
-            return ShadingMode::LIGHTING_ONLY;
-        }
-        if (option == 11) {
-            return ShadingMode::EMISSIVE;
-        }
-        if (option == 12) {
-            return ShadingMode::SURFACE_CACHE;
-        }
-        if (option == 13) {
-            return ShadingMode::SURFACE_CACHE_SAMPLES;
-        }
-        return ShadingMode::RANDOM;
-    }
+        inline static const std::vector<Entry> entries = {
+                {"LIT",                   "Lit",                   Icons::lightbulb,        LIT},
+                {"ALBEDO",                "Albedo",                Icons::image,            ALBEDO},
+                {"NORMAL",                "Normal",                Icons::gradient,         NORMAL},
+                {"ROUGHNESS",             "Roughness",             Icons::texture,          ROUGHNESS},
+                {"METALLIC",              "Metallic",              Icons::blur_on,          METALLIC},
+                {"AO",                    "Occlusion",             Icons::contrast,         AO},
+                {"RANDOM",                "Random",                Icons::casino,           RANDOM},
+                {"DEPTH",                 "Depth",                 Icons::layers,           DEPTH},
+                {"UV",                    "UV",                    Icons::grid_on,          UV},
+                {"POSITION",              "Position",              Icons::place,            POSITION},
+                {"LIGHTING_ONLY",         "Lighting only",         Icons::highlight,        LIGHTING_ONLY},
+                {"EMISSIVE",              "Emission",              Icons::wb_incandescent,  EMISSIVE},
+                {"SURFACE_CACHE",         "Surface cache",         Icons::ipublic,          SURFACE_CACHE},
+                {"SURFACE_CACHE_SAMPLES", "Surface cache samples", Icons::ipublic,          SURFACE_CACHE_SAMPLES}
+        };
 
-    static int IndexOfValue(const ShadingMode mode) {
-        if (mode == ShadingMode::LIT) {
-            return 0;
+        static inline std::string GetNames() {
+            std::string names;
+            for (const auto &entry: entries) {
+                names += entry.label + '\0';
+            }
+            return names;
         }
-        if (mode == ShadingMode::ALBEDO) {
-            return 1;
+
+        static inline std::unordered_map<std::string, unsigned int> getShaderEntries() {
+            std::unordered_map<std::string, unsigned int> shaderEntries;
+            for (const auto &entry: entries) {
+                shaderEntries[entry.name] = entry.value;
+            }
+            return shaderEntries;
         }
-        if (mode == ShadingMode::NORMAL) {
-            return 2;
+
+        static inline ShadingMode ValueOfIndex(const int option) {
+            if (option >= 0 && option < entries.size()) {
+                return entries[option].value;
+            }
+            return RANDOM;
         }
-        if (mode == ShadingMode::ROUGHNESS) {
-            return 3;
+
+        static inline int IndexOfValue(const ShadingMode mode) {
+            for (int i = 0; i < entries.size(); ++i) {
+                if (entries[i].value == mode) {
+                    return i;
+                }
+            }
+            return 6; // RANDOM
         }
-        if (mode == ShadingMode::METALLIC) {
-            return 4;
-        }
-        if (mode == ShadingMode::AO) {
-            return 5;
-        }
-        if (mode == ShadingMode::RANDOM) {
-            return 6;
-        }
-        if (mode == ShadingMode::DEPTH) {
-            return 7;
-        }
-        if (mode == ShadingMode::UV) {
-            return 8;
-        }
-        if (mode == ShadingMode::POSITION) {
-            return 9;
-        }
-        if (mode == ShadingMode::LIGHTING_ONLY) {
-            return 10;
-        }
-        if (mode == ShadingMode::EMISSIVE) {
-            return 11;
-        }
-        if (mode == ShadingMode::SURFACE_CACHE) {
-            return 12;
-        }
-        if (mode == ShadingMode::SURFACE_CACHE_SAMPLES) {
-            return 13;
-        }
-        return 6;
-    }
+    };
 }
 
 #endif //SHADINGMODE_H

@@ -1,6 +1,7 @@
 #ifndef LIGHTTYPE_H
 #define LIGHTTYPE_H
 #include <unordered_map>
+#include <string>
 
 namespace Metal::LightTypes{
     enum LightType {
