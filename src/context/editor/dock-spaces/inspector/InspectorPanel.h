@@ -11,7 +11,6 @@ namespace Metal {
     class InspectorPanel final : public AbstractDockPanel {
         std::vector<Inspectable *> repositories{};
         std::vector<Inspectable *> additionalInspection{};
-        Inspectable *currentInspection = nullptr;
         Inspectable *selectedEntity = nullptr;
 
         FormPanel *formPanel = nullptr;

@@ -294,6 +294,8 @@ add_executable(
         src/service/voxel/VoxelService.h
         src/service/framebuffer/FrameBufferInstance.cpp
         src/util/Serializable.cpp
+        src/context/editor/abstract/form/ChildPanel.cpp
+        src/context/editor/abstract/form/ChildPanel.h
 )
 
 

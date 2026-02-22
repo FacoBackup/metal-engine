@@ -1,5 +1,6 @@
 #include "AccordionPanel.h"
 #include "imgui.h"
+#include "../../../ApplicationContext.h"
 
 namespace Metal {
     void AccordionPanel::setTitle(const std::string &t) {
@@ -12,9 +13,11 @@ namespace Metal {
             onSyncChildren();
             return;
         }
+        ImGui::PushStyleColor(ImGuiCol_Header, CTX.themeService.neutralPalette);
         if (ImGui::CollapsingHeader(fixedId.c_str())) {
             onSyncChildren();
         }
+        ImGui::PopStyleColor();
     }
 
     void AccordionPanel::onSyncChildren() const {

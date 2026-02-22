@@ -1,5 +1,6 @@
 #include "FormPanel.h"
 #include "AccordionPanel.h"
+#include "ChildPanel.h"
 #include "../../../../enum/FieldType.h"
 #include "../../../../common/inspection/Inspectable.h"
 #include "../../../../context/gui/GuiContext.h"
@@ -16,14 +17,18 @@
 #include "types/Vec4Field.h"
 
 namespace Metal {
-    void FormPanel::processFields(std::unordered_map<std::string, AccordionPanel *> &groups) {
+    void FormPanel::processFields(Inspectable *inspection) {
+        std::unordered_map<std::string, ChildPanel *> groups{};
+        const auto rootPanel = new AccordionPanel();
+        appendChild(rootPanel);
+        rootPanel->setTitle(std::string(inspection->getIcon()) + " " + inspection->getTitle());
         for (const auto &field: inspection->getFields()) {
             if (!groups.contains(field->group)) {
-                const auto panel = new AccordionPanel();
+                const auto panel = new ChildPanel();
                 groups[field->group] = panel;
-                appendChild(panel);
+                rootPanel->appendChild(panel);
             }
-            AccordionPanel *group = groups[field->group];
+            ChildPanel *group = groups[field->group];
             group->setTitle(field->group);
             switch (field->type) {
                 case STRING:
@@ -60,36 +65,36 @@ namespace Metal {
                 case RESOURCE:
                     group->appendChild(new ResourceField{dynamic_cast<InspectedField<std::string> &>(*field)});
                     break;
-                //                    case OPTIONS:
-                //                        group->appendChild(new OptionsField(field, changeHandler));
-                //                        break;
-                //                    case LIST:
-                //                        break;
-                //                    case COMPOSITE:
-                //                        break;
-                //                    case CUSTOM:
-                //                        break;
+                    //                    case OPTIONS:
+                    //                        group->appendChild(new OptionsField(field, changeHandler));
+                    //                        break;
+                    //                    case LIST:
+                    //                        break;
+                    //                    case COMPOSITE:
+                    //                        break;
+                    //                    case CUSTOM:
+                    //                        break;
             }
         }
     }
 
     void FormPanel::setInspection(Inspectable *inspection) {
-        if (inspection != this->inspection) {
-            this->inspection = inspection;
-            removeAllChildren();
+        if (inspection == nullptr) {
+            return;
+        }
+        if (!inspectionMap.contains(inspection->getUniqueId())) {
+            inspectionMap.emplace(inspection->getUniqueId(), inspection);
 
-            if (inspection == nullptr) {
-                return;
-            }
-            std::unordered_map<std::string, AccordionPanel *> groups;
-            processFields(groups);
+            processFields(inspection);
         }
     }
 
     void FormPanel::onSync() {
-        if (inspection == nullptr) return;
-        ImGui::Text("%s%s", inspection->getIcon(), inspection->getTitle());
-        ImGui::Separator();
         onSyncChildren();
+    }
+
+    void FormPanel::resetForm() {
+        removeAllChildren();
+        inspectionMap.clear();
     }
 }

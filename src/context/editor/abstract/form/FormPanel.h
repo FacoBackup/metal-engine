@@ -9,14 +9,16 @@ namespace Metal {
     class Inspectable;
 
     class FormPanel final : public AbstractPanel {
-        Inspectable *inspection = nullptr;
+        std::unordered_map<std::string, Inspectable*> inspectionMap{};
 
     public:
-        void processFields(std::unordered_map<std::string, AccordionPanel *> &pairs);
+        void processFields(Inspectable * inspection);
 
         void setInspection(Inspectable *inspection);
 
         void onSync() override;
+
+        void resetForm();
     };
 }
 
