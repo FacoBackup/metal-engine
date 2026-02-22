@@ -5,22 +5,16 @@
 
 namespace Metal {
     void AccumulationPass::onInitialize() {
-        PipelineBuilder shadingPipelineBuilder = PipelineBuilder::Of("PathTracerAccumulation.comp")
-                .setPushConstantsSize(sizeof(AccumulationPushConstant))
+        PipelineBuilder builder = PipelineBuilder::Of("PathTracerAccumulation.comp")
                 .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.gBufferPosition.get())
                 .addDescriptorSet(CTX.coreDescriptorSets.currentFrameDescriptor.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.previousFrameDescriptor.get());
-        pipelineInstance = CTX.pipelineService.createPipeline(shadingPipelineBuilder);
+                .addDescriptorSet(CTX.coreDescriptorSets.accumulatedFrameDescriptor.get());
+        pipelineInstance = CTX.pipelineService.createPipeline(builder);
     }
 
     void AccumulationPass::onSync() {
-        syncWriting(CTX.coreTextures.currentFrame->vkImage);
-        if (initialized) {
-            recordPushConstant(&pushConstant);
-            recordImageDispatch(CTX.coreTextures.currentFrame, 8, 8);
-        }
-        initialized = true;
-        pushConstant.previousFrameProjView = CTX.engineContext.getGlobalDataUBO().projView;
+        syncWriting(CTX.coreTextures.accumulatedFrame->vkImage);
+        recordImageDispatch(CTX.coreTextures.accumulatedFrame, 8, 8);
+        endWriting(CTX.coreTextures.rawRenderedFrame->vkImage);
     }
 } // Metal

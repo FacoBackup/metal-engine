@@ -3,7 +3,6 @@
 #include "./CommandBufferRecorder.h"
 #include "../compute-pass/impl/AccumulationPass.h"
 #include "../compute-pass/impl/HWRayTracingPass.h"
-#include "../compute-pass/impl/AccumulationMetadataPass.h"
 #include "../render-pass/impl/GBufferGenPass.h"
 #include "../render-pass/impl/PostProcessingPass.h"
 #include "../render-pass/impl/tools/SelectedDotPass.h"
@@ -23,7 +22,6 @@ namespace Metal {
 
         addPass(computePasses, new HWRayTracingPass());
         addPass(computePasses, new AccumulationPass());
-        addPass(computePasses, new AccumulationMetadataPass());
 
         addPass(postProcessingPasses, new PostProcessingPass());
         if (CTX.isDebugMode()) {

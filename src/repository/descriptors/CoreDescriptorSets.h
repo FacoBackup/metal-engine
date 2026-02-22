@@ -23,9 +23,8 @@ namespace Metal {
         std::unique_ptr<DescriptorInstance> gBufferNormal = nullptr;
         std::unique_ptr<DescriptorInstance> gBufferPosition = nullptr;
         std::unique_ptr<DescriptorInstance> surfaceCacheImage = nullptr;
-        std::unique_ptr<DescriptorInstance> previousFrameDescriptor = nullptr;
-        std::unique_ptr<DescriptorInstance> previousFrameMetadataDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> currentFrameDescriptor = nullptr;
+        std::unique_ptr<DescriptorInstance> accumulatedFrameDescriptor = nullptr;
         std::unique_ptr<DescriptorInstance> lightData = nullptr;
         std::unique_ptr<DescriptorInstance> volumeData = nullptr;
         std::unique_ptr<DescriptorInstance> materialData = nullptr;

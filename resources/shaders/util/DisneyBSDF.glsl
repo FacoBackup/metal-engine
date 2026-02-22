@@ -72,7 +72,7 @@ float pdfMicrofacetAniso(const in vec3 wi, const in vec3 wo, const in vec3 X, co
     float alphay = max(.001, pow2(material.roughness)*aspect);
 
     float alphax2 = alphax * alphax;
-    float alphay2 = alphax * alphay;
+    float alphay2 = alphay * alphay;
 
     float hDotX = dot(wh, X);
     float hDotY = dot(wh, Y);
@@ -357,9 +357,9 @@ void disneyMicrofacetAnisoSample(out vec3 wi, const in vec3 wo, const in vec3 X,
     float alphax = max(.001, pow2(material.roughness)/aspect);
     float alphay = max(.001, pow2(material.roughness)*aspect);
 
-    phi = atan(alphay / alphax * tan(2. * PI * u[1] + .5 * PI));
+    phi = atan(alphay / alphax * tan(2. * PI * u[1] + 0.5 * PI));
 
-    if (u[1] > .5f) phi += PI;
+    if (u[1] > 0.5) phi += PI;
     float sinPhi = sin(phi), cosPhi = cos(phi);
     float alphax2 = alphax * alphax, alphay2 = alphay * alphay;
     float alpha2 = 1. / (cosPhi * cosPhi / alphax2 + sinPhi * sinPhi / alphay2);
@@ -407,9 +407,23 @@ float bsdfPdf(const in vec3 wi, const in vec3 wo, const in vec3 X, const in vec3
 }
 
 float light_pdf(const in Light light, const in SurfaceInteraction interaction) {
-    float sinThetaMax2 =  pow2(light.dataB.x) / distanceSq(light.position, interaction.point);
-    float cosThetaMax = sqrt(max(EPSILON, 1. - sinThetaMax2));
-    return 1. / (TWO_PI * (1. - cosThetaMax));
+    switch (light.itemType) {
+        case ITEM_TYPE_SPHERE: {
+            float sinThetaMax2 = pow2(light.dataB.x) / distanceSq(light.position, interaction.point);
+            float cosThetaMax = sqrt(max(EPSILON, 1. - sinThetaMax2));
+            return 1. / (TWO_PI * (1. - cosThetaMax));
+        }
+        case ITEM_TYPE_PLANE: {
+            vec3 lightSize = light.dataB.xyz;
+            float lightArea = lightSize.x * lightSize.z;
+            vec3 lightDir = normalize(light.position - interaction.point);
+            float cosTheta = max(0.0, dot(-lightDir, light.dataA));
+            float distSq = distanceSq(light.position, interaction.point);
+            return distSq / (cosTheta * lightArea);
+        }
+        default:
+            return 0.0;
+    }
 }
 
 vec3 bsdfSample(out vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y, out float pdf, const in SurfaceInteraction interaction, const in MaterialInfo material) {
@@ -422,7 +436,7 @@ vec3 bsdfSample(out vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y,
     float rnd = random();
     if (rnd <= 0.3333) {
         disneyDiffuseSample(wi, wo, pdf, u, interaction.normal, material);
-    } else if (rnd >= 0.3333 && rnd < 0.6666) {
+    } else if (rnd > 0.3333 && rnd < 0.6666) {
         disneyMicrofacetAnisoSample(wi, wo, X, Y, u, interaction, material);
     } else {
         disneyClearCoatSample(wi, wo, u, interaction, material);
@@ -459,7 +473,7 @@ vec3 calculateDirectLight(const in Light light, const in SurfaceInteraction inte
     isBlack = dot(Li, Li) == 0.;
 
     if (lightPdf > EPSILON && !isBlack) {
-        vec3 f = bsdfEvaluate(wi, wo, interaction.tangent, interaction.binormal, interaction, material) * abs(dot(wi, interaction.normal));
+        vec3 fDirect = bsdfEvaluate(wi, wo, interaction.tangent, interaction.binormal, interaction, material) * abs(dot(wi, interaction.normal));
         float weight = 1.;
 
         if (globalData.multipleImportanceSampling){
@@ -467,9 +481,9 @@ vec3 calculateDirectLight(const in Light light, const in SurfaceInteraction inte
             weight = powerHeuristic(1., lightPdf, 1., scatteringPdf);
         }
 
-        isBlack = dot(f, f) == 0.;
+        isBlack = dot(fDirect, fDirect) == 0.;
         if (!isBlack) {
-            Ld += Li * f * weight/ lightPdf;
+            Ld += Li * fDirect * weight/ lightPdf;
         }
     }
 

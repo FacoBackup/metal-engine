@@ -272,8 +272,6 @@ add_executable(
         src/context/editor/dock-spaces/inspector/MaterialEditPanel.cpp
         src/context/editor/dock-spaces/inspector/MaterialEditPanel.h
         src/enum/LightType.h
-        src/context/engine/compute-pass/impl/AccumulationMetadataPass.cpp
-        src/context/engine/compute-pass/impl/AccumulationMetadataPass.h
         src/context/engine/compute-pass/impl/AccumulationPass.cpp
         src/context/engine/compute-pass/impl/AccumulationPass.h
         src/service/lights/LightService.cpp

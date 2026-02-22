@@ -16,8 +16,6 @@ namespace Metal {
 
         void registerFields() override;
 
-        ComponentTypes::ComponentType getType() override;
-
         void onUpdate(InspectableMember *member) override;
 
         nlohmann::json toJson() const override {

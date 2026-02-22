@@ -8,6 +8,10 @@ namespace Metal {
     struct PlaneLightComponent final : LightComponent {
         LightTypes::LightType getLightType() override { return LightTypes::PLANE; }
 
+        ComponentTypes::ComponentType getType() override {
+            return ComponentTypes::PLANE_LIGHT;
+        }
+
         nlohmann::json toJson() const override {
             nlohmann::json j = LightComponent::toJson();
             j["lightType"] = "PLANE";

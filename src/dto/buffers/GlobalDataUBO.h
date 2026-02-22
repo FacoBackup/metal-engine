@@ -19,7 +19,7 @@ namespace Metal {
         alignas(4) unsigned int isAtmosphereEnabled;
 
 
-        alignas(4) unsigned int enabledDenoiser;
+        alignas(4) unsigned int enableSurfaceCache;
         alignas(4) unsigned int multipleImportanceSampling;
         alignas(4) unsigned int pathTracerMaxSamples;
         alignas(4) unsigned int pathTracerSamples;

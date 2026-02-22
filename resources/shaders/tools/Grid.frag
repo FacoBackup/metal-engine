@@ -20,15 +20,15 @@ layout(set = 1, binding = 0) uniform sampler2D gBufferPosition;
 
 vec3 p = vec3(0);
 bool rayMarch(vec3 ro, vec3 rd, float width) {
-    float t = 0.0;
-    for (int i = 0; i < 256; i++) {
-        p = ro + t * rd;
-        float d = p.y;
-        if (d < 0.001) return true;
-        if (t > THRESHOLD || d < 0.0) break;
-        t += max(d, 0.001);
-    }
-    return false;
+    // Avoid division by zero (ray parallel to plane)
+    if (abs(rd.y) < 1e-6) return false;
+
+    float t = -ro.y / rd.y;          // distance along ray to y=0 plane
+    if (t < 0.0) return false;       // intersection behind camera
+    if (t > float(THRESHOLD)) return false; // beyond fade distance
+
+    p = ro + t * rd;                  // compute hit point
+    return true;
 }
 
 float getGridLine(float gridScale){

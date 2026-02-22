@@ -31,7 +31,6 @@ void main() {
 
     vec4 worldPos = texture(gBufferPosition, texCoords);// Position + ID
     vec3 finalColor = vec3(0);
-    float finalData = 1;
     vec3 rayDirection = createRay(texCoords, globalData.invProj, globalData.invView);
 
     if (worldPos.a == 0.) {
@@ -63,7 +62,7 @@ void main() {
             } else if (globalData.debugFlag == METALLIC) {
                 finalColor = vec3(material.metallic);
             } else if (globalData.debugFlag == DEPTH) {
-                finalColor = vec3(worldPos.a / 100.);
+                finalColor = vec3(distance(worldPos.rgb, globalData.cameraWorldPosition) / 25.);
             } else if (globalData.debugFlag == UV) {
                 finalColor = vec3(materialA.rg, 0);
             } else if (globalData.debugFlag == RANDOM) {
@@ -94,15 +93,6 @@ void main() {
             finalColor = calculatePixelColor(rayDirection, texCoords, material, interaction);
         }
 
-        if (globalData.enabledDenoiser) {
-            finalData = worldPos.a;
-        } else {
-            vec4 previousFrame = imageLoad(outputImage, ivec2(gl_LaunchIDEXT.xy));
-            float accumulationCount = min(globalData.pathTracerMaxSamples, previousFrame.a);
-            finalColor = previousFrame.rgb * (1. - 1. / accumulationCount) + finalColor * 1. / accumulationCount;
-            finalData = accumulationCount + 1;
-        }
-
         #ifdef DEBUG
         if (globalData.debugFlag == SURFACE_CACHE_SAMPLES || globalData.debugFlag == SURFACE_CACHE) {
             ivec2 coord = ivec2(worldToSurfaceCacheHash(interaction.point) * vec2(globalData.surfaceCacheWidth, globalData.surfaceCacheHeight));
@@ -119,5 +109,5 @@ void main() {
         finalColor = volumetricColor.rgb * volumetricColor.a + finalColor * (1.0 - volumetricColor.a);
     }
 
-    imageStore(outputImage, ivec2(gl_LaunchIDEXT.xy), vec4(finalColor, finalData));
+    imageStore(outputImage, ivec2(gl_LaunchIDEXT.xy), vec4(finalColor, 1));
 }

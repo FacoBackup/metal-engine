@@ -12,7 +12,7 @@ struct BounceInfo {
     vec3 indirectLight;
 };
 
-void evaluateLightSimplified(in Light l, in BounceInfo bounceInfo, inout vec3 throughput, inout vec3 indirectLight){
+void evaluateLightSimplified(in Light l, in BounceInfo bounceInfo, inout vec3 throughput, inout vec3 indirectLight) {
     float bias = max(.05, 1e-4 * length(bounceInfo.currentPosition.xyz));
     vec3 localHitPosition = bounceInfo.currentPosition.xyz + bounceInfo.hitNormal * bias;
     vec3 lightDir = normalize(l.position - localHitPosition);
@@ -20,49 +20,68 @@ void evaluateLightSimplified(in Light l, in BounceInfo bounceInfo, inout vec3 th
     vec3 visibility = visibilityTest(l, bounceInfo.currentPosition.xyz, lightDir);
     float NdotL = max(dot(bounceInfo.hitNormal, lightDir), 0.0);
     vec3 lightColorContribution = l.color.rgb * l.color.a * bounceInfo.albedo * visibility / PI;
-    vec3 lightContribution = lightColorContribution * NdotL / length(l.position - localHitPosition);
+    vec3 lightContribution = lightColorContribution * NdotL / distanceSq(l.position, localHitPosition);
     indirectLight += throughput * lightContribution;
-    throughput *= lightColorContribution;
 }
-
-void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo){
-    ivec2 coord = ivec2(worldToSurfaceCacheHash(bounceInfo.currentPosition) * vec2(globalData.surfaceCacheWidth, globalData.surfaceCacheHeight));
-
-    vec4 previousCacheData;
-
-    if (!bounceInfo.isEmissive){
-        previousCacheData = imageLoad(surfaceCacheImage, coord);
+void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo)
+{
+    // ----------------------------------------------------
+    // 1. Emissive bypass
+    // ----------------------------------------------------
+    if (bounceInfo.isEmissive)
+    {
+        vec3 emission = bounceInfo.albedo * globalData.giEmissiveFactor;
+        bounceInfo.indirectLight += bounceInfo.throughput * emission;
+        return;
     }
 
-    if (previousCacheData.a < globalData.pathTracerMaxSamples){
-        if (bounceInfo.isEmissive){
-            vec3 scaledAlbedo = bounceInfo.albedo * globalData.giEmissiveFactor;
-            bounceInfo.indirectLight += bounceInfo.throughput * scaledAlbedo;
-            bounceInfo.throughput *= scaledAlbedo;
+    ivec2 coord = ivec2(
+    worldToSurfaceCacheHash(bounceInfo.currentPosition) *
+    vec2(globalData.surfaceCacheWidth, globalData.surfaceCacheHeight)
+    );
 
-            imageStore(surfaceCacheImage, coord, vec4(bounceInfo.throughput * scaledAlbedo, previousCacheData.a + 1));
-        } else {
-            vec3 lIndirect = vec3(0);
-            vec3 lT = vec3(1);
+    vec4 cacheData = imageLoad(surfaceCacheImage, coord);
 
-            for (int i = 0; i < globalData.lightsCount; ++i) {
-                Light l = lightBuffer.items[i];
-                evaluateLightSimplified(l, bounceInfo, lT, lIndirect);
-            }
+    float sampleCount = cacheData.a;
+    vec3 cachedRadiance = cacheData.rgb;
 
-            imageStore(surfaceCacheImage, coord, vec4(lIndirect, previousCacheData.a + 1));
-            bounceInfo.indirectLight += lIndirect;
-            bounceInfo.throughput *= lT;
-        }
-    } else {
-        if (bounceInfo.isEmissive){
-            vec3 scaledAlbedo = bounceInfo.albedo * globalData.giEmissiveFactor;
-            bounceInfo.indirectLight += bounceInfo.throughput * scaledAlbedo;
-            bounceInfo.throughput *= scaledAlbedo;
-        } else {
-            bounceInfo.indirectLight += previousCacheData.rgb;
-            bounceInfo.throughput *= previousCacheData.rgb;
-        }
+    float maxSamples = float(globalData.pathTracerMaxSamples);
+
+    float confidence = clamp(sampleCount / maxSamples, 0.0, 1.0);
+
+    // ----------------------------------------------------
+    // 2. If confident → reuse only
+    // ----------------------------------------------------
+    if (confidence >= 1.0 && globalData.enableSurfaceCache)
+    {
+        bounceInfo.indirectLight += bounceInfo.throughput * cachedRadiance;
+        return;
+    }
+
+    // ----------------------------------------------------
+    // 3. Otherwise compute fresh lighting
+    // ----------------------------------------------------
+    vec3 directRadiance = vec3(0);
+    vec3 lT = vec3(1);
+
+    for (int i = 0; i < globalData.lightsCount; ++i)
+    {
+        Light l = lightBuffer.items[i];
+        evaluateLightSimplified(l, bounceInfo, lT, directRadiance);
+    }
+
+    bounceInfo.indirectLight += bounceInfo.throughput * directRadiance;
+
+    // ----------------------------------------------------
+    // 4. Update cache ONLY when we computed fresh lighting
+    // ----------------------------------------------------
+    if (globalData.enableSurfaceCache)
+    {
+        float newCount = min(sampleCount + 1.0, maxSamples);
+
+        vec3 newRadiance = (cachedRadiance * sampleCount + directRadiance) / newCount;
+
+        imageStore(surfaceCacheImage, coord, vec4(newRadiance, newCount));
     }
 }
 
@@ -78,9 +97,12 @@ vec3 calculateIndirectLighting(float roughness, vec3 normal, vec3 currentPositio
     float localRoughness = roughness;
     vec3 localRayDir = rayDir;
 
-    uint samples = 0;
-    for (uint j = 0; j < globalData.pathTracerBounces; j++){
-        vec3 diffuseRayDir = normalize(bounceInfo.hitNormal + RandomUnitVector());
+    for (uint j = 0; j < globalData.pathTracerBounces; j++) {
+        vec3 wiLocal = cosineSampleHemisphere(vec2(random(), random()));
+        vec3 tangent, binormal;
+        createBasis(bounceInfo.hitNormal, tangent, binormal);
+        vec3 diffuseRayDir = wiLocal.x * tangent + wiLocal.y * binormal + wiLocal.z * bounceInfo.hitNormal;
+
         vec3 specularRayDir = reflect(localRayDir, bounceInfo.hitNormal);
 
         specularRayDir = normalize(mix(specularRayDir, diffuseRayDir, localRoughness * localRoughness));
@@ -90,29 +112,26 @@ vec3 calculateIndirectLighting(float roughness, vec3 normal, vec3 currentPositio
         traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xFF, 0, 0, 0, bounceInfo.currentPosition, 0.001, localRayDir, 1000.0, 0);
 
         if (!payload.hit) {
-            if (globalData.isAtmosphereEnabled){
+            if (globalData.isAtmosphereEnabled) {
                 bounceInfo.albedo = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), localRayDir, 2.0f) * 0.05f;
                 bounceInfo.isEmissive = true;
                 fetchSurfaceCacheRadiance(bounceInfo);
-                samples++;
             }
             break;
         }
-
-        localRoughness = 1;
 
         bounceInfo.albedo = payload.material.baseColor;
         bounceInfo.isEmissive = payload.material.isEmissive;
         bounceInfo.hitNormal = payload.hitNormal;
         bounceInfo.currentPosition = payload.hitPosition;
+        localRoughness = payload.material.roughness;
 
         fetchSurfaceCacheRadiance(bounceInfo);
-        samples++;
     }
-    return samples > 0 ? bounceInfo.indirectLight / samples : vec3(0);
+    return bounceInfo.indirectLight;
 }
 
-vec3 calculatePixelColor( vec3 rayDirection, in vec2 texCoords, MaterialInfo material, SurfaceInteraction interaction) {
+vec3 calculatePixelColor(vec3 rayDirection, in vec2 texCoords, MaterialInfo material, SurfaceInteraction interaction) {
     vec3 L = vec3(0.);
     vec3 beta = vec3(1.);
 
@@ -127,36 +146,30 @@ vec3 calculatePixelColor( vec3 rayDirection, in vec2 texCoords, MaterialInfo mat
     material.anisotropic = 0.;
     material.sheen = 0.;
     material.sheenTint = 0.;
-    //    material.clearcoat = 1.;
-    //    material.specular = 0.1;
-    //    material.subsurface = 1.;
-    //    material.clearcoatGloss = 1.;
 
-    // Direct lighting - Disney BSDF
     vec3 X = vec3(0.), Y = vec3(0.);
     directionOfAnisotropicity(interaction.normal, X, Y);
     interaction.tangent = X;
     interaction.binormal = Y;
 
-    for (uint i = 0; i < globalData.pathTracerSamples; i++){
+    for (uint i = 0; i < globalData.pathTracerSamples; i++) {
         vec3 f = vec3(0.);
         float scatteringPdf = 0.;
         vec3 Ld = vec3(0);
-        for (uint i = 0; i < globalData.lightsCount; i++){
+        for (uint i = 0; i < globalData.lightsCount; i++) {
             Light l = lightBuffer.items[i];
-            l.color.rgb *= 20.;
             Ld += beta * calculateDirectLight(l, interaction, material, wi, f, scatteringPdf) * l.color.a;
         }
 
         L += Ld;
 
-        if (scatteringPdf > EPSILON && dot(f, f) > EPSILON){
-            beta *=  f / scatteringPdf;
+        if (scatteringPdf > EPSILON && dot(f, f) > EPSILON) {
+            beta *= f / scatteringPdf;
         }
 
-        if (globalData.pathTracerBounces > 0 && globalData.pathTracerMultiplier > 0){
+        if (globalData.pathTracerBounces > 0 && globalData.pathTracerMultiplier > 0) {
             float bias = max(.05, 1e-4 * length(interaction.point));
-            vec3 point =  interaction.point + bias * interaction.normal;
+            vec3 point = interaction.point + bias * interaction.normal;
             L += (material.baseColor / PI) * calculateIndirectLighting(material.roughness, interaction.normal, point, rayDirection) * globalData.pathTracerMultiplier;
         }
     }

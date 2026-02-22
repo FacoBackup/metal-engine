@@ -1,5 +1,6 @@
 #include "./HWRayTracingPass.h"
 #include "../../../ApplicationContext.h"
+#include "../../../../service/framebuffer/FrameBufferInstance.h"
 #include "../../../../service/pipeline/PipelineBuilder.h"
 #include "../../../../service/pipeline/PipelineInstance.h"
 #include "../../../../service/texture/TextureInstance.h"
@@ -37,19 +38,17 @@ namespace Metal {
         bool surfaceCacheReset = CTX.engineContext.isGISettingsUpdated() || CTX.engineContext.
                               isUpdateLights();
         if (surfaceCacheReset) {
-            clearTexture(CTX.coreTextures.giSurfaceCache->vkImage);
+            clearTexture(CTX.coreTextures.surfaceCache->vkImage);
         }
 
-        if (CTX.engineRepository.enabledDenoiser) {
-            clearTexture(CTX.coreTextures.currentFrame->vkImage);
-            CTX.engineContext.resetPathTracerAccumulationCount();
-        } else if (isFirstRun || CTX.engineContext.isCameraUpdated() || surfaceCacheReset) {
-            clearTexture(CTX.coreTextures.currentFrame->vkImage);
+        if (isFirstRun || CTX.engineContext.isCameraUpdated() || surfaceCacheReset) {
+            clearTexture(CTX.coreTextures.rawRenderedFrame->vkImage);
+            clearTexture(CTX.coreTextures.accumulatedFrame->vkImage);
             CTX.engineContext.resetPathTracerAccumulationCount();
             isFirstRun = false;
         }
 
-        startWriting(CTX.coreTextures.currentFrame->vkImage);
+        startWriting(CTX.coreTextures.rawRenderedFrame->vkImage);
 
         // Trace rays
         CTX.vulkanContext.vkCmdTraceRaysKHR(
@@ -58,10 +57,10 @@ namespace Metal {
             &pipelineInstance->missRegion,
             &pipelineInstance->hitRegion,
             &pipelineInstance->callableRegion,
-            CTX.coreTextures.currentFrame->width,
-            CTX.coreTextures.currentFrame->height,
+            CTX.coreFrameBuffers.gBufferFBO->bufferWidth,
+            CTX.coreFrameBuffers.gBufferFBO->bufferHeight,
             1);
 
-        endWriting(CTX.coreTextures.currentFrame->vkImage);
+        endWriting(CTX.coreTextures.rawRenderedFrame->vkImage);
     }
 } // Metal
