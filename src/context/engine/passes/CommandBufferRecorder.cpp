@@ -17,12 +17,9 @@ namespace Metal {
         allocInfo.commandPool = CTX.vulkanContext.commandPool;
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
         allocInfo.commandBufferCount = MAX_FRAMES_IN_FLIGHT;
-        {
-            std::lock_guard<std::mutex> lock(CTX.vulkanContext.commandPoolMutex);
-            VulkanUtils::CheckVKResult(
-                vkAllocateCommandBuffers(CTX.vulkanContext.device.device, &allocInfo,
-                                         _commandBuffers.data()));
-        }
+        VulkanUtils::CheckVKResult(
+            vkAllocateCommandBuffers(CTX.vulkanContext.device.device, &allocInfo,
+                                     _commandBuffers.data()));
     }
 
     CommandBufferRecorder::CommandBufferRecorder(FrameBufferInstance *frameBuffer,

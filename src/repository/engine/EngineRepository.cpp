@@ -28,7 +28,7 @@ namespace Metal {
         registerInt(giTileSubdivision, PATH_TRACER, "Grid subdivision", 1);
         registerFloat(giEmissiveFactor, PATH_TRACER, "Emissive surface factor", 0);
 
-        registerBool(atmosphereEnabled, ATMOSPHERE, "Enabled?");
+        registerBool(atmosphereEnabled, ATMOSPHERE, "Enable atmosphere?");
         registerFloat(elapsedTime, ATMOSPHERE, "Elapsed time");
         registerBool(incrementTime, ATMOSPHERE, "Increment time");
         registerFloat(elapsedTimeSpeed, ATMOSPHERE, "Time of day speed");

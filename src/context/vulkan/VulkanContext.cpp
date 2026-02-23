@@ -296,6 +296,7 @@ namespace Metal {
         CTX.textureService.disposeAll();
         CTX.meshService.disposeAll();
         CTX.framebufferService.disposeAll();
+        CTX.rayTracingService.destroyAccelerationStructures();
         vkDestroyDescriptorPool(CTX.vulkanContext.device.device, descriptorPool,
                                 nullptr);
         vkDestroyCommandPool(CTX.vulkanContext.device.device, commandPool,
@@ -327,7 +328,6 @@ namespace Metal {
     }
 
     VkCommandBuffer VulkanContext::beginSingleTimeCommands() const {
-        std::lock_guard<std::mutex> lock(commandPoolMutex);
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -353,16 +353,10 @@ namespace Metal {
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &commandBuffer;
 
-        {
-            std::lock_guard<std::mutex> lock(queueMutex);
-            vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
-            vkQueueWaitIdle(graphicsQueue);
-        }
+        vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+        vkQueueWaitIdle(graphicsQueue);
 
-        {
-            std::lock_guard<std::mutex> lock(commandPoolMutex);
-            vkFreeCommandBuffers(device.device, commandPool, 1, &commandBuffer);
-        }
+        vkFreeCommandBuffers(device.device, commandPool, 1, &commandBuffer);
     }
 
 
@@ -380,9 +374,6 @@ namespace Metal {
         info.signalSemaphoreCount = 1;
         info.pSignalSemaphores = &render_complete_semaphore;
         VulkanUtils::CheckVKResult(vkEndCommandBuffer(fd->CommandBuffer));
-        {
-            std::lock_guard<std::mutex> lock(CTX.vulkanContext.queueMutex);
-            VulkanUtils::CheckVKResult(vkQueueSubmit(CTX.vulkanContext.graphicsQueue, 1, &info, fd->Fence));
-        }
+        VulkanUtils::CheckVKResult(vkQueueSubmit(CTX.vulkanContext.graphicsQueue, 1, &info, fd->Fence));
     }
 }

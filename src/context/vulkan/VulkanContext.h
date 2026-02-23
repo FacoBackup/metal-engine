@@ -3,7 +3,6 @@
 
 #include "vk_mem_alloc.h"
 #include <unordered_map>
-#include <mutex>
 
 #include "imgui_impl_vulkan.h"
 #include <GLFW/glfw3.h>
@@ -69,8 +68,6 @@ namespace Metal {
         VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
         VkCommandPool commandPool = VK_NULL_HANDLE;
         VkPhysicalDeviceRayTracingPipelinePropertiesKHR rayTracingPipelineProperties{};
-        mutable std::mutex queueMutex;
-        mutable std::mutex commandPoolMutex;
 
         PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR = nullptr;
         PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR = nullptr;
