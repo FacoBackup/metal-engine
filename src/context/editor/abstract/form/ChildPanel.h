@@ -1,10 +1,10 @@
-#ifndef ACCORDION_H
-#define ACCORDION_H
+#ifndef CHILD_H
+#define CHILD_H
 
 #include "AbstractFormFieldPanel.h"
 
 namespace Metal {
-    class AccordionPanel final : public AbstractFormFieldPanel {
+    class ChildPanel final : public AbstractFormFieldPanel {
         std::string fixedId = id;
         std::string title;
 

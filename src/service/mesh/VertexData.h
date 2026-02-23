@@ -3,10 +3,11 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <vulkan/vulkan.h>
-#include "../../util/Serializable.h"
+
+#include "../../util/serialization-definitions.h"
 
 namespace Metal {
-    struct VertexData final : Serializable {
+    struct VertexData final {
         glm::vec3 vertex;
         glm::vec3 normal;
         glm::vec2 uv;
@@ -32,19 +33,9 @@ namespace Metal {
             return attributeDescriptions;
         }
 
-        nlohmann::json toJson() const override {
-            nlohmann::json j;
-            j["v"] = {vertex.x, vertex.y, vertex.z};
-            j["n"] = {normal.x, normal.y, normal.z};
-            j["u"] = {uv.x, uv.y};
-            return j;
-        }
-
-        void fromJson(const nlohmann::json& j) override {
-            vertex = {j.at("v")[0], j.at("v")[1], j.at("v")[2]};
-            normal = {j.at("n")[0], j.at("n")[1], j.at("n")[2]};
-            uv = {j.at("u")[0], j.at("u")[1]};
-        }
+        SERIALIZE_TEMPLATE(vertex.x, vertex.y, vertex.z,
+               normal.x, normal.y, normal.z,
+               uv.x, uv.y)
     };
 }
 

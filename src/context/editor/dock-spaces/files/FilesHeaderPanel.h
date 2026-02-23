@@ -6,13 +6,13 @@
 #include "../../abstract/AbstractPanel.h"
 
 namespace Metal {
-    class FilesHeader final : public AbstractPanel {
+    class FilesHeaderPanel final : public AbstractPanel {
         FilesContext &filesContext;
         std::string actionLabel;
         std::function<void()> action;
         int editorMode = 0;
     public:
-        explicit FilesHeader(FilesContext &files_context, const std::string &actionLabel,
+        explicit FilesHeaderPanel(FilesContext &files_context, const std::string &actionLabel,
                              std::function<void()> action)
             : filesContext(files_context), actionLabel(actionLabel), action(std::move(action)) {
         }

@@ -1,5 +1,5 @@
 #include "ColorField.h"
-
+#include <algorithm>
 #include <imgui.h>
 #include "../../../../../common/inspection/Inspectable.h"
 
@@ -23,5 +23,12 @@ namespace Metal {
         } else {
             ImGui::ColorButton("%s", ImVec4(field.field->x, field.field->y, field.field->z, 1.));
         }
+    }
+
+    bool ColorField::isVisible() const {
+        if (!filter || filter->empty()) return true;
+        std::string lowerName = field.name;
+        std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
+        return lowerName.find(*filter) != std::string::npos;
     }
 } // Metal

@@ -35,7 +35,7 @@
 #include "../repository/inspection/FileInspectionRepository.h"
 #include "../repository/world/WorldRepository.h"
 #include "../repository/runtime/RuntimeRepository.h"
-#include "../repository/streaming/StreamingRepository.h"
+#include "../repository/streaming/StreamingService.h"
 #include "../repository/engine/EngineRepository.h"
 #include "../repository/dock/DockRepository.h"
 #include "../repository/editor/EditorRepository.h"
@@ -115,7 +115,7 @@ namespace Metal {
         WorldGridRepository worldGridRepository{};
         WorldRepository worldRepository{};
         RuntimeRepository runtimeRepository{};
-        StreamingRepository streamingRepository{};
+        StreamingService streamingRepository{};
         EngineRepository engineRepository{};
         DockRepository dockRepository{};
         EditorRepository editorRepository{};
@@ -155,6 +155,8 @@ namespace Metal {
         }
 
         [[nodiscard]] unsigned int getFrameIndex() const;
+
+        void dispose();
 
         void start();
 

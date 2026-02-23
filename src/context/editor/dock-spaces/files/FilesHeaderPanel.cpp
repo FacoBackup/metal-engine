@@ -1,18 +1,17 @@
-#include "FilesHeader.h"
+#include "FilesHeaderPanel.h"
 
 #include "../../../../enum/EntryType.h"
-#include "../../../../dto/file/FileEntry.h"
+#include "../../../../dto/file/FSEntry.h"
 #include "../../../../common/interface/Icons.h"
 #include "../../../../util/FilesUtil.h"
 #include "../../../../context/ApplicationContext.h"
 #include "../../../../util/UIUtil.h"
 
 namespace Metal {
-    void FilesHeader::onSync() {
+    void FilesHeaderPanel::onSync() {
         if (UIUtil::ButtonSimple(Icons::create_new_folder + id, UIUtil::ONLY_ICON_BUTTON_SIZE,
                                  UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            FilesUtil::MkDir(
-                filesContext.currentDirectory->absolutePath + "/new-directory (" + Util::uuidV4().substr(0, 4) + ")");
+            FilesService::CreateDirectory(filesContext.currentDirectory);
             FilesService::GetEntries(filesContext.currentDirectory);
         }
         UIUtil::RenderTooltip("Create folder");
@@ -40,7 +39,7 @@ namespace Metal {
 
         if (UIUtil::ButtonSimple(Icons::format_paint + id, UIUtil::ONLY_ICON_BUTTON_SIZE,
                                  UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            CTX.filesService.createMaterial(filesContext.currentDirectory->absolutePath);
+            CTX.filesService.createMaterial(filesContext.currentDirectory->absolutePath, filesContext.currentDirectory);
             FilesService::GetEntries(filesContext.currentDirectory);
         }
         UIUtil::RenderTooltip("Create material");

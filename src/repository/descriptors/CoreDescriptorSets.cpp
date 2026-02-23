@@ -76,28 +76,9 @@ namespace Metal {
             surfaceCacheImage->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
                                                                           VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
                                                                           VK_NULL_HANDLE,
-                                                                          CTX.coreTextures.giSurfaceCache->
+                                                                          CTX.coreTextures.surfaceCache->
                                                                           vkImageView));
             surfaceCacheImage->create();
-        }
-
-        {
-            previousFrameDescriptor = std::make_unique<DescriptorInstance>();
-            previousFrameDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_COMPUTE_BIT,
-                                                                            VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
-                                                                            VK_NULL_HANDLE,
-                                                                            CTX.coreTextures.previousFrame->
-                                                                            vkImageView));
-            previousFrameDescriptor->create();
-        }
-
-        {
-            previousFrameMetadataDescriptor = std::make_unique<DescriptorInstance>();
-            previousFrameMetadataDescriptor->addLayoutBinding(DescriptorBinding::Of(
-                VK_SHADER_STAGE_COMPUTE_BIT, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-                0, VK_NULL_HANDLE,
-                CTX.coreTextures.previousFrameMetadata->vkImageView));
-            previousFrameMetadataDescriptor->create();
         }
 
         {
@@ -105,8 +86,17 @@ namespace Metal {
             currentFrameDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
                                                                            VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
                                                                            VK_NULL_HANDLE,
-                                                                           CTX.coreTextures.currentFrame->vkImageView));
+                                                                           CTX.coreTextures.rawRenderedFrame->vkImageView));
             currentFrameDescriptor->create();
+        }
+
+        {
+            accumulatedFrameDescriptor = std::make_unique<DescriptorInstance>();
+            accumulatedFrameDescriptor->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
+                                                                               VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0,
+                                                                               VK_NULL_HANDLE,
+                                                                               CTX.coreTextures.accumulatedFrame->vkImageView));
+            accumulatedFrameDescriptor->create();
         }
     }
 
@@ -123,7 +113,7 @@ namespace Metal {
             surfaceCacheFragment->addLayoutBinding(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
                                                                          VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
                                                                          CTX.coreDescriptorSets.vkImageSampler,
-                                                                         CTX.coreTextures.giSurfaceCache->
+                                                                         CTX.coreTextures.surfaceCache->
                                                                          vkImageView));
             surfaceCacheFragment->create();
         }
@@ -134,7 +124,7 @@ namespace Metal {
                                                                              VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                                              0,
                                                                              CTX.coreDescriptorSets.vkImageSampler,
-                                                                             CTX.coreTextures.currentFrame->
+                                                                             CTX.coreTextures.accumulatedFrame->
                                                                              vkImageView));
             postProcessingDescriptor->create();
         }

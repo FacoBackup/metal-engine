@@ -41,10 +41,6 @@ namespace Metal {
                     mPushConstant.model = worldRepository.registry.get<TransformComponent>(entity).model;
                     mPushConstant.renderIndex = mesh.renderIndex = renderIndex;
 
-                    mPushConstant.albedoEmissive = glm::vec4(mesh.albedoColor,
-                                                             mesh.emissiveSurface);
-                    mPushConstant.roughnessFactor = mesh.roughnessFactor;
-                    mPushConstant.metallicFactor = mesh.metallicFactor;
                     mPushConstant.parallaxLayers = mesh.parallaxLayers;
                     mPushConstant.parallaxHeightScale = mesh.parallaxHeightScale;
 

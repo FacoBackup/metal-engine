@@ -1,5 +1,5 @@
 #include "IntField.h"
-
+#include <algorithm>
 #include <imgui.h>
 #include "../../../../../common/inspection/Inspectable.h"
 
@@ -18,5 +18,12 @@ namespace Metal {
     }
 
     IntField::IntField(InspectedField<int> &field) : field(field) {
+    }
+
+    bool IntField::isVisible() const {
+        if (!filter || filter->empty()) return true;
+        std::string lowerName = field.name;
+        std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
+        return lowerName.find(*filter) != std::string::npos;
     }
 } // Metal

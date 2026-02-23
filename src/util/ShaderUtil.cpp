@@ -10,6 +10,7 @@
 #include "FilesUtil.h"
 #include "../service/log/LogService.h"
 #include "../enum/LightType.h"
+#include "../enum/ShadingMode.h"
 #include "glslang/Include/glslang_c_interface.h"
 #include "glslang/Public/resource_limits_c.h"
 #define BASE_PATH "../resources/shaders/"
@@ -166,6 +167,9 @@ namespace Metal {
         if (CTX.isDebugMode()) {
             source = "#define DEBUG\n" + source;
         }
+        for (auto &entry: ShadingModes::getShaderEntries()) {
+            source = "#define " + entry.first + " " + std::to_string(entry.second) + "\n" + source;
+        }
         for (auto &entry: LightTypes::getEntries()) {
             source = "#define " + entry.first + " " + std::to_string(entry.second) + "\n" + source;
         }
@@ -188,7 +192,7 @@ namespace Metal {
             if (hashFile >> cachedHash && cachedHash == sourceHash) {
                 try {
                     FilesUtil::ReadBinaryFile(binaryFilename.c_str(), shader.SPIRV);
-                    
+
                     VkShaderModuleCreateInfo shaderCreateInfo{};
                     shaderCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
                     shaderCreateInfo.codeSize = shader.SPIRV.size() * sizeof(unsigned int);

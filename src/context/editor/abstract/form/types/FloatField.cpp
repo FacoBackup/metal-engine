@@ -1,5 +1,5 @@
 #include "FloatField.h"
-
+#include <algorithm>
 #include <imgui.h>
 #include "../../../../../common/inspection/Inspectable.h"
 
@@ -19,5 +19,12 @@ namespace Metal {
     }
 
     FloatField::FloatField(InspectedField<float> &field) : field(field) {
+    }
+
+    bool FloatField::isVisible() const {
+        if (!filter || filter->empty()) return true;
+        std::string lowerName = field.name;
+        std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
+        return lowerName.find(*filter) != std::string::npos;
     }
 } // Metal

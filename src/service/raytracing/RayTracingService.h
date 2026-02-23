@@ -36,12 +36,9 @@ namespace Metal {
 
         void buildTLAS();
 
-        void destroyAccelerationStructures();
 
     public:
-        explicit RayTracingService()
-            : AbstractRuntimeComponent() {
-        }
+        void destroyAccelerationStructures();
 
         void onSync() override;
 

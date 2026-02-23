@@ -6,15 +6,15 @@
 #include "EntryMetadata.h"
 
 namespace Metal {
-    struct FileEntry final : EntryMetadata {
+    struct FSEntry final : EntryMetadata {
         std::string absolutePath;
         std::string formattedDate;
         std::string formattedSize;
         bool isHovered = false;
-        std::vector<FileEntry *> children{};
-        FileEntry *parent = nullptr;
+        std::vector<FSEntry *> children{};
+        FSEntry *parent = nullptr;
 
-        FileEntry(FileEntry *parent, std::string absolute_path, std::string formatted_date)
+        FSEntry(FSEntry *parent, std::string absolute_path, std::string formatted_date)
             : absolutePath(std::move(absolute_path)),
               formattedDate(std::move(formatted_date)),
               parent(parent) {

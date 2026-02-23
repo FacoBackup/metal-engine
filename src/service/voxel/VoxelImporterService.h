@@ -24,6 +24,7 @@ namespace Metal {
         size_t serialize(SparseVoxelOctreeBuilder &builder, const std::string &filePath) const;
 
         std::string importData(const std::string &targetDir, const std::string &pathToFile,
+                               const std::shared_ptr<ImportSettingsDTO> &settings,
                                const std::stop_token &stopToken) override;
     };
 } // Metal

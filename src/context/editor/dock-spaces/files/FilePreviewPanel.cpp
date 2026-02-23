@@ -1,18 +1,18 @@
 #include "FilePreviewPanel.h"
 #include <imgui.h>
 #include "../../../../util/UIUtil.h"
-#include "../../../../dto/file/FileEntry.h"
+#include "../../../../dto/file/FSEntry.h"
 #include "../../../../context/ApplicationContext.h"
 #include "../../../../common/interface/Icons.h"
 #include "../../../../service/texture/TextureInstance.h"
-#include "../inspector/MaterialInspection.h"
+#include "../inspector/MaterialEditPanel.h"
 
 namespace Metal {
     FilePreviewPanel::FilePreviewPanel(FilesContext &filesContext) : filesContext(filesContext) {
     }
 
     void FilePreviewPanel::onInitialize() {
-        materialInspection = new MaterialInspection();
+        materialInspection = new MaterialEditPanel();
         appendChild(materialInspection);
     }
 
@@ -22,7 +22,7 @@ namespace Metal {
             return;
         }
 
-        FileEntry *selected = filesContext.selected.begin()->second;
+        FSEntry *selected = filesContext.selected.begin()->second;
 
         ImGui::Text(selected->name.c_str());
         ImGui::Separator();

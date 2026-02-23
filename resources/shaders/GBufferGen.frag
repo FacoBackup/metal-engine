@@ -15,10 +15,6 @@ layout (location = 0) out vec4 outMaterialA;
 layout (location = 1) out vec4 outMaterialB;
 layout (location = 2) out vec4 outMaterialC;
 
-#ifdef DEBUG
-#include "./DebugFlags.glsl"
-#endif
-
 bool hasMaterial() { return push.materialIndex != 0u; }
 
 float encode(float depthFunc, float val) {
@@ -97,12 +93,12 @@ void main() {
     mat3 TBN = computeTBN(inPosition, localUV, N, isDecalPass);
     vec3 W = inPosition;
 
-    float metallic = push.metallicFactor;
-    float roughness = push.roughnessFactor;
-    outMaterialA = vec4(push.albedoEmissive.rgb, gl_FragCoord.z);
+    float metallic = 0;
+    float roughness = 1;
+    outMaterialA = vec4(1, 1, 1, gl_FragCoord.z);
     outMaterialB = vec4(N, 0);
     outMaterialC = vec4(inPosition, push.renderIndex + 1);
-    bool isEmissive = push.albedoEmissive.a > 0;
+    bool isEmissive = false;
     if (hasMaterial()) {
         MaterialData mat = materialBuffer.items[push.materialIndex];
         isEmissive = mat.isEmissive == 1u;

@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "../../dto/file/ImportSettingsDTO.h"
 #include "../../common/AbstractRuntimeComponent.h"
 
 namespace Metal {
@@ -18,6 +19,7 @@ namespace Metal {
         }
 
         virtual std::string importData(const std::string &targetDir, const std::string &pathToFile,
+                                       const std::shared_ptr<ImportSettingsDTO> &settings,
                                        const std::stop_token &stopToken) {
             return "";
         }

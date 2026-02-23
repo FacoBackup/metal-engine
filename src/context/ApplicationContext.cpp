@@ -46,13 +46,25 @@ namespace Metal {
         PARSE_TEMPLATE(worldRepository, rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository) + ".json")
 
 
-        FilesUtil::MkDir(getShadersDirectory());
-        FilesUtil::MkDir(getAssetRefDirectory());
-        FilesUtil::MkDir(getAssetDirectory());
+        FilesUtil::CreateDirectory(getShadersDirectory());
+        FilesUtil::CreateDirectory(getAssetRefDirectory());
+        FilesUtil::CreateDirectory(getAssetDirectory());
     }
 
     unsigned int ApplicationContext::getFrameIndex() const {
         return vulkanContext.imguiVulkanWindow.FrameIndex;
+    }
+
+    void ApplicationContext::dispose() {
+        NFD_Quit();
+        try {
+            asyncTaskService.endAll();
+            guiContext.dispose();
+            vulkanContext.dispose();
+            glfwContext.dispose();
+        } catch (std::exception &e) {
+            std::cerr << e.what() << std::endl;
+        }
     }
 
     void ApplicationContext::start() {
@@ -106,15 +118,7 @@ namespace Metal {
                     glfwContext.presentFrame();
             }
         }
-        NFD_Quit();
-        try {
-            asyncTaskService.endAll();
-            guiContext.dispose();
-            vulkanContext.dispose();
-            glfwContext.dispose();
-        } catch (std::exception &e) {
-            std::cerr << e.what() << std::endl;
-        }
+        dispose();
     }
 
     void ApplicationContext::save() {

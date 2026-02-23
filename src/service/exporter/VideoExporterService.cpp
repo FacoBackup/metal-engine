@@ -25,7 +25,7 @@ namespace Metal {
             frameOutputDirectory = CTX.getRootDirectory() + "/video-frames";
             std::error_code error;
             std::filesystem::remove_all(frameOutputDirectory, error);
-            FilesUtil::MkDir(frameOutputDirectory);
+            FilesUtil::CreateDirectory(frameOutputDirectory);
 
             CTX.engineRepository.isBaking = true;
             isFirstBakeLoop = false;

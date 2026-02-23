@@ -1,5 +1,5 @@
 #include "Vec3Field.h"
-
+#include <algorithm>
 #include <imgui.h>
 #include "../../../../../common/inspection/Inspectable.h"
 
@@ -23,5 +23,12 @@ namespace Metal {
         } else {
             ImGui::Text("%s: <%f, %f, %f>", field.name.c_str(), field.field->x, field.field->y, field.field->z);
         }
+    }
+
+    bool Vec3Field::isVisible() const {
+        if (!filter || filter->empty()) return true;
+        std::string lowerName = field.name;
+        std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
+        return lowerName.find(*filter) != std::string::npos;
     }
 } // Metal

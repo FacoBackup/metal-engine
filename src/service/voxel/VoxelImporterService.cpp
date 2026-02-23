@@ -21,7 +21,7 @@ namespace fs = std::filesystem;
 namespace Metal {
 
     std::string VoxelImporterService::importData(const std::string &targetDir,
-                                             const std::string &pathToFile, const std::stop_token &stopToken) {
+                                             const std::string &pathToFile, const std::shared_ptr<ImportSettingsDTO> &settings, const std::stop_token &stopToken) {
         try {
             auto metadata = EntryMetadata{};
             metadata.type = EntryType::VOLUME;

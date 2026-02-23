@@ -1,6 +1,6 @@
 #include "SceneImporterService.h"
 
-#include "../../dto/file/FileEntry.h"
+#include "../../dto/file/FSEntry.h"
 #include "MeshData.h"
 #include "EntityAssetData.h"
 #include "SceneData.h"
@@ -13,17 +13,29 @@
 #include "../../enum/engine-definitions.h"
 #include "../../context/ApplicationContext.h"
 #include "../../util/serialization-definitions.h"
+#include "../../dto/file/SceneImportSettingsDTO.h"
 
 namespace Metal {
+
     std::string SceneImporterService::importData(const std::string &targetDir, const std::string &pathToFile,
-                                          const std::stop_token &stopToken) {
+                                                 const std::shared_ptr<ImportSettingsDTO> &settings,
+                                                 const std::stop_token &stopToken) {
 
         Assimp::Importer importer;
-        const aiScene *scene = importer.ReadFile(
-            pathToFile,
-            aiProcess_Triangulate | aiProcess_GlobalScale |
-            aiProcess_FindInstances | aiProcess_FlipUVs | aiProcess_TransformUVCoords | aiProcess_GenUVCoords |
-            aiProcess_PreTransformVertices | aiProcess_GenSmoothNormals);
+
+        unsigned int flags = aiProcess_GlobalScale | aiProcess_FindInstances | aiProcess_PreTransformVertices;
+        auto sceneSettings = std::dynamic_pointer_cast<SceneImportSettingsDTO>(settings);
+        if (sceneSettings) {
+            if (sceneSettings->triangulate) flags |= aiProcess_Triangulate;
+            if (sceneSettings->flipUVs) flags |= aiProcess_FlipUVs;
+            if (sceneSettings->genSmoothNormals) flags |= aiProcess_GenSmoothNormals;
+            if (sceneSettings->generateUVs) flags |= aiProcess_GenUVCoords | aiProcess_TransformUVCoords;
+
+            importer.SetPropertyFloat(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, 0.0f);
+            importer.SetPropertyFloat(AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY, sceneSettings->scale);
+        }
+
+        const aiScene *scene = importer.ReadFile(pathToFile, flags);
 
         if (stopToken.stop_requested()) {
            throw std::runtime_error("Import cancelled");

@@ -8,10 +8,6 @@ namespace Metal {
         registerFloat(intensity, "", "Intensity", .1, 100);
     }
 
-    ComponentTypes::ComponentType LightComponent::getType() {
-        return ComponentTypes::SPHERE_LIGHT;
-    }
-
     void LightComponent::onUpdate(InspectableMember *member) {
         CTX.engineContext.setUpdateLights(true);
     }

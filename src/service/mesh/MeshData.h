@@ -1,13 +1,14 @@
 #ifndef MESHDATA_H
 #define MESHDATA_H
+#include <string>
 #include <vector>
 #include "VertexData.h"
-#include "../../util/Serializable.h"
+#include "../../util/serialization-definitions.h"
 
 namespace Metal {
     struct LevelOfDetail;
 
-    struct MeshData final : Serializable {
+    struct MeshData final {
         std::string name;
         std::vector<VertexData> data;
         std::vector<unsigned int> indices;
@@ -22,30 +23,7 @@ namespace Metal {
               gizmoCenter(gizmoCenter) {
         }
 
-        nlohmann::json toJson() const override {
-            nlohmann::json j;
-            j["name"] = name;
-            j["indices"] = indices;
-            j["gizmoCenter"] = {gizmoCenter.x, gizmoCenter.y, gizmoCenter.z};
-            nlohmann::json d = nlohmann::json::array();
-            for (const auto& v : data) {
-                d.push_back(v.toJson());
-            }
-            j["data"] = d;
-            return j;
-        }
-
-        void fromJson(const nlohmann::json& j) override {
-            name = j.at("name").get<std::string>();
-            indices = j.at("indices").get<std::vector<unsigned int>>();
-            gizmoCenter = {j.at("gizmoCenter")[0], j.at("gizmoCenter")[1], j.at("gizmoCenter")[2]};
-            data.clear();
-            for (const auto& v : j.at("data")) {
-                VertexData vd;
-                vd.fromJson(v);
-                data.push_back(vd);
-            }
-        }
+        SAVE_TEMPLATE(name, indices, data, gizmoCenter.x, gizmoCenter.y, gizmoCenter.z)
     };
 } // Metal
 

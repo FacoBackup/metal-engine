@@ -1,5 +1,6 @@
 #include "AccordionPanel.h"
 #include "imgui.h"
+#include "../../../ApplicationContext.h"
 
 namespace Metal {
     void AccordionPanel::setTitle(const std::string &t) {
@@ -12,19 +13,29 @@ namespace Metal {
             onSyncChildren();
             return;
         }
-        if (ImGui::CollapsingHeader(fixedId.c_str())) {
+
+        ImGui::PushStyleColor(ImGuiCol_Header, CTX.themeService.neutralPalette);
+        bool open = ImGui::CollapsingHeader(fixedId.c_str(), ImGuiTreeNodeFlags_None);
+        ImGui::PopStyleColor();
+
+        if (open) {
+            ImGui::Spacing();
+            ImGui::Indent(15.0f);
             onSyncChildren();
+            ImGui::Unindent(15.0f);
+            ImGui::Spacing();
+            ImGui::Separator();
         }
     }
 
-    void AccordionPanel::onSyncChildren() const {
-        for (int i = 0; i < children.size(); i++) {
-            children[i]->onSync();
+    bool AccordionPanel::isVisible() const {
+        if (!filter || filter->empty()) return true;
 
-            if (i < children.size() - 1) {
-                ImGui::Dummy(ImVec2(0, 4));
-                ImGui::Separator();
+        for (const auto panel : children) {
+            if (auto abstractPanel = dynamic_cast<AbstractFormFieldPanel*>(panel)) {
+                if (abstractPanel->isVisible()) return true;
             }
         }
+        return false;
     }
 }

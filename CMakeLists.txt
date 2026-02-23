@@ -127,12 +127,12 @@ add_executable(
         src/service/mesh/MeshInstance.cpp
         src/service/mesh/MeshInstance.h
         src/util/FilesUtil.h
-        src/dto/file/FileEntry.h
+        src/dto/file/FSEntry.h
         src/enum/EntryType.h
         src/context/editor/dock-spaces/files/FilesContext.h
         src/util/FileDialogUtil.h
-        src/context/editor/dock-spaces/files/FilesHeader.cpp
-        src/context/editor/dock-spaces/files/FilesHeader.h
+        src/context/editor/dock-spaces/files/FilesHeaderPanel.cpp
+        src/context/editor/dock-spaces/files/FilesHeaderPanel.h
         src/service/material/MaterialImporterService.cpp
         src/service/material/MaterialImporterService.h
         src/service/mesh/MeshImporterService.cpp
@@ -191,8 +191,8 @@ add_executable(
         src/context/editor/abstract/form/types/StringField.h
         src/context/editor/abstract/form/types/ResourceFilesPanel.h
         src/context/editor/abstract/form/types/ResourceFilesPanel.cpp
-        src/repository/streaming/StreamingRepository.cpp
-        src/repository/streaming/StreamingRepository.h
+        src/repository/streaming/StreamingService.cpp
+        src/repository/streaming/StreamingService.h
         src/enum/ResourceType.h
         src/context/editor/dock-spaces/viewport/GizmoPanel.cpp
         src/context/editor/dock-spaces/viewport/GizmoPanel.h
@@ -269,11 +269,9 @@ add_executable(
         src/service/material/MaterialFileData.cpp
         src/repository/inspection/FileInspectionRepository.cpp
         src/repository/inspection/FileInspectionRepository.h
-        src/context/editor/dock-spaces/inspector/MaterialInspection.cpp
-        src/context/editor/dock-spaces/inspector/MaterialInspection.h
+        src/context/editor/dock-spaces/inspector/MaterialEditPanel.cpp
+        src/context/editor/dock-spaces/inspector/MaterialEditPanel.h
         src/enum/LightType.h
-        src/context/engine/compute-pass/impl/AccumulationMetadataPass.cpp
-        src/context/engine/compute-pass/impl/AccumulationMetadataPass.h
         src/context/engine/compute-pass/impl/AccumulationPass.cpp
         src/context/engine/compute-pass/impl/AccumulationPass.h
         src/service/lights/LightService.cpp
@@ -294,6 +292,9 @@ add_executable(
         src/service/voxel/VoxelService.h
         src/service/framebuffer/FrameBufferInstance.cpp
         src/util/Serializable.cpp
+        src/context/editor/abstract/form/ChildPanel.cpp
+        src/context/editor/abstract/form/ChildPanel.h
+        src/dto/file/SceneImportSettingsDTO.h
 )
 
 

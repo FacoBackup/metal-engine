@@ -9,11 +9,6 @@ namespace Metal {
         registerResourceSelection(meshId, "", "Mesh", EntryType::MESH);
         registerResourceSelection(materialId, "", "Material", EntryType::MATERIAL);
 
-        registerBool(emissiveSurface, "", "Is emissive surface?");
-
-        registerColor(albedoColor, "Material", "Albedo Color");
-        registerFloat(roughnessFactor, "Material", "Roughness Factor", 0, 1, false, .001);
-        registerFloat(metallicFactor, "Material", "Metallic Factor", 0, 1, false, .001);
         registerFloat(parallaxHeightScale, "Material", "Parallax height scale", 0);
         registerInt(parallaxLayers, "Material", "Parallax layers", 1);
     }
@@ -30,10 +25,27 @@ namespace Metal {
             }
         }
         CTX.engineContext.setGISettingsUpdated(true);
-        needsReVoxelization = true;
     }
 
     ComponentTypes::ComponentType MeshComponent::getType() {
         return ComponentTypes::MESH;
+    }
+
+    nlohmann::json MeshComponent::toJson() const {
+        nlohmann::json j;
+        j["entityId"] = entityId;
+        j["meshId"] = meshId;
+        j["materialId"] = materialId;
+        j["parallaxHeightScale"] = parallaxHeightScale;
+        j["parallaxLayers"] = parallaxLayers;
+        return j;
+    }
+
+    void MeshComponent::fromJson(const nlohmann::json &j) {
+        entityId = j.at("entityId").get<EntityID>();
+        meshId = j.at("meshId").get<std::string>();
+        materialId = j.at("materialId").get<std::string>();
+        parallaxHeightScale = j.at("parallaxHeightScale").get<float>();
+        parallaxLayers = j.at("parallaxLayers").get<int>();
     }
 }

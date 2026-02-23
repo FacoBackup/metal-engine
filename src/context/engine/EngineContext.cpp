@@ -105,7 +105,7 @@ namespace Metal {
         globalDataUBO.volumeShadowSteps = CTX.engineRepository.volumeShadowSteps;
         globalDataUBO.isAtmosphereEnabled = CTX.engineRepository.atmosphereEnabled;
 
-        globalDataUBO.enabledDenoiser = CTX.engineRepository.enabledDenoiser;
+        globalDataUBO.enableSurfaceCache = CTX.engineRepository.enableSurfaceCache ? 1 : 0;
         globalDataUBO.multipleImportanceSampling = CTX.engineRepository.multipleImportanceSampling;
         globalDataUBO.pathTracerMaxSamples = CTX.engineRepository.pathTracerMaxSamples;
         globalDataUBO.pathTracerSamples = CTX.engineRepository.pathTracerSamples;
@@ -113,7 +113,7 @@ namespace Metal {
         globalDataUBO.giTileSubdivision = CTX.engineRepository.giTileSubdivision;
         globalDataUBO.giEmissiveFactor = CTX.engineRepository.giEmissiveFactor;
 
-        globalDataUBO.debugFlag = ShadingMode::IndexOfValue(CTX.editorRepository.shadingMode);
+        globalDataUBO.debugFlag = ShadingModes::IndexOfValue(CTX.editorRepository.shadingMode);
         globalDataUBO.surfaceCacheWidth = SURFACE_CACHE_RES;
         globalDataUBO.surfaceCacheHeight = SURFACE_CACHE_RES;
         CTX.engineRepository.pathTracerAccumulationCount++;

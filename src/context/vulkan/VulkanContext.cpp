@@ -296,6 +296,7 @@ namespace Metal {
         CTX.textureService.disposeAll();
         CTX.meshService.disposeAll();
         CTX.framebufferService.disposeAll();
+        CTX.rayTracingService.destroyAccelerationStructures();
         vkDestroyDescriptorPool(CTX.vulkanContext.device.device, descriptorPool,
                                 nullptr);
         vkDestroyCommandPool(CTX.vulkanContext.device.device, commandPool,

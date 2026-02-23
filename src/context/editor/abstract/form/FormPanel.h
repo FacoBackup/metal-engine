@@ -2,21 +2,25 @@
 #define FORMPANEL_H
 #include <unordered_map>
 
-#include "AccordionPanel.h"
 #include "../AbstractPanel.h"
+#include <string>
 
 namespace Metal {
     class Inspectable;
 
     class FormPanel final : public AbstractPanel {
-        Inspectable *inspection = nullptr;
+        std::unordered_map<std::string, Inspectable*> inspectionMap{};
+        std::string searchFilter;
+        char searchBuffer[256] = "";
 
     public:
-        void processFields(std::unordered_map<std::string, AccordionPanel *> &pairs);
+        void processFields(Inspectable * inspection);
 
         void setInspection(Inspectable *inspection);
 
         void onSync() override;
+
+        void resetForm();
     };
 }
 

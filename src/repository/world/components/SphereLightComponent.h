@@ -11,6 +11,10 @@ namespace Metal {
 
         void registerFields() override;
 
+        ComponentTypes::ComponentType getType() override {
+            return ComponentTypes::SPHERE_LIGHT;
+        }
+
         nlohmann::json toJson() const override {
             nlohmann::json j = LightComponent::toJson();
             j["radiusSize"] = radiusSize;

@@ -1,15 +1,17 @@
 #ifndef FILESPANEL_H
 #define FILESPANEL_H
+
 #include <functional>
-#include <unordered_set>
-#include <imgui.h>
+#include <map>
 
 #include "FilesContext.h"
 #include "../docks/AbstractDockPanel.h"
+#include "../../../../dto/file/ImportSettingsDTO.h"
 
 namespace Metal {
-    struct FileEntry;
+    struct FSEntry;
     class FilePreviewPanel;
+    class FormPanel;
 
     class FilesPanel : public AbstractDockPanel {
     protected:
@@ -17,7 +19,14 @@ namespace Metal {
         FilePreviewPanel *previewPanel = nullptr;
         AbstractPanel *filesHeader = nullptr;
         AbstractPanel *filesListPanel = nullptr;
+        FormPanel *settingsForm = nullptr;
         float previewWidth = 200.0f;
+        std::vector<std::string> pendingImports;
+        std::map<std::string, std::shared_ptr<ImportSettingsDTO>> importSettingsMap;
+        std::string selectedFileForSettings;
+
+    private:
+        void renderImportModal();
 
     public:
         virtual bool renderPreview() {
@@ -48,7 +57,7 @@ namespace Metal {
             return EntryType::NONE;
         }
 
-        virtual void openResource(FileEntry *root);
+        virtual void openResource(FSEntry *root);
 
         virtual bool renderHeader() { return true; }
     };

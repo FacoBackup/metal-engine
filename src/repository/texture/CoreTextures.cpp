@@ -8,17 +8,14 @@
 namespace Metal {
     void CoreTextures::onInitialize() {
 
-        giSurfaceCache = CTX.textureService.createForCompute(SURFACE_CACHE_RES, SURFACE_CACHE_RES);
-        giSurfaceCache->setAsNoDisposal();
+        surfaceCache = CTX.textureService.createForCompute(SURFACE_CACHE_RES, SURFACE_CACHE_RES);
+        surfaceCache->setAsNoDisposal();
 
-        previousFrame = CTX.textureService.createForCompute(CTX.vulkanContext.getWindowWidth() / CTX.engineRepository.shadingResInvScale, CTX.vulkanContext.getWindowHeight() / CTX.engineRepository.shadingResInvScale);
-        previousFrame->setAsNoDisposal();
+        rawRenderedFrame = CTX.textureService.createForCompute(CTX.vulkanContext.getWindowWidth() / CTX.engineRepository.shadingResInvScale, CTX.vulkanContext.getWindowHeight() / CTX.engineRepository.shadingResInvScale);
+        rawRenderedFrame->setAsNoDisposal();
 
-        previousFrameMetadata = CTX.textureService.createForCompute(CTX.vulkanContext.getWindowWidth() / CTX.engineRepository.shadingResInvScale, CTX.vulkanContext.getWindowHeight() / CTX.engineRepository.shadingResInvScale);
-        previousFrameMetadata->setAsNoDisposal();
-
-        currentFrame = CTX.textureService.createForCompute(CTX.vulkanContext.getWindowWidth() / CTX.engineRepository.shadingResInvScale, CTX.vulkanContext.getWindowHeight() / CTX.engineRepository.shadingResInvScale);
-        currentFrame->setAsNoDisposal();
+        accumulatedFrame = CTX.textureService.createForCompute(CTX.vulkanContext.getWindowWidth() / CTX.engineRepository.shadingResInvScale, CTX.vulkanContext.getWindowHeight() / CTX.engineRepository.shadingResInvScale);
+        accumulatedFrame->setAsNoDisposal();
 
     }
 } // Metal

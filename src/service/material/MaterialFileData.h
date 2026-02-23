@@ -14,10 +14,10 @@ namespace Metal {
         std::string metallic;
         std::string ao;
         std::string height;
-        glm::vec3 albedoColor;
-        float roughnessFactor;
-        float metallicFactor;
-        bool isEmissive;
+        glm::vec3 albedoColor{1, 1, 1};
+        float roughnessFactor = 1;
+        float metallicFactor = 0;
+        bool isEmissive = false;
 
         void registerFields() override;
 

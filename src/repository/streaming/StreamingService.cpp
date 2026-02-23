@@ -1,4 +1,4 @@
-#include "StreamingRepository.h"
+#include "StreamingService.h"
 
 #include "../../context/ApplicationContext.h"
 #include "../../service/voxel/SVOInstance.h"
@@ -77,23 +77,23 @@ return instance;\
 return nullptr;
 
 namespace Metal {
-    MaterialInstance *StreamingRepository::streamMaterial(const std::string &id) {
+    MaterialInstance *StreamingService::streamMaterial(const std::string &id) {
         STREAM_NO_LOD(CTX.materialService, MaterialInstance)
     }
 
-    SVOInstance *StreamingRepository::streamSVO(const std::string &id) {
+    SVOInstance *StreamingService::streamSVO(const std::string &id) {
         STREAM_NO_LOD(CTX.voxelService, SVOInstance)
     }
 
-    MeshInstance *StreamingRepository::streamMesh(const std::string &id, const LevelOfDetail &lod) {
+    MeshInstance *StreamingService::streamMesh(const std::string &id, const LevelOfDetail &lod) {
         STREAM(CTX.meshService, MeshInstance)
     }
 
-    TextureInstance *StreamingRepository::streamTexture(const std::string &id, const LevelOfDetail &lod) {
+    TextureInstance *StreamingService::streamTexture(const std::string &id, const LevelOfDetail &lod) {
         STREAM(CTX.textureService, TextureInstance)
     }
 
-    void StreamingRepository::onSync() {
+    void StreamingService::onSync() {
         if ((CTX.engineContext.currentTime - sinceLastCleanup).count() >= MAX_TIMEOUT) {
             sinceLastCleanup = CTX.engineContext.currentTime;
             DISPOSAL(CTX.meshService.getResources())
