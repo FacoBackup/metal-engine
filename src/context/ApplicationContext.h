@@ -32,7 +32,7 @@
 #include "./engine/passes/PassesService.h"
 
 #include "../repository/world/impl/WorldGridRepository.h"
-#include "../repository/inspection/FileInspectionRepository.h"
+#include "../repository/inspection/FilesRepository.h"
 #include "../repository/world/WorldRepository.h"
 #include "../repository/runtime/RuntimeRepository.h"
 #include "../repository/streaming/StreamingService.h"
@@ -111,7 +111,7 @@ namespace Metal {
         // ----------- Services
 
         // ----------- Repository
-        FileInspectionRepository fileInspection{};
+        FilesRepository fileInspection{};
         WorldGridRepository worldGridRepository{};
         WorldRepository worldRepository{};
         RuntimeRepository runtimeRepository{};

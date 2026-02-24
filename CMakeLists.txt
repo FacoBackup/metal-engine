@@ -267,8 +267,8 @@ add_executable(
         src/service/material/MaterialService.cpp
         src/service/material/MaterialService.h
         src/service/material/MaterialFileData.cpp
-        src/repository/inspection/FileInspectionRepository.cpp
-        src/repository/inspection/FileInspectionRepository.h
+        src/repository/inspection/FilesRepository.cpp
+        src/repository/inspection/FilesRepository.h
         src/context/editor/dock-spaces/inspector/MaterialEditPanel.cpp
         src/context/editor/dock-spaces/inspector/MaterialEditPanel.h
         src/enum/LightType.h
@@ -295,6 +295,10 @@ add_executable(
         src/context/editor/abstract/form/ChildPanel.cpp
         src/context/editor/abstract/form/ChildPanel.h
         src/dto/file/SceneImportSettingsDTO.h
+        src/context/editor/panel/NotificationsPanel.cpp
+        src/context/editor/panel/NotificationsPanel.h
+        src/context/editor/panel/FileImportModalPanel.cpp
+        src/context/editor/panel/FileImportModalPanel.h
 )
 
 
@@ -338,7 +342,6 @@ set(COMMON_LIBRARIES
 target_link_libraries(metal_engine PRIVATE ${COMMON_LIBRARIES})
 add_subdirectory(dependencies/vk-bootstrap)
 # ------ LIBS
-
 # ------ STATIC RESOURCES
 file(COPY "${CMAKE_SOURCE_DIR}/resources" DESTINATION "${CMAKE_BINARY_DIR}/")
 # ------ STATIC RESOURCES
@@ -346,7 +349,6 @@ file(COPY "${CMAKE_SOURCE_DIR}/resources" DESTINATION "${CMAKE_BINARY_DIR}/")
 # ------ VCPKG
 
 #set(CMAKE_TOOLCHAIN_FILE "Users/cafe/.vcpkg-clion/vcpkg/scripts/buildsystems/vcpkg.cmake")
-set(CMAKE_TOOLCHAIN_FILE "C:/Users/russi/vcpkg/scripts/buildsystems/vcpkg.cmake")
 set(VCPKG_JSON_PATH "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg.json")
 
 # Include vcpkg toolchain

@@ -19,14 +19,7 @@ namespace Metal {
         FilePreviewPanel *previewPanel = nullptr;
         AbstractPanel *filesHeader = nullptr;
         AbstractPanel *filesListPanel = nullptr;
-        FormPanel *settingsForm = nullptr;
         float previewWidth = 200.0f;
-        std::vector<std::string> pendingImports;
-        std::map<std::string, std::shared_ptr<ImportSettingsDTO>> importSettingsMap;
-        std::string selectedFileForSettings;
-
-    private:
-        void renderImportModal();
 
     public:
         virtual bool renderPreview() {
