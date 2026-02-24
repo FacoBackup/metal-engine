@@ -299,6 +299,13 @@ add_executable(
         src/context/editor/panel/NotificationsPanel.h
         src/context/editor/panel/FileImportModalPanel.cpp
         src/context/editor/panel/FileImportModalPanel.h
+        src/context/engine/frame-builder/EngineFrameBuilder.cpp
+        src/context/engine/frame-builder/EngineFrameBuilder.h
+        src/context/engine/frame-builder/structures/FramebufferBuilder.cpp
+        src/context/engine/frame-builder/structures/FramebufferBuilder.h
+        src/context/engine/frame-builder/structures/TextureBuilder.cpp
+        src/context/engine/frame-builder/structures/TextureBuilder.h
+        src/context/engine/frame-builder/structures/ResourceBuilder.h
 )
 
 
