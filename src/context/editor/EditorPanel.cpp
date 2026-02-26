@@ -79,12 +79,14 @@ namespace Metal {
     void EditorPanel::onSync() {
         CTX.themeService.onSync();
         renderDockSpaces();
+        notificationsPanel->onSync();
+        fileImportModalPanel->onSync();
     }
 
     void EditorPanel::onInitialize() {
         headerPanel = new EditorHeaderPanel();
         headerPanel->onInitialize();
-        appendChild(new NotificationsPanel());
-        appendChild(new FileImportModalPanel());
+        notificationsPanel = new NotificationsPanel();
+        fileImportModalPanel = new FileImportModalPanel();
     }
 }

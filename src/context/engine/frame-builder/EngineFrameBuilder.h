@@ -3,21 +3,36 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <glm/vec4.hpp>
 #include <vulkan/vulkan_core.h>
+
+#include "structures/ResourceBuilder.h"
 
 namespace Metal {
     struct FrameBufferInstance;
+    struct DescriptorBinding;
     class ResourceBuilder;
+    class EngineFrame;
 
     class EngineFrameBuilder final {
         std::vector<std::shared_ptr<ResourceBuilder> > builders{};
         std::shared_ptr<ResourceBuilder> currentBuilder{};
 
     public:
-        EngineFrameBuilder &addFramebuffer(std::string id);
+        EngineFrameBuilder &addFramebuffer(std::string id, unsigned w, unsigned h, glm::vec4 clearColor);
 
         EngineFrameBuilder &addColor(std::string id, VkFormat format, VkImageUsageFlagBits usage,
                                      FrameBufferInstance *framebuffer);
+
+        EngineFrameBuilder &addDepth();
+
+        EngineFrameBuilder &addTexture(const std::string& id, unsigned w, unsigned h);
+
+        EngineFrameBuilder &addTexture(const std::string &id);
+
+        bool tryMatch(const std::string &id, ResourceBuilderType type);
+
+        std::unique_ptr<EngineFrame> build();
     };
 } // Metal
 
