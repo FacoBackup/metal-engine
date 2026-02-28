@@ -15,7 +15,7 @@ namespace Metal {
     }
 
     void DescriptorInstance::Write(const VkDescriptorSet &vkDescriptorSet,
-                                   std::vector<DescriptorBinding> &bindings) {
+                                   const std::vector<DescriptorBinding> &bindings) {
         std::vector<VkWriteDescriptorSet> writeDescriptorSets;
         std::vector<VkDescriptorBufferInfo> bufferInfos;
         std::vector<std::vector<VkDescriptorImageInfo>> imageInfosPool;
@@ -26,23 +26,27 @@ namespace Metal {
         imageInfosPool.reserve(bindings.size());
 
         for (auto &binding: bindings) {
-            if (binding.accelerationStructure != VK_NULL_HANDLE) {
-                VkWriteDescriptorSetAccelerationStructureKHR asInfo{};
-                asInfo.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
-                asInfo.accelerationStructureCount = 1;
-                asInfo.pAccelerationStructures = &binding.accelerationStructure;
-                asInfos.push_back(asInfo);
+            if (binding.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR) {
+                if (binding.accelerationStructure != VK_NULL_HANDLE) {
+                    VkWriteDescriptorSetAccelerationStructureKHR asInfo{};
+                    asInfo.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
+                    asInfo.accelerationStructureCount = 1;
+                    asInfo.pAccelerationStructures = &binding.accelerationStructure;
+                    asInfos.push_back(asInfo);
 
-                VkWriteDescriptorSet descriptorWrite{};
-                descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-                descriptorWrite.dstSet = vkDescriptorSet;
-                descriptorWrite.dstBinding = binding.bindingPoint;
-                descriptorWrite.dstArrayElement = 0;
-                descriptorWrite.descriptorType = binding.descriptorType;
-                descriptorWrite.descriptorCount = 1;
-                descriptorWrite.pNext = &asInfos.back();
+                    VkWriteDescriptorSetAccelerationStructureKHR *pAsInfo = &asInfos.back();
 
-                writeDescriptorSets.push_back(descriptorWrite);
+                    VkWriteDescriptorSet descriptorWrite{};
+                    descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                    descriptorWrite.dstSet = vkDescriptorSet;
+                    descriptorWrite.dstBinding = binding.bindingPoint;
+                    descriptorWrite.dstArrayElement = 0;
+                    descriptorWrite.descriptorType = binding.descriptorType;
+                    descriptorWrite.descriptorCount = 1;
+                    descriptorWrite.pNext = pAsInfo;
+
+                    writeDescriptorSets.push_back(descriptorWrite);
+                }
             } else if (binding.bufferInstance != nullptr) {
                 VkDescriptorBufferInfo bufferInfo{};
                 bufferInfo.buffer = binding.bufferInstance->vkBuffer;
@@ -50,6 +54,8 @@ namespace Metal {
                 bufferInfo.offset = 0;
                 // Store the buffer info in the vector.
                 bufferInfos.push_back(bufferInfo);
+
+                VkDescriptorBufferInfo *pBufferInfo = &bufferInfos.back();
 
                 VkWriteDescriptorSet descriptorWrite{};
                 descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -59,7 +65,7 @@ namespace Metal {
                 descriptorWrite.descriptorType = binding.descriptorType;
                 descriptorWrite.descriptorCount = 1;
                 // Use the address of the element in the vector.
-                descriptorWrite.pBufferInfo = &bufferInfos.back();
+                descriptorWrite.pBufferInfo = pBufferInfo;
 
                 writeDescriptorSets.push_back(descriptorWrite);
             } else if (binding.view != VK_NULL_HANDLE) {
@@ -72,6 +78,8 @@ namespace Metal {
                 imageInfos.push_back(imageInfo);
                 imageInfosPool.push_back(imageInfos);
 
+                VkDescriptorImageInfo *pImageInfo = imageInfosPool.back().data();
+
                 VkWriteDescriptorSet descriptorWrite{};
                 descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
                 descriptorWrite.dstSet = vkDescriptorSet;
@@ -79,18 +87,19 @@ namespace Metal {
                 descriptorWrite.dstArrayElement = 0;
                 descriptorWrite.descriptorType = binding.descriptorType;
                 descriptorWrite.descriptorCount = binding.descriptorCount;
-                descriptorWrite.pImageInfo = imageInfosPool.back().data();
+                descriptorWrite.pImageInfo = pImageInfo;
 
                 writeDescriptorSets.push_back(descriptorWrite);
             }
         }
+
+        if (writeDescriptorSets.empty()) return;
 
         vkUpdateDescriptorSets(CTX.vulkanContext.device.device,
                                static_cast<unsigned int>(writeDescriptorSets.size()),
                                writeDescriptorSets.data(),
                                0,
                                nullptr);
-        bindings.clear();
     }
 
     void DescriptorInstance::create() {

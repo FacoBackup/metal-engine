@@ -10,8 +10,8 @@ namespace Metal {
                     "QUAD.vert",
                     "tools/Icon.frag"
                 )
-                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.lightData.get())
+                .addResourceBinding(CTX.coreBuffers.globalData)
+                .addResourceBinding(CTX.coreBuffers.lightBuffer)
                 .setBlendEnabled();
         pipelineInstance = CTX.pipelineService.createPipeline(iconPipelineBuilder);
     }

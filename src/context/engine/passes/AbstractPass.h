@@ -39,9 +39,9 @@ namespace Metal {
 
         virtual void bindStaticDescriptorSets();
 
-        void bindDescriptorSets(const std::vector<VkDescriptorSet> &descriptors);
-
         void bindSingleDescriptorSet(unsigned int descriptorSetIndex, const VkDescriptorSet &descriptorSet);
+
+        void bindDescriptorSets(const std::vector<VkDescriptorSet> &descriptors);
 
         VkPipelineBindPoint getBindingPoint() const;
     };

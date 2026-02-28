@@ -12,8 +12,8 @@ namespace Metal {
                 )
                 .setBlendEnabled()
                 .setPushConstantsSize(sizeof(GridPushConstant))
-                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.gBufferPosition.get());
+                .addResourceBinding(CTX.coreBuffers.globalData)
+                .addResourceBinding(CTX.vulkanContext.vkImageSampler, CTX.coreFrameBuffers.gBufferFBO->attachments[2]->vkImageView);
         pipelineInstance = CTX.pipelineService.createPipeline(gridPipelineBuilder);
     }
 

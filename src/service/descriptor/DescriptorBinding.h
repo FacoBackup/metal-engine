@@ -8,15 +8,17 @@ namespace Metal {
     struct BufferInstance;
 
     struct DescriptorBinding {
-        VkShaderStageFlagBits stageFlags;
-        VkDescriptorType descriptorType;
-        unsigned int bindingPoint;
+        VkShaderStageFlagBits stageFlags = static_cast<VkShaderStageFlagBits>(0);
+        VkDescriptorType descriptorType = static_cast<VkDescriptorType>(0);
+        unsigned int bindingPoint = 0;
         unsigned int descriptorCount = 1;
         BufferInstance *bufferInstance = nullptr;
         VkSampler sampler = VK_NULL_HANDLE;
         VkImageView view = VK_NULL_HANDLE;
         VkImageLayout layout = VK_IMAGE_LAYOUT_GENERAL;
         VkAccelerationStructureKHR accelerationStructure = VK_NULL_HANDLE;
+
+        DescriptorBinding() = default;
 
         DescriptorBinding(VkShaderStageFlagBits stageFlags, VkDescriptorType descriptorType, unsigned int bindingPoint,
                           unsigned int descriptorCount = 1,

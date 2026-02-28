@@ -12,7 +12,7 @@ namespace Metal {
                     "PostProcessing.frag"
                 )
                 .setPushConstantsSize(sizeof(PostProcessingPushConstant))
-                .addDescriptorSet(CTX.coreDescriptorSets.postProcessingDescriptor.get());
+                .addResourceBinding(CTX.vulkanContext.vkImageSampler, CTX.coreTextures.accumulatedFrame->vkImageView);
         pipelineInstance = CTX.pipelineService.createPipeline(ppPipelineBuilder);
     }
 

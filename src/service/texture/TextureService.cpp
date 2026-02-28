@@ -15,7 +15,7 @@
 namespace Metal {
     void TextureService::copyBufferToImage(const VkBuffer &vkBuffer, const TextureInstance *image,
                                            const int layerCount) const {
-        VkCommandBuffer commandBuffer = CTX.CTX.vulkanContext.beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = CTX.vulkanContext.beginSingleTimeCommands();
 
         VkBufferImageCopy region{};
         region.bufferOffset = 0;
@@ -37,18 +37,18 @@ namespace Metal {
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             1,
             &region);
-        CTX.CTX.vulkanContext.endSingleTimeCommands(commandBuffer);
+        CTX.vulkanContext.endSingleTimeCommands(commandBuffer);
     }
 
     void TextureService::createImageWithInfo(const VkImageCreateInfo &imageInfo,
                                              VkMemoryPropertyFlagBits vkMemoryProperties,
                                              TextureInstance *image) const {
-        if (vkCreateImage(CTX.CTX.vulkanContext.device.device, &imageInfo, nullptr, &image->vkImage) != VK_SUCCESS) {
+        if (vkCreateImage(CTX.vulkanContext.device.device, &imageInfo, nullptr, &image->vkImage) != VK_SUCCESS) {
             throw std::runtime_error("failed to create image!");
         }
 
         VkMemoryRequirements memRequirements;
-        vkGetImageMemoryRequirements(CTX.CTX.vulkanContext.device.device, image->vkImage, &memRequirements);
+        vkGetImageMemoryRequirements(CTX.vulkanContext.device.device, image->vkImage, &memRequirements);
 
         VkMemoryAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -56,12 +56,12 @@ namespace Metal {
         allocInfo.memoryTypeIndex = CTX.bufferService.findMemoryType(
             memRequirements.memoryTypeBits, vkMemoryProperties);
 
-        if (vkAllocateMemory(CTX.CTX.vulkanContext.device.device, &allocInfo, nullptr, &image->vkImageMemory) !=
+        if (vkAllocateMemory(CTX.vulkanContext.device.device, &allocInfo, nullptr, &image->vkImageMemory) !=
             VK_SUCCESS) {
             throw std::runtime_error("failed to allocate image memory!");
         }
 
-        if (vkBindImageMemory(CTX.CTX.vulkanContext.device.device, image->vkImage, image->vkImageMemory, 0) !=
+        if (vkBindImageMemory(CTX.vulkanContext.device.device, image->vkImage, image->vkImageMemory, 0) !=
             VK_SUCCESS) {
             throw std::runtime_error("failed to bind image memory!");
         }
@@ -102,7 +102,7 @@ namespace Metal {
         imageViewInfo.subresourceRange.levelCount = image->mipLevels;
         imageViewInfo.image = image->vkImage;
 
-        vkCreateImageView(CTX.CTX.vulkanContext.device.device, &imageViewInfo, nullptr, &image->vkImageView);
+        vkCreateImageView(CTX.vulkanContext.device.device, &imageViewInfo, nullptr, &image->vkImageView);
     }
 
     void TextureService::createImage(VkFormat imageFormat, TextureInstance *image, const int width,
@@ -173,7 +173,7 @@ namespace Metal {
 
     void TextureService::transitionImageLayout(const TextureInstance *image, VkImageLayout oldLayout,
                                                VkImageLayout newLayout) const {
-        VkCommandBuffer commandBuffer = CTX.CTX.vulkanContext.beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = CTX.vulkanContext.beginSingleTimeCommands();
         VkImageMemoryBarrier barrier{};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier.oldLayout = oldLayout;
@@ -224,19 +224,19 @@ namespace Metal {
             0, nullptr,
             1, &barrier);
 
-        CTX.CTX.vulkanContext.endSingleTimeCommands(commandBuffer);
+        CTX.vulkanContext.endSingleTimeCommands(commandBuffer);
     }
 
     void TextureService::generateMipmaps(const TextureInstance *image) const {
         VkFormatProperties formatProperties;
-        vkGetPhysicalDeviceFormatProperties(CTX.CTX.vulkanContext.physDevice.physical_device, image->vkFormat,
+        vkGetPhysicalDeviceFormatProperties(CTX.vulkanContext.physDevice.physical_device, image->vkFormat,
                                             &formatProperties);
 
         if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT)) {
             throw std::runtime_error("texture image format does not support linear blitting!");
         }
 
-        VkCommandBuffer commandBuffer = CTX.CTX.vulkanContext.beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = CTX.vulkanContext.beginSingleTimeCommands();
 
         VkImageMemoryBarrier barrier{};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -299,7 +299,7 @@ namespace Metal {
         vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0,
                              nullptr, 0, nullptr, 1, &barrier);
 
-        CTX.CTX.vulkanContext.endSingleTimeCommands(commandBuffer);
+        CTX.vulkanContext.endSingleTimeCommands(commandBuffer);
     }
 
     TextureInstance *TextureService::create(const std::string &id) {
@@ -347,26 +347,33 @@ namespace Metal {
         if (textureIndices.contains(id)) return textureIndices[id];
 
         if (resources.contains(id)) {
-            auto *texture = dynamic_cast<TextureInstance *>(resources.at(id));
+            auto *texture = resources.at(id);
             unsigned int index = nextTextureIndex++;
             textureIndices[id] = index;
 
-            // Update bindless descriptor set
-            VkWriteDescriptorSet write{};
-            write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            write.dstSet = CTX.coreDescriptorSets.textureArray->vkDescriptorSet;
-            write.dstBinding = 0;
-            write.dstArrayElement = index;
-            write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            write.descriptorCount = 1;
+            // Update all descriptors that contain a texture array
+            auto descriptors = CTX.pipelineService.getAllDescriptors();
+            for (auto *descriptor: descriptors) {
+                for (auto &binding: descriptor->bindings) {
+                    if (binding.descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER && binding.descriptorCount > 1) {
+                        VkWriteDescriptorSet write{};
+                        write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                        write.dstSet = descriptor->vkDescriptorSet;
+                        write.dstBinding = binding.bindingPoint;
+                        write.dstArrayElement = index;
+                        write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+                        write.descriptorCount = 1;
 
-            VkDescriptorImageInfo imageInfo{};
-            imageInfo.sampler = CTX.coreDescriptorSets.vkImageSampler;
-            imageInfo.imageView = texture->vkImageView;
-            imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            write.pImageInfo = &imageInfo;
+                        VkDescriptorImageInfo imageInfo{};
+                        imageInfo.sampler = CTX.vulkanContext.vkImageSampler;
+                        imageInfo.imageView = texture->vkImageView;
+                        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                        write.pImageInfo = &imageInfo;
 
-            vkUpdateDescriptorSets(CTX.vulkanContext.device.device, 1, &write, 0, nullptr);
+                        vkUpdateDescriptorSets(CTX.vulkanContext.device.device, 1, &write, 0, nullptr);
+                    }
+                }
+            }
 
             return index;
         }

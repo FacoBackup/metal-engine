@@ -15,7 +15,7 @@ namespace Metal {
 
         void dispose() const;
 
-        static void Write(const VkDescriptorSet &vkDescriptorSet, std::vector<DescriptorBinding> &bindings);
+        static void Write(const VkDescriptorSet &vkDescriptorSet, const std::vector<DescriptorBinding> &bindings);
 
         void create();
 

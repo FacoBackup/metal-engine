@@ -14,22 +14,27 @@ namespace Metal {
         auto &bufferService = CTX.bufferService;
         globalData = bufferService.createBuffer("globalData", sizeof(GlobalDataUBO),
                                                 VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                                                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+                                                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                                UNIFORM_BUFFER);
 
         tileInfo = bufferService.createBuffer("tileInfo", sizeof(TileInfoUBO),
                                                 VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                                                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+                                                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                                UNIFORM_BUFFER);
 
         lightBuffer = bufferService.createBuffer("lightBuffer", MAX_LIGHTS * sizeof(LightData),
                                                 VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                                                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+                                                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                                STORAGE_BUFFER);
 
         volumesBuffer = bufferService.createBuffer("volumesBuffer", MAX_VOLUMES * sizeof(VolumeData),
                                                 VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                                                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+                                                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                                STORAGE_BUFFER);
 
         materialBuffer = bufferService.createBuffer("materialBuffer", MAX_MATERIALS * sizeof(MaterialData),
                                                 VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                                                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+                                                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                                STORAGE_BUFFER);
     }
 }

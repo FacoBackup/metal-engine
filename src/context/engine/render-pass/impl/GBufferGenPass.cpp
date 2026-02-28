@@ -16,9 +16,9 @@ namespace Metal {
                     "GBufferGen.vert",
                     "GBufferGen.frag"
                 )
-                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.materialData.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.textureArray.get())
+                .addResourceBinding(CTX.coreBuffers.globalData)
+                .addResourceBinding(CTX.coreBuffers.materialBuffer)
+                .addResourceBinding(CTX.vulkanContext.vkImageSampler, VK_NULL_HANDLE, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1000)
                 .setPrepareForMesh()
                 .setDepthTest()
                 .setCullMode(VK_CULL_MODE_BACK_BIT)

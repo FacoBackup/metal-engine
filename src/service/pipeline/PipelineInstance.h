@@ -3,6 +3,8 @@
 #include <vulkan/vulkan_core.h>
 
 #include "../../repository/abstract/RuntimeResource.h"
+#include "../descriptor/DescriptorInstance.h"
+#include <memory>
 
 namespace Metal {
     struct FrameBufferInstance;
@@ -15,7 +17,7 @@ namespace Metal {
     struct PipelineInstance final : RuntimeResource {
         VkPipelineLayout vkPipelineLayout = VK_NULL_HANDLE;
         VkPipeline vkPipeline = VK_NULL_HANDLE;
-        std::vector<VkDescriptorSet> descriptorSets{};
+        std::unique_ptr<DescriptorInstance> descriptor{};
         bool isCompute = false;
         bool isRayTracing = false;
         unsigned int pushConstantsSize = 0;

@@ -281,13 +281,13 @@ namespace Metal {
         createMemoryAllocator();
         createCommandPool();
         createDescriptorPool();
+        CTX.framebufferService.createSampler(false, vkImageSampler);
         // ------- CORE INITIALIZATION
 
         // ------- REPOSITORY INITIALIZATION
         CTX.coreBuffers.onInitialize();
         CTX.coreFrameBuffers.onInitialize();
         CTX.coreTextures.onInitialize();
-        CTX.coreDescriptorSets.onInitialize();
         // ------- REPOSITORY INITIALIZATION
     }
 
@@ -297,6 +297,9 @@ namespace Metal {
         CTX.meshService.disposeAll();
         CTX.framebufferService.disposeAll();
         CTX.rayTracingService.destroyAccelerationStructures();
+
+        vkDestroySampler(device.device, vkImageSampler, nullptr);
+
         vkDestroyDescriptorPool(CTX.vulkanContext.device.device, descriptorPool,
                                 nullptr);
         vkDestroyCommandPool(CTX.vulkanContext.device.device, commandPool,

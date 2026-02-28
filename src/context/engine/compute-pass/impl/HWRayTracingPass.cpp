@@ -7,28 +7,32 @@
 #include "../../../../service/raytracing/RayTracingService.h"
 
 namespace Metal {
-    bool HWRayTracingPass::shouldRun() {
-        if (!CTX.rayTracingService.isReady()) {
-            return false;
-        }
-
-        if (pipelineInstance == nullptr) {
-            PipelineBuilder builder = PipelineBuilder::OfRayTracing(
+    void HWRayTracingPass::onInitialize() {
+        PipelineBuilder builder = PipelineBuilder::OfRayTracing(
                     "rt/HWRayTracing.rgen",
                     "rt/HWRayTracing.rmiss",
                     "rt/HWRayTracing.rchit")
-                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.tlasDescriptor.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.gBufferAlbedo.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.gBufferNormal.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.gBufferPosition.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.currentFrameDescriptor.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.surfaceCacheImage.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.lightData.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.volumeData.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.materialData.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.textureArray.get());
-            pipelineInstance = CTX.pipelineService.createPipeline(builder);
+                .addResourceBinding(CTX.coreBuffers.globalData)
+                .addResourceBinding(CTX.rayTracingService.getTLAS())
+                .addResourceBinding(CTX.vulkanContext.vkImageSampler,
+                                    CTX.coreFrameBuffers.gBufferFBO->attachments[0]->vkImageView)
+                .addResourceBinding(CTX.vulkanContext.vkImageSampler,
+                                    CTX.coreFrameBuffers.gBufferFBO->attachments[1]->vkImageView)
+                .addResourceBinding(CTX.vulkanContext.vkImageSampler,
+                                    CTX.coreFrameBuffers.gBufferFBO->attachments[2]->vkImageView)
+                .addResourceBinding(CTX.coreTextures.rawRenderedFrame->vkImageView)
+                .addResourceBinding(CTX.coreTextures.surfaceCache->vkImageView)
+                .addResourceBinding(CTX.coreBuffers.lightBuffer)
+                .addResourceBinding(CTX.coreBuffers.volumesBuffer)
+                .addResourceBinding(CTX.coreBuffers.materialBuffer)
+                .addResourceBinding(CTX.vulkanContext.vkImageSampler, VK_NULL_HANDLE,
+                                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1000);
+        pipelineInstance = CTX.pipelineService.createPipeline(builder);
+    }
+
+    bool HWRayTracingPass::shouldRun() {
+        if (!CTX.rayTracingService.isReady()) {
+            return false;
         }
 
         return true;
@@ -36,7 +40,7 @@ namespace Metal {
 
     void HWRayTracingPass::onSync() {
         bool surfaceCacheReset = CTX.engineContext.isGISettingsUpdated() || CTX.engineContext.
-                              isUpdateLights();
+                                 isUpdateLights();
         if (surfaceCacheReset) {
             clearTexture(CTX.coreTextures.surfaceCache->vkImage);
         }

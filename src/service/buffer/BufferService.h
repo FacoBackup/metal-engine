@@ -23,7 +23,7 @@ namespace Metal {
 
         BufferInstance *createBuffer(const std::string &id, VkDeviceSize bufferSize,
                                      VkBufferUsageFlags usageFlags,
-                                     VkMemoryPropertyFlags memoryPropertyFlags);
+                                     VkMemoryPropertyFlags memoryPropertyFlags, BufferType type = OTHER);
 
         BufferInstance *createBuffer(const std::string &id, VkDeviceSize dataSize,
                                      VkBufferUsageFlags usageFlags,

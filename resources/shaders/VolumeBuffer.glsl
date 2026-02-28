@@ -7,7 +7,7 @@ struct Volume {
     vec3 dataB; //For volumes: <density, scatteringAlbedo, phase function asymmetry>
 };
 
-layout(set = VOLUME_SET, binding = 0) readonly buffer Volumes {
+layout(set = 0, binding = VOLUME_SET) readonly buffer Volumes {
     Volume items[];
 } volumesBuffer;
 #endif

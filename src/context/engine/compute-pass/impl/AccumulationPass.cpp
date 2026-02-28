@@ -6,9 +6,9 @@
 namespace Metal {
     void AccumulationPass::onInitialize() {
         PipelineBuilder builder = PipelineBuilder::Of("PathTracerAccumulation.comp")
-                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.currentFrameDescriptor.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.accumulatedFrameDescriptor.get());
+                .addResourceBinding(CTX.coreBuffers.globalData)
+                .addResourceBinding(CTX.coreTextures.rawRenderedFrame->vkImageView)
+                .addResourceBinding(CTX.coreTextures.accumulatedFrame->vkImageView);
         pipelineInstance = CTX.pipelineService.createPipeline(builder);
     }
 

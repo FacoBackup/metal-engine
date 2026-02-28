@@ -2,10 +2,12 @@
 #define PIPELINEBUILDER_H
 #include <vector>
 #include <vulkan/vulkan.h>
+#include "../descriptor/DescriptorBinding.h"
 
 namespace Metal {
     struct DescriptorInstance;
     struct FrameBufferInstance;
+    struct TextureInstance;
 
     struct PipelineBuilder final {
         const char *id = nullptr;
@@ -17,8 +19,9 @@ namespace Metal {
         const char *rayGenShader = nullptr;
         const char *missShader = nullptr;
         const char *closestHitShader = nullptr;
-        std::vector<DescriptorInstance *> descriptorSetsToBind{};
+        std::vector<DescriptorBinding> resourceBindings{};
         unsigned int pushConstantsSize = 0;
+        unsigned int currentBindingPoint = 0;
         bool blendEnabled = false;
         bool prepareForMesh = false;
         bool depthTest = false;
@@ -26,68 +29,37 @@ namespace Metal {
         bool isRayTracing = false;
 
         static PipelineBuilder Of(FrameBufferInstance *frameBuffer, const char *vertexShader,
-                                  const char *fragmentShader) {
-            PipelineBuilder d{};
-            d.frameBuffer = frameBuffer;
-            d.vertexShader = vertexShader;
-            d.fragmentShader = fragmentShader;
-            return d;
-        }
+                                  const char *fragmentShader);
 
-        static PipelineBuilder Of(const char *computeShader) {
-            PipelineBuilder d{};
-            d.computeShader = computeShader;
-            return d;
-        }
+        static PipelineBuilder Of(const char *computeShader);
 
-        static PipelineBuilder OfRayTracing(const char *rayGen, const char *miss, const char *closestHit) {
-            PipelineBuilder d{};
-            d.rayGenShader = rayGen;
-            d.missShader = miss;
-            d.closestHitShader = closestHit;
-            d.isRayTracing = true;
-            return d;
-        }
+        static PipelineBuilder OfRayTracing(const char *rayGen, const char *miss, const char *closestHit);
 
-        PipelineBuilder &setBlendEnabled() {
-            blendEnabled = true;
-            return *this;
-        }
+        PipelineBuilder &setBlendEnabled();
 
-        PipelineBuilder &setPrepareForMesh() {
-            prepareForMesh = true;
-            return *this;
-        }
+        PipelineBuilder &setPrepareForMesh();
 
-        PipelineBuilder &setDepthTest() {
-            depthTest = true;
-            return *this;
-        }
+        PipelineBuilder &setDepthTest();
 
-        PipelineBuilder &useTriangleStrip() {
-            useStrip = true;
-            return *this;
-        }
+        PipelineBuilder &useTriangleStrip();
 
-        PipelineBuilder &setCullMode(VkCullModeFlagBits cullMode) {
-            this->cullMode = cullMode;
-            return *this;
-        }
+        PipelineBuilder &setCullMode(VkCullModeFlagBits cullMode);
 
-        PipelineBuilder &setPushConstantsSize(unsigned int size) {
-            pushConstantsSize = size;
-            return *this;
-        }
+        PipelineBuilder &setPushConstantsSize(unsigned int size);
 
-        PipelineBuilder &addDescriptorSet(DescriptorInstance *d) {
-            descriptorSetsToBind.push_back(d);
-            return *this;
-        }
+        PipelineBuilder &addResourceBinding(BufferInstance *buffer);
 
-        PipelineBuilder &setId(const char *id) {
-            this->id = id;
-            return *this;
-        }
+        PipelineBuilder &addResourceBinding(VkSampler sampler, VkImageView view,
+                                            VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                                            unsigned int descriptorCount = 1);
+
+        PipelineBuilder &addResourceBinding(TextureInstance *texture);
+
+        PipelineBuilder &addResourceBinding(VkImageView imageView);
+
+        PipelineBuilder &addResourceBinding(VkAccelerationStructureKHR tlas);
+
+        PipelineBuilder &setId(const char *id);
     };
 }
 

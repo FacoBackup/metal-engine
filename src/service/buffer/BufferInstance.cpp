@@ -7,6 +7,10 @@
 #include "../../util/VulkanUtils.h"
 
 namespace Metal {
+    BufferType BufferInstance::getBufferType() {
+        return bufferType;
+    }
+
     void BufferInstance::update(void *newData) const {
         if (mapped == nullptr) {
             throw std::runtime_error("BufferInstance::update() called on a non-mapped buffer");

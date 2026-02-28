@@ -76,10 +76,11 @@ namespace Metal {
         if (updateVolumes) {
             CTX.volumeService.onSync();
         }
-        CTX.rayTracingService.onSync();
         updateGlobalData();
 
         CTX.passesService.onSync();
+
+        CTX.rayTracingService.onSync();
 
         setUpdateLights(false);
         setCameraUpdated(false);

@@ -7,8 +7,8 @@
 namespace Metal {
     BufferInstance *BufferService::createBuffer(const std::string &id, VkDeviceSize bufferSize,
                                                 VkBufferUsageFlags usageFlags,
-                                                VkMemoryPropertyFlags memoryPropertyFlags) {
-        BufferInstance *buffer = createResourceInstance(id, bufferSize);
+                                                VkMemoryPropertyFlags memoryPropertyFlags, BufferType type) {
+        BufferInstance *buffer = createResourceInstance(id, bufferSize, type);
         createVkBuffer(usageFlags, memoryPropertyFlags, buffer);
         vkMapMemory(CTX.vulkanContext.device.device, buffer->vkDeviceMemory, 0, bufferSize, 0, &buffer->mapped);
         return buffer;
@@ -17,8 +17,8 @@ namespace Metal {
     BufferInstance *BufferService::createBuffer(const std::string &id, VkDeviceSize dataSize,
                                                 VkBufferUsageFlags usageFlags,
                                                 const void *bufferData) {
-        BufferInstance *stagingBuffer = createResourceInstance(id + "_staging", dataSize);
-        BufferInstance *finalBuffer = createResourceInstance(id, dataSize);
+        BufferInstance *stagingBuffer = createResourceInstance(id + "_staging", dataSize, OTHER);
+        BufferInstance *finalBuffer = createResourceInstance(id, dataSize, OTHER);
 
         createVkBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer);
@@ -88,7 +88,7 @@ namespace Metal {
                                                 VkBufferUsageFlags usageFlags,
                                                 VkMemoryPropertyFlags memoryPropertyFlags,
                                                 bool deviceAddress) {
-        BufferInstance *buffer = createResourceInstance(id, bufferSize);
+        BufferInstance *buffer = createResourceInstance(id, bufferSize, OTHER);
 
         VkBufferCreateInfo bufferInfo{};
         bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -133,7 +133,7 @@ namespace Metal {
                                                 const void *bufferData,
                                                 bool deviceAddress) {
         BufferInstance *stagingBuffer = createResourceInstance(
-            id + "_staging", dataSize);
+            id + "_staging", dataSize, OTHER);
         createVkBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer);
 
@@ -153,7 +153,7 @@ namespace Metal {
     }
 
     void BufferService::disposeResource(BufferInstance *resource) {
-        LOG_INFO("Disposing of buffer instance");
+        LOG_INFO("Disposing of buffer instance " + resource->getId());
 
         vkDestroyBuffer(CTX.vulkanContext.device.device, resource->vkBuffer, nullptr);
         vkFreeMemory(CTX.vulkanContext.device.device, resource->vkDeviceMemory, nullptr);

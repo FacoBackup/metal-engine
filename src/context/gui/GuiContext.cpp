@@ -4,9 +4,7 @@
 #include "imgui_freetype.h"
 #include "../ApplicationContext.h"
 #include "../../util/VulkanUtils.h"
-#include "../../repository/descriptors/CoreDescriptorSets.h"
 #include "../../service/descriptor/DescriptorInstance.h"
-#include "../../service/framebuffer/FrameBufferAttachment.h"
 #include "../../service/texture/TextureInstance.h"
 
 namespace Metal {

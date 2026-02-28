@@ -44,18 +44,20 @@ namespace Metal {
         buildTLAS();
 
         if (tlas != VK_NULL_HANDLE) {
-            if (CTX.coreDescriptorSets.tlasDescriptor == nullptr) {
-                CTX.coreDescriptorSets.tlasDescriptor = std::make_unique<DescriptorInstance>();
-                CTX.coreDescriptorSets.tlasDescriptor->addLayoutBinding(
-                    DescriptorBinding::OfAccelerationStructure(
-                        VK_SHADER_STAGE_RAYGEN_BIT_KHR, 0, tlas));
-                CTX.coreDescriptorSets.tlasDescriptor->create();
-            } else {
-                std::vector<DescriptorBinding> bindings;
-                bindings.push_back(
-                    DescriptorBinding::OfAccelerationStructure(
-                        VK_SHADER_STAGE_RAYGEN_BIT_KHR, 0, tlas));
-                DescriptorInstance::Write(CTX.coreDescriptorSets.tlasDescriptor->vkDescriptorSet, bindings);
+            LOG_INFO("Updating acceleration structures");
+            auto descriptors = CTX.pipelineService.getAllDescriptors();
+            for (auto *descriptor: descriptors) {
+                bool needsUpdate = false;
+                for (auto &binding: descriptor->bindings) {
+                    if (binding.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR) {
+                        binding.accelerationStructure = tlas;
+                        needsUpdate = true;
+                    }
+                }
+
+                if (needsUpdate) {
+                    DescriptorInstance::Write(descriptor->vkDescriptorSet, descriptor->bindings);
+                }
             }
             accelerationStructureBuilt = true;
             needsRebuild = false;
@@ -292,14 +294,14 @@ namespace Metal {
             if (entry.accelerationStructure != VK_NULL_HANDLE) {
                 vulkan.vkDestroyAccelerationStructureKHR(vulkan.device.device, entry.accelerationStructure, nullptr);
             }
-            CTX.bufferService.dispose("blas_" + meshId);
-            CTX.bufferService.dispose("blas_scratch_" + meshId);
+            // CTX.bufferService.dispose("blas_" + meshId);
+            // CTX.bufferService.dispose("blas_scratch_" + meshId);
         }
         blasEntries.clear();
 
-        CTX.bufferService.dispose("tlas_buffer");
-        CTX.bufferService.dispose("tlas_instances");
-        CTX.bufferService.dispose("tlas_scratch");
+        // CTX.bufferService.dispose("tlas_buffer");
+        // CTX.bufferService.dispose("tlas_instances");
+        // CTX.bufferService.dispose("tlas_scratch");
         
         tlasBuffer = nullptr;
         instancesBuffer = nullptr;

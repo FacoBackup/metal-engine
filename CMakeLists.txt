@@ -114,8 +114,6 @@ add_executable(
         src/service/descriptor/DescriptorInstance.h
         src/dto/buffers/GlobalDataUBO.h
         src/repository/runtime/RuntimeRepository.h
-        src/repository/descriptors/CoreDescriptorSets.cpp
-        src/repository/descriptors/CoreDescriptorSets.h
         src/service/buffer/BufferInstance.cpp
         src/service/buffer/BufferInstance.h
         src/service/mesh/MeshService.cpp
@@ -298,6 +296,7 @@ add_executable(
         src/context/engine/frame-builder/structures/BufferBuilder.cpp
         src/context/engine/frame-builder/structures/BufferBuilder.h
         src/context/engine/frame-builder/structures/ResourceBuilder.h
+        src/service/pipeline/PipelineBuilder.cpp
 )
 
 

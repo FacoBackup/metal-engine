@@ -12,24 +12,23 @@ namespace Metal {
     struct DescriptorInstance;
 
     class PipelineService final : public AbstractResourceService<PipelineInstance> {
-        PipelineInstance *createComputePipeline(const PipelineBuilder &pipelineBuilder);
-
-        PipelineInstance *createRenderingPipeline(PipelineBuilder &pipelineBuilder);
-
-        PipelineInstance *createRayTracingPipeline(const PipelineBuilder &pipelineBuilder);
-
-        void createPipelineLayout(const std::vector<DescriptorInstance *> &descriptorSetsToBind,
-                                  unsigned int pushConstantsSize,
-                                  PipelineInstance *pipeline) const;
-
     public:
-        explicit PipelineService()
-            : AbstractResourceService<PipelineInstance>() {
-        }
-
         PipelineInstance *createPipeline(PipelineBuilder &pipelineBuilder);
 
         void disposeResource(PipelineInstance *resource) override;
+
+        std::vector<DescriptorInstance *> getAllDescriptors() const;
+
+    private:
+        PipelineInstance *createComputePipeline(const PipelineBuilder &pipelineBuilder, PipelineInstance *pipeline);
+
+        PipelineInstance *createRenderingPipeline(PipelineBuilder &pipelineBuilder, PipelineInstance *pipeline);
+
+        PipelineInstance *createRayTracingPipeline(const PipelineBuilder &pipelineBuilder, PipelineInstance *pipeline);
+
+        void createPipelineLayout(
+            unsigned int pushConstantsSize,
+            PipelineInstance *pipeline) const;
     };
 } // Metal
 

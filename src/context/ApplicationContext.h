@@ -8,7 +8,6 @@
 #include "vulkan/VulkanContext.h"
 #include "../repository/framebuffer/CoreFrameBuffers.h"
 #include "../repository/buffers/CoreBuffers.h"
-#include "../repository/descriptors/CoreDescriptorSets.h"
 #include "../repository/texture/CoreTextures.h"
 
 #include "../service/mesh/MeshService.h"
@@ -73,7 +72,6 @@ namespace Metal {
         // // ----------- CORE REPOSITORIES
         CoreFrameBuffers coreFrameBuffers{};
         CoreBuffers coreBuffers{};
-        CoreDescriptorSets coreDescriptorSets{};
         CoreTextures coreTextures{};
         // ----------- CORE REPOSITORIES
 

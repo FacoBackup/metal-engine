@@ -1,6 +1,6 @@
 #include "../GlobalDataBuffer.glsl"
 
-layout (set = 1, binding = 0) uniform sampler2D gBufferPositionIndex;
+layout (set = 0, binding = 1) uniform sampler2D gBufferPositionIndex;
 
 layout (location = 0) out vec4 outColor;
 
