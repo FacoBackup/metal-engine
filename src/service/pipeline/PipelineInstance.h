@@ -17,7 +17,7 @@ namespace Metal {
     struct PipelineInstance final : RuntimeResource {
         VkPipelineLayout vkPipelineLayout = VK_NULL_HANDLE;
         VkPipeline vkPipeline = VK_NULL_HANDLE;
-        std::unique_ptr<DescriptorInstance> descriptor{};
+        DescriptorInstance* descriptor = nullptr;
         bool isCompute = false;
         bool isRayTracing = false;
         unsigned int pushConstantsSize = 0;

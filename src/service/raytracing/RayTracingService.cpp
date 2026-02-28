@@ -55,7 +55,7 @@ namespace Metal {
                 }
 
                 if (needsUpdate) {
-                    DescriptorInstance::Write(descriptor->vkDescriptorSet, descriptor->bindings);
+                    DescriptorSetService::Write(descriptor->vkDescriptorSet, descriptor->bindings);
                 }
             }
             accelerationStructureBuilt = true;

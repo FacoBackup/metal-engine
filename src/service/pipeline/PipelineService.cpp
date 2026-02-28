@@ -17,7 +17,7 @@ namespace Metal {
         const unsigned int pushConstantsSize, PipelineInstance *pipeline) const {
         VkPipelineLayoutCreateInfo layoutInfo = {};
         layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        std::array descriptorLayouts{pipeline->descriptor.get()->vkDescriptorSetLayout};
+        std::array descriptorLayouts{pipeline->descriptor->vkDescriptorSetLayout};
         layoutInfo.pSetLayouts = descriptorLayouts.data();
         layoutInfo.setLayoutCount = 1;
 
@@ -55,27 +55,7 @@ namespace Metal {
                 stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
             }
 
-            if (!pipelineBuilder.resourceBindings.empty()) {
-                auto descriptorInstance = std::make_unique<DescriptorInstance>();
-                for (auto &binding: pipelineBuilder.resourceBindings) {
-                    if (binding.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR || binding.
-                        accelerationStructure != VK_NULL_HANDLE) {
-                        binding.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
-                    } else if (binding.bufferInstance != nullptr) {
-                        binding.descriptorType = binding.bufferInstance->getBufferType() == BufferType::UNIFORM_BUFFER
-                                                     ? VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
-                                                     : VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-                    } else if (binding.view != VK_NULL_HANDLE) {
-                        binding.descriptorType = binding.sampler != VK_NULL_HANDLE
-                                                     ? VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
-                                                     : VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-                    }
-                    binding.stageFlags = static_cast<VkShaderStageFlagBits>(stageFlags);
-                    descriptorInstance->addLayoutBinding(binding);
-                }
-                descriptorInstance->create();
-                pipeline->descriptor = std::move(descriptorInstance);
-            }
+            pipeline->descriptor = descriptorSetService.createDescriptor(pipelineBuilder, id + "_descriptor", stageFlags);
         }
 
         if (pipelineBuilder.isRayTracing) {
@@ -389,18 +369,15 @@ namespace Metal {
     void PipelineService::disposeResource(PipelineInstance *resource) {
         LOG_INFO("Disposing of pipeline instance");
 
+        if (resource->descriptor != nullptr) {
+            descriptorSetService.dispose(resource->getId());
+        }
+
         vkDestroyPipelineLayout(CTX.vulkanContext.device.device, resource->vkPipelineLayout, nullptr);
         vkDestroyPipeline(CTX.vulkanContext.device.device, resource->vkPipeline, nullptr);
     }
 
     std::vector<DescriptorInstance *> PipelineService::getAllDescriptors() const {
-        std::vector<DescriptorInstance *> descriptors;
-        std::lock_guard lock(resourceMutex);
-        for (auto &[id, pipeline]: resources) {
-            if (pipeline->descriptor != nullptr) {
-                descriptors.push_back(pipeline->descriptor.get());
-            }
-        }
-        return descriptors;
+        return descriptorSetService.getAllDescriptors();
     }
 } // Metal

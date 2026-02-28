@@ -16,7 +16,7 @@
 #include "../service/framebuffer/FrameBufferService.h"
 #include "../service/pipeline/PipelineService.h"
 #include "../service/buffer/BufferService.h"
-#include "../service/descriptor/DescriptorService.h"
+#include "../service/descriptor/DescriptorSetService.h"
 #include "../service/theme/ThemeService.h"
 #include "../service/dock/DockService.h"
 #include "../service/selection/SelectionService.h"
@@ -83,9 +83,9 @@ namespace Metal {
         MaterialService materialService{};
         TextureService textureService{};
         FrameBufferService framebufferService{};
-        PipelineService pipelineService{};
+        DescriptorSetService descriptorSetService{};
+        PipelineService pipelineService{descriptorSetService};
         BufferService bufferService{};
-        DescriptorService descriptorService{};
         ThemeService themeService{};
         DockService dockService{};
         SelectionService selectionService{};

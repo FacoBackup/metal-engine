@@ -69,7 +69,7 @@ namespace Metal {
         const ImVec2 viewportSize{size->x, size->y - tabHeight - ViewportHeaderPanel::HEIGHT};
 
         auto *framebuffer = CTX.coreFrameBuffers.postProcessingFBO;
-        CTX.descriptorService.setImageDescriptor(framebuffer, 0);
+        CTX.descriptorSetService.setImageDescriptor(framebuffer, 0);
         ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet),
                      viewportSize);
 

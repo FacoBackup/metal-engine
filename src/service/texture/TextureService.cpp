@@ -387,7 +387,7 @@ namespace Metal {
         vkDestroySampler(CTX.vulkanContext.device.device, resource->vkSampler, nullptr);
 
         if (resource->imageDescriptor != nullptr) {
-            resource->imageDescriptor->dispose();
+            CTX.descriptorSetService.disposeResource(resource->imageDescriptor);
         }
     }
 } // Metal

@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "../abstract/AbstractResourceService.h"
+#include "../descriptor/DescriptorSetService.h"
 #include "PipelineInstance.h"
 
 namespace Metal {
@@ -13,6 +14,8 @@ namespace Metal {
 
     class PipelineService final : public AbstractResourceService<PipelineInstance> {
     public:
+        explicit PipelineService(DescriptorSetService &descriptorSetService) : descriptorSetService(descriptorSetService) {}
+
         PipelineInstance *createPipeline(PipelineBuilder &pipelineBuilder);
 
         void disposeResource(PipelineInstance *resource) override;
@@ -20,6 +23,8 @@ namespace Metal {
         std::vector<DescriptorInstance *> getAllDescriptors() const;
 
     private:
+        DescriptorSetService &descriptorSetService;
+
         PipelineInstance *createComputePipeline(const PipelineBuilder &pipelineBuilder, PipelineInstance *pipeline);
 
         PipelineInstance *createRenderingPipeline(PipelineBuilder &pipelineBuilder, PipelineInstance *pipeline);

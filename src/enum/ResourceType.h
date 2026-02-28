@@ -6,7 +6,8 @@ namespace Metal {
         FRAMEBUFFER,
         TEXTURE,
         PIPELINE,
-        BUFFER
+        BUFFER,
+        DESCRIPTOR_SET
     };
 }
 

@@ -15,7 +15,7 @@ namespace Metal {
         unsigned int mipLevels = 1;
         unsigned int width{}, height{}, channels{};
         VkFormat vkFormat{};
-        std::unique_ptr<DescriptorInstance> imageDescriptor = nullptr;
+        DescriptorInstance *imageDescriptor = nullptr;
 
         explicit TextureInstance(const std::string& id) : RuntimeResource(id) {
         }

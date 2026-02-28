@@ -10,7 +10,7 @@ namespace Metal {
         vkFreeMemory(CTX.vulkanContext.device.device, vkImageMemory, nullptr);
 
         if (imageDescriptor != nullptr) {
-            imageDescriptor->dispose();
+            CTX.descriptorSetService.disposeResource(imageDescriptor);
         }
     }
 }
