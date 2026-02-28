@@ -1,7 +1,6 @@
 #include "GBufferGenPass.h"
 
 #include "../../../../context/ApplicationContext.h"
-#include "../../../../enum/LevelOfDetail.h"
 #include "../../../../repository/world/components/MeshComponent.h"
 #include "../../../../repository/world/components/TransformComponent.h"
 #include "../../../../service//framebuffer/FrameBufferInstance.h"
@@ -36,7 +35,7 @@ namespace Metal {
                 if (worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) {
                     continue;
                 }
-                const auto *meshInstance = streamingRepository.streamMesh(mesh.meshId, LevelOfDetail::LOD_0);
+                const auto *meshInstance = streamingRepository.streamMesh(mesh.meshId);
                 if (meshInstance != nullptr) {
                     mPushConstant.model = worldRepository.registry.get<TransformComponent>(entity).model;
                     mPushConstant.renderIndex = mesh.renderIndex = renderIndex;

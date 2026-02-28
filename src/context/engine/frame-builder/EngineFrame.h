@@ -29,10 +29,10 @@ namespace Metal {
         }
 
         void destroy() {
-            for (auto &pair: resources) {
-                pair.second->dispose();
-            }
-            resources.clear();
+            // for (auto &pair: resources) {
+            //     pair.second->dispose();
+            // }
+            // resources.clear();
         }
     };
 }

@@ -29,4 +29,10 @@ namespace Metal {
         //   }
          return nullptr;
     }
+
+    void VoxelService::disposeResource(SVOInstance *resource) {
+        if (resource->voxelsBuffer != nullptr) {
+            dispose(resource->voxelsBuffer->getId());
+        }
+    }
 } // Metal

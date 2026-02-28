@@ -8,7 +8,8 @@
 
 namespace Metal {
     void FileImportModalPanel::onInitialize() {
-        appendChild(settingsForm = new FormPanel());
+        formPanel = new FormPanel();
+        appendChild(formPanel);
     }
 
     void FileImportModalPanel::onSync() {
@@ -18,7 +19,7 @@ namespace Metal {
         }
 
         if (isFirst) {
-            settingsForm->processFields(
+            formPanel->setInspection(
                 CTX.fileInspection.importSettingsMap.at(CTX.fileInspection.selectedFileForSettings).get());
             isFirst = false;
         }
@@ -30,8 +31,8 @@ namespace Metal {
         ImGui::SetNextWindowPos(viewport->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
         ImGui::SetNextWindowSizeConstraints(ImVec2(width, 400), ImVec2(width, maxHeight));
 
-        if (ImGui::BeginPopupModal(("Import files?" + id + "importModal").c_str(), nullptr,
-                                   ImGuiWindowFlags_AlwaysAutoResize)) {
+        if (ImGui::Begin(("Import files?" + id + "importModal").c_str(), nullptr,
+                                   ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoMove)) {
             if (ImGui::BeginTable((id + "ImportLayoutTable").c_str(), 2, ImGuiTableFlags_Resizable)) {
                 ImGui::TableSetupColumn("FileList", ImGuiTableColumnFlags_WidthStretch, 0.4f);
                 ImGui::TableSetupColumn("Settings", ImGuiTableColumnFlags_WidthStretch, 0.6f);
@@ -56,7 +57,7 @@ namespace Metal {
                         if (ImGui::Selectable(p.filename().string().c_str(), isSelected,
                                               ImGuiSelectableFlags_SpanAllColumns)) {
                             CTX.fileInspection.selectedFileForSettings = filePath;
-                            settingsForm->setInspection(
+                            formPanel->setInspection(
                                 CTX.fileInspection.importSettingsMap.at(CTX.fileInspection.selectedFileForSettings).
                                 get());
                         }
@@ -77,7 +78,7 @@ namespace Metal {
                             std::filesystem::path(CTX.fileInspection.selectedFileForSettings).filename().string().
                             c_str());
                 ImGui::BeginChild((id + "SettingsFormChild").c_str(), ImVec2(0, maxHeight - 180.0f), true);
-                settingsForm->onSync();
+                formPanel->onSync();
                 ImGui::EndChild();
 
                 ImGui::EndTable();
@@ -96,17 +97,15 @@ namespace Metal {
                 FilesService::GetEntries(CTX.fileInspection.targetImportDirectory);
                 CTX.fileInspection.pendingImports.clear();
                 CTX.fileInspection.importSettingsMap.clear();
-                settingsForm->resetForm();
-                ImGui::CloseCurrentPopup();
+                formPanel->resetForm();
             }
             ImGui::SameLine();
             if (ImGui::Button(("Cancel" + id + "cancel").c_str(), ImVec2(120, 0))) {
                 CTX.fileInspection.pendingImports.clear();
                 CTX.fileInspection.importSettingsMap.clear();
-                settingsForm->resetForm();
-                ImGui::CloseCurrentPopup();
+                formPanel->resetForm();
             }
-            ImGui::EndPopup();
         }
+        ImGui::End();
     }
 } // Metal

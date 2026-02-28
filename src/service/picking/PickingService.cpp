@@ -18,7 +18,7 @@ namespace Metal {
         auto &attachment = gBuffer->attachments[2];
 
         constexpr VkDeviceSize imageSize = sizeof(float) * 4;
-        auto stagingBuffer = CTX.bufferService.createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+        auto stagingBuffer = CTX.bufferService.createBuffer("stagingBuffer", imageSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                                                             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                             VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
@@ -67,7 +67,7 @@ namespace Metal {
         const auto *pixel = static_cast<const float *>(data);
         const float idValue = pixel[3];
         vkUnmapMemory(CTX.vulkanContext.device.device, stagingBuffer->vkDeviceMemory);
-        stagingBuffer->dispose();
+        CTX.bufferService.dispose("stagingBuffer");
 
         if (idValue <= 0.0f) {
             return std::nullopt;

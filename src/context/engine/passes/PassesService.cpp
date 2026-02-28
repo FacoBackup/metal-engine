@@ -54,9 +54,9 @@ namespace Metal {
         computePasses.clear();
         gBufferPasses.clear();
         postProcessingPasses.clear();
+        CTX.pipelineService.disposeAll();
 
         for (auto &pass: allPasses) {
-            pass->getPipeline()->dispose();
             delete pass;
         }
         allPasses.clear();

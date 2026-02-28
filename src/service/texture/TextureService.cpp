@@ -2,7 +2,6 @@
 
 #include <iostream>
 
-#include "../../enum/LevelOfDetail.h"
 #include "../../util/ImageUtils.h"
 
 #include <stb_image.h>
@@ -125,8 +124,8 @@ namespace Metal {
         createImageWithInfo(imageInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image);
     }
 
-    TextureData *TextureService::stream(const std::string &id, const LevelOfDetail &lod) const {
-        auto pathToFile = CTX.getAssetDirectory() + FORMAT_FILE_TEXTURE(id, lod);
+    TextureData *TextureService::stream(const std::string &id) const {
+        auto pathToFile = CTX.getAssetDirectory() + FORMAT_FILE_TEXTURE(id);
         if (std::filesystem::exists(pathToFile)) {
             int width, height, channels;
             unsigned char *data = stbi_load(pathToFile.c_str(), &width, &height, &channels, 0);
@@ -141,8 +140,7 @@ namespace Metal {
     TextureInstance *TextureService::loadTexture(const std::string &id, const std::string &pathToImage,
                                                  bool generateMipMaps,
                                                  VkFormat imageFormat) {
-        auto *image = new TextureInstance(id);
-        registerResource(image);
+        auto *image = createResourceInstance(id);
         int width, height, channels;
         const auto data = stbi_load(pathToImage.c_str(), &width, &height, &channels, 4);
         image->width = width;
@@ -154,7 +152,8 @@ namespace Metal {
         image->vkFormat = imageFormat;
         LOG_INFO("Loading texture " + id + " from " + pathToImage);
         LOG_INFO("Texture data: Width " + std::to_string(image->width) + " Height " + std::to_string(image->height));
-        const std::shared_ptr<BufferInstance> stagingBuffer = CTX.bufferService.createBuffer(
+        BufferInstance *stagingBuffer = CTX.bufferService.createBuffer(
+            id + "_staging",
             image->width * image->height * 4, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
         stagingBuffer->update(data);
@@ -303,12 +302,12 @@ namespace Metal {
         CTX.CTX.vulkanContext.endSingleTimeCommands(commandBuffer);
     }
 
-    TextureInstance *TextureService::create(const std::string &id, const LevelOfDetail &lod) {
-        auto pathToFile = CTX.getAssetDirectory() + FORMAT_FILE_TEXTURE(id, lod);
+    TextureInstance *TextureService::create(const std::string &id) {
+        auto pathToFile = CTX.getAssetDirectory() + FORMAT_FILE_TEXTURE(id);
         if (std::filesystem::exists(pathToFile)) {
-            auto *instance = loadTexture(id + lod.suffix, pathToFile, true, VK_FORMAT_R8G8B8A8_UNORM);
+            auto *instance = loadTexture(id, pathToFile, true, VK_FORMAT_R8G8B8A8_UNORM);
             if (instance != nullptr) {
-                getTextureIndex(id + lod.suffix);
+                getTextureIndex(id);
             }
             return instance;
         }
@@ -316,8 +315,7 @@ namespace Metal {
     }
 
     TextureInstance *TextureService::createForCompute(const unsigned int width, const unsigned int height) {
-        auto *image = new TextureInstance(Util::uuidV4());
-        registerResource(image);
+        auto *image = createResourceInstance(Util::uuidV4());
         image->width = width;
         image->height = height;
         VkImageCreateInfo imageCreateInfo = {};
@@ -373,5 +371,16 @@ namespace Metal {
             return index;
         }
         return 0;
+    }
+
+    void TextureService::disposeResource(TextureInstance *resource) {
+        vkDestroyImage(CTX.vulkanContext.device.device, resource->vkImage, nullptr);
+        vkFreeMemory(CTX.vulkanContext.device.device, resource->vkImageMemory, nullptr);
+        vkDestroyImageView(CTX.vulkanContext.device.device, resource->vkImageView, nullptr);
+        vkDestroySampler(CTX.vulkanContext.device.device, resource->vkSampler, nullptr);
+
+        if (resource->imageDescriptor != nullptr) {
+            resource->imageDescriptor->dispose();
+        }
     }
 } // Metal

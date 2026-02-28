@@ -5,25 +5,62 @@
 #include <unordered_map>
 
 #include "../../common/AbstractRuntimeComponent.h"
+#include "../../repository/abstract/RuntimeResource.h"
 
 namespace Metal {
     class VulkanContext;
-    class RuntimeResource;
 
+    template<typename T>
     class AbstractResourceService : public AbstractRuntimeComponent {
+        static_assert(std::is_base_of_v<RuntimeResource, T>, "T must be a subclass of RuntimeResource");
+
     protected:
-        std::unordered_map<std::string, RuntimeResource *> resources{};
+        std::unordered_map<std::string, T *> resources{};
         mutable std::mutex resourceMutex;
 
-        void registerResource(RuntimeResource *resource);
+        template<typename... Args>
+        T *createResourceInstance(const std::string &id, Args &&... args) {
+            std::lock_guard lock(resourceMutex);
+            auto *resource = new T(id, std::forward<Args>(args)...);
+            resources[id] = resource;
+            return resource;
+        }
 
     public:
-        std::unordered_map<std::string, RuntimeResource *> &getResources() {
-            std::lock_guard<std::mutex> lock(resourceMutex);
+        T *getResource(const std::string &id) const {
+            std::lock_guard lock(resourceMutex);
+            if (resources.contains(id)) {
+                return resources.at(id);
+            }
+            return nullptr;
+        }
+
+        std::unordered_map<std::string, T *> &getResources() {
+            std::lock_guard lock(resourceMutex);
             return resources;
         }
 
-        void disposeAll();
+        virtual void disposeResource(T *resource) = 0;
+
+        virtual void dispose(std::string id) {
+            std::lock_guard lock(resourceMutex);
+            if (resources.contains(id)) {
+                auto *r = resources.at(id);
+                disposeResource(r);
+                resources.erase(id);
+                delete r;
+            }
+        }
+
+        void disposeAll() {
+            std::lock_guard lock(resourceMutex);
+            for (auto it = resources.begin(); it != resources.end();) {
+                auto *r = it->second;
+                disposeResource(r);
+                delete r;
+                it = resources.erase(it);
+            }
+        }
     };
 } // Metal
 

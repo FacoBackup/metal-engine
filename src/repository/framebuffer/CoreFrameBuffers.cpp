@@ -8,7 +8,7 @@ namespace Metal {
 
         {
             // G-BUFFER
-            gBufferFBO = framebufferService.createFrameBuffer(
+            gBufferFBO = framebufferService.createFrameBuffer("gBufferFBO",
                 CTX.vulkanContext.getWindowWidth() / CTX.engineRepository.shadingResInvScale,
                 CTX.vulkanContext.getWindowHeight() / CTX.engineRepository.shadingResInvScale, glm::vec4(0, 0, 0, 0));
             framebufferService.createAttachment("Albedo; Emission flag | AO", VK_FORMAT_R16G16B16A16_SFLOAT,
@@ -21,7 +21,7 @@ namespace Metal {
             framebufferService.createRenderPass(gBufferFBO);
         } {
             // POST PROCESSING
-            postProcessingFBO = framebufferService.createFrameBuffer(CTX.vulkanContext.getWindowWidth(),
+            postProcessingFBO = framebufferService.createFrameBuffer("postProcessingFBO", CTX.vulkanContext.getWindowWidth(),
                                                                      CTX.vulkanContext.getWindowHeight());
             framebufferService.createAttachment("Color", VK_FORMAT_R16G16B16A16_SFLOAT,
                                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, postProcessingFBO);

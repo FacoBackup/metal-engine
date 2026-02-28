@@ -6,7 +6,7 @@ namespace Metal {
     class FormPanel;
 
     class FileImportModalPanel final : public AbstractPanel {
-        FormPanel *settingsForm = nullptr;
+        FormPanel *formPanel = nullptr;
         bool isFirst = false;
 
     public:

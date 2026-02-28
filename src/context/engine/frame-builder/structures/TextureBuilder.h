@@ -13,7 +13,7 @@ namespace Metal {
             : ResourceBuilder(id), w(w), h(h) {
         }
 
-        ResourceBuilderType getType() override;
+        ResourceType getType() override;
 
         RuntimeResource *build() override;
     };

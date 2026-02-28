@@ -12,7 +12,7 @@ namespace Metal {
         VkDescriptorType descriptorType;
         unsigned int bindingPoint;
         unsigned int descriptorCount = 1;
-        std::shared_ptr<BufferInstance> bufferInstance = nullptr;
+        BufferInstance *bufferInstance = nullptr;
         VkSampler sampler = VK_NULL_HANDLE;
         VkImageView view = VK_NULL_HANDLE;
         VkImageLayout layout = VK_IMAGE_LAYOUT_GENERAL;
@@ -20,14 +20,14 @@ namespace Metal {
 
         DescriptorBinding(VkShaderStageFlagBits stageFlags, VkDescriptorType descriptorType, unsigned int bindingPoint,
                           unsigned int descriptorCount = 1,
-                          std::shared_ptr<BufferInstance> bufferInstance = nullptr, VkSampler sampler = VK_NULL_HANDLE,
+                          BufferInstance *bufferInstance = nullptr, VkSampler sampler = VK_NULL_HANDLE,
                           VkImageView view = VK_NULL_HANDLE, VkImageLayout layout = VK_IMAGE_LAYOUT_GENERAL,
                           VkAccelerationStructureKHR accelerationStructure = VK_NULL_HANDLE)
             : stageFlags(stageFlags),
               descriptorType(descriptorType),
               bindingPoint(bindingPoint),
               descriptorCount(descriptorCount),
-              bufferInstance(std::move(bufferInstance)),
+              bufferInstance(bufferInstance),
               sampler(sampler),
               view(view),
               layout(layout),
@@ -41,7 +41,7 @@ namespace Metal {
         }
 
         static DescriptorBinding Of(VkShaderStageFlagBits stageFlags, VkDescriptorType type, unsigned int bindingPoint,
-                                    const std::shared_ptr<BufferInstance> &bufferInstance) {
+                                    BufferInstance *bufferInstance) {
             return DescriptorBinding(stageFlags, type, bindingPoint, 1, bufferInstance);
         }
 

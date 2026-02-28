@@ -14,7 +14,6 @@
 #include "../service/mesh/MeshService.h"
 #include "../service/world/WorldGridService.h"
 #include "../service/texture/TextureService.h"
-#include "../service/exporter/VideoExporterService.h"
 #include "../service/framebuffer/FrameBufferService.h"
 #include "../service/pipeline/PipelineService.h"
 #include "../service/buffer/BufferService.h"
@@ -65,7 +64,6 @@ namespace Metal {
             : debugMode(debug_mode) {
         }
 
-        VideoExporterService videoExporterService{ true};
         EngineContext engineContext{};
         PassesService passesService{};
         VulkanContext vulkanContext{ debugMode};

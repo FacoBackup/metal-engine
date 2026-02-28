@@ -1,7 +1,6 @@
 #include "SelectedDotPass.h"
 
 #include "../../../../../context/ApplicationContext.h"
-#include "../../../../../enum/LevelOfDetail.h"
 #include "../../../../../repository/world/components/TransformComponent.h"
 #include "../../../../../dto/push-constant/SelectedDotPushConstant.h"
 #include "../../../../../service/pipeline/PipelineBuilder.h"
@@ -45,7 +44,7 @@ namespace Metal {
                 continue;
             }
 
-            const auto *meshInstance = streamingRepository.streamMesh(mesh.meshId, LevelOfDetail::LOD_0);
+            const auto *meshInstance = streamingRepository.streamMesh(mesh.meshId);
             if (!meshInstance) {
                 continue;
             }

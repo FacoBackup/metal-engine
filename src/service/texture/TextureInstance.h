@@ -20,17 +20,6 @@ namespace Metal {
         explicit TextureInstance(const std::string& id) : RuntimeResource(id) {
         }
 
-        void dispose() override {
-            vkDestroyImage(CTX.vulkanContext.device.device, vkImage, nullptr);
-            vkFreeMemory(CTX.vulkanContext.device.device, vkImageMemory, nullptr);
-            vkDestroyImageView(CTX.vulkanContext.device.device, vkImageView, nullptr);
-            vkDestroySampler(CTX.vulkanContext.device.device, vkSampler, nullptr);
-
-            if (imageDescriptor != nullptr) {
-                imageDescriptor->dispose();
-            }
-        }
-
         ResourceType resourceType() override {
             return TEXTURE;
         }

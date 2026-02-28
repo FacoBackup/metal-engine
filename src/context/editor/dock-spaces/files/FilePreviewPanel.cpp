@@ -28,7 +28,7 @@ namespace Metal {
         ImGui::Separator();
 
         if (selected->type == EntryType::TEXTURE) {
-            auto *texture = CTX.streamingRepository.streamTexture(selected->getId(), LevelOfDetail::LOD_3);
+            auto *texture = CTX.streamingRepository.streamTexture(selected->getId());
             if (texture != nullptr) {
                 float availWidth = ImGui::GetContentRegionAvail().x;
                 float availHeight = ImGui::GetContentRegionAvail().y * 0.6f; // reserve space for table

@@ -1,26 +1,27 @@
 #ifndef MESHSERVICE_H
 #define MESHSERVICE_H
 #include "../../service/abstract/AbstractResourceService.h"
+#include "../../service/abstract/IStreamable.h"
+#include "MeshInstance.h"
 #include "../../enum/engine-definitions.h"
 
 namespace Metal {
-    struct LevelOfDetail;
     struct MeshData;
     struct MeshInstance;
 
-    class MeshService final : public AbstractResourceService {
+    class MeshService final : public IStreamable<MeshInstance> {
     public:
-        explicit MeshService()
-            : AbstractResourceService() {
-        }
+        MeshInstance *create(const std::string &id) override;
 
-        MeshInstance *create(const std::string &id, const LevelOfDetail &levelOfDetail);
+        MeshData *stream(const std::string &id) const;
 
-        MeshData *stream(const std::string &id, const LevelOfDetail &levelOfDetail) const;
-
-        EntityID createMeshEntity(const std::string &name, const std::string &meshId, const std::string &materialId) const;
+        EntityID createMeshEntity(const std::string &name, const std::string &meshId,
+                                  const std::string &materialId) const;
 
         void createSceneEntities(const std::string &id) const;
+
+        void disposeResource(MeshInstance *resource) override;
+
     };
 } // Metal
 

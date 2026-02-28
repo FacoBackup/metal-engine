@@ -8,6 +8,7 @@ namespace Metal {
     struct FrameBufferInstance;
 
     struct PipelineBuilder final {
+        const char *id = nullptr;
         FrameBufferInstance *frameBuffer = nullptr;
         VkCullModeFlagBits cullMode = VK_CULL_MODE_NONE;
         const char *vertexShader = nullptr;
@@ -80,6 +81,11 @@ namespace Metal {
 
         PipelineBuilder &addDescriptorSet(DescriptorInstance *d) {
             descriptorSetsToBind.push_back(d);
+            return *this;
+        }
+
+        PipelineBuilder &setId(const char *id) {
+            this->id = id;
             return *this;
         }
     };

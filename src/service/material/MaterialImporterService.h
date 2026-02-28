@@ -9,11 +9,8 @@
 #include "../abstract/AbstractResourceService.h"
 
 namespace Metal {
-    class MaterialImporterService final : public AbstractResourceService {
+    class MaterialImporterService final : public AbstractRuntimeComponent {
     public:
-        explicit MaterialImporterService()
-            : AbstractResourceService() {
-        }
 
         void persistAllMaterials(const std::string &targetDir, const aiScene *scene,
                                  std::unordered_map<unsigned int, std::string> &materialMap,

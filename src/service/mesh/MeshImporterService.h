@@ -7,16 +7,11 @@
 #include <string>
 #include <stop_token>
 
-#include "../../enum/LevelOfDetail.h"
-
 namespace Metal {
     struct MeshData;
 
-    class MeshImporterService final : public AbstractResourceService {
+    class MeshImporterService final : public AbstractRuntimeComponent {
     public:
-        explicit MeshImporterService()
-            : AbstractResourceService() {
-        }
 
         void persistAllMeshes(const std::string &targetDir, const aiScene *scene,
                               std::unordered_map<unsigned int, std::string> &meshMap,
@@ -24,8 +19,6 @@ namespace Metal {
                               const std::stop_token &stopToken = {}) const;
 
     private:
-        size_t simplifyMesh(const std::string &fileId, const MeshData &mesh, const LevelOfDetail &levelOfDetail) const;
-
         [[nodiscard]] std::string persistMesh(const std::string &targetDir, const MeshData &mesh) const;
     };
 }

@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "../abstract/AbstractResourceService.h"
+#include "PipelineInstance.h"
 
 namespace Metal {
     struct PipelineBuilder;
@@ -10,12 +11,12 @@ namespace Metal {
     struct PipelineInstance;
     struct DescriptorInstance;
 
-    class PipelineService final : public AbstractResourceService {
-        PipelineInstance *createComputePipeline(const PipelineBuilder &pipelineBuilder) const;
+    class PipelineService final : public AbstractResourceService<PipelineInstance> {
+        PipelineInstance *createComputePipeline(const PipelineBuilder &pipelineBuilder);
 
         PipelineInstance *createRenderingPipeline(PipelineBuilder &pipelineBuilder);
 
-        PipelineInstance *createRayTracingPipeline(const PipelineBuilder &pipelineBuilder) const;
+        PipelineInstance *createRayTracingPipeline(const PipelineBuilder &pipelineBuilder);
 
         void createPipelineLayout(const std::vector<DescriptorInstance *> &descriptorSetsToBind,
                                   unsigned int pushConstantsSize,
@@ -23,10 +24,12 @@ namespace Metal {
 
     public:
         explicit PipelineService()
-            : AbstractResourceService() {
+            : AbstractResourceService<PipelineInstance>() {
         }
 
         PipelineInstance *createPipeline(PipelineBuilder &pipelineBuilder);
+
+        void disposeResource(PipelineInstance *resource) override;
     };
 } // Metal
 

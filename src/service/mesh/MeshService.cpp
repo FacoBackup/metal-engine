@@ -12,29 +12,29 @@
 #include <fstream>
 
 #include "../../context/ApplicationContext.h"
-#include "../../enum/LevelOfDetail.h"
 #include "../../repository/world/components/MeshComponent.h"
 #include "../../repository/world/components/TransformComponent.h"
 
 namespace Metal {
-    MeshInstance *MeshService::create(const std::string &id, const LevelOfDetail &levelOfDetail) {
-        MeshData *data = stream(id, levelOfDetail);
+    MeshInstance *MeshService::create(const std::string &id) {
+        MeshData *data = stream(id);
         if (data == nullptr) {
             return nullptr;
         }
-        auto *instance = new MeshInstance(id + levelOfDetail.suffix);
-        registerResource(instance);
+        auto *instance = createResourceInstance(id);
 
         instance->indexCount = data->indices.size();
         instance->vertexCount = data->data.size();
 
         instance->dataBuffer = CTX.bufferService.createBuffer(
+            id + "_data",
             sizeof(VertexData) * data->data.size(),
             VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
             data->data.data(),
             true);
 
         instance->indexBuffer = CTX.bufferService.createBuffer(
+            id + "_indices",
             sizeof(unsigned int) * data->indices.size(),
             VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
             data->indices.data(),
@@ -45,8 +45,8 @@ namespace Metal {
         return instance;
     }
 
-    MeshData *MeshService::stream(const std::string &id, const LevelOfDetail &levelOfDetail) const {
-        auto pathToFile = CTX.getAssetDirectory() + FORMAT_FILE_MESH(id, levelOfDetail);
+    MeshData *MeshService::stream(const std::string &id) const {
+        auto pathToFile = CTX.getAssetDirectory() + FORMAT_FILE_MESH(id);
         if (std::filesystem::exists(pathToFile)) {
             auto *data = new MeshData;
             std::ifstream input(pathToFile, std::ios::binary);
@@ -57,7 +57,8 @@ namespace Metal {
         return nullptr;
     }
 
-    EntityID MeshService::createMeshEntity(const std::string &name, const std::string &meshId, const std::string &materialId) const {
+    EntityID MeshService::createMeshEntity(const std::string &name, const std::string &meshId,
+                                           const std::string &materialId) const {
         const auto id = CTX.worldRepository.createEntity();
         CTX.worldRepository.createComponent(id, ComponentTypes::ComponentType::MESH);
         const auto entity = static_cast<entt::entity>(id);
@@ -65,7 +66,7 @@ namespace Metal {
         mesh.meshId = meshId;
         mesh.materialId = materialId;
 
-        MeshData *data = stream(meshId, LevelOfDetail::LOD_0);
+        MeshData *data = stream(meshId);
         if (data != nullptr) {
             auto &transform = CTX.worldRepository.registry.get<TransformComponent>(entity);
             transform.gizmoCenter = data->gizmoCenter;
@@ -101,5 +102,12 @@ namespace Metal {
             }
             repo.linkEntities(entities.at(entity.parentEntity), entities.at(entity.id));
         }
+    }
+
+    void MeshService::disposeResource(MeshInstance *resource) {
+        LOG_INFO("Disposing of mesh instance");
+        CTX.rayTracingService.destroyAccelerationStructures();
+        CTX.bufferService.dispose(resource->indexBuffer->getId());
+        CTX.bufferService.dispose(resource->dataBuffer->getId());
     }
 } // Metal

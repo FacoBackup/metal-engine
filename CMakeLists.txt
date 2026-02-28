@@ -79,6 +79,8 @@ add_executable(
         src/context/editor/dock-spaces/files/FilePreviewPanel.h
         src/context/editor/dock-spaces/console/ConsolePanel.cpp
         src/context/editor/dock-spaces/console/ConsolePanel.h
+        src/context/editor/dock-spaces/metrics/MetricsPanel.cpp
+        src/context/editor/dock-spaces/metrics/MetricsPanel.h
         src/service/log/LogService.cpp
         src/service/log/LogService.h
         src/context/editor/dock-spaces/hierarchy/HierarchyPanel.cpp
@@ -91,10 +93,6 @@ add_executable(
         src/context/engine/render-pass/AbstractRenderPass.cpp
         src/context/engine/render-pass/AbstractRenderPass.h
         src/context/engine/render-pass/impl/GBufferGenPass.cpp
-        src/context/engine/render-pass/impl/GBufferGenPass.h
-        src/service/texture/TextureInstance.h
-        src/repository/abstract/ResourceRepository.h
-        src/service/abstract/AbstractResourceService.cpp
         src/service/abstract/AbstractResourceService.h
         src/service/framebuffer/FrameBufferAttachment.h
         src/repository/framebuffer/CoreFrameBuffers.cpp
@@ -120,11 +118,9 @@ add_executable(
         src/repository/descriptors/CoreDescriptorSets.h
         src/service/buffer/BufferInstance.cpp
         src/service/buffer/BufferInstance.h
-        src/service/pipeline/PipelineInstance.cpp
         src/service/mesh/MeshService.cpp
         src/service/mesh/MeshService.h
         src/service/mesh/MeshData.h
-        src/service/mesh/MeshInstance.cpp
         src/service/mesh/MeshInstance.h
         src/util/FilesUtil.h
         src/dto/file/FSEntry.h
@@ -140,8 +136,6 @@ add_executable(
         src/service/mesh/SceneImporterService.cpp
         src/service/mesh/SceneImporterService.h
         src/service/abstract/AbstractImporter.h
-        src/enum/LevelOfDetail.h
-        src/enum/LevelOfDetail.cpp
         src/service/texture/TextureImporterService.cpp
         src/service/texture/TextureImporterService.h
         src/dto/file/EntryMetadata.h
@@ -240,7 +234,6 @@ add_executable(
         src/context/engine/render-pass/impl/tools/SelectedDotPass.h
         src/service/picking/PickingService.cpp
         src/service/picking/PickingService.h
-        src/service/voxel/SVOInstance.cpp
         src/service/voxel/SVOInstance.h
         src/dto/push-constant/VoxelDebugSettingsPushConstant.h
         src/service/world/WorldGridService.cpp
@@ -279,8 +272,6 @@ add_executable(
         src/repository/world/components/VolumeComponent.cpp
         src/repository/world/components/VolumeComponent.h
         src/service/descriptor/DescriptorBinding.h
-        src/service/exporter/VideoExporterService.cpp
-        src/service/exporter/VideoExporterService.h
         src/service/notification/AsyncTask.h
         src/service/voxel/VoxelImporterService.cpp
         src/service/voxel/VoxelImporterService.h
@@ -290,7 +281,6 @@ add_executable(
         src/service/volumes/VolumeService.h
         src/service/voxel/VoxelService.cpp
         src/service/voxel/VoxelService.h
-        src/service/framebuffer/FrameBufferInstance.cpp
         src/util/Serializable.cpp
         src/context/editor/abstract/form/ChildPanel.cpp
         src/context/editor/abstract/form/ChildPanel.h
@@ -305,6 +295,8 @@ add_executable(
         src/context/engine/frame-builder/structures/FramebufferBuilder.h
         src/context/engine/frame-builder/structures/TextureBuilder.cpp
         src/context/engine/frame-builder/structures/TextureBuilder.h
+        src/context/engine/frame-builder/structures/BufferBuilder.cpp
+        src/context/engine/frame-builder/structures/BufferBuilder.h
         src/context/engine/frame-builder/structures/ResourceBuilder.h
 )
 

@@ -6,11 +6,8 @@
 #include <optional>
 
 namespace Metal {
-    class PickingService final : public AbstractResourceService {
+    class PickingService final : public AbstractRuntimeComponent {
     public:
-        explicit PickingService()
-            : AbstractResourceService() {
-        }
 
         [[nodiscard]] std::optional<EntityID> pickEntityFromGBuffer(uint32_t pixelX, uint32_t pixelY) const;
     };

@@ -2,6 +2,7 @@
 #include "../../common/interface/Icons.h"
 #include "../../context/editor/dock-spaces/console/ConsolePanel.h"
 #include "../../context/editor/dock-spaces/files/FilesPanel.h"
+#include "../../context/editor/dock-spaces/metrics/MetricsPanel.h"
 #include "../../context/editor/dock-spaces/inspector/InspectorPanel.h"
 #include "../../context/editor/dock-spaces/viewport/ViewportPanel.h"
 #include "../../context/editor/dock-spaces/hierarchy/HierarchyPanel.h"
@@ -14,7 +15,8 @@ namespace Metal {
     DockSpace DockSpace::HIERARCHY{1, "Hierarchy", Icons::account_tree, 4, 4, CB(HierarchyPanel)};
     DockSpace DockSpace::CONSOLE{2, "Console", Icons::terminal, 4, 4, CB(ConsolePanel)};
     DockSpace DockSpace::FILES{3, "Files", Icons::folder_open, 4, 4, CB(FilesPanel)};
-    const char *DockSpace::OPTIONS = "Inspector\0Hierarchy\0Console\0Files";
+    DockSpace DockSpace::METRICS{4, "Metrics", Icons::analytics, 4, 4, CB(MetricsPanel)};
+    const char *DockSpace::OPTIONS = "Inspector\0Hierarchy\0Console\0Files\0Metrics";
 
 
     DockSpace *DockSpace::GetOption(const int selected) {
@@ -27,6 +29,8 @@ namespace Metal {
                 return &CONSOLE;
             case 3:
                 return &FILES;
+            case 4:
+                return &METRICS;
             default:
                 return nullptr;
         }

@@ -12,23 +12,23 @@
 namespace Metal {
     void CoreBuffers::onInitialize() {
         auto &bufferService = CTX.bufferService;
-        globalData = bufferService.createBuffer(sizeof(GlobalDataUBO),
+        globalData = bufferService.createBuffer("globalData", sizeof(GlobalDataUBO),
                                                 VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-        tileInfo = bufferService.createBuffer(sizeof(TileInfoUBO),
+        tileInfo = bufferService.createBuffer("tileInfo", sizeof(TileInfoUBO),
                                                 VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-        lightBuffer = bufferService.createBuffer(MAX_LIGHTS * sizeof(LightData),
+        lightBuffer = bufferService.createBuffer("lightBuffer", MAX_LIGHTS * sizeof(LightData),
                                                 VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-        volumesBuffer = bufferService.createBuffer(MAX_VOLUMES * sizeof(VolumeData),
+        volumesBuffer = bufferService.createBuffer("volumesBuffer", MAX_VOLUMES * sizeof(VolumeData),
                                                 VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-        materialBuffer = bufferService.createBuffer(MAX_MATERIALS * sizeof(MaterialData),
+        materialBuffer = bufferService.createBuffer("materialBuffer", MAX_MATERIALS * sizeof(MaterialData),
                                                 VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     }

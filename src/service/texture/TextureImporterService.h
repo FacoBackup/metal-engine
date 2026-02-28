@@ -5,7 +5,6 @@
 struct aiTexture;
 
 namespace Metal {
-    struct LevelOfDetail;
     struct TextureData;
 
     class TextureImporterService final : public AbstractImporter {
@@ -23,8 +22,7 @@ namespace Metal {
         std::string importEmbeddedTexture(const std::string &targetDir, const ::aiTexture *texture,
                                           const std::string &nameHint) const;
 
-        size_t reduceImage(const std::string &fileId,
-                         const TextureData &textureData, const LevelOfDetail &levelOfDetail) const;
+        size_t saveImage(const std::string &fileId, const TextureData &textureData) const;
     };
 }
 

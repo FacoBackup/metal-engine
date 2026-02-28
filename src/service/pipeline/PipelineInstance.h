@@ -20,16 +20,17 @@ namespace Metal {
         bool isRayTracing = false;
         unsigned int pushConstantsSize = 0;
 
+        explicit PipelineInstance(const std::string &id) : RuntimeResource(id) {
+        }
+
         // Ray tracing SBT
-        std::shared_ptr<BufferInstance> raygenSBT = nullptr;
-        std::shared_ptr<BufferInstance> missSBT = nullptr;
-        std::shared_ptr<BufferInstance> hitSBT = nullptr;
+        BufferInstance *raygenSBT = nullptr;
+        BufferInstance *missSBT = nullptr;
+        BufferInstance *hitSBT = nullptr;
         VkStridedDeviceAddressRegionKHR raygenRegion{};
         VkStridedDeviceAddressRegionKHR missRegion{};
         VkStridedDeviceAddressRegionKHR hitRegion{};
         VkStridedDeviceAddressRegionKHR callableRegion{};
-
-        void dispose() override;
 
         ResourceType resourceType() override {
             return PIPELINE;

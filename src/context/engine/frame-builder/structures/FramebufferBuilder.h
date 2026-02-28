@@ -27,7 +27,7 @@ namespace Metal {
             : ResourceBuilder(id), clearColor(clearColor), w(w), h(h) {
         }
 
-        ResourceBuilderType getType() override;
+        ResourceType getType() override;
 
         void addColor(std::string id, VkFormat format, VkImageUsageFlagBits usage,
                       FrameBufferInstance *framebuffer) {

@@ -84,8 +84,6 @@ namespace Metal {
         setUpdateLights(false);
         setCameraUpdated(false);
         setGISettingsUpdated(false);
-
-        CTX.videoExporterService.onSync();
     }
 
     void EngineContext::updateGlobalData() {

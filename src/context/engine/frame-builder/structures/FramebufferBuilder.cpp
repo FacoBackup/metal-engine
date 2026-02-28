@@ -4,13 +4,13 @@
 #include "../../../../service/framebuffer/FrameBufferInstance.h"
 
 namespace Metal {
-    ResourceBuilderType FramebufferBuilder::getType() {
-        return ResourceBuilderType::FRAMEBUFFER;
+    ResourceType FramebufferBuilder::getType() {
+        return ResourceType::FRAMEBUFFER;
     }
 
     RuntimeResource* FramebufferBuilder::build() {
         auto &framebufferService = CTX.framebufferService;
-        FrameBufferInstance* fbo = framebufferService.createFrameBuffer(w, h, clearColor);
+        FrameBufferInstance* fbo = framebufferService.createFrameBuffer(id, w, h, clearColor);
 
         for (const auto& attachment : attachments) {
             framebufferService.createAttachment(attachment.id.c_str(), attachment.format, attachment.usage, fbo);

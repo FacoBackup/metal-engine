@@ -51,8 +51,9 @@ namespace Metal {
         return createRenderingPipeline(pipelineBuilder);
     }
 
-    PipelineInstance *PipelineService::createComputePipeline(const PipelineBuilder &pipelineBuilder) const {
-        auto *pipeline = new PipelineInstance();
+    PipelineInstance *PipelineService::createComputePipeline(const PipelineBuilder &pipelineBuilder) {
+        auto id = pipelineBuilder.id != nullptr ? std::string(pipelineBuilder.id) : Util::uuidV4();
+        auto *pipeline = createResourceInstance(id);
         pipeline->isCompute = true;
         pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
         VkShaderModule computeShaderModule = ShaderUtil::CreateShaderModule(pipelineBuilder.computeShader);
@@ -86,11 +87,11 @@ namespace Metal {
     PipelineInstance *PipelineService::createRenderingPipeline(PipelineBuilder &pipelineBuilder) {
         auto meshDescriptions = VertexData::GetAttributeDescriptions();
 
-        auto *pipeline = new PipelineInstance();
+        auto id = pipelineBuilder.id != nullptr ? std::string(pipelineBuilder.id) : Util::uuidV4();
+        auto *pipeline = createResourceInstance(id);
         pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
         auto fragmentShaderModule = ShaderUtil::CreateShaderModule(pipelineBuilder.fragmentShader);
         auto vertexShaderModule = ShaderUtil::CreateShaderModule(pipelineBuilder.vertexShader);
-        registerResource(pipeline);
         createPipelineLayout(pipelineBuilder.descriptorSetsToBind, pipelineBuilder.pushConstantsSize, pipeline);
 
         std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages{};
@@ -233,8 +234,9 @@ namespace Metal {
         return fn(device, &info);
     }
 
-    PipelineInstance *PipelineService::createRayTracingPipeline(const PipelineBuilder &pipelineBuilder) const {
-        auto *pipeline = new PipelineInstance();
+    PipelineInstance *PipelineService::createRayTracingPipeline(const PipelineBuilder &pipelineBuilder) {
+        auto id = pipelineBuilder.id != nullptr ? std::string(pipelineBuilder.id) : Util::uuidV4();
+        auto *pipeline = createResourceInstance(id);
         pipeline->isRayTracing = true;
         pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
 
@@ -318,9 +320,10 @@ namespace Metal {
                 0, groupCount, sbtSize, shaderHandleStorage.data()));
 
         // Create SBT buffers - each needs baseAlignment
-        auto createSBTBuffer = [&](uint32_t groupIndex) -> std::shared_ptr<BufferInstance> {
+        auto createSBTBuffer = [&](uint32_t groupIndex, const std::string& sbtType) -> BufferInstance * {
             const uint32_t sbtBufferSize = (handleSizeAligned + baseAlignment - 1) & ~(baseAlignment - 1);
-            auto buf = CTX.bufferService.createBuffer(
+            auto *buf = CTX.bufferService.createBuffer(
+                id + "_sbt_" + sbtType,
                 sbtBufferSize,
                 VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -329,11 +332,11 @@ namespace Metal {
             return buf;
         };
 
-        pipeline->raygenSBT = createSBTBuffer(0);
-        pipeline->missSBT = createSBTBuffer(1);
-        pipeline->hitSBT = createSBTBuffer(2);
+        pipeline->raygenSBT = createSBTBuffer(0, "raygen");
+        pipeline->missSBT = createSBTBuffer(1, "miss");
+        pipeline->hitSBT = createSBTBuffer(2, "hit");
 
-        auto getAddr = [&](const std::shared_ptr<BufferInstance> &buf) {
+        auto getAddr = [&](const BufferInstance *buf) {
             return getBufferDeviceAddress(CTX.vulkanContext.device.device, buf->vkBuffer, CTX.vulkanContext.vkGetBufferDeviceAddressKHR);
         };
 
@@ -361,5 +364,12 @@ namespace Metal {
         vkDestroyShaderModule(CTX.vulkanContext.device.device, closestHitModule, nullptr);
 
         return pipeline;
+    }
+
+    void PipelineService::disposeResource(PipelineInstance *resource) {
+        LOG_INFO("Disposing of pipeline instance");
+
+        vkDestroyPipelineLayout(CTX.vulkanContext.device.device, resource->vkPipelineLayout, nullptr);
+        vkDestroyPipeline(CTX.vulkanContext.device.device, resource->vkPipeline, nullptr);
     }
 } // Metal

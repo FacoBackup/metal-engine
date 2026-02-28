@@ -14,8 +14,8 @@ namespace Metal {
     class RayTracingService final : public AbstractRuntimeComponent {
         struct BLASEntry {
             VkAccelerationStructureKHR accelerationStructure = VK_NULL_HANDLE;
-            std::shared_ptr<BufferInstance> buffer = nullptr;
-            std::shared_ptr<BufferInstance> scratchBuffer = nullptr;
+            BufferInstance *buffer = nullptr;
+            BufferInstance *scratchBuffer = nullptr;
         };
 
         // One BLAS per unique mesh ID
@@ -23,11 +23,11 @@ namespace Metal {
 
         // TLAS
         VkAccelerationStructureKHR tlas = VK_NULL_HANDLE;
-        std::shared_ptr<BufferInstance> tlasBuffer = nullptr;
-        std::shared_ptr<BufferInstance> instancesBuffer = nullptr;
+        BufferInstance *tlasBuffer = nullptr;
+        BufferInstance *instancesBuffer = nullptr;
 
         // Scratch buffer for TLAS
-        std::shared_ptr<BufferInstance> tlasScratchBuffer = nullptr;
+        BufferInstance *tlasScratchBuffer = nullptr;
 
         bool accelerationStructureBuilt = false;
         bool needsRebuild = true;

@@ -17,10 +17,8 @@ namespace Metal {
         data->freezeVersion();
         DUMP_TEMPLATE(CTX.getAssetDirectory() + FORMAT_FILE_MATERIAL(prevSelection), *data)
         CTX.notificationService.pushMessage("Material was saved", NotificationSeverities::SUCCESS);
-        if (CTX.materialService.getResources().contains(prevSelection)) {
-            CTX.materialService.getResources().at(prevSelection)->dispose();
-            CTX.materialService.getResources().erase(prevSelection);
-        }
+
+        CTX.materialService.dispose(prevSelection);
     }
 
     void MaterialEditPanel::onSync() {

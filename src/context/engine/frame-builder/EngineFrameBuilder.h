@@ -21,6 +21,8 @@ namespace Metal {
     public:
         EngineFrameBuilder &addFramebuffer(std::string id, unsigned w, unsigned h, glm::vec4 clearColor);
 
+        EngineFrameBuilder &addFramebuffer(const std::string &id);
+
         EngineFrameBuilder &addColor(std::string id, VkFormat format, VkImageUsageFlagBits usage,
                                      FrameBufferInstance *framebuffer);
 
@@ -30,7 +32,12 @@ namespace Metal {
 
         EngineFrameBuilder &addTexture(const std::string &id);
 
-        bool tryMatch(const std::string &id, ResourceBuilderType type);
+        EngineFrameBuilder &addBuffer(const std::string &id, VkDeviceSize size, VkBufferUsageFlags usage,
+                                      VkMemoryPropertyFlags properties);
+
+        EngineFrameBuilder &addBuffer(const std::string &id);
+
+        bool tryMatch(const std::string &id, ResourceType type);
 
         std::unique_ptr<EngineFrame> build();
     };

@@ -87,6 +87,9 @@ namespace Metal {
         headerPanel = new EditorHeaderPanel();
         headerPanel->onInitialize();
         notificationsPanel = new NotificationsPanel();
+        notificationsPanel->onInitialize();
+
         fileImportModalPanel = new FileImportModalPanel();
+        fileImportModalPanel->onInitialize();
     }
 }

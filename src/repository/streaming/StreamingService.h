@@ -3,7 +3,11 @@
 #include <unordered_map>
 #include <string>
 #include <chrono>
+
+#include "../../service/abstract/AbstractResourceService.h"
 #include "../abstract/AbstractCoreRepository.h"
+#include "../../service/abstract/IStreamable.h"
+#include "../abstract/RuntimeResource.h"
 
 
 namespace Metal {
@@ -14,7 +18,6 @@ using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
 
 namespace Metal {
-    struct LevelOfDetail;
     struct MeshInstance;
     struct TextureInstance;
     struct MaterialInstance;
@@ -25,17 +28,13 @@ namespace Metal {
         TimePoint sinceLastCleanup;
 
     public:
-        explicit StreamingService()
-            : AbstractRuntimeComponent() {
-        }
-
-        MeshInstance *streamMesh(const std::string &id, const LevelOfDetail &lod);
+        MeshInstance *streamMesh(const std::string &id);
 
         MaterialInstance *streamMaterial(const std::string &id);
 
         SVOInstance *streamSVO(const std::string &id);
 
-        TextureInstance *streamTexture(const std::string &id, const LevelOfDetail &lod);
+        TextureInstance *streamTexture(const std::string &id);
 
         void onSync() override;
     };

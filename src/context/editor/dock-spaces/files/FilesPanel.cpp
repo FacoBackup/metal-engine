@@ -24,7 +24,7 @@ namespace Metal {
     }
 
     std::function<void()> FilesPanel::onAction() {
-        return [this]() {
+        return [this] {
             auto files = FileDialogUtil::PickFiles({
                 {
                     "Files",
@@ -42,6 +42,7 @@ namespace Metal {
                     }
                 }
                 CTX.fileInspection.selectedFileForSettings = CTX.fileInspection.pendingImports[0];
+                CTX.fileInspection.targetImportDirectory = filesContext.currentDirectory;
             }
         };
     }

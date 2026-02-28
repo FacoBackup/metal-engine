@@ -3,8 +3,8 @@
 #include "../../../../service/texture/TextureInstance.h"
 
 namespace Metal {
-    ResourceBuilderType TextureBuilder::getType() {
-        return ResourceBuilderType::TEXTURE;
+    ResourceType TextureBuilder::getType() {
+        return ResourceType::TEXTURE;
     }
 
     RuntimeResource *TextureBuilder::build() {

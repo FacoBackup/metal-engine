@@ -6,7 +6,6 @@
 #include "../mesh/MeshInstance.h"
 #include "../mesh/VertexData.h"
 #include "../../util/VulkanUtils.h"
-#include "../../enum/LevelOfDetail.h"
 #include <cstddef>
 
 namespace Metal {
@@ -29,7 +28,7 @@ namespace Metal {
             if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
             auto &meshComp = view.get<MeshComponent>(entity);
             if (meshComp.meshId.empty()) continue;
-            auto *instance = CTX.streamingRepository.streamMesh(meshComp.meshId, LevelOfDetail::LOD_0);
+            auto *instance = CTX.streamingRepository.streamMesh(meshComp.meshId);
             if (instance != nullptr && instance->dataBuffer != nullptr && instance->indexBuffer != nullptr) {
                 hasMeshes = true;
                 break;
@@ -75,7 +74,7 @@ namespace Metal {
             auto &meshComp = view.get<MeshComponent>(entity);
             if (meshComp.meshId.empty()) continue;
             if (uniqueMeshes.contains(meshComp.meshId)) continue;
-            auto *instance = CTX.streamingRepository.streamMesh(meshComp.meshId, LevelOfDetail::LOD_0);
+            auto *instance = CTX.streamingRepository.streamMesh(meshComp.meshId);
             if (instance == nullptr || instance->dataBuffer == nullptr || instance->indexBuffer == nullptr) {
                 continue;
             }
@@ -122,6 +121,7 @@ namespace Metal {
 
             BLASEntry entry;
             entry.buffer = CTX.bufferService.createBuffer(
+                "blas_" + meshId,
                 sizeInfo.accelerationStructureSize,
                 VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -137,6 +137,7 @@ namespace Metal {
                                                         &entry.accelerationStructure));
 
             entry.scratchBuffer = CTX.bufferService.createBuffer(
+                "blas_scratch_" + meshId,
                 sizeInfo.buildScratchSize,
                 VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -209,6 +210,7 @@ namespace Metal {
         if (instances.empty()) return;
 
         instancesBuffer = CTX.bufferService.createBuffer(
+            "tlas_instances",
             sizeof(VkAccelerationStructureInstanceKHR) * instances.size(),
             VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
             instances.data(),
@@ -244,6 +246,7 @@ namespace Metal {
             &sizeInfo);
 
         tlasBuffer = CTX.bufferService.createBuffer(
+            "tlas_buffer",
             sizeInfo.accelerationStructureSize,
             VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -258,6 +261,7 @@ namespace Metal {
             vulkan.vkCreateAccelerationStructureKHR(vulkan.device.device, &createInfo, nullptr, &tlas));
 
         tlasScratchBuffer = CTX.bufferService.createBuffer(
+            "tlas_scratch",
             sizeInfo.buildScratchSize,
             VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -276,6 +280,7 @@ namespace Metal {
     }
 
     void RayTracingService::destroyAccelerationStructures() {
+        LOG_INFO("Destroying acceleration structures");
         auto &vulkan = CTX.vulkanContext;
 
         if (tlas != VK_NULL_HANDLE) {
@@ -287,9 +292,15 @@ namespace Metal {
             if (entry.accelerationStructure != VK_NULL_HANDLE) {
                 vulkan.vkDestroyAccelerationStructureKHR(vulkan.device.device, entry.accelerationStructure, nullptr);
             }
+            CTX.bufferService.dispose("blas_" + meshId);
+            CTX.bufferService.dispose("blas_scratch_" + meshId);
         }
         blasEntries.clear();
 
+        CTX.bufferService.dispose("tlas_buffer");
+        CTX.bufferService.dispose("tlas_instances");
+        CTX.bufferService.dispose("tlas_scratch");
+        
         tlasBuffer = nullptr;
         instancesBuffer = nullptr;
         tlasScratchBuffer = nullptr;
