@@ -16,6 +16,8 @@ namespace Metal {
             VkAccelerationStructureKHR accelerationStructure = VK_NULL_HANDLE;
             BufferInstance *buffer = nullptr;
             BufferInstance *scratchBuffer = nullptr;
+            BufferInstance *vertexData = nullptr;
+            BufferInstance *indexData = nullptr;
         };
 
         // One BLAS per unique mesh ID
