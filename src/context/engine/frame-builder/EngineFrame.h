@@ -12,55 +12,42 @@ namespace Metal {
     class CommandBufferRecorder;
     class AbstractPass;
     class EngineFrame {
+        std::string id;
+        bool shouldRender = false;
         std::unordered_map<std::string, RuntimeResource *> resources;
         std::vector<std::pair<CommandBufferRecorder *, std::vector<AbstractPass *> > > passes;
 
     public:
-        void addResource(RuntimeResource *resource) {
-            if (resource) {
-                resources[resource->getId()] = resource;
+        explicit EngineFrame(std::string id);
+
+        [[nodiscard]] const std::string &getId() const { return id; }
+
+        void setShouldRender(const bool val) { shouldRender = val; }
+
+        [[nodiscard]] bool getShouldRender() const { return shouldRender; }
+
+        void addResource(RuntimeResource *resource);
+
+        template<typename T>
+        T *getResourceAs(const std::string &resourceId) {
+            auto it = resources.find(id + "_" +resourceId);
+            if (it != resources.end()) {
+                return dynamic_cast<T *>(it->second);
             }
+            return nullptr;
         }
 
-        void addPass(CommandBufferRecorder *recorder, const std::vector<AbstractPass *> &p) {
-            if (recorder) {
-                passes.push_back({recorder, p});
-            }
-        }
+        void addPass(CommandBufferRecorder *recorder, const std::vector<AbstractPass *> &p);
 
         [[nodiscard]] const std::vector<std::pair<CommandBufferRecorder *, std::vector<AbstractPass *> > > &getPasses() const {
             return passes;
         }
 
-        void onSync() {
-            for (auto &pair: passes) {
-                pair.first->recordCommands(pair.second);
-            }
-        }
+        void onSync();
 
-        void dispose() {
-            for (auto &pair: passes) {
-                delete pair.first;
-                for (auto *pass: pair.second) {
-                    delete pass;
-                }
-            }
-            passes.clear();
-        }
+        void dispose();
 
-        RuntimeResource *getResource(const std::string &id) {
-            if (resources.contains(id)) {
-                return resources[id];
-            }
-            return nullptr;
-        }
-
-        void destroy() {
-            // for (auto &pair: resources) {
-            //     pair.second->dispose();
-            // }
-            // resources.clear();
-        }
+        void destroy() {}
     };
 }
 

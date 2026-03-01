@@ -80,41 +80,6 @@ namespace Metal {
         cameraPanel->onSync();
     }
 
-    void ViewportPanel::handleViewportPicking(const ImVec2 &imageMin, const ImVec2 &imageMax) const {
-        if (!ImGui::IsItemHovered() || !ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-            return;
-        }
-        if (ImGuizmo::IsUsing() || ImGuizmo::IsOver()) {
-            return;
-        }
-
-        const ImVec2 mousePos = ImGui::GetMousePos();
-        const float imageW = imageMax.x - imageMin.x;
-        const float imageH = imageMax.y - imageMin.y;
-        if (imageW <= 1.0f || imageH <= 1.0f) {
-            return;
-        }
-
-        const float u = (mousePos.x - imageMin.x) / imageW;
-        const float v = (mousePos.y - imageMin.y) / imageH;
-        if (u < 0.0f || u > 1.0f || v < 0.0f || v > 1.0f) {
-            return;
-        }
-
-        auto *gBuffer = CTX.framebufferService.getResource("gBufferFBO");
-        if (!gBuffer) {
-            return;
-        }
-        const auto width = gBuffer->bufferWidth;
-        const auto height = gBuffer->bufferHeight;
-        const uint32_t pixelX = std::min(static_cast<uint32_t>(u * static_cast<float>(width)), width - 1);
-        const uint32_t pixelY = std::min(static_cast<uint32_t>(v * static_cast<float>(height)), height - 1);
-
-        const auto picked = CTX.pickingService.pickEntityFromGBuffer(pixelX, pixelY);
-        CTX.selectionService.clearSelection();
-        CTX.selectionService.addSelected(picked.value_or(EMPTY_ENTITY));
-    }
-
     void ViewportPanel::updateCamera() {
         auto &worldRepository = CTX.worldRepository;
         const auto &cameraService = CTX.cameraService;

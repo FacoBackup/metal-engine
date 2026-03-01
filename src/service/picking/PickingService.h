@@ -6,10 +6,11 @@
 #include <optional>
 
 namespace Metal {
+    struct FrameBufferInstance;
     class PickingService final : public AbstractRuntimeComponent {
     public:
 
-        [[nodiscard]] std::optional<EntityID> pickEntityFromGBuffer(uint32_t pixelX, uint32_t pixelY) const;
+        [[nodiscard]] std::optional<EntityID> pickEntityFromGBuffer(const FrameBufferInstance *gBuffer, uint32_t pixelX, uint32_t pixelY) const;
     };
 } // Metal
 

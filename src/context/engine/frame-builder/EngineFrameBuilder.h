@@ -19,11 +19,13 @@ namespace Metal {
     class EngineFrame;
 
     class EngineFrameBuilder final {
+        std::string frameId;
         std::vector<std::shared_ptr<ResourceBuilder> > builders{};
         std::shared_ptr<ResourceBuilder> currentBuilder{};
         std::vector<PassType> passTypes{};
 
     public:
+        explicit EngineFrameBuilder(std::string frameId = Util::uuidV4());
         EngineFrameBuilder &addFramebuffer(std::string id, unsigned w, unsigned h, glm::vec4 clearColor);
 
         EngineFrameBuilder &addFramebuffer(const std::string &id);

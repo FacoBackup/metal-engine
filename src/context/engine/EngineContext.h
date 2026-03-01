@@ -73,8 +73,17 @@ namespace Metal {
         TimePoint previousTime = Clock::now();
         float deltaTime = 0;
 
+        std::vector<EngineFrame *> registeredFrames;
         EngineFrame *currentFrame = nullptr;
         void updateGlobalData();
+
+        void registerFrame(EngineFrame *frame) {
+            registeredFrames.push_back(frame);
+        }
+
+        void unregisterFrame(EngineFrame *frame) {
+            std::erase(registeredFrames, frame);
+        }
 
         void onSync() override;
 

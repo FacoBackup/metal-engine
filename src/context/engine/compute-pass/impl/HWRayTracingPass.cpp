@@ -5,27 +5,24 @@
 #include "../../../../service/pipeline/PipelineInstance.h"
 #include "../../../../service/texture/TextureInstance.h"
 #include "../../../../service/raytracing/RayTracingService.h"
+#include "../../../../enum/EngineResourceIDs.h"
 
 namespace Metal {
     void HWRayTracingPass::onInitialize() {
-        auto *gBuffer = CTX.framebufferService.getResource("gBufferFBO");
         PipelineBuilder builder = PipelineBuilder::OfRayTracing(
                     "rt/HWRayTracing.rgen",
                     "rt/HWRayTracing.rmiss",
                     "rt/HWRayTracing.rchit")
-                .addResourceBinding("globalData")
+                .addResourceBinding(getScopedResourceId(RID_GLOBAL_DATA))
                 .addResourceBinding(CTX.rayTracingService.getTLAS())
-                .addResourceBinding(CTX.vulkanContext.vkImageSampler,
-                                    gBuffer->attachments[0]->vkImageView)
-                .addResourceBinding(CTX.vulkanContext.vkImageSampler,
-                                    gBuffer->attachments[1]->vkImageView)
-                .addResourceBinding(CTX.vulkanContext.vkImageSampler,
-                                    gBuffer->attachments[2]->vkImageView)
-                .addResourceBinding(CTX.textureService.getResource("rawRenderedFrame")->vkImageView)
-                .addResourceBinding(CTX.textureService.getResource("surfaceCache")->vkImageView)
-                .addResourceBinding("lightBuffer")
-                .addResourceBinding("volumesBuffer")
-                .addResourceBinding("materialBuffer")
+                .addResourceBinding(getScopedResourceId(RID_G_BUFFER_FBO), 0)
+                .addResourceBinding(getScopedResourceId(RID_G_BUFFER_FBO), 1)
+                .addResourceBinding(getScopedResourceId(RID_G_BUFFER_FBO), 2)
+                .addResourceBinding(frame->getResourceAs<TextureInstance>(RID_RAW_RENDERED_FRAME)->vkImageView)
+                .addResourceBinding(frame->getResourceAs<TextureInstance>(RID_SURFACE_CACHE)->vkImageView)
+                .addResourceBinding(getScopedResourceId(RID_LIGHT_BUFFER))
+                .addResourceBinding(getScopedResourceId(RID_VOLUMES_BUFFER))
+                .addResourceBinding(getScopedResourceId(RID_MATERIAL_BUFFER))
                 .addResourceBinding(CTX.vulkanContext.vkImageSampler, VK_NULL_HANDLE,
                                     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1000);
         pipelineInstance = CTX.pipelineService.createPipeline(builder);
@@ -40,9 +37,9 @@ namespace Metal {
     }
 
     void HWRayTracingPass::onSync() {
-        auto *surfaceCache = CTX.textureService.getResource("surfaceCache");
-        auto *rawRenderedFrame = CTX.textureService.getResource("rawRenderedFrame");
-        auto *accumulatedFrame = CTX.textureService.getResource("accumulatedFrame");
+        auto *surfaceCache = frame->getResourceAs<TextureInstance>(RID_SURFACE_CACHE);
+        auto *rawRenderedFrame = frame->getResourceAs<TextureInstance>(RID_RAW_RENDERED_FRAME);
+        auto *accumulatedFrame = frame->getResourceAs<TextureInstance>(RID_ACCUMULATED_FRAME);
 
         bool surfaceCacheReset = CTX.engineContext.isGISettingsUpdated() || CTX.engineContext.
                                  isUpdateLights();
@@ -58,7 +55,7 @@ namespace Metal {
         }
 
         startWriting(rawRenderedFrame->vkImage);
-        auto *gBuffer = CTX.framebufferService.getResource("gBufferFBO");
+        auto *gBuffer = frame->getResourceAs<FrameBufferInstance>(RID_G_BUFFER_FBO);
 
         // Trace rays
         CTX.vulkanContext.vkCmdTraceRaysKHR(

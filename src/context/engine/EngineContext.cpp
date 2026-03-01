@@ -1,5 +1,6 @@
 #include "EngineContext.h"
 
+#include "../../enum/EngineResourceIDs.h"
 #include "../../context/ApplicationContext.h"
 #include "../../service/buffer/BufferInstance.h"
 #include "../../service/descriptor/DescriptorBinding.h"
@@ -38,7 +39,7 @@ namespace Metal {
             }
 
             if (i > 0) {
-                CTX.bufferService.getResource("tileInfo")->update(tileInfoUBO.tileCenterValid.data());
+                currentFrame->getResourceAs<BufferInstance>(RID_TILE_INFO)->update(tileInfoUBO.tileCenterValid.data());
             }
             CTX.worldGridRepository.hasMainTileChanged = false;
         }
@@ -72,19 +73,24 @@ namespace Metal {
         CTX.streamingRepository.onSync();
         CTX.cameraService.onSync();
 
+        for (auto *frame: registeredFrames) {
+            if (frame->getShouldRender()) {
+                currentFrame = frame;
 
-        updateTileData();
-        if (updateLights) {
-            CTX.lightService.onSync();
-        }
+                updateTileData();
+                if (updateLights) {
+                    CTX.lightService.onSync();
+                }
 
-        if (updateVolumes) {
-            CTX.volumeService.onSync();
-        }
+                if (updateVolumes) {
+                    CTX.volumeService.onSync();
+                }
 
-        if (currentFrame != nullptr) {
-            updateGlobalData();
-            currentFrame->onSync();
+                updateGlobalData();
+                currentFrame->onSync();
+
+                frame->setShouldRender(false);
+            }
         }
 
         CTX.rayTracingService.onSync();
@@ -96,7 +102,7 @@ namespace Metal {
 
     void EngineContext::updateGlobalData() {
         auto &camera = CTX.worldRepository.camera;
-        auto *fbo = CTX.framebufferService.getResource("postProcessingFBO");
+        auto *fbo = currentFrame->getResourceAs<FrameBufferInstance>(  RID_POST_PROCESSING_FBO);
         globalDataUBO.outputRes.x = fbo->bufferWidth;
         globalDataUBO.outputRes.y = fbo->bufferHeight;
         globalDataUBO.viewMatrix = camera.viewMatrix;
@@ -134,6 +140,6 @@ namespace Metal {
         CTX.lightService.computeSunInfo();
         globalDataUBO.sunPosition = CTX.lightService.getSunPosition();
         globalDataUBO.sunColor = CTX.lightService.getSunColor();
-        CTX.bufferService.getResource("globalData")->update(&globalDataUBO);
+        currentFrame->getResourceAs<BufferInstance>(RID_GLOBAL_DATA)->update(&globalDataUBO);
     }
 }

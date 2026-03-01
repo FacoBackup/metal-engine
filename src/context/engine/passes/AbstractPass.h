@@ -1,10 +1,12 @@
 #ifndef ABSTRACTPASS_H
 #define ABSTRACTPASS_H
 #include <vector>
+#include <string>
 #include <vulkan/vulkan.h>
 #include "../../../common/AbstractRuntimeComponent.h"
 
 namespace Metal {
+    class EngineFrame;
     struct WorldRepository;
     struct MeshInstance;
     class StreamingService;
@@ -14,6 +16,7 @@ namespace Metal {
         bool isComputePass;
 
     public:
+        EngineFrame *frame = nullptr;
         VkCommandBuffer vkCommandBuffer = VK_NULL_HANDLE;
         WorldRepository &worldRepository;
         StreamingService &streamingRepository;
@@ -44,6 +47,8 @@ namespace Metal {
         void bindDescriptorSets(const std::vector<VkDescriptorSet> &descriptors);
 
         VkPipelineBindPoint getBindingPoint() const;
+
+        [[nodiscard]] std::string getScopedResourceId(const std::string &id) const;
     };
 } // Metal
 

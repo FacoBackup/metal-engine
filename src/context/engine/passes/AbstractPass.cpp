@@ -1,4 +1,5 @@
 #include "AbstractPass.h"
+#include "../frame-builder/EngineFrame.h"
 #include "../../../context/ApplicationContext.h"
 #include "../../../service/pipeline/PipelineInstance.h"
 
@@ -75,5 +76,12 @@ namespace Metal {
             return VK_PIPELINE_BIND_POINT_COMPUTE;
         }
         return VK_PIPELINE_BIND_POINT_GRAPHICS;
+    }
+
+    std::string AbstractPass::getScopedResourceId(const std::string &id) const {
+        if (frame != nullptr) {
+            return frame->getId() + "_" + id;
+        }
+        return id;
     }
 }

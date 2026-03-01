@@ -2,19 +2,20 @@
 #include "../../../ApplicationContext.h"
 #include "../../../../service/pipeline/PipelineBuilder.h"
 #include "../../../../service/texture/TextureInstance.h"
+#include "../../../../enum/EngineResourceIDs.h"
 
 namespace Metal {
     void AccumulationPass::onInitialize() {
         PipelineBuilder builder = PipelineBuilder::Of("PathTracerAccumulation.comp")
-                .addResourceBinding("globalData")
-                .addResourceBinding(CTX.textureService.getResource("rawRenderedFrame")->vkImageView)
-                .addResourceBinding(CTX.textureService.getResource("accumulatedFrame")->vkImageView);
+                .addResourceBinding(getScopedResourceId(RID_GLOBAL_DATA))
+                .addResourceBinding(frame->getResourceAs<TextureInstance>(RID_RAW_RENDERED_FRAME)->vkImageView)
+                .addResourceBinding(frame->getResourceAs<TextureInstance>(RID_ACCUMULATED_FRAME)->vkImageView);
         pipelineInstance = CTX.pipelineService.createPipeline(builder);
     }
 
     void AccumulationPass::onSync() {
-        auto *accumulatedFrame = CTX.textureService.getResource("accumulatedFrame");
-        auto *rawRenderedFrame = CTX.textureService.getResource("rawRenderedFrame");
+        auto *accumulatedFrame = frame->getResourceAs<TextureInstance>(RID_ACCUMULATED_FRAME);
+        auto *rawRenderedFrame = frame->getResourceAs<TextureInstance>(RID_RAW_RENDERED_FRAME);
         syncWriting(accumulatedFrame->vkImage);
         recordImageDispatch(accumulatedFrame, 8, 8);
         endWriting(rawRenderedFrame->vkImage);

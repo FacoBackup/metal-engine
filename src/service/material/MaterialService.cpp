@@ -13,10 +13,8 @@
 
 #include "MaterialInstance.h"
 #include "../../context/ApplicationContext.h"
-#include "../../repository/world/components/MeshComponent.h"
-#include "../texture/TextureInstance.h"
-#include "../../service/descriptor/DescriptorInstance.h"
-#include "../../service/framebuffer/FrameBufferInstance.h"
+#include "../../enum/EngineResourceIDs.h"
+
 
 namespace Metal {
     MaterialInstance *MaterialService::create(const std::string &id) {
@@ -80,7 +78,7 @@ namespace Metal {
 
         materials[instance->materialIndex] = materialData;
 
-        auto *materialBuffer = CTX.bufferService.getResource("materialBuffer");
+        auto *materialBuffer = CTX.engineContext.currentFrame->getResourceAs<BufferInstance>(RID_MATERIAL_BUFFER);
         materialBuffer->update(materials.data());
 
         delete data;

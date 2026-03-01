@@ -282,6 +282,8 @@ add_executable(
         src/context/editor/panel/FileImportModalPanel.h
         src/context/engine/frame-builder/EngineFrameBuilder.cpp
         src/context/engine/frame-builder/EngineFrameBuilder.h
+        src/context/engine/frame-builder/EngineFrame.cpp
+        src/context/engine/frame-builder/EngineFrame.h
         src/context/engine/frame-builder/structures/FramebufferBuilder.cpp
         src/context/engine/frame-builder/structures/FramebufferBuilder.h
         src/context/engine/frame-builder/structures/TextureBuilder.cpp

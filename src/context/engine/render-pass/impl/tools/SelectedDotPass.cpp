@@ -4,11 +4,12 @@
 #include "../../../../../repository/world/components/TransformComponent.h"
 #include "../../../../../dto/push-constant/SelectedDotPushConstant.h"
 #include "../../../../../service/pipeline/PipelineBuilder.h"
+#include "../../../../../enum/EngineResourceIDs.h"
 
 namespace Metal {
     void SelectedDotPass::onInitialize() {
         PipelineBuilder builder = PipelineBuilder::Of(
-                    "postProcessingFBO",
+                   getScopedResourceId(RID_POST_PROCESSING_FBO),
                     "tools/SelectedDot.vert",
                     "tools/SelectedDot.frag"
                 )
@@ -16,8 +17,8 @@ namespace Metal {
                 .setPrepareForMesh()
                 .setCullMode(VK_CULL_MODE_BACK_BIT)
                 .setPushConstantsSize(sizeof(SelectedDotPushConstant))
-                .addResourceBinding("globalData")
-                .addResourceBinding("gBufferFBO", 2);
+                .addResourceBinding(getScopedResourceId(RID_GLOBAL_DATA))
+                .addResourceBinding(getScopedResourceId(RID_G_BUFFER_FBO), 2);
         pipelineInstance = CTX.pipelineService.createPipeline(builder);
     }
 

@@ -8,6 +8,7 @@
 #include "../../../../service/framebuffer/FrameBufferInstance.h"
 #include "../../../../service/picking/PickingService.h"
 #include "../../../../enum/engine-definitions.h"
+#include "../../../../enum/EngineResourceIDs.h"
 #include "../../../../dto/buffers/GlobalDataUBO.h"
 #include "../../../../dto/buffers/TileInfoUBO.h"
 #include "../../../../dto/buffers/LightData.h"
@@ -23,20 +24,20 @@ namespace Metal {
         const auto gBufferH = CTX.vulkanContext.getWindowHeight() / CTX.engineRepository.shadingResInvScale;
 
         engineFrame = EngineFrameBuilder()
-                .addBuffer("globalData", sizeof(GlobalDataUBO),
+                .addBuffer(RID_GLOBAL_DATA, sizeof(GlobalDataUBO),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, UNIFORM_BUFFER)
-                .addBuffer("tileInfo", sizeof(TileInfoUBO),
+                .addBuffer(RID_TILE_INFO, sizeof(TileInfoUBO),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, UNIFORM_BUFFER)
-                .addBuffer("lightBuffer", MAX_LIGHTS * sizeof(LightData),
+                .addBuffer(RID_LIGHT_BUFFER, MAX_LIGHTS * sizeof(LightData),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
-                .addBuffer("volumesBuffer", MAX_VOLUMES * sizeof(VolumeData),
+                .addBuffer(RID_VOLUMES_BUFFER, MAX_VOLUMES * sizeof(VolumeData),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
-                .addBuffer("materialBuffer", MAX_MATERIALS * sizeof(MaterialData),
+                .addBuffer(RID_MATERIAL_BUFFER, MAX_MATERIALS * sizeof(MaterialData),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
-                .addTexture("surfaceCache", SURFACE_CACHE_RES, SURFACE_CACHE_RES)
-                .addTexture("rawRenderedFrame", gBufferW, gBufferH)
-                .addTexture("accumulatedFrame", gBufferW, gBufferH)
-                .addFramebuffer("gBufferFBO", gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
+                .addTexture(RID_SURFACE_CACHE, SURFACE_CACHE_RES, SURFACE_CACHE_RES)
+                .addTexture(RID_RAW_RENDERED_FRAME, gBufferW, gBufferH)
+                .addTexture(RID_ACCUMULATED_FRAME, gBufferW, gBufferH)
+                .addFramebuffer(RID_G_BUFFER_FBO, gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
                 .addColor("Albedo; Emission flag | AO", VK_FORMAT_R16G16B16A16_SFLOAT,
                           VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, nullptr)
                 .addColor("Normal; Roughness | Metallic", VK_FORMAT_R32G32B32A32_SFLOAT,
@@ -44,7 +45,7 @@ namespace Metal {
                 .addColor("Position; ID", VK_FORMAT_R32G32B32A32_SFLOAT,
                           VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, nullptr)
                 .addDepth()
-                .addFramebuffer("postProcessingFBO", CTX.vulkanContext.getWindowWidth(),
+                .addFramebuffer(RID_POST_PROCESSING_FBO, CTX.vulkanContext.getWindowWidth(),
                                 CTX.vulkanContext.getWindowHeight(), glm::vec4(0, 0, 0, 0))
                 .addColor("Color", VK_FORMAT_R16G16B16A16_SFLOAT,
                           VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, nullptr)
@@ -52,10 +53,12 @@ namespace Metal {
                 .addPass(COMPUTE)
                 .addPass(POST_PROCESSING)
                 .build();
+
+        CTX.engineContext.registerFrame(engineFrame.get());
     }
 
     void EngineFramePanel::onSync() {
-        CTX.engineContext.currentFrame = engineFrame.get();
+        engineFrame->setShouldRender(true);
 
         const float tabHeight = ImGui::GetFrameHeightWithSpacing();
         // Assuming this panel is inside ViewportPanel, we need to get its size.
@@ -63,7 +66,7 @@ namespace Metal {
         // Actually, ViewportPanel sets its size in updateInputs.
         const ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 
-        auto *framebuffer = CTX.framebufferService.getResource("postProcessingFBO");
+        auto *framebuffer = engineFrame->getResourceAs<FrameBufferInstance>(RID_POST_PROCESSING_FBO);
         if (framebuffer) {
             CTX.descriptorSetService.setImageDescriptor(framebuffer, 0);
             ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet),
@@ -96,7 +99,7 @@ namespace Metal {
             return;
         }
 
-        auto *gBuffer = CTX.framebufferService.getResource("gBufferFBO");
+        auto *gBuffer = engineFrame->getResourceAs<FrameBufferInstance>(RID_G_BUFFER_FBO);
         if (!gBuffer) {
             return;
         }
@@ -105,7 +108,7 @@ namespace Metal {
         const uint32_t pixelX = std::min(static_cast<uint32_t>(u * static_cast<float>(width)), width - 1);
         const uint32_t pixelY = std::min(static_cast<uint32_t>(v * static_cast<float>(height)), height - 1);
 
-        const auto picked = CTX.pickingService.pickEntityFromGBuffer(pixelX, pixelY);
+        const auto picked = CTX.pickingService.pickEntityFromGBuffer(gBuffer, pixelX, pixelY);
         CTX.selectionService.clearSelection();
         CTX.selectionService.addSelected(picked.value_or(EMPTY_ENTITY));
     }

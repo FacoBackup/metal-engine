@@ -8,16 +8,17 @@
 #include "../../../../service/material/MaterialService.h"
 #include "../../../../service/material/MaterialInstance.h"
 #include "../../../../service/pipeline/PipelineBuilder.h"
+#include "../../../../enum/EngineResourceIDs.h"
 
 namespace Metal {
     void GBufferGenPass::onInitialize() {
         PipelineBuilder gBufferPipelineBuilder = PipelineBuilder::Of(
-                    "gBufferFBO",
+                    getScopedResourceId(RID_G_BUFFER_FBO),
                     "GBufferGen.vert",
                     "GBufferGen.frag"
                 )
-                .addResourceBinding("globalData")
-                .addResourceBinding("materialBuffer")
+                .addResourceBinding(getScopedResourceId(RID_GLOBAL_DATA))
+                .addResourceBinding(getScopedResourceId(RID_MATERIAL_BUFFER))
                 .addResourceBinding(CTX.vulkanContext.vkImageSampler, VK_NULL_HANDLE, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1000)
                 .setPrepareForMesh()
                 .setDepthTest()

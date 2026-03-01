@@ -3,6 +3,7 @@
 #include "../../context/ApplicationContext.h"
 #include "../../repository/world/components/SphereLightComponent.h"
 #include "../buffer/BufferInstance.h"
+#include "../../enum/EngineResourceIDs.h"
 
 namespace Metal {
     void LightService::registerLights() {
@@ -53,7 +54,7 @@ namespace Metal {
         registerLights();
 
         if (!items.empty()) {
-            CTX.bufferService.getResource("lightBuffer")->update(items.data());
+            CTX.engineContext.currentFrame->getResourceAs<BufferInstance>(RID_LIGHT_BUFFER)->update(items.data());
         }
     }
 
