@@ -18,7 +18,7 @@ namespace Metal {
                 .setCullMode(VK_CULL_MODE_BACK_BIT)
                 .setPushConstantsSize(sizeof(SelectedDotPushConstant))
                 .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
-                .addStorageImageBinding(getScopedResourceId(RID_RENDER_INDEX_STENCIL));
+                .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_POSITION_INDEX));
         pipelineInstance = CTX.pipelineService.createPipeline(builder);
     }
 

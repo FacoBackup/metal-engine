@@ -8,7 +8,7 @@ namespace Metal {
     std::optional<EntityID> PickingService::pickEntityFromGBuffer(TextureInstance *attachment, const uint32_t pixelX,
                                                                   const uint32_t pixelY) const {
 
-        constexpr VkDeviceSize imageSize = sizeof(float);
+        constexpr VkDeviceSize imageSize = 4 * sizeof(float);
         auto stagingBuffer = CTX.bufferService.createBuffer("stagingBuffer", imageSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                                                             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                             VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
@@ -56,7 +56,7 @@ namespace Metal {
         void *data = nullptr;
         vkMapMemory(CTX.vulkanContext.device.device, stagingBuffer->vkDeviceMemory, 0, imageSize, 0, &data);
         const auto *pixel = static_cast<const float *>(data);
-        const float idValue = pixel[0];
+        const float idValue = pixel[3]; // Render index is in the A channel (index 3)
         vkUnmapMemory(CTX.vulkanContext.device.device, stagingBuffer->vkDeviceMemory);
         CTX.bufferService.dispose("stagingBuffer");
 

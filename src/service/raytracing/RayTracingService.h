@@ -33,12 +33,14 @@ namespace Metal {
         // Scratch buffer for TLAS
         BufferInstance *tlasScratchBuffer = nullptr;
 
-        std::vector<MeshMetadata> meshMetadata{MAX_MESH_INSTANCES};
+        std::vector<MeshMetadata> meshMetadata{};
 
         bool accelerationStructureBuilt = false;
         bool needsRebuild = true;
 
         void buildBLAS();
+
+        void destroyTLAS();
 
         void buildTLAS();
 

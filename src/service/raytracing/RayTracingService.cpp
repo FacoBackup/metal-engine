@@ -181,25 +181,9 @@ namespace Metal {
 
     void RayTracingService::buildTLAS() {
         auto &vulkan = CTX.vulkanContext;
-
         if (blasEntries.empty()) return;
 
-        if (vulkan.device.device != VK_NULL_HANDLE) {
-            vkDeviceWaitIdle(vulkan.device.device);
-        }
-
-        if (tlas != VK_NULL_HANDLE) {
-            vulkan.vkDestroyAccelerationStructureKHR(vulkan.device.device, tlas, nullptr);
-            tlas = VK_NULL_HANDLE;
-        }
-
-        if (tlasBuffer) CTX.bufferService.dispose("tlas_buffer");
-        if (instancesBuffer) CTX.bufferService.dispose("tlas_instances");
-        if (tlasScratchBuffer) CTX.bufferService.dispose("tlas_scratch");
-
-        tlasBuffer = nullptr;
-        instancesBuffer = nullptr;
-        tlasScratchBuffer = nullptr;
+        destroyTLAS();
 
         std::vector<VkAccelerationStructureInstanceKHR> instances;
         auto view = CTX.worldRepository.registry.view<MeshComponent, TransformComponent>();
@@ -239,8 +223,7 @@ namespace Metal {
             uint32_t materialIndex = CTX.materialService.getMaterialIndex(meshComp.materialId);
             
             meshComp.renderIndex = currentInstanceIndex;
-            meshMetadata[currentInstanceIndex].renderIndex = meshComp.renderIndex;
-            meshMetadata[currentInstanceIndex].materialIndex = materialIndex;
+            meshMetadata.emplace_back(meshComp.renderIndex, materialIndex, 0, 0);
 
             VkAccelerationStructureInstanceKHR instance{};
             instance.transform = transform;
@@ -333,19 +316,33 @@ namespace Metal {
         vulkan.endSingleTimeCommands(cmd);
     }
 
-    void RayTracingService::destroyAccelerationStructures() {
-        LOG_INFO("Destroying acceleration structures");
+    void RayTracingService::destroyTLAS() {
         auto &vulkan = CTX.vulkanContext;
 
         if (vulkan.device.device != VK_NULL_HANDLE) {
             vkDeviceWaitIdle(vulkan.device.device);
         }
-
         if (tlas != VK_NULL_HANDLE) {
             vulkan.vkDestroyAccelerationStructureKHR(vulkan.device.device, tlas, nullptr);
             tlas = VK_NULL_HANDLE;
         }
 
+        if (tlasBuffer) CTX.bufferService.dispose("tlas_buffer");
+        if (instancesBuffer) CTX.bufferService.dispose("tlas_instances");
+        if (tlasScratchBuffer) CTX.bufferService.dispose("tlas_scratch");
+
+        tlasBuffer = nullptr;
+        instancesBuffer = nullptr;
+        tlasScratchBuffer = nullptr;
+        meshMetadata.clear();
+    }
+
+    void RayTracingService::destroyAccelerationStructures() {
+        LOG_INFO("Destroying acceleration structures");
+
+        destroyTLAS();
+
+        auto &vulkan = CTX.vulkanContext;
         for (auto &[meshId, entry]: blasEntries) {
             if (entry.accelerationStructure != VK_NULL_HANDLE) {
                 vulkan.vkDestroyAccelerationStructureKHR(vulkan.device.device, entry.accelerationStructure, nullptr);
@@ -355,14 +352,6 @@ namespace Metal {
             if (entry.scratchBuffer) CTX.bufferService.dispose("blas_scratch_" + meshId);
         }
         blasEntries.clear();
-
-        if (tlasBuffer) CTX.bufferService.dispose("tlas_buffer");
-        if (instancesBuffer) CTX.bufferService.dispose("tlas_instances");
-        if (tlasScratchBuffer) CTX.bufferService.dispose("tlas_scratch");
-
-        tlasBuffer = nullptr;
-        instancesBuffer = nullptr;
-        tlasScratchBuffer = nullptr;
         accelerationStructureBuilt = false;
     }
 }

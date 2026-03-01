@@ -18,6 +18,8 @@ namespace Metal {
                 .addStorageImageBinding(getScopedResourceId(RID_RAW_RENDERED_FRAME))
                 .addStorageImageBinding(getScopedResourceId(RID_SURFACE_CACHE))
                 .addStorageImageBinding(getScopedResourceId(RID_RENDER_INDEX_STENCIL))
+                .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_POSITION_INDEX))
+                .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_NORMAL))
                 .addBufferBinding(getScopedResourceId(RID_LIGHT_BUFFER))
                 .addBufferBinding(getScopedResourceId(RID_VOLUMES_BUFFER))
                 .addBufferBinding(getScopedResourceId(RID_MATERIAL_BUFFER))
@@ -45,6 +47,13 @@ namespace Metal {
         auto *surfaceCache = frame->getResourceAs<TextureInstance>(RID_SURFACE_CACHE);
         auto *rawRenderedFrame = frame->getResourceAs<TextureInstance>(RID_RAW_RENDERED_FRAME);
         auto *accumulatedFrame = frame->getResourceAs<TextureInstance>(RID_ACCUMULATED_FRAME);
+        auto *renderIndexStencil = frame->getResourceAs<TextureInstance>(RID_RENDER_INDEX_STENCIL);
+        auto *gBufferPositionIndex = frame->getResourceAs<TextureInstance>(RID_GBUFFER_POSITION_INDEX);
+        auto *gBufferNormal = frame->getResourceAs<TextureInstance>(RID_GBUFFER_NORMAL);
+
+        auto *previousColor = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_COLOR);
+        auto *previousPositionIndex = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_POSITION_INDEX);
+        auto *previousNormal = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_NORMAL);
 
         bool surfaceCacheReset = CTX.engineContext.isGISettingsUpdated() || CTX.engineContext.
                                  isUpdateLights();
@@ -55,13 +64,25 @@ namespace Metal {
         if (isFirstRun || CTX.engineContext.isCameraUpdated() || surfaceCacheReset) {
             clearTexture(rawRenderedFrame->vkImage);
             clearTexture(accumulatedFrame->vkImage);
+            clearTexture(renderIndexStencil->vkImage);
+            clearTexture(gBufferPositionIndex->vkImage);
+            clearTexture(gBufferNormal->vkImage);
+            clearTexture(previousColor->vkImage);
+            clearTexture(previousPositionIndex->vkImage);
+            clearTexture(previousNormal->vkImage);
             CTX.engineContext.resetPathTracerAccumulationCount();
             isFirstRun = false;
         }
 
+        // Copy current to previous before writing new values
+        copyTexture(rawRenderedFrame, previousColor);
+        copyTexture(gBufferPositionIndex, previousPositionIndex);
+        copyTexture(gBufferNormal, previousNormal);
+
         startWriting(rawRenderedFrame->vkImage);
-        auto *renderIndexStencil = frame->getResourceAs<TextureInstance>(RID_RENDER_INDEX_STENCIL);
         startWriting(renderIndexStencil->vkImage);
+        startWriting(gBufferPositionIndex->vkImage);
+        startWriting(gBufferNormal->vkImage);
 
         // Trace rays
         CTX.vulkanContext.vkCmdTraceRaysKHR(
@@ -76,5 +97,7 @@ namespace Metal {
 
         endWriting(rawRenderedFrame->vkImage);
         endWriting(renderIndexStencil->vkImage);
+        endWriting(gBufferPositionIndex->vkImage);
+        endWriting(gBufferNormal->vkImage);
     }
 } // Metal

@@ -22,6 +22,8 @@ namespace Metal {
         void recordImageDispatch(const TextureInstance *image, unsigned int threadCountX,
                                  unsigned int threadCountY) const;
 
+        void copyTexture(const TextureInstance *src, const TextureInstance *dst) const;
+
         void endWriting(VkImage &vkImage) const;
 
         void startWriting(VkImage &vkImage) const;

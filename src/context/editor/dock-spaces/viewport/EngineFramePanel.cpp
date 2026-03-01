@@ -41,6 +41,11 @@ namespace Metal {
                 .addTexture(RID_RAW_RENDERED_FRAME, gBufferW, gBufferH)
                 .addTexture(RID_ACCUMULATED_FRAME, gBufferW, gBufferH)
                 .addTexture(RID_RENDER_INDEX_STENCIL, gBufferW, gBufferH, VK_FORMAT_R32_SFLOAT)
+                .addTexture(RID_GBUFFER_POSITION_INDEX, gBufferW, gBufferH, VK_FORMAT_R32G32B32A32_SFLOAT)
+                .addTexture(RID_GBUFFER_NORMAL, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
+                .addTexture(RID_PREVIOUS_COLOR, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
+                .addTexture(RID_PREVIOUS_POSITION_INDEX, gBufferW, gBufferH, VK_FORMAT_R32G32B32A32_SFLOAT)
+                .addTexture(RID_PREVIOUS_NORMAL, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
                 .addFramebuffer(RID_POST_PROCESSING_FBO, CTX.vulkanContext.getWindowWidth(),
                                 CTX.vulkanContext.getWindowHeight(), glm::vec4(0, 0, 0, 0))
                 .addColor("Color", VK_FORMAT_R16G16B16A16_SFLOAT,
@@ -110,12 +115,12 @@ namespace Metal {
         const uint32_t pixelX = std::min(static_cast<uint32_t>(u * static_cast<float>(width)), width - 1);
         const uint32_t pixelY = std::min(static_cast<uint32_t>(v * static_cast<float>(height)), height - 1);
 
-        auto *renderIndexStencil = engineFrame->getResourceAs<TextureInstance>(RID_RENDER_INDEX_STENCIL);
-        if (!renderIndexStencil) {
+        auto *gBufferPositionIndex = engineFrame->getResourceAs<TextureInstance>(RID_GBUFFER_POSITION_INDEX);
+        if (!gBufferPositionIndex) {
             return;
         }
 
-        const auto picked = CTX.pickingService.pickEntityFromGBuffer(renderIndexStencil, pixelX, pixelY);
+        const auto picked = CTX.pickingService.pickEntityFromGBuffer(gBufferPositionIndex, pixelX, pixelY);
         CTX.selectionService.clearSelection();
         CTX.selectionService.addSelected(picked.value_or(EMPTY_ENTITY));
     }

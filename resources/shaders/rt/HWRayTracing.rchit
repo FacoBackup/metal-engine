@@ -2,12 +2,12 @@
 #extension GL_EXT_nonuniform_qualifier: enable
 
 #include "../util/HWRayTracingUtil.glsl"
-#define MATERIAL_SET 7
+#define MATERIAL_SET 9
 #include "../MaterialBuffer.glsl"
-#define MESH_METADATA_SET 8
+#define MESH_METADATA_SET 10
 #include "../MeshMetadata.glsl"
 
-layout (set = 0, binding = 9) uniform sampler2D textureArray[];
+layout (set = 0, binding = 11) uniform sampler2D textureArray[];
 
 layout (location = 0) rayPayloadInEXT RayPayload payload;
 hitAttributeEXT vec2 attribs; // Barycentric coordinates for the hit

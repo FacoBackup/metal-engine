@@ -16,18 +16,16 @@ layout(push_constant) uniform Push {
 
 layout(location = 0) in vec2 texCoords;
 layout(location = 0) out vec4 finalColor;
-layout(set = 0, binding = 1, r32f) uniform readonly image2D renderIndexStencil;
+layout(set = 0, binding = 1, rgba32f) uniform readonly image2D gBufferPositionIndex;
 
 vec3 p = vec3(0);
+
 bool rayMarch(vec3 ro, vec3 rd, float width) {
-    // Avoid division by zero (ray parallel to plane)
     if (abs(rd.y) < 1e-6) return false;
-
-    float t = -ro.y / rd.y;          // distance along ray to y=0 plane
-    if (t < 0.0) return false;       // intersection behind camera
-    if (t > float(THRESHOLD)) return false; // beyond fade distance
-
-    p = ro + t * rd;                  // compute hit point
+    float t = -ro.y / rd.y;
+    if (t < 0.0) return false;
+    if (t > float(THRESHOLD)) return false;
+    p = ro + t * rd;
     return true;
 }
 
@@ -39,18 +37,14 @@ float getGridLine(float gridScale){
 }
 
 void main() {
-    float renderIndex = imageLoad(renderIndexStencil, ivec2(gl_FragCoord.xy)).r;
+    vec4 positionIndex = imageLoad(gBufferPositionIndex, ivec2(gl_FragCoord.xy));
+    float renderIndex = positionIndex.a;
     bool hasData = false;
     bool isOverlay = false;
     if (renderIndex != 0){
-        // We no longer have world position here, so we skip overlaying objects for now
-        // or we could reconstruct position from depth if we had a depth buffer.
-        // hasData = OVERLAY_OBJECTS;
-        // isOverlay = true;
-        // p = worldPos.rgb;
-        
-        vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
-        hasData = rayMarch(globalData.cameraWorldPosition.xyz, rayDir, 1);
+        hasData = OVERLAY_OBJECTS;
+        isOverlay = true;
+        p = positionIndex.rgb;
     } else {
         vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
         hasData = rayMarch(globalData.cameraWorldPosition.xyz, rayDir, 1);

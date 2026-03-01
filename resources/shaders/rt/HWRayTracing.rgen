@@ -6,19 +6,21 @@ layout (set = 0, binding = 1) uniform accelerationStructureEXT topLevelAS;
 layout (set = 0, binding = 2, rgba32f) uniform image2D outputImage;
 layout (set = 0, binding = 3, rgba32f) uniform image2D surfaceCacheImage;
 layout (set = 0, binding = 4, r32f) uniform image2D renderIndexStencil;
+layout (set = 0, binding = 5, rgba32f) uniform image2D gBufferPositionIndex;
+layout (set = 0, binding = 6, rgba16f) uniform image2D gBufferNormal;
 
 #include "../util/HWRayTracingUtil.glsl"
 
 layout (location = 0) rayPayloadEXT RayPayload payload;
 
 
-#define LIGHT_SET 5
+#define LIGHT_SET 7
 #include "../LightBuffer.glsl"
-#define VOLUME_SET 6
+#define VOLUME_SET 8
 #include "../VolumeBuffer.glsl"
-#define MATERIAL_SET 7
+#define MATERIAL_SET 9
 #include "../MaterialBuffer.glsl"
-#define MESH_METADATA_SET 8
+#define MESH_METADATA_SET 10
 #include "../MeshMetadata.glsl"
 
 #include "../util/DisneyBSDF.glsl"
@@ -57,8 +59,12 @@ void main() {
             finalColor = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), rayDirection, 2.0f) * 0.05f;
         }
         imageStore(renderIndexStencil, ivec2(gl_LaunchIDEXT.xy), vec4(0.0));
+        imageStore(gBufferPositionIndex, ivec2(gl_LaunchIDEXT.xy), vec4(0.0, 0.0, 0.0, 0.0));
+        imageStore(gBufferNormal, ivec2(gl_LaunchIDEXT.xy), vec4(0.0, 0.0, 0.0, 0.0));
     } else {
         imageStore(renderIndexStencil, ivec2(gl_LaunchIDEXT.xy), vec4(float(payload.renderIndex + 1), 0, 0, 0));
+        imageStore(gBufferPositionIndex, ivec2(gl_LaunchIDEXT.xy), vec4(payload.hitPosition, float(payload.renderIndex + 1)));
+        imageStore(gBufferNormal, ivec2(gl_LaunchIDEXT.xy), vec4(payload.hitNormal, 0.0));
 
         MaterialInfo material = payload.material;
         SurfaceInteraction interaction;
