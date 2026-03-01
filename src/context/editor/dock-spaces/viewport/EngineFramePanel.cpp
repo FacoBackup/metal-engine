@@ -14,6 +14,7 @@
 #include "../../../../dto/buffers/LightData.h"
 #include "../../../../dto/buffers/VolumeData.h"
 #include "../../../../dto/buffers/MaterialData.h"
+#include "../../../../dto/buffers/MeshMetadata.h"
 #include "ViewportHeaderPanel.h"
 #include "ImGuizmo.h"
 #include <algorithm>
@@ -34,24 +35,24 @@ namespace Metal {
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
                 .addBuffer(RID_MATERIAL_BUFFER, MAX_MATERIALS * sizeof(MaterialData),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
+                .addBuffer(RID_MESH_METADATA_BUFFER, MAX_MESH_INSTANCES * sizeof(MeshMetadata),
+                           VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
                 .addTexture(RID_SURFACE_CACHE, SURFACE_CACHE_RES, SURFACE_CACHE_RES)
                 .addTexture(RID_RAW_RENDERED_FRAME, gBufferW, gBufferH)
                 .addTexture(RID_ACCUMULATED_FRAME, gBufferW, gBufferH)
-                .addFramebuffer(RID_G_BUFFER_FBO, gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
-                .addColor("Albedo; Emission flag | AO", VK_FORMAT_R16G16B16A16_SFLOAT,
-                          VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, nullptr)
-                .addColor("Normal; Roughness | Metallic", VK_FORMAT_R32G32B32A32_SFLOAT,
-                          VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, nullptr)
-                .addColor("Position; ID", VK_FORMAT_R32G32B32A32_SFLOAT,
-                          VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, nullptr)
-                .addDepth()
+                .addTexture(RID_RENDER_INDEX_STENCIL, gBufferW, gBufferH, VK_FORMAT_R32_SFLOAT)
                 .addFramebuffer(RID_POST_PROCESSING_FBO, CTX.vulkanContext.getWindowWidth(),
                                 CTX.vulkanContext.getWindowHeight(), glm::vec4(0, 0, 0, 0))
                 .addColor("Color", VK_FORMAT_R16G16B16A16_SFLOAT,
                           VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, nullptr)
-                .addPass(GBUFFER)
-                .addPass(COMPUTE)
-                .addPass(POST_PROCESSING)
+                .addComputeCommandBuffer(RID_COMPUTE_CB)
+                .addPass(COMPUTE, RID_COMPUTE_CB)
+                .addPass(ACCUMULATION, RID_COMPUTE_CB)
+                .addCommandBuffer(RID_POST_PROCESSING_CB, RID_POST_PROCESSING_FBO)
+                .addPass(POST_PROCESSING, RID_POST_PROCESSING_CB)
+                .addPass(SELECTED_DOT, RID_POST_PROCESSING_CB)
+                .addPass(GRID, RID_POST_PROCESSING_CB)
+                .addPass(ICONS, RID_POST_PROCESSING_CB)
                 .build();
 
         CTX.engineContext.registerFrame(engineFrame.get());
@@ -99,16 +100,22 @@ namespace Metal {
             return;
         }
 
-        auto *gBuffer = engineFrame->getResourceAs<FrameBufferInstance>(RID_G_BUFFER_FBO);
-        if (!gBuffer) {
+        auto *rawRenderedFrame = engineFrame->getResourceAs<TextureInstance>(RID_RAW_RENDERED_FRAME);
+        if (!rawRenderedFrame) {
             return;
         }
-        const auto width = gBuffer->bufferWidth;
-        const auto height = gBuffer->bufferHeight;
+
+        const auto width = rawRenderedFrame->width;
+        const auto height = rawRenderedFrame->height;
         const uint32_t pixelX = std::min(static_cast<uint32_t>(u * static_cast<float>(width)), width - 1);
         const uint32_t pixelY = std::min(static_cast<uint32_t>(v * static_cast<float>(height)), height - 1);
 
-        const auto picked = CTX.pickingService.pickEntityFromGBuffer(gBuffer, pixelX, pixelY);
+        auto *renderIndexStencil = engineFrame->getResourceAs<TextureInstance>(RID_RENDER_INDEX_STENCIL);
+        if (!renderIndexStencil) {
+            return;
+        }
+
+        const auto picked = CTX.pickingService.pickEntityFromGBuffer(renderIndexStencil, pixelX, pixelY);
         CTX.selectionService.clearSelection();
         CTX.selectionService.addSelected(picked.value_or(EMPTY_ENTITY));
     }

@@ -34,6 +34,7 @@
 #include "../repository/dock/DockRepository.h"
 #include "../repository/editor/EditorRepository.h"
 #include "../service/material/MaterialService.h"
+#include "../service/passes/CommandBufferRecorderService.h"
 #include "../service/notification/NotificationService.h"
 #include "../service/notification/AsyncTaskService.h"
 #include "../service/log/LogService.h"
@@ -46,7 +47,9 @@
 #include "../service/raytracing/RayTracingService.h"
 #include "editor/EditorPanel.h"
 #include "gui/GuiContext.h"
+
 #define CTX Metal::ApplicationContext::Get()
+
 namespace Metal {
     class ApplicationContext {
         static std::unique_ptr<ApplicationContext> CONTEXT;
@@ -94,6 +97,7 @@ namespace Metal {
         LightService lightService{};
         VolumeService volumeService{};
         RayTracingService rayTracingService{};
+        CommandBufferRecorderService commandBufferRecorderService{};
         VoxelImporterService voxelImporterService{};
         VoxelService voxelService{};
         // ----------- Services
@@ -103,7 +107,7 @@ namespace Metal {
         WorldGridRepository worldGridRepository{};
         WorldRepository worldRepository{};
         RuntimeRepository runtimeRepository{};
-        StreamingService streamingRepository{};
+        StreamingService streamingService{};
         EngineRepository engineRepository{};
         DockRepository dockRepository{};
         EditorRepository editorRepository{};

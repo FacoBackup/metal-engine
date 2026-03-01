@@ -16,7 +16,7 @@ layout(push_constant) uniform Push {
 
 layout(location = 0) in vec2 texCoords;
 layout(location = 0) out vec4 finalColor;
-layout(set = 0, binding = 1) uniform sampler2D gBufferPosition;
+layout(set = 0, binding = 1, r32f) uniform readonly image2D renderIndexStencil;
 
 vec3 p = vec3(0);
 bool rayMarch(vec3 ro, vec3 rd, float width) {
@@ -39,13 +39,18 @@ float getGridLine(float gridScale){
 }
 
 void main() {
-    vec4 worldPos = texture(gBufferPosition, texCoords);
+    float renderIndex = imageLoad(renderIndexStencil, ivec2(gl_FragCoord.xy)).r;
     bool hasData = false;
     bool isOverlay = false;
-    if (worldPos.a != 0){
-        hasData = OVERLAY_OBJECTS;
-        isOverlay = true;
-        p = worldPos.rgb;
+    if (renderIndex != 0){
+        // We no longer have world position here, so we skip overlaying objects for now
+        // or we could reconstruct position from depth if we had a depth buffer.
+        // hasData = OVERLAY_OBJECTS;
+        // isOverlay = true;
+        // p = worldPos.rgb;
+        
+        vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
+        hasData = rayMarch(globalData.cameraWorldPosition.xyz, rayDir, 1);
     } else {
         vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
         hasData = rayMarch(globalData.cameraWorldPosition.xyz, rayDir, 1);

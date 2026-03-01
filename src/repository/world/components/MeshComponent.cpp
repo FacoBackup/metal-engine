@@ -7,9 +7,6 @@ namespace Metal {
     void MeshComponent::registerFields() {
         registerResourceSelection(meshId, "", "Mesh", EntryType::MESH);
         registerResourceSelection(materialId, "", "Material", EntryType::MATERIAL);
-
-        registerFloat(parallaxHeightScale, "Material", "Parallax height scale", 0);
-        registerInt(parallaxLayers, "Material", "Parallax layers", 1);
     }
 
     void MeshComponent::onUpdate(InspectableMember *member) {
@@ -35,8 +32,6 @@ namespace Metal {
         j["entityId"] = entityId;
         j["meshId"] = meshId;
         j["materialId"] = materialId;
-        j["parallaxHeightScale"] = parallaxHeightScale;
-        j["parallaxLayers"] = parallaxLayers;
         return j;
     }
 
@@ -44,7 +39,5 @@ namespace Metal {
         entityId = j.at("entityId").get<EntityID>();
         meshId = j.at("meshId").get<std::string>();
         materialId = j.at("materialId").get<std::string>();
-        parallaxHeightScale = j.at("parallaxHeightScale").get<float>();
-        parallaxLayers = j.at("parallaxLayers").get<int>();
     }
 }

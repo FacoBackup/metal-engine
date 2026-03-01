@@ -5,6 +5,8 @@
 namespace Metal {
     class AccumulationPass final : public AbstractComputePass {
     public:
+        explicit AccumulationPass(const std::string &id) : AbstractComputePass(id) {}
+
         void onSync() override;
 
         void onInitialize() override;

@@ -3,8 +3,8 @@
 
 namespace Metal {
     enum PassType {
-        GBUFFER,
         COMPUTE,
+        ACCUMULATION,
         POST_PROCESSING,
         SELECTED_DOT,
         GRID,

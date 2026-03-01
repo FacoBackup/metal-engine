@@ -4,6 +4,7 @@
 #include <string>
 #include <vulkan/vulkan.h>
 #include "../../../common/AbstractRuntimeComponent.h"
+#include "../../../repository/abstract/RuntimeResource.h"
 
 namespace Metal {
     class EngineFrame;
@@ -12,19 +13,21 @@ namespace Metal {
     class StreamingService;
     struct PipelineInstance;
 
-    class AbstractPass : public AbstractRuntimeComponent {
+    class AbstractPass : public AbstractRuntimeComponent, public RuntimeResource {
         bool isComputePass;
 
     public:
         EngineFrame *frame = nullptr;
         VkCommandBuffer vkCommandBuffer = VK_NULL_HANDLE;
-        WorldRepository &worldRepository;
-        StreamingService &streamingRepository;
         PipelineInstance *pipelineInstance = nullptr;
 
-        explicit AbstractPass(bool isComputePass);
+        explicit AbstractPass(const std::string &id, bool isComputePass);
 
         virtual ~AbstractPass() override;
+
+        ResourceType resourceType() override {
+            return PASS;
+        }
 
         void recordPushConstant(const void *data);
 

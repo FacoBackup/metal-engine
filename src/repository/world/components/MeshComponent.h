@@ -10,9 +10,7 @@ namespace Metal {
         std::string meshId;
         std::string materialId;
 
-        int parallaxLayers = 16;
         unsigned int renderIndex = 0;
-        float parallaxHeightScale = 1;
 
         void registerFields() override;
 

@@ -28,6 +28,7 @@ struct RayPayload {
     MaterialInfo material;
     vec3 hitPosition;
     vec3 hitNormal;
+    uint renderIndex;
     bool hit;
     float t;
 };

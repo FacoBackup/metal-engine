@@ -13,7 +13,7 @@ namespace Metal {
 
     class AbstractComputePass : public AbstractPass {
     public:
-        explicit AbstractComputePass();
+        explicit AbstractComputePass(const std::string &id);
 
         void recordDispatch(unsigned int groupX, unsigned int groupY, unsigned int groupZ) const;
 

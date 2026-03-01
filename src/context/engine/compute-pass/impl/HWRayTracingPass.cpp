@@ -15,14 +15,13 @@ namespace Metal {
                     "rt/HWRayTracing.rchit")
                 .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
                 .addAccelerationStructureBinding(CTX.rayTracingService.getTLAS())
-                .addFboBinding(getScopedResourceId(RID_G_BUFFER_FBO), 0)
-                .addFboBinding(getScopedResourceId(RID_G_BUFFER_FBO), 1)
-                .addFboBinding(getScopedResourceId(RID_G_BUFFER_FBO), 2)
                 .addStorageImageBinding(getScopedResourceId(RID_RAW_RENDERED_FRAME))
                 .addStorageImageBinding(getScopedResourceId(RID_SURFACE_CACHE))
+                .addStorageImageBinding(getScopedResourceId(RID_RENDER_INDEX_STENCIL))
                 .addBufferBinding(getScopedResourceId(RID_LIGHT_BUFFER))
                 .addBufferBinding(getScopedResourceId(RID_VOLUMES_BUFFER))
                 .addBufferBinding(getScopedResourceId(RID_MATERIAL_BUFFER))
+                .addBufferBinding(getScopedResourceId(RID_MESH_METADATA_BUFFER))
                 .addCombinedImageSamplerBinding(CTX.vulkanContext.vkImageSampler, VK_NULL_HANDLE,
                                     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1000);
         pipelineInstance = CTX.pipelineService.createPipeline(builder);
@@ -37,6 +36,12 @@ namespace Metal {
     }
 
     void HWRayTracingPass::onSync() {
+
+        auto view = CTX.worldRepository.registry.view<MeshComponent, TransformComponent>();
+        for (auto entity: view) {
+            CTX.streamingService.streamMesh(view.get<MeshComponent>(entity).meshId);
+        }
+
         auto *surfaceCache = frame->getResourceAs<TextureInstance>(RID_SURFACE_CACHE);
         auto *rawRenderedFrame = frame->getResourceAs<TextureInstance>(RID_RAW_RENDERED_FRAME);
         auto *accumulatedFrame = frame->getResourceAs<TextureInstance>(RID_ACCUMULATED_FRAME);
@@ -55,7 +60,8 @@ namespace Metal {
         }
 
         startWriting(rawRenderedFrame->vkImage);
-        auto *gBuffer = frame->getResourceAs<FrameBufferInstance>(RID_G_BUFFER_FBO);
+        auto *renderIndexStencil = frame->getResourceAs<TextureInstance>(RID_RENDER_INDEX_STENCIL);
+        startWriting(renderIndexStencil->vkImage);
 
         // Trace rays
         CTX.vulkanContext.vkCmdTraceRaysKHR(
@@ -64,10 +70,11 @@ namespace Metal {
             &pipelineInstance->missRegion,
             &pipelineInstance->hitRegion,
             &pipelineInstance->callableRegion,
-            gBuffer->bufferWidth,
-            gBuffer->bufferHeight,
+            rawRenderedFrame->width,
+            rawRenderedFrame->height,
             1);
 
         endWriting(rawRenderedFrame->vkImage);
+        endWriting(renderIndexStencil->vkImage);
     }
 } // Metal

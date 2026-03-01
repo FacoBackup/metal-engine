@@ -1,6 +1,6 @@
 #include "../GlobalDataBuffer.glsl"
 
-layout (set = 0, binding = 1) uniform sampler2D gBufferPositionIndex;
+layout (set = 0, binding = 1, r32f) uniform readonly image2D gBufferPositionIndex;
 
 layout (location = 0) out vec4 outColor;
 
@@ -12,7 +12,7 @@ layout (push_constant) uniform Push {
 
 void main() {
     vec2 uv = gl_FragCoord.xy / vec2(globalData.outputRes);
-    uint currentIndex = uint(abs(texture(gBufferPositionIndex, uv).a));
+    uint currentIndex = uint(abs(imageLoad(gBufferPositionIndex, ivec2(gl_FragCoord.xy)).r));
 
     int thickness = int(push.selectionColor.a);
     bool isBoundary = false;
@@ -33,8 +33,7 @@ void main() {
                 break;
             }
 
-            vec2 neighborUv = vec2(neighborPixel) / vec2(globalData.outputRes);
-            uint neighborIndex = uint(abs(texture(gBufferPositionIndex, neighborUv).a));
+            uint neighborIndex = uint(abs(imageLoad(gBufferPositionIndex, neighborPixel).r));
 
             if (neighborIndex != push.renderIndex + 1) {
                 isBoundary = true;

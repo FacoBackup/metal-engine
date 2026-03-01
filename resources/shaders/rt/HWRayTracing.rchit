@@ -2,10 +2,12 @@
 #extension GL_EXT_nonuniform_qualifier: enable
 
 #include "../util/HWRayTracingUtil.glsl"
-#define MATERIAL_SET 9
+#define MATERIAL_SET 7
 #include "../MaterialBuffer.glsl"
+#define MESH_METADATA_SET 8
+#include "../MeshMetadata.glsl"
 
-layout (set = 0, binding = 10) uniform sampler2D textureArray[];
+layout (set = 0, binding = 9) uniform sampler2D textureArray[];
 
 layout (location = 0) rayPayloadInEXT RayPayload payload;
 hitAttributeEXT vec2 attribs; // Barycentric coordinates for the hit
@@ -19,7 +21,11 @@ void main() {
     // Use hit barycentric coords as a provisional UV. This will be replaced with proper vertex UV interpolation later.
     vec2 uv = attribs;
 
-    uint matIndex = gl_InstanceCustomIndexEXT;
+    uint metadataIndex = gl_InstanceCustomIndexEXT;
+    MeshMetadata metadata = meshMetadataBuffer.items[metadataIndex];
+    uint matIndex = metadata.materialIndex;
+    payload.renderIndex = metadata.renderIndex;
+
     vec3 baseColor = vec3(1.0);
     float roughness = 1.0;
     float metallic = 0.0;

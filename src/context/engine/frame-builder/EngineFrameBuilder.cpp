@@ -3,11 +3,12 @@
 #include "structures/FramebufferBuilder.h"
 #include "structures/TextureBuilder.h"
 #include "structures/BufferBuilder.h"
+#include "structures/PassBuilder.h"
+#include "structures/CommandBufferRecorderBuilder.h"
 #include "EngineFrame.h"
 #include "../../../enum/EngineResourceIDs.h"
 #include "../../ApplicationContext.h"
 #include "../passes/CommandBufferRecorder.h"
-#include "../render-pass/impl/GBufferGenPass.h"
 #include "../render-pass/impl/PostProcessingPass.h"
 #include "../compute-pass/impl/HWRayTracingPass.h"
 #include "../compute-pass/impl/AccumulationPass.h"
@@ -44,8 +45,8 @@ namespace Metal {
         return *this;
     }
 
-    EngineFrameBuilder &EngineFrameBuilder::addTexture(const std::string &id, unsigned w, unsigned h) {
-        currentBuilder = std::make_shared<TextureBuilder>(frameId + "_" + id, w, h);
+    EngineFrameBuilder &EngineFrameBuilder::addTexture(const std::string &id, unsigned w, unsigned h, VkFormat format) {
+        currentBuilder = std::make_shared<TextureBuilder>(frameId + "_" + id, w, h, format);
         builders.push_back(currentBuilder);
         return *this;
     }
@@ -73,8 +74,22 @@ namespace Metal {
         return *this;
     }
 
-    EngineFrameBuilder &EngineFrameBuilder::addPass(PassType type) {
-        passTypes.push_back(type);
+    EngineFrameBuilder &EngineFrameBuilder::addCommandBuffer(const std::string &id, const std::string &framebufferId,
+                                                            const bool clearBuffer) {
+        currentBuilder = std::make_shared<CommandBufferRecorderBuilder>(frameId + "_" + id, frameId + "_" + framebufferId, clearBuffer);
+        builders.push_back(currentBuilder);
+        return *this;
+    }
+
+    EngineFrameBuilder &EngineFrameBuilder::addComputeCommandBuffer(const std::string &id) {
+        currentBuilder = std::make_shared<CommandBufferRecorderBuilder>(frameId + "_" + id);
+        builders.push_back(currentBuilder);
+        return *this;
+    }
+
+    EngineFrameBuilder &EngineFrameBuilder::addPass(PassType type, const std::string &commandBufferId) {
+        currentBuilder = std::make_shared<PassBuilder>(Util::uuidV4(), type, frameId + "_" + commandBufferId);
+        builders.push_back(currentBuilder);
         return *this;
     }
 
@@ -90,64 +105,41 @@ namespace Metal {
 
     std::unique_ptr<EngineFrame> EngineFrameBuilder::build() {
         auto frame = std::make_unique<EngineFrame>(frameId);
+        std::unordered_map<std::string, RuntimeResource *> builtResources;
+
         for (const auto &builder: builders) {
-            frame->addResource(builder->build());
+            auto *resource = builder->build();
+            if (resource) {
+                frame->addResource(resource);
+                builtResources[builder->getId()] = resource;
+            }
         }
 
-        auto &fbService = CTX.framebufferService;
-        for (const auto &passType: passTypes) {
-            switch (passType) {
-                case GBUFFER: {
-                    auto *fbo = fbService.getResource(frameId + "_" + RID_G_BUFFER_FBO);
-                    auto *pass = new GBufferGenPass();
-                    pass->frame = frame.get();
-                    pass->onInitialize();
-                    auto *recorder = new CommandBufferRecorder(fbo);
-                    frame->addPass(recorder, {pass});
-                    break;
+        std::unordered_map<std::string, std::vector<AbstractPass *> > recorderToPasses;
+        std::vector<std::string> recorderOrder;
+
+        for (const auto &builder: builders) {
+            if (auto *passBuilder = dynamic_cast<PassBuilder *>(builder.get())) {
+                const auto cbId = passBuilder->getCommandBufferId();
+                if (std::find(recorderOrder.begin(), recorderOrder.end(), cbId) == recorderOrder.end()) {
+                    recorderOrder.push_back(cbId);
                 }
-                case COMPUTE: {
-                    auto *pass1 = new HWRayTracingPass();
-                    pass1->frame = frame.get();
-                    pass1->onInitialize();
-                    auto *pass2 = new AccumulationPass();
-                    pass2->frame = frame.get();
-                    pass2->onInitialize();
-                    auto *recorder = new CommandBufferRecorder();
-                    frame->addPass(recorder, {pass1, pass2});
-                    break;
-                }
-                case POST_PROCESSING: {
-                    auto *fbo = fbService.getResource(frameId + "_" + RID_POST_PROCESSING_FBO);
-                    std::vector<AbstractPass *> passes;
-                    auto *ppPass = new PostProcessingPass();
-                    ppPass->frame = frame.get();
-                    ppPass->onInitialize();
-                    passes.push_back(ppPass);
 
-                    if (CTX.isDebugMode()) {
-                        auto *dot = new SelectedDotPass();
-                        dot->frame = frame.get();
-                        dot->onInitialize();
-                        passes.push_back(dot);
-
-                        auto *grid = new GridPass();
-                        grid->frame = frame.get();
-                        grid->onInitialize();
-                        passes.push_back(grid);
-
-                        auto *icons = new IconsPass();
-                        icons->frame = frame.get();
-                        icons->onInitialize();
-                        passes.push_back(icons);
+                if (builtResources.contains(builder->getId())) {
+                    auto *pass = dynamic_cast<AbstractPass *>(builtResources.at(builder->getId()));
+                    if (pass) {
+                        pass->frame = frame.get();
+                        dynamic_cast<Initializable *>(pass)->onInitialize();
+                        recorderToPasses[cbId].push_back(pass);
                     }
-
-                    auto *recorder = new CommandBufferRecorder(fbo);
-                    frame->addPass(recorder, passes);
-                    break;
                 }
-                default:
-                    break;
+            }
+        }
+
+        for (const auto &cbId: recorderOrder) {
+            auto *recorder = CTX.commandBufferRecorderService.getResource(cbId);
+            if (recorder) {
+                frame->addPass(recorder, recorderToPasses[cbId]);
             }
         }
 

@@ -1,23 +1,14 @@
 #include "PickingService.h"
 
 #include "../buffer/BufferInstance.h"
-#include "../framebuffer/FrameBufferInstance.h"
+#include "../texture/TextureInstance.h"
 #include "../../context/ApplicationContext.h"
 
 namespace Metal {
-    std::optional<EntityID> PickingService::pickEntityFromGBuffer(const FrameBufferInstance *gBuffer, const uint32_t pixelX,
+    std::optional<EntityID> PickingService::pickEntityFromGBuffer(TextureInstance *attachment, const uint32_t pixelX,
                                                                   const uint32_t pixelY) const {
-        if (!gBuffer || gBuffer->attachments.size() < 3) {
-            return std::nullopt;
-        }
-        if (pixelX >= gBuffer->bufferWidth || pixelY >= gBuffer->bufferHeight) {
-            return std::nullopt;
-        }
 
-        // Attachment #2 stores `vec4(position, renderIndex + 1)` in `R32G32B32A32_SFLOAT`.
-        auto &attachment = gBuffer->attachments[2];
-
-        constexpr VkDeviceSize imageSize = sizeof(float) * 4;
+        constexpr VkDeviceSize imageSize = sizeof(float);
         auto stagingBuffer = CTX.bufferService.createBuffer("stagingBuffer", imageSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                                                             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                             VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
@@ -65,7 +56,7 @@ namespace Metal {
         void *data = nullptr;
         vkMapMemory(CTX.vulkanContext.device.device, stagingBuffer->vkDeviceMemory, 0, imageSize, 0, &data);
         const auto *pixel = static_cast<const float *>(data);
-        const float idValue = pixel[3];
+        const float idValue = pixel[0];
         vkUnmapMemory(CTX.vulkanContext.device.device, stagingBuffer->vkDeviceMemory);
         CTX.bufferService.dispose("stagingBuffer");
 

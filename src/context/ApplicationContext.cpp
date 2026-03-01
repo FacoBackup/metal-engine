@@ -58,6 +58,7 @@ namespace Metal {
     void ApplicationContext::dispose() {
         NFD_Quit();
         try {
+            rayTracingService.destroyAccelerationStructures();
             asyncTaskService.endAll();
             engineContext.dispose();
             guiContext.dispose();

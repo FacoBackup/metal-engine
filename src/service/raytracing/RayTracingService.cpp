@@ -6,6 +6,7 @@
 #include "../mesh/MeshInstance.h"
 #include "../mesh/VertexData.h"
 #include "../../util/VulkanUtils.h"
+#include "../../enum/EngineResourceIDs.h"
 #include <cstddef>
 
 namespace Metal {
@@ -28,7 +29,7 @@ namespace Metal {
             if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
             auto &meshComp = view.get<MeshComponent>(entity);
             if (meshComp.meshId.empty()) continue;
-            auto *instance = CTX.streamingRepository.streamMesh(meshComp.meshId);
+            auto *instance = CTX.streamingService.streamMesh(meshComp.meshId);
             if (instance != nullptr && instance->dataBuffer != nullptr && instance->indexBuffer != nullptr) {
                 hasMeshes = true;
                 break;
@@ -75,7 +76,7 @@ namespace Metal {
             auto &meshComp = view.get<MeshComponent>(entity);
             if (meshComp.meshId.empty()) continue;
             if (uniqueMeshes.contains(meshComp.meshId)) continue;
-            auto *instance = CTX.streamingRepository.streamMesh(meshComp.meshId);
+            auto *instance = CTX.streamingService.streamMesh(meshComp.meshId);
             if (instance == nullptr || instance->dataBuffer == nullptr || instance->indexBuffer == nullptr) {
                 continue;
             }
@@ -203,7 +204,12 @@ namespace Metal {
         std::vector<VkAccelerationStructureInstanceKHR> instances;
         auto view = CTX.worldRepository.registry.view<MeshComponent, TransformComponent>();
 
+        unsigned int currentInstanceIndex = 0;
         for (auto entity: view) {
+            if (currentInstanceIndex >= MAX_MESH_INSTANCES) {
+                LOG_ERROR("Max mesh instances reached for ray tracing: " + std::to_string(MAX_MESH_INSTANCES));
+                break;
+            }
             if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
             auto &meshComp = view.get<MeshComponent>(entity);
             if (meshComp.meshId.empty()) continue;
@@ -230,18 +236,32 @@ namespace Metal {
                 }
             }
 
+            uint32_t materialIndex = CTX.materialService.getMaterialIndex(meshComp.materialId);
+            
+            meshComp.renderIndex = currentInstanceIndex;
+            meshMetadata[currentInstanceIndex].renderIndex = meshComp.renderIndex;
+            meshMetadata[currentInstanceIndex].materialIndex = materialIndex;
+
             VkAccelerationStructureInstanceKHR instance{};
             instance.transform = transform;
-            instance.instanceCustomIndex = CTX.materialService.getMaterialIndex(meshComp.materialId);
+            instance.instanceCustomIndex = currentInstanceIndex;
             instance.mask = 0xFF;
             instance.instanceShaderBindingTableRecordOffset = 0;
             instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
             instance.accelerationStructureReference = blasAddress;
 
             instances.push_back(instance);
+            currentInstanceIndex++;
         }
 
         if (instances.empty()) return;
+
+        if (CTX.engineContext.currentFrame != nullptr) {
+            auto *meshMetadataBuffer = CTX.engineContext.currentFrame->getResourceAs<BufferInstance>(RID_MESH_METADATA_BUFFER);
+            if (meshMetadataBuffer != nullptr) {
+                meshMetadataBuffer->update(meshMetadata.data());
+            }
+        }
 
         instancesBuffer = CTX.bufferService.createBuffer(
             "tlas_instances",

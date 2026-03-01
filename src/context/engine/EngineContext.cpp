@@ -24,7 +24,7 @@ namespace Metal {
             std::vector<DescriptorBinding> bindings{};
             for (auto *tile: CTX.worldGridRepository.getLoadedTiles()) {
                 if (tile != nullptr) {
-                    const auto *svo = CTX.streamingRepository.streamSVO(tile->id);
+                    const auto *svo = CTX.streamingService.streamSVO(tile->id);
                     if (svo != nullptr) {
                         tileInfoUBO.tileCenterValid[i] = glm::vec4(tile->x, 0,
                                                                    tile->z, 1);
@@ -70,7 +70,7 @@ namespace Metal {
 
         CTX.transformService.onSync();
         CTX.worldGridService.onSync();
-        CTX.streamingRepository.onSync();
+        CTX.streamingService.onSync();
         CTX.cameraService.onSync();
 
         for (auto *frame: registeredFrames) {

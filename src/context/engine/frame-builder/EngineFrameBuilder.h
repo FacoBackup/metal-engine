@@ -22,7 +22,6 @@ namespace Metal {
         std::string frameId;
         std::vector<std::shared_ptr<ResourceBuilder> > builders{};
         std::shared_ptr<ResourceBuilder> currentBuilder{};
-        std::vector<PassType> passTypes{};
 
     public:
         explicit EngineFrameBuilder(std::string frameId = Util::uuidV4());
@@ -35,7 +34,7 @@ namespace Metal {
 
         EngineFrameBuilder &addDepth();
 
-        EngineFrameBuilder &addTexture(const std::string &id, unsigned w, unsigned h);
+        EngineFrameBuilder &addTexture(const std::string &id, unsigned w, unsigned h, VkFormat format = VK_FORMAT_R16G16B16A16_SFLOAT);
 
         EngineFrameBuilder &addTexture(const std::string &id);
 
@@ -44,7 +43,11 @@ namespace Metal {
 
         EngineFrameBuilder &addBuffer(const std::string &id);
 
-        EngineFrameBuilder &addPass(PassType type);
+        EngineFrameBuilder &addCommandBuffer(const std::string &id, const std::string &framebufferId, bool clearBuffer = true);
+
+        EngineFrameBuilder &addComputeCommandBuffer(const std::string &id);
+
+        EngineFrameBuilder &addPass(PassType type, const std::string &commandBufferId);
 
         bool tryMatch(const std::string &id, ResourceType type);
 

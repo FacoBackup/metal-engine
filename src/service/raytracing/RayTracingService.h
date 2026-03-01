@@ -1,6 +1,8 @@
 #ifndef RAYTRACINGSERVICE_H
 #define RAYTRACINGSERVICE_H
 
+#include "../../dto/buffers/MeshMetadata.h"
+#include "../../enum/engine-definitions.h"
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -30,6 +32,8 @@ namespace Metal {
 
         // Scratch buffer for TLAS
         BufferInstance *tlasScratchBuffer = nullptr;
+
+        std::vector<MeshMetadata> meshMetadata{MAX_MESH_INSTANCES};
 
         bool accelerationStructureBuilt = false;
         bool needsRebuild = true;

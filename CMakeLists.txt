@@ -94,7 +94,6 @@ add_executable(
         src/service/pipeline/ShaderModule.h
         src/context/engine/render-pass/AbstractRenderPass.cpp
         src/context/engine/render-pass/AbstractRenderPass.h
-        src/context/engine/render-pass/impl/GBufferGenPass.cpp
         src/service/abstract/AbstractResourceService.h
         src/service/framebuffer/FrameBufferAttachment.h
         src/repository/abstract/AbstractCoreRepository.h
@@ -142,7 +141,6 @@ add_executable(
         src/service/files/FileImporterService.cpp
         src/service/files/FileImporterService.h
         src/context/editor/dock-spaces/files/FilesContext.cpp
-        src/dto/push-constant/MeshPushConstant.h
         src/service/mesh/VertexData.h
         src/context/editor/dock-spaces/viewport/CameraPositionPanel.cpp
         src/context/editor/dock-spaces/viewport/CameraPositionPanel.h
@@ -293,6 +291,8 @@ add_executable(
         src/context/engine/frame-builder/structures/ResourceBuilder.h
         src/service/pipeline/PipelineBuilder.cpp
         src/service/descriptor/DescriptorSetService.cpp
+        src/context/engine/frame-builder/structures/PassBuilder.cpp
+        src/context/engine/frame-builder/structures/CommandBufferRecorderBuilder.cpp
 )
 
 

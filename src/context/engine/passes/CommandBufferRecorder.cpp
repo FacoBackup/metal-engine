@@ -22,8 +22,8 @@ namespace Metal {
                                      _commandBuffers.data()));
     }
 
-    CommandBufferRecorder::CommandBufferRecorder(FrameBufferInstance *frameBuffer,
-                                                 const bool clearBuffer) {
+    CommandBufferRecorder::CommandBufferRecorder(std::string id, FrameBufferInstance *frameBuffer,
+                                                 const bool clearBuffer) : RuntimeResource(std::move(id)) {
         createRenderPassInfo(frameBuffer, clearBuffer);
 
         viewport.width = static_cast<float>(frameBuffer->bufferWidth);
@@ -40,7 +40,7 @@ namespace Metal {
         computePassMode = false;
     }
 
-    CommandBufferRecorder::CommandBufferRecorder() {
+    CommandBufferRecorder::CommandBufferRecorder(std::string id) : RuntimeResource(std::move(id)) {
         createCommandBuffer();
         computePassMode = true;
     }

@@ -18,7 +18,7 @@ namespace Metal {
                 .setCullMode(VK_CULL_MODE_BACK_BIT)
                 .setPushConstantsSize(sizeof(SelectedDotPushConstant))
                 .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
-                .addFboBinding(getScopedResourceId(RID_G_BUFFER_FBO), 2);
+                .addStorageImageBinding(getScopedResourceId(RID_RENDER_INDEX_STENCIL));
         pipelineInstance = CTX.pipelineService.createPipeline(builder);
     }
 
@@ -27,6 +27,7 @@ namespace Metal {
     }
 
     void SelectedDotPass::onSync() {
+        auto &worldRepository = CTX.worldRepository;
         for (const auto &pair: CTX.editorRepository.selected) {
             if (!pair.second) {
                 continue;
@@ -45,7 +46,7 @@ namespace Metal {
                 continue;
             }
 
-            const auto *meshInstance = streamingRepository.streamMesh(mesh.meshId);
+            const auto *meshInstance = CTX.streamingService.streamMesh(mesh.meshId);
             if (!meshInstance) {
                 continue;
             }

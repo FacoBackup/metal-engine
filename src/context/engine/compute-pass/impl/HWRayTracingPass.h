@@ -7,6 +7,8 @@ namespace Metal {
         bool isFirstRun = true;
 
     public:
+        explicit HWRayTracingPass(const std::string &id) : AbstractComputePass(id) {}
+
         bool shouldRun() override;
 
         void onSync() override;

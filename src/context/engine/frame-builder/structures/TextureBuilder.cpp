@@ -13,7 +13,7 @@ namespace Metal {
             return texture;
         }
 
-        texture = CTX.textureService.createForCompute(id, w, h);
+        texture = CTX.textureService.createForCompute(id, w, h, format);
         texture->setAsNoDisposal();
 
         return texture;
