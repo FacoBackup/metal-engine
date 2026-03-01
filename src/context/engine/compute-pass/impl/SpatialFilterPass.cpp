@@ -11,8 +11,7 @@ namespace Metal {
                 .addStorageImageBinding(getScopedResourceId(RID_TEMPORAL_OUTPUT))
                 .addStorageImageBinding(getScopedResourceId(RID_DENOISED_FRAME))
                 .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_POSITION_INDEX))
-                .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_NORMAL))
-                .addStorageImageBinding(getScopedResourceId(RID_VARIANCE_BUFFER));
+                .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_NORMAL));
         pipelineInstance = CTX.pipelineService.createPipeline(spatialBuilder);
     }
 

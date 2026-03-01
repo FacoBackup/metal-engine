@@ -17,7 +17,6 @@ namespace Metal {
     inline constexpr const char* RID_ACCUMULATED_FRAME = "accumulatedFrame";
     inline constexpr const char* RID_DENOISED_FRAME = "denoisedFrame";
     inline constexpr const char* RID_TEMPORAL_OUTPUT = "temporalOutput";
-    inline constexpr const char* RID_VARIANCE_BUFFER = "varianceBuffer";
     inline constexpr const char* RID_PREVIOUS_DENOISED_FRAME = "previousDenoisedFrame";
     inline constexpr const char* RID_POST_PROCESSING_FBO = "postProcessingFBO";
     inline constexpr const char* RID_COMPUTE_CB = "ComputeCB";

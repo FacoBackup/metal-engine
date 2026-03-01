@@ -1,18 +1,13 @@
 layout (local_size_x = 8, local_size_y = 8) in;
 #include "./GlobalDataBuffer.glsl"
 
-layout (set = 0, binding = 1, rgba16f) uniform image2D currentFrameImage;
-layout (set = 0, binding = 2, rgba16f) uniform image2D temporalOutputImage;
-layout (set = 0, binding = 3, rgba16f) uniform image2D previousDenoisedImage;
+layout (set = 0, binding = 1, rgba32f) uniform image2D currentFrameImage;
+layout (set = 0, binding = 2, rgba32f) uniform image2D temporalOutputImage;
+layout (set = 0, binding = 3, rgba32f) uniform image2D previousDenoisedImage;
 layout (set = 0, binding = 4, rgba32f) uniform image2D currentPositionIndexImage;
 layout (set = 0, binding = 5, rgba32f) uniform image2D previousPositionIndexImage;
 layout (set = 0, binding = 6, rgba16f) uniform image2D currentNormalImage;
 layout (set = 0, binding = 7, rgba16f) uniform image2D previousNormalImage;
-layout (set = 0, binding = 8, rg16f) uniform image2D varianceImage;
-
-float luminance(vec3 rgb) {
-    return dot(rgb, vec3(0.2126, 0.7152, 0.0722));
-}
 
 void main() {
     ivec2 coord = ivec2(gl_GlobalInvocationID.xy);
@@ -22,7 +17,6 @@ void main() {
     vec3 currentPtrColor = imageLoad(currentFrameImage, coord).rgb;
     if (globalData.denoiserEnabled == 0) {
         imageStore(temporalOutputImage, coord, vec4(currentPtrColor, 1));
-        imageStore(varianceImage, coord, vec4(0.0, 0.0, 0.0, 0.0));
         return;
     }
 
@@ -33,7 +27,6 @@ void main() {
 
     if (globalData.debugFlag != 0) {
         imageStore(temporalOutputImage, coord, vec4(currentPtrColor, 1.0));
-        imageStore(varianceImage, coord, vec4(0.0, 0.0, 0.0, 0.0));
         return;
     }
 
@@ -46,75 +39,51 @@ void main() {
     vec4 prevPositionIndex = vec4(0.0);
     vec3 prevNormal = vec3(0.0);
     vec3 prevDenoisedColor = vec3(0.0);
-    float prevVariance = 0.0;
     float historyLen = 0.0;
 
-    float confidence = 1.0;
+    bool valid = true;
     if (prevCoord.x < 0 || prevCoord.x >= size.x || prevCoord.y < 0 || prevCoord.y >= size.y) {
-        confidence = 0.0;
+        valid = false;
     } else {
         prevPositionIndex = imageLoad(previousPositionIndexImage, prevCoord);
         prevNormal = imageLoad(previousNormalImage, prevCoord).rgb;
         vec4 prevDenoised = imageLoad(previousDenoisedImage, prevCoord);
         prevDenoisedColor = prevDenoised.rgb;
         historyLen = prevDenoised.a;
-        prevVariance = imageLoad(varianceImage, prevCoord).r;
 
-        // Validation checks with confidence
-        if (currentIdx != prevPositionIndex.a) confidence = 0.0;
-        
-        float dist = distance(currentPos, prevPositionIndex.rgb);
-        confidence *= clamp(1.0 - dist / 0.2, 0.0, 1.0);
-        
-        float dotN = dot(currentNormal, prevNormal);
-        confidence *= clamp((dotN - 0.8) / (1.0 - 0.8), 0.0, 1.0);
+        // Validation checks
+        if (currentIdx != prevPositionIndex.a) valid = false;
+        if (distance(currentPos, prevPositionIndex.rgb) > 0.1) valid = false;
+        if (dot(currentNormal, prevNormal) < 0.9) valid = false;
     }
 
-    if (confidence < 0.1) {
+    if (!valid) {
         historyLen = 0.0;
-        prevVariance = 0.0;
     }
-    
-    historyLen = min(historyLen + 1.0, 32.0) * confidence;
 
-    float alpha = 1.0 / max(historyLen, 1.0);
+    // Recursive blur alpha. Stabilizes the image over time.
+    // We cap the history length to avoid infinite accumulation and allow for some responsiveness.
+    float maxHistory = 32.0;
+    historyLen = min(historyLen + 1.0, maxHistory);
+
+    float alpha = 1.0 / historyLen;
+    // For recursive blur, we might want a minimum alpha to keep it responsive to lighting changes
     alpha = max(alpha, 0.05);
 
-    // Neighborhood for clamping and variance estimation
-    vec3 m1 = currentPtrColor;
-    vec3 m2 = currentPtrColor * currentPtrColor;
+    // Luminance clamping to avoid color outliers
     vec3 minColor = currentPtrColor;
     vec3 maxColor = currentPtrColor;
-
     for (int y = -1; y <= 1; y++) {
         for (int x = -1; x <= 1; x++) {
             if (x == 0 && y == 0) continue;
-            ivec2 neighborCoord = coord + ivec2(x, y);
-            if (neighborCoord.x < 0 || neighborCoord.x >= size.x || neighborCoord.y < 0 || neighborCoord.y >= size.y) continue;
-            
-            vec3 neighbor = imageLoad(currentFrameImage, neighborCoord).rgb;
-            m1 += neighbor;
-            m2 += neighbor * neighbor;
+            vec3 neighbor = imageLoad(currentFrameImage, coord + ivec2(x, y)).rgb;
             minColor = min(minColor, neighbor);
             maxColor = max(maxColor, neighbor);
         }
     }
-    
-    m1 /= 9.0;
-    m2 /= 9.0;
-    vec3 stdDev = sqrt(max(vec3(0.0), m2 - m1 * m1));
-    
-    // Tighter clamping using variance
-    vec3 clampedPrevColor = clamp(prevDenoisedColor, m1 - 2.0 * stdDev, m1 + 2.0 * stdDev);
-    clampedPrevColor = clamp(clampedPrevColor, minColor, maxColor);
+    vec3 clampedPrevColor = clamp(prevDenoisedColor, minColor, maxColor);
 
     vec3 resultColor = mix(clampedPrevColor, currentPtrColor, alpha);
-    
-    // Variance estimation
-    float currentLum = luminance(currentPtrColor);
-    float temporalVariance = mix(prevVariance, (currentLum - luminance(resultColor)) * (currentLum - luminance(clampedPrevColor)), alpha);
-    temporalVariance = max(0.0, temporalVariance);
 
     imageStore(temporalOutputImage, coord, vec4(resultColor, historyLen));
-    imageStore(varianceImage, coord, vec4(temporalVariance, 0.0, 0.0, 0.0));
 }

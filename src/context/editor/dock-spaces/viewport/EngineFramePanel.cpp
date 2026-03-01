@@ -46,7 +46,6 @@ namespace Metal {
                 .addTexture(RID_PREVIOUS_NORMAL, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
                 .addTexture(RID_DENOISED_FRAME, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
                 .addTexture(RID_TEMPORAL_OUTPUT, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
-                .addTexture(RID_VARIANCE_BUFFER, gBufferW, gBufferH, VK_FORMAT_R16G16_SFLOAT)
                 .addTexture(RID_PREVIOUS_DENOISED_FRAME, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
                 .addFramebuffer(RID_POST_PROCESSING_FBO, gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
                 .addColor("Color", VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
