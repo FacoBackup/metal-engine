@@ -15,20 +15,9 @@ namespace Metal {
         unsigned int mipLevels = 1;
         unsigned int width{}, height{}, channels{};
         VkFormat vkFormat{};
-        std::unique_ptr<DescriptorInstance> imageDescriptor = nullptr;
+        DescriptorInstance *imageDescriptor = nullptr;
 
         explicit TextureInstance(const std::string& id) : RuntimeResource(id) {
-        }
-
-        void dispose() override {
-            vkDestroyImage(CTX.vulkanContext.device.device, vkImage, nullptr);
-            vkFreeMemory(CTX.vulkanContext.device.device, vkImageMemory, nullptr);
-            vkDestroyImageView(CTX.vulkanContext.device.device, vkImageView, nullptr);
-            vkDestroySampler(CTX.vulkanContext.device.device, vkSampler, nullptr);
-
-            if (imageDescriptor != nullptr) {
-                imageDescriptor->dispose();
-            }
         }
 
         ResourceType resourceType() override {

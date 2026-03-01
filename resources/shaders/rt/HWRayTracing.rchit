@@ -5,7 +5,7 @@
 #define MATERIAL_SET 9
 #include "../MaterialBuffer.glsl"
 
-layout (set = 10, binding = 0) uniform sampler2D textureArray[];
+layout (set = 0, binding = 10) uniform sampler2D textureArray[];
 
 layout (location = 0) rayPayloadInEXT RayPayload payload;
 hitAttributeEXT vec2 attribs; // Barycentric coordinates for the hit

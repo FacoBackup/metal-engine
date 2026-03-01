@@ -8,18 +8,17 @@
 namespace Metal {
     struct BufferInstance;
 
-    struct DescriptorInstance final {
+    struct DescriptorInstance final : RuntimeResource {
         VkDescriptorSetLayout vkDescriptorSetLayout = VK_NULL_HANDLE;
         VkDescriptorSet vkDescriptorSet = VK_NULL_HANDLE;
         std::vector<DescriptorBinding> bindings;
 
-        void dispose() const;
+        explicit DescriptorInstance(const std::string &id) : RuntimeResource(id) {
+        }
 
-        static void Write(const VkDescriptorSet &vkDescriptorSet, std::vector<DescriptorBinding> &bindings);
-
-        void create();
-
-        void addLayoutBinding(DescriptorBinding binding);
+        ResourceType resourceType() override {
+            return DESCRIPTOR_SET;
+        }
     };
 } // Metal
 

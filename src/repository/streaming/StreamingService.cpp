@@ -2,104 +2,86 @@
 
 #include "../../context/ApplicationContext.h"
 #include "../../service/voxel/SVOInstance.h"
-#include "../../enum/LevelOfDetail.h"
 #include "../../service/mesh/MeshInstance.h"
 #include "../../service/texture/TextureInstance.h"
 #include <iostream>
 #include "../../repository/abstract/RuntimeResource.h"
 #include "../../service/material/MaterialInstance.h"
 
-#define MAX_TIMEOUT 1000
-#define MAX_TRIES 5
-#define DISPOSAL(R)\
-for (auto it = R.begin(); it != R.end();) {\
-    if (lastUse.contains(it->second->getId()) && !it->second->isNoDisposal() && (lastUse.at(it->second->getId()) - CTX.engineContext.currentTimeMs) >= MAX_TIMEOUT) {\
-        LOG_INFO("Disposing of " + it->first + " Since last use: " + std::to_string(lastUse.at(it->second->getId()) - CTX.engineContext.currentTimeMs));\
-        it->second->dispose();\
-        auto newIt = R.erase(it);\
-        delete it->second;\
-        it = newIt;\
-    } else {\
-        ++it;\
-    }\
-}
-
-#define STREAM(T, V)\
-if (!id.empty() && T.getResources().contains(id + lod.suffix)) {\
-    auto *e = T.getResources().at(id + lod.suffix);\
-    lastUse.emplace(e->getId(), CTX.engineContext.currentTimeMs);\
-    return dynamic_cast<V*>(e);\
-}\
-if (!tries.contains(id)) {\
-    tries[id] = 0;\
-}\
-tries[id]++;\
-if (tries[id] < MAX_TRIES) {\
-    LOG_INFO("Streaming " + id);\
-    auto *instance = T.create(id, lod);\
-    if (instance != nullptr) {\
-        tries[id] = 0;\
-        for(auto &dep : instance->getDependencies()){\
-            if (lastUse.contains(dep)) {\
-                lastUse[dep] = CTX.engineContext.currentTimeMs;\
-            }\
-        }\
-    }\
-    return instance;\
-}\
-return nullptr;
-
-
-
-#define STREAM_NO_LOD(T, V)\
-if (!id.empty() && T.getResources().contains(id)) {\
-auto *e = T.getResources().at(id);\
-lastUse.emplace(e->getId(), CTX.engineContext.currentTimeMs);\
-return dynamic_cast<V*>(e);\
-}\
-if (!tries.contains(id)) {\
-tries[id] = 0;\
-}\
-tries[id]++;\
-if (tries[id] < MAX_TRIES) {\
-LOG_INFO("Streaming " + id);\
-auto *instance = T.create(id);\
-if (instance != nullptr) {\
-    tries[id] = 0;\
-    for(auto &dep : instance->getDependencies()){\
-        if (lastUse.contains(dep)) {\
-            lastUse[dep] = CTX.engineContext.currentTimeMs;\
-        }\
-    }\
-}\
-return instance;\
-}\
-return nullptr;
-
 namespace Metal {
+    static constexpr int MAX_TIMEOUT = 10000;
+    static constexpr int MAX_TRIES = 5;
+
+    template<typename T>
+    T *stream(IStreamable<T> &service, const std::string &id,
+                            std::unordered_map<std::string, long long> &lastUse,
+                            std::unordered_map<std::string, unsigned int> &tries) {
+        if (!id.empty() && service.getResources().contains(id)) {
+            auto *e = service.getResource(id);
+            lastUse[e->getId()] = CTX.engineContext.currentTimeMs;
+            return e;
+        }
+        if (!tries.contains(id)) {
+            tries[id] = 0;
+        }
+        tries[id]++;
+        if (tries[id] < MAX_TRIES) {
+            LOG_DEBUG("Streaming " + id);
+            auto *instance = service.create(id);
+            if (instance != nullptr) {
+                tries[id] = 0;
+                for (auto &dep: instance->getDependencies()) {
+                    if (lastUse.contains(dep)) {
+                        lastUse[dep] = CTX.engineContext.currentTimeMs;
+                    }
+                }
+            }
+            return instance;
+        }
+        return nullptr;
+    }
+
     MaterialInstance *StreamingService::streamMaterial(const std::string &id) {
-        STREAM_NO_LOD(CTX.materialService, MaterialInstance)
+        return stream(CTX.materialService, id, lastUse, tries);
     }
 
     SVOInstance *StreamingService::streamSVO(const std::string &id) {
-        STREAM_NO_LOD(CTX.voxelService, SVOInstance)
+        return stream(CTX.voxelService, id, lastUse, tries);
     }
 
-    MeshInstance *StreamingService::streamMesh(const std::string &id, const LevelOfDetail &lod) {
-        STREAM(CTX.meshService, MeshInstance)
+    MeshInstance *StreamingService::streamMesh(const std::string &id) {
+        return stream(CTX.meshService, id, lastUse, tries);
     }
 
-    TextureInstance *StreamingService::streamTexture(const std::string &id, const LevelOfDetail &lod) {
-        STREAM(CTX.textureService, TextureInstance)
+    TextureInstance *StreamingService::streamTexture(const std::string &id) {
+        return stream(CTX.textureService, id, lastUse, tries);
+    }
+
+    template<typename T>
+    void disposeResources(AbstractResourceService<T> &service, std::unordered_map<std::string, long long> &lastUse) {
+        auto &resources = service.getResources();
+        for (auto it = resources.begin(); it != resources.end();) {
+            if (lastUse.contains(it->second->getId()) && !it->second->isNoDisposal() && (
+                    CTX.engineContext.currentTimeMs - lastUse.at(it->second->getId())) >= MAX_TIMEOUT) {
+                LOG_DEBUG(
+                    "Disposing of " + it->first + " Since last use: " + std::to_string(CTX.engineContext.currentTimeMs -
+                        lastUse.at(it->second->getId())));
+                std::string id = it->first;
+                ++it;
+                service.dispose(id);
+            } else {
+                ++it;
+            }
+        }
     }
 
     void StreamingService::onSync() {
         if ((CTX.engineContext.currentTime - sinceLastCleanup).count() >= MAX_TIMEOUT) {
             sinceLastCleanup = CTX.engineContext.currentTime;
-            DISPOSAL(CTX.meshService.getResources())
-            DISPOSAL(CTX.textureService.getResources())
-            DISPOSAL(CTX.voxelService.getResources())
-            DISPOSAL(CTX.materialService.getResources())
+            disposeResources(CTX.meshService, lastUse);
+            disposeResources(CTX.textureService, lastUse);
+            disposeResources(CTX.voxelService, lastUse);
+            disposeResources(CTX.materialService, lastUse);
         }
     }
 }

@@ -9,13 +9,13 @@ namespace Metal {
     class Inspectable;
 
     class FormPanel final : public AbstractPanel {
-        std::unordered_map<std::string, Inspectable*> inspectionMap{};
+        std::unordered_map<std::string, Inspectable *> inspectionMap{};
         std::string searchFilter;
         char searchBuffer[256] = "";
 
-    public:
-        void processFields(Inspectable * inspection);
+        void processFields(Inspectable *inspection);
 
+    public:
         void setInspection(Inspectable *inspection);
 
         void onSync() override;

@@ -11,7 +11,6 @@
 #include "../../util/FilesUtil.h"
 #include "../../context/ApplicationContext.h"
 #include "TextureData.h"
-#include "../../enum/LevelOfDetail.h"
 
 namespace fs = std::filesystem;
 
@@ -31,10 +30,7 @@ namespace Metal {
             }
             const auto textureData = TextureData{width, height, channels, data};
 
-            metadata.size += reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_0);
-            metadata.size += reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_1);
-            metadata.size += reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_2);
-            metadata.size += reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_3);
+            metadata.size += saveImage(metadata.getId(), textureData);
 
             DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(metadata.getId()), metadata)
 
@@ -91,10 +87,7 @@ namespace Metal {
             }
 
             const auto textureData = TextureData{width, height, channels, data};
-            metadata.size += reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_0);
-            metadata.size += reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_1);
-            metadata.size += reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_2);
-            metadata.size += reduceImage(metadata.getId(), textureData, LevelOfDetail::LOD_3);
+            metadata.size += saveImage(metadata.getId(), textureData);
 
             DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(metadata.getId()), metadata)
 
@@ -108,35 +101,15 @@ namespace Metal {
         }
     }
 
-    size_t TextureImporterService::reduceImage(const std::string &fileId,
-                                             const TextureData &textureData, const LevelOfDetail &levelOfDetail) const {
-        const int newWidth = std::max(1, textureData.width / levelOfDetail.level);
-        const int newHeight = std::max(1, textureData.height / levelOfDetail.level);
-
-        // Allocate memory for the resized image
-        auto *resizedData = new unsigned char[newWidth * newHeight * textureData.channels];
-
-        // Resize the image
-        for (int y = 0; y < newHeight; ++y) {
-            for (int x = 0; x < newWidth; ++x) {
-                int srcX = x * textureData.width / newWidth;
-                int srcY = y * textureData.height / newHeight;
-                for (int c = 0; c < textureData.channels; ++c) {
-                    resizedData[(y * newWidth + x) * textureData.channels + c] = textureData.data[
-                        (srcY * textureData.width + srcX) * textureData.channels + c];
-                }
-            }
-        }
-
-        std::string texturePath = CTX.getAssetDirectory() + FORMAT_FILE_TEXTURE(fileId, levelOfDetail);
+    size_t TextureImporterService::saveImage(const std::string &fileId,
+                                             const TextureData &textureData) const {
+        std::string texturePath = CTX.getAssetDirectory() + FORMAT_FILE_TEXTURE(fileId);
         if (!stbi_write_png(texturePath.c_str(),
-                            newWidth, newHeight, textureData.channels, resizedData,
-                            newWidth * textureData.channels)) {
-            delete[] resizedData;
-            throw std::runtime_error("Failed to write resized image");
+                            textureData.width, textureData.height, textureData.channels, textureData.data,
+                            textureData.width * textureData.channels)) {
+            throw std::runtime_error("Failed to write image");
         }
 
-        delete[] resizedData;
         return fs::file_size(texturePath);
     }
 } // Metal

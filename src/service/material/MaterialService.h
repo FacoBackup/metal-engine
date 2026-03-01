@@ -3,25 +3,24 @@
 #include "MaterialFileData.h"
 #include "MaterialInstance.h"
 #include "../../service/abstract/AbstractResourceService.h"
+#include "../../service/abstract/IStreamable.h"
 
 #include "../../enum/engine-definitions.h"
 #include <vector>
 #include "../../dto/buffers/MaterialData.h"
 
 namespace Metal {
-    class MaterialService final : public AbstractResourceService {
+    class MaterialService final : public IStreamable<MaterialInstance> {
         unsigned int nextMaterialIndex = 1;
         std::vector<MaterialData> materials {MAX_MATERIALS};
     public:
-        explicit MaterialService()
-            : AbstractResourceService() {
-        }
-
-        MaterialInstance *create(const std::string &id);
+        MaterialInstance *create(const std::string &id) override;
 
         MaterialFileData *stream(const std::string &id) const;
 
         unsigned int getMaterialIndex(const std::string &id);
+
+        void disposeResource(MaterialInstance *resource) override;
     };
 } // Metal
 

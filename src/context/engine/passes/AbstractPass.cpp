@@ -1,38 +1,45 @@
 #include "AbstractPass.h"
+#include "../frame-builder/EngineFrame.h"
 #include "../../../context/ApplicationContext.h"
 #include "../../../service/pipeline/PipelineInstance.h"
 
 namespace Metal {
     AbstractPass::AbstractPass(bool isComputePass) : AbstractRuntimeComponent(),
-        worldRepository(CTX.worldRepository),
-        streamingRepository(
-            CTX.streamingRepository), isComputePass(isComputePass) {
+                                                     worldRepository(CTX.worldRepository),
+                                                     streamingRepository(
+                                                         CTX.streamingRepository), isComputePass(isComputePass) {
+    }
+
+    AbstractPass::~AbstractPass() {
+        if (pipelineInstance != nullptr) {
+            CTX.pipelineService.dispose(pipelineInstance->getId());
+        }
     }
 
     void AbstractPass::recordPushConstant(const void *data) {
+        VkShaderStageFlags stageFlags = 0;
+        if (getPipeline()->isRayTracing) {
+            stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_MISS_BIT_KHR |
+                         VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR |
+                         VK_SHADER_STAGE_INTERSECTION_BIT_KHR;
+        } else if (isComputePass) {
+            stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
+        } else {
+            stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+        }
+
         vkCmdPushConstants(
             vkCommandBuffer,
             getPipeline()->vkPipelineLayout,
-            isComputePass ? VK_SHADER_STAGE_COMPUTE_BIT : (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT),
+            stageFlags,
             0,
             getPipeline()->pushConstantsSize,
             data);
     }
 
     void AbstractPass::bindStaticDescriptorSets() {
-        bindDescriptorSets(getPipeline()->descriptorSets);
-    }
-
-    void AbstractPass::bindDescriptorSets(const std::vector<VkDescriptorSet> &descriptors) {
-        if (!descriptors.empty()) {
-            vkCmdBindDescriptorSets(vkCommandBuffer,
-                                    getBindingPoint(),
-                                    getPipeline()->vkPipelineLayout,
-                                    0,
-                                    descriptors.size(),
-                                    descriptors.data(),
-                                    0,
-                                    nullptr);
+        if (getPipeline()->descriptor != nullptr) {
+            bindSingleDescriptorSet(0, getPipeline()->descriptor->vkDescriptorSet);
         }
     }
 
@@ -49,6 +56,18 @@ namespace Metal {
         );
     }
 
+    void AbstractPass::bindDescriptorSets(const std::vector<VkDescriptorSet> &descriptors) {
+        if (!descriptors.empty()) {
+            vkCmdBindDescriptorSets(vkCommandBuffer,
+                                    getBindingPoint(),
+                                    getPipeline()->vkPipelineLayout,
+                                    0,
+                                    descriptors.size(),
+                                    descriptors.data(),
+                                    0,
+                                    nullptr);
+        }
+    }
     VkPipelineBindPoint AbstractPass::getBindingPoint() const {
         if (pipelineInstance != nullptr && pipelineInstance->isRayTracing) {
             return VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR;
@@ -57,5 +76,12 @@ namespace Metal {
             return VK_PIPELINE_BIND_POINT_COMPUTE;
         }
         return VK_PIPELINE_BIND_POINT_GRAPHICS;
+    }
+
+    std::string AbstractPass::getScopedResourceId(const std::string &id) const {
+        if (frame != nullptr) {
+            return frame->getId() + "_" + id;
+        }
+        return id;
     }
 }

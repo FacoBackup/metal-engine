@@ -3,7 +3,6 @@
 #include "VertexData.h"
 #include "../../dto/file/EntryMetadata.h"
 #include "../../enum/engine-definitions.h"
-#include "../../enum/LevelOfDetail.h"
 #include "../../util/FilesUtil.h"
 #include "../../context/ApplicationContext.h"
 #include <cereal/archives/binary.hpp>
@@ -19,17 +18,13 @@ namespace Metal {
             metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.'));
         }
 
-        std::string lod0Path = CTX.getAssetDirectory() + FORMAT_FILE_MESH(metadata.getId(), LevelOfDetail::LOD_0);
+        std::string lod0Path = CTX.getAssetDirectory() + FORMAT_FILE_MESH(metadata.getId());
         {
             std::ofstream output(lod0Path, std::ios::binary);
             cereal::BinaryOutputArchive archive(output);
             archive(mesh);
         }
         metadata.size += fs::file_size(lod0Path);
-
-        metadata.size += simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_1);
-        metadata.size += simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_2);
-        metadata.size += simplifyMesh(metadata.getId(), mesh, LevelOfDetail::LOD_3);
 
         DUMP_TEMPLATE(targetDir + '/' + metadata.getId() + FILE_METADATA, metadata)
         return metadata.getId();
@@ -87,43 +82,5 @@ namespace Metal {
             meshMaterialMap.insert({id, assimpMesh->mMaterialIndex});
             LOG_INFO("Persisted mesh: " + meshData.name + " (" + id + ")");
         }
-    }
-
-    size_t MeshImporterService::simplifyMesh(const std::string &fileId, const MeshData &mesh,
-                                            const LevelOfDetail &levelOfDetail) const {
-        size_t vertexCount = mesh.data.size();
-        size_t indexCount = mesh.indices.size();
-        size_t targetIndexCount = indexCount / levelOfDetail.level;
-
-        std::vector<unsigned int> simplifiedIndices(indexCount);
-        float target_error = 1e-2f;
-        float lod_error = 0.f;
-
-        size_t simplifiedIndexCount = meshopt_simplify(
-            simplifiedIndices.data(),
-            mesh.indices.data(),
-            indexCount,
-            &mesh.data[0].vertex.x,
-            vertexCount,
-            sizeof(VertexData),
-            targetIndexCount,
-            target_error,
-            0,
-            &lod_error
-        );
-
-        simplifiedIndices.resize(simplifiedIndexCount);
-
-        MeshData simplifiedMesh;
-        simplifiedMesh.data = mesh.data;
-        simplifiedMesh.indices = std::move(simplifiedIndices);
-
-        std::string lodPath = CTX.getAssetDirectory() + FORMAT_FILE_MESH(fileId, levelOfDetail);
-        {
-            std::ofstream output(lodPath, std::ios::binary);
-            cereal::BinaryOutputArchive archive(output);
-            archive(simplifiedMesh);
-        }
-        return fs::file_size(lodPath);
     }
 }

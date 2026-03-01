@@ -24,10 +24,6 @@ namespace Metal {
             return id;
         }
 
-        virtual void dispose() {
-            throw std::runtime_error("Not implemented");
-        }
-
         void setAsNoDisposal() {
             noDisposal = true;
         }

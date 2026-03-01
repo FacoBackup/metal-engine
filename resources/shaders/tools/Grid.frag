@@ -16,7 +16,7 @@ layout(push_constant) uniform Push {
 
 layout(location = 0) in vec2 texCoords;
 layout(location = 0) out vec4 finalColor;
-layout(set = 1, binding = 0) uniform sampler2D gBufferPosition;
+layout(set = 0, binding = 1) uniform sampler2D gBufferPosition;
 
 vec3 p = vec3(0);
 bool rayMarch(vec3 ro, vec3 rd, float width) {

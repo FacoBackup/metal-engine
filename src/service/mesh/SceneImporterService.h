@@ -9,7 +9,6 @@
 
 namespace Metal {
     struct MaterialFileData;
-    struct LevelOfDetail;
     struct MeshData;
     struct SceneData;
 

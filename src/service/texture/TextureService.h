@@ -5,13 +5,13 @@
 #include <vulkan/vulkan_core.h>
 
 #include "TextureData.h"
-#include "../abstract/AbstractResourceService.h"
+#include "../abstract/IStreamable.h"
+#include "TextureInstance.h"
 
 namespace Metal {
-    struct LevelOfDetail;
     struct TextureInstance;
 
-    class TextureService final : public AbstractResourceService {
+    class TextureService final : public IStreamable<TextureInstance> {
         unsigned int nextTextureIndex = 1;
         std::unordered_map<std::string, unsigned int> textureIndices{};
 
@@ -32,21 +32,19 @@ namespace Metal {
         void generateMipmaps(const TextureInstance *image) const;
 
     public:
-        [[nodiscard]] TextureData *stream(const std::string &id, const LevelOfDetail &lod) const;
-
-        explicit TextureService()
-            : AbstractResourceService() {
-        }
+        [[nodiscard]] TextureData *stream(const std::string &id) const;
 
         TextureInstance *loadTexture(const std::string &id, const std::string &pathToImage,
                                      bool generateMipMaps = false,
                                      VkFormat imageFormat = VK_FORMAT_R8G8B8A8_SRGB);
 
-        TextureInstance *create(const std::string &id, const LevelOfDetail &lod);
+        TextureInstance *create(const std::string &id) override;
 
-        TextureInstance *createForCompute(unsigned int width, unsigned int height);
+        TextureInstance *createForCompute(const std::string &id, unsigned int width, unsigned int height);
 
         unsigned int getTextureIndex(const std::string &id);
+
+        void disposeResource(TextureInstance *resource) override;
     };
 } // Metal
 

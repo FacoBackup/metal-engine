@@ -1,15 +1,15 @@
 #include "SelectedDotPass.h"
 
 #include "../../../../../context/ApplicationContext.h"
-#include "../../../../../enum/LevelOfDetail.h"
 #include "../../../../../repository/world/components/TransformComponent.h"
 #include "../../../../../dto/push-constant/SelectedDotPushConstant.h"
 #include "../../../../../service/pipeline/PipelineBuilder.h"
+#include "../../../../../enum/EngineResourceIDs.h"
 
 namespace Metal {
     void SelectedDotPass::onInitialize() {
         PipelineBuilder builder = PipelineBuilder::Of(
-                    CTX.coreFrameBuffers.postProcessingFBO,
+                   getScopedResourceId(RID_POST_PROCESSING_FBO),
                     "tools/SelectedDot.vert",
                     "tools/SelectedDot.frag"
                 )
@@ -17,8 +17,8 @@ namespace Metal {
                 .setPrepareForMesh()
                 .setCullMode(VK_CULL_MODE_BACK_BIT)
                 .setPushConstantsSize(sizeof(SelectedDotPushConstant))
-                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.gBufferPosition.get());
+                .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
+                .addFboBinding(getScopedResourceId(RID_G_BUFFER_FBO), 2);
         pipelineInstance = CTX.pipelineService.createPipeline(builder);
     }
 
@@ -45,7 +45,7 @@ namespace Metal {
                 continue;
             }
 
-            const auto *meshInstance = streamingRepository.streamMesh(mesh.meshId, LevelOfDetail::LOD_0);
+            const auto *meshInstance = streamingRepository.streamMesh(mesh.meshId);
             if (!meshInstance) {
                 continue;
             }

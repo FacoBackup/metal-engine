@@ -23,7 +23,8 @@ namespace Metal {
             ImGui::SameLine();
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Open", "Ctrl+O")) {
-                    CTX.updateRootPath(true); // TODO - CLEAR APPLICATION STATE
+                    CTX.engineContext.dispose();
+                    CTX.updateRootPath(true);
                 }
                 if (ImGui::MenuItem("Save", "Ctrl+S")) {
                     CTX.save();
@@ -38,8 +39,8 @@ namespace Metal {
             // Create an "Edit" menu
             if (ImGui::BeginMenu("Edit")) {
                 if (ImGui::MenuItem("Compile shaders")) {
-                    CTX.passesService.dispose();
-                    CTX.passesService.onInitialize();
+                    CTX.engineContext.dispose();
+                    // TODO - CREATE NEW FRAME
                 }
                 ImGui::EndMenu();
             }
@@ -58,7 +59,9 @@ namespace Metal {
 
     void EditorHeaderPanel::framerate() {
         const int framerate = static_cast<int>(round(ImGui::GetIO().Framerate));
-        ImGui::Text("%i ms | %i fps", 1000 / framerate, framerate);
+        if (framerate > 0) {
+            ImGui::Text("%i ms | %i fps", 1000 / framerate, framerate);
+        }
     }
 
     void EditorHeaderPanel::renderShortcuts() {
@@ -77,7 +80,9 @@ namespace Metal {
         }
 
         if (ImGui::BeginPopup("AllShortcutsPopup")) {
-            if (ImGui::BeginTable("ShortcutsTable", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp)) {
+            if (ImGui::BeginTable("ShortcutsTable", 2,
+                                  ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg |
+                                  ImGuiTableFlags_SizingStretchProp)) {
                 ImGui::TableSetupColumn("Key");
                 ImGui::TableSetupColumn("Action");
                 ImGui::TableHeadersRow();

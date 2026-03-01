@@ -3,16 +3,18 @@
 #include "../../../../context/ApplicationContext.h"
 
 #include "../../../../service/pipeline/PipelineBuilder.h"
+#include "../../../../enum/EngineResourceIDs.h"
+
 
 namespace Metal {
     void PostProcessingPass::onInitialize() {
         PipelineBuilder ppPipelineBuilder = PipelineBuilder::Of(
-                    CTX.coreFrameBuffers.postProcessingFBO,
+                    getScopedResourceId(RID_POST_PROCESSING_FBO),
                     "QUAD.vert",
                     "PostProcessing.frag"
                 )
                 .setPushConstantsSize(sizeof(PostProcessingPushConstant))
-                .addDescriptorSet(CTX.coreDescriptorSets.postProcessingDescriptor.get());
+                .addCombinedImageSamplerBinding(CTX.vulkanContext.vkImageSampler, frame->getResourceAs<TextureInstance>(RID_ACCUMULATED_FRAME)->vkImageView);
         pipelineInstance = CTX.pipelineService.createPipeline(ppPipelineBuilder);
     }
 

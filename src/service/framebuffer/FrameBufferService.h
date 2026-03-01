@@ -6,7 +6,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "../abstract/AbstractResourceService.h"
-
+#include "FrameBufferInstance.h"
 
 namespace Metal {
     struct FrameBufferAttachment;
@@ -19,7 +19,7 @@ namespace Metal {
      * - Render passes
      * - Framebuffers
      */
-    class FrameBufferService final : public AbstractResourceService {
+    class FrameBufferService final : public AbstractResourceService<FrameBufferInstance> {
         std::shared_ptr<FrameBufferAttachment> createAttachmentInternal(const char *name, VkFormat format,
                                                                         VkImageUsageFlagBits usage,
                                                                         FrameBufferInstance *framebuffer) const;
@@ -28,12 +28,12 @@ namespace Metal {
 
     public:
         explicit FrameBufferService()
-            : AbstractResourceService() {
+            : AbstractResourceService<FrameBufferInstance>() {
         }
 
         void createSampler(bool linear, VkSampler &vkImageSampler);
 
-        FrameBufferInstance *createFrameBuffer(unsigned int w, unsigned int h, glm::vec4 clearColor = glm::vec4(0.0f));
+        FrameBufferInstance *createFrameBuffer(const std::string &id, unsigned int w, unsigned int h, glm::vec4 clearColor = glm::vec4(0.0f));
 
         void createDepthAttachment(FrameBufferInstance *framebuffer) const;
 
@@ -42,6 +42,8 @@ namespace Metal {
 
 
         void createRenderPass(FrameBufferInstance *framebuffer) const;
+
+        void disposeResource(FrameBufferInstance *resource) override;
     };
 } // Metal
 

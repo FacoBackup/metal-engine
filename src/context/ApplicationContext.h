@@ -6,19 +6,14 @@
 #include "engine/EngineContext.h"
 #include "glfw/GLFWContext.h"
 #include "vulkan/VulkanContext.h"
-#include "../repository/framebuffer/CoreFrameBuffers.h"
-#include "../repository/buffers/CoreBuffers.h"
-#include "../repository/descriptors/CoreDescriptorSets.h"
-#include "../repository/texture/CoreTextures.h"
 
 #include "../service/mesh/MeshService.h"
 #include "../service/world/WorldGridService.h"
 #include "../service/texture/TextureService.h"
-#include "../service/exporter/VideoExporterService.h"
 #include "../service/framebuffer/FrameBufferService.h"
 #include "../service/pipeline/PipelineService.h"
 #include "../service/buffer/BufferService.h"
-#include "../service/descriptor/DescriptorService.h"
+#include "../service/descriptor/DescriptorSetService.h"
 #include "../service/theme/ThemeService.h"
 #include "../service/dock/DockService.h"
 #include "../service/selection/SelectionService.h"
@@ -29,10 +24,9 @@
 #include "../service/files/FilesService.h"
 #include "../service/files/FileImporterService.h"
 #include "../service/camera/CameraService.h"
-#include "./engine/passes/PassesService.h"
 
 #include "../repository/world/impl/WorldGridRepository.h"
-#include "../repository/inspection/FileInspectionRepository.h"
+#include "../repository/inspection/FilesRepository.h"
 #include "../repository/world/WorldRepository.h"
 #include "../repository/runtime/RuntimeRepository.h"
 #include "../repository/streaming/StreamingService.h"
@@ -65,18 +59,12 @@ namespace Metal {
             : debugMode(debug_mode) {
         }
 
-        VideoExporterService videoExporterService{ true};
         EngineContext engineContext{};
-        PassesService passesService{};
         VulkanContext vulkanContext{ debugMode};
         GuiContext guiContext{};
         GLFWContext glfwContext{};
 
         // // ----------- CORE REPOSITORIES
-        CoreFrameBuffers coreFrameBuffers{};
-        CoreBuffers coreBuffers{};
-        CoreDescriptorSets coreDescriptorSets{};
-        CoreTextures coreTextures{};
         // ----------- CORE REPOSITORIES
 
         // ----------- Services
@@ -87,9 +75,9 @@ namespace Metal {
         MaterialService materialService{};
         TextureService textureService{};
         FrameBufferService framebufferService{};
-        PipelineService pipelineService{};
+        DescriptorSetService descriptorSetService{};
+        PipelineService pipelineService{descriptorSetService};
         BufferService bufferService{};
-        DescriptorService descriptorService{};
         ThemeService themeService{};
         DockService dockService{};
         SelectionService selectionService{};
@@ -111,7 +99,7 @@ namespace Metal {
         // ----------- Services
 
         // ----------- Repository
-        FileInspectionRepository fileInspection{};
+        FilesRepository fileInspection{};
         WorldGridRepository worldGridRepository{};
         WorldRepository worldRepository{};
         RuntimeRepository runtimeRepository{};

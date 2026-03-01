@@ -6,8 +6,6 @@
 #include "../../util/serialization-definitions.h"
 
 namespace Metal {
-    struct LevelOfDetail;
-
     struct MeshData final {
         std::string name;
         std::vector<VertexData> data;

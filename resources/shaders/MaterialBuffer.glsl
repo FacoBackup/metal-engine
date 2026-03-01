@@ -21,7 +21,7 @@ struct MaterialData {
     uint heightTexture;
 };
 
-layout (set = MATERIAL_SET, binding = 0) readonly buffer Materials {
+layout (set = 0, binding = MATERIAL_SET) readonly buffer Materials {
     MaterialData items[];
 } materialBuffer;
 #endif

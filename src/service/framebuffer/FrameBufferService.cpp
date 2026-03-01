@@ -30,12 +30,11 @@ namespace Metal {
                                                    &vkImageSampler));
     }
 
-    FrameBufferInstance *FrameBufferService::createFrameBuffer(const unsigned w, const unsigned h, glm::vec4 clearColor) {
-        auto *framebuffer = new FrameBufferInstance();
+    FrameBufferInstance *FrameBufferService::createFrameBuffer(const std::string &id, const unsigned w, const unsigned h, glm::vec4 clearColor) {
+        auto *framebuffer = createResourceInstance(id);
         framebuffer->bufferWidth = w;
         framebuffer->bufferHeight = h;
         framebuffer->clearColor = clearColor;
-        registerResource(framebuffer);
 
         return framebuffer;
     }
@@ -216,5 +215,16 @@ namespace Metal {
 
         vkCreateFramebuffer(CTX.vulkanContext.device.device, &framebufferInfo, nullptr,
                             &framebuffer->vkFramebuffer);
+    }
+
+    void FrameBufferService::disposeResource(FrameBufferInstance *resource) {
+        LOG_INFO("Disposing framebuffer instance");
+        vkDestroyFramebuffer(CTX.vulkanContext.device.device, resource->vkFramebuffer, nullptr);
+        vkDestroyRenderPass(CTX.vulkanContext.device.device, resource->vkRenderPass, nullptr);
+
+        for (int i = 0; i < resource->attachments.size(); i++) {
+            LOG_INFO("Disposing of attachment instance " + std::to_string(i));
+            resource->attachments[i]->dispose();
+        }
     }
 } // Metal

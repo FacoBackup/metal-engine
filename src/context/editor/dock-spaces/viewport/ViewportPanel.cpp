@@ -4,16 +4,26 @@
 #include "GizmoPanel.h"
 #include "ImGuizmo.h"
 #include "ViewportHeaderPanel.h"
+#include "EngineFramePanel.h"
 #include "../../../../context/ApplicationContext.h"
 #include "../../../../service/descriptor/DescriptorInstance.h"
 #include "../../../../service/framebuffer/FrameBufferInstance.h"
 #include "../../../../service/camera/Camera.h"
+#include "../../../../context/engine/frame-builder/EngineFrameBuilder.h"
+#include "../../../../service/framebuffer/FrameBufferService.h"
+#include "../../../../enum/engine-definitions.h"
+#include "../../../../dto/buffers/GlobalDataUBO.h"
+#include "../../../../dto/buffers/TileInfoUBO.h"
+#include "../../../../dto/buffers/LightData.h"
+#include "../../../../dto/buffers/VolumeData.h"
+#include "../../../../dto/buffers/MaterialData.h"
 
 #include <algorithm>
 
 namespace Metal {
     void ViewportPanel::onInitialize() {
         appendChild(headerPanel = new ViewportHeaderPanel());
+        appendChild(engineFramePanel = new EngineFramePanel());
         appendChild(gizmoPanel = new GizmoPanel(position, size));
         appendChild(cameraPanel = new CameraPositionPanel());
 
@@ -64,56 +74,10 @@ namespace Metal {
         }
 
         headerPanel->onSync();
-
-        const float tabHeight = ImGui::GetFrameHeightWithSpacing();
-        const ImVec2 viewportSize{size->x, size->y - tabHeight - ViewportHeaderPanel::HEIGHT};
-
-        auto *framebuffer = CTX.coreFrameBuffers.postProcessingFBO;
-        CTX.descriptorService.setImageDescriptor(framebuffer, 0);
-        ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet),
-                     viewportSize);
-
-        const ImVec2 imageMin = ImGui::GetItemRectMin();
-        const ImVec2 imageMax = ImGui::GetItemRectMax();
-        handleViewportPicking(imageMin, imageMax);
+        engineFramePanel->onSync();
 
         gizmoPanel->onSync();
         cameraPanel->onSync();
-    }
-
-    void ViewportPanel::handleViewportPicking(const ImVec2 &imageMin, const ImVec2 &imageMax) const {
-        if (!ImGui::IsItemHovered() || !ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-            return;
-        }
-        if (ImGuizmo::IsUsing() || ImGuizmo::IsOver()) {
-            return;
-        }
-
-        const ImVec2 mousePos = ImGui::GetMousePos();
-        const float imageW = imageMax.x - imageMin.x;
-        const float imageH = imageMax.y - imageMin.y;
-        if (imageW <= 1.0f || imageH <= 1.0f) {
-            return;
-        }
-
-        const float u = (mousePos.x - imageMin.x) / imageW;
-        const float v = (mousePos.y - imageMin.y) / imageH;
-        if (u < 0.0f || u > 1.0f || v < 0.0f || v > 1.0f) {
-            return;
-        }
-
-        auto *gBuffer = CTX.coreFrameBuffers.gBufferFBO;
-        if (!gBuffer) {
-            return;
-        }
-        const auto width = gBuffer->bufferWidth;
-        const auto height = gBuffer->bufferHeight;
-        const uint32_t pixelX = std::min(static_cast<uint32_t>(u * static_cast<float>(width)), width - 1);
-        const uint32_t pixelY = std::min(static_cast<uint32_t>(v * static_cast<float>(height)), height - 1);
-
-        const auto picked = CTX.pickingService.pickEntityFromGBuffer(pixelX, pixelY);
-        CTX.selectionService.clearSelection();
-        CTX.selectionService.addSelected(picked.value_or(EMPTY_ENTITY));
     }
 
     void ViewportPanel::updateCamera() {

@@ -13,21 +13,19 @@
 #include "../buffer/BufferInstance.h"
 
 namespace Metal {
-    void PipelineService::createPipelineLayout(const std::vector<DescriptorInstance *> &descriptorSetsToBind,
-                                               const unsigned int pushConstantsSize, PipelineInstance *pipeline) const {
+    void PipelineService::createPipelineLayout(
+        const unsigned int pushConstantsSize, PipelineInstance *pipeline) const {
         VkPipelineLayoutCreateInfo layoutInfo = {};
         layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        std::vector<VkDescriptorSetLayout> descriptorLayouts{};
-        for (int i = 0; i < descriptorSetsToBind.size(); i++) {
-            descriptorLayouts.push_back(descriptorSetsToBind[i]->vkDescriptorSetLayout);
-        }
+        std::array descriptorLayouts{pipeline->descriptor->vkDescriptorSetLayout};
         layoutInfo.pSetLayouts = descriptorLayouts.data();
-        layoutInfo.setLayoutCount = descriptorLayouts.size();
+        layoutInfo.setLayoutCount = 1;
 
         if (pushConstantsSize > 0) {
             VkPushConstantRange pushConstantRange{};
             pushConstantRange.stageFlags = pipeline->isRayTracing
-                                               ? (VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_MISS_BIT_KHR)
+                                               ? (VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR |
+                                                  VK_SHADER_STAGE_MISS_BIT_KHR)
                                                : pipeline->isCompute
                                                      ? VK_SHADER_STAGE_COMPUTE_BIT
                                                      : VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -42,17 +40,35 @@ namespace Metal {
     }
 
     PipelineInstance *PipelineService::createPipeline(PipelineBuilder &pipelineBuilder) {
+        auto id = pipelineBuilder.id != nullptr ? std::string(pipelineBuilder.id) : Util::uuidV4();
+        auto *pipeline = createResourceInstance(id);
+
+        if (!pipelineBuilder.resourceBindings.empty()) {
+            VkShaderStageFlags stageFlags = 0;
+            if (pipelineBuilder.isRayTracing) {
+                stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_MISS_BIT_KHR |
+                             VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR |
+                             VK_SHADER_STAGE_INTERSECTION_BIT_KHR;
+            } else if (pipelineBuilder.computeShader != nullptr) {
+                stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
+            } else {
+                stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+            }
+
+            pipeline->descriptor = descriptorSetService.createDescriptor(pipelineBuilder, id + "_descriptor", stageFlags);
+        }
+
         if (pipelineBuilder.isRayTracing) {
-            return createRayTracingPipeline(pipelineBuilder);
+            return createRayTracingPipeline(pipelineBuilder, pipeline);
         }
         if (pipelineBuilder.computeShader != nullptr) {
-            return createComputePipeline(pipelineBuilder);
+            return createComputePipeline(pipelineBuilder, pipeline);
         }
-        return createRenderingPipeline(pipelineBuilder);
+        return createRenderingPipeline(pipelineBuilder, pipeline);
     }
 
-    PipelineInstance *PipelineService::createComputePipeline(const PipelineBuilder &pipelineBuilder) const {
-        auto *pipeline = new PipelineInstance();
+    PipelineInstance *PipelineService::createComputePipeline(const PipelineBuilder &pipelineBuilder,
+                                                             PipelineInstance *pipeline) {
         pipeline->isCompute = true;
         pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
         VkShaderModule computeShaderModule = ShaderUtil::CreateShaderModule(pipelineBuilder.computeShader);
@@ -62,7 +78,7 @@ namespace Metal {
         computeShaderStageInfo.module = computeShaderModule;
         computeShaderStageInfo.pName = "main";
 
-        createPipelineLayout(pipelineBuilder.descriptorSetsToBind, pipelineBuilder.pushConstantsSize, pipeline);
+        createPipelineLayout(pipelineBuilder.pushConstantsSize, pipeline);
 
         VkComputePipelineCreateInfo pipelineInfo{};
         pipelineInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
@@ -74,24 +90,18 @@ namespace Metal {
             throw std::runtime_error("failed to create compute pipeline!");
         }
 
-        pipeline->descriptorSets.resize(pipelineBuilder.descriptorSetsToBind.size());
-        for (int i = 0; i < pipelineBuilder.descriptorSetsToBind.size(); i++) {
-            pipeline->descriptorSets[i] = pipelineBuilder.descriptorSetsToBind[i]->vkDescriptorSet;
-        }
-
         vkDestroyShaderModule(CTX.vulkanContext.device.device, computeShaderModule, nullptr);
         return pipeline;
     }
 
-    PipelineInstance *PipelineService::createRenderingPipeline(PipelineBuilder &pipelineBuilder) {
+    PipelineInstance *PipelineService::createRenderingPipeline(PipelineBuilder &pipelineBuilder,
+                                                               PipelineInstance *pipeline) {
         auto meshDescriptions = VertexData::GetAttributeDescriptions();
 
-        auto *pipeline = new PipelineInstance();
         pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
         auto fragmentShaderModule = ShaderUtil::CreateShaderModule(pipelineBuilder.fragmentShader);
         auto vertexShaderModule = ShaderUtil::CreateShaderModule(pipelineBuilder.vertexShader);
-        registerResource(pipeline);
-        createPipelineLayout(pipelineBuilder.descriptorSetsToBind, pipelineBuilder.pushConstantsSize, pipeline);
+        createPipelineLayout(pipelineBuilder.pushConstantsSize, pipeline);
 
         std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages{};
         shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -133,7 +143,6 @@ namespace Metal {
 
         VkPipelineRasterizationStateCreateInfo rasterizer{};
         rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-        rasterizer.depthClampEnable = VK_FALSE;
         rasterizer.rasterizerDiscardEnable = VK_FALSE;
         rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
         rasterizer.lineWidth = 1.0f;
@@ -146,10 +155,15 @@ namespace Metal {
         multisampling.sampleShadingEnable = VK_FALSE;
         multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
 
+        auto *frameBuffer = CTX.framebufferService.getResource(pipelineBuilder.frameBufferId);
+        if (!frameBuffer) {
+            throw std::runtime_error("Framebuffer not found: " + pipelineBuilder.frameBufferId);
+        }
+
         std::vector<VkPipelineColorBlendAttachmentState> colorBlendAttachments{};
-        for (int i = 0; i < pipelineBuilder.frameBuffer->attachments.size(); i++) {
+        for (int i = 0; i < frameBuffer->attachments.size(); i++) {
             auto &colorBlendAttachment = colorBlendAttachments.emplace_back();
-            if (pipelineBuilder.blendEnabled && !pipelineBuilder.frameBuffer->attachments[i]->depth) {
+            if (pipelineBuilder.blendEnabled && !frameBuffer->attachments[i]->depth) {
                 colorBlendAttachment.blendEnable = VK_TRUE;
                 colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
                 colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
@@ -208,7 +222,7 @@ namespace Metal {
         pipelineInfo.pColorBlendState = &colorBlending;
         pipelineInfo.pDynamicState = &dynamicState;
         pipelineInfo.layout = pipeline->vkPipelineLayout;
-        pipelineInfo.renderPass = pipelineBuilder.frameBuffer->vkRenderPass;
+        pipelineInfo.renderPass = frameBuffer->vkRenderPass;
         pipelineInfo.subpass = 0;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
@@ -217,24 +231,21 @@ namespace Metal {
                                                              nullptr,
                                                              &pipeline->vkPipeline));
 
-        pipeline->descriptorSets.resize(pipelineBuilder.descriptorSetsToBind.size());
-        for (int i = 0; i < pipelineBuilder.descriptorSetsToBind.size(); i++) {
-            pipeline->descriptorSets[i] = pipelineBuilder.descriptorSetsToBind[i]->vkDescriptorSet;
-        }
         vkDestroyShaderModule(CTX.vulkanContext.device.device, fragmentShaderModule, nullptr);
         vkDestroyShaderModule(CTX.vulkanContext.device.device, vertexShaderModule, nullptr);
         return pipeline;
     }
 
-    static VkDeviceAddress getBufferDeviceAddress(VkDevice device, VkBuffer buffer, PFN_vkGetBufferDeviceAddressKHR fn) {
+    static VkDeviceAddress
+    getBufferDeviceAddress(VkDevice device, VkBuffer buffer, PFN_vkGetBufferDeviceAddressKHR fn) {
         VkBufferDeviceAddressInfo info{};
         info.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
         info.buffer = buffer;
         return fn(device, &info);
     }
 
-    PipelineInstance *PipelineService::createRayTracingPipeline(const PipelineBuilder &pipelineBuilder) const {
-        auto *pipeline = new PipelineInstance();
+    PipelineInstance *PipelineService::createRayTracingPipeline(const PipelineBuilder &pipelineBuilder,
+                                                                PipelineInstance *pipeline) {
         pipeline->isRayTracing = true;
         pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
 
@@ -286,7 +297,7 @@ namespace Metal {
         shaderGroups[2].anyHitShader = VK_SHADER_UNUSED_KHR;
         shaderGroups[2].intersectionShader = VK_SHADER_UNUSED_KHR;
 
-        createPipelineLayout(pipelineBuilder.descriptorSetsToBind, pipelineBuilder.pushConstantsSize, pipeline);
+        createPipelineLayout(pipelineBuilder.pushConstantsSize, pipeline);
 
         VkRayTracingPipelineCreateInfoKHR rtPipelineInfo{};
         rtPipelineInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_KHR;
@@ -318,9 +329,10 @@ namespace Metal {
                 0, groupCount, sbtSize, shaderHandleStorage.data()));
 
         // Create SBT buffers - each needs baseAlignment
-        auto createSBTBuffer = [&](uint32_t groupIndex) -> std::shared_ptr<BufferInstance> {
+        auto createSBTBuffer = [&](uint32_t groupIndex, const std::string &sbtType) -> BufferInstance * {
             const uint32_t sbtBufferSize = (handleSizeAligned + baseAlignment - 1) & ~(baseAlignment - 1);
-            auto buf = CTX.bufferService.createBuffer(
+            auto *buf = CTX.bufferService.createBuffer(
+                pipeline->getId() + "_sbt_" + sbtType,
                 sbtBufferSize,
                 VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -329,12 +341,13 @@ namespace Metal {
             return buf;
         };
 
-        pipeline->raygenSBT = createSBTBuffer(0);
-        pipeline->missSBT = createSBTBuffer(1);
-        pipeline->hitSBT = createSBTBuffer(2);
+        pipeline->raygenSBT = createSBTBuffer(0, "raygen");
+        pipeline->missSBT = createSBTBuffer(1, "miss");
+        pipeline->hitSBT = createSBTBuffer(2, "hit");
 
-        auto getAddr = [&](const std::shared_ptr<BufferInstance> &buf) {
-            return getBufferDeviceAddress(CTX.vulkanContext.device.device, buf->vkBuffer, CTX.vulkanContext.vkGetBufferDeviceAddressKHR);
+        auto getAddr = [&](const BufferInstance *buf) {
+            return getBufferDeviceAddress(CTX.vulkanContext.device.device, buf->vkBuffer,
+                                          CTX.vulkanContext.vkGetBufferDeviceAddressKHR);
         };
 
         pipeline->raygenRegion.deviceAddress = getAddr(pipeline->raygenSBT);
@@ -351,15 +364,25 @@ namespace Metal {
 
         pipeline->callableRegion = {}; // unused
 
-        pipeline->descriptorSets.resize(pipelineBuilder.descriptorSetsToBind.size());
-        for (size_t i = 0; i < pipelineBuilder.descriptorSetsToBind.size(); i++) {
-            pipeline->descriptorSets[i] = pipelineBuilder.descriptorSetsToBind[i]->vkDescriptorSet;
-        }
-
         vkDestroyShaderModule(CTX.vulkanContext.device.device, rayGenModule, nullptr);
         vkDestroyShaderModule(CTX.vulkanContext.device.device, missModule, nullptr);
         vkDestroyShaderModule(CTX.vulkanContext.device.device, closestHitModule, nullptr);
 
         return pipeline;
+    }
+
+    void PipelineService::disposeResource(PipelineInstance *resource) {
+        LOG_INFO("Disposing of pipeline instance");
+
+        if (resource->descriptor != nullptr) {
+            descriptorSetService.dispose(resource->getId());
+        }
+
+        vkDestroyPipelineLayout(CTX.vulkanContext.device.device, resource->vkPipelineLayout, nullptr);
+        vkDestroyPipeline(CTX.vulkanContext.device.device, resource->vkPipeline, nullptr);
+    }
+
+    std::vector<DescriptorInstance *> PipelineService::getAllDescriptors() const {
+        return descriptorSetService.getAllDescriptors();
     }
 } // Metal

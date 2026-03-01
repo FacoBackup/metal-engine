@@ -22,6 +22,8 @@ add_executable(
         src/context/gui/GuiContext.h
         src/context/editor/dock-spaces/viewport/ViewportPanel.cpp
         src/context/editor/dock-spaces/viewport/ViewportPanel.h
+        src/context/editor/dock-spaces/viewport/EngineFramePanel.cpp
+        src/context/editor/dock-spaces/viewport/EngineFramePanel.h
         src/context/editor/dock-spaces/docks/AbstractDockPanel.h
         src/context/ApplicationContext.cpp
         src/context/ApplicationContext.h
@@ -79,6 +81,8 @@ add_executable(
         src/context/editor/dock-spaces/files/FilePreviewPanel.h
         src/context/editor/dock-spaces/console/ConsolePanel.cpp
         src/context/editor/dock-spaces/console/ConsolePanel.h
+        src/context/editor/dock-spaces/metrics/MetricsPanel.cpp
+        src/context/editor/dock-spaces/metrics/MetricsPanel.h
         src/service/log/LogService.cpp
         src/service/log/LogService.h
         src/context/editor/dock-spaces/hierarchy/HierarchyPanel.cpp
@@ -91,14 +95,8 @@ add_executable(
         src/context/engine/render-pass/AbstractRenderPass.cpp
         src/context/engine/render-pass/AbstractRenderPass.h
         src/context/engine/render-pass/impl/GBufferGenPass.cpp
-        src/context/engine/render-pass/impl/GBufferGenPass.h
-        src/service/texture/TextureInstance.h
-        src/repository/abstract/ResourceRepository.h
-        src/service/abstract/AbstractResourceService.cpp
         src/service/abstract/AbstractResourceService.h
         src/service/framebuffer/FrameBufferAttachment.h
-        src/repository/framebuffer/CoreFrameBuffers.cpp
-        src/repository/framebuffer/CoreFrameBuffers.h
         src/repository/abstract/AbstractCoreRepository.h
         src/service/framebuffer/FrameBufferService.cpp
         src/service/framebuffer/FrameBufferService.h
@@ -106,25 +104,18 @@ add_executable(
         src/service/pipeline/PipelineService.cpp
         src/service/pipeline/PipelineService.h
         src/service/pipeline/PipelineInstance.h
-        src/repository/buffers/CoreBuffers.cpp
-        src/repository/buffers/CoreBuffers.h
         src/service/buffer/BufferService.cpp
         src/service/buffer/BufferService.h
-        src/service/descriptor/DescriptorService.cpp
-        src/service/descriptor/DescriptorService.h
-        src/service/descriptor/DescriptorInstance.cpp
+        src/service/descriptor/DescriptorSetService.cpp
+        src/service/descriptor/DescriptorSetService.h
         src/service/descriptor/DescriptorInstance.h
         src/dto/buffers/GlobalDataUBO.h
         src/repository/runtime/RuntimeRepository.h
-        src/repository/descriptors/CoreDescriptorSets.cpp
-        src/repository/descriptors/CoreDescriptorSets.h
         src/service/buffer/BufferInstance.cpp
         src/service/buffer/BufferInstance.h
-        src/service/pipeline/PipelineInstance.cpp
         src/service/mesh/MeshService.cpp
         src/service/mesh/MeshService.h
         src/service/mesh/MeshData.h
-        src/service/mesh/MeshInstance.cpp
         src/service/mesh/MeshInstance.h
         src/util/FilesUtil.h
         src/dto/file/FSEntry.h
@@ -140,8 +131,6 @@ add_executable(
         src/service/mesh/SceneImporterService.cpp
         src/service/mesh/SceneImporterService.h
         src/service/abstract/AbstractImporter.h
-        src/enum/LevelOfDetail.h
-        src/enum/LevelOfDetail.cpp
         src/service/texture/TextureImporterService.cpp
         src/service/texture/TextureImporterService.h
         src/dto/file/EntryMetadata.h
@@ -226,8 +215,6 @@ add_executable(
         src/service/framebuffer/FrameBufferAttachment.cpp
         src/repository/engine/EngineRepository.cpp
         src/repository/engine/EngineRepository.h
-        src/repository/texture/CoreTextures.cpp
-        src/repository/texture/CoreTextures.h
         src/util/serialization-definitions.h
         src/service/notification/NotificationService.cpp
         src/service/notification/NotificationService.h
@@ -240,7 +227,6 @@ add_executable(
         src/context/engine/render-pass/impl/tools/SelectedDotPass.h
         src/service/picking/PickingService.cpp
         src/service/picking/PickingService.h
-        src/service/voxel/SVOInstance.cpp
         src/service/voxel/SVOInstance.h
         src/dto/push-constant/VoxelDebugSettingsPushConstant.h
         src/service/world/WorldGridService.cpp
@@ -260,15 +246,13 @@ add_executable(
         src/context/engine/compute-pass/AbstractComputePass.h
         src/context/engine/passes/AbstractPass.cpp
         src/context/engine/passes/AbstractPass.h
-        src/context/engine/passes/PassesService.cpp
-        src/context/engine/passes/PassesService.h
         src/util/ImageUtils.h
         src/service/material/MaterialInstance.h
         src/service/material/MaterialService.cpp
         src/service/material/MaterialService.h
         src/service/material/MaterialFileData.cpp
-        src/repository/inspection/FileInspectionRepository.cpp
-        src/repository/inspection/FileInspectionRepository.h
+        src/repository/inspection/FilesRepository.cpp
+        src/repository/inspection/FilesRepository.h
         src/context/editor/dock-spaces/inspector/MaterialEditPanel.cpp
         src/context/editor/dock-spaces/inspector/MaterialEditPanel.h
         src/enum/LightType.h
@@ -279,8 +263,6 @@ add_executable(
         src/repository/world/components/VolumeComponent.cpp
         src/repository/world/components/VolumeComponent.h
         src/service/descriptor/DescriptorBinding.h
-        src/service/exporter/VideoExporterService.cpp
-        src/service/exporter/VideoExporterService.h
         src/service/notification/AsyncTask.h
         src/service/voxel/VoxelImporterService.cpp
         src/service/voxel/VoxelImporterService.h
@@ -290,11 +272,27 @@ add_executable(
         src/service/volumes/VolumeService.h
         src/service/voxel/VoxelService.cpp
         src/service/voxel/VoxelService.h
-        src/service/framebuffer/FrameBufferInstance.cpp
         src/util/Serializable.cpp
         src/context/editor/abstract/form/ChildPanel.cpp
         src/context/editor/abstract/form/ChildPanel.h
         src/dto/file/SceneImportSettingsDTO.h
+        src/context/editor/panel/NotificationsPanel.cpp
+        src/context/editor/panel/NotificationsPanel.h
+        src/context/editor/panel/FileImportModalPanel.cpp
+        src/context/editor/panel/FileImportModalPanel.h
+        src/context/engine/frame-builder/EngineFrameBuilder.cpp
+        src/context/engine/frame-builder/EngineFrameBuilder.h
+        src/context/engine/frame-builder/EngineFrame.cpp
+        src/context/engine/frame-builder/EngineFrame.h
+        src/context/engine/frame-builder/structures/FramebufferBuilder.cpp
+        src/context/engine/frame-builder/structures/FramebufferBuilder.h
+        src/context/engine/frame-builder/structures/TextureBuilder.cpp
+        src/context/engine/frame-builder/structures/TextureBuilder.h
+        src/context/engine/frame-builder/structures/BufferBuilder.cpp
+        src/context/engine/frame-builder/structures/BufferBuilder.h
+        src/context/engine/frame-builder/structures/ResourceBuilder.h
+        src/service/pipeline/PipelineBuilder.cpp
+        src/service/descriptor/DescriptorSetService.cpp
 )
 
 
@@ -338,7 +336,6 @@ set(COMMON_LIBRARIES
 target_link_libraries(metal_engine PRIVATE ${COMMON_LIBRARIES})
 add_subdirectory(dependencies/vk-bootstrap)
 # ------ LIBS
-
 # ------ STATIC RESOURCES
 file(COPY "${CMAKE_SOURCE_DIR}/resources" DESTINATION "${CMAKE_BINARY_DIR}/")
 # ------ STATIC RESOURCES
@@ -346,7 +343,6 @@ file(COPY "${CMAKE_SOURCE_DIR}/resources" DESTINATION "${CMAKE_BINARY_DIR}/")
 # ------ VCPKG
 
 #set(CMAKE_TOOLCHAIN_FILE "Users/cafe/.vcpkg-clion/vcpkg/scripts/buildsystems/vcpkg.cmake")
-set(CMAKE_TOOLCHAIN_FILE "C:/Users/russi/vcpkg/scripts/buildsystems/vcpkg.cmake")
 set(VCPKG_JSON_PATH "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg.json")
 
 # Include vcpkg toolchain

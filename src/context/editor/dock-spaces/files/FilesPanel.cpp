@@ -24,7 +24,7 @@ namespace Metal {
     }
 
     std::function<void()> FilesPanel::onAction() {
-        return [this]() {
+        return [this] {
             auto files = FileDialogUtil::PickFiles({
                 {
                     "Files",
@@ -32,20 +32,17 @@ namespace Metal {
                 }
             });
             if (!files.empty()) {
-                pendingImports = files;
-                importSettingsMap.clear();
-                for (const auto& file : pendingImports) {
+                CTX.fileInspection.pendingImports = files;
+                CTX.fileInspection.importSettingsMap.clear();
+                for (const auto& file : CTX.fileInspection.pendingImports) {
                     if (CTX.sceneImporterService.isCompatible(file)) {
-                        importSettingsMap.emplace(file, std::make_shared<SceneImportSettingsDTO>());
+                        CTX.fileInspection.importSettingsMap.emplace(file, std::make_shared<SceneImportSettingsDTO>());
                     } else {
-                        importSettingsMap.emplace(file, std::make_shared<ImportSettingsDTO>());
+                        CTX.fileInspection.importSettingsMap.emplace(file, std::make_shared<ImportSettingsDTO>());
                     }
                 }
-                selectedFileForSettings = pendingImports[0];
-                if (settingsForm) {
-                    settingsForm->setInspection(importSettingsMap.at(selectedFileForSettings).get());
-                }
-                ImGui::OpenPopup(("Import files?" + id + "importModal").c_str());
+                CTX.fileInspection.selectedFileForSettings = CTX.fileInspection.pendingImports[0];
+                CTX.fileInspection.targetImportDirectory = filesContext.currentDirectory;
             }
         };
     }
@@ -62,9 +59,6 @@ namespace Metal {
         appendChild(filesListPanel);
         previewPanel = new FilePreviewPanel(filesContext);
         appendChild(previewPanel);
-
-        settingsForm = new FormPanel();
-        appendChild(settingsForm);
 
         shortcuts = {
             ShortcutDTO("Cut", ImGuiMod_Ctrl | ImGuiKey_X, [this]() {
@@ -88,8 +82,6 @@ namespace Metal {
             filesHeader->onSync();
         }
         ImGui::Separator();
-
-        renderImportModal();
 
         if (renderPreview()) {
             if (ImGui::BeginTable((id + "split_table").c_str(), 2,
@@ -185,88 +177,5 @@ namespace Metal {
     void FilesPanel::deleteSelected() const {
         CTX.filesService.deleteFiles(filesContext.selected);
         FilesService::GetEntries(filesContext.currentDirectory);
-    }
-
-    void FilesPanel::renderImportModal() {
-        const ImGuiViewport *viewport = ImGui::GetMainViewport();
-        const float maxHeight = viewport->Size.y * 0.7f;
-        const float width = 800.0f;
-
-        ImGui::SetNextWindowPos(viewport->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-        ImGui::SetNextWindowSizeConstraints(ImVec2(width, 400), ImVec2(width, maxHeight));
-
-        if (ImGui::BeginPopupModal(("Import files?" + id + "importModal").c_str(), nullptr,
-                                   ImGuiWindowFlags_AlwaysAutoResize)) {
-
-            if (ImGui::BeginTable((id + "ImportLayoutTable").c_str(), 2, ImGuiTableFlags_Resizable)) {
-                ImGui::TableSetupColumn("FileList", ImGuiTableColumnFlags_WidthStretch, 0.4f);
-                ImGui::TableSetupColumn("Settings", ImGuiTableColumnFlags_WidthStretch, 0.6f);
-
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
-
-                ImGui::Text("Files:");
-                if (ImGui::BeginTable((id + "ImportFilesTable").c_str(), 3,
-                                      ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,
-                                      ImVec2(0, maxHeight - 180.0f))) {
-                    ImGui::TableSetupColumn("Name");
-                    ImGui::TableSetupColumn("Ext", ImGuiTableColumnFlags_WidthFixed, 40.0f);
-                    ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed, 80.0f);
-                    ImGui::TableHeadersRow();
-
-                    for (const auto &filePath: pendingImports) {
-                        std::filesystem::path p(filePath);
-                        ImGui::TableNextRow();
-                        ImGui::TableNextColumn();
-                        bool isSelected = (selectedFileForSettings == filePath);
-                        if (ImGui::Selectable(p.filename().string().c_str(), isSelected, ImGuiSelectableFlags_SpanAllColumns)) {
-                            selectedFileForSettings = filePath;
-                            settingsForm->setInspection(importSettingsMap.at(selectedFileForSettings).get());
-                        }
-                        ImGui::TableNextColumn();
-                        ImGui::TextUnformatted(p.extension().string().c_str());
-                        ImGui::TableNextColumn();
-                        try {
-                            ImGui::TextUnformatted(FilesUtil::FormatSize(std::filesystem::file_size(p)).c_str());
-                        } catch (...) {
-                            ImGui::TextUnformatted("N/A");
-                        }
-                    }
-                    ImGui::EndTable();
-                }
-
-                ImGui::TableNextColumn();
-                ImGui::Text("Settings: %s", std::filesystem::path(selectedFileForSettings).filename().string().c_str());
-                ImGui::BeginChild((id + "SettingsFormChild").c_str(), ImVec2(0, maxHeight - 180.0f), true);
-                settingsForm->onSync();
-                ImGui::EndChild();
-
-                ImGui::EndTable();
-            }
-
-            ImGui::Spacing();
-            ImGui::Separator();
-            ImGui::Spacing();
-
-            if (ImGui::Button(("Approve" + id + "approveImport").c_str(), ImVec2(120, 0))) {
-                for (const std::string &file: pendingImports) {
-                    CTX.fileImporterService.importFile(filesContext.currentDirectory->absolutePath, file, importSettingsMap.at(file));
-                }
-                CTX.notificationService.pushMessage("Importing files...", NotificationSeverities::WARNING);
-                FilesService::GetEntries(filesContext.currentDirectory);
-                pendingImports.clear();
-                importSettingsMap.clear();
-                settingsForm->resetForm();
-                ImGui::CloseCurrentPopup();
-            }
-            ImGui::SameLine();
-            if (ImGui::Button(("Cancel" + id + "cancel").c_str(), ImVec2(120, 0))) {
-                pendingImports.clear();
-                importSettingsMap.clear();
-                settingsForm->resetForm();
-                ImGui::CloseCurrentPopup();
-            }
-            ImGui::EndPopup();
-        }
     }
 }

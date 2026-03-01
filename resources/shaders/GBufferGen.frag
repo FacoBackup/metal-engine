@@ -9,7 +9,7 @@ layout (location = 0) in vec3 inPosition;
 layout (location = 1) in vec3 inNormal;
 layout (location = 2) in vec2 inUV;
 
-layout (set = 2, binding = 0) uniform sampler2D textureArray[];
+layout (set = 0, binding = 2) uniform sampler2D textureArray[];
 
 layout (location = 0) out vec4 outMaterialA;
 layout (location = 1) out vec4 outMaterialB;

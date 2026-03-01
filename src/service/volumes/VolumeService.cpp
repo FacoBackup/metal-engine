@@ -2,6 +2,7 @@
 #include "../../context/ApplicationContext.h"
 #include "../../repository/world/components/VolumeComponent.h"
 #include "../buffer/BufferInstance.h"
+#include "../../enum/EngineResourceIDs.h"
 
 namespace Metal {
     void VolumeService::registerVolumes() {
@@ -29,7 +30,7 @@ namespace Metal {
         registerVolumes();
 
         if (!items.empty()) {
-            CTX.coreBuffers.volumesBuffer->update(items.data());
+            CTX.engineContext.currentFrame->getResourceAs<BufferInstance>(RID_VOLUMES_BUFFER)->update(items.data());
         }
     }
 } // Metal

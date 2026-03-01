@@ -8,7 +8,7 @@ namespace Metal {
         VkDeviceMemory vkImageMemory = VK_NULL_HANDLE;
         VkImageView vkImageView = VK_NULL_HANDLE;
         VkFormat format = VK_FORMAT_MAX_ENUM;
-        std::unique_ptr<DescriptorInstance> imageDescriptor = nullptr;
+        DescriptorInstance *imageDescriptor = nullptr;
         bool depth = false;
         const char *name = nullptr;
 

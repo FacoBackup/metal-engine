@@ -1,17 +1,17 @@
 #ifndef METAL_ENGINE_VOXELSERVICE_H
 #define METAL_ENGINE_VOXELSERVICE_H
-#include "../abstract/AbstractResourceService.h"
+
+#include "../abstract/IStreamable.h"
+#include "SVOInstance.h"
 
 namespace Metal {
     struct SVOInstance;
 
-    class VoxelService final : public AbstractResourceService {
+    class VoxelService final : public IStreamable<SVOInstance> {
     public:
-        explicit VoxelService()
-            : AbstractResourceService() {
-        }
+        SVOInstance *create(const std::string &id) override;
 
-        SVOInstance *create(const std::string &id);
+        void disposeResource(SVOInstance *resource) override;
     };
 } // Metal
 

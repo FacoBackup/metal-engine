@@ -2,7 +2,6 @@
 #include "../../../context/ApplicationContext.h"
 #include "../../../enum/EntryType.h"
 #include "../../../service/mesh/MeshData.h"
-#include "../../../enum/LevelOfDetail.h"
 
 namespace Metal {
     void MeshComponent::registerFields() {
@@ -15,7 +14,7 @@ namespace Metal {
 
     void MeshComponent::onUpdate(InspectableMember *member) {
         if (member != nullptr && member->name == "meshId") {
-            MeshData *data = CTX.meshService.stream(meshId, LevelOfDetail::LOD_0);
+            MeshData *data = CTX.meshService.stream(meshId);
             if (data != nullptr) {
                 const auto e = static_cast<entt::entity>(entityId);
                 if (CTX.worldRepository.registry.all_of<TransformComponent>(e)) {

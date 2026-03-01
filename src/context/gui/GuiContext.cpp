@@ -4,9 +4,7 @@
 #include "imgui_freetype.h"
 #include "../ApplicationContext.h"
 #include "../../util/VulkanUtils.h"
-#include "../../repository/descriptors/CoreDescriptorSets.h"
 #include "../../service/descriptor/DescriptorInstance.h"
-#include "../../service/framebuffer/FrameBufferAttachment.h"
 #include "../../service/texture/TextureInstance.h"
 
 namespace Metal {
@@ -15,7 +13,7 @@ namespace Metal {
     }
 
     void GuiContext::renderImage(TextureInstance *texture, const float sizeX, const float sizeY) const {
-        CTX.descriptorService.setImageDescriptor(texture);
+        CTX.descriptorSetService.setImageDescriptor(texture);
         ImGui::Image(reinterpret_cast<ImTextureID>(texture->imageDescriptor->vkDescriptorSet), ImVec2{sizeX, sizeY});
     }
 

@@ -1,7 +1,9 @@
 #ifndef METAL_ENGINE_ENGINECONTEXT_H
 #define METAL_ENGINE_ENGINECONTEXT_H
 
+#include "frame-builder/EngineFrame.h"
 #include <chrono>
+#include <memory>
 
 #include "../../dto/buffers/GlobalDataUBO.h"
 #include "../../common/AbstractRuntimeComponent.h"
@@ -71,9 +73,21 @@ namespace Metal {
         TimePoint previousTime = Clock::now();
         float deltaTime = 0;
 
+        std::vector<EngineFrame *> registeredFrames;
+        EngineFrame *currentFrame = nullptr;
         void updateGlobalData();
 
+        void registerFrame(EngineFrame *frame) {
+            registeredFrames.push_back(frame);
+        }
+
+        void unregisterFrame(EngineFrame *frame) {
+            std::erase(registeredFrames, frame);
+        }
+
         void onSync() override;
+
+        void dispose();
     };
 }
 #endif

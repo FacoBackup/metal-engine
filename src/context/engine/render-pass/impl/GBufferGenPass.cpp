@@ -1,7 +1,6 @@
 #include "GBufferGenPass.h"
 
 #include "../../../../context/ApplicationContext.h"
-#include "../../../../enum/LevelOfDetail.h"
 #include "../../../../repository/world/components/MeshComponent.h"
 #include "../../../../repository/world/components/TransformComponent.h"
 #include "../../../../service//framebuffer/FrameBufferInstance.h"
@@ -9,17 +8,18 @@
 #include "../../../../service/material/MaterialService.h"
 #include "../../../../service/material/MaterialInstance.h"
 #include "../../../../service/pipeline/PipelineBuilder.h"
+#include "../../../../enum/EngineResourceIDs.h"
 
 namespace Metal {
     void GBufferGenPass::onInitialize() {
         PipelineBuilder gBufferPipelineBuilder = PipelineBuilder::Of(
-                    CTX.coreFrameBuffers.gBufferFBO,
+                    getScopedResourceId(RID_G_BUFFER_FBO),
                     "GBufferGen.vert",
                     "GBufferGen.frag"
                 )
-                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.materialData.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.textureArray.get())
+                .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
+                .addBufferBinding(getScopedResourceId(RID_MATERIAL_BUFFER))
+                .addCombinedImageSamplerBinding(CTX.vulkanContext.vkImageSampler, VK_NULL_HANDLE, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1000)
                 .setPrepareForMesh()
                 .setDepthTest()
                 .setCullMode(VK_CULL_MODE_BACK_BIT)
@@ -36,7 +36,7 @@ namespace Metal {
                 if (worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) {
                     continue;
                 }
-                const auto *meshInstance = streamingRepository.streamMesh(mesh.meshId, LevelOfDetail::LOD_0);
+                const auto *meshInstance = streamingRepository.streamMesh(mesh.meshId);
                 if (meshInstance != nullptr) {
                     mPushConstant.model = worldRepository.registry.get<TransformComponent>(entity).model;
                     mPushConstant.renderIndex = mesh.renderIndex = renderIndex;

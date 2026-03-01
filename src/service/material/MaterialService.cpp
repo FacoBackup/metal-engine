@@ -13,11 +13,8 @@
 
 #include "MaterialInstance.h"
 #include "../../context/ApplicationContext.h"
-#include "../../enum/LevelOfDetail.h"
-#include "../../repository/world/components/MeshComponent.h"
-#include "../texture/TextureInstance.h"
-#include "../../service/descriptor/DescriptorInstance.h"
-#include "../../service/framebuffer/FrameBufferInstance.h"
+#include "../../enum/EngineResourceIDs.h"
+
 
 namespace Metal {
     MaterialInstance *MaterialService::create(const std::string &id) {
@@ -26,9 +23,8 @@ namespace Metal {
             return nullptr;
         }
 
-        auto *instance = new MaterialInstance(id);
+        auto *instance = createResourceInstance(id);
         instance->materialIndex = nextMaterialIndex++;
-        registerResource(instance);
         MaterialData materialData{};
         materialData.albedo = data->albedoColor;
         materialData.roughness = data->roughnessFactor;
@@ -50,44 +46,39 @@ namespace Metal {
         materialData.heightTextureId = 0;
 
         if (!data->albedo.empty()) {
-            auto *tex = CTX.textureService.create(data->albedo, LevelOfDetail::LOD_0);
+            auto *tex = CTX.textureService.create(data->albedo);
             if (tex != nullptr) {
-                materialData.albedoTextureId = CTX.textureService.getTextureIndex(
-                    data->albedo + LevelOfDetail::LOD_0.suffix);
+                materialData.albedoTextureId = CTX.textureService.getTextureIndex(data->albedo);
             }
         }
         if (!data->normal.empty()) {
-            auto *tex = CTX.textureService.create(data->normal, LevelOfDetail::LOD_0);
+            auto *tex = CTX.textureService.create(data->normal);
             if (tex != nullptr) {
-                materialData.normalTextureId = CTX.textureService.getTextureIndex(
-                    data->normal + LevelOfDetail::LOD_0.suffix);
+                materialData.normalTextureId = CTX.textureService.getTextureIndex(data->normal);
             }
         }
         if (!data->roughness.empty()) {
-            auto *tex = CTX.textureService.create(data->roughness, LevelOfDetail::LOD_0);
+            auto *tex = CTX.textureService.create(data->roughness);
             if (tex != nullptr) {
-                materialData.roughnessTextureId = CTX.textureService.getTextureIndex(
-                    data->roughness + LevelOfDetail::LOD_0.suffix);
+                materialData.roughnessTextureId = CTX.textureService.getTextureIndex(data->roughness);
             }
         }
         if (!data->metallic.empty()) {
-            auto *tex = CTX.textureService.create(data->metallic, LevelOfDetail::LOD_0);
+            auto *tex = CTX.textureService.create(data->metallic);
             if (tex != nullptr) {
-                materialData.metallicTextureId = CTX.textureService.getTextureIndex(
-                    data->metallic + LevelOfDetail::LOD_0.suffix);
+                materialData.metallicTextureId = CTX.textureService.getTextureIndex(data->metallic);
             }
         }
         if (!data->height.empty()) {
-            auto *tex = CTX.textureService.create(data->height, LevelOfDetail::LOD_0);
+            auto *tex = CTX.textureService.create(data->height);
             if (tex != nullptr) {
-                materialData.heightTextureId = CTX.textureService.getTextureIndex(
-                    data->height + LevelOfDetail::LOD_0.suffix);
+                materialData.heightTextureId = CTX.textureService.getTextureIndex(data->height);
             }
         }
 
         materials[instance->materialIndex] = materialData;
 
-        auto *materialBuffer = CTX.coreBuffers.materialBuffer.get();
+        auto *materialBuffer = CTX.engineContext.currentFrame->getResourceAs<BufferInstance>(RID_MATERIAL_BUFFER);
         materialBuffer->update(materials.data());
 
         delete data;
@@ -117,5 +108,11 @@ namespace Metal {
             return instance->materialIndex;
         }
         return 0;
+    }
+
+    void MaterialService::disposeResource(MaterialInstance *resource) {
+        // Materials are currently just entries in a global buffer, 
+        // they don't hold many resources themselves, but they do have dependencies
+        // which are handled by StreamingService.
     }
 } // Metal

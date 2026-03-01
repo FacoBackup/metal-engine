@@ -15,9 +15,6 @@ namespace Metal {
         std::vector<std::string> textures{};
         unsigned int materialIndex = 0;
 
-        void dispose() override {
-        }
-
         std::vector<std::string> &getDependencies() override {
             return textures;
         }

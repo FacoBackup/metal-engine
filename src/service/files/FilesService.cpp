@@ -12,16 +12,11 @@
 #include <iostream>
 #include "../../util/serialization-definitions.h"
 
-#include "../../enum/LevelOfDetail.h"
-
 namespace fs = std::filesystem;
 
 #define DELETE_F(F)\
 std::filesystem::remove_all(entry.second->absolutePath);\
-std::filesystem::remove_all(CTX.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_0));\
-std::filesystem::remove_all(CTX.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_1));\
-std::filesystem::remove_all(CTX.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_2));\
-std::filesystem::remove_all(CTX.getAssetDirectory() + F(entry.second->getId(), LevelOfDetail::LOD_3));
+std::filesystem::remove_all(CTX.getAssetDirectory() + F(entry.second->getId()));
 
 #define DELETE_S(F)\
 std::filesystem::remove_all(entry.second->absolutePath);\

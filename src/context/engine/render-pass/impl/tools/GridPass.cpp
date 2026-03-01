@@ -2,18 +2,19 @@
 
 #include "../../../../../context/ApplicationContext.h"
 #include "../../../../../service/pipeline/PipelineBuilder.h"
+#include "../../../../../enum/EngineResourceIDs.h"
 
 namespace Metal {
     void GridPass::onInitialize() {
         PipelineBuilder gridPipelineBuilder = PipelineBuilder::Of(
-                    CTX.coreFrameBuffers.postProcessingFBO,
+                    getScopedResourceId(RID_POST_PROCESSING_FBO),
                     "QUAD.vert",
                     "tools/Grid.frag"
                 )
                 .setBlendEnabled()
                 .setPushConstantsSize(sizeof(GridPushConstant))
-                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.gBufferPosition.get());
+                .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
+                .addFboBinding(getScopedResourceId(RID_G_BUFFER_FBO), 2);
         pipelineInstance = CTX.pipelineService.createPipeline(gridPipelineBuilder);
     }
 

@@ -5,26 +5,26 @@
 #include "BufferInstance.h"
 
 namespace Metal {
-
-    std::shared_ptr<BufferInstance> BufferService::createBuffer(VkDeviceSize bufferSize,
-                                                                VkBufferUsageFlags usageFlags,
-                                                                VkMemoryPropertyFlags memoryPropertyFlags) const {
-        std::shared_ptr<BufferInstance> buffer(new BufferInstance{bufferSize});
+    BufferInstance *BufferService::createBuffer(const std::string &id, VkDeviceSize bufferSize,
+                                                VkBufferUsageFlags usageFlags,
+                                                VkMemoryPropertyFlags memoryPropertyFlags, BufferType type) {
+        BufferInstance *buffer = createResourceInstance(id, bufferSize, type);
         createVkBuffer(usageFlags, memoryPropertyFlags, buffer);
         vkMapMemory(CTX.vulkanContext.device.device, buffer->vkDeviceMemory, 0, bufferSize, 0, &buffer->mapped);
         return buffer;
     }
 
-    std::shared_ptr<BufferInstance> BufferService::createBuffer(VkDeviceSize dataSize,
-                                                                VkBufferUsageFlags usageFlags,
-                                                                const void *bufferData) const {
-        std::shared_ptr<BufferInstance> stagingBuffer(new BufferInstance{dataSize});
-        std::shared_ptr<BufferInstance> finalBuffer(new BufferInstance{dataSize});
+    BufferInstance *BufferService::createBuffer(const std::string &id, VkDeviceSize dataSize,
+                                                VkBufferUsageFlags usageFlags,
+                                                const void *bufferData) {
+        BufferInstance *stagingBuffer = createResourceInstance(id + "_staging", dataSize, OTHER);
+        BufferInstance *finalBuffer = createResourceInstance(id, dataSize, OTHER);
 
         createVkBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer);
 
-        vkMapMemory(CTX.vulkanContext.device.device, stagingBuffer->vkDeviceMemory, 0, dataSize, 0, &stagingBuffer->mapped);
+        vkMapMemory(CTX.vulkanContext.device.device, stagingBuffer->vkDeviceMemory, 0, dataSize, 0,
+                    &stagingBuffer->mapped);
         memcpy(stagingBuffer->mapped, bufferData, dataSize);
         vkUnmapMemory(CTX.vulkanContext.device.device, stagingBuffer->vkDeviceMemory);
 
@@ -33,13 +33,14 @@ namespace Metal {
 
         copyBuffer(stagingBuffer, finalBuffer);
 
-        stagingBuffer->dispose();
+        dispose(stagingBuffer->getId());
         return finalBuffer;
     }
 
     unsigned int BufferService::findMemoryType(unsigned int typeFilter, VkMemoryPropertyFlags properties) const {
         for (unsigned int i = 0; i < CTX.vulkanContext.physicalDeviceMemoryProperties.memoryTypeCount; i++) {
-            if ((typeFilter & (1 << i)) && (CTX.vulkanContext.physicalDeviceMemoryProperties.memoryTypes[i].propertyFlags &
+            if ((typeFilter & (1 << i)) && (CTX.vulkanContext.physicalDeviceMemoryProperties.memoryTypes[i].
+                                            propertyFlags &
                                             properties) == properties) {
                 return i;
             }
@@ -49,7 +50,7 @@ namespace Metal {
     }
 
     void BufferService::createVkBuffer(VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
-                                       const std::shared_ptr<BufferInstance> &buffer) const {
+                                       BufferInstance *buffer) const {
         VkBufferCreateInfo bufferInfo{};
         bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
         bufferInfo.size = buffer->dataSize;
@@ -72,8 +73,8 @@ namespace Metal {
         vkBindBufferMemory(CTX.vulkanContext.device.device, buffer->vkBuffer, buffer->vkDeviceMemory, 0);
     }
 
-    void BufferService::copyBuffer(const std::shared_ptr<BufferInstance> &srcBuffer,
-                                   const std::shared_ptr<BufferInstance> &dstBuffer) const {
+    void BufferService::copyBuffer(const BufferInstance *srcBuffer,
+                                   const BufferInstance *dstBuffer) const {
         VkCommandBuffer commandBuffer = CTX.vulkanContext.beginSingleTimeCommands();
 
         VkBufferCopy copyRegion{};
@@ -83,11 +84,11 @@ namespace Metal {
         CTX.vulkanContext.endSingleTimeCommands(commandBuffer);
     }
 
-    std::shared_ptr<BufferInstance> BufferService::createBuffer(VkDeviceSize bufferSize,
-                                                                VkBufferUsageFlags usageFlags,
-                                                                VkMemoryPropertyFlags memoryPropertyFlags,
-                                                                bool deviceAddress) const {
-        std::shared_ptr<BufferInstance> buffer(new BufferInstance{bufferSize});
+    BufferInstance *BufferService::createBuffer(const std::string &id, VkDeviceSize bufferSize,
+                                                VkBufferUsageFlags usageFlags,
+                                                VkMemoryPropertyFlags memoryPropertyFlags,
+                                                bool deviceAddress) {
+        BufferInstance *buffer = createResourceInstance(id, bufferSize, OTHER);
 
         VkBufferCreateInfo bufferInfo{};
         bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -127,25 +128,34 @@ namespace Metal {
         return buffer;
     }
 
-    std::shared_ptr<BufferInstance> BufferService::createBuffer(VkDeviceSize dataSize,
-                                                                VkBufferUsageFlags usageFlags,
-                                                                const void *bufferData,
-                                                                bool deviceAddress) const {
-        std::shared_ptr<BufferInstance> stagingBuffer(new BufferInstance{dataSize});
+    BufferInstance *BufferService::createBuffer(const std::string &id, VkDeviceSize dataSize,
+                                                VkBufferUsageFlags usageFlags,
+                                                const void *bufferData,
+                                                bool deviceAddress) {
+        BufferInstance *stagingBuffer = createResourceInstance(
+            id + "_staging", dataSize, OTHER);
         createVkBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer);
 
-        vkMapMemory(CTX.vulkanContext.device.device, stagingBuffer->vkDeviceMemory, 0, dataSize, 0, &stagingBuffer->mapped);
+        vkMapMemory(CTX.vulkanContext.device.device, stagingBuffer->vkDeviceMemory, 0, dataSize, 0,
+                    &stagingBuffer->mapped);
         memcpy(stagingBuffer->mapped, bufferData, dataSize);
         vkUnmapMemory(CTX.vulkanContext.device.device, stagingBuffer->vkDeviceMemory);
 
-        auto finalBuffer = createBuffer(dataSize,
-                                        VK_BUFFER_USAGE_TRANSFER_DST_BIT | usageFlags,
-                                        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                                        deviceAddress);
+        auto *finalBuffer = createBuffer(id, dataSize,
+                                         VK_BUFFER_USAGE_TRANSFER_DST_BIT | usageFlags,
+                                         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                                         deviceAddress);
 
         copyBuffer(stagingBuffer, finalBuffer);
-        stagingBuffer->dispose();
+        dispose(stagingBuffer->getId());
         return finalBuffer;
+    }
+
+    void BufferService::disposeResource(BufferInstance *resource) {
+        LOG_INFO("Disposing of buffer instance " + resource->getId());
+
+        vkDestroyBuffer(CTX.vulkanContext.device.device, resource->vkBuffer, nullptr);
+        vkFreeMemory(CTX.vulkanContext.device.device, resource->vkDeviceMemory, nullptr);
     }
 } // Metal

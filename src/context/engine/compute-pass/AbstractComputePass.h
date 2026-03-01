@@ -8,9 +8,7 @@ namespace Metal {
     struct WorldRepository;
     struct MeshInstance;
     class StreamingService;
-    struct CoreFrameBuffers;
     struct PipelineInstance;
-    struct CoreBuffers;
     struct TextureInstance;
 
     class AbstractComputePass : public AbstractPass {

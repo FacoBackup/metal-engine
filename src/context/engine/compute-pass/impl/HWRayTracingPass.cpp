@@ -5,50 +5,57 @@
 #include "../../../../service/pipeline/PipelineInstance.h"
 #include "../../../../service/texture/TextureInstance.h"
 #include "../../../../service/raytracing/RayTracingService.h"
+#include "../../../../enum/EngineResourceIDs.h"
 
 namespace Metal {
-    bool HWRayTracingPass::shouldRun() {
-        if (!CTX.rayTracingService.isReady()) {
-            return false;
-        }
-
-        if (pipelineInstance == nullptr) {
-            PipelineBuilder builder = PipelineBuilder::OfRayTracing(
+    void HWRayTracingPass::onInitialize() {
+        PipelineBuilder builder = PipelineBuilder::OfRayTracing(
                     "rt/HWRayTracing.rgen",
                     "rt/HWRayTracing.rmiss",
                     "rt/HWRayTracing.rchit")
-                .addDescriptorSet(CTX.coreDescriptorSets.globalDataDescriptor.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.tlasDescriptor.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.gBufferAlbedo.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.gBufferNormal.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.gBufferPosition.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.currentFrameDescriptor.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.surfaceCacheImage.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.lightData.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.volumeData.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.materialData.get())
-                .addDescriptorSet(CTX.coreDescriptorSets.textureArray.get());
-            pipelineInstance = CTX.pipelineService.createPipeline(builder);
+                .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
+                .addAccelerationStructureBinding(CTX.rayTracingService.getTLAS())
+                .addFboBinding(getScopedResourceId(RID_G_BUFFER_FBO), 0)
+                .addFboBinding(getScopedResourceId(RID_G_BUFFER_FBO), 1)
+                .addFboBinding(getScopedResourceId(RID_G_BUFFER_FBO), 2)
+                .addStorageImageBinding(getScopedResourceId(RID_RAW_RENDERED_FRAME))
+                .addStorageImageBinding(getScopedResourceId(RID_SURFACE_CACHE))
+                .addBufferBinding(getScopedResourceId(RID_LIGHT_BUFFER))
+                .addBufferBinding(getScopedResourceId(RID_VOLUMES_BUFFER))
+                .addBufferBinding(getScopedResourceId(RID_MATERIAL_BUFFER))
+                .addCombinedImageSamplerBinding(CTX.vulkanContext.vkImageSampler, VK_NULL_HANDLE,
+                                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1000);
+        pipelineInstance = CTX.pipelineService.createPipeline(builder);
+    }
+
+    bool HWRayTracingPass::shouldRun() {
+        if (!CTX.rayTracingService.isReady()) {
+            return false;
         }
 
         return true;
     }
 
     void HWRayTracingPass::onSync() {
+        auto *surfaceCache = frame->getResourceAs<TextureInstance>(RID_SURFACE_CACHE);
+        auto *rawRenderedFrame = frame->getResourceAs<TextureInstance>(RID_RAW_RENDERED_FRAME);
+        auto *accumulatedFrame = frame->getResourceAs<TextureInstance>(RID_ACCUMULATED_FRAME);
+
         bool surfaceCacheReset = CTX.engineContext.isGISettingsUpdated() || CTX.engineContext.
-                              isUpdateLights();
+                                 isUpdateLights();
         if (surfaceCacheReset) {
-            clearTexture(CTX.coreTextures.surfaceCache->vkImage);
+            clearTexture(surfaceCache->vkImage);
         }
 
         if (isFirstRun || CTX.engineContext.isCameraUpdated() || surfaceCacheReset) {
-            clearTexture(CTX.coreTextures.rawRenderedFrame->vkImage);
-            clearTexture(CTX.coreTextures.accumulatedFrame->vkImage);
+            clearTexture(rawRenderedFrame->vkImage);
+            clearTexture(accumulatedFrame->vkImage);
             CTX.engineContext.resetPathTracerAccumulationCount();
             isFirstRun = false;
         }
 
-        startWriting(CTX.coreTextures.rawRenderedFrame->vkImage);
+        startWriting(rawRenderedFrame->vkImage);
+        auto *gBuffer = frame->getResourceAs<FrameBufferInstance>(RID_G_BUFFER_FBO);
 
         // Trace rays
         CTX.vulkanContext.vkCmdTraceRaysKHR(
@@ -57,10 +64,10 @@ namespace Metal {
             &pipelineInstance->missRegion,
             &pipelineInstance->hitRegion,
             &pipelineInstance->callableRegion,
-            CTX.coreFrameBuffers.gBufferFBO->bufferWidth,
-            CTX.coreFrameBuffers.gBufferFBO->bufferHeight,
+            gBuffer->bufferWidth,
+            gBuffer->bufferHeight,
             1);
 
-        endWriting(CTX.coreTextures.rawRenderedFrame->vkImage);
+        endWriting(rawRenderedFrame->vkImage);
     }
 } // Metal

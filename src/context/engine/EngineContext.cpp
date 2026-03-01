@@ -1,5 +1,6 @@
 #include "EngineContext.h"
 
+#include "../../enum/EngineResourceIDs.h"
 #include "../../context/ApplicationContext.h"
 #include "../../service/buffer/BufferInstance.h"
 #include "../../service/descriptor/DescriptorBinding.h"
@@ -15,7 +16,6 @@ namespace Metal {
 
     void EngineContext::onInitialize() {
         CTX.worldGridService.onSync();
-        CTX.passesService.onInitialize();
     }
 
     void EngineContext::updateTileData() {
@@ -39,7 +39,7 @@ namespace Metal {
             }
 
             if (i > 0) {
-                CTX.coreBuffers.tileInfo->update(tileInfoUBO.tileCenterValid.data());
+                currentFrame->getResourceAs<BufferInstance>(RID_TILE_INFO)->update(tileInfoUBO.tileCenterValid.data());
             }
             CTX.worldGridRepository.hasMainTileChanged = false;
         }
@@ -59,6 +59,12 @@ namespace Metal {
         }
     }
 
+    void EngineContext::dispose() {
+        if (currentFrame != nullptr) {
+            currentFrame->dispose();
+        }
+    }
+
     void EngineContext::onSync() {
         updateCurrentTime();
 
@@ -67,30 +73,36 @@ namespace Metal {
         CTX.streamingRepository.onSync();
         CTX.cameraService.onSync();
 
+        for (auto *frame: registeredFrames) {
+            if (frame->getShouldRender()) {
+                currentFrame = frame;
 
-        updateTileData();
-        if (updateLights) {
-            CTX.lightService.onSync();
+                updateTileData();
+                if (updateLights) {
+                    CTX.lightService.onSync();
+                }
+
+                if (updateVolumes) {
+                    CTX.volumeService.onSync();
+                }
+
+                updateGlobalData();
+                currentFrame->onSync();
+
+                frame->setShouldRender(false);
+            }
         }
 
-        if (updateVolumes) {
-            CTX.volumeService.onSync();
-        }
         CTX.rayTracingService.onSync();
-        updateGlobalData();
-
-        CTX.passesService.onSync();
 
         setUpdateLights(false);
         setCameraUpdated(false);
         setGISettingsUpdated(false);
-
-        CTX.videoExporterService.onSync();
     }
 
     void EngineContext::updateGlobalData() {
         auto &camera = CTX.worldRepository.camera;
-        auto *fbo = CTX.coreFrameBuffers.postProcessingFBO;
+        auto *fbo = currentFrame->getResourceAs<FrameBufferInstance>(  RID_POST_PROCESSING_FBO);
         globalDataUBO.outputRes.x = fbo->bufferWidth;
         globalDataUBO.outputRes.y = fbo->bufferHeight;
         globalDataUBO.viewMatrix = camera.viewMatrix;
@@ -128,6 +140,6 @@ namespace Metal {
         CTX.lightService.computeSunInfo();
         globalDataUBO.sunPosition = CTX.lightService.getSunPosition();
         globalDataUBO.sunColor = CTX.lightService.getSunColor();
-        CTX.coreBuffers.globalData->update(&globalDataUBO);
+        currentFrame->getResourceAs<BufferInstance>(RID_GLOBAL_DATA)->update(&globalDataUBO);
     }
 }

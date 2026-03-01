@@ -1,5 +1,5 @@
-#ifndef RENDERPASSINSTANCE_H
-#define RENDERPASSINSTANCE_H
+#ifndef FRAMEBUFFER_INSTANCE_H
+#define FRAMEBUFFER_INSTANCE_H
 
 #include "../../repository/abstract/RuntimeResource.h"
 #include <vector>
@@ -7,8 +7,6 @@
 #include "FrameBufferAttachment.h"
 
 namespace Metal {
-    struct ShaderModule;
-
     struct FrameBufferInstance final : RuntimeResource {
         unsigned int bufferWidth{};
         unsigned int bufferHeight{};
@@ -17,7 +15,8 @@ namespace Metal {
         VkFramebuffer vkFramebuffer = VK_NULL_HANDLE;
         std::vector<std::shared_ptr<FrameBufferAttachment> > attachments{};
 
-        void dispose() override;
+        explicit FrameBufferInstance(const std::string &id) : RuntimeResource(id) {
+        }
 
         ResourceType resourceType() override {
             return FRAMEBUFFER;

@@ -9,8 +9,7 @@ namespace Metal {
         AbstractPanel *headerPanel = nullptr;
         AbstractPanel *gizmoPanel = nullptr;
         AbstractPanel *cameraPanel = nullptr;
-
-        void handleViewportPicking(const ImVec2 &imageMin, const ImVec2 &imageMax) const;
+        AbstractPanel *engineFramePanel = nullptr;
 
     public:
         void onInitialize() override;

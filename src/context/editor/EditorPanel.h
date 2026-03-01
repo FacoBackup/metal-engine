@@ -13,6 +13,8 @@ namespace Metal {
         static float HEADER_HEIGHT;
         ImGuiID windowId = 0;
         AbstractPanel *headerPanel = nullptr;
+        AbstractPanel *notificationsPanel = nullptr;
+        AbstractPanel *fileImportModalPanel = nullptr;
 
         static void SetWindowStyle();
 

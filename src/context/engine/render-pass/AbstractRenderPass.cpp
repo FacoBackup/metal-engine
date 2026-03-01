@@ -13,7 +13,8 @@ namespace Metal {
     }
 
     void AbstractRenderPass::recordDrawMesh(const MeshInstance *instance, const unsigned int instanceCount) const {
-        constexpr VkDeviceSize offsets[] = {0};
+        if (instance == nullptr || instance->dataBuffer == nullptr || instance->indexBuffer == nullptr) return;
+        VkDeviceSize offsets[] = {0};
         vkCmdBindVertexBuffers(vkCommandBuffer, 0, 1, &instance->dataBuffer->vkBuffer, offsets);
         vkCmdBindIndexBuffer(vkCommandBuffer, instance->indexBuffer->vkBuffer, 0, VK_INDEX_TYPE_UINT32);
         vkCmdDrawIndexed(vkCommandBuffer, instance->indexCount, instanceCount, 0, 0, 0);
