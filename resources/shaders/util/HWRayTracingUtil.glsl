@@ -7,6 +7,7 @@ struct MaterialInfo {
     float metallic;
     float transmission;
     float thickness;
+    float ior;
     float specular;
     float specularTint;
     float clearcoat;

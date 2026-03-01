@@ -78,13 +78,15 @@ namespace Metal {
                 currentFrame = frame;
 
                 updateTileData();
-                if (updateLights) {
+                if (updateLights || isFirstFrame) {
                     CTX.lightService.onSync();
                 }
 
-                if (updateVolumes) {
+                if (updateVolumes || isFirstFrame) {
                     CTX.volumeService.onSync();
                 }
+
+                isFirstFrame = false;
 
                 updateGlobalData();
                 currentFrame->onSync();

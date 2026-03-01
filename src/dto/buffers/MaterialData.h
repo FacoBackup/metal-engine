@@ -11,6 +11,7 @@ namespace Metal {
         alignas(4) float metallic{};
         alignas(4) float transmission{};
         alignas(4) float thickness{};
+        alignas(4) float ior{1.45f};
         alignas(4) unsigned int isEmissive{};
 
         alignas(4) unsigned int useAlbedoTexture;

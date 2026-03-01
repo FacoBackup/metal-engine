@@ -6,6 +6,7 @@ struct MaterialData {
     float metallic;
     float transmission;
     float thickness;
+    float ior;
     uint isEmissive;
 
     uint useAlbedoTexture;

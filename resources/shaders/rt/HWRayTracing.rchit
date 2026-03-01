@@ -70,6 +70,7 @@ void main() {
     float metallic = 0.0;
     float transmission = 0.0;
     float thickness = 0.0;
+    float ior = 1.45;
     bool isEmissive = false;
 
     if (matIndex != 0u) {
@@ -91,6 +92,7 @@ void main() {
         }
         transmission = mat.transmission;
         thickness = mat.thickness;
+        ior = mat.ior;
         isEmissive = mat.isEmissive == 1u;
     }
 
@@ -99,6 +101,7 @@ void main() {
     payload.material.metallic = metallic;
     payload.material.transmission = transmission;
     payload.material.thickness = thickness;
+    payload.material.ior = ior;
     payload.material.subsurface = 0.0;
     payload.material.specular = 0.0;
     payload.material.specularTint = 0.0;

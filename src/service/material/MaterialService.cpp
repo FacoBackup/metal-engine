@@ -31,6 +31,7 @@ namespace Metal {
         materialData.metallic = data->metallicFactor;
         materialData.transmission = data->transmissionFactor;
         materialData.thickness = data->thicknessFactor;
+        materialData.ior = data->ior;
         materialData.isEmissive = data->isEmissive ? 1 : 0;
 
         materialData.useAlbedoTexture = !data->albedo.empty();

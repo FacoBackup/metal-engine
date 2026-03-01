@@ -10,6 +10,7 @@ namespace Metal {
         registerFloat(metallicFactor, "", "Metallic factor", 0, 1);
         registerFloat(transmissionFactor, "", "Transmission factor", 0, 1);
         registerFloat(thicknessFactor, "", "Thickness factor", 0, 10);
+        registerFloat(ior, "", "IOR", 1, 3);
 
         registerResourceSelection(albedo, "", "Albedo", EntryType::TEXTURE);
         registerResourceSelection(normal, "", "Normal", EntryType::TEXTURE);
@@ -36,6 +37,7 @@ namespace Metal {
         j["metallicFactor"] = metallicFactor;
         j["transmissionFactor"] = transmissionFactor;
         j["thicknessFactor"] = thicknessFactor;
+        j["ior"] = ior;
         j["isEmissive"] = isEmissive;
         return j;
     }
@@ -49,6 +51,7 @@ namespace Metal {
         metallicFactor = j.at("metallicFactor").get<float>();
         transmissionFactor = j.value("transmissionFactor", 0.0f);
         thicknessFactor = j.value("thicknessFactor", 0.0f);
+        ior = j.value("ior", 1.45f);
         isEmissive = j.at("isEmissive").get<bool>();
 
         albedoColor = {j.at("albedoColor")[0], j.at("albedoColor")[1], j.at("albedoColor")[2]};

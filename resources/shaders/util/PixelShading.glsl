@@ -60,8 +60,8 @@ vec3 calculateIndirectLighting(MaterialInfo material, SurfaceInteraction interac
 
         bounceInfo.throughput *= f / pdf;
 
-        float bias = max(.05, 1e-4 * length(bounceInfo.interaction.point));
-        vec3 rayOrigin = bounceInfo.interaction.point + bounceInfo.interaction.normal * bias;
+        float bias = 0.001;
+        vec3 rayOrigin = bounceInfo.interaction.point + (dot(wi, bounceInfo.interaction.normal) > 0.0 ? 1.0 : -1.0) * bounceInfo.interaction.normal * bias;
 
         payload.hit = true;
         traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xFF, 0, 0, 0, rayOrigin, 0.001, wi, 1000.0, 0);
@@ -125,6 +125,9 @@ vec3 calculatePixelColor(vec3 rayDirection, in vec2 texCoords, MaterialInfo mate
 
         if (scatteringPdf > EPSILON && dot(f, f) > EPSILON) {
             beta *= f / scatteringPdf;
+
+            float bias = 0.001;
+            interaction.point += (dot(wi, interaction.normal) > 0.0 ? 1.0 : -1.0) * interaction.normal * bias;
         }
     }
 

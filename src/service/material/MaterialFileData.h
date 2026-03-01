@@ -17,6 +17,7 @@ namespace Metal {
         float metallicFactor = 0;
         float transmissionFactor = 0;
         float thicknessFactor = 0;
+        float ior = 1.45;
         bool isEmissive = false;
 
         void registerFields() override;
