@@ -22,6 +22,8 @@ add_executable(
         src/context/gui/GuiContext.h
         src/context/editor/dock-spaces/viewport/ViewportPanel.cpp
         src/context/editor/dock-spaces/viewport/ViewportPanel.h
+        src/context/editor/dock-spaces/viewport/EngineFramePanel.cpp
+        src/context/editor/dock-spaces/viewport/EngineFramePanel.h
         src/context/editor/dock-spaces/docks/AbstractDockPanel.h
         src/context/ApplicationContext.cpp
         src/context/ApplicationContext.h
@@ -95,8 +97,6 @@ add_executable(
         src/context/engine/render-pass/impl/GBufferGenPass.cpp
         src/service/abstract/AbstractResourceService.h
         src/service/framebuffer/FrameBufferAttachment.h
-        src/repository/framebuffer/CoreFrameBuffers.cpp
-        src/repository/framebuffer/CoreFrameBuffers.h
         src/repository/abstract/AbstractCoreRepository.h
         src/service/framebuffer/FrameBufferService.cpp
         src/service/framebuffer/FrameBufferService.h
@@ -104,8 +104,6 @@ add_executable(
         src/service/pipeline/PipelineService.cpp
         src/service/pipeline/PipelineService.h
         src/service/pipeline/PipelineInstance.h
-        src/repository/buffers/CoreBuffers.cpp
-        src/repository/buffers/CoreBuffers.h
         src/service/buffer/BufferService.cpp
         src/service/buffer/BufferService.h
         src/service/descriptor/DescriptorSetService.cpp
@@ -217,8 +215,6 @@ add_executable(
         src/service/framebuffer/FrameBufferAttachment.cpp
         src/repository/engine/EngineRepository.cpp
         src/repository/engine/EngineRepository.h
-        src/repository/texture/CoreTextures.cpp
-        src/repository/texture/CoreTextures.h
         src/util/serialization-definitions.h
         src/service/notification/NotificationService.cpp
         src/service/notification/NotificationService.h
@@ -250,8 +246,6 @@ add_executable(
         src/context/engine/compute-pass/AbstractComputePass.h
         src/context/engine/passes/AbstractPass.cpp
         src/context/engine/passes/AbstractPass.h
-        src/context/engine/passes/PassesService.cpp
-        src/context/engine/passes/PassesService.h
         src/util/ImageUtils.h
         src/service/material/MaterialInstance.h
         src/service/material/MaterialService.cpp

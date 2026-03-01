@@ -6,7 +6,7 @@
 
 namespace Metal {
     std::optional<EntityID> PickingService::pickEntityFromGBuffer(const uint32_t pixelX, const uint32_t pixelY) const {
-        auto *gBuffer = CTX.coreFrameBuffers.gBufferFBO;
+        auto *gBuffer = CTX.framebufferService.getResource("gBufferFBO");
         if (!gBuffer || gBuffer->attachments.size() < 3) {
             return std::nullopt;
         }

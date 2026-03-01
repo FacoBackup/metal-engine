@@ -13,12 +13,34 @@ namespace Metal {
         auto *descriptorInstance = createResourceInstance(id);
         
         for (auto binding : pipelineBuilder.resourceBindings) {
+            if (binding.frameBufferId != "") {
+                auto *fbo = CTX.framebufferService.getResource(binding.frameBufferId);
+                if (fbo == nullptr) {
+                    throw std::runtime_error("Framebuffer not found: " + binding.frameBufferId);
+                }
+                binding.view = fbo->attachments[binding.attachmentIndex]->vkImageView;
+                if (binding.sampler == VK_NULL_HANDLE) {
+                    binding.sampler = CTX.vulkanContext.vkImageSampler;
+                }
+            }
+
             if (binding.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR || binding.accelerationStructure != VK_NULL_HANDLE) {
                 binding.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
-            } else if (binding.bufferInstance != nullptr) {
-                binding.descriptorType = binding.bufferInstance->getBufferType() == BufferType::UNIFORM_BUFFER
-                                             ? VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
-                                             : VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+            } else if (binding.bufferInstance != nullptr || !binding.bufferId.empty()) {
+                BufferInstance *buffer = binding.bufferInstance;
+                if (buffer == nullptr) {
+                    buffer = CTX.bufferService.getResource(binding.bufferId);
+                }
+
+                if (buffer != nullptr) {
+                    binding.descriptorType = buffer->getBufferType() == BufferType::UNIFORM_BUFFER
+                                                 ? VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+                                                 : VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+                } else {
+                    // Default to storage buffer if not found during initialization, or maybe handle differently?
+                    // Usually globalData and such are available.
+                    binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+                }
             } else if (binding.view != VK_NULL_HANDLE) {
                 binding.descriptorType = binding.sampler != VK_NULL_HANDLE
                                              ? VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
@@ -128,7 +150,7 @@ namespace Metal {
     }
 
     void DescriptorSetService::Write(const VkDescriptorSet &vkDescriptorSet,
-                                   const std::vector<DescriptorBinding> &bindings) {
+                                     const std::vector<DescriptorBinding> &bindings) {
         std::vector<VkWriteDescriptorSet> writeDescriptorSets;
         std::vector<VkDescriptorBufferInfo> bufferInfos;
         std::vector<std::vector<VkDescriptorImageInfo>> imageInfosPool;
@@ -160,10 +182,20 @@ namespace Metal {
 
                     writeDescriptorSets.push_back(descriptorWrite);
                 }
-            } else if (binding.bufferInstance != nullptr) {
+            } else if (binding.bufferInstance != nullptr || !binding.bufferId.empty()) {
+                BufferInstance *buffer = binding.bufferInstance;
+                if (buffer == nullptr) {
+                    buffer = CTX.bufferService.getResource(binding.bufferId);
+                }
+
+                if (buffer == nullptr) {
+                    LOG_ERROR("DescriptorSetService Buffer not found: " + binding.bufferId);
+                    continue;
+                }
+
                 VkDescriptorBufferInfo bufferInfo{};
-                bufferInfo.buffer = binding.bufferInstance->vkBuffer;
-                bufferInfo.range = binding.bufferInstance->dataSize;
+                bufferInfo.buffer = buffer->vkBuffer;
+                bufferInfo.range = buffer->dataSize;
                 bufferInfo.offset = 0;
                 // Store the buffer info in the vector.
                 bufferInfos.push_back(bufferInfo);

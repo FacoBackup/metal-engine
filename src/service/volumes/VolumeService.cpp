@@ -29,7 +29,7 @@ namespace Metal {
         registerVolumes();
 
         if (!items.empty()) {
-            CTX.coreBuffers.volumesBuffer->update(items.data());
+            CTX.bufferService.getResource("volumesBuffer")->update(items.data());
         }
     }
 } // Metal

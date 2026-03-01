@@ -80,7 +80,7 @@ namespace Metal {
 
         materials[instance->materialIndex] = materialData;
 
-        auto *materialBuffer = CTX.coreBuffers.materialBuffer;
+        auto *materialBuffer = CTX.bufferService.getResource("materialBuffer");
         materialBuffer->update(materials.data());
 
         delete data;

@@ -8,7 +8,7 @@
 namespace Metal {
     void SelectedDotPass::onInitialize() {
         PipelineBuilder builder = PipelineBuilder::Of(
-                    CTX.coreFrameBuffers.postProcessingFBO,
+                    "postProcessingFBO",
                     "tools/SelectedDot.vert",
                     "tools/SelectedDot.frag"
                 )
@@ -16,8 +16,8 @@ namespace Metal {
                 .setPrepareForMesh()
                 .setCullMode(VK_CULL_MODE_BACK_BIT)
                 .setPushConstantsSize(sizeof(SelectedDotPushConstant))
-                .addResourceBinding(CTX.coreBuffers.globalData)
-                .addResourceBinding(CTX.vulkanContext.vkImageSampler, CTX.coreFrameBuffers.gBufferFBO->attachments[2]->vkImageView);
+                .addResourceBinding("globalData")
+                .addResourceBinding("gBufferFBO", 2);
         pipelineInstance = CTX.pipelineService.createPipeline(builder);
     }
 

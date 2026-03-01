@@ -8,23 +8,24 @@
 
 namespace Metal {
     void HWRayTracingPass::onInitialize() {
+        auto *gBuffer = CTX.framebufferService.getResource("gBufferFBO");
         PipelineBuilder builder = PipelineBuilder::OfRayTracing(
                     "rt/HWRayTracing.rgen",
                     "rt/HWRayTracing.rmiss",
                     "rt/HWRayTracing.rchit")
-                .addResourceBinding(CTX.coreBuffers.globalData)
+                .addResourceBinding("globalData")
                 .addResourceBinding(CTX.rayTracingService.getTLAS())
                 .addResourceBinding(CTX.vulkanContext.vkImageSampler,
-                                    CTX.coreFrameBuffers.gBufferFBO->attachments[0]->vkImageView)
+                                    gBuffer->attachments[0]->vkImageView)
                 .addResourceBinding(CTX.vulkanContext.vkImageSampler,
-                                    CTX.coreFrameBuffers.gBufferFBO->attachments[1]->vkImageView)
+                                    gBuffer->attachments[1]->vkImageView)
                 .addResourceBinding(CTX.vulkanContext.vkImageSampler,
-                                    CTX.coreFrameBuffers.gBufferFBO->attachments[2]->vkImageView)
-                .addResourceBinding(CTX.coreTextures.rawRenderedFrame->vkImageView)
-                .addResourceBinding(CTX.coreTextures.surfaceCache->vkImageView)
-                .addResourceBinding(CTX.coreBuffers.lightBuffer)
-                .addResourceBinding(CTX.coreBuffers.volumesBuffer)
-                .addResourceBinding(CTX.coreBuffers.materialBuffer)
+                                    gBuffer->attachments[2]->vkImageView)
+                .addResourceBinding(CTX.textureService.getResource("rawRenderedFrame")->vkImageView)
+                .addResourceBinding(CTX.textureService.getResource("surfaceCache")->vkImageView)
+                .addResourceBinding("lightBuffer")
+                .addResourceBinding("volumesBuffer")
+                .addResourceBinding("materialBuffer")
                 .addResourceBinding(CTX.vulkanContext.vkImageSampler, VK_NULL_HANDLE,
                                     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1000);
         pipelineInstance = CTX.pipelineService.createPipeline(builder);
@@ -39,20 +40,25 @@ namespace Metal {
     }
 
     void HWRayTracingPass::onSync() {
+        auto *surfaceCache = CTX.textureService.getResource("surfaceCache");
+        auto *rawRenderedFrame = CTX.textureService.getResource("rawRenderedFrame");
+        auto *accumulatedFrame = CTX.textureService.getResource("accumulatedFrame");
+
         bool surfaceCacheReset = CTX.engineContext.isGISettingsUpdated() || CTX.engineContext.
                                  isUpdateLights();
         if (surfaceCacheReset) {
-            clearTexture(CTX.coreTextures.surfaceCache->vkImage);
+            clearTexture(surfaceCache->vkImage);
         }
 
         if (isFirstRun || CTX.engineContext.isCameraUpdated() || surfaceCacheReset) {
-            clearTexture(CTX.coreTextures.rawRenderedFrame->vkImage);
-            clearTexture(CTX.coreTextures.accumulatedFrame->vkImage);
+            clearTexture(rawRenderedFrame->vkImage);
+            clearTexture(accumulatedFrame->vkImage);
             CTX.engineContext.resetPathTracerAccumulationCount();
             isFirstRun = false;
         }
 
-        startWriting(CTX.coreTextures.rawRenderedFrame->vkImage);
+        startWriting(rawRenderedFrame->vkImage);
+        auto *gBuffer = CTX.framebufferService.getResource("gBufferFBO");
 
         // Trace rays
         CTX.vulkanContext.vkCmdTraceRaysKHR(
@@ -61,10 +67,10 @@ namespace Metal {
             &pipelineInstance->missRegion,
             &pipelineInstance->hitRegion,
             &pipelineInstance->callableRegion,
-            CTX.coreFrameBuffers.gBufferFBO->bufferWidth,
-            CTX.coreFrameBuffers.gBufferFBO->bufferHeight,
+            gBuffer->bufferWidth,
+            gBuffer->bufferHeight,
             1);
 
-        endWriting(CTX.coreTextures.rawRenderedFrame->vkImage);
+        endWriting(rawRenderedFrame->vkImage);
     }
 } // Metal

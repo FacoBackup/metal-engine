@@ -53,7 +53,7 @@ namespace Metal {
         registerLights();
 
         if (!items.empty()) {
-            CTX.coreBuffers.lightBuffer->update(items.data());
+            CTX.bufferService.getResource("lightBuffer")->update(items.data());
         }
     }
 

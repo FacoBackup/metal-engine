@@ -6,9 +6,6 @@
 #include "engine/EngineContext.h"
 #include "glfw/GLFWContext.h"
 #include "vulkan/VulkanContext.h"
-#include "../repository/framebuffer/CoreFrameBuffers.h"
-#include "../repository/buffers/CoreBuffers.h"
-#include "../repository/texture/CoreTextures.h"
 
 #include "../service/mesh/MeshService.h"
 #include "../service/world/WorldGridService.h"
@@ -27,7 +24,6 @@
 #include "../service/files/FilesService.h"
 #include "../service/files/FileImporterService.h"
 #include "../service/camera/CameraService.h"
-#include "./engine/passes/PassesService.h"
 
 #include "../repository/world/impl/WorldGridRepository.h"
 #include "../repository/inspection/FilesRepository.h"
@@ -64,15 +60,11 @@ namespace Metal {
         }
 
         EngineContext engineContext{};
-        PassesService passesService{};
         VulkanContext vulkanContext{ debugMode};
         GuiContext guiContext{};
         GLFWContext glfwContext{};
 
         // // ----------- CORE REPOSITORIES
-        CoreFrameBuffers coreFrameBuffers{};
-        CoreBuffers coreBuffers{};
-        CoreTextures coreTextures{};
         // ----------- CORE REPOSITORIES
 
         // ----------- Services

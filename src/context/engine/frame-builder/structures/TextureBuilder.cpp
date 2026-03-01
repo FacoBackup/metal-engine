@@ -8,7 +8,12 @@ namespace Metal {
     }
 
     RuntimeResource *TextureBuilder::build() {
-        auto texture = CTX.textureService.createForCompute(w, h);
+        auto *texture = CTX.textureService.getResource(id);
+        if (texture != nullptr) {
+            return texture;
+        }
+
+        texture = CTX.textureService.createForCompute(id, w, h);
         texture->setAsNoDisposal();
 
         return texture;

@@ -285,9 +285,6 @@ namespace Metal {
         // ------- CORE INITIALIZATION
 
         // ------- REPOSITORY INITIALIZATION
-        CTX.coreBuffers.onInitialize();
-        CTX.coreFrameBuffers.onInitialize();
-        CTX.coreTextures.onInitialize();
         // ------- REPOSITORY INITIALIZATION
     }
 

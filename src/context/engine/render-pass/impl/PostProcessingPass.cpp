@@ -7,12 +7,12 @@
 namespace Metal {
     void PostProcessingPass::onInitialize() {
         PipelineBuilder ppPipelineBuilder = PipelineBuilder::Of(
-                    CTX.coreFrameBuffers.postProcessingFBO,
+                    "postProcessingFBO",
                     "QUAD.vert",
                     "PostProcessing.frag"
                 )
                 .setPushConstantsSize(sizeof(PostProcessingPushConstant))
-                .addResourceBinding(CTX.vulkanContext.vkImageSampler, CTX.coreTextures.accumulatedFrame->vkImageView);
+                .addResourceBinding(CTX.vulkanContext.vkImageSampler, CTX.textureService.getResource("accumulatedFrame")->vkImageView);
         pipelineInstance = CTX.pipelineService.createPipeline(ppPipelineBuilder);
     }
 

@@ -155,10 +155,15 @@ namespace Metal {
         multisampling.sampleShadingEnable = VK_FALSE;
         multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
 
+        auto *frameBuffer = CTX.framebufferService.getResource(pipelineBuilder.frameBufferId);
+        if (!frameBuffer) {
+            throw std::runtime_error("Framebuffer not found: " + pipelineBuilder.frameBufferId);
+        }
+
         std::vector<VkPipelineColorBlendAttachmentState> colorBlendAttachments{};
-        for (int i = 0; i < pipelineBuilder.frameBuffer->attachments.size(); i++) {
+        for (int i = 0; i < frameBuffer->attachments.size(); i++) {
             auto &colorBlendAttachment = colorBlendAttachments.emplace_back();
-            if (pipelineBuilder.blendEnabled && !pipelineBuilder.frameBuffer->attachments[i]->depth) {
+            if (pipelineBuilder.blendEnabled && !frameBuffer->attachments[i]->depth) {
                 colorBlendAttachment.blendEnable = VK_TRUE;
                 colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
                 colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
@@ -217,7 +222,7 @@ namespace Metal {
         pipelineInfo.pColorBlendState = &colorBlending;
         pipelineInfo.pDynamicState = &dynamicState;
         pipelineInfo.layout = pipeline->vkPipelineLayout;
-        pipelineInfo.renderPass = pipelineBuilder.frameBuffer->vkRenderPass;
+        pipelineInfo.renderPass = frameBuffer->vkRenderPass;
         pipelineInfo.subpass = 0;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 

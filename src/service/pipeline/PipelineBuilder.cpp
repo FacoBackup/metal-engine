@@ -2,10 +2,10 @@
 #include "../texture/TextureInstance.h"
 
 namespace Metal {
-    PipelineBuilder PipelineBuilder::Of(FrameBufferInstance *frameBuffer, const char *vertexShader,
+    PipelineBuilder PipelineBuilder::Of(std::string frameBufferId, const char *vertexShader,
                                         const char *fragmentShader) {
         PipelineBuilder d{};
-        d.frameBuffer = frameBuffer;
+        d.frameBufferId = std::move(frameBufferId);
         d.vertexShader = vertexShader;
         d.fragmentShader = fragmentShader;
         return d;
@@ -56,10 +56,10 @@ namespace Metal {
         return *this;
     }
 
-    PipelineBuilder &PipelineBuilder::addResourceBinding(BufferInstance *buffer) {
+    PipelineBuilder &PipelineBuilder::addResourceBinding(std::string bufferId) {
         DescriptorBinding b{};
         b.bindingPoint = currentBindingPoint++;
-        b.bufferInstance = buffer;
+        b.bufferId = std::move(bufferId);
         resourceBindings.push_back(b);
         return *this;
     }
@@ -73,6 +73,17 @@ namespace Metal {
         b.view = view;
         b.layout = layout;
         b.descriptorCount = descriptorCount;
+        resourceBindings.push_back(b);
+        return *this;
+    }
+
+    PipelineBuilder &PipelineBuilder::addResourceBinding(std::string frameBufferId, uint32_t attachmentIndex,
+                                                         VkImageLayout layout) {
+        DescriptorBinding b{};
+        b.bindingPoint = currentBindingPoint++;
+        b.frameBufferId = std::move(frameBufferId);
+        b.attachmentIndex = static_cast<int>(attachmentIndex);
+        b.layout = layout;
         resourceBindings.push_back(b);
         return *this;
     }

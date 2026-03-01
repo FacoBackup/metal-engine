@@ -10,7 +10,12 @@ namespace Metal {
 
     RuntimeResource* FramebufferBuilder::build() {
         auto &framebufferService = CTX.framebufferService;
-        FrameBufferInstance* fbo = framebufferService.createFrameBuffer(id, w, h, clearColor);
+        FrameBufferInstance* fbo = framebufferService.getResource(id);
+        if (fbo != nullptr) {
+            return fbo;
+        }
+
+        fbo = framebufferService.createFrameBuffer(id, w, h, clearColor);
 
         for (const auto& attachment : attachments) {
             framebufferService.createAttachment(attachment.id.c_str(), attachment.format, attachment.usage, fbo);

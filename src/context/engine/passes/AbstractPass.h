@@ -8,9 +8,7 @@ namespace Metal {
     struct WorldRepository;
     struct MeshInstance;
     class StreamingService;
-    struct CoreFrameBuffers;
     struct PipelineInstance;
-    struct CoreBuffers;
 
     class AbstractPass : public AbstractRuntimeComponent {
         bool isComputePass;
@@ -22,6 +20,8 @@ namespace Metal {
         PipelineInstance *pipelineInstance = nullptr;
 
         explicit AbstractPass(bool isComputePass);
+
+        virtual ~AbstractPass() override;
 
         void recordPushConstant(const void *data);
 

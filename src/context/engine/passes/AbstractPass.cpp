@@ -9,6 +9,12 @@ namespace Metal {
                                                          CTX.streamingRepository), isComputePass(isComputePass) {
     }
 
+    AbstractPass::~AbstractPass() {
+        if (pipelineInstance != nullptr) {
+            CTX.pipelineService.dispose(pipelineInstance->getId());
+        }
+    }
+
     void AbstractPass::recordPushConstant(const void *data) {
         VkShaderStageFlags stageFlags = 0;
         if (getPipeline()->isRayTracing) {

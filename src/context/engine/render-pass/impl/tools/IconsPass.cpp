@@ -6,12 +6,12 @@
 namespace Metal {
     void IconsPass::onInitialize() {
         PipelineBuilder iconPipelineBuilder = PipelineBuilder::Of(
-                    CTX.coreFrameBuffers.postProcessingFBO,
+                    "postProcessingFBO",
                     "QUAD.vert",
                     "tools/Icon.frag"
                 )
-                .addResourceBinding(CTX.coreBuffers.globalData)
-                .addResourceBinding(CTX.coreBuffers.lightBuffer)
+                .addResourceBinding("globalData")
+                .addResourceBinding("lightBuffer")
                 .setBlendEnabled();
         pipelineInstance = CTX.pipelineService.createPipeline(iconPipelineBuilder);
     }

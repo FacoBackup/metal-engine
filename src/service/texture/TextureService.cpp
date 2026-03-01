@@ -314,8 +314,8 @@ namespace Metal {
         return nullptr;
     }
 
-    TextureInstance *TextureService::createForCompute(const unsigned int width, const unsigned int height) {
-        auto *image = createResourceInstance(Util::uuidV4());
+    TextureInstance *TextureService::createForCompute(const std::string &id, const unsigned int width, const unsigned int height) {
+        auto *image = createResourceInstance(id);
         image->width = width;
         image->height = height;
         VkImageCreateInfo imageCreateInfo = {};

@@ -15,7 +15,6 @@ namespace Metal {
 
     void EngineContext::onInitialize() {
         CTX.worldGridService.onSync();
-        CTX.passesService.onInitialize();
     }
 
     void EngineContext::updateTileData() {
@@ -39,7 +38,7 @@ namespace Metal {
             }
 
             if (i > 0) {
-                CTX.coreBuffers.tileInfo->update(tileInfoUBO.tileCenterValid.data());
+                CTX.bufferService.getResource("tileInfo")->update(tileInfoUBO.tileCenterValid.data());
             }
             CTX.worldGridRepository.hasMainTileChanged = false;
         }
@@ -56,6 +55,12 @@ namespace Metal {
 
         if (start == -1) {
             start = currentTimeMs;
+        }
+    }
+
+    void EngineContext::dispose() {
+        if (currentFrame != nullptr) {
+            currentFrame->dispose();
         }
     }
 
@@ -76,9 +81,11 @@ namespace Metal {
         if (updateVolumes) {
             CTX.volumeService.onSync();
         }
-        updateGlobalData();
 
-        CTX.passesService.onSync();
+        if (currentFrame != nullptr) {
+            updateGlobalData();
+            currentFrame->onSync();
+        }
 
         CTX.rayTracingService.onSync();
 
@@ -89,7 +96,7 @@ namespace Metal {
 
     void EngineContext::updateGlobalData() {
         auto &camera = CTX.worldRepository.camera;
-        auto *fbo = CTX.coreFrameBuffers.postProcessingFBO;
+        auto *fbo = CTX.framebufferService.getResource("postProcessingFBO");
         globalDataUBO.outputRes.x = fbo->bufferWidth;
         globalDataUBO.outputRes.y = fbo->bufferHeight;
         globalDataUBO.viewMatrix = camera.viewMatrix;
@@ -127,6 +134,6 @@ namespace Metal {
         CTX.lightService.computeSunInfo();
         globalDataUBO.sunPosition = CTX.lightService.getSunPosition();
         globalDataUBO.sunColor = CTX.lightService.getSunColor();
-        CTX.coreBuffers.globalData->update(&globalDataUBO);
+        CTX.bufferService.getResource("globalData")->update(&globalDataUBO);
     }
 }

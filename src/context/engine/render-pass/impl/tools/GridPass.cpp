@@ -6,14 +6,14 @@
 namespace Metal {
     void GridPass::onInitialize() {
         PipelineBuilder gridPipelineBuilder = PipelineBuilder::Of(
-                    CTX.coreFrameBuffers.postProcessingFBO,
+                    "postProcessingFBO",
                     "QUAD.vert",
                     "tools/Grid.frag"
                 )
                 .setBlendEnabled()
                 .setPushConstantsSize(sizeof(GridPushConstant))
-                .addResourceBinding(CTX.coreBuffers.globalData)
-                .addResourceBinding(CTX.vulkanContext.vkImageSampler, CTX.coreFrameBuffers.gBufferFBO->attachments[2]->vkImageView);
+                .addResourceBinding("globalData")
+                .addResourceBinding("gBufferFBO", 2);
         pipelineInstance = CTX.pipelineService.createPipeline(gridPipelineBuilder);
     }
 

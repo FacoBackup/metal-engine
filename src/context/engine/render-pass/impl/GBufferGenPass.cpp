@@ -12,12 +12,12 @@
 namespace Metal {
     void GBufferGenPass::onInitialize() {
         PipelineBuilder gBufferPipelineBuilder = PipelineBuilder::Of(
-                    CTX.coreFrameBuffers.gBufferFBO,
+                    "gBufferFBO",
                     "GBufferGen.vert",
                     "GBufferGen.frag"
                 )
-                .addResourceBinding(CTX.coreBuffers.globalData)
-                .addResourceBinding(CTX.coreBuffers.materialBuffer)
+                .addResourceBinding("globalData")
+                .addResourceBinding("materialBuffer")
                 .addResourceBinding(CTX.vulkanContext.vkImageSampler, VK_NULL_HANDLE, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1000)
                 .setPrepareForMesh()
                 .setDepthTest()

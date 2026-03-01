@@ -40,7 +40,7 @@ namespace Metal {
 
         TextureInstance *create(const std::string &id) override;
 
-        TextureInstance *createForCompute(unsigned int width, unsigned int height);
+        TextureInstance *createForCompute(const std::string &id, unsigned int width, unsigned int height);
 
         unsigned int getTextureIndex(const std::string &id);
 

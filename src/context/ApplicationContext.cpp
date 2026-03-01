@@ -59,6 +59,7 @@ namespace Metal {
         NFD_Quit();
         try {
             asyncTaskService.endAll();
+            engineContext.dispose();
             guiContext.dispose();
             vulkanContext.dispose();
             glfwContext.dispose();

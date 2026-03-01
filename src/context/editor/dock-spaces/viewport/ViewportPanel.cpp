@@ -4,16 +4,26 @@
 #include "GizmoPanel.h"
 #include "ImGuizmo.h"
 #include "ViewportHeaderPanel.h"
+#include "EngineFramePanel.h"
 #include "../../../../context/ApplicationContext.h"
 #include "../../../../service/descriptor/DescriptorInstance.h"
 #include "../../../../service/framebuffer/FrameBufferInstance.h"
 #include "../../../../service/camera/Camera.h"
+#include "../../../../context/engine/frame-builder/EngineFrameBuilder.h"
+#include "../../../../service/framebuffer/FrameBufferService.h"
+#include "../../../../enum/engine-definitions.h"
+#include "../../../../dto/buffers/GlobalDataUBO.h"
+#include "../../../../dto/buffers/TileInfoUBO.h"
+#include "../../../../dto/buffers/LightData.h"
+#include "../../../../dto/buffers/VolumeData.h"
+#include "../../../../dto/buffers/MaterialData.h"
 
 #include <algorithm>
 
 namespace Metal {
     void ViewportPanel::onInitialize() {
         appendChild(headerPanel = new ViewportHeaderPanel());
+        appendChild(engineFramePanel = new EngineFramePanel());
         appendChild(gizmoPanel = new GizmoPanel(position, size));
         appendChild(cameraPanel = new CameraPositionPanel());
 
@@ -64,18 +74,7 @@ namespace Metal {
         }
 
         headerPanel->onSync();
-
-        const float tabHeight = ImGui::GetFrameHeightWithSpacing();
-        const ImVec2 viewportSize{size->x, size->y - tabHeight - ViewportHeaderPanel::HEIGHT};
-
-        auto *framebuffer = CTX.coreFrameBuffers.postProcessingFBO;
-        CTX.descriptorSetService.setImageDescriptor(framebuffer, 0);
-        ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet),
-                     viewportSize);
-
-        const ImVec2 imageMin = ImGui::GetItemRectMin();
-        const ImVec2 imageMax = ImGui::GetItemRectMax();
-        handleViewportPicking(imageMin, imageMax);
+        engineFramePanel->onSync();
 
         gizmoPanel->onSync();
         cameraPanel->onSync();
@@ -102,7 +101,7 @@ namespace Metal {
             return;
         }
 
-        auto *gBuffer = CTX.coreFrameBuffers.gBufferFBO;
+        auto *gBuffer = CTX.framebufferService.getResource("gBufferFBO");
         if (!gBuffer) {
             return;
         }

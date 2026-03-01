@@ -1,5 +1,6 @@
 #ifndef METAL_ENGINE_ENGINEFRAMEBUILDER_H
 #define METAL_ENGINE_ENGINEFRAMEBUILDER_H
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -7,8 +8,11 @@
 #include <vulkan/vulkan_core.h>
 
 #include "structures/ResourceBuilder.h"
+#include "../../../enum/PassType.h"
+#include "../../../service/buffer/BufferInstance.h"
 
 namespace Metal {
+    class CommandBufferRecorder;
     struct FrameBufferInstance;
     struct DescriptorBinding;
     class ResourceBuilder;
@@ -17,6 +21,7 @@ namespace Metal {
     class EngineFrameBuilder final {
         std::vector<std::shared_ptr<ResourceBuilder> > builders{};
         std::shared_ptr<ResourceBuilder> currentBuilder{};
+        std::vector<PassType> passTypes{};
 
     public:
         EngineFrameBuilder &addFramebuffer(std::string id, unsigned w, unsigned h, glm::vec4 clearColor);
@@ -28,14 +33,16 @@ namespace Metal {
 
         EngineFrameBuilder &addDepth();
 
-        EngineFrameBuilder &addTexture(const std::string& id, unsigned w, unsigned h);
+        EngineFrameBuilder &addTexture(const std::string &id, unsigned w, unsigned h);
 
         EngineFrameBuilder &addTexture(const std::string &id);
 
-        EngineFrameBuilder &addBuffer(const std::string &id, VkDeviceSize size, VkBufferUsageFlags usage,
-                                      VkMemoryPropertyFlags properties);
+        EngineFrameBuilder &addBuffer(const std::string &id, VkDeviceSize size,
+                                      VkMemoryPropertyFlags properties, BufferType type);
 
         EngineFrameBuilder &addBuffer(const std::string &id);
+
+        EngineFrameBuilder &addPass(PassType type);
 
         bool tryMatch(const std::string &id, ResourceType type);
 
