@@ -10,47 +10,18 @@ struct BounceInfo {
     vec3 indirectLight;
 };
 
-void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo)
+void computeRadiance(inout BounceInfo bounceInfo)
 {
-    // ----------------------------------------------------
-    // 1. Emissive bypass
-    // ----------------------------------------------------
     if (bounceInfo.material.isEmissive)
     {
-        vec3 emission = bounceInfo.material.baseColor * globalData.giEmissiveFactor;
+        vec3 emission = bounceInfo.material.baseColor * pushConstants.pathTracingEmissiveFactor;
         bounceInfo.indirectLight += bounceInfo.throughput * emission;
         return;
     }
 
-    ivec2 coord = ivec2(
-        worldToSurfaceCacheHash(bounceInfo.interaction.point) *
-        vec2(globalData.surfaceCacheWidth, globalData.surfaceCacheHeight)
-    );
-
-    vec4 cacheData = imageLoad(surfaceCacheImage, coord);
-
-    float sampleCount = cacheData.a;
-    vec3 cachedRadiance = cacheData.rgb;
-
-    float maxSamples = float(globalData.pathTracerMaxSamples);
-
-    float confidence = clamp(sampleCount / maxSamples, 0.0, 1.0);
-
-    // ----------------------------------------------------
-    // 2. If confident → reuse only
-    // ----------------------------------------------------
-    if (confidence >= 1.0 && globalData.enableSurfaceCache)
-    {
-        bounceInfo.indirectLight += bounceInfo.throughput * cachedRadiance;
-        return;
-    }
-
-    // ----------------------------------------------------
-    // 3. Otherwise compute fresh lighting
-    // ----------------------------------------------------
     vec3 directRadiance = vec3(0);
 
-    for (int i = 0; i < globalData.lightsCount; ++i)
+    for (int i = 0; i < int(globalData.lightsCount); ++i)
     {
         Light l = lightBuffer.items[i];
         l.color.rgb *= l.color.a;
@@ -63,22 +34,10 @@ void fetchSurfaceCacheRadiance(inout BounceInfo bounceInfo)
     }
 
     bounceInfo.indirectLight += bounceInfo.throughput * directRadiance;
-
-    // ----------------------------------------------------
-    // 4. Update cache ONLY when we computed fresh lighting
-    // ----------------------------------------------------
-    if (globalData.enableSurfaceCache)
-    {
-        float newCount = min(sampleCount + 1.0, maxSamples);
-
-        vec3 newRadiance = (cachedRadiance * sampleCount + directRadiance) / newCount;
-
-        imageStore(surfaceCacheImage, coord, vec4(newRadiance, newCount));
-    }
 }
 
 vec3 calculateIndirectLighting(MaterialInfo material, SurfaceInteraction interaction) {
-    if (globalData.pathTracerBounces == 0) return vec3(0);
+    if (pushConstants.pathTracerBounces == 0) return vec3(0);
 
     BounceInfo bounceInfo;
     bounceInfo.indirectLight = vec3(0);
@@ -86,7 +45,7 @@ vec3 calculateIndirectLighting(MaterialInfo material, SurfaceInteraction interac
     bounceInfo.material = material;
     bounceInfo.interaction = interaction;
 
-    for (uint j = 0; j < globalData.pathTracerBounces; j++) {
+    for (uint j = 0; j < pushConstants.pathTracerBounces; j++) {
         vec3 wi;
         float pdf;
         vec3 X = vec3(0.), Y = vec3(0.);
@@ -108,11 +67,11 @@ vec3 calculateIndirectLighting(MaterialInfo material, SurfaceInteraction interac
         traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xFF, 0, 0, 0, rayOrigin, 0.001, wi, 1000.0, 0);
 
         if (!payload.hit) {
-            if (globalData.isAtmosphereEnabled) {
+            if (pushConstants.isAtmosphereEnabled != 0) {
                 bounceInfo.material.baseColor = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), wi, 2.0f) * 0.05f;
                 bounceInfo.material.isEmissive = true;
                 bounceInfo.interaction.point = rayOrigin + wi * 1000.0; // Placeholder point for atmosphere
-                fetchSurfaceCacheRadiance(bounceInfo);
+                computeRadiance(bounceInfo);
             }
             break;
         }
@@ -122,7 +81,7 @@ vec3 calculateIndirectLighting(MaterialInfo material, SurfaceInteraction interac
         bounceInfo.interaction.point = payload.hitPosition;
         bounceInfo.interaction.incomingRayDir = wi;
 
-        fetchSurfaceCacheRadiance(bounceInfo);
+        computeRadiance(bounceInfo);
     }
     return bounceInfo.indirectLight;
 }
@@ -148,7 +107,7 @@ vec3 calculatePixelColor(vec3 rayDirection, in vec2 texCoords, MaterialInfo mate
     interaction.tangent = X;
     interaction.binormal = Y;
 
-    for (uint i = 0; i < globalData.pathTracerSamples; i++) {
+    for (uint i = 0; i < pushConstants.pathTracerSamples; i++) {
         vec3 f = vec3(0.);
         float scatteringPdf = 0.;
         vec3 Ld = vec3(0);
@@ -160,8 +119,8 @@ vec3 calculatePixelColor(vec3 rayDirection, in vec2 texCoords, MaterialInfo mate
 
         L += Ld;
 
-        if (globalData.pathTracerBounces > 0 && globalData.pathTracerMultiplier > 0) {
-            L += beta * calculateIndirectLighting(material, interaction) * globalData.pathTracerMultiplier;
+        if (pushConstants.pathTracerBounces > 0 && pushConstants.pathTracerMultiplier > 0) {
+            L += beta * calculateIndirectLighting(material, interaction) * pushConstants.pathTracerMultiplier;
         }
 
         if (scatteringPdf > EPSILON && dot(f, f) > EPSILON) {
@@ -169,5 +128,5 @@ vec3 calculatePixelColor(vec3 rayDirection, in vec2 texCoords, MaterialInfo mate
         }
     }
 
-    return L / globalData.pathTracerSamples;
+    return L / pushConstants.pathTracerSamples;
 }

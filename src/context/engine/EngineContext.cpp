@@ -103,34 +103,20 @@ namespace Metal {
     void EngineContext::updateGlobalData() {
         auto &camera = CTX.worldRepository.camera;
         auto *fbo = currentFrame->getResourceAs<FrameBufferInstance>(  RID_POST_PROCESSING_FBO);
-        globalDataUBO.outputRes.x = fbo->bufferWidth;
-        globalDataUBO.outputRes.y = fbo->bufferHeight;
         globalDataUBO.viewMatrix = camera.viewMatrix;
         globalDataUBO.projectionMatrix = camera.projectionMatrix;
         globalDataUBO.projView = camera.projViewMatrix;
         globalDataUBO.invProj = camera.invProjectionMatrix;
         globalDataUBO.invView = camera.invViewMatrix;
         globalDataUBO.cameraWorldPosition = camera.position;
-        globalDataUBO.pathTracerMultiplier = CTX.engineRepository.pathTracerMultiplier;
         globalDataUBO.volumeCount = CTX.volumeService.getCount();
         globalDataUBO.lightsCount = CTX.lightService.getCount();
-        globalDataUBO.volumeShadowSteps = CTX.engineRepository.volumeShadowSteps;
-        globalDataUBO.isAtmosphereEnabled = CTX.engineRepository.atmosphereEnabled;
-
-        globalDataUBO.enableSurfaceCache = CTX.engineRepository.enableSurfaceCache ? 1 : 0;
-        globalDataUBO.multipleImportanceSampling = CTX.engineRepository.multipleImportanceSampling;
-        globalDataUBO.pathTracerMaxSamples = CTX.engineRepository.pathTracerMaxSamples;
-        globalDataUBO.pathTracerSamples = CTX.engineRepository.pathTracerSamples;
-        globalDataUBO.pathTracerBounces = CTX.engineRepository.pathTracerBounces;
-        globalDataUBO.giTileSubdivision = CTX.engineRepository.giTileSubdivision;
-        globalDataUBO.giEmissiveFactor = CTX.engineRepository.giEmissiveFactor;
-
         globalDataUBO.debugFlag = ShadingModes::IndexOfValue(CTX.editorRepository.shadingMode);
-        globalDataUBO.surfaceCacheWidth = SURFACE_CACHE_RES;
-        globalDataUBO.surfaceCacheHeight = SURFACE_CACHE_RES;
         CTX.engineRepository.pathTracerAccumulationCount++;
         globalDataUBO.pathTracerAccumulationCount = CTX.engineRepository.pathTracerAccumulationCount;
         globalDataUBO.globalFrameCount++;
+        globalDataUBO.outputRes = {fbo->bufferWidth, fbo->bufferHeight};
+        globalDataUBO.pathTracerMaxSamples = CTX.engineRepository.pathTracerMaxSamples;
 
         if (CTX.engineRepository.incrementTime) {
             CTX.engineRepository.elapsedTime += .0005f * CTX.engineRepository.elapsedTimeSpeed;

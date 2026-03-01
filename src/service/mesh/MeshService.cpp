@@ -29,14 +29,14 @@ namespace Metal {
         instance->dataBuffer = CTX.bufferService.createBuffer(
             id + "_data",
             sizeof(VertexData) * data->data.size(),
-            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
+            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
             data->data.data(),
             true);
 
         instance->indexBuffer = CTX.bufferService.createBuffer(
             id + "_indices",
             sizeof(unsigned int) * data->indices.size(),
-            VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
+            VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
             data->indices.data(),
             true);
 
@@ -106,7 +106,7 @@ namespace Metal {
 
     void MeshService::disposeResource(MeshInstance *resource) {
         LOG_INFO("Disposing of mesh instance");
-        CTX.rayTracingService.destroyAccelerationStructures();
+        CTX.rayTracingService.markDirty();
         CTX.bufferService.dispose(resource->indexBuffer->getId());
         CTX.bufferService.dispose(resource->dataBuffer->getId());
     }

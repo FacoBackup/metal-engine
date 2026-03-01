@@ -24,9 +24,7 @@ namespace Metal {
         registerInt(pathTracerSamples, PATH_TRACER, "Samples per pixel", 1, 32);
         registerInt(pathTracerBounces, PATH_TRACER, "Bounces", 0, 7);
         registerBool(multipleImportanceSampling, PATH_TRACER, "Enable multiple importance sampling?");
-        registerBool(enableSurfaceCache, PATH_TRACER, "Enable surface cache?");
-        registerInt(giTileSubdivision, PATH_TRACER, "Grid subdivision", 1);
-        registerFloat(giEmissiveFactor, PATH_TRACER, "Emissive surface factor", 0);
+        registerFloat(pathTracingEmissiveFactor, PATH_TRACER, "Emissive surface factor", 0);
 
         registerBool(atmosphereEnabled, ATMOSPHERE, "Enable atmosphere?");
         registerFloat(elapsedTime, ATMOSPHERE, "Elapsed time");
@@ -68,8 +66,7 @@ namespace Metal {
         j["nightColor"] = {nightColor.x, nightColor.y, nightColor.z};
         j["middayColor"] = {middayColor.x, middayColor.y, middayColor.z};
         j["svoFilePaths"] = svoFilePaths;
-        j["giTileSubdivision"] = giTileSubdivision;
-        j["giEmissiveFactor"] = giEmissiveFactor;
+        j["pathTracingEmissiveFactor"] = pathTracingEmissiveFactor;
         j["pathTracerMultiplier"] = pathTracerMultiplier;
         j["shadingResInvScale"] = shadingResInvScale;
         j["pathTracerMaxSamples"] = pathTracerMaxSamples;
@@ -93,8 +90,7 @@ namespace Metal {
         nightColor = {j.at("nightColor")[0], j.at("nightColor")[1], j.at("nightColor")[2]};
         middayColor = {j.at("middayColor")[0], j.at("middayColor")[1], j.at("middayColor")[2]};
         svoFilePaths = j.at("svoFilePaths").get<std::vector<std::string> >();
-        giTileSubdivision = j.at("giTileSubdivision").get<int>();
-        giEmissiveFactor = j.at("giEmissiveFactor").get<float>();
+        pathTracingEmissiveFactor = j.at("pathTracingEmissiveFactor").get<float>();
         pathTracerMultiplier = j.at("pathTracerMultiplier").get<float>();
         shadingResInvScale = j.at("shadingResInvScale").get<int>();
         pathTracerMaxSamples = j.at("pathTracerMaxSamples").get<int>();

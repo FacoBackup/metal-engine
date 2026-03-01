@@ -1,8 +1,6 @@
 #ifndef ENGINEID_H
 #define ENGINEID_H
 
-#define SURFACE_CACHE_RES 2000
-
 typedef unsigned long long EntityID;
 #define MAX_VOLUMES 300
 #define MAX_LIGHTS 300

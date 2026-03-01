@@ -37,7 +37,6 @@ namespace Metal {
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
                 .addBuffer(RID_MESH_METADATA_BUFFER, MAX_MESH_INSTANCES * sizeof(MeshMetadata),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
-                .addTexture(RID_SURFACE_CACHE, SURFACE_CACHE_RES, SURFACE_CACHE_RES)
                 .addTexture(RID_RAW_RENDERED_FRAME, gBufferW, gBufferH)
                 .addTexture(RID_ACCUMULATED_FRAME, gBufferW, gBufferH)
                 .addTexture(RID_RENDER_INDEX_STENCIL, gBufferW, gBufferH, VK_FORMAT_R32_SFLOAT)
@@ -46,12 +45,10 @@ namespace Metal {
                 .addTexture(RID_PREVIOUS_COLOR, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
                 .addTexture(RID_PREVIOUS_POSITION_INDEX, gBufferW, gBufferH, VK_FORMAT_R32G32B32A32_SFLOAT)
                 .addTexture(RID_PREVIOUS_NORMAL, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
-                .addFramebuffer(RID_POST_PROCESSING_FBO, CTX.vulkanContext.getWindowWidth(),
-                                CTX.vulkanContext.getWindowHeight(), glm::vec4(0, 0, 0, 0))
-                .addColor("Color", VK_FORMAT_R16G16B16A16_SFLOAT,
-                          VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, nullptr)
+                .addFramebuffer(RID_POST_PROCESSING_FBO, gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
+                .addColor("Color", VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
                 .addComputeCommandBuffer(RID_COMPUTE_CB)
-                .addPass(COMPUTE, RID_COMPUTE_CB)
+                .addPass(RAY_TRACING, RID_COMPUTE_CB)
                 .addPass(ACCUMULATION, RID_COMPUTE_CB)
                 .addCommandBuffer(RID_POST_PROCESSING_CB, RID_POST_PROCESSING_FBO)
                 .addPass(POST_PROCESSING, RID_POST_PROCESSING_CB)

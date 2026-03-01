@@ -10,14 +10,12 @@ namespace Metal {
 
         bool isBaking = false;
 
-        bool enableSurfaceCache = true;
         bool multipleImportanceSampling = false;
         int maxVideoFrames = 100;
         int volumeShadowSteps = 8;
         int shadingResInvScale = 2;
         int pathTracerMaxSamples = 200;
-        int giTileSubdivision = 40;
-        float giEmissiveFactor = 2;
+        float pathTracingEmissiveFactor = 2;
         int pathTracerSamples = 1;
         int pathTracerBounces = 1;
         int pathTracerAccumulationCount = 0;

@@ -34,9 +34,8 @@ namespace Metal {
         return *this;
     }
 
-    EngineFrameBuilder &EngineFrameBuilder::addColor(std::string id, VkFormat format, VkImageUsageFlagBits usage,
-                                                     FrameBufferInstance *framebuffer) {
-        dynamic_cast<FramebufferBuilder *>(currentBuilder.get())->addColor(frameId + "_" + id, format, usage, framebuffer);
+    EngineFrameBuilder &EngineFrameBuilder::addColor(std::string id, VkFormat format, VkImageUsageFlagBits usage) {
+        dynamic_cast<FramebufferBuilder *>(currentBuilder.get())->addColor(frameId + "_" + id, format, usage, nullptr);
         return *this;
     }
 

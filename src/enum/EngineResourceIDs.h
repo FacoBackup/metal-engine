@@ -8,7 +8,6 @@ namespace Metal {
     inline constexpr const char* RID_VOLUMES_BUFFER = "volumesBuffer";
     inline constexpr const char* RID_MATERIAL_BUFFER = "materialBuffer";
     inline constexpr const char* RID_MESH_METADATA_BUFFER = "meshMetadataBuffer";
-    inline constexpr const char* RID_SURFACE_CACHE = "surfaceCache";
     inline constexpr const char* RID_GBUFFER_POSITION_INDEX = "gBufferPositionIndex";
     inline constexpr const char* RID_GBUFFER_NORMAL = "gBufferNormal";
     inline constexpr const char* RID_PREVIOUS_COLOR = "previousColor";

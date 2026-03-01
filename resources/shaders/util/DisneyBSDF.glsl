@@ -476,7 +476,7 @@ vec3 calculateDirectLight(const in Light light, const in SurfaceInteraction inte
         vec3 fDirect = bsdfEvaluate(wi, wo, interaction.tangent, interaction.binormal, interaction, material) * abs(dot(wi, interaction.normal));
         float weight = 1.;
 
-        if (globalData.multipleImportanceSampling){
+        if (pushConstants.multipleImportanceSampling == 1){
             scatteringPdf = bsdfPdf(wi, wo, interaction.tangent, interaction.binormal, interaction, material);
             weight = powerHeuristic(1., lightPdf, 1., scatteringPdf);
         }
@@ -491,7 +491,7 @@ vec3 calculateDirectLight(const in Light light, const in SurfaceInteraction inte
     f = bsdfSample(wi, wo, interaction.tangent, interaction.binormal, scatteringPdf, interaction, material);
     f *= abs(dot(wi, interaction.normal));
 
-    if (globalData.multipleImportanceSampling){
+    if (pushConstants.multipleImportanceSampling == 1){
 
         isBlack = dot(f, f) == 0.;
         Li = light.color.rgb;

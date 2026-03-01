@@ -49,22 +49,6 @@ namespace Metal {
         return fields;
     }
 
-    unsigned long Inspectable::getChangeId() const {
-        return changes;
-    }
-
-    void Inspectable::registerChange() {
-        changes++;
-    }
-
-    bool Inspectable::isNotFrozen() const {
-        return frozenVersion != getChangeId();
-    }
-
-    void Inspectable::freezeVersion() {
-        frozenVersion = getChangeId();
-    }
-
     void Inspectable::registerInt(int &v,
                                   std::string group, std::string name,
                                   int min, int max, bool disabled) {

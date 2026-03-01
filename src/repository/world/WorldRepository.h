@@ -20,6 +20,8 @@
 #include "components/VolumeComponent.h"
 
 namespace Metal {
+    class Inspectable;
+
     struct WorldRepository final : AbstractRuntimeComponent, Serializable {
         static constexpr EntityID ROOT_ID = 1;
 
@@ -40,19 +42,19 @@ namespace Metal {
 
         Inspectable *getComponent(ComponentTypes::ComponentType comp, EntityID entity);
 
-        void deleteRecursively(const std::vector<EntityID> &entities);
 
         void deleteEntities(const std::vector<EntityID> &entities);
 
         void changeVisibility(EntityID entity, bool isVisible);
 
-    private:
-        void changeVisibilityRecursively(EntityID entity, bool isVisible);
-
-    public:
         nlohmann::json toJson() const override;
 
         void fromJson(const nlohmann::json &j) override;
+
+    private:
+        void deleteRecursively(const std::vector<EntityID> &entities);
+
+        void changeVisibilityRecursively(EntityID entity, bool isVisible);
     };
 } // Metal
 

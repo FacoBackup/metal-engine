@@ -13,10 +13,10 @@ namespace Metal {
                     "rt/HWRayTracing.rgen",
                     "rt/HWRayTracing.rmiss",
                     "rt/HWRayTracing.rchit")
+                .setPushConstantsSize(sizeof(HWRayTracingPushConstant))
                 .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
                 .addAccelerationStructureBinding(CTX.rayTracingService.getTLAS())
                 .addStorageImageBinding(getScopedResourceId(RID_RAW_RENDERED_FRAME))
-                .addStorageImageBinding(getScopedResourceId(RID_SURFACE_CACHE))
                 .addStorageImageBinding(getScopedResourceId(RID_RENDER_INDEX_STENCIL))
                 .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_POSITION_INDEX))
                 .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_NORMAL))
@@ -25,7 +25,7 @@ namespace Metal {
                 .addBufferBinding(getScopedResourceId(RID_MATERIAL_BUFFER))
                 .addBufferBinding(getScopedResourceId(RID_MESH_METADATA_BUFFER))
                 .addCombinedImageSamplerBinding(CTX.vulkanContext.vkImageSampler, VK_NULL_HANDLE,
-                                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1000);
+                                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1000);
         pipelineInstance = CTX.pipelineService.createPipeline(builder);
     }
 
@@ -38,13 +38,11 @@ namespace Metal {
     }
 
     void HWRayTracingPass::onSync() {
-
         auto view = CTX.worldRepository.registry.view<MeshComponent, TransformComponent>();
         for (auto entity: view) {
             CTX.streamingService.streamMesh(view.get<MeshComponent>(entity).meshId);
         }
 
-        auto *surfaceCache = frame->getResourceAs<TextureInstance>(RID_SURFACE_CACHE);
         auto *rawRenderedFrame = frame->getResourceAs<TextureInstance>(RID_RAW_RENDERED_FRAME);
         auto *accumulatedFrame = frame->getResourceAs<TextureInstance>(RID_ACCUMULATED_FRAME);
         auto *renderIndexStencil = frame->getResourceAs<TextureInstance>(RID_RENDER_INDEX_STENCIL);
@@ -55,13 +53,10 @@ namespace Metal {
         auto *previousPositionIndex = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_POSITION_INDEX);
         auto *previousNormal = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_NORMAL);
 
-        bool surfaceCacheReset = CTX.engineContext.isGISettingsUpdated() || CTX.engineContext.
-                                 isUpdateLights();
-        if (surfaceCacheReset) {
-            clearTexture(surfaceCache->vkImage);
-        }
-
-        if (isFirstRun || CTX.engineContext.isCameraUpdated() || surfaceCacheReset) {
+        if (isFirstRun || CTX.engineContext.isCameraUpdated() || CTX.engineContext.isGISettingsUpdated() || CTX.engineContext.
+                                 isUpdateLights() || CTX.worldGridService.
+            isNotFrozen()) {
+            CTX.worldGridService.freezeVersion();
             clearTexture(rawRenderedFrame->vkImage);
             clearTexture(accumulatedFrame->vkImage);
             clearTexture(renderIndexStencil->vkImage);
@@ -85,6 +80,17 @@ namespace Metal {
         startWriting(gBufferNormal->vkImage);
 
         // Trace rays
+        pushConstant.pathTracerMultiplier = CTX.engineRepository.pathTracerMultiplier;
+        pushConstant.volumeShadowSteps = CTX.engineRepository.volumeShadowSteps;
+        pushConstant.isAtmosphereEnabled = CTX.engineRepository.atmosphereEnabled;
+
+        pushConstant.multipleImportanceSampling = CTX.engineRepository.multipleImportanceSampling;
+        pushConstant.pathTracerSamples = CTX.engineRepository.pathTracerSamples;
+        pushConstant.pathTracerBounces = CTX.engineRepository.pathTracerBounces;
+        pushConstant.pathTracingEmissiveFactor = CTX.engineRepository.pathTracingEmissiveFactor;
+
+        recordPushConstant(&pushConstant);
+
         CTX.vulkanContext.vkCmdTraceRaysKHR(
             vkCommandBuffer,
             &pipelineInstance->raygenRegion,

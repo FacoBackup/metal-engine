@@ -38,12 +38,11 @@ namespace Metal {
         bool accelerationStructureBuilt = false;
         bool needsRebuild = true;
 
+        void updateDescriptorSets(VkAccelerationStructureKHR asHandle);
+
         void buildBLAS();
 
-        void destroyTLAS();
-
         void buildTLAS();
-
 
     public:
         void destroyAccelerationStructures();

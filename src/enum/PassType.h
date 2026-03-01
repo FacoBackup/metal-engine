@@ -3,7 +3,7 @@
 
 namespace Metal {
     enum PassType {
-        COMPUTE,
+        RAY_TRACING,
         ACCUMULATION,
         POST_PROCESSING,
         SELECTED_DOT,

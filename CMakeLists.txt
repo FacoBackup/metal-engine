@@ -226,7 +226,6 @@ add_executable(
         src/service/picking/PickingService.cpp
         src/service/picking/PickingService.h
         src/service/voxel/SVOInstance.h
-        src/dto/push-constant/VoxelDebugSettingsPushConstant.h
         src/service/world/WorldGridService.cpp
         src/service/world/WorldGridService.h
         src/dto/buffers/TileInfoUBO.h
@@ -293,6 +292,7 @@ add_executable(
         src/service/descriptor/DescriptorSetService.cpp
         src/context/engine/frame-builder/structures/PassBuilder.cpp
         src/context/engine/frame-builder/structures/CommandBufferRecorderBuilder.cpp
+        src/common/interface/Changeable.h
 )
 
 

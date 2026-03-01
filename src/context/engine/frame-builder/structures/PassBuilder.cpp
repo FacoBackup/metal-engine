@@ -11,7 +11,7 @@ namespace Metal {
         switch (passType) {
             case POST_PROCESSING:
                 return new PostProcessingPass(id);
-            case COMPUTE:
+            case RAY_TRACING:
                 return new HWRayTracingPass(id);
             case ACCUMULATION:
                 return new AccumulationPass(id);
