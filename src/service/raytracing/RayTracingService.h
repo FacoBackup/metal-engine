@@ -42,7 +42,8 @@ namespace Metal {
 
         void buildBLAS();
 
-        void buildTLAS();// ... existing code ...
+        void buildTLAS();
+        void updateMeshMaterials();
 
         void destroyTLAS();
 

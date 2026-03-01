@@ -9,6 +9,11 @@ namespace Metal {
         bool vsync = true;
 
         bool isBaking = false;
+        bool denoiserEnabled = false;
+        bool dofEnabled = false;
+        float dofFocusDistance = 10;
+        float dofAperture = 1.2f;
+        float dofFocalLength = 5;
 
         bool multipleImportanceSampling = false;
         int maxVideoFrames = 100;

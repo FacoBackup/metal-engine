@@ -293,6 +293,10 @@ add_executable(
         src/context/engine/frame-builder/structures/PassBuilder.cpp
         src/context/engine/frame-builder/structures/CommandBufferRecorderBuilder.cpp
         src/common/interface/Changeable.h
+        src/context/engine/compute-pass/impl/TemporalAccumulationPass.cpp
+        src/context/engine/compute-pass/impl/TemporalAccumulationPass.h
+        src/context/engine/compute-pass/impl/SpatialFilterPass.cpp
+        src/context/engine/compute-pass/impl/SpatialFilterPass.h
 )
 
 

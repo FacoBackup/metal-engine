@@ -35,6 +35,7 @@ namespace Metal {
     }
     void RayTracingService::onSync() {
         if (!needsRebuild) {
+            updateMeshMaterials();
             return;
         }
 
@@ -80,6 +81,36 @@ namespace Metal {
 
     bool RayTracingService::isReady() const {
         return accelerationStructureBuilt && tlas != VK_NULL_HANDLE;
+    }
+
+    void RayTracingService::updateMeshMaterials() {
+        if (!accelerationStructureBuilt || meshMetadata.empty()) return;
+
+        bool changed = false;
+        auto view = CTX.worldRepository.registry.view<MeshComponent>();
+
+        for (auto entity: view) {
+            if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
+            auto &meshComp = view.get<MeshComponent>(entity);
+            if (meshComp.meshId.empty()) continue;
+
+            if (meshComp.renderIndex < meshMetadata.size()) {
+                unsigned int materialIndex = CTX.materialService.getMaterialIndex(meshComp.materialId);
+                if (meshMetadata[meshComp.renderIndex].materialIndex != materialIndex) {
+                    meshMetadata[meshComp.renderIndex].materialIndex = materialIndex;
+                    changed = true;
+                }
+            }
+        }
+
+        if (changed) {
+            for (auto *frame : CTX.engineContext.registeredFrames) {
+                auto *meshMetadataBuffer = frame->getResourceAs<BufferInstance>(RID_MESH_METADATA_BUFFER);
+                if (meshMetadataBuffer != nullptr) {
+                    meshMetadataBuffer->update(meshMetadata.data());
+                }
+            }
+        }
     }
 
     void RayTracingService::destroyTLAS() {

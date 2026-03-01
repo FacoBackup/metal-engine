@@ -122,7 +122,7 @@ namespace Metal {
                     auto *pass = dynamic_cast<AbstractPass *>(builtResources.at(builder->getId()));
                     if (pass) {
                         pass->frame = frame.get();
-                        dynamic_cast<Initializable *>(pass)->onInitialize();
+                        pass->onInitialize();
                         recorderToPasses[cbId].push_back(pass);
                     }
                 }

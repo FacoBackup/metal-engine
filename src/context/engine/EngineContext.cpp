@@ -103,6 +103,7 @@ namespace Metal {
     void EngineContext::updateGlobalData() {
         auto &camera = CTX.worldRepository.camera;
         auto *fbo = currentFrame->getResourceAs<FrameBufferInstance>(  RID_POST_PROCESSING_FBO);
+        globalDataUBO.previousProjView = globalDataUBO.projView;
         globalDataUBO.viewMatrix = camera.viewMatrix;
         globalDataUBO.projectionMatrix = camera.projectionMatrix;
         globalDataUBO.projView = camera.projViewMatrix;
@@ -117,6 +118,7 @@ namespace Metal {
         globalDataUBO.globalFrameCount++;
         globalDataUBO.outputRes = {fbo->bufferWidth, fbo->bufferHeight};
         globalDataUBO.pathTracerMaxSamples = CTX.engineRepository.pathTracerMaxSamples;
+        globalDataUBO.denoiserEnabled = CTX.engineRepository.denoiserEnabled && (globalDataUBO.debugFlag == LIT || globalDataUBO.debugFlag == LIGHTING_ONLY)? 1 : 0;
 
         if (CTX.engineRepository.incrementTime) {
             CTX.engineRepository.elapsedTime += .0005f * CTX.engineRepository.elapsedTimeSpeed;

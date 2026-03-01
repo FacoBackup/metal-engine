@@ -6,6 +6,7 @@ layout (set = 0, binding = 0) uniform GlobalDataBlock {
     mat4 projView;
     mat4 invView;
     mat4 invProj;
+    mat4 previousProjView;
     vec3 cameraWorldPosition;
     vec3 sunColor;
     vec3 sunPosition;
@@ -18,6 +19,7 @@ layout (set = 0, binding = 0) uniform GlobalDataBlock {
     uint pathTracerAccumulationCount;
     uint globalFrameCount;
     uint pathTracerMaxSamples;
+    uint denoiserEnabled;
 
 } globalData;
 

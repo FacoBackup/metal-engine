@@ -2,6 +2,8 @@
 #include "../../render-pass/impl/PostProcessingPass.h"
 #include "../../compute-pass/impl/HWRayTracingPass.h"
 #include "../../compute-pass/impl/AccumulationPass.h"
+#include "../../compute-pass/impl/TemporalAccumulationPass.h"
+#include "../../compute-pass/impl/SpatialFilterPass.h"
 #include "../../render-pass/impl/tools/SelectedDotPass.h"
 #include "../../render-pass/impl/tools/GridPass.h"
 #include "../../render-pass/impl/tools/IconsPass.h"
@@ -15,6 +17,10 @@ namespace Metal {
                 return new HWRayTracingPass(id);
             case ACCUMULATION:
                 return new AccumulationPass(id);
+            case TEMPORAL_ACCUMULATION:
+                return new TemporalAccumulationPass(id);
+            case SPATIAL_FILTER:
+                return new SpatialFilterPass(id);
             case SELECTED_DOT:
                 return new SelectedDotPass(id);
             case GRID:

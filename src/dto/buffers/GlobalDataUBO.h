@@ -9,6 +9,9 @@ namespace Metal {
         alignas(16) glm::mat4x4 projView{};
         alignas(16) glm::mat4x4 invView{};
         alignas(16) glm::mat4x4 invProj{};
+
+        alignas(16) glm::mat4x4 previousProjView{};
+
         alignas(16) glm::vec3 cameraWorldPosition{};
         alignas(16) glm::vec3 sunColor{};
         alignas(16) glm::vec3 sunPosition{};
@@ -22,6 +25,7 @@ namespace Metal {
         alignas(4) unsigned int pathTracerAccumulationCount = 0;
         alignas(4) unsigned int globalFrameCount = 0;
         alignas(4) unsigned int pathTracerMaxSamples{};
+        alignas(4) unsigned int denoiserEnabled;
 
     };
 }

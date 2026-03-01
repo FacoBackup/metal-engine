@@ -11,6 +11,11 @@ layout(push_constant) uniform PushConstants {
     uint pathTracerBounces;
     float pathTracingEmissiveFactor;
     uint shouldTrace;
+
+    uint dofEnabled;
+    float dofFocusDistance;
+    float dofAperture;
+    float dofFocalLength;
 } pushConstants;
 
 #endif

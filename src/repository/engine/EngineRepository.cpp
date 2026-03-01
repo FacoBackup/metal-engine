@@ -8,6 +8,7 @@
 #define ATMOSPHERE "Atmosphere"
 #define SUN "Sun"
 #define VOLUMES "Volumes"
+#define DEPTH_OF_FIELD "Depth of field"
 
 namespace Metal {
     void EngineRepository::registerFields() {
@@ -20,11 +21,17 @@ namespace Metal {
         registerInt(volumeShadowSteps, VOLUMES, "Shadow steps", 1);
 
         registerFloat(pathTracerMultiplier, PATH_TRACER, "Strength");
+        registerBool(denoiserEnabled, PATH_TRACER, "Enable denoiser?");
         registerInt(pathTracerMaxSamples, PATH_TRACER, "Maximum accumulation", 1, 10000);
         registerInt(pathTracerSamples, PATH_TRACER, "Samples per pixel", 1, 32);
         registerInt(pathTracerBounces, PATH_TRACER, "Bounces", 0, 7);
         registerBool(multipleImportanceSampling, PATH_TRACER, "Enable multiple importance sampling?");
         registerFloat(pathTracingEmissiveFactor, PATH_TRACER, "Emissive surface factor", 0);
+
+        registerBool(dofEnabled, DEPTH_OF_FIELD, "Enable depth of field?");
+        registerFloat(dofFocusDistance, DEPTH_OF_FIELD, "Focus distance");
+        registerFloat(dofAperture, DEPTH_OF_FIELD, "Aperture");
+        registerFloat(dofFocalLength, DEPTH_OF_FIELD, "Focal length");
 
         registerBool(atmosphereEnabled, ATMOSPHERE, "Enable atmosphere?");
         registerFloat(elapsedTime, ATMOSPHERE, "Elapsed time");
@@ -43,7 +50,7 @@ namespace Metal {
             CTX.worldGridRepository.hasMainTileChanged = true;
         }
         if (member != nullptr && (member->group == PATH_TRACER || member->group == ATMOSPHERE || member->group
-                                  == SUN)) {
+                                  == SUN || member->group == DEPTH_OF_FIELD)) {
             CTX.engineContext.setGISettingsUpdated(true);
             CTX.engineContext.setUpdateLights(true);
         }
@@ -71,6 +78,11 @@ namespace Metal {
         j["shadingResInvScale"] = shadingResInvScale;
         j["pathTracerMaxSamples"] = pathTracerMaxSamples;
         j["volumeShadowSteps"] = volumeShadowSteps;
+        j["denoiserEnabled"] = denoiserEnabled;
+        j["dofEnabled"] = dofEnabled;
+        j["dofFocusDistance"] = dofFocusDistance;
+        j["dofAperture"] = dofAperture;
+        j["dofFocalLength"] = dofFocalLength;
         return j;
     }
 
@@ -94,7 +106,12 @@ namespace Metal {
         pathTracerMultiplier = j.at("pathTracerMultiplier").get<float>();
         shadingResInvScale = j.at("shadingResInvScale").get<int>();
         pathTracerMaxSamples = j.at("pathTracerMaxSamples").get<int>();
+        denoiserEnabled = j.at("denoiserEnabled").get<bool>();
         volumeShadowSteps = j.at("volumeShadowSteps").get<int>();
+        dofEnabled = j.at("dofEnabled").get<bool>();
+        dofFocusDistance = j.at("dofFocusDistance").get<float>();
+        dofAperture = j.at("dofAperture").get<float>();
+        dofFocalLength = j.at("dofFocalLength").get<float>();
     }
 
     const char *EngineRepository::getIcon() {

@@ -24,11 +24,6 @@ namespace Metal {
         bool vignetteEnabled = false;
         bool chromaticAberrationEnabled = false;
         bool distortionEnabled = false;
-        bool DOF = false;
-        int focusDistanceDOF = 10;
-        float apertureDOF = 1.2f;
-        int focalLengthDOF = 5;
-        int samplesDOF = 100;
         float filmGrainStrength = 1.f;
         float vignetteStrength = .25f;
         float bloomThreshold = .75f;
@@ -86,11 +81,6 @@ namespace Metal {
             j["vignetteEnabled"] = vignetteEnabled;
             j["chromaticAberrationEnabled"] = chromaticAberrationEnabled;
             j["distortionEnabled"] = distortionEnabled;
-            j["DOF"] = DOF;
-            j["focusDistanceDOF"] = focusDistanceDOF;
-            j["apertureDOF"] = apertureDOF;
-            j["focalLengthDOF"] = focalLengthDOF;
-            j["samplesDOF"] = samplesDOF;
             j["filmGrainStrength"] = filmGrainStrength;
             j["vignetteStrength"] = vignetteStrength;
             j["bloomThreshold"] = bloomThreshold;
@@ -127,11 +117,6 @@ namespace Metal {
             vignetteEnabled = j.at("vignetteEnabled").get<bool>();
             chromaticAberrationEnabled = j.at("chromaticAberrationEnabled").get<bool>();
             distortionEnabled = j.at("distortionEnabled").get<bool>();
-            DOF = j.at("DOF").get<bool>();
-            focusDistanceDOF = j.at("focusDistanceDOF").get<int>();
-            apertureDOF = j.at("apertureDOF").get<float>();
-            focalLengthDOF = j.at("focalLengthDOF").get<int>();
-            samplesDOF = j.at("samplesDOF").get<int>();
             filmGrainStrength = j.at("filmGrainStrength").get<float>();
             vignetteStrength = j.at("vignetteStrength").get<float>();
             bloomThreshold = j.at("bloomThreshold").get<float>();

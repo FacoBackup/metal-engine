@@ -13,6 +13,10 @@ namespace Metal {
         alignas(4) float pathTracingEmissiveFactor{};
         alignas(4) unsigned int shouldTrace{};
 
+        alignas(4) unsigned int dofEnabled{};
+        alignas(4) float dofFocusDistance{};
+        alignas(4) float dofAperture{};
+        alignas(4) float dofFocalLength{};
     };
 }
 

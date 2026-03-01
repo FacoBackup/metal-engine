@@ -50,11 +50,6 @@ namespace Metal {
             CTX.worldGridService.freezeVersion();
             clearTexture(rawRenderedFrame->vkImage);
             clearTexture(accumulatedFrame->vkImage);
-            clearTexture(gBufferPositionIndex->vkImage);
-            clearTexture(gBufferNormal->vkImage);
-            clearTexture(previousColor->vkImage);
-            clearTexture(previousPositionIndex->vkImage);
-            clearTexture(previousNormal->vkImage);
             CTX.engineContext.resetPathTracerAccumulationCount();
             isFirstRun = false;
         }
@@ -78,6 +73,11 @@ namespace Metal {
         pushConstant.pathTracerBounces = CTX.engineRepository.pathTracerBounces;
         pushConstant.pathTracingEmissiveFactor = CTX.engineRepository.pathTracingEmissiveFactor;
         pushConstant.shouldTrace = CTX.rayTracingService.isReady() && anyMeshes ? 1 : 0;
+
+        pushConstant.dofEnabled = CTX.engineRepository.dofEnabled;
+        pushConstant.dofFocusDistance = CTX.engineRepository.dofFocusDistance;
+        pushConstant.dofAperture = CTX.engineRepository.dofAperture;
+        pushConstant.dofFocalLength = CTX.engineRepository.dofFocalLength;
 
         recordPushConstant(&pushConstant);
 
