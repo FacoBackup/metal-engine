@@ -40,7 +40,7 @@ namespace Metal {
 
         TextureInstance *create(const std::string &id) override;
 
-        TextureInstance *createForCompute(const std::string &id, unsigned int width, unsigned int height);
+        TextureInstance *createForCompute(const std::string &id, unsigned int width, unsigned int height, VkFormat format = VK_FORMAT_R16G16B16A16_SFLOAT);
 
         unsigned int getTextureIndex(const std::string &id);
 

@@ -7,7 +7,9 @@ namespace Metal {
         TEXTURE,
         PIPELINE,
         BUFFER,
-        DESCRIPTOR_SET
+        DESCRIPTOR_SET,
+        COMMAND_BUFFER_RECORDER,
+        PASS
     };
 }
 

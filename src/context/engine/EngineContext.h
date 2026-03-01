@@ -21,6 +21,7 @@ namespace Metal {
         bool updateLights = true;
         bool updateVolumes = true;
         bool giSettingsUpdated = true;
+        bool isFirstFrame = true;
 
     public:
         GlobalDataUBO &getGlobalDataUBO() { return globalDataUBO; }

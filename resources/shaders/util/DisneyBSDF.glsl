@@ -248,7 +248,14 @@ float lightPdf(const in vec4 light, const in SurfaceInteraction interaction) {
 }
 
 vec3 bsdfEvaluate(const in vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y, const in SurfaceInteraction interaction, const in MaterialInfo material) {
-    if (!sameHemiSphere(wo, wi, interaction.normal))
+    bool reflected = sameHemiSphere(wo, wi, interaction.normal);
+    if (material.transmission > 0.0) {
+        if (!reflected) {
+            return vec3(0.0);
+        }
+    }
+
+    if (!reflected)
     return vec3(0.);
 
     float NdotL = dot(interaction.normal, wo);
@@ -266,7 +273,7 @@ vec3 bsdfEvaluate(const in vec3 wi, const in vec3 wo, const in vec3 X, const in 
     float clearCoat = disneyClearCoat(NdotL, NdotV, NdotH, LdotH, material);
     vec3 sheen = disneySheen(LdotH, material);
 
-    return (mix(diffuse, subSurface, material.subsurface) + sheen) * (1. - material.metallic) + glossy + clearCoat;
+    return (1.0 - material.transmission) * ((mix(diffuse, subSurface, material.subsurface) + sheen) * (1. - material.metallic) + glossy + clearCoat);
 }
 
 
@@ -400,10 +407,15 @@ void disneyClearCoatSample(out vec3 wi, const in vec3 wo, const in vec2 u, const
 }
 
 float bsdfPdf(const in vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y, const in SurfaceInteraction interaction, const in MaterialInfo material) {
+    bool reflected = sameHemiSphere(wo, wi, interaction.normal);
+    if (material.transmission > 0.0 && !reflected) {
+        // Refraction PDF
+        return material.transmission; 
+    }
     float pdfDiffuse = pdfLambertianReflection(wi, wo, interaction.normal);
     float pdfMicrofacet = pdfMicrofacetAniso(wi, wo, X, Y, interaction, material);
     float pdfClearCoat = pdfClearCoat(wi, wo, interaction, material);;
-    return (pdfDiffuse + pdfMicrofacet + pdfClearCoat)/3.;
+    return (1.0 - material.transmission) * (pdfDiffuse + pdfMicrofacet + pdfClearCoat)/3.;
 }
 
 float light_pdf(const in Light light, const in SurfaceInteraction interaction) {
@@ -434,15 +446,54 @@ vec3 bsdfSample(out vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y,
 
     vec2 u = vec2(random(), random());
     float rnd = random();
-    if (rnd <= 0.3333) {
-        disneyDiffuseSample(wi, wo, pdf, u, interaction.normal, material);
-    } else if (rnd > 0.3333 && rnd < 0.6666) {
-        disneyMicrofacetAnisoSample(wi, wo, X, Y, u, interaction, material);
+
+    if (rnd < material.transmission) {
+        float ior = material.ior;
+        float n1 = 1.0; // Air
+        float n2 = ior;
+        vec3 normal = interaction.normal;
+
+        if (dot(wo, normal) < 0.0) {
+            // Hit from inside
+            n1 = ior;
+            n2 = 1.0;
+            normal = -normal;
+        }
+
+        float eta = n1 / n2;
+        float cosThetaI = dot(wo, normal);
+        float sin2ThetaI = max(0.0, 1.0 - cosThetaI * cosThetaI);
+        float sin2ThetaT = eta * eta * sin2ThetaI;
+
+        // Fresnel reflection coefficient (Schlick's approximation)
+        float r0 = (n1 - n2) / (n1 + n2);
+        r0 *= r0;
+        float fresnel = r0 + (1.0 - r0) * pow(1.0 - abs(cosThetaI), 5.0);
+
+        if (sin2ThetaT > 1.0 || random() < fresnel) {
+            // Total internal reflection or Fresnel reflection
+            wi = reflect(-wo, normal);
+            f = vec3(fresnel);
+            pdf = material.transmission * (sin2ThetaT > 1.0 ? 1.0 : fresnel);
+        } else {
+            // Refraction
+            wi = refract(-wo, normal, eta);
+            f = material.baseColor * (1.0 - fresnel);
+            pdf = material.transmission * (1.0 - fresnel);
+        }
     } else {
-        disneyClearCoatSample(wi, wo, u, interaction, material);
+        float rndBSDF = random();
+        if (rndBSDF <= 0.3333) {
+            disneyDiffuseSample(wi, wo, pdf, u, interaction.normal, material);
+        } else if (rndBSDF > 0.3333 && rndBSDF < 0.6666) {
+            disneyMicrofacetAnisoSample(wi, wo, X, Y, u, interaction, material);
+        } else {
+            disneyClearCoatSample(wi, wo, u, interaction, material);
+        }
+        f = bsdfEvaluate(wi, wo, X, Y, interaction, material);
+        pdf = bsdfPdf(wi, wo, X, Y, interaction, material);
     }
-    f = bsdfEvaluate(wi, wo, X, Y, interaction, material);
-    pdf = bsdfPdf(wi, wo, X, Y, interaction, material);
+
     if (pdf < EPSILON){
         return vec3(0.);
     }
@@ -476,7 +527,7 @@ vec3 calculateDirectLight(const in Light light, const in SurfaceInteraction inte
         vec3 fDirect = bsdfEvaluate(wi, wo, interaction.tangent, interaction.binormal, interaction, material) * abs(dot(wi, interaction.normal));
         float weight = 1.;
 
-        if (globalData.multipleImportanceSampling){
+        if (pushConstants.multipleImportanceSampling == 1){
             scatteringPdf = bsdfPdf(wi, wo, interaction.tangent, interaction.binormal, interaction, material);
             weight = powerHeuristic(1., lightPdf, 1., scatteringPdf);
         }
@@ -491,7 +542,7 @@ vec3 calculateDirectLight(const in Light light, const in SurfaceInteraction inte
     f = bsdfSample(wi, wo, interaction.tangent, interaction.binormal, scatteringPdf, interaction, material);
     f *= abs(dot(wi, interaction.normal));
 
-    if (globalData.multipleImportanceSampling){
+    if (pushConstants.multipleImportanceSampling == 1){
 
         isBlack = dot(f, f) == 0.;
         Li = light.color.rgb;

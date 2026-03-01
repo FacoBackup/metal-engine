@@ -13,6 +13,8 @@ namespace Metal {
     }
 
     EntityID WorldRepository::createEntity(std::string name, const bool container) {
+        registerChange();
+
         const auto entity = registry.create();
         auto &entityComp = registry.emplace<EntityComponent>(entity);
         entityComp.initialize(container);
@@ -25,6 +27,8 @@ namespace Metal {
     }
 
     void WorldRepository::linkEntities(EntityID parentId, EntityID childId) {
+        registerChange();
+
         const auto child = static_cast<entt::entity>(childId);
         auto &childHierarchy = registry.get<HierarchyComponent>(child);
 
@@ -108,6 +112,7 @@ namespace Metal {
     }
 
     void WorldRepository::deleteEntities(const std::vector<EntityID> &entities) {
+        registerChange();
         deleteRecursively(entities);
         CTX.engineContext.setUpdateLights(true);
         CTX.engineContext.setUpdateVolumes(true);
@@ -115,6 +120,7 @@ namespace Metal {
     }
 
     void WorldRepository::changeVisibility(EntityID entity, bool isVisible) {
+        registerChange();
         changeVisibilityRecursively(entity, isVisible);
         CTX.engineContext.setUpdateLights(true);
         CTX.engineContext.setUpdateVolumes(true);

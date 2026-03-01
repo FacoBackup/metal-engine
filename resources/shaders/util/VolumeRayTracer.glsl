@@ -65,7 +65,7 @@ vec4 integrateVolume(vec3 ro, vec3 rd, in Volume volume, float sceneDepth) {
         float extinctionCoefficient  = scatteringCoefficient + absorptionCoefficient;
 
         vec3 inScattered = vec3(0.0);
-        for (int li = 0; li < globalData.lightsCount; li++) {
+        for (int li = 0; li < int(globalData.lightsCount); li++) {
             Light light = lightBuffer.items[li];
             vec3 samplePos;
 
@@ -83,9 +83,9 @@ vec4 integrateVolume(vec3 ro, vec3 rd, in Volume volume, float sceneDepth) {
             vec3 L = normalize(samplePos - pos);
             float lightDist = length(samplePos - pos);
 
-            float dtShadow = lightDist / float(globalData.volumeShadowSteps);
+            float dtShadow = lightDist / float(pushConstants.volumeShadowSteps);
             float opticalDepth = 0.0;
-            for (int j = 0; j < globalData.volumeShadowSteps; j++) {
+            for (int j = 0; j < int(pushConstants.volumeShadowSteps); j++) {
                 float tShadow = float(j) * dtShadow;
                 vec3 posShadow = pos + L * tShadow;
                 vec3 localShadow = posShadow - volume.position;

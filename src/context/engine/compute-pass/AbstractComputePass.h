@@ -13,7 +13,7 @@ namespace Metal {
 
     class AbstractComputePass : public AbstractPass {
     public:
-        explicit AbstractComputePass();
+        explicit AbstractComputePass(const std::string &id);
 
         void recordDispatch(unsigned int groupX, unsigned int groupY, unsigned int groupZ) const;
 
@@ -21,6 +21,8 @@ namespace Metal {
 
         void recordImageDispatch(const TextureInstance *image, unsigned int threadCountX,
                                  unsigned int threadCountY) const;
+
+        void copyTexture(const TextureInstance *src, const TextureInstance *dst) const;
 
         void endWriting(VkImage &vkImage) const;
 

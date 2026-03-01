@@ -12,11 +12,12 @@ namespace Metal {
         std::string normal;
         std::string roughness;
         std::string metallic;
-        std::string ao;
-        std::string height;
         glm::vec3 albedoColor{1, 1, 1};
         float roughnessFactor = 1;
         float metallicFactor = 0;
+        float transmissionFactor = 0;
+        float thicknessFactor = 0;
+        float ior = 1.45;
         bool isEmissive = false;
 
         void registerFields() override;

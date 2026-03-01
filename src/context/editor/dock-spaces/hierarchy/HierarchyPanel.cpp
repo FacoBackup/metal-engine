@@ -111,10 +111,8 @@ namespace Metal {
             ImGui::PopStyleColor();
         }
 
-        if (entityId != WorldRepository::ROOT_ID) {
-            handleDragDrop(entityId);
-            renderEntityColumns(entityId, false);
-        }
+        handleDragDrop(entityId);
+        renderEntityColumns(entityId, false);
 
         if (open) {
             opened.insert({entityId, ImGuiTreeNodeFlags_DefaultOpen});

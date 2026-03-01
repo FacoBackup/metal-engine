@@ -14,7 +14,7 @@ namespace Metal {
                 .setBlendEnabled()
                 .setPushConstantsSize(sizeof(GridPushConstant))
                 .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
-                .addFboBinding(getScopedResourceId(RID_G_BUFFER_FBO), 2);
+                .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_POSITION_INDEX));
         pipelineInstance = CTX.pipelineService.createPipeline(gridPipelineBuilder);
     }
 

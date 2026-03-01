@@ -5,7 +5,7 @@
 #include "../../../util/ImageUtils.h"
 
 namespace Metal {
-    AbstractComputePass::AbstractComputePass() : AbstractPass(true) {
+    AbstractComputePass::AbstractComputePass(const std::string &id) : AbstractPass(id, true) {
     }
 
     void AbstractComputePass::recordDispatch(const unsigned int groupX, const unsigned int groupY,
@@ -67,6 +67,20 @@ namespace Metal {
     void AbstractComputePass::recordImageDispatch(const TextureInstance *image, const unsigned int threadCountX,
                                                   const unsigned int threadCountY) const {
         vkCmdDispatch(vkCommandBuffer, image->width / threadCountX, image->height / threadCountY, 1);
+    }
+
+    void AbstractComputePass::copyTexture(const TextureInstance *src, const TextureInstance *dst) const {
+        VkImageCopy copyRegion = {};
+        copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        copyRegion.srcSubresource.layerCount = 1;
+        copyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        copyRegion.dstSubresource.layerCount = 1;
+        copyRegion.extent.width = src->width;
+        copyRegion.extent.height = src->height;
+        copyRegion.extent.depth = 1;
+
+        vkCmdCopyImage(vkCommandBuffer, src->vkImage, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                       dst->vkImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
     }
 
     void AbstractComputePass::endWriting(VkImage &vkImage) const {

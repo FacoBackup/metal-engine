@@ -5,7 +5,7 @@
 #include "../../../service/buffer/BufferInstance.h"
 
 namespace Metal {
-    AbstractRenderPass::AbstractRenderPass() : AbstractPass(false) {
+    AbstractRenderPass::AbstractRenderPass(const std::string &id) : AbstractPass(id, false) {
     }
 
     void AbstractRenderPass::recordDrawSimpleInstanced(const unsigned int vertexCount, const unsigned int instanceCount) const {

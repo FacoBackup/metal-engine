@@ -1,5 +1,6 @@
 #ifndef RENDERPASS_H
 #define RENDERPASS_H
+#include "../../../repository/abstract/RuntimeResource.h"
 #include <array>
 #include <vector>
 #include "../../../service/pipeline/PipelineInstance.h"
@@ -10,9 +11,8 @@ namespace Metal {
     class ApplicationContext;
     struct FrameBufferInstance;
 
-    class CommandBufferRecorder final {
+    class CommandBufferRecorder final : public RuntimeResource {
         std::array<VkCommandBuffer, MAX_FRAMES_IN_FLIGHT> _commandBuffers{};
-        ;
         VkViewport viewport{};
         VkRect2D scissor{};
         VkRenderPassBeginInfo renderPassInfo{};
@@ -26,9 +26,13 @@ namespace Metal {
         void createRenderPassInfo(const FrameBufferInstance *frameBuffer, bool clearBuffer);
 
     public:
-        explicit CommandBufferRecorder(FrameBufferInstance *frameBuffer, bool clearBuffer = true);
+        explicit CommandBufferRecorder(std::string id, FrameBufferInstance *frameBuffer, bool clearBuffer = true);
 
-        explicit CommandBufferRecorder();
+        explicit CommandBufferRecorder(std::string id);
+
+        ResourceType resourceType() override {
+            return COMMAND_BUFFER_RECORDER;
+        }
 
         void createCommandBuffer();
 

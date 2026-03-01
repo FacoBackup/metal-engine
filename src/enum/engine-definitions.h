@@ -1,12 +1,11 @@
 #ifndef ENGINEID_H
 #define ENGINEID_H
 
-#define SURFACE_CACHE_RES 2000
-
 typedef unsigned long long EntityID;
 #define MAX_VOLUMES 300
 #define MAX_LIGHTS 300
 #define MAX_MATERIALS 100
+#define MAX_MESH_INSTANCES 1000
 #define EMPTY_ENTITY 0
 #define FILE_METADATA ".mjson"
 #define FILE_SCENE "-scene"

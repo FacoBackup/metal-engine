@@ -4,10 +4,8 @@
 #include "../../../service/pipeline/PipelineInstance.h"
 
 namespace Metal {
-    AbstractPass::AbstractPass(bool isComputePass) : AbstractRuntimeComponent(),
-                                                     worldRepository(CTX.worldRepository),
-                                                     streamingRepository(
-                                                         CTX.streamingRepository), isComputePass(isComputePass) {
+    AbstractPass::AbstractPass(const std::string &id, bool isComputePass) : RuntimeResource(id),
+                                                                            isComputePass(isComputePass) {
     }
 
     AbstractPass::~AbstractPass() {
@@ -43,7 +41,8 @@ namespace Metal {
         }
     }
 
-    void AbstractPass::bindSingleDescriptorSet(const unsigned int descriptorSetIndex, const VkDescriptorSet &descriptorSet) {
+    void AbstractPass::bindSingleDescriptorSet(const unsigned int descriptorSetIndex,
+                                               const VkDescriptorSet &descriptorSet) {
         vkCmdBindDescriptorSets(
             vkCommandBuffer,
             getBindingPoint(),
@@ -68,6 +67,7 @@ namespace Metal {
                                     nullptr);
         }
     }
+
     VkPipelineBindPoint AbstractPass::getBindingPoint() const {
         if (pipelineInstance != nullptr && pipelineInstance->isRayTracing) {
             return VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR;

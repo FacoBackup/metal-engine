@@ -12,7 +12,7 @@ namespace Metal {
 
     class AbstractRenderPass : public AbstractPass {
     public:
-        explicit AbstractRenderPass();
+        explicit AbstractRenderPass(const std::string &id);
 
         void recordDrawSimpleInstanced(unsigned int vertexCount, unsigned int instanceCount) const;
 

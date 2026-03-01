@@ -1,0 +1,63 @@
+layout (local_size_x = 8, local_size_y = 8) in;
+#include "./GlobalDataBuffer.glsl"
+
+layout (set = 0, binding = 1, rgba32f) uniform image2D inputImage;
+layout (set = 0, binding = 2, rgba32f) uniform image2D outputImage;
+layout (set = 0, binding = 3, rgba32f) uniform image2D positionImage;
+layout (set = 0, binding = 4, rgba16f) uniform image2D normalImage;
+
+void main() {
+    ivec2 coord = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outputImage);
+    if (coord.x >= size.x || coord.y >= size.y) return;
+
+    if (globalData.denoiserEnabled == 0) {
+        imageStore(outputImage, coord, imageLoad(inputImage, coord));
+        return;
+    }
+
+    vec4 centerData = imageLoad(inputImage, coord);
+    vec3 centerColor = centerData.rgb;
+    float historyLen = centerData.a;
+    vec3 centerPos = imageLoad(positionImage, coord).rgb;
+    vec3 centerNormal = imageLoad(normalImage, coord).rgb;
+
+    // Bilateral filter parameters
+    const float sigmaSpatial = 2.0;
+    const float sigmaNormal = 0.5;
+    const float sigmaDepth = 0.1;
+
+    vec3 sumColor = vec3(0.0);
+    float sumWeight = 0.0;
+
+    int radius = historyLen < 4.0 ? 5 : 3; // 11x11 or 7x7 neighborhood
+    for (int y = -radius; y <= radius; y++) {
+        for (int x = -radius; x <= radius; x++) {
+            ivec2 neighborCoord = coord + ivec2(x, y);
+            if (neighborCoord.x < 0 || neighborCoord.x >= size.x || neighborCoord.y < 0 || neighborCoord.y >= size.y) continue;
+
+            vec3 neighborColor = imageLoad(inputImage, neighborCoord).rgb;
+            vec3 neighborPos = imageLoad(positionImage, neighborCoord).rgb;
+            vec3 neighborNormal = imageLoad(normalImage, neighborCoord).rgb;
+
+            // Spatial weight
+            float distSq = float(x*x + y*y);
+            float wSpatial = exp(-distSq / (2.0 * sigmaSpatial * sigmaSpatial));
+
+            // Normal weight
+            float normalDiff = max(0.0, dot(centerNormal, neighborNormal));
+            float wNormal = pow(normalDiff, 128.0); // Sharp falloff for normals
+
+            // Depth/Position weight
+            float depthDiff = distance(centerPos, neighborPos);
+            float wDepth = exp(-depthDiff / (2.0 * sigmaDepth * sigmaDepth));
+
+            float weight = wSpatial * wNormal * wDepth;
+            sumColor += neighborColor * weight;
+            sumWeight += weight;
+        }
+    }
+
+    vec3 resultColor = sumWeight > 0.0 ? sumColor / sumWeight : centerColor;
+    imageStore(outputImage, coord, vec4(resultColor, historyLen));
+}

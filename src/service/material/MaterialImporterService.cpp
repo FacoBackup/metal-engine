@@ -75,12 +75,10 @@ namespace Metal {
             trySetFromType(materialData.metallic, aiTextureType_METALNESS, "metallic");
             trySetFromType(materialData.roughness, aiTextureType_DIFFUSE_ROUGHNESS, "roughness");
 
-            // Height (if present)
-            trySetFromType(materialData.height, aiTextureType_HEIGHT, "height");
 
             // If we didn't import any textures, don't create/persist a material at all.
             if (materialData.albedo.empty() && materialData.normal.empty() && materialData.roughness.empty() &&
-                materialData.metallic.empty() && materialData.height.empty()) {
+                materialData.metallic.empty()) {
                 LOG_INFO("Skipping material " + std::to_string(i) + ": no textures associated");
                 continue;
             }

@@ -9,6 +9,8 @@ namespace Metal {
         SelectedDotPushConstant pushConstant{};
 
     public:
+        explicit SelectedDotPass(const std::string &id) : AbstractRenderPass(id) {}
+
         void onInitialize() override;
 
         bool shouldRun() override;

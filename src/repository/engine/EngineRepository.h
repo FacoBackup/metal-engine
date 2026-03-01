@@ -9,15 +9,18 @@ namespace Metal {
         bool vsync = true;
 
         bool isBaking = false;
+        bool denoiserEnabled = false;
+        bool dofEnabled = false;
+        float dofFocusDistance = 10;
+        float dofAperture = 1.2f;
+        float dofFocalLength = 5;
 
-        bool enableSurfaceCache = true;
         bool multipleImportanceSampling = false;
         int maxVideoFrames = 100;
         int volumeShadowSteps = 8;
         int shadingResInvScale = 2;
         int pathTracerMaxSamples = 200;
-        int giTileSubdivision = 40;
-        float giEmissiveFactor = 2;
+        float pathTracingEmissiveFactor = 2;
         int pathTracerSamples = 1;
         int pathTracerBounces = 1;
         int pathTracerAccumulationCount = 0;

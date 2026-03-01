@@ -314,14 +314,14 @@ namespace Metal {
         return nullptr;
     }
 
-    TextureInstance *TextureService::createForCompute(const std::string &id, const unsigned int width, const unsigned int height) {
+    TextureInstance *TextureService::createForCompute(const std::string &id, const unsigned int width, const unsigned int height, VkFormat format) {
         auto *image = createResourceInstance(id);
         image->width = width;
         image->height = height;
         VkImageCreateInfo imageCreateInfo = {};
         imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-        imageCreateInfo.format = VK_FORMAT_R16G16B16A16_SFLOAT;
+        imageCreateInfo.format = format;
         imageCreateInfo.extent.width = width;
         imageCreateInfo.extent.height = height;
         imageCreateInfo.extent.depth = 1;
@@ -334,7 +334,7 @@ namespace Metal {
         imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
         createImageWithInfo(imageCreateInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image);
-        createImageView(VK_FORMAT_R16G16B16A16_SFLOAT, image);
+        createImageView(format, image);
 
         transitionImageLayout(image, VK_IMAGE_LAYOUT_UNDEFINED,
                               VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);

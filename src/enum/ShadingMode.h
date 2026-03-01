@@ -20,8 +20,6 @@ namespace Metal {
         POSITION,
         LIGHTING_ONLY,
         EMISSIVE,
-        SURFACE_CACHE,
-        SURFACE_CACHE_SAMPLES
     };
 
     class ShadingModes {
@@ -46,8 +44,6 @@ namespace Metal {
                 {"POSITION",              "Position",              Icons::place,            POSITION},
                 {"LIGHTING_ONLY",         "Lighting only",         Icons::highlight,        LIGHTING_ONLY},
                 {"EMISSIVE",              "Emission",              Icons::wb_incandescent,  EMISSIVE},
-                {"SURFACE_CACHE",         "Surface cache",         Icons::ipublic,          SURFACE_CACHE},
-                {"SURFACE_CACHE_SAMPLES", "Surface cache samples", Icons::ipublic,          SURFACE_CACHE_SAMPLES}
         };
 
         static inline std::string GetNames() {
