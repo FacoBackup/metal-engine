@@ -39,7 +39,6 @@ namespace Metal {
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
                 .addTexture(RID_RAW_RENDERED_FRAME, gBufferW, gBufferH)
                 .addTexture(RID_ACCUMULATED_FRAME, gBufferW, gBufferH)
-                .addTexture(RID_RENDER_INDEX_STENCIL, gBufferW, gBufferH, VK_FORMAT_R32_SFLOAT)
                 .addTexture(RID_GBUFFER_POSITION_INDEX, gBufferW, gBufferH, VK_FORMAT_R32G32B32A32_SFLOAT)
                 .addTexture(RID_GBUFFER_NORMAL, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
                 .addTexture(RID_PREVIOUS_COLOR, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)

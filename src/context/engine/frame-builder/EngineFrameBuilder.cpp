@@ -6,15 +6,9 @@
 #include "structures/PassBuilder.h"
 #include "structures/CommandBufferRecorderBuilder.h"
 #include "EngineFrame.h"
-#include "../../../enum/EngineResourceIDs.h"
 #include "../../ApplicationContext.h"
 #include "../passes/CommandBufferRecorder.h"
-#include "../render-pass/impl/PostProcessingPass.h"
-#include "../compute-pass/impl/HWRayTracingPass.h"
-#include "../compute-pass/impl/AccumulationPass.h"
 #include "../render-pass/impl/tools/SelectedDotPass.h"
-#include "../render-pass/impl/tools/GridPass.h"
-#include "../render-pass/impl/tools/IconsPass.h"
 
 namespace Metal {
     EngineFrameBuilder::EngineFrameBuilder(std::string frameId) : frameId(std::move(frameId)) {

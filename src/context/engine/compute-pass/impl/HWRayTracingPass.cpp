@@ -17,7 +17,6 @@ namespace Metal {
                 .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
                 .addAccelerationStructureBinding(CTX.rayTracingService.getTLAS())
                 .addStorageImageBinding(getScopedResourceId(RID_RAW_RENDERED_FRAME))
-                .addStorageImageBinding(getScopedResourceId(RID_RENDER_INDEX_STENCIL))
                 .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_POSITION_INDEX))
                 .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_NORMAL))
                 .addBufferBinding(getScopedResourceId(RID_LIGHT_BUFFER))
@@ -29,37 +28,28 @@ namespace Metal {
         pipelineInstance = CTX.pipelineService.createPipeline(builder);
     }
 
-    bool HWRayTracingPass::shouldRun() {
-        if (!CTX.rayTracingService.isReady()) {
-            return false;
-        }
-
-        return true;
-    }
-
     void HWRayTracingPass::onSync() {
+        bool anyMeshes = false;
         auto view = CTX.worldRepository.registry.view<MeshComponent, TransformComponent>();
         for (auto entity: view) {
             CTX.streamingService.streamMesh(view.get<MeshComponent>(entity).meshId);
+            anyMeshes = true;
         }
 
-        auto *rawRenderedFrame = frame->getResourceAs<TextureInstance>(RID_RAW_RENDERED_FRAME);
-        auto *accumulatedFrame = frame->getResourceAs<TextureInstance>(RID_ACCUMULATED_FRAME);
-        auto *renderIndexStencil = frame->getResourceAs<TextureInstance>(RID_RENDER_INDEX_STENCIL);
-        auto *gBufferPositionIndex = frame->getResourceAs<TextureInstance>(RID_GBUFFER_POSITION_INDEX);
-        auto *gBufferNormal = frame->getResourceAs<TextureInstance>(RID_GBUFFER_NORMAL);
+        rawRenderedFrame = frame->getResourceAs<TextureInstance>(RID_RAW_RENDERED_FRAME);
+        accumulatedFrame = frame->getResourceAs<TextureInstance>(RID_ACCUMULATED_FRAME);
+        gBufferPositionIndex = frame->getResourceAs<TextureInstance>(RID_GBUFFER_POSITION_INDEX);
+        gBufferNormal = frame->getResourceAs<TextureInstance>(RID_GBUFFER_NORMAL);
+        previousColor = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_COLOR);
+        previousPositionIndex = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_POSITION_INDEX);
+        previousNormal = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_NORMAL);
 
-        auto *previousColor = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_COLOR);
-        auto *previousPositionIndex = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_POSITION_INDEX);
-        auto *previousNormal = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_NORMAL);
-
-        if (isFirstRun || CTX.engineContext.isCameraUpdated() || CTX.engineContext.isGISettingsUpdated() || CTX.engineContext.
-                                 isUpdateLights() || CTX.worldGridService.
-            isNotFrozen()) {
+        bool worldChanged = CTX.engineContext.isUpdateLights() || CTX.worldGridService.isNotFrozen();
+        if (isFirstRun || CTX.engineContext.isCameraUpdated() || CTX.engineContext.isGISettingsUpdated() ||
+            worldChanged) {
             CTX.worldGridService.freezeVersion();
             clearTexture(rawRenderedFrame->vkImage);
             clearTexture(accumulatedFrame->vkImage);
-            clearTexture(renderIndexStencil->vkImage);
             clearTexture(gBufferPositionIndex->vkImage);
             clearTexture(gBufferNormal->vkImage);
             clearTexture(previousColor->vkImage);
@@ -75,7 +65,6 @@ namespace Metal {
         copyTexture(gBufferNormal, previousNormal);
 
         startWriting(rawRenderedFrame->vkImage);
-        startWriting(renderIndexStencil->vkImage);
         startWriting(gBufferPositionIndex->vkImage);
         startWriting(gBufferNormal->vkImage);
 
@@ -88,6 +77,7 @@ namespace Metal {
         pushConstant.pathTracerSamples = CTX.engineRepository.pathTracerSamples;
         pushConstant.pathTracerBounces = CTX.engineRepository.pathTracerBounces;
         pushConstant.pathTracingEmissiveFactor = CTX.engineRepository.pathTracingEmissiveFactor;
+        pushConstant.shouldTrace = CTX.rayTracingService.isReady() && anyMeshes ? 1 : 0;
 
         recordPushConstant(&pushConstant);
 
@@ -102,7 +92,6 @@ namespace Metal {
             1);
 
         endWriting(rawRenderedFrame->vkImage);
-        endWriting(renderIndexStencil->vkImage);
         endWriting(gBufferPositionIndex->vkImage);
         endWriting(gBufferNormal->vkImage);
     }

@@ -33,15 +33,14 @@ namespace Metal {
             }
         }
     }
-
     void RayTracingService::onSync() {
         if (!needsRebuild) {
             return;
         }
 
+        // Check if any mesh is present and streamed
         bool hasMeshes = false;
         auto view = CTX.worldRepository.registry.view<MeshComponent, TransformComponent>();
-
         for (auto entity: view) {
             if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
             auto &meshComp = view.get<MeshComponent>(entity);
@@ -54,21 +53,60 @@ namespace Metal {
         }
 
         if (!hasMeshes) {
-            destroyAccelerationStructures();
+            // No meshes – destroy all structures and set descriptor to null
+            destroyAccelerationStructures();   // destroys BLAS and TLAS (waits for idle)
             updateDescriptorSets(VK_NULL_HANDLE);
+            accelerationStructureBuilt = false;
             needsRebuild = false;
             return;
         }
 
-        buildBLAS();
-        buildTLAS();
+        // At least one mesh exists: rebuild acceleration structures safely
+        destroyTLAS();          // Destroy old TLAS (waits for idle) before modifying BLAS
+        buildBLAS();            // Rebuild BLAS (incremental, safe because TLAS is gone)
+        buildTLAS();            // Build new TLAS
 
         if (tlas != VK_NULL_HANDLE) {
             LOG_INFO("Updating acceleration structures");
             updateDescriptorSets(tlas);
             accelerationStructureBuilt = true;
-            needsRebuild = false;
+        } else {
+            LOG_WARN("TLAS build failed or resulted in NULL handle");
+            updateDescriptorSets(VK_NULL_HANDLE);
+            accelerationStructureBuilt = false;
         }
+        needsRebuild = false;
+    }
+
+    bool RayTracingService::isReady() const {
+        return accelerationStructureBuilt && tlas != VK_NULL_HANDLE;
+    }
+
+    void RayTracingService::destroyTLAS() {
+        auto &vulkan = CTX.vulkanContext;
+        if (vulkan.device.device != VK_NULL_HANDLE) {
+            vkDeviceWaitIdle(vulkan.device.device);
+        }
+
+        if (tlas != VK_NULL_HANDLE) {
+            vulkan.vkDestroyAccelerationStructureKHR(vulkan.device.device, tlas, nullptr);
+            tlas = VK_NULL_HANDLE;
+        }
+
+        if (tlasBuffer) {
+            CTX.bufferService.dispose("tlas_buffer");
+            tlasBuffer = nullptr;
+        }
+        if (instancesBuffer) {
+            CTX.bufferService.dispose("tlas_instances");
+            instancesBuffer = nullptr;
+        }
+        if (tlasScratchBuffer) {
+            CTX.bufferService.dispose("tlas_scratch");
+            tlasScratchBuffer = nullptr;
+        }
+
+        meshMetadata.clear();
     }
 
     void RayTracingService::buildBLAS() {
@@ -101,10 +139,13 @@ namespace Metal {
                 // If mesh buffers changed, we need to rebuild this BLAS
                 // For now, let's just destroy and re-create below by removing it
                 if (vulkan.device.device != VK_NULL_HANDLE) {
-                    vulkan.vkDestroyAccelerationStructureKHR(vulkan.device.device, existing.accelerationStructure, nullptr);
+                    vulkan.vkDestroyAccelerationStructureKHR(vulkan.device.device, existing.accelerationStructure,
+                                                             nullptr);
                 }
-                if (existing.buffer) CTX.bufferService.dispose("blas_" + meshId);
-                if (existing.scratchBuffer) CTX.bufferService.dispose("blas_scratch_" + meshId);
+                if (existing.buffer)
+                    CTX.bufferService.dispose("blas_" + meshId);
+                if (existing.scratchBuffer)
+                    CTX.bufferService.dispose("blas_scratch_" + meshId);
                 blasEntries.erase(meshId);
             }
             VkDeviceAddress vertexAddress = getDeviceAddress(vulkan, instance->dataBuffer->vkBuffer);
@@ -188,24 +229,12 @@ namespace Metal {
 
     void RayTracingService::buildTLAS() {
         auto &vulkan = CTX.vulkanContext;
+        meshMetadata.clear();
         if (blasEntries.empty()) return;
 
         if (vulkan.device.device != VK_NULL_HANDLE) {
             vkDeviceWaitIdle(vulkan.device.device);
         }
-
-        if (tlas != VK_NULL_HANDLE) {
-            vulkan.vkDestroyAccelerationStructureKHR(vulkan.device.device, tlas, nullptr);
-            tlas = VK_NULL_HANDLE;
-        }
-
-        if (tlasBuffer) CTX.bufferService.dispose("tlas_buffer");
-        if (instancesBuffer) CTX.bufferService.dispose("tlas_instances");
-        if (tlasScratchBuffer) CTX.bufferService.dispose("tlas_scratch");
-
-        tlasBuffer = nullptr;
-        instancesBuffer = nullptr;
-        tlasScratchBuffer = nullptr;
 
         std::vector<VkAccelerationStructureInstanceKHR> instances;
         auto view = CTX.worldRepository.registry.view<MeshComponent, TransformComponent>();
@@ -265,7 +294,8 @@ namespace Metal {
         if (instances.empty()) return;
 
         if (CTX.engineContext.currentFrame != nullptr) {
-            auto *meshMetadataBuffer = CTX.engineContext.currentFrame->getResourceAs<BufferInstance>(RID_MESH_METADATA_BUFFER);
+            auto *meshMetadataBuffer = CTX.engineContext.currentFrame->getResourceAs<BufferInstance>(
+                RID_MESH_METADATA_BUFFER);
             if (meshMetadataBuffer != nullptr) {
                 meshMetadataBuffer->update(meshMetadata.data());
             }
@@ -349,28 +379,22 @@ namespace Metal {
             vkDeviceWaitIdle(vulkan.device.device);
         }
 
-        if (tlas != VK_NULL_HANDLE) {
-            vulkan.vkDestroyAccelerationStructureKHR(vulkan.device.device, tlas, nullptr);
-            tlas = VK_NULL_HANDLE;
-        }
+        // Destroy TLAS and its buffers
+        destroyTLAS();
 
+        // Destroy all BLAS entries
         for (auto &[meshId, entry]: blasEntries) {
             if (entry.accelerationStructure != VK_NULL_HANDLE) {
                 vulkan.vkDestroyAccelerationStructureKHR(vulkan.device.device, entry.accelerationStructure, nullptr);
                 entry.accelerationStructure = VK_NULL_HANDLE;
             }
-            if (entry.buffer) CTX.bufferService.dispose("blas_" + meshId);
-            if (entry.scratchBuffer) CTX.bufferService.dispose("blas_scratch_" + meshId);
+            if (entry.buffer)
+                CTX.bufferService.dispose("blas_" + meshId);
+            if (entry.scratchBuffer)
+                CTX.bufferService.dispose("blas_scratch_" + meshId);
         }
         blasEntries.clear();
 
-        if (tlasBuffer) CTX.bufferService.dispose("tlas_buffer");
-        if (instancesBuffer) CTX.bufferService.dispose("tlas_instances");
-        if (tlasScratchBuffer) CTX.bufferService.dispose("tlas_scratch");
-
-        tlasBuffer = nullptr;
-        instancesBuffer = nullptr;
-        tlasScratchBuffer = nullptr;
         accelerationStructureBuilt = false;
     }
 }

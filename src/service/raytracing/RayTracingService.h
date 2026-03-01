@@ -42,14 +42,16 @@ namespace Metal {
 
         void buildBLAS();
 
-        void buildTLAS();
+        void buildTLAS();// ... existing code ...
+
+        void destroyTLAS();
 
     public:
         void destroyAccelerationStructures();
 
         void onSync() override;
 
-        [[nodiscard]] bool isReady() const { return accelerationStructureBuilt; }
+        [[nodiscard]] bool isReady() const;
 
         void markDirty() { needsRebuild = true; }
 
