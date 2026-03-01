@@ -10,6 +10,21 @@ namespace Metal {
     struct FrameBufferInstance;
     struct TextureInstance;
 
+    struct DescriptorBindingBuilder {
+        std::string bufferId;
+        std::string storageImageId;
+        VkSampler sampler = VK_NULL_HANDLE;
+        VkImageView view = VK_NULL_HANDLE;
+        VkImageLayout layout = VK_IMAGE_LAYOUT_GENERAL;
+        VkAccelerationStructureKHR accelerationStructure = VK_NULL_HANDLE;
+        std::string frameBufferId;
+        int attachmentIndex = -1;
+        unsigned int descriptorCount = 1;
+        unsigned int bindingPoint = 0;
+        VkDescriptorType descriptorType = static_cast<VkDescriptorType>(0);
+        DescriptorBindingType type;
+    };
+
     struct PipelineBuilder final {
         const char *id = nullptr;
         std::string frameBufferId;
@@ -20,7 +35,7 @@ namespace Metal {
         const char *rayGenShader = nullptr;
         const char *missShader = nullptr;
         const char *closestHitShader = nullptr;
-        std::vector<DescriptorBinding> resourceBindings{};
+        std::vector<DescriptorBindingBuilder> resourceBindings{};
         unsigned int pushConstantsSize = 0;
         unsigned int currentBindingPoint = 0;
         bool blendEnabled = false;
@@ -48,20 +63,20 @@ namespace Metal {
 
         PipelineBuilder &setPushConstantsSize(unsigned int size);
 
-        PipelineBuilder &addResourceBinding(std::string bufferId);
+        PipelineBuilder &addBufferBinding(std::string bufferId);
 
-        PipelineBuilder &addResourceBinding(VkSampler sampler, VkImageView view,
+        PipelineBuilder &addCombinedImageSamplerBinding(VkSampler sampler, VkImageView view,
                                             VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
                                             unsigned int descriptorCount = 1);
 
-        PipelineBuilder &addResourceBinding(std::string frameBufferId, uint32_t attachmentIndex,
+        PipelineBuilder &addFboBinding(std::string frameBufferId, uint32_t attachmentIndex,
                                             VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-        PipelineBuilder &addResourceBinding(TextureInstance *texture);
+        PipelineBuilder &addTextureBinding(TextureInstance *texture);
 
-        PipelineBuilder &addResourceBinding(VkImageView imageView);
+        PipelineBuilder &addStorageImageBinding(std::string storageImageId);
 
-        PipelineBuilder &addResourceBinding(VkAccelerationStructureKHR tlas);
+        PipelineBuilder &addAccelerationStructureBinding(VkAccelerationStructureKHR tlas);
 
         PipelineBuilder &setId(const char *id);
     };

@@ -13,17 +13,17 @@ namespace Metal {
                     "rt/HWRayTracing.rgen",
                     "rt/HWRayTracing.rmiss",
                     "rt/HWRayTracing.rchit")
-                .addResourceBinding(getScopedResourceId(RID_GLOBAL_DATA))
-                .addResourceBinding(CTX.rayTracingService.getTLAS())
-                .addResourceBinding(getScopedResourceId(RID_G_BUFFER_FBO), 0)
-                .addResourceBinding(getScopedResourceId(RID_G_BUFFER_FBO), 1)
-                .addResourceBinding(getScopedResourceId(RID_G_BUFFER_FBO), 2)
-                .addResourceBinding(frame->getResourceAs<TextureInstance>(RID_RAW_RENDERED_FRAME)->vkImageView)
-                .addResourceBinding(frame->getResourceAs<TextureInstance>(RID_SURFACE_CACHE)->vkImageView)
-                .addResourceBinding(getScopedResourceId(RID_LIGHT_BUFFER))
-                .addResourceBinding(getScopedResourceId(RID_VOLUMES_BUFFER))
-                .addResourceBinding(getScopedResourceId(RID_MATERIAL_BUFFER))
-                .addResourceBinding(CTX.vulkanContext.vkImageSampler, VK_NULL_HANDLE,
+                .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
+                .addAccelerationStructureBinding(CTX.rayTracingService.getTLAS())
+                .addFboBinding(getScopedResourceId(RID_G_BUFFER_FBO), 0)
+                .addFboBinding(getScopedResourceId(RID_G_BUFFER_FBO), 1)
+                .addFboBinding(getScopedResourceId(RID_G_BUFFER_FBO), 2)
+                .addStorageImageBinding(getScopedResourceId(RID_RAW_RENDERED_FRAME))
+                .addStorageImageBinding(getScopedResourceId(RID_SURFACE_CACHE))
+                .addBufferBinding(getScopedResourceId(RID_LIGHT_BUFFER))
+                .addBufferBinding(getScopedResourceId(RID_VOLUMES_BUFFER))
+                .addBufferBinding(getScopedResourceId(RID_MATERIAL_BUFFER))
+                .addCombinedImageSamplerBinding(CTX.vulkanContext.vkImageSampler, VK_NULL_HANDLE,
                                     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1000);
         pipelineInstance = CTX.pipelineService.createPipeline(builder);
     }

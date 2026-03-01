@@ -56,56 +56,61 @@ namespace Metal {
         return *this;
     }
 
-    PipelineBuilder &PipelineBuilder::addResourceBinding(std::string bufferId) {
-        DescriptorBinding b{};
+    PipelineBuilder &PipelineBuilder::addBufferBinding(std::string bufferId) {
+        DescriptorBindingBuilder b{};
         b.bindingPoint = currentBindingPoint++;
         b.bufferId = std::move(bufferId);
+        b.type = DescriptorBindingType::BUFFER;
         resourceBindings.push_back(b);
         return *this;
     }
 
-    PipelineBuilder &PipelineBuilder::addResourceBinding(VkSampler sampler, VkImageView view,
+    PipelineBuilder &PipelineBuilder::addCombinedImageSamplerBinding(VkSampler sampler, VkImageView view,
                                                          VkImageLayout layout,
                                                          unsigned int descriptorCount) {
-        DescriptorBinding b{};
+        DescriptorBindingBuilder b{};
         b.bindingPoint = currentBindingPoint++;
         b.sampler = sampler;
         b.view = view;
         b.layout = layout;
         b.descriptorCount = descriptorCount;
+        b.type = DescriptorBindingType::COMBINED_IMAGE_SAMPLER;
         resourceBindings.push_back(b);
         return *this;
     }
 
-    PipelineBuilder &PipelineBuilder::addResourceBinding(std::string frameBufferId, uint32_t attachmentIndex,
+    PipelineBuilder &PipelineBuilder::addFboBinding(std::string frameBufferId, uint32_t attachmentIndex,
                                                          VkImageLayout layout) {
-        DescriptorBinding b{};
+        DescriptorBindingBuilder b{};
         b.bindingPoint = currentBindingPoint++;
         b.frameBufferId = std::move(frameBufferId);
         b.attachmentIndex = static_cast<int>(attachmentIndex);
         b.layout = layout;
+        b.type = DescriptorBindingType::FBO_ATTACHMENT;
         resourceBindings.push_back(b);
         return *this;
     }
 
-    PipelineBuilder &PipelineBuilder::addResourceBinding(TextureInstance *texture) {
-        return addResourceBinding(texture->vkSampler, texture->vkImageView);
+    PipelineBuilder &PipelineBuilder::addTextureBinding(TextureInstance *texture) {
+        return addCombinedImageSamplerBinding(texture->vkSampler, texture->vkImageView);
     }
 
-    PipelineBuilder &PipelineBuilder::addResourceBinding(const VkImageView imageView) {
-        DescriptorBinding b{};
+    PipelineBuilder &PipelineBuilder::addStorageImageBinding(std::string storageImageId) {
+        DescriptorBindingBuilder b{};
         b.bindingPoint = currentBindingPoint++;
-        b.view = imageView;
+        b.storageImageId = std::move(storageImageId);
         b.layout = VK_IMAGE_LAYOUT_GENERAL;
+        b.type = DescriptorBindingType::STORAGE_IMAGE;
         resourceBindings.push_back(b);
         return *this;
     }
 
-    PipelineBuilder &PipelineBuilder::addResourceBinding(const VkAccelerationStructureKHR tlas) {
-        DescriptorBinding b{};
+    PipelineBuilder &PipelineBuilder::addAccelerationStructureBinding(const VkAccelerationStructureKHR tlas) {
+        DescriptorBindingBuilder b{};
         b.bindingPoint = currentBindingPoint++;
         b.accelerationStructure = tlas;
         b.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
+        b.type = DescriptorBindingType::ACCELERATION_STRUCTURE;
         resourceBindings.push_back(b);
         return *this;
     }

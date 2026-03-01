@@ -12,8 +12,21 @@ namespace Metal {
     DescriptorInstance *DescriptorSetService::createDescriptor(const PipelineBuilder &pipelineBuilder, const std::string &id, VkShaderStageFlags stageFlags) {
         auto *descriptorInstance = createResourceInstance(id);
         
-        for (auto binding : pipelineBuilder.resourceBindings) {
-            if (binding.frameBufferId != "") {
+        for (auto &builder : pipelineBuilder.resourceBindings) {
+            DescriptorBinding binding{};
+            binding.bindingPoint = builder.bindingPoint;
+            binding.descriptorCount = builder.descriptorCount;
+            binding.descriptorType = builder.descriptorType;
+            binding.sampler = builder.sampler;
+            binding.view = builder.view;
+            binding.layout = builder.layout;
+            binding.accelerationStructure = builder.accelerationStructure;
+            binding.bufferId = builder.bufferId;
+            binding.storageImageId = builder.storageImageId;
+            binding.frameBufferId = builder.frameBufferId;
+            binding.attachmentIndex = builder.attachmentIndex;
+
+            if (builder.type == DescriptorBindingType::FBO_ATTACHMENT) {
                 auto *fbo = CTX.framebufferService.getResource(binding.frameBufferId);
                 if (fbo == nullptr) {
                     throw std::runtime_error("Framebuffer not found: " + binding.frameBufferId);
@@ -24,27 +37,35 @@ namespace Metal {
                 }
             }
 
-            if (binding.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR || binding.accelerationStructure != VK_NULL_HANDLE) {
-                binding.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
-            } else if (binding.bufferInstance != nullptr || !binding.bufferId.empty()) {
-                BufferInstance *buffer = binding.bufferInstance;
-                if (buffer == nullptr) {
-                    buffer = CTX.bufferService.getResource(binding.bufferId);
-                }
+            switch (builder.type) {
+                case DescriptorBindingType::ACCELERATION_STRUCTURE:
+                    binding.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
+                    break;
+                case DescriptorBindingType::BUFFER: {
+                    BufferInstance *buffer = CTX.bufferService.getResource(binding.bufferId);
 
-                if (buffer != nullptr) {
-                    binding.descriptorType = buffer->getBufferType() == BufferType::UNIFORM_BUFFER
-                                                 ? VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
-                                                 : VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-                } else {
-                    // Default to storage buffer if not found during initialization, or maybe handle differently?
-                    // Usually globalData and such are available.
-                    binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+                    if (buffer != nullptr) {
+                        binding.descriptorType = buffer->getBufferType() == BufferType::UNIFORM_BUFFER
+                                                     ? VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+                                                     : VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+                    } else {
+                        binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+                    }
+                    break;
                 }
-            } else if (binding.view != VK_NULL_HANDLE) {
-                binding.descriptorType = binding.sampler != VK_NULL_HANDLE
-                                             ? VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
-                                             : VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+                case DescriptorBindingType::COMBINED_IMAGE_SAMPLER:
+                case DescriptorBindingType::FBO_ATTACHMENT:
+                    binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+                    break;
+                case DescriptorBindingType::STORAGE_IMAGE: {
+                    auto *texture = CTX.textureService.getResource(binding.storageImageId);
+                    if (texture == nullptr) {
+                        throw std::runtime_error("Storage image texture not found: " + binding.storageImageId);
+                    }
+                    binding.view = texture->vkImageView;
+                    binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+                    break;
+                }
             }
             binding.stageFlags = static_cast<VkShaderStageFlagBits>(stageFlags);
             descriptorInstance->bindings.push_back(binding);
@@ -182,11 +203,8 @@ namespace Metal {
 
                     writeDescriptorSets.push_back(descriptorWrite);
                 }
-            } else if (binding.bufferInstance != nullptr || !binding.bufferId.empty()) {
-                BufferInstance *buffer = binding.bufferInstance;
-                if (buffer == nullptr) {
-                    buffer = CTX.bufferService.getResource(binding.bufferId);
-                }
+            } else if (!binding.bufferId.empty()) {
+                BufferInstance *buffer = CTX.bufferService.getResource(binding.bufferId);
 
                 if (buffer == nullptr) {
                     LOG_ERROR("DescriptorSetService Buffer not found: " + binding.bufferId);

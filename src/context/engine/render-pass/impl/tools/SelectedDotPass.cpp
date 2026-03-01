@@ -17,8 +17,8 @@ namespace Metal {
                 .setPrepareForMesh()
                 .setCullMode(VK_CULL_MODE_BACK_BIT)
                 .setPushConstantsSize(sizeof(SelectedDotPushConstant))
-                .addResourceBinding(getScopedResourceId(RID_GLOBAL_DATA))
-                .addResourceBinding(getScopedResourceId(RID_G_BUFFER_FBO), 2);
+                .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
+                .addFboBinding(getScopedResourceId(RID_G_BUFFER_FBO), 2);
         pipelineInstance = CTX.pipelineService.createPipeline(builder);
     }
 

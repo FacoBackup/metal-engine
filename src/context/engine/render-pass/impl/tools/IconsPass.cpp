@@ -11,8 +11,8 @@ namespace Metal {
                     "QUAD.vert",
                     "tools/Icon.frag"
                 )
-                .addResourceBinding(getScopedResourceId(RID_GLOBAL_DATA))
-                .addResourceBinding(getScopedResourceId(RID_LIGHT_BUFFER))
+                .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
+                .addBufferBinding(getScopedResourceId(RID_LIGHT_BUFFER))
                 .setBlendEnabled();
         pipelineInstance = CTX.pipelineService.createPipeline(iconPipelineBuilder);
     }

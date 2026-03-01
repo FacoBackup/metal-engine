@@ -17,9 +17,9 @@ namespace Metal {
                     "GBufferGen.vert",
                     "GBufferGen.frag"
                 )
-                .addResourceBinding(getScopedResourceId(RID_GLOBAL_DATA))
-                .addResourceBinding(getScopedResourceId(RID_MATERIAL_BUFFER))
-                .addResourceBinding(CTX.vulkanContext.vkImageSampler, VK_NULL_HANDLE, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1000)
+                .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
+                .addBufferBinding(getScopedResourceId(RID_MATERIAL_BUFFER))
+                .addCombinedImageSamplerBinding(CTX.vulkanContext.vkImageSampler, VK_NULL_HANDLE, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1000)
                 .setPrepareForMesh()
                 .setDepthTest()
                 .setCullMode(VK_CULL_MODE_BACK_BIT)
