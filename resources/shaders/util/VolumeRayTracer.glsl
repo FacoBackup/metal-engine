@@ -20,33 +20,33 @@ float hash(vec3 p) {
 }
 
 float densityVariation(vec3 p, float baseDensity) {
-//    float noise = hash(p * 0.5);
+    //    float noise = hash(p * 0.5);
     return baseDensity; //* (0.5 + 0.5 * noise);
 }
 
 // Henyey–Greenstein phase function
 float phaseHenyeyGreenstein(vec3 wo, vec3 wi, float g) {
     float cosTheta = dot(wo, wi);
-    float denom = 1.0 + g*g - 2.0 * g * cosTheta;
-    return (1.0 - g*g) / (4.0 * 3.14159265359 * pow(denom, 1.5));
+    float denom = 1.0 + g * g - 2.0 * g * cosTheta;
+    return (1.0 - g * g) / (4.0 * 3.14159265359 * pow(denom, 1.5));
 }
 
-vec4 integrateVolume(vec3 ro, vec3 rd, in Volume volume, float sceneDepth) {
-    vec3 roLocal = ro - volume.position;
+vec4 integrateVolume(vec3 ro, vec3 rd, float sceneDepth) {
+    vec3 roLocal = ro;
 
     float tEntry, tExit;
-    bool intersects = intersectBox(roLocal, rd, volume.dataA, tEntry, tExit);
+    bool intersects = intersectBox(roLocal, rd, atmosphereData.volumeScale, tEntry, tExit);
     if (!intersects) {
         return vec4(0.0);
     }
 
-    if (tEntry > sceneDepth){
+    if (tEntry > sceneDepth) {
         return vec4(0.0);
     }
 
     tEntry = max(tEntry, 0.0);
 
-    int steps = int(volume.color.a);
+    int steps = int(atmosphereData.samples);
     float dt = (tExit - tEntry) / float(steps);
 
     vec3 scattering = vec3(0.0);
@@ -55,14 +55,14 @@ vec4 integrateVolume(vec3 ro, vec3 rd, in Volume volume, float sceneDepth) {
     for (int i = 0; i < steps; i++) {
         float tCurrent = tEntry + dt * (float(i) + 0.5);
         vec3 pos = ro + rd * tCurrent;
-        vec3 localPos = pos - volume.position;
+        vec3 localPos = pos ;
 
-        float density = densityVariation(localPos, volume.dataB.x);
+        float density = densityVariation(localPos, atmosphereData.density);
 
-        float scatteringAlbedo = volume.dataB.y;// fraction of extinction that is scattering
+        float scatteringAlbedo = atmosphereData.scatteringAlbedo;// fraction of extinction that is scattering
         float scatteringCoefficient = density * scatteringAlbedo;
-        float absorptionCoefficient  = density * (1.0 - scatteringAlbedo);
-        float extinctionCoefficient  = scatteringCoefficient + absorptionCoefficient;
+        float absorptionCoefficient = density * (1.0 - scatteringAlbedo);
+        float extinctionCoefficient = scatteringCoefficient + absorptionCoefficient;
 
         vec3 inScattered = vec3(0.0);
         for (int li = 0; li < int(globalData.lightsCount); li++) {
@@ -83,16 +83,16 @@ vec4 integrateVolume(vec3 ro, vec3 rd, in Volume volume, float sceneDepth) {
             vec3 L = normalize(samplePos - pos);
             float lightDist = length(samplePos - pos);
 
-            float dtShadow = lightDist / float(pushConstants.volumeShadowSteps);
+            float dtShadow = lightDist / float(atmosphereData.volumeShadowSteps);
             float opticalDepth = 0.0;
-            for (int j = 0; j < int(pushConstants.volumeShadowSteps); j++) {
+            for (int j = 0; j < int(atmosphereData.volumeShadowSteps); j++) {
                 float tShadow = float(j) * dtShadow;
                 vec3 posShadow = pos + L * tShadow;
-                vec3 localShadow = posShadow - volume.position;
-                opticalDepth += densityVariation(localShadow, volume.dataB.x) * dtShadow;
+                vec3 localShadow = posShadow;
+                opticalDepth += densityVariation(localShadow, atmosphereData.density) * dtShadow;
             }
             float lightTransmittance = exp(-opticalDepth);
-            float g = volume.dataB.z;// phase function asymmetry parameter; 0.0 for isotropic
+            float g = atmosphereData.g;// phase function asymmetry parameter; 0.0 for isotropic
             float phase = phaseHenyeyGreenstein(rd, L, g);
             inScattered += light.color.rgb * light.color.a * lightTransmittance * phase;
         }
@@ -100,15 +100,16 @@ vec4 integrateVolume(vec3 ro, vec3 rd, in Volume volume, float sceneDepth) {
         viewTransmittance *= exp(-extinctionCoefficient * dt);
     }
     float volumeAlpha = 1.0 - viewTransmittance;
-    return vec4(scattering * volume.color.rgb, volumeAlpha);
+    return vec4(scattering * atmosphereData.albedo, volumeAlpha);
 }
 
-void traceVolumes(inout vec4 finalColor, vec3 worldPosition, vec3 rayDirection){
+void traceVolumes(inout vec4 finalColor, vec3 worldPosition, vec3 rayDirection) {
+    if (atmosphereData.isVolumeEnabled == 0) {
+        return;
+    }
     vec3 rayOrigin = globalData.cameraWorldPosition;
     float sceneDepth = length(worldPosition.rgb - rayOrigin);
 
-    for (uint i = 0; i < globalData.volumeCount; i++) {
-        Volume volume = volumesBuffer.items[i];
-        finalColor += integrateVolume(rayOrigin, rayDirection, volume, sceneDepth);
-    }
+    finalColor += integrateVolume(rayOrigin, rayDirection, sceneDepth);
+
 }

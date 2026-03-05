@@ -8,6 +8,7 @@
 namespace Metal {
     struct MeshData;
     struct MeshInstance;
+    struct EntityAssetData;
 
     class MeshService final : public IStreamable<MeshInstance> {
     public:
@@ -16,7 +17,7 @@ namespace Metal {
         MeshData *stream(const std::string &id) const;
 
         EntityID createMeshEntity(const std::string &name, const std::string &meshId,
-                                  const std::string &materialId) const;
+                                  const EntityAssetData *data) const;
 
         void createSceneEntities(const std::string &id) const;
 

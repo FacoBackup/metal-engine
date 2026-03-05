@@ -1,17 +1,15 @@
 #include "MaterialImporterService.h"
 #include "../../context/ApplicationContext.h"
-#include "MaterialFileData.h"
 #include "../../dto/file/EntryMetadata.h"
 #include "../../enum/engine-definitions.h"
 #include "../../util/FilesUtil.h"
 #include <assimp/material.h>
-
 #include <filesystem>
 #include "../../util/serialization-definitions.h"
 
 namespace Metal {
     void MaterialImporterService::persistAllMaterials(const std::string &targetDir, const aiScene *scene,
-                                                      std::unordered_map<unsigned int, std::string> &materialMap,
+                                                      std::unordered_map<unsigned int, MaterialData> &materialMap,
                                                       const std::string &rootDirectory,
                                                       const std::stop_token &stopToken) const {
         namespace fs = std::filesystem;
@@ -19,7 +17,7 @@ namespace Metal {
         for (unsigned int i = 0; i < scene->mNumMaterials; ++i) {
             if (stopToken.stop_requested()) return;
             const aiMaterial *material = scene->mMaterials[i];
-            auto materialData = MaterialFileData{};
+            auto materialData = MaterialData{};
 
             const auto importAssimpTexture = [&
                     ](const aiString &assimpPath, const std::string &nameHint) -> std::string {
@@ -83,22 +81,9 @@ namespace Metal {
                 continue;
             }
 
-            std::string materialId;
-            {
-                EntryMetadata materialMetadata{};
-                materialMetadata.type = EntryType::MATERIAL;
-                materialMetadata.name = "Material " + std::to_string(i);
+            materialMap.insert({i, materialData});
 
-                std::string materialBlobPath = CTX.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialMetadata.getId());
-                DUMP_TEMPLATE(materialBlobPath, materialData)
-                materialMetadata.size = fs::file_size(materialBlobPath);
-
-                DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(materialMetadata.getId()), materialMetadata)
-                materialId = materialMetadata.getId();
-            }
-            materialMap.insert({i, materialId});
-
-            LOG_INFO("Persisted material: " + materialId);
+            LOG_INFO("Processed material: " + std::to_string(i));
         }
     }
 }

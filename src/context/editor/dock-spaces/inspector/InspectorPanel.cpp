@@ -48,8 +48,8 @@ namespace Metal {
                 if (selectedEntity != nullptr) {
                     additionalInspection.push_back(selectedEntity);
 
-                    if (repo.registry.all_of<MeshComponent>(entity)) {
-                        additionalInspection.push_back((Inspectable *) &repo.registry.get<MeshComponent>(entity));
+                    if (repo.registry.all_of<PrimitiveComponent>(entity)) {
+                        additionalInspection.push_back((Inspectable *) &repo.registry.get<PrimitiveComponent>(entity));
                     }
                     if (repo.registry.all_of<TransformComponent>(entity)) {
                         additionalInspection.push_back((Inspectable *) &repo.registry.get<TransformComponent>(entity));
@@ -60,6 +60,9 @@ namespace Metal {
                     }
                     if (repo.registry.all_of<VolumeComponent>(entity)) {
                         additionalInspection.push_back((Inspectable *) &repo.registry.get<VolumeComponent>(entity));
+                    }
+                    if (repo.registry.all_of<AtmosphereComponent>(entity)) {
+                        additionalInspection.push_back((Inspectable *) &repo.registry.get<AtmosphereComponent>(entity));
                     }
                 }
             } else {

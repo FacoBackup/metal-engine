@@ -23,7 +23,6 @@ namespace Metal {
 
     void MetricsPanel::onSync() {
         drawResourceList("Meshes", CTX.meshService, id);
-        drawResourceList("Materials", CTX.materialService, id);
         drawResourceList("Voxels", CTX.voxelService, id);
         drawResourceList("Framebuffers", CTX.framebufferService, id);
         drawResourceList("Textures", CTX.textureService, id);

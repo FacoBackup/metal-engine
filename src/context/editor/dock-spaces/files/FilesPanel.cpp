@@ -32,17 +32,17 @@ namespace Metal {
                 }
             });
             if (!files.empty()) {
-                CTX.fileInspection.pendingImports = files;
-                CTX.fileInspection.importSettingsMap.clear();
-                for (const auto& file : CTX.fileInspection.pendingImports) {
+                CTX.editorRepository.pendingImports = files;
+                CTX.editorRepository.importSettingsMap.clear();
+                for (const auto& file : CTX.editorRepository.pendingImports) {
                     if (CTX.sceneImporterService.isCompatible(file)) {
-                        CTX.fileInspection.importSettingsMap.emplace(file, std::make_shared<SceneImportSettingsDTO>());
+                        CTX.editorRepository.importSettingsMap.emplace(file, std::make_shared<SceneImportSettingsDTO>());
                     } else {
-                        CTX.fileInspection.importSettingsMap.emplace(file, std::make_shared<ImportSettingsDTO>());
+                        CTX.editorRepository.importSettingsMap.emplace(file, std::make_shared<ImportSettingsDTO>());
                     }
                 }
-                CTX.fileInspection.selectedFileForSettings = CTX.fileInspection.pendingImports[0];
-                CTX.fileInspection.targetImportDirectory = filesContext.currentDirectory;
+                CTX.editorRepository.selectedFileForSettings = CTX.editorRepository.pendingImports[0];
+                CTX.editorRepository.targetImportDirectory = filesContext.currentDirectory;
             }
         };
     }
@@ -124,7 +124,7 @@ namespace Metal {
     void FilesPanel::openResource(FSEntry *root) {
         switch (root->type) {
             case EntryType::MESH: {
-                CTX.meshService.createMeshEntity(root->name, root->getId(), "");
+                CTX.meshService.createMeshEntity(root->name, root->getId(), nullptr);
                 break;
             }
             case EntryType::SCENE: {

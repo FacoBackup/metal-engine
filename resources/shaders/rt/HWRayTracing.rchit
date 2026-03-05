@@ -4,12 +4,10 @@
 #extension GL_EXT_buffer_reference2 : require
 
 #include "../util/HWRayTracingUtil.glsl"
-#define MATERIAL_SET 7
-#include "../MaterialBuffer.glsl"
-#define MESH_METADATA_SET 8
+#define MESH_METADATA_SET 7
 #include "../MeshMetadata.glsl"
 
-layout (set = 0, binding = 9) uniform sampler2D textureArray[];
+layout (set = 0, binding = 8) uniform sampler2D textureArray[];
 
 layout (location = 0) rayPayloadInEXT RayPayload payload;
 hitAttributeEXT vec2 attribs; // Barycentric coordinates for the hit
@@ -73,27 +71,26 @@ void main() {
     float ior = 1.45;
     bool isEmissive = false;
 
-    if (matIndex != 0u) {
-        MaterialData mat = materialBuffer.items[matIndex];
-        if (mat.useAlbedoTexture == 1u) {
-            baseColor = texture(textureArray[nonuniformEXT(mat.albedoTexture)], uv).rgb;
+    if (matIndex != 0u) { 
+        if (metadata.useAlbedoTexture == 1u) {
+            baseColor = texture(textureArray[nonuniformEXT(metadata.albedoTexture)], uv).rgb;
         } else {
-            baseColor = mat.albedo;
+            baseColor = metadata.albedo;
         }
-        if (mat.useRoughnessTexture == 1u) {
-            roughness = texture(textureArray[nonuniformEXT(mat.roughnessTexture)], uv).r;
+        if (metadata.useRoughnessTexture == 1u) {
+            roughness = texture(textureArray[nonuniformEXT(metadata.roughnessTexture)], uv).r;
         } else {
-            roughness = mat.roughness;
+            roughness = metadata.roughness;
         }
-        if (mat.useMetallicTexture == 1u) {
-            metallic = texture(textureArray[nonuniformEXT(mat.metallicTexture)], uv).r;
+        if (metadata.useMetallicTexture == 1u) {
+            metallic = texture(textureArray[nonuniformEXT(metadata.metallicTexture)], uv).r;
         } else {
-            metallic = mat.metallic;
+            metallic = metadata.metallic;
         }
-        transmission = mat.transmission;
-        thickness = mat.thickness;
-        ior = mat.ior;
-        isEmissive = mat.isEmissive == 1u;
+        transmission = metadata.transmission;
+        thickness = metadata.thickness;
+        ior = metadata.ior;
+        isEmissive = metadata.isEmissive == 1u;
     }
 
     payload.material.baseColor = baseColor;

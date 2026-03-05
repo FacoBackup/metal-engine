@@ -7,6 +7,10 @@
 #include "../../../../service/raytracing/RayTracingService.h"
 #include "../../../../enum/EngineResourceIDs.h"
 
+#include "../../../../repository/world/components/PrimitiveComponent.h"
+#include "../../../../repository/world/components/TransformComponent.h"
+#include "../../../../repository/world/components/AtmosphereComponent.h"
+
 namespace Metal {
     void HWRayTracingPass::onInitialize() {
         PipelineBuilder builder = PipelineBuilder::OfRayTracing(
@@ -20,8 +24,7 @@ namespace Metal {
                 .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_POSITION_INDEX))
                 .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_NORMAL))
                 .addBufferBinding(getScopedResourceId(RID_LIGHT_BUFFER))
-                .addBufferBinding(getScopedResourceId(RID_VOLUMES_BUFFER))
-                .addBufferBinding(getScopedResourceId(RID_MATERIAL_BUFFER))
+                .addBufferBinding(getScopedResourceId(RID_ATMOSPHERE_DATA))
                 .addBufferBinding(getScopedResourceId(RID_MESH_METADATA_BUFFER))
                 .addCombinedImageSamplerBinding(CTX.vulkanContext.vkImageSampler, VK_NULL_HANDLE,
                                                 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1000);
@@ -30,9 +33,10 @@ namespace Metal {
 
     void HWRayTracingPass::onSync() {
         bool anyMeshes = false;
-        auto view = CTX.worldRepository.registry.view<MeshComponent, TransformComponent>();
+        entt::registry &reg = CTX.worldRepository.registry;
+        auto view = reg.view<PrimitiveComponent, TransformComponent>();
         for (auto entity: view) {
-            CTX.streamingService.streamMesh(view.get<MeshComponent>(entity).meshId);
+            CTX.streamingService.streamMesh(reg.get<PrimitiveComponent>(entity).meshId);
             anyMeshes = true;
         }
 
@@ -65,8 +69,6 @@ namespace Metal {
 
         // Trace rays
         pushConstant.pathTracerMultiplier = CTX.engineRepository.pathTracerMultiplier;
-        pushConstant.volumeShadowSteps = CTX.engineRepository.volumeShadowSteps;
-        pushConstant.isAtmosphereEnabled = CTX.engineRepository.atmosphereEnabled;
 
         pushConstant.multipleImportanceSampling = CTX.engineRepository.multipleImportanceSampling;
         pushConstant.pathTracerSamples = CTX.engineRepository.pathTracerSamples;

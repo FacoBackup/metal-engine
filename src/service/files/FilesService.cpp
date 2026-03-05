@@ -81,10 +81,6 @@ namespace Metal {
                     DELETE_S(FORMAT_FILE_SCENE)
                     break;
                 }
-                case EntryType::MATERIAL: {
-                    DELETE_S(FORMAT_FILE_MATERIAL)
-                    break;
-                }
                 case EntryType::VOLUME: {
                     DELETE_S(FORMAT_FILE_VOLUME)
                     break;
@@ -92,22 +88,6 @@ namespace Metal {
                 default: break;;
             }
         }
-    }
-
-    void FilesService::createMaterial(const std::string &targetDir, FSEntry *currentDirectory) const {
-        EntryMetadata materialMetadata{};
-        materialMetadata.type = EntryType::MATERIAL;
-        int count = 0;
-        for (FSEntry *child: currentDirectory->children) {
-            if (child->type == EntryType::MATERIAL && child->name == "New Material (" + std::to_string(count) + ")") {
-                count++;
-            }
-        }
-        materialMetadata.name = "New Material (" + std::to_string(count+1) + ")";
-
-        DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(materialMetadata.getId()), materialMetadata)
-        MaterialFileData data{};
-        DUMP_TEMPLATE(CTX.getAssetDirectory() + FORMAT_FILE_MATERIAL(materialMetadata.getId()), data)
     }
 
     void FilesService::CreateDirectory(FSEntry *currentDirectory) {

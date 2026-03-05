@@ -112,6 +112,7 @@ add_executable(
         src/repository/runtime/RuntimeRepository.h
         src/service/buffer/BufferInstance.cpp
         src/service/buffer/BufferInstance.h
+        src/dto/buffers/AtmosphereUBO.h
         src/service/mesh/MeshService.cpp
         src/service/mesh/MeshService.h
         src/service/mesh/MeshData.h
@@ -154,7 +155,7 @@ add_executable(
         src/repository/world/impl/EntityComponent.h
         src/enum/ComponentType.h
         src/repository/world/impl/AbstractComponent.h
-        src/repository/world/components/MeshComponent.h
+        src/repository/world/components/PrimitiveComponent.h
         src/repository/world/components/TransformComponent.h
         src/enum/ShadingMode.h
         src/context/editor/dock-spaces/hierarchy/HierarchyHeaderPanel.cpp
@@ -163,7 +164,7 @@ add_executable(
         src/service/selection/SelectionService.h
         src/repository/world/impl/EntityComponent.cpp
         src/repository/world/components/TransformComponent.cpp
-        src/repository/world/components/MeshComponent.cpp
+        src/repository/world/components/PrimitiveComponent.cpp
         src/context/editor/abstract/form/types/ResourceField.cpp
         src/context/editor/abstract/form/types/ResourceField.h
         src/context/editor/abstract/form/types/ColorField.cpp
@@ -202,7 +203,6 @@ add_executable(
         src/service/voxel/impl/VoxelData.h
         src/service/mesh/SceneData.h
         src/service/mesh/EntityAssetData.h
-        src/service/material/MaterialFileData.h
         src/context/engine/render-pass/impl/PostProcessingPass.cpp
         src/context/engine/render-pass/impl/PostProcessingPass.h
         src/context/engine/compute-pass/impl/HWRayTracingPass.cpp
@@ -244,14 +244,8 @@ add_executable(
         src/context/engine/passes/AbstractPass.cpp
         src/context/engine/passes/AbstractPass.h
         src/util/ImageUtils.h
-        src/service/material/MaterialInstance.h
         src/service/material/MaterialService.cpp
         src/service/material/MaterialService.h
-        src/service/material/MaterialFileData.cpp
-        src/repository/inspection/FilesRepository.cpp
-        src/repository/inspection/FilesRepository.h
-        src/context/editor/dock-spaces/inspector/MaterialEditPanel.cpp
-        src/context/editor/dock-spaces/inspector/MaterialEditPanel.h
         src/enum/LightType.h
         src/context/engine/compute-pass/impl/AccumulationPass.cpp
         src/context/engine/compute-pass/impl/AccumulationPass.h
@@ -259,11 +253,12 @@ add_executable(
         src/service/lights/LightService.h
         src/repository/world/components/VolumeComponent.cpp
         src/repository/world/components/VolumeComponent.h
+        src/repository/world/components/AtmosphereComponent.cpp
+        src/repository/world/components/AtmosphereComponent.h
         src/service/descriptor/DescriptorBinding.h
         src/service/notification/AsyncTask.h
         src/service/voxel/VoxelImporterService.cpp
         src/service/voxel/VoxelImporterService.h
-        src/dto/buffers/MaterialData.h
         src/dto/buffers/VolumeData.h
         src/service/volumes/VolumeService.cpp
         src/service/volumes/VolumeService.h
@@ -297,6 +292,7 @@ add_executable(
         src/context/engine/compute-pass/impl/TemporalAccumulationPass.h
         src/context/engine/compute-pass/impl/SpatialFilterPass.cpp
         src/context/engine/compute-pass/impl/SpatialFilterPass.h
+        src/repository/world/components/AtmosphereComponent.cpp
 )
 
 

@@ -13,11 +13,12 @@
 #include "impl/EntityComponent.h"
 #include "../../enum/ComponentType.h"
 #include "components/LightComponent.h"
-#include "components/MeshComponent.h"
+#include "components/PrimitiveComponent.h"
 #include "components/SphereLightComponent.h"
 #include "components/PlaneLightComponent.h"
 #include "components/TransformComponent.h"
 #include "components/VolumeComponent.h"
+#include "components/AtmosphereComponent.h"
 
 namespace Metal {
     class Inspectable;
@@ -39,9 +40,6 @@ namespace Metal {
         void linkEntities(EntityID parentId, EntityID childId);
 
         [[nodiscard]] EntityComponent *getEntity(EntityID node);
-
-        Inspectable *getComponent(ComponentTypes::ComponentType comp, EntityID entity);
-
 
         void deleteEntities(const std::vector<EntityID> &entities);
 

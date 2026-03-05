@@ -1,13 +1,14 @@
-#ifndef MATERIAL_FILE_DATA_H
-#define MATERIAL_FILE_DATA_H
-#include <string>
+#ifndef PRIMITIVE_COMPONENT_H
+#define PRIMITIVE_COMPONENT_H
 
-#include "../../common/inspection/Inspectable.h"
-#include "../../util/Serializable.h"
+#include "../impl/AbstractComponent.h"
+#include "../../../util/Serializable.h"
 #include <glm/glm.hpp>
 
 namespace Metal {
-    struct MaterialFileData final : Inspectable, Serializable {
+    struct PrimitiveComponent final : AbstractComponent, Serializable {
+        std::string meshId;
+
         std::string albedo;
         std::string normal;
         std::string roughness;
@@ -20,16 +21,17 @@ namespace Metal {
         float ior = 1.45;
         bool isEmissive = false;
 
+        unsigned int renderIndex = 0;
+
         void registerFields() override;
 
-        const char *getIcon() override;
+        void onUpdate(InspectableMember *member) override;
 
-        const char *getTitle() override;
+        ComponentTypes::ComponentType getType() override;
 
         nlohmann::json toJson() const override;
 
-        void fromJson(const nlohmann::json &j) override;
+        void fromJson(const nlohmann::json& j) override;
     };
 }
-
-#endif //MATERIALDATA_H
+#endif //MESHCOMPONENT_H

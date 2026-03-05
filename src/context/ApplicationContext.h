@@ -26,7 +26,6 @@
 #include "../service/camera/CameraService.h"
 
 #include "../repository/world/impl/WorldGridRepository.h"
-#include "../repository/inspection/FilesRepository.h"
 #include "../repository/world/WorldRepository.h"
 #include "../repository/runtime/RuntimeRepository.h"
 #include "../repository/streaming/StreamingService.h"
@@ -67,9 +66,6 @@ namespace Metal {
         GuiContext guiContext{};
         GLFWContext glfwContext{};
 
-        // // ----------- CORE REPOSITORIES
-        // ----------- CORE REPOSITORIES
-
         // ----------- Services
         NotificationService notificationService;
         AsyncTaskService asyncTaskService;
@@ -103,7 +99,6 @@ namespace Metal {
         // ----------- Services
 
         // ----------- Repository
-        FilesRepository fileInspection{};
         WorldGridRepository worldGridRepository{};
         WorldRepository worldRepository{};
         RuntimeRepository runtimeRepository{};

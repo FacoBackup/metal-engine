@@ -27,8 +27,6 @@ namespace Metal {
 
         void deleteFiles(const std::unordered_map<std::string, FSEntry *> &files_context);
 
-        void createMaterial(const std::string &targetDir, FSEntry *currentDirectory) const;
-
         void Move(FSEntry *toMove, FSEntry *targetDir);
 
         static void CreateDirectory(FSEntry *currentDirectory);

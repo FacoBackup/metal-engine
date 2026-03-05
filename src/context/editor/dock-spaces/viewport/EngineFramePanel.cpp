@@ -12,9 +12,8 @@
 #include "../../../../dto/buffers/GlobalDataUBO.h"
 #include "../../../../dto/buffers/TileInfoUBO.h"
 #include "../../../../dto/buffers/LightData.h"
-#include "../../../../dto/buffers/VolumeData.h"
-#include "../../../../dto/buffers/MaterialData.h"
 #include "../../../../dto/buffers/MeshMetadata.h"
+#include "../../../../dto/buffers/AtmosphereUBO.h"
 #include "ViewportHeaderPanel.h"
 #include "ImGuizmo.h"
 #include <algorithm>
@@ -27,13 +26,9 @@ namespace Metal {
         engineFrame = EngineFrameBuilder()
                 .addBuffer(RID_GLOBAL_DATA, sizeof(GlobalDataUBO),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, UNIFORM_BUFFER)
-                .addBuffer(RID_TILE_INFO, sizeof(TileInfoUBO),
+                .addBuffer(RID_ATMOSPHERE_DATA, sizeof(AtmosphereUBO),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, UNIFORM_BUFFER)
                 .addBuffer(RID_LIGHT_BUFFER, MAX_LIGHTS * sizeof(LightData),
-                           VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
-                .addBuffer(RID_VOLUMES_BUFFER, MAX_VOLUMES * sizeof(VolumeData),
-                           VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
-                .addBuffer(RID_MATERIAL_BUFFER, MAX_MATERIALS * sizeof(MaterialData),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
                 .addBuffer(RID_MESH_METADATA_BUFFER, MAX_MESH_INSTANCES * sizeof(MeshMetadata),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)

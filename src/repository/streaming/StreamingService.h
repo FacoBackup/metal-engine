@@ -6,13 +6,7 @@
 
 #include "../../service/abstract/AbstractResourceService.h"
 #include "../abstract/AbstractCoreRepository.h"
-#include "../../service/abstract/IStreamable.h"
 #include "../abstract/RuntimeResource.h"
-
-
-namespace Metal {
-    struct SVOInstance;
-}
 
 using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
@@ -20,7 +14,7 @@ using TimePoint = std::chrono::time_point<Clock>;
 namespace Metal {
     struct MeshInstance;
     struct TextureInstance;
-    struct MaterialInstance;
+    struct SVOInstance;
 
     class StreamingService final : public AbstractRuntimeComponent {
         std::unordered_map<std::string, unsigned int> tries{};
@@ -29,8 +23,6 @@ namespace Metal {
 
     public:
         MeshInstance *streamMesh(const std::string &id);
-
-        MaterialInstance *streamMaterial(const std::string &id);
 
         SVOInstance *streamSVO(const std::string &id);
 

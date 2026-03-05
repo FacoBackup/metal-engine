@@ -14,6 +14,8 @@
 
 namespace Metal {
     struct TransformComponent;
+    struct FSEntry;
+    struct ImportSettingsDTO;
 
     struct EditorRepository final : Inspectable, Serializable {
         ImVec4 accent{};
@@ -49,6 +51,12 @@ namespace Metal {
         std::string focusedWindowName{};
         std::vector<ShortcutDTO> focusedShortcuts{};
         ShadingMode shadingMode = LIT;
+
+
+        std::vector<std::string> pendingImports;
+        std::unordered_map<std::string, std::shared_ptr<ImportSettingsDTO> > importSettingsMap;
+        std::string selectedFileForSettings;
+        FSEntry *targetImportDirectory = nullptr;
 
         void registerFields() override;
 

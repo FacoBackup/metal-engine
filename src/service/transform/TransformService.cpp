@@ -57,7 +57,7 @@ namespace Metal {
         auto *newTile = CTX.worldGridRepository.getOrCreateTile(translation);
 
         CTX.worldGridRepository.moveBetweenTiles(st->getEntityId(), previousTile, newTile);
-        if (CTX.worldRepository.registry.all_of<MeshComponent>(static_cast<entt::basic_registry<>::entity_type>(st->getEntityId()))) {
+        if (CTX.worldRepository.registry.all_of<PrimitiveComponent>(static_cast<entt::basic_registry<>::entity_type>(st->getEntityId()))) {
             CTX.rayTracingService.markDirty();
         }
     }

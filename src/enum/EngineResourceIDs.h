@@ -3,10 +3,7 @@
 
 namespace Metal {
     inline constexpr const char* RID_GLOBAL_DATA = "globalData";
-    inline constexpr const char* RID_TILE_INFO = "tileInfo";
     inline constexpr const char* RID_LIGHT_BUFFER = "lightBuffer";
-    inline constexpr const char* RID_VOLUMES_BUFFER = "volumesBuffer";
-    inline constexpr const char* RID_MATERIAL_BUFFER = "materialBuffer";
     inline constexpr const char* RID_MESH_METADATA_BUFFER = "meshMetadataBuffer";
     inline constexpr const char* RID_GBUFFER_POSITION_INDEX = "gBufferPositionIndex";
     inline constexpr const char* RID_GBUFFER_NORMAL = "gBufferNormal";
@@ -21,6 +18,8 @@ namespace Metal {
     inline constexpr const char* RID_POST_PROCESSING_FBO = "postProcessingFBO";
     inline constexpr const char* RID_COMPUTE_CB = "ComputeCB";
     inline constexpr const char* RID_POST_PROCESSING_CB = "PostProcessingCB";
+    inline constexpr const char* RID_ATMOSPHERE_DATA = "atmosphereData";
+    inline constexpr const char* RID_VOLUMES_BUFFER = "volumesBuffer";
 }
 
 #endif //ENGINE_RESOURCE_IDS_H

@@ -3,17 +3,10 @@
 #include "../../../../util/UIUtil.h"
 #include "../../../../dto/file/FSEntry.h"
 #include "../../../../context/ApplicationContext.h"
-#include "../../../../common/interface/Icons.h"
 #include "../../../../service/texture/TextureInstance.h"
-#include "../inspector/MaterialEditPanel.h"
 
 namespace Metal {
     FilePreviewPanel::FilePreviewPanel(FilesContext &filesContext) : filesContext(filesContext) {
-    }
-
-    void FilePreviewPanel::onInitialize() {
-        materialInspection = new MaterialEditPanel();
-        appendChild(materialInspection);
     }
 
     void FilePreviewPanel::onSync() {
@@ -51,12 +44,7 @@ namespace Metal {
                 CTX.guiContext.renderImage(texture, renderWidth, renderHeight);
                 ImGui::Separator();
             }
-        } else if (selected->type == EntryType::MATERIAL) {
-            CTX.fileInspection.materialId = selected->getId();
-            materialInspection->onSync();
-            ImGui::Separator();
         }
-
         if (ImGui::BeginTable((id + "metadata").c_str(), 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
             ImGui::TableSetupColumn("Property");
             ImGui::TableSetupColumn("Value");
@@ -76,7 +64,6 @@ namespace Metal {
                 case EntryType::MESH: typeLabel = "Mesh"; break;
                 case EntryType::TEXTURE: typeLabel = "Texture"; break;
                 case EntryType::VOLUME: typeLabel = "Volume"; break;
-                case EntryType::MATERIAL: typeLabel = "Material"; break;
                 case EntryType::DIRECTORY: typeLabel = "Directory"; break;
                 default: typeLabel = "Unknown"; break;
             }

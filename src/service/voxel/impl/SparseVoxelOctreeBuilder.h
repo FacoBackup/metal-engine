@@ -9,7 +9,7 @@ namespace Metal {
     struct SnapshotWorldTile;
     struct VoxelData;
     struct OctreeNode;
-    struct MeshComponent;
+    struct PrimitiveComponent;
 
     class SparseVoxelOctreeBuilder {
         OctreeNode root{};

@@ -8,6 +8,9 @@
 #include "../../service/camera/Camera.h"
 #include "../../service/framebuffer/FrameBufferInstance.h"
 #include "../../service/texture/TextureInstance.h"
+#include "../../repository/world/components/AtmosphereComponent.h"
+#include "../../repository/world/impl/EntityComponent.h"
+#include "../../repository/world/components/TransformComponent.h"
 
 namespace Metal {
     void EngineContext::resetPathTracerAccumulationCount() const {
@@ -16,33 +19,6 @@ namespace Metal {
 
     void EngineContext::onInitialize() {
         CTX.worldGridService.onSync();
-    }
-
-    void EngineContext::updateTileData() {
-        if (CTX.worldGridRepository.hasMainTileChanged) {
-            unsigned int i = 0;
-            std::vector<DescriptorBinding> bindings{};
-            for (auto *tile: CTX.worldGridRepository.getLoadedTiles()) {
-                if (tile != nullptr) {
-                    const auto *svo = CTX.streamingService.streamSVO(tile->id);
-                    if (svo != nullptr) {
-                        tileInfoUBO.tileCenterValid[i] = glm::vec4(tile->x, 0,
-                                                                   tile->z, 1);
-                        tileInfoUBO.voxelBufferOffset[i] = svo->voxelBufferOffset;
-                        i++;
-                    }
-                }
-            }
-
-            for (unsigned int j = i; j < 9; j++) {
-                tileInfoUBO.tileCenterValid[i].w = 0;
-            }
-
-            if (i > 0) {
-                currentFrame->getResourceAs<BufferInstance>(RID_TILE_INFO)->update(tileInfoUBO.tileCenterValid.data());
-            }
-            CTX.worldGridRepository.hasMainTileChanged = false;
-        }
     }
 
     void EngineContext::updateCurrentTime() {
@@ -77,7 +53,6 @@ namespace Metal {
             if (frame->getShouldRender()) {
                 currentFrame = frame;
 
-                updateTileData();
                 if (updateLights || isFirstFrame) {
                     CTX.lightService.onSync();
                 }
@@ -112,7 +87,6 @@ namespace Metal {
         globalDataUBO.invProj = camera.invProjectionMatrix;
         globalDataUBO.invView = camera.invViewMatrix;
         globalDataUBO.cameraWorldPosition = camera.position;
-        globalDataUBO.volumeCount = CTX.volumeService.getCount();
         globalDataUBO.lightsCount = CTX.lightService.getCount();
         globalDataUBO.debugFlag = ShadingModes::IndexOfValue(CTX.editorRepository.shadingMode);
         CTX.engineRepository.pathTracerAccumulationCount++;
@@ -122,14 +96,23 @@ namespace Metal {
         globalDataUBO.pathTracerMaxSamples = CTX.engineRepository.pathTracerMaxSamples;
         globalDataUBO.denoiserEnabled = CTX.engineRepository.denoiserEnabled && (globalDataUBO.debugFlag == LIT || globalDataUBO.debugFlag == LIGHTING_ONLY)? 1 : 0;
 
-        if (CTX.engineRepository.incrementTime) {
-            CTX.engineRepository.elapsedTime += .0005f * CTX.engineRepository.elapsedTimeSpeed;
-            setGISettingsUpdated(true);
-            updateLights = true;
+        entt::registry &reg = CTX.worldRepository.registry;
+        auto view = reg.view<AtmosphereComponent>();
+        if (auto it = view.begin(); it != view.end()) {
+            auto &atmo = reg.get<AtmosphereComponent>(*it);
+            atmosphereUBO.volumeScale = atmo.volumeScale;
+            atmosphereUBO.albedo = atmo.albedo;
+            atmosphereUBO.density = atmo.density;
+            atmosphereUBO.g = atmo.g;
+            atmosphereUBO.isAtmosphereEnabled = atmo.atmosphereEnabled ? 1 : 0;
+            atmosphereUBO.isVolumeEnabled = atmo.volumeEnabled ? 1 : 0;
+            atmosphereUBO.volumeShadowSteps = atmo.volumeShadowSteps;
+            atmosphereUBO.scatteringAlbedo = atmo.scatteringAlbedo;
+            atmosphereUBO.samples = atmo.samples;
+            atmosphereUBO.sunPosition = atmo.sunPosition;
         }
-        CTX.lightService.computeSunInfo();
-        globalDataUBO.sunPosition = CTX.lightService.getSunPosition();
-        globalDataUBO.sunColor = CTX.lightService.getSunColor();
+
         currentFrame->getResourceAs<BufferInstance>(RID_GLOBAL_DATA)->update(&globalDataUBO);
+        currentFrame->getResourceAs<BufferInstance>(RID_ATMOSPHERE_DATA)->update(&atmosphereUBO);
     }
 }

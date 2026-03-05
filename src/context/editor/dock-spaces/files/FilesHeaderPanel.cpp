@@ -35,15 +35,7 @@ namespace Metal {
         ImGui::SameLine();
 
         ImGui::Text(filesContext.pathToCurrentDirectory.c_str());
-        UIUtil::DynamicSpacing(264);
-
-        if (UIUtil::ButtonSimple(Icons::format_paint + id, UIUtil::ONLY_ICON_BUTTON_SIZE,
-                                 UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            CTX.filesService.createMaterial(filesContext.currentDirectory->absolutePath, filesContext.currentDirectory);
-            FilesService::GetEntries(filesContext.currentDirectory);
-        }
-        UIUtil::RenderTooltip("Create material");
-        ImGui::SameLine();
+        UIUtil::DynamicSpacing(200);
 
         ImGui::SetNextItemWidth(100);
         editorMode = IndexOfValue(filesContext.filterType);

@@ -8,7 +8,7 @@
 #include <stop_token>
 
 namespace Metal {
-    struct MaterialFileData;
+    struct MaterialData;
     struct MeshData;
     struct SceneData;
 
@@ -16,7 +16,7 @@ namespace Metal {
         static void ProcessNode(int &increment, SceneData &scene, const aiNode *node, int parentId,
                                 const std::unordered_map<unsigned int, std::string> &meshMap,
                                 const std::unordered_map<std::string, unsigned int> &meshMaterialMap,
-                                const std::unordered_map<unsigned int, std::string> &materialsMap,
+                                const std::unordered_map<unsigned int, MaterialData> &materialsMap,
                                 const std::stop_token &stopToken);
 
     public:

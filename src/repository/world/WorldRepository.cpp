@@ -58,27 +58,6 @@ namespace Metal {
         return nullptr;
     }
 
-    Inspectable *WorldRepository::getComponent(ComponentTypes::ComponentType comp, EntityID entityId) {
-        const auto entity = static_cast<entt::entity>(entityId);
-        if (!registry.valid(entity)) return nullptr;
-
-        switch (comp) {
-            case ComponentTypes::MESH:
-                return registry.all_of<MeshComponent>(entity) ? &registry.get<MeshComponent>(entity) : nullptr;
-            case ComponentTypes::TRANSFORM:
-                return registry.all_of<TransformComponent>(entity) ? &registry.get<TransformComponent>(entity) : nullptr;
-            case ComponentTypes::SPHERE_LIGHT:
-            case ComponentTypes::PLANE_LIGHT:
-                return registry.all_of<std::unique_ptr<LightComponent>>(entity)
-                           ? registry.get<std::unique_ptr<LightComponent>>(entity).get()
-                           : nullptr;
-            case ComponentTypes::VOLUME:
-                return registry.all_of<VolumeComponent>(entity) ? &registry.get<VolumeComponent>(entity) : nullptr;
-            default:
-                return nullptr;
-        }
-    }
-
     void WorldRepository::deleteRecursively(const std::vector<EntityID> &entities) {
         for (EntityID entityId: entities) {
             const auto entity = static_cast<entt::entity>(entityId);
@@ -148,8 +127,8 @@ namespace Metal {
             return;
         }
         switch (type) {
-            case ComponentTypes::MESH: {
-                auto &mesh = registry.emplace_or_replace<MeshComponent>(entity);
+            case ComponentTypes::PRIMITIVE: {
+                auto &mesh = registry.emplace_or_replace<PrimitiveComponent>(entity);
                 mesh.setEntityId(entityId);
                 createComponent(entityId, ComponentTypes::TRANSFORM);
                 CTX.rayTracingService.markDirty();
@@ -187,6 +166,12 @@ namespace Metal {
                 }
                 break;
             }
+            case ComponentTypes::ATMOSPHERE: {
+                auto &atmo = registry.emplace_or_replace<AtmosphereComponent>(entity);
+                atmo.setEntityId(entityId);
+                CTX.engineContext.setGISettingsUpdated(true);
+                break;
+            }
             default:
                 break;
         }
@@ -208,8 +193,8 @@ namespace Metal {
                 auto &h = registry.get<HierarchyComponent>(entity);
                 ej["hierarchy"] = {{"parent", h.parent}, {"children", h.children}};
             }
-            if (registry.all_of<MeshComponent>(entity)) {
-                ej["mesh"] = registry.get<MeshComponent>(entity).toJson();
+            if (registry.all_of<PrimitiveComponent>(entity)) {
+                ej["mesh"] = registry.get<PrimitiveComponent>(entity).toJson();
             }
             if (registry.all_of<TransformComponent>(entity)) {
                 ej["transform"] = registry.get<TransformComponent>(entity).toJson();
@@ -219,6 +204,9 @@ namespace Metal {
             }
             if (registry.all_of<VolumeComponent>(entity)) {
                 ej["volume"] = registry.get<VolumeComponent>(entity).toJson();
+            }
+            if (registry.all_of<AtmosphereComponent>(entity)) {
+                ej["atmosphere"] = registry.get<AtmosphereComponent>(entity).toJson();
             }
             entitiesJson[std::to_string(id)] = ej;
         }
@@ -245,7 +233,7 @@ namespace Metal {
                     h.children = val.at("hierarchy").at("children").get<std::vector<EntityID>>();
                 }
                 if (val.contains("mesh")) {
-                    registry.emplace<MeshComponent>(entity).fromJson(val.at("mesh"));
+                    registry.emplace<PrimitiveComponent>(entity).fromJson(val.at("mesh"));
                 }
                 if (val.contains("transform")) {
                     registry.emplace<TransformComponent>(entity).fromJson(val.at("transform"));
@@ -265,6 +253,9 @@ namespace Metal {
                 }
                 if (val.contains("volume")) {
                     registry.emplace<VolumeComponent>(entity).fromJson(val.at("volume"));
+                }
+                if (val.contains("atmosphere")) {
+                    registry.emplace<AtmosphereComponent>(entity).fromJson(val.at("atmosphere"));
                 }
             }
         }

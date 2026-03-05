@@ -130,8 +130,8 @@ namespace Metal {
 
     const char *HierarchyPanel::GetIcon(const EntityID entityId) const {
         const auto entity = static_cast<entt::entity>(entityId);
-        if (world->registry.all_of<MeshComponent>(entity)) {
-            return ComponentTypes::IconOf(ComponentTypes::MESH);
+        if (world->registry.all_of<PrimitiveComponent>(entity)) {
+            return ComponentTypes::IconOf(ComponentTypes::PRIMITIVE);
         }
         if (world->registry.all_of<std::unique_ptr<LightComponent> >(entity)) {
             return ComponentTypes::IconOf(ComponentTypes::SPHERE_LIGHT);

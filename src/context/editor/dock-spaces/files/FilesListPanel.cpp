@@ -196,8 +196,6 @@ namespace Metal {
                     break;
                 case EntryType::VOLUME: typeLabel = "Volume";
                     break;
-                case EntryType::MATERIAL: typeLabel = "Material";
-                    break;
                 default: typeLabel = "";
                     break;
             }

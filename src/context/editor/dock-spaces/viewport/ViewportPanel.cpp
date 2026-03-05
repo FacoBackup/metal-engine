@@ -6,18 +6,9 @@
 #include "ViewportHeaderPanel.h"
 #include "EngineFramePanel.h"
 #include "../../../../context/ApplicationContext.h"
-#include "../../../../service/descriptor/DescriptorInstance.h"
-#include "../../../../service/framebuffer/FrameBufferInstance.h"
 #include "../../../../service/camera/Camera.h"
 #include "../../../../context/engine/frame-builder/EngineFrameBuilder.h"
-#include "../../../../service/framebuffer/FrameBufferService.h"
 #include "../../../../enum/engine-definitions.h"
-#include "../../../../dto/buffers/GlobalDataUBO.h"
-#include "../../../../dto/buffers/TileInfoUBO.h"
-#include "../../../../dto/buffers/LightData.h"
-#include "../../../../dto/buffers/VolumeData.h"
-#include "../../../../dto/buffers/MaterialData.h"
-
 #include <algorithm>
 
 namespace Metal {

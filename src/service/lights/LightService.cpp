@@ -5,6 +5,8 @@
 #include "../buffer/BufferInstance.h"
 #include "../../enum/EngineResourceIDs.h"
 
+#include "../../repository/world/components/AtmosphereComponent.h"
+
 namespace Metal {
     void LightService::registerLights() {
         auto view = CTX.worldRepository.registry.view<std::unique_ptr<LightComponent>, TransformComponent>();
@@ -36,14 +38,18 @@ namespace Metal {
     }
 
     void LightService::registerSun() {
-        if (CTX.engineRepository.atmosphereEnabled) {
-            items.push_back(LightData(
-                glm::vec4(sunColor, CTX.engineRepository.sunLightIntensity),
-                sunPosition,
-                glm::vec3(0),
-                glm::vec3(CTX.engineRepository.sunRadius),
-                LightTypes::SPHERE
-            ));
+        auto view = CTX.worldRepository.registry.view<AtmosphereComponent>();
+        if (auto it = view.begin(); it != view.end()) {
+            auto &atmo = CTX.worldRepository.registry.get<AtmosphereComponent>(*it);
+            if (atmo.atmosphereEnabled) {
+                items.push_back(LightData(
+                        glm::vec4(atmo.sunColor, atmo.sunLightIntensity),
+                        atmo.sunPosition,
+                        glm::vec3(0),
+                        glm::vec3(atmo.sunRadius),
+                        LightTypes::SPHERE
+                ));
+            }
         }
     }
 
@@ -56,41 +62,5 @@ namespace Metal {
         if (!items.empty()) {
             CTX.engineContext.currentFrame->getResourceAs<BufferInstance>(RID_LIGHT_BUFFER)->update(items.data());
         }
-    }
-
-
-    void LightService::computeSunInfo() {
-        sunPosition = glm::vec3(0,
-                                std::cos(CTX.engineRepository.elapsedTime),
-                                std::sin(CTX.engineRepository.elapsedTime)) * CTX.engineRepository
-                      .sunDistance;
-        sunColor = LightService::CalculateSunColor(
-            sunPosition.y / CTX.engineRepository.sunDistance,
-            CTX.engineRepository.nightColor, CTX.engineRepository.dawnColor,
-            CTX.engineRepository.middayColor);
-    }
-
-    glm::vec3 LightService::CalculateSunColor(const float elevation, glm::vec3 &nightColor, glm::vec3 &dawnColor,
-                                              glm::vec3 &middayColor) {
-        if (elevation <= -0.1f) {
-            return nightColor;
-        }
-        if (elevation <= 0.0f) {
-            float t = (elevation + 0.1f) / 0.1f;
-            return BlendColors(nightColor, dawnColor, t);
-        }
-        if (elevation <= 0.5f) {
-            float t = elevation / 0.5f;
-            return BlendColors(dawnColor, middayColor, t);
-        }
-        return middayColor;
-    }
-
-    glm::vec3 LightService::BlendColors(glm::vec3 &c1, glm::vec3 &c2, float t) {
-        return {
-            (c1.x * (1 - t) + c2.x * t),
-            (c1.y * (1 - t) + c2.y * t),
-            (c1.z * (1 - t) + c2.z * t)
-        };
     }
 } // Metal

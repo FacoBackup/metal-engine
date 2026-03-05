@@ -34,17 +34,20 @@ namespace Metal {
         }
     }
     void RayTracingService::onSync() {
-        if (!needsRebuild) {
+        if (needsMaterialUpdate) {
             updateMeshMaterials();
+            needsMaterialUpdate = false;
+        }
+        if (!needsRebuild) {
             return;
         }
 
         // Check if any mesh is present and streamed
         bool hasMeshes = false;
-        auto view = CTX.worldRepository.registry.view<MeshComponent, TransformComponent>();
+        auto view = CTX.worldRepository.registry.view<PrimitiveComponent, TransformComponent>();
         for (auto entity: view) {
             if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
-            auto &meshComp = view.get<MeshComponent>(entity);
+            auto &meshComp = view.get<PrimitiveComponent>(entity);
             if (meshComp.meshId.empty()) continue;
             auto *instance = CTX.streamingService.streamMesh(meshComp.meshId);
             if (instance != nullptr && instance->dataBuffer != nullptr && instance->indexBuffer != nullptr) {
@@ -84,22 +87,19 @@ namespace Metal {
     }
 
     void RayTracingService::updateMeshMaterials() {
-        if (!accelerationStructureBuilt || meshMetadata.empty()) return;
+        if (!meshMetadata.empty()) return;
 
         bool changed = false;
-        auto view = CTX.worldRepository.registry.view<MeshComponent>();
+        auto view = CTX.worldRepository.registry.view<PrimitiveComponent>();
 
         for (auto entity: view) {
             if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
-            auto &meshComp = view.get<MeshComponent>(entity);
+            auto &meshComp = view.get<PrimitiveComponent>(entity);
             if (meshComp.meshId.empty()) continue;
 
             if (meshComp.renderIndex < meshMetadata.size()) {
-                unsigned int materialIndex = CTX.materialService.getMaterialIndex(meshComp.materialId);
-                if (meshMetadata[meshComp.renderIndex].materialIndex != materialIndex) {
-                    meshMetadata[meshComp.renderIndex].materialIndex = materialIndex;
-                    changed = true;
-                }
+                CTX.materialService.load(meshMetadata[meshComp.renderIndex], meshComp);
+                changed = true;
             }
         }
 
@@ -145,11 +145,11 @@ namespace Metal {
 
         std::unordered_map<std::string, MeshInstance *> uniqueMeshes;
 
-        auto view = CTX.worldRepository.registry.view<MeshComponent, TransformComponent>();
+        auto view = CTX.worldRepository.registry.view<PrimitiveComponent, TransformComponent>();
 
         for (auto entity: view) {
             if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
-            auto &meshComp = view.get<MeshComponent>(entity);
+            auto &meshComp = view.get<PrimitiveComponent>(entity);
             if (meshComp.meshId.empty()) continue;
             if (uniqueMeshes.contains(meshComp.meshId)) continue;
             auto *instance = CTX.streamingService.streamMesh(meshComp.meshId);
@@ -268,7 +268,7 @@ namespace Metal {
         }
 
         std::vector<VkAccelerationStructureInstanceKHR> instances;
-        auto view = CTX.worldRepository.registry.view<MeshComponent, TransformComponent>();
+        auto view = CTX.worldRepository.registry.view<PrimitiveComponent, TransformComponent>();
 
         unsigned int currentInstanceIndex = 0;
         for (auto entity: view) {
@@ -277,7 +277,7 @@ namespace Metal {
                 break;
             }
             if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
-            auto &meshComp = view.get<MeshComponent>(entity);
+            auto &meshComp = view.get<PrimitiveComponent>(entity);
             if (meshComp.meshId.empty()) continue;
 
             auto it = blasEntries.find(meshComp.meshId);
@@ -302,13 +302,11 @@ namespace Metal {
                 }
             }
 
-            uint32_t materialIndex = CTX.materialService.getMaterialIndex(meshComp.materialId);
-
             VkDeviceAddress vertexAddress = getDeviceAddress(vulkan, it->second.vertexData->vkBuffer);
             VkDeviceAddress indexAddress = getDeviceAddress(vulkan, it->second.indexData->vkBuffer);
 
             meshComp.renderIndex = currentInstanceIndex;
-            meshMetadata.push_back({meshComp.renderIndex, materialIndex, vertexAddress, indexAddress});
+            meshMetadata.push_back({meshComp.renderIndex, vertexAddress, indexAddress});
 
             VkAccelerationStructureInstanceKHR instance{};
             instance.transform = transform;
@@ -324,13 +322,8 @@ namespace Metal {
 
         if (instances.empty()) return;
 
-        if (CTX.engineContext.currentFrame != nullptr) {
-            auto *meshMetadataBuffer = CTX.engineContext.currentFrame->getResourceAs<BufferInstance>(
-                RID_MESH_METADATA_BUFFER);
-            if (meshMetadataBuffer != nullptr) {
-                meshMetadataBuffer->update(meshMetadata.data());
-            }
-        }
+
+        updateMeshMaterials();
 
         instancesBuffer = CTX.bufferService.createBuffer(
             "tlas_instances",

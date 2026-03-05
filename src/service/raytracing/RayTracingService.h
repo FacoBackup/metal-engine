@@ -37,17 +37,23 @@ namespace Metal {
 
         bool accelerationStructureBuilt = false;
         bool needsRebuild = true;
+        bool needsMaterialUpdate = false;
 
         void updateDescriptorSets(VkAccelerationStructureKHR asHandle);
 
         void buildBLAS();
 
         void buildTLAS();
-        void updateMeshMaterials();
 
         void destroyTLAS();
 
+        void updateMeshMaterials();
+
     public:
+        void setNeedsMaterialUpdate(bool val) {
+            needsMaterialUpdate = val;
+        }
+
         void destroyAccelerationStructures();
 
         void onSync() override;

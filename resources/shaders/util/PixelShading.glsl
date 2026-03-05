@@ -67,8 +67,8 @@ vec3 calculateIndirectLighting(MaterialInfo material, SurfaceInteraction interac
         traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xFF, 0, 0, 0, rayOrigin, 0.001, wi, 1000.0, 0);
 
         if (!payload.hit) {
-            if (pushConstants.isAtmosphereEnabled != 0) {
-                bounceInfo.material.baseColor = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), wi, 2.0f) * 0.05f;
+            if (atmosphereData.isAtmosphereEnabled != 0) {
+                bounceInfo.material.baseColor = calculate_sky_luminance_rgb(normalize(atmosphereData.sunPosition), wi, 2.0f) * 0.05f;
                 bounceInfo.material.isEmissive = true;
                 bounceInfo.interaction.point = rayOrigin + wi * 1000.0; // Placeholder point for atmosphere
                 computeRadiance(bounceInfo);

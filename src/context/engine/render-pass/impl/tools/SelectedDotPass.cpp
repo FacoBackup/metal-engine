@@ -34,11 +34,11 @@ namespace Metal {
             }
             const EntityID entityId = pair.first;
             const auto entity = static_cast<entt::entity>(entityId);
-            if (!worldRepository.registry.all_of<MeshComponent>(entity) || !worldRepository.registry.all_of<TransformComponent>(entity)) {
+            if (!worldRepository.registry.all_of<PrimitiveComponent>(entity) || !worldRepository.registry.all_of<TransformComponent>(entity)) {
                 continue;
             }
 
-            const auto &mesh = worldRepository.registry.get<MeshComponent>(entity);
+            const auto &mesh = worldRepository.registry.get<PrimitiveComponent>(entity);
             if (mesh.meshId.empty()) {
                 continue;
             }

@@ -66,9 +66,9 @@ namespace Metal {
 
         const unsigned int renderIndex = static_cast<unsigned int>(idValue + 0.5f) - 1;
 
-        auto view = CTX.worldRepository.registry.view<MeshComponent, TransformComponent>();
+        auto view = CTX.worldRepository.registry.view<PrimitiveComponent, TransformComponent>();
         for (auto entity: view) {
-            auto &mesh = view.get<MeshComponent>(entity);
+            auto &mesh = view.get<PrimitiveComponent>(entity);
             if (mesh.renderIndex == renderIndex) {
                 return static_cast<EntityID>(entity);
             }

@@ -17,7 +17,6 @@ namespace Metal {
 
         bool multipleImportanceSampling = false;
         int maxVideoFrames = 100;
-        int volumeShadowSteps = 8;
         int shadingResInvScale = 2;
         int pathTracerMaxSamples = 200;
         float pathTracingEmissiveFactor = 2;
@@ -26,16 +25,6 @@ namespace Metal {
         int pathTracerAccumulationCount = 0;
         float pathTracerMultiplier = 1;
         int numberOfTiles = 10;
-        float elapsedTime = .5f;
-        bool atmosphereEnabled = false;
-        bool incrementTime = false;
-        float elapsedTimeSpeed = 1;
-        float sunDistance = 10000;
-        float sunRadius = 3000;
-        float sunLightIntensity = 2;
-        glm::vec3 dawnColor{1, .39f, .19f};
-        glm::vec3 nightColor{.1f, .1f, .1f};
-        glm::vec3 middayColor{.9f, .9f, .9f};
         std::vector<std::string> svoFilePaths{};
 
         void registerFields() override;

@@ -4,9 +4,6 @@
 #include "../../service/voxel/SVOInstance.h"
 #include "../../service/mesh/MeshInstance.h"
 #include "../../service/texture/TextureInstance.h"
-#include <iostream>
-#include "../../repository/abstract/RuntimeResource.h"
-#include "../../service/material/MaterialInstance.h"
 
 namespace Metal {
     static constexpr int MAX_TIMEOUT = 10000;
@@ -39,10 +36,6 @@ namespace Metal {
             return instance;
         }
         return nullptr;
-    }
-
-    MaterialInstance *StreamingService::streamMaterial(const std::string &id) {
-        return stream(CTX.materialService, id, lastUse, tries);
     }
 
     SVOInstance *StreamingService::streamSVO(const std::string &id) {
@@ -81,7 +74,6 @@ namespace Metal {
             disposeResources(CTX.meshService, lastUse);
             disposeResources(CTX.textureService, lastUse);
             disposeResources(CTX.voxelService, lastUse);
-            disposeResources(CTX.materialService, lastUse);
         }
     }
 }

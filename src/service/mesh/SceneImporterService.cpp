@@ -4,6 +4,7 @@
 #include "MeshData.h"
 #include "EntityAssetData.h"
 #include "SceneData.h"
+#include "../material/MaterialImporterService.h"
 #include <iostream>
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
@@ -68,7 +69,7 @@ namespace Metal {
             throw std::runtime_error("Import cancelled");
         }
 
-        std::unordered_map<unsigned int, std::string> materialsMap{};
+        std::unordered_map<unsigned int, MaterialData> materialsMap{};
         fs::path absolutePath = fs::absolute(pathToFile);
         fs::path directoryPath = absolutePath.parent_path();
 
@@ -95,7 +96,7 @@ namespace Metal {
     void SceneImporterService::ProcessNode(int &increment, SceneData &scene, const aiNode *node, int parentId,
                                            const std::unordered_map<unsigned int, std::string> &meshMap,
                                            const std::unordered_map<std::string, unsigned int> &meshMaterialMap,
-                                           const std::unordered_map<unsigned int, std::string> &materialsMap,
+                                           const std::unordered_map<unsigned int, MaterialData> &materialsMap,
                                            const std::stop_token &stopToken) {
         if (stopToken.stop_requested()) return;
         auto &currentNode = scene.entities.emplace_back();
@@ -127,7 +128,11 @@ namespace Metal {
             if (meshMaterialMap.contains(childMeshNode.meshId)) {
                 unsigned int matIndex = meshMaterialMap.at(childMeshNode.meshId);
                 if (materialsMap.contains(matIndex)) {
-                    childMeshNode.materialId = materialsMap.at(matIndex);
+                    const auto &matData = materialsMap.at(matIndex);
+                    childMeshNode.albedo = matData.albedo;
+                    childMeshNode.normal = matData.normal;
+                    childMeshNode.roughness = matData.roughness;
+                    childMeshNode.metallic = matData.metallic;
                 }
             }
             increment++;
