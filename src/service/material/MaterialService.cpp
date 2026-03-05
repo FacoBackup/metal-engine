@@ -16,13 +16,7 @@ namespace Metal {
         materialData.ior = data.ior;
         materialData.isEmissive = data.isEmissive ? 1 : 0;
 
-        materialData.useAlbedoTexture = !data.albedo.empty();
-        materialData.useNormalTexture = !data.normal.empty();
-        materialData.useRoughnessTexture = !data.roughness.empty();
-        materialData.useMetallicTexture = !data.metallic.empty();
-
         materialData.albedoTextureId = 0;
-        materialData.normalTextureId = 0;
         materialData.roughnessTextureId = 0;
         materialData.metallicTextureId = 0;
 
@@ -30,12 +24,6 @@ namespace Metal {
             auto *tex = CTX.textureService.create(data.albedo);
             if (tex != nullptr) {
                 materialData.albedoTextureId = CTX.textureService.getTextureIndex(data.albedo);
-            }
-        }
-        if (!data.normal.empty()) {
-            auto *tex = CTX.textureService.create(data.normal);
-            if (tex != nullptr) {
-                materialData.normalTextureId = CTX.textureService.getTextureIndex(data.normal);
             }
         }
         if (!data.roughness.empty()) {

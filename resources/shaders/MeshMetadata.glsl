@@ -16,13 +16,7 @@ struct MeshMetadata {
     float ior;
     uint isEmissive;
 
-    uint useAlbedoTexture;
-    uint useNormalTexture;
-    uint useRoughnessTexture;
-    uint useMetallicTexture;
-
     uint albedoTexture;
-    uint normalTexture;
     uint roughnessTexture;
     uint metallicTexture;
 };

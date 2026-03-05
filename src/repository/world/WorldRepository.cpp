@@ -94,7 +94,6 @@ namespace Metal {
         registerChange();
         deleteRecursively(entities);
         CTX.engineContext.setUpdateLights(true);
-        CTX.engineContext.setUpdateVolumes(true);
         CTX.rayTracingService.markDirty();
     }
 
@@ -102,7 +101,6 @@ namespace Metal {
         registerChange();
         changeVisibilityRecursively(entity, isVisible);
         CTX.engineContext.setUpdateLights(true);
-        CTX.engineContext.setUpdateVolumes(true);
         CTX.rayTracingService.markDirty();
     }
 
@@ -154,15 +152,12 @@ namespace Metal {
                 auto &vol = registry.emplace_or_replace<VolumeComponent>(entity);
                 vol.setEntityId(entityId);
                 createComponent(entityId, ComponentTypes::TRANSFORM);
-                CTX.engineContext.setUpdateVolumes(true);
                 break;
             }
             case ComponentTypes::TRANSFORM: {
                 if (!registry.all_of<TransformComponent>(entity)) {
                     auto &trans = registry.emplace<TransformComponent>(entity);
                     trans.setEntityId(entityId);
-                    CTX.worldGridRepository.getCurrentTile()->entities.push_back(entityId);
-                    registry.get<EntityComponent>(entity).onTile = CTX.worldGridRepository.getCurrentTile()->id;
                 }
                 break;
             }

@@ -11,7 +11,6 @@
 namespace Metal {
     struct MaterialData {
         std::string albedo;
-        std::string normal;
         std::string roughness;
         std::string metallic;
     };
@@ -19,7 +18,7 @@ namespace Metal {
     class MaterialImporterService final : public AbstractRuntimeComponent {
     public:
 
-        void persistAllMaterials(const std::string &targetDir, const aiScene *scene,
+        void collectMaterials(const std::string &targetDir, const aiScene *scene,
                                  std::unordered_map<unsigned int, MaterialData> &materialMap,
                                  const std::string &rootDirectory,
                                  const std::stop_token &stopToken = {}) const;

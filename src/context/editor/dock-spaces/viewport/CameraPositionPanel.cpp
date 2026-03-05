@@ -19,11 +19,6 @@ namespace Metal {
         if (ImGui::Begin(id.c_str(), &UIUtil::OPEN, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar |
             ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse)) {
             const auto &positionCamera = CTX.worldRepository.camera.position;
-            ImGui::Text("Current tile: %i %i | N of tiles: %i",
-                        CTX.worldGridRepository.getCurrentTile()->x,
-                        CTX.worldGridRepository.getCurrentTile()->z,
-                        CTX.worldGridRepository.getTiles().size());
-            ImGui::SameLine();
             ImGui::TextColored(RED, "X: %i", static_cast<int>(positionCamera.x));
             ImGui::SameLine();
             ImGui::TextColored(GREEN, "Y: %i", static_cast<int>(positionCamera.y));

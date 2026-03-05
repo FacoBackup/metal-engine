@@ -42,8 +42,6 @@ namespace Metal {
             LOG_WARN("Entity will not be transformed because it is set to static " + std::to_string(st->getEntityId()));
             return;
         }
-        translation = glm::vec3(st->model[3]);
-        auto *previousTile = CTX.worldGridRepository.getOrCreateTile(translation);
 
         auxMat42 = glm::identity<glm::mat4>();
         auxMat42 = glm::translate(auxMat42, st->translation); // Translation
@@ -53,10 +51,6 @@ namespace Metal {
         st->model = auxMat4 * auxMat42;
         st->freezeVersion();
 
-        translation = glm::vec3(st->model[3]);
-        auto *newTile = CTX.worldGridRepository.getOrCreateTile(translation);
-
-        CTX.worldGridRepository.moveBetweenTiles(st->getEntityId(), previousTile, newTile);
         if (CTX.worldRepository.registry.all_of<PrimitiveComponent>(static_cast<entt::basic_registry<>::entity_type>(st->getEntityId()))) {
             CTX.rayTracingService.markDirty();
         }

@@ -192,9 +192,6 @@ add_executable(
         src/context/editor/abstract/form/types/QuatField.h
         src/service/transform/TransformService.cpp
         src/service/transform/TransformService.h
-        src/repository/world/impl/WorldGridRepository.cpp
-        src/repository/world/impl/WorldGridRepository.h
-        src/repository/world/impl/WorldTile.h
         src/repository/world/impl/BoundingBox.h
         src/service/voxel/impl/SparseVoxelOctreeBuilder.cpp
         src/service/voxel/impl/SparseVoxelOctreeBuilder.h
@@ -226,8 +223,6 @@ add_executable(
         src/service/picking/PickingService.cpp
         src/service/picking/PickingService.h
         src/service/voxel/SVOInstance.h
-        src/service/world/WorldGridService.cpp
-        src/service/world/WorldGridService.h
         src/dto/buffers/TileInfoUBO.h
         src/dto/buffers/LightData.h
         src/repository/world/components/LightComponent.cpp
@@ -260,8 +255,6 @@ add_executable(
         src/service/voxel/VoxelImporterService.cpp
         src/service/voxel/VoxelImporterService.h
         src/dto/buffers/VolumeData.h
-        src/service/volumes/VolumeService.cpp
-        src/service/volumes/VolumeService.h
         src/service/voxel/VoxelService.cpp
         src/service/voxel/VoxelService.h
         src/util/Serializable.cpp

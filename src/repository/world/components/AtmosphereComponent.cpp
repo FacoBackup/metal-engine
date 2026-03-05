@@ -53,8 +53,7 @@ namespace Metal {
     void AtmosphereComponent::onUpdate(InspectableMember *member) {
         CTX.engineContext.setGISettingsUpdated(true);
         CTX.engineContext.setUpdateLights(true);
-        CTX.engineContext.setUpdateVolumes(true);
-        
+
         sunPosition = glm::vec3(0,
                                    std::cos(elapsedTime),
                                    std::sin(elapsedTime)) * sunDistance;

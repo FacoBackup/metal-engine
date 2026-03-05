@@ -73,7 +73,7 @@ namespace Metal {
         fs::path absolutePath = fs::absolute(pathToFile);
         fs::path directoryPath = absolutePath.parent_path();
 
-        CTX.materialImporterService.persistAllMaterials(targetDir, scene, materialsMap, directoryPath.string(),
+        CTX.materialImporterService.collectMaterials(targetDir, scene, materialsMap, directoryPath.string(),
                                                             stopToken);
 
         if (stopToken.stop_requested()) {
@@ -130,7 +130,6 @@ namespace Metal {
                 if (materialsMap.contains(matIndex)) {
                     const auto &matData = materialsMap.at(matIndex);
                     childMeshNode.albedo = matData.albedo;
-                    childMeshNode.normal = matData.normal;
                     childMeshNode.roughness = matData.roughness;
                     childMeshNode.metallic = matData.metallic;
                 }

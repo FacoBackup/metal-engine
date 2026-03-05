@@ -48,10 +48,8 @@ namespace Metal {
         previousPositionIndex = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_POSITION_INDEX);
         previousNormal = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_NORMAL);
 
-        bool worldChanged = CTX.engineContext.isUpdateLights() || CTX.worldGridService.isNotFrozen();
         if (isFirstRun || CTX.engineContext.isCameraUpdated() || CTX.engineContext.isGISettingsUpdated() ||
-            worldChanged) {
-            CTX.worldGridService.freezeVersion();
+            CTX.engineContext.isUpdateLights()) {
             clearTexture(rawRenderedFrame->vkImage);
             clearTexture(accumulatedFrame->vkImage);
             CTX.engineContext.resetPathTracerAccumulationCount();

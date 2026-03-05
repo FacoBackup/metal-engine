@@ -8,7 +8,7 @@
 #include "../../util/serialization-definitions.h"
 
 namespace Metal {
-    void MaterialImporterService::persistAllMaterials(const std::string &targetDir, const aiScene *scene,
+    void MaterialImporterService::collectMaterials(const std::string &targetDir, const aiScene *scene,
                                                       std::unordered_map<unsigned int, MaterialData> &materialMap,
                                                       const std::string &rootDirectory,
                                                       const std::stop_token &stopToken) const {
@@ -65,17 +65,13 @@ namespace Metal {
             trySetFromType(materialData.albedo, aiTextureType_BASE_COLOR, "albedo");
             trySetFromType(materialData.albedo, aiTextureType_DIFFUSE, "albedo");
 
-            // Normal
-            trySetFromType(materialData.normal, aiTextureType_NORMALS, "normal");
-            trySetFromType(materialData.normal, aiTextureType_NORMAL_CAMERA, "normal");
-
             // Metallic / Roughness
             trySetFromType(materialData.metallic, aiTextureType_METALNESS, "metallic");
             trySetFromType(materialData.roughness, aiTextureType_DIFFUSE_ROUGHNESS, "roughness");
 
 
             // If we didn't import any textures, don't create/persist a material at all.
-            if (materialData.albedo.empty() && materialData.normal.empty() && materialData.roughness.empty() &&
+            if (materialData.albedo.empty() && materialData.roughness.empty() &&
                 materialData.metallic.empty()) {
                 LOG_INFO("Skipping material " + std::to_string(i) + ": no textures associated");
                 continue;

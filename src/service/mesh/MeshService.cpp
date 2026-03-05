@@ -29,16 +29,14 @@ namespace Metal {
         instance->dataBuffer = CTX.bufferService.createBuffer(
             id + "_data",
             sizeof(VertexData) * data->data.size(),
-            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR |
-            VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
+            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
             data->data.data(),
             true);
 
         instance->indexBuffer = CTX.bufferService.createBuffer(
             id + "_indices",
             sizeof(unsigned int) * data->indices.size(),
-            VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR |
-            VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
+            VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
             data->indices.data(),
             true);
 
@@ -69,7 +67,6 @@ namespace Metal {
 
         if (data != nullptr) {
             mesh.albedo = data->albedo;
-            mesh.normal = data->normal;
             mesh.roughness = data->roughness;
             mesh.metallic = data->metallic;
             mesh.albedoColor = data->albedoColor;

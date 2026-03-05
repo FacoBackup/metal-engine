@@ -18,7 +18,6 @@ namespace Metal {
     }
 
     void EngineContext::onInitialize() {
-        CTX.worldGridService.onSync();
     }
 
     void EngineContext::updateCurrentTime() {
@@ -45,7 +44,6 @@ namespace Metal {
         updateCurrentTime();
 
         CTX.transformService.onSync();
-        CTX.worldGridService.onSync();
         CTX.streamingService.onSync();
         CTX.cameraService.onSync();
 
@@ -55,10 +53,6 @@ namespace Metal {
 
                 if (updateLights || isFirstFrame) {
                     CTX.lightService.onSync();
-                }
-
-                if (updateVolumes || isFirstFrame) {
-                    CTX.volumeService.onSync();
                 }
 
                 isFirstFrame = false;

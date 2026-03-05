@@ -20,13 +20,9 @@ namespace Metal {
 
     void TransformComponent::onUpdate(InspectableMember *member) {
         const auto e = static_cast<entt::entity>(entityId);
-        bool isVolume = CTX.worldRepository.registry.all_of<VolumeComponent>(e);
         bool isLight = CTX.worldRepository.registry.all_of<std::unique_ptr<LightComponent> >(e);
         if (isLight) {
             CTX.engineContext.setUpdateLights(true);
-        }
-        if (isVolume) {
-            CTX.engineContext.setUpdateVolumes(true);
         }
         if (member != nullptr && member->name == ROTATION) {
             rotation = normalize(glm::quat(rotationEuler * (glm::pi<float>() / 180.f)));

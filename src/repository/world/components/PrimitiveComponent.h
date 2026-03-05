@@ -10,7 +10,6 @@ namespace Metal {
         std::string meshId;
 
         std::string albedo;
-        std::string normal;
         std::string roughness;
         std::string metallic;
         glm::vec3 albedoColor{1, 1, 1};

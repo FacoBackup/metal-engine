@@ -8,7 +8,6 @@
 #include "vulkan/VulkanContext.h"
 
 #include "../service/mesh/MeshService.h"
-#include "../service/world/WorldGridService.h"
 #include "../service/texture/TextureService.h"
 #include "../service/framebuffer/FrameBufferService.h"
 #include "../service/pipeline/PipelineService.h"
@@ -25,7 +24,6 @@
 #include "../service/files/FileImporterService.h"
 #include "../service/camera/CameraService.h"
 
-#include "../repository/world/impl/WorldGridRepository.h"
 #include "../repository/world/WorldRepository.h"
 #include "../repository/runtime/RuntimeRepository.h"
 #include "../repository/streaming/StreamingService.h"
@@ -39,7 +37,6 @@
 #include "../service/log/LogService.h"
 #include "../service/transform/TransformService.h"
 #include "../service/picking/PickingService.h"
-#include "../service/volumes/VolumeService.h"
 #include "../service/voxel/VoxelImporterService.h"
 #include "../service/voxel/VoxelService.h"
 #include "../service/lights/LightService.h"
@@ -88,10 +85,8 @@ namespace Metal {
         FileImporterService fileImporterService{};
         CameraService cameraService{};
         PickingService pickingService{};
-        WorldGridService worldGridService{};
         TransformService transformService{};
         LightService lightService{};
-        VolumeService volumeService{};
         RayTracingService rayTracingService{};
         CommandBufferRecorderService commandBufferRecorderService{};
         VoxelImporterService voxelImporterService{};
@@ -99,7 +94,6 @@ namespace Metal {
         // ----------- Services
 
         // ----------- Repository
-        WorldGridRepository worldGridRepository{};
         WorldRepository worldRepository{};
         RuntimeRepository runtimeRepository{};
         StreamingService streamingService{};

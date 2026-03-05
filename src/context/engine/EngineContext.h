@@ -20,7 +20,6 @@ namespace Metal {
         long long start = -1;
         bool cameraUpdated = true;
         bool updateLights = true;
-        bool updateVolumes = true;
         bool giSettingsUpdated = true;
         bool isFirstFrame = true;
 
@@ -33,14 +32,6 @@ namespace Metal {
 
         [[nodiscard]] bool isUpdateLights() const {
             return updateLights;
-        }
-
-        void setUpdateVolumes(const bool val) {
-            updateVolumes = val;
-        }
-
-        [[nodiscard]] bool isUpdateVolumes() const {
-            return updateVolumes;
         }
 
         void setCameraUpdated(const bool val) {

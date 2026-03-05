@@ -30,9 +30,6 @@ namespace Metal {
     }
 
     void EngineRepository::onUpdate(InspectableMember *member) {
-        if (member != nullptr && member->name == LEVEL_OF_DETAIL) {
-            CTX.worldGridRepository.hasMainTileChanged = true;
-        }
         if (member != nullptr && (member->group == PATH_TRACER || member->group == DEPTH_OF_FIELD)) {
             CTX.engineContext.setGISettingsUpdated(true);
             CTX.engineContext.setUpdateLights(true);

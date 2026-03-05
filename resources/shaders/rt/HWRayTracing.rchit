@@ -72,17 +72,17 @@ void main() {
     bool isEmissive = false;
 
     if (matIndex != 0u) { 
-        if (metadata.useAlbedoTexture == 1u) {
+        if (metadata.albedoTexture != 0u) {
             baseColor = texture(textureArray[nonuniformEXT(metadata.albedoTexture)], uv).rgb;
         } else {
             baseColor = metadata.albedo;
         }
-        if (metadata.useRoughnessTexture == 1u) {
+        if (metadata.roughnessTexture != 0u) {
             roughness = texture(textureArray[nonuniformEXT(metadata.roughnessTexture)], uv).r;
         } else {
             roughness = metadata.roughness;
         }
-        if (metadata.useMetallicTexture == 1u) {
+        if (metadata.metallicTexture != 0u) {
             metallic = texture(textureArray[nonuniformEXT(metadata.metallicTexture)], uv).r;
         } else {
             metallic = metadata.metallic;

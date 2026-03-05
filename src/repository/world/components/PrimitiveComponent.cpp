@@ -14,7 +14,6 @@ namespace Metal {
         registerFloat(thicknessFactor, "Material", "Thickness factor", 0, 10);
         registerFloat(ior, "Material", "IOR", 1, 3);
         registerResourceSelection(albedo, "Material", "Albedo", EntryType::TEXTURE);
-        registerResourceSelection(normal, "Material", "Normal", EntryType::TEXTURE);
         registerResourceSelection(roughness, "Material", "Roughness texture", EntryType::TEXTURE);
         registerResourceSelection(metallic, "Material", "Metallic Texture", EntryType::TEXTURE);
     }
@@ -43,7 +42,6 @@ namespace Metal {
         j["entityId"] = entityId;
         j["meshId"] = meshId;
         j["albedo"] = albedo;
-        j["normal"] = normal;
         j["roughness"] = roughness;
         j["metallic"] = metallic;
         j["albedoColor"] = {albedoColor.x, albedoColor.y, albedoColor.z};
@@ -61,7 +59,6 @@ namespace Metal {
         meshId = j.at("meshId").get<std::string>();
 
         albedo = j.at("albedo").get<std::string>();
-        normal = j.at("normal").get<std::string>();
         roughness = j.at("roughness").get<std::string>();
         metallic = j.at("metallic").get<std::string>();
         roughnessFactor = j.at("roughnessFactor").get<float>();

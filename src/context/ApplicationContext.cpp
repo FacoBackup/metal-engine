@@ -42,7 +42,6 @@ namespace Metal {
         }
         PARSE_TEMPLATE(editorRepository, rootDirectory + "/" + HASH_OF_CLASS_NAME(EditorRepository) + ".json")
         PARSE_TEMPLATE(engineRepository, rootDirectory + "/" + HASH_OF_CLASS_NAME(EngineRepository) + ".json")
-        PARSE_TEMPLATE(worldGridRepository, rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldGridRepository) + ".json")
         PARSE_TEMPLATE(worldRepository, rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository) + ".json")
 
 
@@ -127,7 +126,6 @@ namespace Metal {
         try {
             DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(EditorRepository) + ".json", editorRepository)
             DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(EngineRepository) + ".json", engineRepository)
-            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldGridRepository) + ".json", worldGridRepository)
             DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository) + ".json", worldRepository)
             notificationService.pushMessage("Project saved", NotificationSeverities::SUCCESS);
         } catch (const std::exception &e) {

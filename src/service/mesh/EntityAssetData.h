@@ -13,7 +13,6 @@ namespace Metal {
         int id;
 
         std::string albedo;
-        std::string normal;
         std::string roughness;
         std::string metallic;
         glm::vec3 albedoColor{1, 1, 1};
@@ -32,7 +31,6 @@ namespace Metal {
             j["parentEntity"] = parentEntity;
 
             j["albedo"] = albedo;
-            j["normal"] = normal;
             j["roughness"] = roughness;
             j["metallic"] = metallic;
             j["albedoColor"] = {albedoColor.x, albedoColor.y, albedoColor.z};
@@ -52,7 +50,6 @@ namespace Metal {
             parentEntity = j.at("parentEntity").get<int>();
 
             albedo = j.value("albedo", "");
-            normal = j.value("normal", "");
             roughness = j.value("roughness", "");
             metallic = j.value("metallic", "");
             if (j.contains("albedoColor")) {

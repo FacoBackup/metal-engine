@@ -51,9 +51,8 @@ namespace Metal {
             openvdb::initialize();
         });
 
-        auto *targetTile = CTX.worldGridRepository.getTile(glm::vec3(0, 0, 0));
         int resolution = 12;
-        auto builder = SparseVoxelOctreeBuilder(targetTile->boundingBox, 32);
+        auto builder = SparseVoxelOctreeBuilder(BoundingBox{glm::vec3(-32, -32, -32), glm::vec3(32, 32, 32), glm::vec3(0, 0, 0)}, 32);
 
         try {
             openvdb::io::File file(sourcePath);

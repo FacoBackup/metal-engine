@@ -10,14 +10,12 @@
 
 namespace Metal {
     struct EntityComponent final : Inspectable, Serializable {
-        std::string onTile;
         std::string name = "New entity";
         glm::vec3 color{};
         bool isContainer = false;
 
         nlohmann::json toJson() const override {
             nlohmann::json j;
-            j["onTile"] = onTile;
             j["name"] = name;
             j["color"] = {color.x, color.y, color.z};
             j["isContainer"] = isContainer;
@@ -25,7 +23,6 @@ namespace Metal {
         }
 
         void fromJson(const nlohmann::json &j) override {
-            onTile = j.at("onTile").get<std::string>();
             name = j.at("name").get<std::string>();
             color.x = j.at("color")[0].get<float>();
             color.y = j.at("color")[1].get<float>();
