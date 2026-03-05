@@ -52,45 +52,46 @@ namespace Metal {
         });
 
         int resolution = 12;
-        auto builder = SparseVoxelOctreeBuilder(BoundingBox{glm::vec3(-32, -32, -32), glm::vec3(32, 32, 32), glm::vec3(0, 0, 0)}, 32);
+        // auto builder = SparseVoxelOctreeBuilder(BoundingBox{glm::vec3(-32, -32, -32), glm::vec3(32, 32, 32), glm::vec3(0, 0, 0)}, 32);
+        //
+        // try {
+        //     openvdb::io::File file(sourcePath);
+        //     file.open();
+        //     openvdb::GridPtrVecPtr gridsPtr = file.getGrids();
+        //     file.close();
+        //     if (!gridsPtr) {
+        //         throw std::runtime_error("No grids found in VDB file.");
+        //     }
+        //
+        //     if (stopToken.stop_requested()) {
+        //         return 0;
+        //     }
+        //
+        //     for (const auto &gridPtr: *gridsPtr) {
+        //         if (auto floatGrid = openvdb::gridPtrCast<openvdb::FloatGrid>(gridPtr)) {
+        //             for (auto iter = floatGrid->beginValueOn(); iter; ++iter) {
+        //                 if (stopToken.stop_requested()) {
+        //                     return 0;
+        //                 }
+        //                 const openvdb::Coord xyz = iter.getCoord();
+        //                 const openvdb::Vec3d worldPos = floatGrid->transform().indexToWorld(xyz);
+        //                 const glm::vec3 volumePoint(worldPos.x(), worldPos.y(), worldPos.z());
+        //
+        //                 const glm::vec3 albedo(0.5f);
+        //                 const glm::vec3 normal(0.5f);
+        //                 const VoxelData data{albedo, normal, true};
+        //
+        //                 builder.insert(resolution, volumePoint, data);
+        //             }
+        //             break;
+        //         }
+        //     }
+        // } catch (const std::exception &e) {
+        //     throw std::runtime_error("VDB conversion failed: " + std::string(e.what()));
+        // }
 
-        try {
-            openvdb::io::File file(sourcePath);
-            file.open();
-            openvdb::GridPtrVecPtr gridsPtr = file.getGrids();
-            file.close();
-            if (!gridsPtr) {
-                throw std::runtime_error("No grids found in VDB file.");
-            }
-
-            if (stopToken.stop_requested()) {
-                return 0;
-            }
-
-            for (const auto &gridPtr: *gridsPtr) {
-                if (auto floatGrid = openvdb::gridPtrCast<openvdb::FloatGrid>(gridPtr)) {
-                    for (auto iter = floatGrid->beginValueOn(); iter; ++iter) {
-                        if (stopToken.stop_requested()) {
-                            return 0;
-                        }
-                        const openvdb::Coord xyz = iter.getCoord();
-                        const openvdb::Vec3d worldPos = floatGrid->transform().indexToWorld(xyz);
-                        const glm::vec3 volumePoint(worldPos.x(), worldPos.y(), worldPos.z());
-
-                        const glm::vec3 albedo(0.5f);
-                        const glm::vec3 normal(0.5f);
-                        const VoxelData data{albedo, normal, true};
-
-                        builder.insert(resolution, volumePoint, data);
-                    }
-                    break;
-                }
-            }
-        } catch (const std::exception &e) {
-            throw std::runtime_error("VDB conversion failed: " + std::string(e.what()));
-        }
-
-        return serialize(builder, outPath);
+        // return serialize(builder, outPath);
+        return 0;
     }
 
     void VoxelImporterService::FillStorage(SparseVoxelOctreeBuilder &builder, unsigned int &bufferIndex,

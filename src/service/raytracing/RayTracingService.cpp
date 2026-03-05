@@ -87,8 +87,6 @@ namespace Metal {
     }
 
     void RayTracingService::updateMeshMaterials() {
-        if (!meshMetadata.empty()) return;
-
         bool changed = false;
         auto view = CTX.worldRepository.registry.view<PrimitiveComponent>();
 
