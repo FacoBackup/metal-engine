@@ -10,7 +10,7 @@
 #include "../../context/ApplicationContext.h"
 
 namespace Metal {
-   void FrameBufferService::createSampler(bool linear, VkSampler &vkImageSampler) {
+    void FrameBufferService::createSampler(bool linear, VkSampler &vkImageSampler) {
         VkSamplerCreateInfo samplerCreateInfo{};
         samplerCreateInfo.magFilter = linear ? VK_FILTER_LINEAR : VK_FILTER_NEAREST;
         samplerCreateInfo.minFilter = linear ? VK_FILTER_LINEAR : VK_FILTER_NEAREST;
@@ -30,7 +30,8 @@ namespace Metal {
                                                    &vkImageSampler));
     }
 
-    FrameBufferInstance *FrameBufferService::createFrameBuffer(const std::string &id, const unsigned w, const unsigned h, glm::vec4 clearColor) {
+    FrameBufferInstance *FrameBufferService::createFrameBuffer(const std::string &id, const unsigned w,
+                                                               const unsigned h, glm::vec4 clearColor) {
         auto *framebuffer = createResourceInstance(id);
         framebuffer->bufferWidth = w;
         framebuffer->bufferHeight = h;
@@ -41,25 +42,24 @@ namespace Metal {
 
     void FrameBufferService::createDepthAttachment(FrameBufferInstance *framebuffer) const {
         VkFormat depthFormat = VulkanUtils::GetValidDepthFormat(CTX.vulkanContext.physDevice.physical_device);
-        const auto att = createAttachmentInternal("Depth attachment", depthFormat,
+        const auto att = createAttachmentInternal(depthFormat,
                                                   VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, framebuffer);
         att->depth = true;
     }
 
-    void FrameBufferService::createAttachment(const char *name, VkFormat format, VkImageUsageFlagBits usage,
+    void FrameBufferService::createAttachment(VkFormat format, VkImageUsageFlagBits usage,
                                               FrameBufferInstance *framebuffer) const {
-        const auto att = createAttachmentInternal(name, format,
+        const auto att = createAttachmentInternal(format,
                                                   usage,
                                                   framebuffer);
         att->depth = false;
     }
 
     std::shared_ptr<FrameBufferAttachment> FrameBufferService::createAttachmentInternal(
-        const char *name, VkFormat format,
+        VkFormat format,
         VkImageUsageFlagBits usage,
         FrameBufferInstance *framebuffer) const {
         std::shared_ptr<FrameBufferAttachment> attachment = std::make_shared<FrameBufferAttachment>();
-        attachment->name = name;
         framebuffer->attachments.push_back(attachment);
         attachment->format = format;
 
@@ -90,7 +90,8 @@ namespace Metal {
         image.initialLayout = layout;
         image.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-        VulkanUtils::CheckVKResult(vkCreateImage(CTX.vulkanContext.device.device, &image, nullptr, &attachment->vkImage));
+        VulkanUtils::CheckVKResult(
+            vkCreateImage(CTX.vulkanContext.device.device, &image, nullptr, &attachment->vkImage));
 
         VkMemoryAllocateInfo memAlloc{};
         VkMemoryRequirements memReqs;

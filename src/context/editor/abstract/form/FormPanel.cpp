@@ -17,19 +17,19 @@
 
 namespace Metal {
     void FormPanel::processFields(Inspectable *inspection) {
-        std::unordered_map<std::string, ChildPanel *> groups{};
-        const auto rootPanel = new AccordionPanel();
+        std::unordered_map<std::string, AccordionPanel *> groups{};
+        const auto rootPanel = new ChildPanel();
         rootPanel->setFilter(&searchFilter);
         appendChild(rootPanel);
         rootPanel->setTitle(std::string(inspection->getIcon()) + " " + inspection->getTitle());
         for (const auto &field: inspection->getFields()) {
             if (!groups.contains(field->group)) {
-                const auto panel = new ChildPanel();
+                const auto panel = new AccordionPanel();
                 panel->setFilter(&searchFilter);
                 groups[field->group] = panel;
                 rootPanel->appendChild(panel);
             }
-            ChildPanel *group = groups[field->group];
+            AccordionPanel *group = groups[field->group];
             group->setTitle(field->group);
             AbstractFormFieldPanel *fieldPanel = nullptr;
             switch (field->type) {

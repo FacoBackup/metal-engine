@@ -1,4 +1,4 @@
-#include "SelectedDotPass.h"
+#include "SelectionIDPass.h"
 
 #include "../../../../../context/ApplicationContext.h"
 #include "../../../../../repository/world/components/TransformComponent.h"
@@ -7,26 +7,24 @@
 #include "../../../../../enum/EngineResourceIDs.h"
 
 namespace Metal {
-    void SelectedDotPass::onInitialize() {
+    void SelectionIDPass::onInitialize() {
         PipelineBuilder builder = PipelineBuilder::Of(
-                   getScopedResourceId(RID_POST_PROCESSING_FBO),
-                    "tools/SelectedDot.vert",
-                    "tools/SelectedDot.frag"
+                   getScopedResourceId(RID_SELECTION_FBO),
+                    "tools/SelectionID.vert",
+                    "tools/SelectionID.frag"
                 )
-                .setBlendEnabled()
                 .setPrepareForMesh()
-                .setCullMode(VK_CULL_MODE_BACK_BIT)
+                .setCullMode(VK_CULL_MODE_NONE)
                 .setPushConstantsSize(sizeof(SelectedDotPushConstant))
-                .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
-                .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_POSITION_INDEX));
+                .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA));
         pipelineInstance = CTX.pipelineService.createPipeline(builder);
     }
 
-    bool SelectedDotPass::shouldRun() {
+    bool SelectionIDPass::shouldRun() {
         return !CTX.editorRepository.selected.empty();
     }
 
-    void SelectedDotPass::onSync() {
+    void SelectionIDPass::onSync() {
         auto &worldRepository = CTX.worldRepository;
         for (const auto &pair: CTX.editorRepository.selected) {
             if (!pair.second) {

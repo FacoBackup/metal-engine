@@ -32,26 +32,28 @@ namespace Metal {
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
                 .addBuffer(RID_MESH_METADATA_BUFFER, MAX_MESH_INSTANCES * sizeof(MeshMetadata),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
-                .addTexture(RID_RAW_RENDERED_FRAME, gBufferW, gBufferH)
                 .addTexture(RID_ACCUMULATED_FRAME, gBufferW, gBufferH)
                 .addTexture(RID_GBUFFER_POSITION_INDEX, gBufferW, gBufferH, VK_FORMAT_R32G32B32A32_SFLOAT)
                 .addTexture(RID_GBUFFER_NORMAL, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
-                .addTexture(RID_PREVIOUS_COLOR, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
                 .addTexture(RID_PREVIOUS_POSITION_INDEX, gBufferW, gBufferH, VK_FORMAT_R32G32B32_SFLOAT) // I noticed current position is rgba32f, but let's check.
                 .addTexture(RID_PREVIOUS_NORMAL, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
                 .addTexture(RID_DENOISED_FRAME, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
                 .addTexture(RID_TEMPORAL_OUTPUT, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
                 .addTexture(RID_PREVIOUS_DENOISED_FRAME, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
+                .addFramebuffer(RID_SELECTION_FBO, gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
+                .addColor(VK_FORMAT_R16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
                 .addFramebuffer(RID_POST_PROCESSING_FBO, gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
-                .addColor("Color", VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
+                .addColor(VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
                 .addComputeCommandBuffer(RID_COMPUTE_CB)
                 .addPass(RAY_TRACING, RID_COMPUTE_CB)
                 .addPass(ACCUMULATION, RID_COMPUTE_CB)
                 .addPass(TEMPORAL_ACCUMULATION, RID_COMPUTE_CB)
                 .addPass(SPATIAL_FILTER, RID_COMPUTE_CB)
+                .addCommandBuffer(RID_SELECTION_CB, RID_SELECTION_FBO)
+                .addPass(SELECTION_ID, RID_SELECTION_CB)
                 .addCommandBuffer(RID_POST_PROCESSING_CB, RID_POST_PROCESSING_FBO)
                 .addPass(POST_PROCESSING, RID_POST_PROCESSING_CB)
-                .addPass(SELECTED_DOT, RID_POST_PROCESSING_CB)
+                .addPass(SELECTION_OUTLINE, RID_POST_PROCESSING_CB)
                 .addPass(GRID, RID_POST_PROCESSING_CB)
                 .addPass(ICONS, RID_POST_PROCESSING_CB)
                 .build();
@@ -101,20 +103,15 @@ namespace Metal {
             return;
         }
 
-        auto *rawRenderedFrame = engineFrame->getResourceAs<TextureInstance>(RID_RAW_RENDERED_FRAME);
-        if (!rawRenderedFrame) {
-            return;
-        }
-
-        const auto width = rawRenderedFrame->width;
-        const auto height = rawRenderedFrame->height;
-        const uint32_t pixelX = std::min(static_cast<uint32_t>(u * static_cast<float>(width)), width - 1);
-        const uint32_t pixelY = std::min(static_cast<uint32_t>(v * static_cast<float>(height)), height - 1);
-
         auto *gBufferPositionIndex = engineFrame->getResourceAs<TextureInstance>(RID_GBUFFER_POSITION_INDEX);
         if (!gBufferPositionIndex) {
             return;
         }
+
+        const auto width = gBufferPositionIndex->width;
+        const auto height = gBufferPositionIndex->height;
+        const uint32_t pixelX = std::min(static_cast<uint32_t>(u * static_cast<float>(width)), width - 1);
+        const uint32_t pixelY = std::min(static_cast<uint32_t>(v * static_cast<float>(height)), height - 1);
 
         const auto picked = CTX.pickingService.pickEntityFromGBuffer(gBufferPositionIndex, pixelX, pixelY);
         CTX.selectionService.clearSelection();

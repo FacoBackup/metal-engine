@@ -1,6 +1,6 @@
 #include "../GlobalDataBuffer.glsl"
 
-layout (set = 0, binding = 1, rgba32f) uniform readonly image2D gBufferPositionIndex;
+layout (set = 0, binding = 1) uniform sampler2D selectionIdSampler;
 
 layout (location = 0) out vec4 outColor;
 
@@ -11,8 +11,10 @@ layout (push_constant) uniform Push {
 } push;
 
 void main() {
-    uint currentIndex = uint(abs(imageLoad(gBufferPositionIndex, ivec2(gl_FragCoord.xy)).a));
-
+    uint currentIndex = uint(abs(texelFetch(selectionIdSampler, ivec2(gl_FragCoord.xy), 0).r));
+    if (currentIndex == 0) {
+        discard;
+    }
     int thickness = int(push.selectionColor.a);
     bool isBoundary = false;
 
@@ -32,9 +34,9 @@ void main() {
                 break;
             }
 
-            uint neighborIndex = uint(abs(imageLoad(gBufferPositionIndex, neighborPixel).a));
+            uint neighborIndex = uint(abs(texelFetch(selectionIdSampler, neighborPixel, 0).r));
 
-            if (neighborIndex != push.renderIndex + 1) {
+            if (neighborIndex != currentIndex) {
                 isBoundary = true;
                 break;
             }
@@ -42,25 +44,10 @@ void main() {
         if (isBoundary)
         break;
     }
-    bool isDiff = currentIndex != (push.renderIndex + 1);
-    if (isBoundary && !isDiff) {
+    if (isBoundary) {
         outColor = vec4(push.selectionColor.rgb, 1.0);
-    } else  {
-        int dotSpacing = 10;
-        int dotRadius = 2;
-
-        vec2 gridIndex = floor(gl_FragCoord.xy / float(dotSpacing));
-        vec2 gridCenter = (gridIndex + 0.5) * float(dotSpacing);
-
-        float dist = distance(gl_FragCoord.xy, gridCenter);
-        if (dist >= dotRadius) {
-            discard;
-        }
-        outColor = vec4(push.selectionColor.rgb, 1.0);
-
-        if (isDiff) {
-            outColor.a = .5;
-        }
+        return;
     }
+    discard;
 
 }

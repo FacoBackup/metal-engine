@@ -20,7 +20,7 @@ namespace Metal {
                 .setPushConstantsSize(sizeof(HWRayTracingPushConstant))
                 .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
                 .addAccelerationStructureBinding(CTX.rayTracingService.getTLAS())
-                .addStorageImageBinding(getScopedResourceId(RID_RAW_RENDERED_FRAME))
+                .addStorageImageBinding(getScopedResourceId(RID_ACCUMULATED_FRAME))
                 .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_POSITION_INDEX))
                 .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_NORMAL))
                 .addBufferBinding(getScopedResourceId(RID_LIGHT_BUFFER))
@@ -40,28 +40,22 @@ namespace Metal {
             anyMeshes = true;
         }
 
-        rawRenderedFrame = frame->getResourceAs<TextureInstance>(RID_RAW_RENDERED_FRAME);
-        accumulatedFrame = frame->getResourceAs<TextureInstance>(RID_ACCUMULATED_FRAME);
-        gBufferPositionIndex = frame->getResourceAs<TextureInstance>(RID_GBUFFER_POSITION_INDEX);
-        gBufferNormal = frame->getResourceAs<TextureInstance>(RID_GBUFFER_NORMAL);
-        previousColor = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_COLOR);
-        previousPositionIndex = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_POSITION_INDEX);
-        previousNormal = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_NORMAL);
+        auto *accumulatedFrame = frame->getResourceAs<TextureInstance>(RID_ACCUMULATED_FRAME);
+        auto *gBufferPositionIndex = frame->getResourceAs<TextureInstance>(RID_GBUFFER_POSITION_INDEX);
+        auto *gBufferNormal = frame->getResourceAs<TextureInstance>(RID_GBUFFER_NORMAL);
+        auto *previousPositionIndex = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_POSITION_INDEX);
+        auto *previousNormal = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_NORMAL);
 
         if (isFirstRun || CTX.engineContext.isCameraUpdated() || CTX.engineContext.isGISettingsUpdated() ||
             CTX.engineContext.isUpdateLights()) {
-            clearTexture(rawRenderedFrame->vkImage);
             clearTexture(accumulatedFrame->vkImage);
             CTX.engineContext.resetPathTracerAccumulationCount();
             isFirstRun = false;
         }
 
-        // Copy current to previous before writing new values
-        copyTexture(rawRenderedFrame, previousColor);
         copyTexture(gBufferPositionIndex, previousPositionIndex);
         copyTexture(gBufferNormal, previousNormal);
 
-        startWriting(rawRenderedFrame->vkImage);
         startWriting(gBufferPositionIndex->vkImage);
         startWriting(gBufferNormal->vkImage);
 
@@ -87,11 +81,11 @@ namespace Metal {
             &pipelineInstance->missRegion,
             &pipelineInstance->hitRegion,
             &pipelineInstance->callableRegion,
-            rawRenderedFrame->width,
-            rawRenderedFrame->height,
+            accumulatedFrame->width,
+            accumulatedFrame->height,
             1);
 
-        endWriting(rawRenderedFrame->vkImage);
+        endWriting(accumulatedFrame->vkImage);
         endWriting(gBufferPositionIndex->vkImage);
         endWriting(gBufferNormal->vkImage);
     }

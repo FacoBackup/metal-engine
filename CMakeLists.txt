@@ -218,8 +218,8 @@ add_executable(
         src/dto/Notification.h
         src/enum/NotificationSeverity.h
         src/service/voxel/impl/SparseVoxelOctreeData.h
-        src/context/engine/render-pass/impl/tools/SelectedDotPass.cpp
-        src/context/engine/render-pass/impl/tools/SelectedDotPass.h
+        src/context/engine/render-pass/impl/tools/SelectionOutlinePass.cpp
+        src/context/engine/render-pass/impl/tools/SelectionOutlinePass.h
         src/service/picking/PickingService.cpp
         src/service/picking/PickingService.h
         src/service/voxel/SVOInstance.h
@@ -232,6 +232,8 @@ add_executable(
         src/repository/world/components/PlaneLightComponent.h
         src/context/engine/render-pass/impl/tools/IconsPass.cpp
         src/context/engine/render-pass/impl/tools/IconsPass.h
+        src/context/engine/render-pass/impl/tools/SelectionIDPass.cpp
+        src/context/engine/render-pass/impl/tools/SelectionIDPass.h
         src/repository/editor/EditorRepository.cpp
         src/dto/push-constant/GridPushConstant.h
         src/context/engine/compute-pass/AbstractComputePass.cpp
@@ -242,8 +244,6 @@ add_executable(
         src/service/material/MaterialService.cpp
         src/service/material/MaterialService.h
         src/enum/LightType.h
-        src/context/engine/compute-pass/impl/AccumulationPass.cpp
-        src/context/engine/compute-pass/impl/AccumulationPass.h
         src/service/lights/LightService.cpp
         src/service/lights/LightService.h
         src/repository/world/components/VolumeComponent.cpp

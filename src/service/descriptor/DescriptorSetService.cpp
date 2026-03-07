@@ -11,7 +11,7 @@
 namespace Metal {
     DescriptorInstance *DescriptorSetService::createDescriptor(const PipelineBuilder &pipelineBuilder, const std::string &id, VkShaderStageFlags stageFlags) {
         auto *descriptorInstance = createResourceInstance(id);
-        
+
         for (auto &builder : pipelineBuilder.resourceBindings) {
             DescriptorBinding binding{};
             binding.bindingPoint = builder.bindingPoint;
@@ -70,7 +70,7 @@ namespace Metal {
             binding.stageFlags = static_cast<VkShaderStageFlagBits>(stageFlags);
             descriptorInstance->bindings.push_back(binding);
         }
-        
+
         updateDescriptor(descriptorInstance);
         return descriptorInstance;
     }
@@ -93,7 +93,7 @@ namespace Metal {
                                                unsigned int attachmentIndex) {
         auto attachment = framebuffer->attachments[attachmentIndex];
         if (attachment->imageDescriptor == nullptr) {
-            attachment->imageDescriptor = createResourceInstance(std::string(attachment->name));
+            attachment->imageDescriptor = createResourceInstance(framebuffer->getId() + std::to_string(attachmentIndex));
             attachment->imageDescriptor->bindings.push_back(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
                 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
                 CTX.vulkanContext.vkImageSampler,

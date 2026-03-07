@@ -49,7 +49,7 @@ void main() {
         prevNormal = imageLoad(previousNormalImage, prevCoord).rgb;
         vec4 prevDenoised = imageLoad(previousDenoisedImage, prevCoord);
         prevDenoisedColor = prevDenoised.rgb;
-        historyLen = prevDenoised.a;
+        historyLen = globalData.pathTracerAccumulationCount - 1;
 
         // Validation checks
         if (currentIdx != prevPositionIndex.a) valid = false;

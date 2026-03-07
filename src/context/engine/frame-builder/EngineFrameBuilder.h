@@ -29,7 +29,7 @@ namespace Metal {
 
         EngineFrameBuilder &addFramebuffer(const std::string &id);
 
-        EngineFrameBuilder &addColor(std::string id, VkFormat format, VkImageUsageFlagBits usage);
+        EngineFrameBuilder &addColor(VkFormat format, VkImageUsageFlagBits usage);
 
         EngineFrameBuilder &addDepth();
 

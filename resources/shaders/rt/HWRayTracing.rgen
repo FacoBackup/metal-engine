@@ -161,6 +161,11 @@ void main() {
         finalColor = volumetricColor.rgb * volumetricColor.a + finalColor * (1.0 - volumetricColor.a);
     }
 
-    finalColor = max(vec3(0), finalColor);
-    imageStore(outputImage, ivec2(gl_LaunchIDEXT.xy), vec4(finalColor, 1));
+    vec4 prev = imageLoad(outputImage, ivec2(gl_LaunchIDEXT.xy));
+    float count = min(float(globalData.pathTracerMaxSamples), max(globalData.pathTracerAccumulationCount, 1.0));
+    vec3 color = prev.rgb * (1.0 - 1.0 / count) + finalColor.rgb * (1.0 / count);
+
+    imageStore(outputImage, ivec2(gl_LaunchIDEXT.xy), vec4(color, 1));
+
+
 }

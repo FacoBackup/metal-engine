@@ -10,7 +10,6 @@ namespace Metal {
         VkFormat format = VK_FORMAT_MAX_ENUM;
         DescriptorInstance *imageDescriptor = nullptr;
         bool depth = false;
-        const char *name = nullptr;
 
         void dispose() const;
     };

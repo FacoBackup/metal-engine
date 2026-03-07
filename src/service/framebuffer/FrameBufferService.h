@@ -12,34 +12,23 @@ namespace Metal {
     struct FrameBufferAttachment;
     struct FrameBufferInstance;
 
-    /**
-     * Responsible for creating:
-     * - Framebuffer attachments
-     * - Command buffers
-     * - Render passes
-     * - Framebuffers
-     */
     class FrameBufferService final : public AbstractResourceService<FrameBufferInstance> {
-        std::shared_ptr<FrameBufferAttachment> createAttachmentInternal(const char *name, VkFormat format,
+        std::shared_ptr<FrameBufferAttachment> createAttachmentInternal(VkFormat format,
                                                                         VkImageUsageFlagBits usage,
                                                                         FrameBufferInstance *framebuffer) const;
 
         void createVKFrameBuffer(FrameBufferInstance *framebuffer) const;
 
     public:
-        explicit FrameBufferService()
-            : AbstractResourceService<FrameBufferInstance>() {
-        }
-
         void createSampler(bool linear, VkSampler &vkImageSampler);
 
-        FrameBufferInstance *createFrameBuffer(const std::string &id, unsigned int w, unsigned int h, glm::vec4 clearColor = glm::vec4(0.0f));
+        FrameBufferInstance *createFrameBuffer(const std::string &id, unsigned int w, unsigned int h,
+                                               glm::vec4 clearColor = glm::vec4(0.0f));
 
         void createDepthAttachment(FrameBufferInstance *framebuffer) const;
 
-        void createAttachment(const char *name, VkFormat format, VkImageUsageFlagBits usage,
+        void createAttachment(VkFormat format, VkImageUsageFlagBits usage,
                               FrameBufferInstance *framebuffer) const;
-
 
         void createRenderPass(FrameBufferInstance *framebuffer) const;
 

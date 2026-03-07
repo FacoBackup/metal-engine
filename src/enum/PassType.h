@@ -8,9 +8,10 @@ namespace Metal {
         TEMPORAL_ACCUMULATION,
         SPATIAL_FILTER,
         POST_PROCESSING,
-        SELECTED_DOT,
+        SELECTION_OUTLINE,
         GRID,
-        ICONS
+        ICONS,
+        SELECTION_ID
     };
 }
 

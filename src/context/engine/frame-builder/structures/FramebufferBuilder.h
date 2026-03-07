@@ -9,7 +9,6 @@ namespace Metal {
     struct FrameBufferInstance;
 
     struct FramebufferAttachmentBuilder {
-        std::string id;
         VkFormat format;
         VkImageUsageFlagBits usage;
         FrameBufferInstance *framebuffer;
@@ -29,9 +28,9 @@ namespace Metal {
 
         ResourceType getType() override;
 
-        void addColor(std::string id, VkFormat format, VkImageUsageFlagBits usage,
+        void addColor( VkFormat format, VkImageUsageFlagBits usage,
                       FrameBufferInstance *framebuffer) {
-            attachments.push_back({std::move(id), format, usage, framebuffer});
+            attachments.push_back({ format, usage, framebuffer});
         }
 
         void addDepth() {

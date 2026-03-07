@@ -18,7 +18,7 @@ namespace Metal {
         fbo = framebufferService.createFrameBuffer(id, w, h, clearColor);
 
         for (const auto& attachment : attachments) {
-            framebufferService.createAttachment(attachment.id.c_str(), attachment.format, attachment.usage, fbo);
+            framebufferService.createAttachment(attachment.format, attachment.usage, fbo);
         }
 
         if (hasDepth) {

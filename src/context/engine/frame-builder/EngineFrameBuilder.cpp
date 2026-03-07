@@ -8,7 +8,7 @@
 #include "EngineFrame.h"
 #include "../../ApplicationContext.h"
 #include "../passes/CommandBufferRecorder.h"
-#include "../render-pass/impl/tools/SelectedDotPass.h"
+#include "../render-pass/impl/tools/SelectionOutlinePass.h"
 
 namespace Metal {
     EngineFrameBuilder::EngineFrameBuilder(std::string frameId) : frameId(std::move(frameId)) {
@@ -28,8 +28,8 @@ namespace Metal {
         return *this;
     }
 
-    EngineFrameBuilder &EngineFrameBuilder::addColor(std::string id, VkFormat format, VkImageUsageFlagBits usage) {
-        dynamic_cast<FramebufferBuilder *>(currentBuilder.get())->addColor(frameId + "_" + id, format, usage, nullptr);
+    EngineFrameBuilder &EngineFrameBuilder::addColor(VkFormat format, VkImageUsageFlagBits usage) {
+        dynamic_cast<FramebufferBuilder *>(currentBuilder.get())->addColor(format, usage, nullptr);
         return *this;
     }
 
@@ -54,7 +54,9 @@ namespace Metal {
     EngineFrameBuilder &EngineFrameBuilder::addBuffer(const std::string &id, VkDeviceSize size,
                                                       VkMemoryPropertyFlags properties, BufferType type) {
         currentBuilder = std::make_shared<BufferBuilder>(
-            frameId + "_" + id, size, type == UNIFORM_BUFFER ? VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT : VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+            frameId + "_" + id, size, type == UNIFORM_BUFFER
+                                          ? VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT
+                                          : VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
             properties, type);
         builders.push_back(currentBuilder);
         return *this;
@@ -68,8 +70,9 @@ namespace Metal {
     }
 
     EngineFrameBuilder &EngineFrameBuilder::addCommandBuffer(const std::string &id, const std::string &framebufferId,
-                                                            const bool clearBuffer) {
-        currentBuilder = std::make_shared<CommandBufferRecorderBuilder>(frameId + "_" + id, frameId + "_" + framebufferId, clearBuffer);
+                                                             const bool clearBuffer) {
+        currentBuilder = std::make_shared<CommandBufferRecorderBuilder>(
+            frameId + "_" + id, frameId + "_" + framebufferId, clearBuffer);
         builders.push_back(currentBuilder);
         return *this;
     }

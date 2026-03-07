@@ -5,11 +5,11 @@
 #include "../../../../../dto/push-constant/SelectedDotPushConstant.h"
 
 namespace Metal {
-    class SelectedDotPass final : public AbstractRenderPass {
+    class SelectionOutlinePass final : public AbstractRenderPass {
         SelectedDotPushConstant pushConstant{};
 
     public:
-        explicit SelectedDotPass(const std::string &id) : AbstractRenderPass(id) {}
+        explicit SelectionOutlinePass(const std::string &id) : AbstractRenderPass(id) {}
 
         void onInitialize() override;
 

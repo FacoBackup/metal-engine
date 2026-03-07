@@ -73,7 +73,7 @@ namespace Metal {
 
     void EngineContext::updateGlobalData() {
         auto &camera = CTX.worldRepository.camera;
-        auto *fbo = currentFrame->getResourceAs<FrameBufferInstance>(  RID_POST_PROCESSING_FBO);
+        auto *fbo = currentFrame->getResourceAs<FrameBufferInstance>(RID_POST_PROCESSING_FBO);
         globalDataUBO.previousProjView = globalDataUBO.projView;
         globalDataUBO.viewMatrix = camera.viewMatrix;
         globalDataUBO.projectionMatrix = camera.projectionMatrix;
@@ -88,7 +88,10 @@ namespace Metal {
         globalDataUBO.globalFrameCount++;
         globalDataUBO.outputRes = {fbo->bufferWidth, fbo->bufferHeight};
         globalDataUBO.pathTracerMaxSamples = CTX.engineRepository.pathTracerMaxSamples;
-        globalDataUBO.denoiserEnabled = CTX.engineRepository.denoiserEnabled && (globalDataUBO.debugFlag == LIT || globalDataUBO.debugFlag == LIGHTING_ONLY)? 1 : 0;
+        globalDataUBO.denoiserEnabled = CTX.engineRepository.denoiserEnabled && (
+                                            globalDataUBO.debugFlag == LIT || globalDataUBO.debugFlag == LIGHTING_ONLY)
+                                            ? 1
+                                            : 0;
 
         entt::registry &reg = CTX.worldRepository.registry;
         auto view = reg.view<AtmosphereComponent>();
@@ -104,6 +107,9 @@ namespace Metal {
             atmosphereUBO.scatteringAlbedo = atmo.scatteringAlbedo;
             atmosphereUBO.samples = atmo.samples;
             atmosphereUBO.sunPosition = atmo.sunPosition;
+        } else {
+            atmosphereUBO.isVolumeEnabled = 0;
+            atmosphereUBO.isAtmosphereEnabled = 0;
         }
 
         currentFrame->getResourceAs<BufferInstance>(RID_GLOBAL_DATA)->update(&globalDataUBO);
