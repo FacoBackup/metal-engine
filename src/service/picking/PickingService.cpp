@@ -5,7 +5,7 @@
 #include "../../context/ApplicationContext.h"
 
 namespace Metal {
-    std::optional<EntityID> PickingService::pickEntityFromGBuffer(TextureInstance *attachment, const uint32_t pixelX,
+    std::optional<entt::entity> PickingService::pickEntityFromGBuffer(TextureInstance *attachment, const uint32_t pixelX,
                                                                   const uint32_t pixelY) const {
 
         constexpr VkDeviceSize imageSize = 4 * sizeof(float);
@@ -70,7 +70,7 @@ namespace Metal {
         for (auto entity: view) {
             auto &mesh = view.get<PrimitiveComponent>(entity);
             if (mesh.renderIndex == renderIndex) {
-                return static_cast<EntityID>(entity);
+                return entity;
             }
         }
 

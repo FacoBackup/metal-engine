@@ -11,11 +11,11 @@ namespace Metal {
 
     class SelectionService final : public AbstractRuntimeComponent {
     public:
-        void addSelected(EntityID entity) const;
+        void addSelected(entt::entity entity) const;
 
         void clearSelection() const;
 
-        void addAllSelected(const std::vector<EntityID> &all) const;
+        void addAllSelected(const std::vector<entt::entity> &all) const;
 
         void updatePrimitiveSelected() const;
     };

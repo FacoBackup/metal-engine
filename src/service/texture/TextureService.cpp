@@ -124,7 +124,7 @@ namespace Metal {
         createImageWithInfo(imageInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image);
     }
 
-    TextureData *TextureService::stream(const std::string &id) const {
+    TextureData *TextureService::loadTextureData(const std::string &id) const {
         auto pathToFile = CTX.getAssetDirectory() + FORMAT_FILE_TEXTURE(id);
         if (std::filesystem::exists(pathToFile)) {
             int width, height, channels;
@@ -135,6 +135,17 @@ namespace Metal {
             return new TextureData{width, height, channels, data};
         }
         return nullptr;
+    }
+
+    TextureInstance *TextureService::stream(const std::string &id) {
+        if (id.empty()) {
+            return nullptr;
+        }
+        auto *resource = getResource(id);
+        if (resource != nullptr) {
+            return resource;
+        }
+        return create(id);
     }
 
     TextureInstance *TextureService::loadTexture(const std::string &id, const std::string &pathToImage,

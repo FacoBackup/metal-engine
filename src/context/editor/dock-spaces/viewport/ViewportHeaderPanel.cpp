@@ -16,15 +16,7 @@ namespace Metal {
             ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPosX() + 2, ImGui::GetCursorPosY() + 4));
             gizmo->onSync();
             ImGui::SameLine();
-            int option = 0;
-            UIUtil::DynamicSpacing(365);
-            ImGui::SetNextItemWidth(100);
-            if (ImGui::Combo((id + "##entities").c_str(), &option, ComponentTypes::NAMES)) {
-                auto id = CTX.worldRepository.createEntity();
-                CTX.worldRepository.createComponent(id, ComponentTypes::ValueOfIndex(option));
-                CTX.selectionService.clearSelection();
-                CTX.selectionService.addSelected(id);
-            }
+            UIUtil::DynamicSpacing(270);
             ImGui::SameLine();
 
             cameraMode();

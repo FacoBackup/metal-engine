@@ -77,6 +77,89 @@ namespace Metal::UIUtil {
         ImGui::SameLine();
     }
 
+    static bool DragFloatWithLabel(const std::string &id, float *value, const std::string &label, const ImVec4 &color,
+                                   float speed = 0.1f) {
+        bool changed = false;
+        ImGui::PushID(id.c_str());
+
+        const float framePadding = ImGui::GetStyle().FramePadding.x;
+        const float labelWidth = ImGui::CalcTextSize(label.c_str()).x + framePadding * 2.0f;
+
+        ImGui::PushStyleColor(ImGuiCol_Button, color);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, color);
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, color);
+        ImGui::Button(label.c_str(), ImVec2(labelWidth, 0));
+        ImGui::PopStyleColor(3);
+
+        ImGui::SameLine(0, 0);
+        ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+        changed = ImGui::DragFloat("##v", value, speed);
+
+        ImGui::PopID();
+        return changed;
+    }
+
+    static bool DrawVec2Control(const std::string &name, const std::string &id, float *values, float speed = 0.1f) {
+        bool changed = false;
+        ImGui::Text(name.c_str());
+        ImGui::PushID(id.c_str());
+
+        if (ImGui::BeginTable("##table", 2, ImGuiTableFlags_NoSavedSettings)) {
+            ImGui::TableNextColumn();
+            if (DragFloatWithLabel("x", &values[0], "X", ImVec4{0.8f, 0.1f, 0.15f, 1.0f}, speed)) changed = true;
+            ImGui::TableNextColumn();
+            if (DragFloatWithLabel("y", &values[1], "Y", ImVec4{0.2f, 0.7f, 0.2f, 1.0f}, speed)) changed = true;
+            ImGui::EndTable();
+        }
+
+        ImGui::PopID();
+        return changed;
+    }
+
+    static bool DrawVec3Control(const std::string &name, const std::string &id, float *values, float speed = 0.1f) {
+        bool changed = false;
+        ImGui::Text(name.c_str());
+        ImGui::PushID(id.c_str());
+
+        if (ImGui::BeginTable("##table", 3, ImGuiTableFlags_NoSavedSettings)) {
+            ImGui::TableNextColumn();
+            if (DragFloatWithLabel("x", &values[0], "X", ImVec4{0.8f, 0.1f, 0.15f, 1.0f}, speed)) changed = true;
+            ImGui::TableNextColumn();
+            if (DragFloatWithLabel("y", &values[1], "Y", ImVec4{0.2f, 0.7f, 0.2f, 1.0f}, speed)) changed = true;
+            ImGui::TableNextColumn();
+            if (DragFloatWithLabel("z", &values[2], "Z", ImVec4{0.1f, 0.25f, 0.8f, 1.0f}, speed)) changed = true;
+            ImGui::EndTable();
+        }
+
+        ImGui::PopID();
+        return changed;
+    }
+
+    static bool DrawVec4Control(const std::string &name, const std::string &id, float *values, float speed = 0.1f) {
+        bool changed = false;
+        ImGui::Text(name.c_str());
+        ImGui::PushID(id.c_str());
+
+        if (ImGui::BeginTable("##table", 4, ImGuiTableFlags_NoSavedSettings)) {
+            ImGui::TableNextColumn();
+            if (DragFloatWithLabel("x", &values[0], "X", ImVec4{0.8f, 0.1f, 0.15f, 1.0f}, speed)) changed = true;
+            ImGui::TableNextColumn();
+            if (DragFloatWithLabel("y", &values[1], "Y", ImVec4{0.2f, 0.7f, 0.2f, 1.0f}, speed)) changed = true;
+            ImGui::TableNextColumn();
+            if (DragFloatWithLabel("z", &values[2], "Z", ImVec4{0.1f, 0.25f, 0.8f, 1.0f}, speed)) changed = true;
+            ImGui::TableNextColumn();
+            if (DragFloatWithLabel("w", &values[3], "W", ImVec4{0.5f, 0.5f, 0.5f, 1.0f}, speed)) changed = true;
+            ImGui::EndTable();
+        }
+
+        ImGui::PopID();
+        return changed;
+    }
+
+    static bool DrawQuatControl(const std::string &name, const std::string &id, float *values, float speed = 0.1f) {
+        return DrawVec4Control(name, id, values, speed);
+    }
+
     static std::string GetKeyChordName(ImGuiKeyChord keyChord) {
         std::string result;
         if (keyChord & ImGuiMod_Ctrl) result += "Ctrl+";

@@ -1,29 +1,40 @@
 #ifndef SPHERELIGHTCOMPONENT_H
 #define SPHERELIGHTCOMPONENT_H
 
-#include "LightComponent.h"
+#include "../impl/AbstractComponent.h"
+#include "../../../util/Serializable.h"
+#include <glm/vec3.hpp>
 
 namespace Metal {
-    struct SphereLightComponent final : LightComponent {
+    struct SphereLightComponent final : AbstractComponent, Serializable {
+        glm::vec3 color = glm::vec3(1.0f);
+        float intensity = 1.0f;
         float radiusSize = 1;
-
-        LightTypes::LightType getLightType() override { return LightTypes::SPHERE; }
 
         void registerFields() override;
 
-        ComponentTypes::ComponentType getType() override {
-            return ComponentTypes::SPHERE_LIGHT;
+        ComponentType getType() override {
+            return ComponentType::SPHERE_LIGHT;
         }
 
+        void onUpdate(InspectableMember *member) override;
+
         nlohmann::json toJson() const override {
-            nlohmann::json j = LightComponent::toJson();
+            nlohmann::json j;
+            j["entityId"] = entityId;
+            j["color"] = {color.x, color.y, color.z};
+            j["intensity"] = intensity;
             j["radiusSize"] = radiusSize;
             j["lightType"] = "SPHERE";
             return j;
         }
 
         void fromJson(const nlohmann::json& j) override {
-            LightComponent::fromJson(j);
+            entityId = j.at("entityId").get<entt::entity>();
+            color.x = j.at("color")[0].get<float>();
+            color.y = j.at("color")[1].get<float>();
+            color.z = j.at("color")[2].get<float>();
+            intensity = j.at("intensity").get<float>();
             radiusSize = j.at("radiusSize").get<float>();
         }
     };

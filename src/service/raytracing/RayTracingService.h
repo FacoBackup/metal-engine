@@ -21,6 +21,7 @@ namespace Metal {
             BufferInstance *vertexData = nullptr;
             BufferInstance *indexData = nullptr;
         };
+        bool anyMeshes = false;
 
         // One BLAS per unique mesh ID
         std::unordered_map<std::string, BLASEntry> blasEntries;
@@ -50,6 +51,7 @@ namespace Metal {
         void updateMeshMaterials();
 
     public:
+
         void setNeedsMaterialUpdate(bool val) {
             needsMaterialUpdate = val;
         }

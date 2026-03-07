@@ -1,12 +1,12 @@
 #ifndef ENGINEID_H
 #define ENGINEID_H
 
-typedef unsigned long long EntityID;
+#include <entt/entt.hpp>
 #define MAX_VOLUMES 300
 #define MAX_LIGHTS 300
 #define MAX_MATERIALS 100
 #define MAX_MESH_INSTANCES 1000
-#define EMPTY_ENTITY 0
+#define EMPTY_ENTITY entt::null
 #define FILE_METADATA ".mjson"
 #define FILE_SCENE "-scene"
 #define FILE_MESH "-mesh"

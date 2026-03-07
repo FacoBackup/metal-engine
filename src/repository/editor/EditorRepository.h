@@ -45,9 +45,9 @@ namespace Metal {
         bool gizmoUseSnapScale = false;
         bool showOnlyEntitiesHierarchy = false;
         TransformComponent *primitiveSelected = nullptr;
-        EntityID mainSelection = EMPTY_ENTITY;
-        std::unordered_map<EntityID, bool> selected{};
-        std::vector<EntityID> copied{};
+        entt::entity mainSelection = EMPTY_ENTITY;
+        std::unordered_map<entt::entity, bool> selected{};
+        std::vector<entt::entity> copied{};
         std::string focusedWindowName{};
         std::vector<ShortcutDTO> focusedShortcuts{};
         ShadingMode shadingMode = LIT;

@@ -9,19 +9,13 @@
 #include "../abstract/AbstractResourceService.h"
 
 namespace Metal {
-    struct MaterialData {
-        std::string albedo;
-        std::string roughness;
-        std::string metallic;
-    };
+    struct PrimitiveComponent;
 
     class MaterialImporterService final : public AbstractRuntimeComponent {
     public:
-
-        void collectMaterials(const std::string &targetDir, const aiScene *scene,
-                                 std::unordered_map<unsigned int, MaterialData> &materialMap,
-                                 const std::string &rootDirectory,
-                                 const std::stop_token &stopToken = {}) const;
+        void importMaterial(const std::string &targetDir, const aiMaterial *material, const aiScene *scene,
+                            const std::string &rootDirectory, PrimitiveComponent &primitive,
+                            const std::stop_token &stopToken = {}) const;
     };
 }
 

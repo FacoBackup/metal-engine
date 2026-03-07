@@ -41,22 +41,21 @@ namespace Metal {
         if (!needsRebuild) {
             return;
         }
-
+        anyMeshes = false;
         // Check if any mesh is present and streamed
-        bool hasMeshes = false;
         auto view = CTX.worldRepository.registry.view<PrimitiveComponent, TransformComponent>();
         for (auto entity: view) {
-            if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
+            if (CTX.worldRepository.hiddenEntities.contains(entity)) continue;
             auto &meshComp = view.get<PrimitiveComponent>(entity);
             if (meshComp.meshId.empty()) continue;
-            auto *instance = CTX.streamingService.streamMesh(meshComp.meshId);
+            auto *instance = CTX.meshService.stream(meshComp.meshId);
             if (instance != nullptr && instance->dataBuffer != nullptr && instance->indexBuffer != nullptr) {
-                hasMeshes = true;
+                anyMeshes = true;
                 break;
             }
         }
 
-        if (!hasMeshes) {
+        if (!anyMeshes) {
             // No meshes – destroy all structures and set descriptor to null
             destroyAccelerationStructures();   // destroys BLAS and TLAS (waits for idle)
             updateDescriptorSets(VK_NULL_HANDLE);
@@ -83,7 +82,7 @@ namespace Metal {
     }
 
     bool RayTracingService::isReady() const {
-        return accelerationStructureBuilt && tlas != VK_NULL_HANDLE;
+        return accelerationStructureBuilt && anyMeshes && tlas != VK_NULL_HANDLE;
     }
 
     void RayTracingService::updateMeshMaterials() {
@@ -91,7 +90,7 @@ namespace Metal {
         auto view = CTX.worldRepository.registry.view<PrimitiveComponent>();
 
         for (auto entity: view) {
-            if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
+            if (CTX.worldRepository.hiddenEntities.contains(entity)) continue;
             auto &meshComp = view.get<PrimitiveComponent>(entity);
             if (meshComp.meshId.empty()) continue;
 
@@ -146,11 +145,11 @@ namespace Metal {
         auto view = CTX.worldRepository.registry.view<PrimitiveComponent, TransformComponent>();
 
         for (auto entity: view) {
-            if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
+            if (CTX.worldRepository.hiddenEntities.contains(entity)) continue;
             auto &meshComp = view.get<PrimitiveComponent>(entity);
             if (meshComp.meshId.empty()) continue;
             if (uniqueMeshes.contains(meshComp.meshId)) continue;
-            auto *instance = CTX.streamingService.streamMesh(meshComp.meshId);
+            auto *instance = CTX.meshService.stream(meshComp.meshId);
             if (instance == nullptr || instance->dataBuffer == nullptr || instance->indexBuffer == nullptr) {
                 continue;
             }
@@ -274,7 +273,7 @@ namespace Metal {
                 LOG_ERROR("Max mesh instances reached for ray tracing: " + std::to_string(MAX_MESH_INSTANCES));
                 break;
             }
-            if (CTX.worldRepository.hiddenEntities.contains(static_cast<EntityID>(entity))) continue;
+            if (CTX.worldRepository.hiddenEntities.contains(entity)) continue;
             auto &meshComp = view.get<PrimitiveComponent>(entity);
             if (meshComp.meshId.empty()) continue;
 

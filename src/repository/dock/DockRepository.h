@@ -8,7 +8,7 @@ namespace Metal {
     struct DockRepository final : AbstractRuntimeComponent {
         DockDTO top{&DockSpace::VIEWPORT, 0.17f};
         DockDTO bottom{&DockSpace::FILES, .25f};
-        DockDTO rightTop{&DockSpace::HIERARCHY, 0.6f};
+        DockDTO rightTop{&DockSpace::WORLD, 0.6f};
         DockDTO rightBottom{&DockSpace::INSPECTOR, 0.4f};
         bool isInitialized = false;
     };

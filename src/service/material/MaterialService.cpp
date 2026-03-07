@@ -21,19 +21,19 @@ namespace Metal {
         materialData.metallicTextureId = 0;
 
         if (!data.albedo.empty()) {
-            auto *tex = CTX.textureService.create(data.albedo);
+            auto *tex = CTX.textureService.stream(data.albedo);
             if (tex != nullptr) {
                 materialData.albedoTextureId = CTX.textureService.getTextureIndex(data.albedo);
             }
         }
         if (!data.roughness.empty()) {
-            auto *tex = CTX.textureService.create(data.roughness);
+            auto *tex = CTX.textureService.stream(data.roughness);
             if (tex != nullptr) {
                 materialData.roughnessTextureId = CTX.textureService.getTextureIndex(data.roughness);
             }
         }
         if (!data.metallic.empty()) {
-            auto *tex = CTX.textureService.create(data.metallic);
+            auto *tex = CTX.textureService.stream(data.metallic);
             if (tex != nullptr) {
                 materialData.metallicTextureId = CTX.textureService.getTextureIndex(data.metallic);
             }

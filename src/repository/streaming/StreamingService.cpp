@@ -5,50 +5,10 @@
 #include "../../service/mesh/MeshInstance.h"
 #include "../../service/texture/TextureInstance.h"
 
+#include "../../repository/world/components/PrimitiveComponent.h"
+
 namespace Metal {
     static constexpr int MAX_TIMEOUT = 10000;
-    static constexpr int MAX_TRIES = 5;
-
-    template<typename T>
-    T *stream(IStreamable<T> &service, const std::string &id,
-                            std::unordered_map<std::string, long long> &lastUse,
-                            std::unordered_map<std::string, unsigned int> &tries) {
-        if (!id.empty() && service.getResources().contains(id)) {
-            auto *e = service.getResource(id);
-            lastUse[e->getId()] = CTX.engineContext.currentTimeMs;
-            return e;
-        }
-        if (!tries.contains(id)) {
-            tries[id] = 0;
-        }
-        tries[id]++;
-        if (tries[id] < MAX_TRIES) {
-            LOG_DEBUG("Streaming " + id);
-            auto *instance = service.create(id);
-            if (instance != nullptr) {
-                tries[id] = 0;
-                for (auto &dep: instance->getDependencies()) {
-                    if (lastUse.contains(dep)) {
-                        lastUse[dep] = CTX.engineContext.currentTimeMs;
-                    }
-                }
-            }
-            return instance;
-        }
-        return nullptr;
-    }
-
-    SVOInstance *StreamingService::streamSVO(const std::string &id) {
-        return stream(CTX.voxelService, id, lastUse, tries);
-    }
-
-    MeshInstance *StreamingService::streamMesh(const std::string &id) {
-        return stream(CTX.meshService, id, lastUse, tries);
-    }
-
-    TextureInstance *StreamingService::streamTexture(const std::string &id) {
-        return stream(CTX.textureService, id, lastUse, tries);
-    }
 
     template<typename T>
     void disposeResources(AbstractResourceService<T> &service, std::unordered_map<std::string, long long> &lastUse) {
@@ -69,6 +29,23 @@ namespace Metal {
     }
 
     void StreamingService::onSync() {
+        auto view = CTX.worldRepository.registry.view<PrimitiveComponent>();
+        for (auto entity: view) {
+            auto &meshComp = view.get<PrimitiveComponent>(entity);
+            if (!meshComp.meshId.empty()) {
+                lastUse[meshComp.meshId] = CTX.engineContext.currentTimeMs;
+            }
+            if (!meshComp.albedo.empty()) {
+                lastUse[meshComp.albedo] = CTX.engineContext.currentTimeMs;
+            }
+            if (!meshComp.roughness.empty()) {
+                lastUse[meshComp.roughness] = CTX.engineContext.currentTimeMs;
+            }
+            if (!meshComp.metallic.empty()) {
+                lastUse[meshComp.metallic] = CTX.engineContext.currentTimeMs;
+            }
+        }
+
         if ((CTX.engineContext.currentTime - sinceLastCleanup).count() >= MAX_TIMEOUT) {
             sinceLastCleanup = CTX.engineContext.currentTime;
             disposeResources(CTX.meshService, lastUse);

@@ -31,8 +31,7 @@ namespace Metal {
     }
 
     void MeshImporterService::persistAllMeshes(const std::string &targetDir, const aiScene *scene,
-                                                std::unordered_map<unsigned int, std::string> &meshMap,
-                                                std::unordered_map<std::string, unsigned int> &meshMaterialMap,
+                                                std::unordered_map<unsigned int, MeshId> &meshMap,
                                                 const std::stop_token &stopToken) const {
         LOG_INFO("Processing meshes for scene...");
         for (unsigned int i = 0; i < scene->mNumMeshes; ++i) {
@@ -78,8 +77,7 @@ namespace Metal {
                 }
             }
             std::string id = persistMesh(targetDir, meshData);
-            meshMap.insert({i, id});
-            meshMaterialMap.insert({id, assimpMesh->mMaterialIndex});
+            meshMap.insert({i, {id, meshData.gizmoCenter}});
             LOG_INFO("Persisted mesh: " + meshData.name + " (" + id + ")");
         }
     }

@@ -26,7 +26,7 @@ namespace Metal {
 
         void onUpdate(InspectableMember *member) override;
 
-        ComponentTypes::ComponentType getType() override;
+        ComponentType getType() override;
 
         nlohmann::json toJson() const override;
 

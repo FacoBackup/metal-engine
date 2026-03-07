@@ -2,37 +2,52 @@
 #include <entt/entt.hpp>
 #include "../../context/ApplicationContext.h"
 #include "../../repository/world/components/SphereLightComponent.h"
+#include "../../repository/world/components/PlaneLightComponent.h"
 #include "../buffer/BufferInstance.h"
 #include "../../enum/EngineResourceIDs.h"
 
+#include "../../enum/LightType.h"
 #include "../../repository/world/components/AtmosphereComponent.h"
 
 namespace Metal {
     void LightService::registerLights() {
-        auto view = CTX.worldRepository.registry.view<std::unique_ptr<LightComponent>, TransformComponent>();
-        for (auto [entity, l_ptr, t]: view.each()) {
-            const auto entityId = static_cast<EntityID>(entity);
+        auto sphereView = CTX.worldRepository.registry.view<SphereLightComponent, TransformComponent>();
+        for (auto [entityId, l, t]: sphereView.each()) {
+
             if (CTX.worldRepository.hiddenEntities.contains(entityId)) {
                 continue;
             }
             auto &translation = t.translation;
-            auto &l = *l_ptr;
-            const auto lightType = l.getLightType();
 
             glm::vec3 normal(0.0f, 1.0f, 0.0f);
             glm::vec3 rotatedNormal = t.rotation * normal;
-
-            float radiusOrScale = 0;
-            if (lightType == LightTypes::SPHERE) {
-                radiusOrScale = static_cast<SphereLightComponent &>(l).radiusSize;
-            }
 
             items.push_back(LightData(
                 glm::vec4(l.color, l.intensity),
                 translation,
                 glm::normalize(rotatedNormal),
-                lightType == LightTypes::SPHERE ? glm::vec3(radiusOrScale) : glm::vec3(t.scale),
-                lightType
+                glm::vec3(l.radiusSize),
+                LightTypes::LightType::SPHERE
+            ));
+        }
+
+        auto planeView = CTX.worldRepository.registry.view<PlaneLightComponent, TransformComponent>();
+        for (auto [entityId, l, t]: planeView.each()) {
+
+            if (CTX.worldRepository.hiddenEntities.contains(entityId)) {
+                continue;
+            }
+            auto &translation = t.translation;
+
+            glm::vec3 normal(0.0f, 1.0f, 0.0f);
+            glm::vec3 rotatedNormal = t.rotation * normal;
+
+            items.push_back(LightData(
+                glm::vec4(l.color, l.intensity),
+                translation,
+                glm::normalize(rotatedNormal),
+                glm::vec3(t.scale),
+                LightTypes::LightType::PLANE
             ));
         }
     }
@@ -47,7 +62,7 @@ namespace Metal {
                         atmo.sunPosition,
                         glm::vec3(0),
                         glm::vec3(atmo.sunRadius),
-                        LightTypes::SPHERE
+                        LightTypes::LightType::SPHERE
                 ));
             }
         }

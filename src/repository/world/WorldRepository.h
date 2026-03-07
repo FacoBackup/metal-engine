@@ -10,13 +10,12 @@
 #include "../../util/Serializable.h"
 #include "../../enum/engine-definitions.h"
 #include "../../service/camera/Camera.h"
-#include "impl/EntityComponent.h"
+#include "impl/MetadataComponent.h"
 #include "../../enum/ComponentType.h"
-#include "components/LightComponent.h"
-#include "components/PrimitiveComponent.h"
 #include "components/SphereLightComponent.h"
 #include "components/PlaneLightComponent.h"
 #include "components/TransformComponent.h"
+#include "components/PrimitiveComponent.h"
 #include "components/VolumeComponent.h"
 #include "components/AtmosphereComponent.h"
 
@@ -24,35 +23,27 @@ namespace Metal {
     class Inspectable;
 
     struct WorldRepository final : AbstractRuntimeComponent, Serializable {
-        static constexpr EntityID ROOT_ID = 1;
-
-        explicit WorldRepository();
-
         Camera camera{-(glm::pi<float>() / 4), glm::pi<float>() / 4, {10, 10, 10}};
         entt::registry registry{};
-        std::unordered_map<EntityID, bool> culled{};
-        std::unordered_map<EntityID, bool> hiddenEntities{};
+        std::unordered_map<entt::entity, bool> culled{};
+        std::unordered_map<entt::entity, bool> hiddenEntities{};
 
-        void createComponent(EntityID entity, ComponentTypes::ComponentType type);
+        void createComponent(entt::entity entity, ComponentType type);
 
-        EntityID createEntity(std::string name = "New Entity", bool container = false);
+        entt::entity createEntity();
 
-        void linkEntities(EntityID parentId, EntityID childId);
+        [[nodiscard]] MetadataComponent *getEntity(entt::entity node);
 
-        [[nodiscard]] EntityComponent *getEntity(EntityID node);
+        void deleteEntities(const std::vector<entt::entity> &entities);
 
-        void deleteEntities(const std::vector<EntityID> &entities);
+        void changeVisibility(entt::entity entity, bool isVisible);
 
-        void changeVisibility(EntityID entity, bool isVisible);
+        void loadScene(const std::string &sceneId);
 
         nlohmann::json toJson() const override;
 
         void fromJson(const nlohmann::json &j) override;
 
-    private:
-        void deleteRecursively(const std::vector<EntityID> &entities);
-
-        void changeVisibilityRecursively(EntityID entity, bool isVisible);
     };
 } // Metal
 

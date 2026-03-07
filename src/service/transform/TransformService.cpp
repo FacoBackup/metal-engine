@@ -8,26 +8,11 @@
 
 namespace Metal {
     void TransformService::onSync() {
-        traverse(WorldRepository::ROOT_ID, false);
-    }
-
-    void TransformService::traverse(const EntityID entityId, bool parentHasChanged) {
-        const auto entity = static_cast<entt::entity>(entityId);
-        TransformComponent *st = CTX.worldRepository.registry.all_of<TransformComponent>(entity)
-                                     ? &CTX.worldRepository.registry.get<TransformComponent>(entity)
-                                     : nullptr;
-        if (st != nullptr && (st->isNotFrozen() || parentHasChanged)) {
-            TransformComponent *parentTransform = findParent(st->getEntityId());
-            transform(st, parentTransform);
-            st->freezeVersion();
-            parentHasChanged = true;
-        }
-
-        const auto e = static_cast<entt::entity>(entityId);
-        if (CTX.worldRepository.registry.all_of<HierarchyComponent>(e)) {
-            const auto &hierarchy = CTX.worldRepository.registry.get<HierarchyComponent>(e);
-            for (auto child: hierarchy.children) {
-                traverse(child, parentHasChanged);
+        for (auto entity : CTX.worldRepository.registry.view<TransformComponent>()) {
+            TransformComponent &st = CTX.worldRepository.registry.get<TransformComponent>(entity);
+            if (st.isNotFrozen()) {
+                transform(&st, nullptr);
+                st.freezeVersion();
             }
         }
     }
@@ -39,7 +24,7 @@ namespace Metal {
             auxMat4 = glm::identity<glm::mat4>();
         }
         if (!st->forceTransform && st->isStatic) {
-            LOG_WARN("Entity will not be transformed because it is set to static " + std::to_string(st->getEntityId()));
+            LOG_WARN("Entity will not be transformed because it is set to static " + std::to_string(entt::to_integral(st->getEntityId())));
             return;
         }
 
@@ -51,30 +36,8 @@ namespace Metal {
         st->model = auxMat4 * auxMat42;
         st->freezeVersion();
 
-        if (CTX.worldRepository.registry.all_of<PrimitiveComponent>(static_cast<entt::basic_registry<>::entity_type>(st->getEntityId()))) {
+        if (CTX.worldRepository.registry.all_of<PrimitiveComponent>(st->getEntityId())) {
             CTX.rayTracingService.markDirty();
         }
-    }
-
-    TransformComponent *TransformService::findParent(EntityID id) const {
-        while (id != EMPTY_ENTITY && id != WorldRepository::ROOT_ID) {
-            const auto e = static_cast<entt::entity>(id);
-            if (!CTX.worldRepository.registry.valid(e)) break;
-            const auto &hierarchy = CTX.worldRepository.registry.get<HierarchyComponent>(e);
-            id = hierarchy.parent;
-            const auto parent = static_cast<entt::entity>(id);
-            TransformComponent *t = (CTX.worldRepository.registry.valid(parent) && CTX.worldRepository.registry.all_of<TransformComponent>(parent))
-                          ? &CTX.worldRepository.registry.get<TransformComponent>(parent)
-                          : nullptr;
-            if (t != nullptr) {
-                return t;
-            }
-        }
-        return nullptr;
-    }
-
-    float TransformService::getDistanceFromCamera(glm::vec3 &translation) {
-        distanceAux = CTX.worldRepository.camera.position;
-        return glm::length(distanceAux - translation);
     }
 } // Metal

@@ -3,6 +3,7 @@
 #include <imgui.h>
 #include <glm/detail/type_quat.hpp>
 #include "../../../../../common/inspection/Inspectable.h"
+#include "../../../../../util/UIUtil.h"
 
 namespace Metal {
     QuatField::QuatField(InspectedField<glm::quat> &field) : field(field) {
@@ -14,8 +15,7 @@ namespace Metal {
             values[1] = field.field->y;
             values[2] = field.field->z;
             values[3] = field.field->w;
-            ImGui::Text(field.name.c_str());
-            if (ImGui::DragFloat4(field.id.c_str(), values, field.incrementF.value())) {
+            if (UIUtil::DrawQuatControl(field.name, field.id, values, field.incrementF.value())) {
                 field.field->x = values[0];
                 field.field->y = values[1];
                 field.field->z = values[2];

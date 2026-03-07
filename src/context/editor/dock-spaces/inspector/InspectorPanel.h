@@ -9,12 +9,11 @@ namespace Metal {
     class Inspectable;
 
     class InspectorPanel final : public AbstractDockPanel {
-        std::vector<Inspectable *> repositories{};
         std::vector<Inspectable *> additionalInspection{};
         Inspectable *selectedEntity = nullptr;
 
         FormPanel *formPanel = nullptr;
-        EntityID selectedId = EMPTY_ENTITY;
+        entt::entity selectedId = EMPTY_ENTITY;
 
     public:
         void onInitialize() override;

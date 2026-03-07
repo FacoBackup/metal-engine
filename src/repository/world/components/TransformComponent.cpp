@@ -1,6 +1,7 @@
 #include "TransformComponent.h"
 #include "VolumeComponent.h"
-#include "LightComponent.h"
+#include "SphereLightComponent.h"
+#include "PlaneLightComponent.h"
 #include "../../../common/interface/Icons.h"
 #include "../../../context/ApplicationContext.h"
 
@@ -14,13 +15,13 @@ namespace Metal {
         registerBool(isStatic, "", "Static?");
     }
 
-    ComponentTypes::ComponentType TransformComponent::getType() {
-        return ComponentTypes::TRANSFORM;
+    ComponentType TransformComponent::getType() {
+        return TRANSFORM;
     }
 
     void TransformComponent::onUpdate(InspectableMember *member) {
-        const auto e = static_cast<entt::entity>(entityId);
-        bool isLight = CTX.worldRepository.registry.all_of<std::unique_ptr<LightComponent> >(e);
+        bool isLight = CTX.worldRepository.registry.all_of<SphereLightComponent>(entityId) ||
+                       CTX.worldRepository.registry.all_of<PlaneLightComponent>(entityId);
         if (isLight) {
             CTX.engineContext.setUpdateLights(true);
         }
@@ -48,7 +49,7 @@ namespace Metal {
     }
 
     void TransformComponent::fromJson(const nlohmann::json &j) {
-        entityId = j.at("entityId").get<EntityID>();
+        entityId = j.at("entityId").get<entt::entity>();
         translation = {j.at("translation")[0], j.at("translation")[1], j.at("translation")[2]};
         rotation = {j.at("rotation")[3], j.at("rotation")[0], j.at("rotation")[1], j.at("rotation")[2]};
         rotationEuler = {j.at("rotationEuler")[0], j.at("rotationEuler")[1], j.at("rotationEuler")[2]};

@@ -33,7 +33,7 @@ namespace Metal {
                 CTX.editorRepository.gizmoType = ImGuizmo::OPERATION::ROTATE;
             }),
             ShortcutDTO("Delete", ImGuiKey_Delete, [this]() {
-                std::vector<EntityID> entities;
+                std::vector<entt::entity> entities;
                 for (auto &entry: CTX.editorRepository.selected) {
                     entities.push_back(entry.first);
                 }
@@ -41,13 +41,12 @@ namespace Metal {
                 CTX.selectionService.clearSelection();
             }),
             ShortcutDTO("Select All", ImGuiMod_Ctrl | ImGuiKey_A, [this]() {
-                std::vector<EntityID> entities;
+                std::vector<entt::entity> entities;
                 auto &storage = CTX.worldRepository.registry.storage<entt::entity>();
                 for (auto it = storage.begin(); it != storage.end(); ++it) {
                     auto entity = *it;
-                    if (static_cast<EntityID>(entity) != WorldRepository::ROOT_ID && CTX.worldRepository.registry.all_of
-                        <EntityComponent>(entity)) {
-                        entities.push_back(static_cast<EntityID>(entity));
+                    if (CTX.worldRepository.registry.all_of<MetadataComponent>(entity)) {
+                        entities.push_back(entity);
                     }
                 }
                 CTX.selectionService.addAllSelected(entities);

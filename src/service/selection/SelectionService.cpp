@@ -4,13 +4,11 @@
 #include "../../repository/world/components/TransformComponent.h"
 
 namespace Metal {
-    void SelectionService::addSelected(EntityID entity) const {
+    void SelectionService::addSelected(entt::entity entity) const {
         auto &editorRepository = CTX.editorRepository;
         if (editorRepository.selected.empty() || entity == EMPTY_ENTITY) {
             editorRepository.mainSelection = entity;
-            if (editorRepository.mainSelection == WorldRepository::ROOT_ID) {
-                editorRepository.mainSelection = EMPTY_ENTITY;
-            } else if (editorRepository.mainSelection != EMPTY_ENTITY) {
+            if (editorRepository.mainSelection != EMPTY_ENTITY) {
                 updatePrimitiveSelected();
             }
         }
@@ -26,10 +24,10 @@ namespace Metal {
         editorRepository.primitiveSelected = nullptr;
     }
 
-    void SelectionService::addAllSelected(const std::vector<EntityID> &all) const {
+    void SelectionService::addAllSelected(const std::vector<entt::entity> &all) const {
         auto &editorRepository = CTX.editorRepository;
         editorRepository.selected.clear();
-        const EntityID first = all.size() > 0 ? all[0] : EMPTY_ENTITY;
+        const entt::entity first = all.size() > 0 ? all[0] : EMPTY_ENTITY;
         editorRepository.mainSelection = first;
         updatePrimitiveSelected();
         for (auto a: all) {
@@ -41,14 +39,13 @@ namespace Metal {
         auto &editorRepository = CTX.editorRepository;
         auto &repo = CTX.worldRepository;
         const auto entityId = editorRepository.mainSelection;
-        const auto entity = static_cast<entt::entity>(entityId);
 
-        if (entityId == EMPTY_ENTITY || !repo.registry.valid(entity)) {
+        if (entityId == EMPTY_ENTITY || !repo.registry.valid(entityId)) {
             return;
         }
 
-        if (repo.registry.all_of<TransformComponent>(entity)) {
-            editorRepository.primitiveSelected = &repo.registry.get<TransformComponent>(entity);
+        if (repo.registry.all_of<TransformComponent>(entityId)) {
+            editorRepository.primitiveSelected = &repo.registry.get<TransformComponent>(entityId);
         }
     }
 

@@ -85,8 +85,8 @@ add_executable(
         src/context/editor/dock-spaces/metrics/MetricsPanel.h
         src/service/log/LogService.cpp
         src/service/log/LogService.h
-        src/context/editor/dock-spaces/hierarchy/HierarchyPanel.cpp
-        src/context/editor/dock-spaces/hierarchy/HierarchyPanel.h
+        src/context/editor/dock-spaces/world/WorldPanel.cpp
+        src/context/editor/dock-spaces/world/WorldPanel.h
         src/repository/abstract/RuntimeResource.h
         src/util/ShaderUtil.cpp
         src/util/ShaderUtil.h
@@ -152,17 +152,18 @@ add_executable(
         src/service/camera/Camera.cpp
         src/repository/world/WorldRepository.cpp
         src/repository/world/WorldRepository.h
-        src/repository/world/impl/EntityComponent.h
+        src/repository/world/impl/MetadataComponent.h
+        src/enum/ComponentType.cpp
         src/enum/ComponentType.h
         src/repository/world/impl/AbstractComponent.h
         src/repository/world/components/PrimitiveComponent.h
         src/repository/world/components/TransformComponent.h
         src/enum/ShadingMode.h
-        src/context/editor/dock-spaces/hierarchy/HierarchyHeaderPanel.cpp
-        src/context/editor/dock-spaces/hierarchy/HierarchyHeaderPanel.h
+        src/context/editor/dock-spaces/world/WorldHeaderPanel.cpp
+        src/context/editor/dock-spaces/world/WorldHeaderPanel.h
         src/service/selection/SelectionService.cpp
         src/service/selection/SelectionService.h
-        src/repository/world/impl/EntityComponent.cpp
+        src/repository/world/impl/MetadataComponent.cpp
         src/repository/world/components/TransformComponent.cpp
         src/repository/world/components/PrimitiveComponent.cpp
         src/context/editor/abstract/form/types/ResourceField.cpp
@@ -199,7 +200,6 @@ add_executable(
         src/service/voxel/impl/OctreeNode.h
         src/service/voxel/impl/VoxelData.h
         src/service/mesh/SceneData.h
-        src/service/mesh/EntityAssetData.h
         src/context/engine/render-pass/impl/PostProcessingPass.cpp
         src/context/engine/render-pass/impl/PostProcessingPass.h
         src/context/engine/compute-pass/impl/HWRayTracingPass.cpp
@@ -225,10 +225,9 @@ add_executable(
         src/service/voxel/SVOInstance.h
         src/dto/buffers/TileInfoUBO.h
         src/dto/buffers/LightData.h
-        src/repository/world/components/LightComponent.cpp
-        src/repository/world/components/LightComponent.h
         src/repository/world/components/SphereLightComponent.cpp
         src/repository/world/components/SphereLightComponent.h
+        src/repository/world/components/PlaneLightComponent.cpp
         src/repository/world/components/PlaneLightComponent.h
         src/context/engine/render-pass/impl/tools/IconsPass.cpp
         src/context/engine/render-pass/impl/tools/IconsPass.h
@@ -286,6 +285,10 @@ add_executable(
         src/context/engine/compute-pass/impl/SpatialFilterPass.cpp
         src/context/engine/compute-pass/impl/SpatialFilterPass.h
         src/repository/world/components/AtmosphereComponent.cpp
+        src/enum/ComponentType.cpp
+        src/service/mesh/SceneEntityData.h
+        src/context/editor/dock-spaces/repositories/RepositoriesPanel.cpp
+        src/context/editor/dock-spaces/repositories/RepositoriesPanel.h
 )
 
 

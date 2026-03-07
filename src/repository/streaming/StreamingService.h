@@ -17,17 +17,10 @@ namespace Metal {
     struct SVOInstance;
 
     class StreamingService final : public AbstractRuntimeComponent {
-        std::unordered_map<std::string, unsigned int> tries{};
         std::unordered_map<std::string, long long> lastUse{};
         TimePoint sinceLastCleanup;
 
     public:
-        MeshInstance *streamMesh(const std::string &id);
-
-        SVOInstance *streamSVO(const std::string &id);
-
-        TextureInstance *streamTexture(const std::string &id);
-
         void onSync() override;
     };
 } // Metal

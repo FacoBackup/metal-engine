@@ -46,8 +46,8 @@ namespace Metal {
         registerColor(middayColor, "Sun", "Midday color");
     }
 
-    ComponentTypes::ComponentType AtmosphereComponent::getType() {
-        return ComponentTypes::ATMOSPHERE;
+    ComponentType AtmosphereComponent::getType() {
+        return ComponentType::ATMOSPHERE;
     }
 
     void AtmosphereComponent::onUpdate(InspectableMember *member) {
@@ -86,7 +86,7 @@ namespace Metal {
     }
 
     void AtmosphereComponent::fromJson(const nlohmann::json &j) {
-        entityId = j.at("entityId").get<EntityID>();
+        entityId = j.at("entityId").get<entt::entity>();
         albedo = {j.at("albedo")[0], j.at("albedo")[1], j.at("albedo")[2]};
         density = j.at("density").get<float>();
         g = j.at("g").get<float>();

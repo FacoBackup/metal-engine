@@ -10,10 +10,11 @@ namespace Metal {
     struct DockSpace {
         static DockSpace VIEWPORT;
         static DockSpace INSPECTOR;
-        static DockSpace HIERARCHY;
+        static DockSpace WORLD;
         static DockSpace CONSOLE;
         static DockSpace FILES;
         static DockSpace METRICS;
+        static DockSpace REPOSITORIES;
         static const char *OPTIONS;
 
         const int index;

@@ -9,7 +9,7 @@
 #include "../../service/framebuffer/FrameBufferInstance.h"
 #include "../../service/texture/TextureInstance.h"
 #include "../../repository/world/components/AtmosphereComponent.h"
-#include "../../repository/world/impl/EntityComponent.h"
+#include "../../repository/world/impl/MetadataComponent.h"
 #include "../../repository/world/components/TransformComponent.h"
 
 namespace Metal {
@@ -46,6 +46,7 @@ namespace Metal {
         CTX.transformService.onSync();
         CTX.streamingService.onSync();
         CTX.cameraService.onSync();
+        CTX.rayTracingService.onSync();
 
         for (auto *frame: registeredFrames) {
             if (frame->getShouldRender()) {
@@ -64,7 +65,6 @@ namespace Metal {
             }
         }
 
-        CTX.rayTracingService.onSync();
 
         setUpdateLights(false);
         setCameraUpdated(false);

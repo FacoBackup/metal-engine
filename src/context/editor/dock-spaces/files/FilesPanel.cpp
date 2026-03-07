@@ -123,15 +123,13 @@ namespace Metal {
 
     void FilesPanel::openResource(FSEntry *root) {
         switch (root->type) {
-            case EntryType::MESH: {
-                CTX.meshService.createMeshEntity(root->name, root->getId(), nullptr);
-                break;
-            }
             case EntryType::SCENE: {
-                CTX.meshService.createSceneEntities(root->getId());
+                CTX.notificationService.pushMessage("Loading scene", NotificationSeverities::SUCCESS);
+                CTX.worldRepository.loadScene(root->getId());
                 break;
             }
             case EntryType::VOLUME: {
+                CTX.notificationService.pushMessage("Loading volume", NotificationSeverities::SUCCESS);
                 CTX.voxelService.create(root->getId());
                 break;
             }
@@ -142,6 +140,7 @@ namespace Metal {
                 break;
             }
             default:
+                CTX.notificationService.pushMessage("Unsupported resource type", NotificationSeverities::ERROR);
                 break;
         }
     }

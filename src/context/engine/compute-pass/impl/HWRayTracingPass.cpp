@@ -32,14 +32,6 @@ namespace Metal {
     }
 
     void HWRayTracingPass::onSync() {
-        bool anyMeshes = false;
-        entt::registry &reg = CTX.worldRepository.registry;
-        auto view = reg.view<PrimitiveComponent, TransformComponent>();
-        for (auto entity: view) {
-            CTX.streamingService.streamMesh(reg.get<PrimitiveComponent>(entity).meshId);
-            anyMeshes = true;
-        }
-
         auto *accumulatedFrame = frame->getResourceAs<TextureInstance>(RID_ACCUMULATED_FRAME);
         auto *gBufferPositionIndex = frame->getResourceAs<TextureInstance>(RID_GBUFFER_POSITION_INDEX);
         auto *gBufferNormal = frame->getResourceAs<TextureInstance>(RID_GBUFFER_NORMAL);
@@ -66,7 +58,7 @@ namespace Metal {
         pushConstant.pathTracerSamples = CTX.engineRepository.pathTracerSamples;
         pushConstant.pathTracerBounces = CTX.engineRepository.pathTracerBounces;
         pushConstant.pathTracingEmissiveFactor = CTX.engineRepository.pathTracingEmissiveFactor;
-        pushConstant.shouldTrace = CTX.rayTracingService.isReady() && anyMeshes ? 1 : 0;
+        pushConstant.shouldTrace = CTX.rayTracingService.isReady();
 
         pushConstant.dofEnabled = CTX.engineRepository.dofEnabled;
         pushConstant.dofFocusDistance = CTX.engineRepository.dofFocusDistance;

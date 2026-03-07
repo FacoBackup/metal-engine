@@ -11,7 +11,7 @@ namespace Metal {
 
         void registerFields() override;
 
-        ComponentTypes::ComponentType getType() override;
+        ComponentType getType() override;
 
         void onUpdate(InspectableMember *member) override;
 
@@ -22,7 +22,7 @@ namespace Metal {
         }
 
         void fromJson(const nlohmann::json& j) override {
-            entityId = j.at("entityId").get<EntityID>();
+            entityId = j.at("entityId").get<entt::entity>();
         }
     };
 } // Metal

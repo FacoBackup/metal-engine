@@ -35,9 +35,15 @@ namespace Metal {
         j["gizmoUseSnapRotate"] = gizmoUseSnapRotate;
         j["gizmoUseSnapScale"] = gizmoUseSnapScale;
         j["showOnlyEntitiesHierarchy"] = showOnlyEntitiesHierarchy;
-        j["mainSelection"] = mainSelection;
-        j["selected"] = selected;
-        j["copied"] = copied;
+        j["mainSelection"] = static_cast<uint32_t>(entt::to_integral(mainSelection));
+        j["selected"] = nlohmann::json::array();
+        for (auto const& [key, val] : selected) {
+            j["selected"].push_back(static_cast<uint32_t>(entt::to_integral(key)));
+        }
+        j["copied"] = nlohmann::json::array();
+        for (auto const& entity : copied) {
+            j["copied"].push_back(static_cast<uint32_t>(entt::to_integral(entity)));
+        }
         j["shadingMode"] = shadingMode;
         return j;
     }
@@ -66,9 +72,19 @@ namespace Metal {
             gizmoUseSnapRotate = j.at("gizmoUseSnapRotate").get<bool>();
             gizmoUseSnapScale = j.at("gizmoUseSnapScale").get<bool>();
             showOnlyEntitiesHierarchy = j.at("showOnlyEntitiesHierarchy").get<bool>();
-            mainSelection = j.at("mainSelection").get<EntityID>();
-            selected = j.at("selected").get<std::unordered_map<EntityID, bool> >();
-            copied = j.at("copied").get<std::vector<EntityID> >();
+            mainSelection = static_cast<entt::entity>(j.at("mainSelection").get<uint32_t>());
+            selected.clear();
+            if (j.contains("selected") && j.at("selected").is_array()) {
+                for (auto const& item : j.at("selected")) {
+                    selected[static_cast<entt::entity>(item.get<uint32_t>())] = true;
+                }
+            }
+            copied.clear();
+            if (j.contains("copied") && j.at("copied").is_array()) {
+                for (auto const& item : j.at("copied")) {
+                    copied.push_back(static_cast<entt::entity>(item.get<uint32_t>()));
+                }
+            }
             shadingMode = static_cast<ShadingMode>(j.at("shadingMode").get<int>());
     }
 

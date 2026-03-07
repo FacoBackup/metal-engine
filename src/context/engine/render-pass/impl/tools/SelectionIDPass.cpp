@@ -26,17 +26,15 @@ namespace Metal {
 
     void SelectionIDPass::onSync() {
         auto &worldRepository = CTX.worldRepository;
-        for (const auto &pair: CTX.editorRepository.selected) {
-            if (!pair.second) {
+        for (auto const& [entityId, selected] : CTX.editorRepository.selected) {
+            if (!selected) {
                 continue;
             }
-            const EntityID entityId = pair.first;
-            const auto entity = static_cast<entt::entity>(entityId);
-            if (!worldRepository.registry.all_of<PrimitiveComponent>(entity) || !worldRepository.registry.all_of<TransformComponent>(entity)) {
+            if (!worldRepository.registry.all_of<PrimitiveComponent>(entityId) || !worldRepository.registry.all_of<TransformComponent>(entityId)) {
                 continue;
             }
 
-            const auto &mesh = worldRepository.registry.get<PrimitiveComponent>(entity);
+            const auto &mesh = worldRepository.registry.get<PrimitiveComponent>(entityId);
             if (mesh.meshId.empty()) {
                 continue;
             }
@@ -44,16 +42,13 @@ namespace Metal {
                 continue;
             }
 
-            const auto *meshInstance = CTX.streamingService.streamMesh(mesh.meshId);
+            const auto *meshInstance = CTX.meshService.stream(mesh.meshId);
             if (!meshInstance) {
                 continue;
             }
 
-            pushConstant.model = worldRepository.registry.get<TransformComponent>(entity).model;
-            pushConstant.selectionColor.x = CTX.editorRepository.selectionColor.x;
-            pushConstant.selectionColor.y = CTX.editorRepository.selectionColor.y;
-            pushConstant.selectionColor.z = CTX.editorRepository.selectionColor.z;
-            pushConstant.selectionColor.w = CTX.editorRepository.selectionOutlineThickness;
+            pushConstant.model = worldRepository.registry.get<TransformComponent>(entityId).model;
+            pushConstant.selectionColor = glm::vec4(CTX.editorRepository.selectionColor, CTX.editorRepository.selectionOutlineThickness);
             pushConstant.renderIndex = mesh.renderIndex;
 
             recordPushConstant(&pushConstant);

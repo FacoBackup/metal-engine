@@ -9,7 +9,7 @@ namespace Metal {
     struct TextureInstance;
     class PickingService final : public AbstractRuntimeComponent {
     public:
-        [[nodiscard]] std::optional<EntityID> pickEntityFromGBuffer(TextureInstance *attachment, uint32_t pixelX, uint32_t pixelY) const;
+        [[nodiscard]] std::optional<entt::entity> pickEntityFromGBuffer(TextureInstance *attachment, uint32_t pixelX, uint32_t pixelY) const;
     };
 } // Metal
 

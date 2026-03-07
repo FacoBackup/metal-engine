@@ -5,8 +5,8 @@ namespace Metal {
     void VolumeComponent::registerFields() {
     }
 
-    ComponentTypes::ComponentType VolumeComponent::getType() {
-        return ComponentTypes::VOLUME;
+    ComponentType VolumeComponent::getType() {
+        return VOLUME;
     }
 
     void VolumeComponent::onUpdate(InspectableMember *member) {

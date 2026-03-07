@@ -16,7 +16,7 @@ namespace Metal {
         gizmoGrid();
         UIUtil::Spacing();
         if (selectedEntityId != editorRepository->mainSelection && CTX.worldRepository.registry.all_of(
-                static_cast<entt::basic_registry<>::entity_type>(editorRepository->mainSelection))) {
+                editorRepository->mainSelection)) {
             selectedEntity = CTX.worldRepository.getEntity(editorRepository->mainSelection);
             selectedEntityId = editorRepository->mainSelection;
         }

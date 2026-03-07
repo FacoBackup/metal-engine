@@ -7,7 +7,7 @@
 #include "../../abstract/AbstractPanel.h"
 
 namespace Metal {
-    struct EntityComponent;
+    struct MetadataComponent;
     struct EditorRepository;
 
     class GizmoSettingsPanel final : public AbstractPanel {
@@ -19,8 +19,8 @@ namespace Metal {
         static constexpr const char *SNAP_SCALE_OPTIONS = "0.5\0 1\0 2\0 5\0 10\0";
         static constexpr std::array<float, 5> SNAP_SCALE_OPTIONS_A = {0.5, 1, 2, 5, 10};
         EditorRepository *editorRepository = nullptr;
-        EntityComponent *selectedEntity = nullptr;
-        EntityID selectedEntityId = 0;
+        MetadataComponent *selectedEntity = nullptr;
+        entt::entity selectedEntityId = EMPTY_ENTITY;
 
     public:
         void onInitialize() override;

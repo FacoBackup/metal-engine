@@ -1,63 +1,44 @@
 #ifndef COMPONENTTYPE_H
 #define COMPONENTTYPE_H
+#include <vector>
+#include <string>
+#include <functional>
+#include <entt/entt.hpp>
+#include <nlohmann/json.hpp>
 #include "../common/interface/Icons.h"
 
-namespace Metal::ComponentTypes {
+namespace Metal {
+    class Inspectable;
+    struct WorldRepository;
+
     enum ComponentType {
         PRIMITIVE,
         TRANSFORM,
         SPHERE_LIGHT,
         PLANE_LIGHT,
         VOLUME,
-        ATMOSPHERE
+        ATMOSPHERE,
+        METADATA
+    };
+}
+
+namespace Metal::ComponentTypes {
+    struct ComponentDefinition {
+        ComponentType type;
+        std::string name;
+        std::string jsonKey;
+        std::string icon;
+        std::vector<ComponentType> dependencies;
+        std::function<void(WorldRepository &, entt::entity)> creator;
+        std::function<nlohmann::json(WorldRepository &, entt::entity)> toJson;
+        std::function<void(WorldRepository &, entt::entity, const nlohmann::json &)> fromJson;
+        std::function<Inspectable*(WorldRepository &, entt::entity)> getInspectable;
     };
 
-    static constexpr const char *NAMES = "Add Entity\0Mesh\0Sphere Light\0Plane Light\0Volume\0Atmosphere\0";
+    const std::vector<ComponentDefinition> &getComponents();
 
-    static ComponentType ValueOfIndex(const int option) {
-        if (option == 1) {
-            return PRIMITIVE;
-        }
-        if (option == 2) {
-            return SPHERE_LIGHT;
-        }
-        if (option == 3) {
-            return PLANE_LIGHT;
-        }
-        if (option == 4) {
-            return VOLUME;
-        }
-        return ATMOSPHERE;
-    }
+    const char *NameOf(ComponentType mode);
 
-    static const char *NameOf(const ComponentType mode) {
-        if (mode == PRIMITIVE)
-            return "Mesh Component";
-        if (mode == TRANSFORM)
-            return "Transformation Component";
-        if (mode == SPHERE_LIGHT)
-            return "Sphere Light Component";
-        if (mode == PLANE_LIGHT)
-            return "Plane Light Component";
-        if (mode == VOLUME)
-            return "Volume Component";
-        if (mode == ATMOSPHERE)
-            return "Atmosphere Component";
-        return nullptr;
-    }
-
-    static const char *IconOf(const ComponentType mode) {
-        if (mode == PRIMITIVE)
-            return Icons::view_in_ar.c_str();
-        if (mode == TRANSFORM)
-            return Icons::transform.c_str();
-        if (mode == SPHERE_LIGHT || mode == PLANE_LIGHT)
-            return Icons::lightbulb.c_str();
-        if (mode == VOLUME)
-            return Icons::blur_on.c_str();
-        if (mode == ATMOSPHERE)
-            return Icons::cloud.c_str();
-        return nullptr;
-    }
+    const char *IconOf(ComponentType mode);
 }
 #endif //COMPONENTTYPE_H

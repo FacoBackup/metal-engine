@@ -17,19 +17,10 @@ namespace Metal {
         glm::mat4x4 auxMat42{};
 
     public:
-        explicit TransformService()
-            : AbstractRuntimeComponent() {
-        }
 
         void onSync() override;
 
-        void traverse(EntityID entityId, bool parentHasChanged);
-
         void transform(TransformComponent *st, const TransformComponent *parentTransform);
-
-        [[nodiscard]] TransformComponent *findParent(EntityID id) const;
-
-        float getDistanceFromCamera(glm::vec3 &translation);
     };
 } // Metal
 

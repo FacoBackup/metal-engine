@@ -6,16 +6,20 @@
 #include <unordered_map>
 #include <string>
 #include <stop_token>
+#include <glm/vec3.hpp>
 
 namespace Metal {
+    struct MeshId {
+        std::string id;
+        glm::vec3 gizmoCenter;
+    };
     struct MeshData;
 
     class MeshImporterService final : public AbstractRuntimeComponent {
     public:
 
         void persistAllMeshes(const std::string &targetDir, const aiScene *scene,
-                              std::unordered_map<unsigned int, std::string> &meshMap,
-                              std::unordered_map<std::string, unsigned int> &meshMaterialMap,
+                              std::unordered_map<unsigned int, MeshId> &meshMap,
                               const std::stop_token &stopToken = {}) const;
 
     private:
