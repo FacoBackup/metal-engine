@@ -33,6 +33,7 @@ struct RayPayload {
     vec3 hitNormal;
     vec2 uv;
     uint renderIndex;
+    float alpha;
     bool hit;
     float t;
 };

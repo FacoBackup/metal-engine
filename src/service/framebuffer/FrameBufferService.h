@@ -20,8 +20,6 @@ namespace Metal {
         void createVKFrameBuffer(FrameBufferInstance *framebuffer) const;
 
     public:
-        void createSampler(bool linear, VkSampler &vkImageSampler);
-
         FrameBufferInstance *createFrameBuffer(const std::string &id, unsigned int w, unsigned int h,
                                                glm::vec4 clearColor = glm::vec4(0.0f));
 

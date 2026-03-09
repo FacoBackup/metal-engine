@@ -376,7 +376,7 @@ namespace Metal {
                         write.descriptorCount = 1;
 
                         VkDescriptorImageInfo imageInfo{};
-                        imageInfo.sampler = CTX.vulkanContext.vkImageSampler;
+                        imageInfo.sampler = CTX.vulkanContext.vkTextureSampler;
                         imageInfo.imageView = texture->vkImageView;
                         imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
                         write.pImageInfo = &imageInfo;
@@ -401,4 +401,25 @@ namespace Metal {
             CTX.descriptorSetService.disposeResource(resource->imageDescriptor);
         }
     }
+
+    void TextureService::createSampler(bool linear, VkSampler &vkImageSampler, VkSamplerAddressMode addressMode) {
+        VkSamplerCreateInfo samplerCreateInfo{};
+        samplerCreateInfo.magFilter = linear ? VK_FILTER_LINEAR : VK_FILTER_NEAREST;
+        samplerCreateInfo.minFilter = linear ? VK_FILTER_LINEAR : VK_FILTER_NEAREST;
+        samplerCreateInfo.mipmapMode = linear ? VK_SAMPLER_MIPMAP_MODE_LINEAR : VK_SAMPLER_MIPMAP_MODE_NEAREST;
+        samplerCreateInfo.addressModeU = addressMode;
+        samplerCreateInfo.addressModeV = addressMode;
+        samplerCreateInfo.addressModeW = addressMode;
+        samplerCreateInfo.mipLodBias = 0.0f;
+        samplerCreateInfo.compareOp = VK_COMPARE_OP_NEVER;
+        samplerCreateInfo.minLod = 0.0f;
+        samplerCreateInfo.maxLod = 1;
+        // TODO - ENABLE/DISABLE ANISOTROPY
+        samplerCreateInfo.maxAnisotropy = 8;
+        samplerCreateInfo.anisotropyEnable = VK_TRUE;
+        samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
+        VulkanUtils::CheckVKResult(vkCreateSampler(CTX.vulkanContext.device.device, &samplerCreateInfo, nullptr,
+                                                   &vkImageSampler));
+    }
+
 } // Metal

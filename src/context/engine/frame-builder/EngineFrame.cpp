@@ -3,7 +3,8 @@
 #include "../passes/AbstractPass.h"
 
 namespace Metal {
-    EngineFrame::EngineFrame(std::string id) : id(std::move(id)) {}
+    EngineFrame::EngineFrame(std::string id) : id(std::move(id)) {
+    }
 
     void EngineFrame::addResource(RuntimeResource *resource) {
         if (resource) {
@@ -32,5 +33,9 @@ namespace Metal {
             }
         }
         passes.clear();
+    }
+
+    std::string EngineFrame::getScopedResourceId(const std::string &resourceId) const {
+        return id + "_" + resourceId;
     }
 }

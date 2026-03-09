@@ -45,19 +45,15 @@ namespace Metal {
 
         CTX.transformService.onSync();
         CTX.streamingService.onSync();
-        CTX.cameraService.onSync();
         CTX.rayTracingService.onSync();
+        CTX.cameraService.onSync();
+        if (updateLights || isFirstFrame) {
+            CTX.lightService.onSync();
+        }
 
         for (auto *frame: registeredFrames) {
             if (frame->getShouldRender()) {
                 currentFrame = frame;
-
-                if (updateLights || isFirstFrame) {
-                    CTX.lightService.onSync();
-                }
-
-                isFirstFrame = false;
-
                 updateGlobalData();
                 currentFrame->onSync();
 
@@ -65,7 +61,7 @@ namespace Metal {
             }
         }
 
-
+        isFirstFrame = false;
         setUpdateLights(false);
         setCameraUpdated(false);
         setGISettingsUpdated(false);
@@ -73,7 +69,6 @@ namespace Metal {
 
     void EngineContext::updateGlobalData() {
         auto &camera = CTX.worldRepository.camera;
-        auto *fbo = currentFrame->getResourceAs<FrameBufferInstance>(RID_POST_PROCESSING_FBO);
         globalDataUBO.previousProjView = globalDataUBO.projView;
         globalDataUBO.viewMatrix = camera.viewMatrix;
         globalDataUBO.projectionMatrix = camera.projectionMatrix;
@@ -86,7 +81,6 @@ namespace Metal {
         CTX.engineRepository.pathTracerAccumulationCount++;
         globalDataUBO.pathTracerAccumulationCount = CTX.engineRepository.pathTracerAccumulationCount;
         globalDataUBO.globalFrameCount++;
-        globalDataUBO.outputRes = {fbo->bufferWidth, fbo->bufferHeight};
         globalDataUBO.pathTracerMaxSamples = CTX.engineRepository.pathTracerMaxSamples;
         globalDataUBO.denoiserEnabled = CTX.engineRepository.denoiserEnabled && (
                                             globalDataUBO.debugFlag == LIT || globalDataUBO.debugFlag == LIGHTING_ONLY)

@@ -281,11 +281,9 @@ namespace Metal {
         createMemoryAllocator();
         createCommandPool();
         createDescriptorPool();
-        CTX.framebufferService.createSampler(false, vkImageSampler);
+        CTX.textureService.createSampler(false, vkImageSampler, VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER);
+        CTX.textureService.createSampler(true, vkTextureSampler, VK_SAMPLER_ADDRESS_MODE_REPEAT);
         // ------- CORE INITIALIZATION
-
-        // ------- REPOSITORY INITIALIZATION
-        // ------- REPOSITORY INITIALIZATION
     }
 
     void VulkanContext::dispose() const {
@@ -296,6 +294,7 @@ namespace Metal {
         CTX.rayTracingService.destroyAccelerationStructures();
 
         vkDestroySampler(device.device, vkImageSampler, nullptr);
+        vkDestroySampler(device.device, vkTextureSampler, nullptr);
 
         vkDestroyDescriptorPool(CTX.vulkanContext.device.device, descriptorPool,
                                 nullptr);

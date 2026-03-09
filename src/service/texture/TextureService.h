@@ -47,6 +47,8 @@ namespace Metal {
         unsigned int getTextureIndex(const std::string &id);
 
         void disposeResource(TextureInstance *resource) override;
+
+        void createSampler(bool linear, VkSampler &vkImageSampler, VkSamplerAddressMode addressMode);
     };
 } // Metal
 

@@ -71,21 +71,21 @@ namespace Metal {
             primitive.isEmissive = (color.r > 0 || color.g > 0 || color.b > 0);
         }
 
-        float factor;
-        if (material->Get(AI_MATKEY_METALLIC_FACTOR, factor) == AI_SUCCESS) {
-            primitive.metallicFactor = factor;
-        }
-
-        if (material->Get(AI_MATKEY_ROUGHNESS_FACTOR, factor) == AI_SUCCESS) {
-            primitive.roughnessFactor = factor;
-        }
-
-        if (material->Get(AI_MATKEY_TRANSMISSION_FACTOR, factor) == AI_SUCCESS) {
-            primitive.transmissionFactor = factor;
-        }
-
-        if (material->Get(AI_MATKEY_REFRACTI, factor) == AI_SUCCESS) {
-            primitive.ior = factor;
-        }
+        // float factor;
+        // if (material->Get(AI_MATKEY_METALLIC_FACTOR, factor) == AI_SUCCESS) {
+        //     primitive.metallicFactor = factor;
+        // }
+        //
+        // if (material->Get(AI_MATKEY_ROUGHNESS_FACTOR, factor) == AI_SUCCESS) {
+        //     primitive.roughnessFactor = factor;
+        // }
+        //
+        // if (material->Get(AI_MATKEY_TRANSMISSION_FACTOR, factor) == AI_SUCCESS) {
+        //     primitive.transmissionFactor = factor;
+        // }
+        //
+        // if (material->Get(AI_MATKEY_REFRACTI, factor) == AI_SUCCESS) {
+        //     primitive.ior = factor;
+        // }
     }
 }

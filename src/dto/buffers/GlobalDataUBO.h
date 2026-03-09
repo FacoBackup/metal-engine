@@ -12,7 +12,6 @@ namespace Metal {
         alignas(16) glm::mat4x4 previousProjView{};
 
         alignas(16) glm::vec3 cameraWorldPosition{};
-        alignas(8) glm::vec2 outputRes{};
 
         alignas(4) unsigned int lightsCount{};
         alignas(4) unsigned int debugFlag;

@@ -93,9 +93,19 @@ void main() {
 
     payload.hit = false;
     payload.renderIndex = 0;
+    payload.alpha = 1.0;
 
     if (pushConstants.shouldTrace == 1) {
-        traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xFF, 0, 0, 0, rayOrigin, 0.001, rayDirection, 10000.0, 0);
+        float tMin = 0.001;
+        vec3 origin = rayOrigin;
+        for (int i = 0; i < 8; i++) {
+            traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xFF, 0, 0, 0, origin, tMin, rayDirection, 10000.0, 0);
+            if (!payload.hit || payload.alpha > 0.0) {
+                break;
+            }
+            origin = payload.hitPosition;
+            tMin = 0.001;
+        }
     }
 
     if (!payload.hit) {

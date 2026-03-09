@@ -50,7 +50,7 @@ namespace Metal {
 
     void DockSpacePanel::handleShortcut() const {
         if (view != nullptr) {
-            const bool isHovered = ImGui::IsWindowFocused(ImGuiHoveredFlags_RootAndChildWindows);
+            const bool isHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows);
             if (isHovered) {
                 CTX.editorRepository.focusedShortcuts = view->getShortcuts();
                 CTX.editorRepository.focusedWindowName = view->dock->name;

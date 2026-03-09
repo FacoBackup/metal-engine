@@ -79,9 +79,6 @@ namespace Metal {
     }
 
     std::string AbstractPass::getScopedResourceId(const std::string &id) const {
-        if (frame != nullptr) {
-            return frame->getId() + "_" + id;
-        }
-        return id;
+        return frame->getScopedResourceId(id);
     }
 }

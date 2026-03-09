@@ -19,6 +19,7 @@ void main() {
     bool isBoundary = false;
 
     ivec2 pixel = ivec2(gl_FragCoord.xy);
+    ivec2 texSize = textureSize(selectionIdSampler, 0);
 
     for (int y = -thickness; y <= thickness; ++y) {
         for (int x = -thickness; x <= thickness; ++x) {
@@ -28,8 +29,8 @@ void main() {
 
             ivec2 neighborPixel = pixel + ivec2(x, y);
 
-            if (neighborPixel.x < 0 || neighborPixel.x >= int(globalData.outputRes.x) ||
-            neighborPixel.y < 0 || neighborPixel.y >= int(globalData.outputRes.y)) {
+            if (neighborPixel.x < 0 || neighborPixel.x >= int(texSize.x) ||
+            neighborPixel.y < 0 || neighborPixel.y >= int(texSize.y)) {
                 isBoundary = true;
                 break;
             }

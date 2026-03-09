@@ -8,7 +8,6 @@ layout (set = 0, binding = 0) uniform GlobalDataBlock {
     mat4 invProj;
     mat4 previousProjView;
     vec3 cameraWorldPosition;
-    vec2 outputRes;
 
     uint lightsCount;
     uint debugFlag;

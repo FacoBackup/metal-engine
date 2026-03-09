@@ -69,6 +69,7 @@ namespace Metal {
         VkCommandPool commandPool = VK_NULL_HANDLE;
         VkPhysicalDeviceRayTracingPipelinePropertiesKHR rayTracingPipelineProperties{};
         VkSampler vkImageSampler = VK_NULL_HANDLE;
+        VkSampler vkTextureSampler = VK_NULL_HANDLE;
 
         PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR = nullptr;
         PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR = nullptr;

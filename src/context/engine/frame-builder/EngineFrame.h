@@ -11,6 +11,7 @@
 namespace Metal {
     class CommandBufferRecorder;
     class AbstractPass;
+
     class EngineFrame {
         std::string id;
         bool shouldRender = false;
@@ -30,7 +31,7 @@ namespace Metal {
 
         template<typename T>
         T *getResourceAs(const std::string &resourceId) {
-            auto it = resources.find(id + "_" +resourceId);
+            auto it = resources.find(getScopedResourceId(resourceId));
             if (it != resources.end()) {
                 return dynamic_cast<T *>(it->second);
             }
@@ -39,7 +40,8 @@ namespace Metal {
 
         void addPass(CommandBufferRecorder *recorder, const std::vector<AbstractPass *> &p);
 
-        [[nodiscard]] const std::vector<std::pair<CommandBufferRecorder *, std::vector<AbstractPass *> > > &getPasses() const {
+        [[nodiscard]] const std::vector<std::pair<CommandBufferRecorder *, std::vector<AbstractPass *> > > &
+        getPasses() const {
             return passes;
         }
 
@@ -47,7 +49,10 @@ namespace Metal {
 
         void dispose();
 
-        void destroy() {}
+        void destroy() {
+        }
+
+        [[nodiscard]] std::string getScopedResourceId(const std::string &resourceId) const;
     };
 }
 

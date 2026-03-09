@@ -70,8 +70,11 @@ void main() {
     float ior = 1.45;
     bool isEmissive = false;
 
+    payload.alpha = 1.0;
     if (metadata.albedoTexture != 0u) {
-        baseColor = texture(textureArray[nonuniformEXT(metadata.albedoTexture)], uv).rgb;
+        vec4 alb = texture(textureArray[nonuniformEXT(metadata.albedoTexture)], uv);
+        payload.alpha = alb.a;
+        baseColor = alb.rgb;
     } else {
         baseColor = metadata.albedo;
     }

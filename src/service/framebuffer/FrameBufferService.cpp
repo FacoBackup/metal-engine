@@ -10,25 +10,6 @@
 #include "../../context/ApplicationContext.h"
 
 namespace Metal {
-    void FrameBufferService::createSampler(bool linear, VkSampler &vkImageSampler) {
-        VkSamplerCreateInfo samplerCreateInfo{};
-        samplerCreateInfo.magFilter = linear ? VK_FILTER_LINEAR : VK_FILTER_NEAREST;
-        samplerCreateInfo.minFilter = linear ? VK_FILTER_LINEAR : VK_FILTER_NEAREST;
-        samplerCreateInfo.mipmapMode = linear ? VK_SAMPLER_MIPMAP_MODE_LINEAR : VK_SAMPLER_MIPMAP_MODE_NEAREST;
-        samplerCreateInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
-        samplerCreateInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
-        samplerCreateInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
-        samplerCreateInfo.mipLodBias = 0.0f;
-        samplerCreateInfo.compareOp = VK_COMPARE_OP_NEVER;
-        samplerCreateInfo.minLod = 0.0f;
-        samplerCreateInfo.maxLod = 1;
-        // TODO - ENABLE/DISABLE ANISOTROPY
-        samplerCreateInfo.maxAnisotropy = 8;
-        samplerCreateInfo.anisotropyEnable = VK_TRUE;
-        samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
-        VulkanUtils::CheckVKResult(vkCreateSampler(CTX.vulkanContext.device.device, &samplerCreateInfo, nullptr,
-                                                   &vkImageSampler));
-    }
 
     FrameBufferInstance *FrameBufferService::createFrameBuffer(const std::string &id, const unsigned w,
                                                                const unsigned h, glm::vec4 clearColor) {
