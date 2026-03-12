@@ -12,12 +12,9 @@
 #include "../../service/camera/Camera.h"
 #include "impl/MetadataComponent.h"
 #include "../../enum/ComponentType.h"
-#include "components/SphereLightComponent.h"
-#include "components/PlaneLightComponent.h"
 #include "components/TransformComponent.h"
 #include "components/PrimitiveComponent.h"
 #include "components/VolumeComponent.h"
-#include "components/AtmosphereComponent.h"
 
 namespace Metal {
     class Inspectable;

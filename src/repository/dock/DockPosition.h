@@ -6,6 +6,8 @@ namespace Metal {
         TOP,
         RIGHT_BOTTOM,
         RIGHT_TOP,
+        LEFT_TOP,
+        LEFT_BOTTOM,
         BOTTOM
     };
 }

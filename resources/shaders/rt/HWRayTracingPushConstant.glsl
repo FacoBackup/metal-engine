@@ -3,6 +3,8 @@
 
 layout(push_constant) uniform PushConstants {
     float pathTracerMultiplier;
+    uint volumeShadowSteps;
+    uint isAtmosphereEnabled;
 
     uint multipleImportanceSampling;
     uint pathTracerSamples;

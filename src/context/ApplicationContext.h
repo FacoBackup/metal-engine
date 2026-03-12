@@ -37,6 +37,7 @@
 #include "../service/log/LogService.h"
 #include "../service/transform/TransformService.h"
 #include "../service/picking/PickingService.h"
+#include "../service/volumes/VolumeService.h"
 #include "../service/voxel/VoxelImporterService.h"
 #include "../service/voxel/VoxelService.h"
 #include "../service/lights/LightService.h"
@@ -87,6 +88,7 @@ namespace Metal {
         PickingService pickingService{};
         TransformService transformService{};
         LightService lightService{};
+        VolumeService volumeService{};
         RayTracingService rayTracingService{};
         CommandBufferRecorderService commandBufferRecorderService{};
         VoxelImporterService voxelImporterService{};

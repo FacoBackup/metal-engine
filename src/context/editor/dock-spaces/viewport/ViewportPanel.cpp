@@ -58,10 +58,8 @@ namespace Metal {
     }
 
     void ViewportPanel::onSync() {
-        if (!CTX.engineRepository.isBaking) {
-            updateCamera();
-            updateInputs();
-        }
+        updateCamera();
+        updateInputs();
 
         headerPanel->onSync();
         engineFramePanel->onSync();

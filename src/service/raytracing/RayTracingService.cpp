@@ -33,6 +33,8 @@ namespace Metal {
             }
         }
     }
+
+    // TODO - EVENT SYSTEM BASED ON WORLD CHANGE AND ENTITY CHANGE
     void RayTracingService::onSync() {
         if (needsMaterialUpdate) {
             updateMeshMaterials();

@@ -14,8 +14,6 @@
 #include "../../context/ApplicationContext.h"
 #include "../../util/serialization-definitions.h"
 #include "../../dto/file/SceneImportSettingsDTO.h"
-#include "../../repository/world/components/SphereLightComponent.h"
-#include "../../repository/world/components/PlaneLightComponent.h"
 
 namespace Metal {
     std::string SceneImporterService::importData(const std::string &targetDir, const std::string &pathToFile,
@@ -24,8 +22,7 @@ namespace Metal {
         Assimp::Importer importer;
 
         unsigned int flags = aiProcess_GlobalScale | aiProcess_FindInstances | aiProcess_PreTransformVertices;
-        auto sceneSettings = std::dynamic_pointer_cast<SceneImportSettingsDTO>(settings);
-        if (sceneSettings) {
+        if (auto sceneSettings = std::dynamic_pointer_cast<SceneImportSettingsDTO>(settings)) {
             if (sceneSettings->triangulate) flags |= aiProcess_Triangulate;
             if (sceneSettings->flipUVs) flags |= aiProcess_FlipUVs;
             if (sceneSettings->genSmoothNormals) flags |= aiProcess_GenSmoothNormals;
@@ -78,7 +75,7 @@ namespace Metal {
 
         std::vector<SceneEntityData> entities{};
         for (SceneEntityData &entity: sceneData.entities) {
-            if (!entity.primitive && !entity.planeLight && !entity.sphereLight) {
+            if (!entity.primitive) {
                 continue;
             }
             entities.push_back(entity);
@@ -145,16 +142,6 @@ namespace Metal {
             auto &lightNode = scene.entities.emplace_back();
             lightNode.entity.name = light->mName.data;
             lightNode.transform.translation = {light->mPosition.x, light->mPosition.y, light->mPosition.z};
-
-            if (light->mType == aiLightSource_POINT) {
-                lightNode.sphereLight = SphereLightComponent();
-                lightNode.sphereLight->color = {light->mColorDiffuse.r, light->mColorDiffuse.g, light->mColorDiffuse.b};
-                lightNode.sphereLight->intensity = 1.0f;
-            } else if (light->mType == aiLightSource_DIRECTIONAL || light->mType == aiLightSource_AREA) {
-                lightNode.planeLight = PlaneLightComponent();
-                lightNode.planeLight->color = {light->mColorDiffuse.r, light->mColorDiffuse.g, light->mColorDiffuse.b};
-                lightNode.planeLight->intensity = 1.0f;
-            }
         }
     }
 

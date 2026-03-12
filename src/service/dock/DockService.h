@@ -16,8 +16,6 @@ namespace Metal {
         static void createDockSpace(DockDTO *dockSpace, ImGuiID *dockMainId);
 
         static void addWindow(DockDTO *d, AbstractPanel *panel);
-
-        explicit DockService();
     };
 } // Metal
 

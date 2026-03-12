@@ -6,7 +6,6 @@
 #include <memory>
 
 #include "../../dto/buffers/GlobalDataUBO.h"
-#include "../../dto/buffers/AtmosphereUBO.h"
 #include "../../common/AbstractRuntimeComponent.h"
 #include "../../dto/buffers/TileInfoUBO.h"
 
@@ -16,23 +15,12 @@ using TimePoint = std::chrono::time_point<Clock>;
 namespace Metal {
     class EngineContext final : public AbstractRuntimeComponent {
         GlobalDataUBO globalDataUBO{};
-        AtmosphereUBO atmosphereUBO{};
         long long start = -1;
         bool cameraUpdated = true;
-        bool updateLights = true;
         bool giSettingsUpdated = true;
-        bool isFirstFrame = true;
 
     public:
         GlobalDataUBO &getGlobalDataUBO() { return globalDataUBO; }
-
-        void setUpdateLights(const bool val) {
-            updateLights = val;
-        }
-
-        [[nodiscard]] bool isUpdateLights() const {
-            return updateLights;
-        }
 
         void setCameraUpdated(const bool val) {
             cameraUpdated = val;
@@ -55,9 +43,6 @@ namespace Metal {
         void onInitialize() override;
 
         void updateCurrentTime();
-
-        explicit EngineContext() : AbstractRuntimeComponent() {
-        }
 
         long long currentTimeMs = 0;
         TimePoint currentTime;

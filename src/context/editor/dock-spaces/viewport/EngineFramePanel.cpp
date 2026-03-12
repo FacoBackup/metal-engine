@@ -1,19 +1,16 @@
 #include "EngineFramePanel.h"
 #include "../../../../context/ApplicationContext.h"
-#include "ViewportPanel.h"
 #include "../../../../context/engine/frame-builder/EngineFrameBuilder.h"
 #include "../../../../context/engine/frame-builder/EngineFrame.h"
-#include "../../../../service/framebuffer/FrameBufferService.h"
 #include "../../../../service/descriptor/DescriptorInstance.h"
 #include "../../../../service/framebuffer/FrameBufferInstance.h"
 #include "../../../../service/picking/PickingService.h"
 #include "../../../../enum/engine-definitions.h"
 #include "../../../../enum/EngineResourceIDs.h"
 #include "../../../../dto/buffers/GlobalDataUBO.h"
-#include "../../../../dto/buffers/TileInfoUBO.h"
 #include "../../../../dto/buffers/LightData.h"
+#include "../../../../dto/buffers/VolumeData.h"
 #include "../../../../dto/buffers/MeshMetadata.h"
-#include "../../../../dto/buffers/AtmosphereUBO.h"
 #include "ViewportHeaderPanel.h"
 #include "ImGuizmo.h"
 #include <algorithm>
@@ -26,10 +23,10 @@ namespace Metal {
         engineFrame = EngineFrameBuilder()
                 .addBuffer(RID_GLOBAL_DATA, sizeof(GlobalDataUBO),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, UNIFORM_BUFFER)
-                .addBuffer(RID_ATMOSPHERE_DATA, sizeof(AtmosphereUBO),
-                           VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, UNIFORM_BUFFER)
                 .addBuffer(RID_LIGHT_BUFFER, MAX_LIGHTS * sizeof(LightData),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
+        .addBuffer(RID_VOLUMES_BUFFER, MAX_VOLUMES * sizeof(VolumeData),
+                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
                 .addBuffer(RID_MESH_METADATA_BUFFER, MAX_MESH_INSTANCES * sizeof(MeshMetadata),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
                 .addTexture(RID_ACCUMULATED_FRAME, gBufferW, gBufferH)
@@ -63,11 +60,6 @@ namespace Metal {
 
     void EngineFramePanel::onSync() {
         engineFrame->setShouldRender(true);
-
-        const float tabHeight = ImGui::GetFrameHeightWithSpacing();
-        // Assuming this panel is inside ViewportPanel, we need to get its size.
-        // But for now, let's use ImGui::GetContentRegionAvail() or similar if we can't access parent size easily.
-        // Actually, ViewportPanel sets its size in updateInputs.
         const ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 
         auto *framebuffer = engineFrame->getResourceAs<FrameBufferInstance>(RID_POST_PROCESSING_FBO);

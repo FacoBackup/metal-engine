@@ -5,12 +5,8 @@
 #include "../../../../common/inspection/Inspectable.h"
 #include "../../../../context/ApplicationContext.h"
 #include "../../../../repository/world/impl/MetadataComponent.h"
-#include "../../../../repository/world/components/VolumeComponent.h"
-#include "../../../../repository/world/components/SphereLightComponent.h"
-#include "../../../../repository/world/components/PlaneLightComponent.h"
 #include <imgui.h>
 #include <format>
-#include "../../../../service/camera/Camera.h"
 
 namespace Metal {
     void InspectorPanel::onInitialize() {

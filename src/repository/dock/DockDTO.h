@@ -2,6 +2,7 @@
 #define METAL_ENGINE_DOCKDTO_H
 
 #include <string>
+#include <vector>
 #include <imgui.h>
 #include "DockSpace.h"
 #include "DockPosition.h"
@@ -19,7 +20,6 @@ namespace Metal {
         float sizeRatioForNodeAtDir{};
         DockDTO *outAtOppositeDir = nullptr;
         DockDTO *origin = nullptr;
-        DockPosition direction = RIGHT_TOP;
         std::vector<DockSpace *> dockSpaces{};
 
 

@@ -5,8 +5,6 @@
 #include "../../../../util/UIUtil.h"
 #include "../../../../context/ApplicationContext.h"
 #include "../../../../repository/world/impl/MetadataComponent.h"
-#include "../../../../repository/world/components/SphereLightComponent.h"
-#include "../../../../repository/world/components/PlaneLightComponent.h"
 #include "../../../../enum/ComponentType.h"
 
 namespace Metal {

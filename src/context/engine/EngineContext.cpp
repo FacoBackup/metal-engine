@@ -3,13 +3,7 @@
 #include "../../enum/EngineResourceIDs.h"
 #include "../../context/ApplicationContext.h"
 #include "../../service/buffer/BufferInstance.h"
-#include "../../service/descriptor/DescriptorBinding.h"
-#include "../../service/voxel/SVOInstance.h"
 #include "../../service/camera/Camera.h"
-#include "../../service/framebuffer/FrameBufferInstance.h"
-#include "../../service/texture/TextureInstance.h"
-#include "../../repository/world/components/AtmosphereComponent.h"
-#include "../../repository/world/impl/MetadataComponent.h"
 #include "../../repository/world/components/TransformComponent.h"
 
 namespace Metal {
@@ -47,9 +41,8 @@ namespace Metal {
         CTX.streamingService.onSync();
         CTX.rayTracingService.onSync();
         CTX.cameraService.onSync();
-        if (updateLights || isFirstFrame) {
-            CTX.lightService.onSync();
-        }
+        CTX.lightService.onSync();
+        CTX.volumeService.onSync();
 
         for (auto *frame: registeredFrames) {
             if (frame->getShouldRender()) {
@@ -61,8 +54,6 @@ namespace Metal {
             }
         }
 
-        isFirstFrame = false;
-        setUpdateLights(false);
         setCameraUpdated(false);
         setGISettingsUpdated(false);
     }
@@ -76,6 +67,7 @@ namespace Metal {
         globalDataUBO.invProj = camera.invProjectionMatrix;
         globalDataUBO.invView = camera.invViewMatrix;
         globalDataUBO.cameraWorldPosition = camera.position;
+        globalDataUBO.volumeCount = CTX.volumeService.getCount();
         globalDataUBO.lightsCount = CTX.lightService.getCount();
         globalDataUBO.debugFlag = ShadingModes::IndexOfValue(CTX.editorRepository.shadingMode);
         CTX.engineRepository.pathTracerAccumulationCount++;
@@ -87,26 +79,9 @@ namespace Metal {
                                             ? 1
                                             : 0;
 
-        entt::registry &reg = CTX.worldRepository.registry;
-        auto view = reg.view<AtmosphereComponent>();
-        if (auto it = view.begin(); it != view.end()) {
-            auto &atmo = reg.get<AtmosphereComponent>(*it);
-            atmosphereUBO.volumeScale = atmo.volumeScale;
-            atmosphereUBO.albedo = atmo.albedo;
-            atmosphereUBO.density = atmo.density;
-            atmosphereUBO.g = atmo.g;
-            atmosphereUBO.isAtmosphereEnabled = atmo.atmosphereEnabled ? 1 : 0;
-            atmosphereUBO.isVolumeEnabled = atmo.volumeEnabled ? 1 : 0;
-            atmosphereUBO.volumeShadowSteps = atmo.volumeShadowSteps;
-            atmosphereUBO.scatteringAlbedo = atmo.scatteringAlbedo;
-            atmosphereUBO.samples = atmo.samples;
-            atmosphereUBO.sunPosition = atmo.sunPosition;
-        } else {
-            atmosphereUBO.isVolumeEnabled = 0;
-            atmosphereUBO.isAtmosphereEnabled = 0;
-        }
-
+        CTX.lightService.computeSunInfo();
+        globalDataUBO.sunPosition = CTX.lightService.getSunPosition();
+        globalDataUBO.sunColor = CTX.lightService.getSunColor();
         currentFrame->getResourceAs<BufferInstance>(RID_GLOBAL_DATA)->update(&globalDataUBO);
-        currentFrame->getResourceAs<BufferInstance>(RID_ATMOSPHERE_DATA)->update(&atmosphereUBO);
     }
 }

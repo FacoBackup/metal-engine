@@ -18,7 +18,7 @@ namespace Metal {
     DockSpace DockSpace::FILES{3, "Files", Icons::folder_open, 4, 4, CB(FilesPanel)};
     DockSpace DockSpace::METRICS{4, "Metrics", Icons::analytics, 4, 4, CB(MetricsPanel)};
     DockSpace DockSpace::REPOSITORIES{5, "Repositories", Icons::search, 4, 4, CB(RepositoriesPanel)};
-    const char *DockSpace::OPTIONS = "Inspector\0World\0Console\0Files\0Metrics\0Repositories";
+    const char *DockSpace::OPTIONS = "Inspector\0World\0Console\0Files\0Metrics\0Repositories\0";
 
 
     DockSpace *DockSpace::GetOption(const int selected) {

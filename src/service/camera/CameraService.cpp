@@ -4,6 +4,8 @@
 #include "../../context/ApplicationContext.h"
 
 namespace Metal {
+    // Per frame
+    // TODO - EVENT SYSTEM
     void CameraService::onSync() {
         camera = &CTX.worldRepository.camera;
         if (camera != nullptr) {

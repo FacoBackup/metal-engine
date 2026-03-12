@@ -35,7 +35,6 @@ namespace Metal {
 
             registry.destroy(entityId);
         }
-        CTX.engineContext.setUpdateLights(true);
         CTX.rayTracingService.markDirty();
     }
 
@@ -46,7 +45,6 @@ namespace Metal {
         } else {
             hiddenEntities.insert({entity, true});
         }
-        CTX.engineContext.setUpdateLights(true);
         CTX.rayTracingService.markDirty();
     }
 
@@ -85,21 +83,6 @@ namespace Metal {
                 primitive.thicknessFactor = entityData.primitive->thicknessFactor;
                 primitive.ior = entityData.primitive->ior;
                 primitive.isEmissive = entityData.primitive->isEmissive;
-            }
-
-            if (entityData.sphereLight) {
-                createComponent(entityId, SPHERE_LIGHT);
-                auto &sphereLight = registry.get<SphereLightComponent>(entityId);
-                sphereLight.color = entityData.sphereLight->color;
-                sphereLight.intensity = entityData.sphereLight->intensity;
-                sphereLight.radiusSize = entityData.sphereLight->radiusSize;
-            }
-
-            if (entityData.planeLight) {
-                createComponent(entityId, PLANE_LIGHT);
-                auto &planeLight = registry.get<PlaneLightComponent>(entityId);
-                planeLight.color = entityData.planeLight->color;
-                planeLight.intensity = entityData.planeLight->intensity;
             }
         }
 

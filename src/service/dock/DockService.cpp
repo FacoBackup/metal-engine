@@ -8,9 +8,6 @@
 #include "../../context/ApplicationContext.h"
 
 namespace Metal {
-    DockService::DockService() : AbstractRuntimeComponent() {
-    }
-
     void DockService::buildViews(ImGuiID windowId, AbstractPanel *panel) const {
         if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DockingEnable) {
             DockRepository &dockRepository = CTX.dockRepository;
@@ -39,45 +36,62 @@ namespace Metal {
             ImGui::DockBuilderRemoveNode(windowId);
             ImGui::DockBuilderAddNode(windowId, ImGuiDockNodeFlags_NoTabBar);
             ImGui::DockBuilderSetNodeSize(windowId, ImGui::GetMainViewport()->Size);
-            {
-                dockRepository.top.direction = TOP;
-                dockRepository.top.origin = nullptr;
-                dockRepository.top.outAtOppositeDir = nullptr;
-                dockRepository.top.splitDir = ImGuiDir_Right;
 
-                createDockSpace(&dockRepository.top, &windowId);
-                addWindow(&dockRepository.top, panel);
+            const auto &left = dockRepository.left;
+            for (size_t i = 0; i < left.size(); i++) {
+                DockDTO *dockSpace = left[i];
+                if (i == 0) {
+                    dockSpace->origin = nullptr;
+                    dockSpace->outAtOppositeDir = nullptr;
+                    dockSpace->splitDir = ImGuiDir_Left;
+                } else {
+                    DockDTO *previous = left[i - 1];
+                    dockSpace->origin = previous;
+                    dockSpace->outAtOppositeDir = previous;
+                    dockSpace->splitDir = ImGuiDir_Down;
+                }
+                createDockSpace(dockSpace, &windowId);
+                addWindow(dockSpace, panel);
             }
 
-            {
-                dockRepository.rightTop.origin = &dockRepository.top;
-                dockRepository.rightTop.outAtOppositeDir = &dockRepository.top;
-                dockRepository.rightTop.splitDir = ImGuiDir_Down;
-                dockRepository.rightTop.direction = RIGHT_TOP;
-                createDockSpace(&dockRepository.rightTop, &windowId);
-                addWindow(&dockRepository.rightTop, panel);
+            const auto &right = dockRepository.right;
+            for (size_t i = 0; i < right.size(); i++) {
+                DockDTO *dockSpace = right[i];
+                if (i == 0) {
+                    dockSpace->origin = nullptr;
+                    dockSpace->outAtOppositeDir = nullptr;
+                    dockSpace->splitDir = ImGuiDir_Right;
+                } else {
+                    DockDTO *previous = right[i - 1];
+                    dockSpace->origin = previous;
+                    dockSpace->outAtOppositeDir = previous;
+                    dockSpace->splitDir = ImGuiDir_Down;
+                }
+                createDockSpace(dockSpace, &windowId);
+                addWindow(dockSpace, panel);
             }
 
-            {
-                dockRepository.rightBottom.origin = &dockRepository.rightTop;
-                dockRepository.rightBottom.outAtOppositeDir = &dockRepository.rightTop;
-
-                dockRepository.rightBottom.splitDir = ImGuiDir_Down;
-                dockRepository.rightBottom.direction = RIGHT_BOTTOM;
-                createDockSpace(&dockRepository.rightBottom, &windowId);
-                addWindow(&dockRepository.rightBottom, panel);
+            const auto &bottom = dockRepository.bottom;
+            for (size_t i = 0, bottomSize = bottom.size(); i < bottomSize; i++) {
+                DockDTO *dockSpace = bottom[i];
+                if (i == 0) {
+                    dockSpace->origin = nullptr;
+                    dockSpace->outAtOppositeDir = nullptr;
+                    dockSpace->splitDir = ImGuiDir_Down;
+                } else {
+                    DockDTO *previous = bottom[i - 1];
+                    dockSpace->origin = previous;
+                    dockSpace->outAtOppositeDir = previous;
+                    dockSpace->splitDir = ImGuiDir_Right;
+                }
+                createDockSpace(dockSpace, &windowId);
+                addWindow(dockSpace, panel);
             }
 
-            {
-                dockRepository.bottom.origin = nullptr;
-                dockRepository.bottom.outAtOppositeDir = nullptr;
-                dockRepository.bottom.splitDir = ImGuiDir_Down;
+            dockRepository.center.nodeId = windowId;
+            addWindow(&dockRepository.center, panel);
 
-                dockRepository.bottom.direction = BOTTOM;
-                createDockSpace(&dockRepository.bottom, &windowId);
-                addWindow(&dockRepository.bottom, panel);
-            }
-            ImGui::DockBuilderDockWindow(dockRepository.top.internalId.c_str(), windowId);
+            ImGui::DockBuilderDockWindow(dockRepository.center.internalId.c_str(), windowId);
             ImGui::DockBuilderFinish(windowId);
         }
     }

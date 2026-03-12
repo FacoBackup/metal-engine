@@ -1,16 +1,20 @@
 #ifndef METAL_ENGINE_DOCKREPOSITORY_H
 #define METAL_ENGINE_DOCKREPOSITORY_H
 
+#include <vector>
 #include "DockDTO.h"
 #include "../../common/AbstractRuntimeComponent.h"
 
 namespace Metal {
     struct DockRepository final : AbstractRuntimeComponent {
-        DockDTO top{&DockSpace::VIEWPORT, 0.17f};
-        DockDTO bottom{&DockSpace::FILES, .25f};
-        DockDTO rightTop{&DockSpace::WORLD, 0.6f};
-        DockDTO rightBottom{&DockSpace::INSPECTOR, 0.4f};
+        DockDTO center{&DockSpace::VIEWPORT};
+        std::vector<DockDTO *> bottom;
+        std::vector<DockDTO *> left;
+        std::vector<DockDTO *> right;
+
         bool isInitialized = false;
+
+        explicit DockRepository();
     };
 } // Metal
 

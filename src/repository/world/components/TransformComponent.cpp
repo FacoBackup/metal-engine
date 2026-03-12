@@ -1,8 +1,5 @@
 #include "TransformComponent.h"
 #include "VolumeComponent.h"
-#include "SphereLightComponent.h"
-#include "PlaneLightComponent.h"
-#include "../../../common/interface/Icons.h"
 #include "../../../context/ApplicationContext.h"
 
 #define ROTATION "Rotation"
@@ -20,11 +17,6 @@ namespace Metal {
     }
 
     void TransformComponent::onUpdate(InspectableMember *member) {
-        bool isLight = CTX.worldRepository.registry.all_of<SphereLightComponent>(entityId) ||
-                       CTX.worldRepository.registry.all_of<PlaneLightComponent>(entityId);
-        if (isLight) {
-            CTX.engineContext.setUpdateLights(true);
-        }
         if (member != nullptr && member->name == ROTATION) {
             rotation = normalize(glm::quat(rotationEuler * (glm::pi<float>() / 180.f)));
         }

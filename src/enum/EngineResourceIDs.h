@@ -16,7 +16,6 @@ namespace Metal {
     inline constexpr const char* RID_POST_PROCESSING_FBO = "postProcessingFBO";
     inline constexpr const char* RID_COMPUTE_CB = "ComputeCB";
     inline constexpr const char* RID_POST_PROCESSING_CB = "PostProcessingCB";
-    inline constexpr const char* RID_ATMOSPHERE_DATA = "atmosphereData";
     inline constexpr const char* RID_VOLUMES_BUFFER = "volumesBuffer";
     inline constexpr const char* RID_SELECTION_FBO = "selectionFBO";
     inline constexpr const char* RID_SELECTION_CB = "selectionCB";

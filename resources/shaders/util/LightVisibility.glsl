@@ -1,6 +1,6 @@
 #ifndef V_T
 #define V_T
-vec3 visibilityTest(const in Light light, in vec3 point, vec3 wi) {
+vec3 visibilityTest(const in Light light,  in vec3 point, vec3 wi) {
     float bias = max(.05, 1e-4 * length(point));
     vec3 shadowsPosition = point + bias * wi;// Offset to avoid self-intersection
 
@@ -20,20 +20,29 @@ vec3 visibilityTest(const in Light light, in vec3 point, vec3 wi) {
     float sigmaT = 0;
     vec3 vColor = vec3(1);
     bool anyHit = false;
+    for (uint i = 0; i < globalData.volumeCount; i++) {
+        Volume volume = volumesBuffer.items[i];
 
-    float tEntry, tExit;
-    vec3 roLocal = shadowsPosition;
-    bool intersects = intersectBox(roLocal, wi, atmosphereData.volumeScale, tEntry, tExit);
-    if (intersects && tEntry < lightDistance) {
+        float tEntry, tExit;
+        vec3 roLocal = shadowsPosition - volume.position;
+        bool intersects = intersectBox(roLocal, wi, volume.dataA, tEntry, tExit);
+        if (!intersects) continue;
+
+        if (tEntry > lightDistance){
+            continue;
+        }
+
         anyHit = true;
-        sigmaT = atmosphereData.density;
+        sigmaT = volume.dataB.x;
         distanceInVolume = tExit - tEntry;
         transmittance *= exp(-sigmaT * distanceInVolume);
-        vColor = atmosphereData.albedo;
+        vColor = volume.color.rgb;
+        if (transmittance < 1e-3) {
+            break;
+        }
     }
 
-
-    return attenuation * vec3(transmittance * exp(-sigmaT * distanceInVolume) * vColor);
+    return attenuation * vec3(transmittance * exp(-sigmaT * distanceInVolume ) * vColor);
 }
 
 #endif

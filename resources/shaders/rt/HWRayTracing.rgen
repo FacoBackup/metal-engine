@@ -13,39 +13,11 @@ layout (set = 0, binding = 4, rgba16f) uniform image2D gBufferNormal;
 layout (location = 0) rayPayloadEXT RayPayload payload;
 
 
-bool intersectBox(vec3 ro, vec3 rd, vec3 dimensions, out float tEntry, out float tExit) {
-    vec3 boxMin = -dimensions * 0.5;
-    vec3 boxMax = dimensions * 0.5;
-    vec3 invRd = 1.0 / rd;
-
-    vec3 t0s = (boxMin - ro) * invRd;
-    vec3 t1s = (boxMax - ro) * invRd;
-    vec3 tsmaller = min(t0s, t1s);
-    vec3 tbigger = max(t0s, t1s);
-
-    tEntry = max(max(tsmaller.x, tsmaller.y), tsmaller.z);
-    tExit = min(min(tbigger.x, tbigger.y), tbigger.z);
-
-    return (tExit >= max(tEntry, 0.0));
-}
-
 #define LIGHT_SET 5
 #include "../LightBuffer.glsl"
 
-
-layout (set = 0, binding = 6) uniform AtmosphereDataBlock {
-    vec3 albedo;
-    vec3 volumeScale;
-    uint isAtmosphereEnabled;
-    uint isVolumeEnabled;
-    uint volumeShadowSteps;
-    float density;
-    float g;
-    float scatteringAlbedo;
-    int samples;
-
-    vec3 sunPosition;
-} atmosphereData;
+#define VOLUME_SET 6
+#include "../VolumeBuffer.glsl"
 
 #define MESH_METADATA_SET 7
 #include "../MeshMetadata.glsl"
@@ -109,8 +81,8 @@ void main() {
     }
 
     if (!payload.hit) {
-        if (atmosphereData.isAtmosphereEnabled != 0) {
-            finalColor = calculate_sky_luminance_rgb(normalize(atmosphereData.sunPosition), rayDirection, 2.0f) * 0.05f;
+        if (pushConstants.isAtmosphereEnabled != 0) {
+            finalColor = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), rayDirection, 2.0f) * 0.05f;
         }
         imageStore(gBufferPositionIndex, ivec2(gl_LaunchIDEXT.xy), vec4(0.0, 0.0, 0.0, 0.0));
         imageStore(gBufferNormal, ivec2(gl_LaunchIDEXT.xy), vec4(0.0, 0.0, 0.0, 0.0));

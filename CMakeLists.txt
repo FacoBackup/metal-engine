@@ -112,7 +112,6 @@ add_executable(
         src/repository/runtime/RuntimeRepository.h
         src/service/buffer/BufferInstance.cpp
         src/service/buffer/BufferInstance.h
-        src/dto/buffers/AtmosphereUBO.h
         src/service/mesh/MeshService.cpp
         src/service/mesh/MeshService.h
         src/service/mesh/MeshData.h
@@ -225,10 +224,6 @@ add_executable(
         src/service/voxel/SVOInstance.h
         src/dto/buffers/TileInfoUBO.h
         src/dto/buffers/LightData.h
-        src/repository/world/components/SphereLightComponent.cpp
-        src/repository/world/components/SphereLightComponent.h
-        src/repository/world/components/PlaneLightComponent.cpp
-        src/repository/world/components/PlaneLightComponent.h
         src/context/engine/render-pass/impl/tools/IconsPass.cpp
         src/context/engine/render-pass/impl/tools/IconsPass.h
         src/context/engine/render-pass/impl/tools/SelectionIDPass.cpp
@@ -247,8 +242,6 @@ add_executable(
         src/service/lights/LightService.h
         src/repository/world/components/VolumeComponent.cpp
         src/repository/world/components/VolumeComponent.h
-        src/repository/world/components/AtmosphereComponent.cpp
-        src/repository/world/components/AtmosphereComponent.h
         src/service/descriptor/DescriptorBinding.h
         src/service/notification/AsyncTask.h
         src/service/voxel/VoxelImporterService.cpp
@@ -284,11 +277,13 @@ add_executable(
         src/context/engine/compute-pass/impl/TemporalAccumulationPass.h
         src/context/engine/compute-pass/impl/SpatialFilterPass.cpp
         src/context/engine/compute-pass/impl/SpatialFilterPass.h
-        src/repository/world/components/AtmosphereComponent.cpp
         src/enum/ComponentType.cpp
         src/service/mesh/SceneEntityData.h
         src/context/editor/dock-spaces/repositories/RepositoriesPanel.cpp
         src/context/editor/dock-spaces/repositories/RepositoriesPanel.h
+        src/service/volumes/VolumeService.cpp
+        src/service/volumes/VolumeService.h
+        src/repository/dock/DockRepository.cpp
 )
 
 

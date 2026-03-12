@@ -44,35 +44,10 @@ namespace Metal::ComponentTypes {
                 }
             ),
             DEFINE_COMPONENT(
-                SPHERE_LIGHT, "Sphere Light", "sphere_light", Icons::lightbulb, {TRANSFORM},
-                SphereLightComponent,
-                [](WorldRepository &repo, entt::entity entityId) {
-                auto &light = repo.registry.emplace_or_replace<SphereLightComponent>(entityId);
-                light.setEntityId(entityId);
-                CTX.engineContext.setUpdateLights(true);
-                }
-            ),
-            DEFINE_COMPONENT(
-                PLANE_LIGHT, "Plane Light", "plane_light", Icons::lightbulb, {TRANSFORM}, PlaneLightComponent,
-                [](WorldRepository &repo, entt::entity entityId) {
-                auto &light = repo.registry.emplace_or_replace<PlaneLightComponent>(entityId);
-                light.setEntityId(entityId);
-                CTX.engineContext.setUpdateLights(true);
-                }
-            ),
-            DEFINE_COMPONENT(
                 VOLUME, "Volume Component", "volume", Icons::blur_on, {TRANSFORM}, VolumeComponent,
                 [](WorldRepository &repo, entt::entity entityId) {
                 auto &vol = repo.registry.emplace_or_replace<VolumeComponent>(entityId);
                 vol.setEntityId(entityId);
-                }
-            ),
-            DEFINE_COMPONENT(
-                ATMOSPHERE, "Atmosphere", "atmosphere", Icons::cloud, {}, AtmosphereComponent,
-                [](WorldRepository &repo, entt::entity entityId) {
-                auto &atmo = repo.registry.emplace_or_replace<AtmosphereComponent>(entityId);
-                atmo.setEntityId(entityId);
-                CTX.engineContext.setGISettingsUpdated(true);
                 }
             ),
             DEFINE_COMPONENT(
