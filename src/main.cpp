@@ -5,7 +5,7 @@
 #define VMA_IMPLEMENTATION
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include "context/ApplicationContext.h"
+#include "ApplicationContext.h"
 
 int main(int, char **) {
     Metal::ApplicationContext::Init(true);

@@ -1,0 +1,43 @@
+#include "../../../service/transform/TransformService.h"
+#include <entt/entt.hpp>
+#include <iostream>
+#include <glm/gtc/quaternion.hpp>
+
+#include "../../ApplicationContext.h"
+#include "../dto/TransformComponent.h"
+
+namespace Metal {
+    void TransformService::onSync() {
+        for (auto entity : CTX.worldRepository.registry.view<TransformComponent>()) {
+            TransformComponent &st = CTX.worldRepository.registry.get<TransformComponent>(entity);
+            if (st.isNotFrozen()) {
+                transform(&st, nullptr);
+                st.freezeVersion();
+            }
+        }
+    }
+
+    void TransformService::transform(TransformComponent *st, const TransformComponent *parentTransform) {
+        if (parentTransform != nullptr) {
+            auxMat4 = parentTransform->model;
+        } else {
+            auxMat4 = glm::identity<glm::mat4>();
+        }
+        if (!st->forceTransform && st->isStatic) {
+            LOG_WARN("Entity will not be transformed because it is set to static " + std::to_string(entt::to_integral(st->getEntityId())));
+            return;
+        }
+
+        auxMat42 = glm::identity<glm::mat4>();
+        auxMat42 = glm::translate(auxMat42, st->translation); // Translation
+        auxMat42 *= glm::mat4_cast(st->rotation);
+        auxMat42 = glm::scale(auxMat42, st->scale); // Scale
+
+        st->model = auxMat4 * auxMat42;
+        st->freezeVersion();
+
+        if (CTX.worldRepository.registry.all_of<PrimitiveComponent>(st->getEntityId())) {
+            CTX.rayTracingService.markDirty();
+        }
+    }
+} // Metal

@@ -1,0 +1,43 @@
+#ifndef RENDERPASS_H
+#define RENDERPASS_H
+#include "../resource/RuntimeResource.h"
+#include <array>
+#include <vector>
+#include "../resource/PipelineInstance.h"
+#include "../../vulkan/VulkanUtils.h"
+
+namespace Metal {
+    class AbstractPass;
+    class ApplicationContext;
+    struct FrameBufferInstance;
+
+    class CommandBufferRecorder final : public RuntimeResource {
+        std::array<VkCommandBuffer, MAX_FRAMES_IN_FLIGHT> _commandBuffers{};
+        VkViewport viewport{};
+        VkRect2D scissor{};
+        VkRenderPassBeginInfo renderPassInfo{};
+        std::vector<VkClearValue> clearColors{};
+        bool computePassMode;
+
+        static void RecordCommandsInternal(
+            const std::vector<AbstractPass *> &passes,
+            VkCommandBuffer vkCommandBuffer);
+
+        void createRenderPassInfo(const FrameBufferInstance *frameBuffer, bool clearBuffer);
+
+    public:
+        explicit CommandBufferRecorder(std::string id, FrameBufferInstance *frameBuffer, bool clearBuffer = true);
+
+        explicit CommandBufferRecorder(std::string id);
+
+        ResourceType resourceType() override {
+            return COMMAND_BUFFER_RECORDER;
+        }
+
+        void createCommandBuffer();
+
+        void recordCommands(const std::vector<AbstractPass *> &passes) const;
+    };
+} // Metal
+
+#endif //RENDERPASS_H
