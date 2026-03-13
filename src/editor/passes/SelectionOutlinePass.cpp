@@ -1,4 +1,4 @@
-#include "../../engine/passes/impl/tools/SelectionOutlinePass.h"
+#include "SelectionOutlinePass.h"
 
 #include "../../ApplicationContext.h"
 #include "../../engine/dto/TransformComponent.h"

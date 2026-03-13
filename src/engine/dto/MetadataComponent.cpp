@@ -1,6 +1,4 @@
-#include "../../../repository/world/impl/MetadataComponent.h"
-#include "../../../common/Icons.h"
-#include "../../editor/util/UIUtil.h"
+#include "MetadataComponent.h"
 
 namespace Metal {
     void MetadataComponent::registerFields() {

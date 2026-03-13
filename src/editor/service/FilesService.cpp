@@ -1,4 +1,4 @@
-#include "../../../service/files/FilesService.h"
+#include "FilesService.h"
 #include "../dto/FSEntry.h"
 #include "../enum/EntryType.h"
 #include "../enum/engine-definitions.h"
@@ -10,7 +10,7 @@
 #include <format>
 #include <fstream>
 #include <iostream>
-#include "../util/serialization-definitions.h"
+#include "../../common/serialization-definitions.h"
 
 namespace fs = std::filesystem;
 

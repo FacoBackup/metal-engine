@@ -1,4 +1,4 @@
-#include "../../../service/voxel/impl/OctreeNode.h"
+#include "OctreeNode.h"
 
 namespace Metal {
     void OctreeNode::addChild(OctreeNode *child, int index) {

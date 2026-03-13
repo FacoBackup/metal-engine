@@ -1,4 +1,4 @@
-#include "../../../service/pipeline/PipelineBuilder.h"
+#include "PipelineBuilder.h"
 #include "../resource/TextureInstance.h"
 
 namespace Metal {

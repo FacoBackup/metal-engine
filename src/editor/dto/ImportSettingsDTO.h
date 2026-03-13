@@ -1,7 +1,7 @@
 #ifndef IMPORTSETTINGSDTO_H
 #define IMPORTSETTINGSDTO_H
 
-#include "../../../common/Inspectable.h"
+#include "../../common//Inspectable.h"
 
 
 namespace Metal {

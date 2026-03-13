@@ -2,7 +2,7 @@
 #define VOLUMECOMPONENT_H
 
 #include "AbstractComponent.h"
-#include "../../../common/Serializable.h"
+#include "../../common/Serializable.h"
 #include <glm/vec3.hpp>
 
 namespace Metal {

@@ -1,6 +1,6 @@
-#include "../../../service/material/MaterialService.h"
+#include "MaterialService.h"
 
-#include "../../editor/util/serialization-definitions.h"
+#include "../../common/serialization-definitions.h"
 #include "../dto/MeshMetadata.h"
 
 #include "../../ApplicationContext.h"

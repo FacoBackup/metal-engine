@@ -1,7 +1,7 @@
 #ifndef PICKINGSERVICE_H
 #define PICKINGSERVICE_H
 
-#include "../../../common/AbstractResourceService.h"
+#include "../../common/AbstractResourceService.h"
 #include "../enum/engine-definitions.h"
 #include <optional>
 

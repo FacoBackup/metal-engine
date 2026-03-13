@@ -2,7 +2,7 @@
 #define VOLUME_SERVICE_H
 #include <vector>
 
-#include "../../../common/AbstractRuntimeComponent.h"
+#include "../../common/AbstractRuntimeComponent.h"
 #include "../dto/VolumeData.h"
 
 namespace Metal {

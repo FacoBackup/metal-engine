@@ -1,9 +1,8 @@
 #include "EngineContext.h"
 
 #include "../editor/enum/EngineResourceIDs.h"
-#include "../../context/ApplicationContext.h"
+#include "../ApplicationContext.h"
 #include "resource/BufferInstance.h"
-#include "dto/Camera.h"
 #include "dto/TransformComponent.h"
 
 namespace Metal {

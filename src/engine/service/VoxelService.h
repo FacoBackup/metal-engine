@@ -1,7 +1,7 @@
 #ifndef METAL_ENGINE_VOXELSERVICE_H
 #define METAL_ENGINE_VOXELSERVICE_H
 
-#include "../../../common/AbstractResourceService.h"
+#include "../../common/AbstractResourceService.h"
 #include "../resource/SVOInstance.h"
 
 namespace Metal {

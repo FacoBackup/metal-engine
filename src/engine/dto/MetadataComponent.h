@@ -6,8 +6,8 @@
 #include "AbstractComponent.h"
 #include "../../editor/enum/engine-definitions.h"
 #include "../enum/ComponentType.h"
-#include "../../../common/Inspectable.h"
-#include "../../../common/Serializable.h"
+#include "../../common/Inspectable.h"
+#include "../../common/Serializable.h"
 
 namespace Metal {
     struct MetadataComponent final : AbstractComponent, Serializable {

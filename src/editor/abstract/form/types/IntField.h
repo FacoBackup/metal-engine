@@ -2,7 +2,7 @@
 #define METAL_ENGINE_INTFIELD_H
 
 #include "../AbstractFormFieldPanel.h"
-#include "../../../../../common/InspectedField.h"
+#include "../../../../common/InspectedField.h"
 
 namespace Metal {
     class IntField final : public AbstractFormFieldPanel {

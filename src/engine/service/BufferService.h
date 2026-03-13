@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <memory>
-#include "../../../common/AbstractResourceService.h"
+#include "../../common/AbstractResourceService.h"
 #include "../resource/BufferInstance.h"
 #include "vulkan/vulkan.h"
 

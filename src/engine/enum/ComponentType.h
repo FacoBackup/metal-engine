@@ -5,7 +5,6 @@
 #include <functional>
 #include <entt/entt.hpp>
 #include <nlohmann/json.hpp>
-#include "../../../common/Icons.h"
 
 namespace Metal {
     class Inspectable;

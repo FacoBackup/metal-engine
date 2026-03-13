@@ -6,8 +6,8 @@
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 
-#include "../../../common/Inspectable.h"
-#include "../../../common/Serializable.h"
+#include "../../common/Inspectable.h"
+#include "../../common/Serializable.h"
 
 
 namespace Metal {

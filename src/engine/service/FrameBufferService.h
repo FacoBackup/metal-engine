@@ -5,7 +5,7 @@
 #include <memory>
 #include <vulkan/vulkan_core.h>
 
-#include "../../../common/AbstractResourceService.h"
+#include "../../common/AbstractResourceService.h"
 #include "../resource/FrameBufferInstance.h"
 
 namespace Metal {

@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <imgui.h>
 
-#include "../../../../../common/Inspectable.h"
+#include "../../../../common/Inspectable.h"
 
 namespace Metal {
     BooleanField::BooleanField(InspectedField<bool> &field) : field(field) {

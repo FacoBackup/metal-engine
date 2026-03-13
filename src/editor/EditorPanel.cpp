@@ -1,7 +1,6 @@
 #include "EditorPanel.h"
 #include "util/UIUtil.h"
-#include "../../context/ApplicationContext.h"
-#include "dto/Notification.h"
+#include "../ApplicationContext.h"
 #include "dock-spaces/header/EditorHeaderPanel.h"
 #include "panel/FileImportModalPanel.h"
 #include "panel/NotificationsPanel.h"

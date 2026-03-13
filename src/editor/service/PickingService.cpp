@@ -1,4 +1,4 @@
-#include "../../../service/picking/PickingService.h"
+#include "PickingService.h"
 
 #include "../../engine/resource/BufferInstance.h"
 #include "../../engine/resource/TextureInstance.h"

@@ -1,4 +1,4 @@
-#include "../../compute-pass/impl/TemporalAccumulationPass.h"
+#include "TemporalAccumulationPass.h"
 #include "../../../ApplicationContext.h"
 #include "../../dto/PipelineBuilder.h"
 #include "../../resource/TextureInstance.h"

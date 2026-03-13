@@ -4,7 +4,7 @@
 #include "imgui.h"
 #include "../dto/DockDTO.h"
 #include "../dock-spaces/docks/DockSpacePanel.h"
-#include "../../../common/AbstractRuntimeComponent.h"
+#include "../../common/AbstractRuntimeComponent.h"
 
 namespace Metal {
     class AbstractPanel;

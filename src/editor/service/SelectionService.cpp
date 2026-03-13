@@ -1,4 +1,4 @@
-#include "../../../service/selection/SelectionService.h"
+#include "SelectionService.h"
 
 #include "../../ApplicationContext.h"
 #include "../../engine/dto/TransformComponent.h"

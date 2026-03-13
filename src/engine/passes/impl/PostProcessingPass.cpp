@@ -1,6 +1,6 @@
-#include "../render-pass/impl/PostProcessingPass.h"
+#include "PostProcessingPass.h"
 
-#include "../../../../context/ApplicationContext.h"
+#include "../../../ApplicationContext.h"
 
 #include "../../dto/PipelineBuilder.h"
 #include "../../../editor/enum/EngineResourceIDs.h"

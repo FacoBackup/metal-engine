@@ -1,10 +1,10 @@
-#include "../../../util/ShaderUtil.h"
+#include "ShaderUtil.h"
 
 #include <regex>
 #include <fstream>
 
 #include "../dto/ShaderModule.h"
-#include "../../vulkan/VulkanUtils.h"
+#include "../../core/vulkan/VulkanUtils.h"
 #include "../../editor/util/Util.h"
 #include "../../ApplicationContext.h"
 #include "../../editor/util/FilesUtil.h"

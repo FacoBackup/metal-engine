@@ -1,5 +1,5 @@
-#include "../../../repository/editor/EditorRepository.h"
-#include "../../../common/Icons.h"
+#include "EditorRepository.h"
+#include "../../common/Icons.h"
 
 namespace Metal {
     const char *EditorRepository::getTitle() {

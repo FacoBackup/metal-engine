@@ -6,7 +6,7 @@
 #include <memory>
 
 #include "dto/GlobalDataUBO.h"
-#include "../../common/AbstractRuntimeComponent.h"
+#include "../common/AbstractRuntimeComponent.h"
 #include "dto/TileInfoUBO.h"
 
 using Clock = std::chrono::high_resolution_clock;

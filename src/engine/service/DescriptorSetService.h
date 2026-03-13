@@ -1,7 +1,7 @@
 #ifndef DESCRIPTORSETSERVICE_H
 #define DESCRIPTORSETSERVICE_H
 
-#include "../../../common/AbstractResourceService.h"
+#include "../../common/AbstractResourceService.h"
 #include "../dto/DescriptorInstance.h"
 
 namespace Metal {

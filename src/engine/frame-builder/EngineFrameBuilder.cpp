@@ -8,7 +8,6 @@
 #include "EngineFrame.h"
 #include "../../ApplicationContext.h"
 #include "../passes/CommandBufferRecorder.h"
-#include "../render-pass/impl/tools/SelectionOutlinePass.h"
 
 namespace Metal {
     EngineFrameBuilder::EngineFrameBuilder(std::string frameId) : frameId(std::move(frameId)) {

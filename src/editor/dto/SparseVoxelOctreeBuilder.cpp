@@ -1,4 +1,4 @@
-#include "../../../service/voxel/impl/SparseVoxelOctreeBuilder.h"
+#include "SparseVoxelOctreeBuilder.h"
 
 namespace Metal {
     void SparseVoxelOctreeBuilder::insert(int maxDepth, glm::vec3 point, VoxelData data) {

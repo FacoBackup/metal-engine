@@ -3,7 +3,7 @@
 #include <glm/vec3.hpp>
 
 #include "../AbstractFormFieldPanel.h"
-#include "../../../../../common/InspectedField.h"
+#include "../../../../common/InspectedField.h"
 
 namespace Metal {
     class ColorField final : public AbstractFormFieldPanel {

@@ -1,4 +1,4 @@
-#include "../../../service/camera/CameraService.h"
+#include "CameraService.h"
 
 #include "../dto/Camera.h"
 #include "../../ApplicationContext.h"

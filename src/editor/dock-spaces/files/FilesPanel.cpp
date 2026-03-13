@@ -3,8 +3,8 @@
 
 #include "FilesHeaderPanel.h"
 #include "FilesListPanel.h"
-#include "../../../../common/Icons.h"
-#include "../../../../context/ApplicationContext.h"
+#include "../../../common/Icons.h"
+#include "../../../ApplicationContext.h"
 #include "../../dto/SceneData.h"
 #include "../../util/UIUtil.h"
 #include "../../dto/FSEntry.h"

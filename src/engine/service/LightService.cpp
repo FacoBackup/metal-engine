@@ -1,4 +1,4 @@
-#include "../../../service/lights/LightService.h"
+#include "LightService.h"
 #include "../../ApplicationContext.h"
 #include "../resource/BufferInstance.h"
 #include "../../editor/enum/EngineResourceIDs.h"

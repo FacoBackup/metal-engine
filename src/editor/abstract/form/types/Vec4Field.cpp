@@ -1,7 +1,7 @@
 #include "Vec4Field.h"
 #include <algorithm>
 #include <imgui.h>
-#include "../../../../../common/Inspectable.h"
+#include "../../../../common/Inspectable.h"
 #include "../../../util/UIUtil.h"
 
 namespace Metal {

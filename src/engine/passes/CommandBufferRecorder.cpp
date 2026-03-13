@@ -1,14 +1,12 @@
 #include "CommandBufferRecorder.h"
 #include <mutex>
 
-#include <iostream>
 
-#include "../dto/DescriptorInstance.h"
 #include "../resource/FrameBufferInstance.h"
 #include "../resource/PipelineInstance.h"
 #include "../../ApplicationContext.h"
-#include "../render-pass/AbstractRenderPass.h"
-#include "../../vulkan/VulkanUtils.h"
+#include "AbstractRenderPass.h"
+#include "../../core/vulkan/VulkanUtils.h"
 
 namespace Metal {
     void CommandBufferRecorder::createCommandBuffer() {

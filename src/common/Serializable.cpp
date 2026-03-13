@@ -1,9 +1,9 @@
-#include "../util/Serializable.h"
+#include "Serializable.h"
 #include "../ApplicationContext.h"
 #include <fstream>
 #include <iostream>
 #include <filesystem>
-#include "../context/editor/service/LogService.h"
+#include "../editor/service/LogService.h"
 
 namespace Metal {
     void Serializable::saveToJson(const std::string &path) const {

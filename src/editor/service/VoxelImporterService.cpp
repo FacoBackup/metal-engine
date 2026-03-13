@@ -1,7 +1,7 @@
-#include "../../../service/voxel/VoxelImporterService.h"
+#include "VoxelImporterService.h"
 
 #include <filesystem>
-#include "../util/serialization-definitions.h"
+#include "../../common/serialization-definitions.h"
 
 #include "../../ApplicationContext.h"
 #include "../dto/EntryMetadata.h"

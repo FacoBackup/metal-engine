@@ -1,14 +1,14 @@
-#include "inspection/Inspectable.h"
+#include "Inspectable.h"
 
 #include <glm/fwd.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
-#include "inspection/InspectedField.h"
-#include "inspection/InspectedMethod.h"
-#include "../context/editor/util/Util.h"
-#include "../context/editor/enum/EntryType.h"
+#include "InspectedField.h"
+#include "InspectedMethod.h"
+#include "../editor/util/Util.h"
+#include "../editor/enum/EntryType.h"
 
 #define  DECLARATION(T, V) \
         std::shared_ptr<InspectedField<T>> field = std::make_shared<InspectedField<T>>(&v);\

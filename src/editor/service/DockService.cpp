@@ -1,6 +1,6 @@
 #include <imgui_internal.h>
 #include <algorithm>
-#include "../../../service/dock/DockService.h"
+#include "DockService.h"
 #include "../dto/DockDTO.h"
 #include "../abstract/AbstractPanel.h"
 #include "../dock-spaces/docks/AbstractDockPanel.h"

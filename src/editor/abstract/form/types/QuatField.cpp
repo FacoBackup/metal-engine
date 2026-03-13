@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <imgui.h>
 #include <glm/detail/type_quat.hpp>
-#include "../../../../../common/Inspectable.h"
+#include "../../../../common/Inspectable.h"
 #include "../../../util/UIUtil.h"
 
 namespace Metal {

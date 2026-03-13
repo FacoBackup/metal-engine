@@ -1,7 +1,7 @@
 #ifndef COMMANDBUFFERRECORDERSERVICE_H
 #define COMMANDBUFFERRECORDERSERVICE_H
 
-#include "../../../common/AbstractResourceService.h"
+#include "../../common/AbstractResourceService.h"
 #include "../passes/CommandBufferRecorder.h"
 
 namespace Metal {

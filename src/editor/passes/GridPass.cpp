@@ -1,4 +1,4 @@
-#include "../../engine/passes/impl/tools/GridPass.h"
+#include "GridPass.h"
 
 #include "../../ApplicationContext.h"
 #include "../../engine/dto/PipelineBuilder.h"

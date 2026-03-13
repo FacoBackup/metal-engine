@@ -1,11 +1,11 @@
-#include "../../../service/framebuffer/FrameBufferService.h"
+#include "FrameBufferService.h"
 
 #include <array>
 #include <iostream>
 #include <glm/vec3.hpp>
 
-#include "FrameBufferInstance.h"
-#include "../../vulkan/VulkanUtils.h"
+#include "../resource/FrameBufferInstance.h"
+#include "../../core/vulkan/VulkanUtils.h"
 #include "../resource/FrameBufferAttachment.h"
 #include "../../ApplicationContext.h"
 

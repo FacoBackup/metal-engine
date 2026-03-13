@@ -1,6 +1,6 @@
 #include "GizmoPanel.h"
 
-#include "../../../../context/ApplicationContext.h"
+#include "../../../ApplicationContext.h"
 #include "../../../engine/dto/TransformComponent.h"
 #include "../../../engine/dto/Camera.h"
 #include "ImGuizmo.h"

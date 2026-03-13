@@ -1,6 +1,6 @@
-#include "../../../service/pipeline/ShaderModule.h"
+#include "ShaderModule.h"
 
-#include "../../vulkan/VulkanContext.h"
+#include "../../core/vulkan/VulkanContext.h"
 
 namespace Metal {
     void ShaderModule::initialize(glslang_program_t *program) {

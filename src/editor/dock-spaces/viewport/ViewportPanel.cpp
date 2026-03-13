@@ -5,10 +5,9 @@
 #include "ImGuizmo.h"
 #include "ViewportHeaderPanel.h"
 #include "EngineFramePanel.h"
-#include "../../../../context/ApplicationContext.h"
+#include "../../../ApplicationContext.h"
 #include "../../../engine/dto/Camera.h"
-#include "../../../../context/engine/frame-builder/EngineFrameBuilder.h"
-#include "../../enum/engine-definitions.h"
+#include "../../../engine/frame-builder/EngineFrameBuilder.h"
 #include <algorithm>
 
 namespace Metal {

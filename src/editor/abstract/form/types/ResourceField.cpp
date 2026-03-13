@@ -4,11 +4,11 @@
 #include <iostream>
 
 #include "ResourceFilesPanel.h"
-#include "../../../../../common/Icons.h"
+#include "../../../../common/Icons.h"
 #include "../../../util/UIUtil.h"
 #include "../../../dto/FSEntry.h"
-#include "../../../../../context/ApplicationContext.h"
-#include "../../../../../common/inspection/Inspectable.h"
+#include "../../../../ApplicationContext.h"
+#include "../../../../common/Inspectable.h"
 
 namespace Metal {
     constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoDocking |

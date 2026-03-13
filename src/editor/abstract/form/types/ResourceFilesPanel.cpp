@@ -1,6 +1,6 @@
 #include "ResourceFilesPanel.h"
 
-#include "../../../../../common/Icons.h"
+#include "../../../../common/Icons.h"
 #include "../../../dto/FSEntry.h"
 #include "../../../service/FilesService.h"
 

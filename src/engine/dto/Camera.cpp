@@ -1,6 +1,6 @@
-#include "../../../service/camera/Camera.h"
+#include "Camera.h"
 
-#include "../../../common/Icons.h"
+#include "../../common/Icons.h"
 
 namespace Metal {
     void Camera::extractFrustumPlanes(glm::mat4x4 m) {

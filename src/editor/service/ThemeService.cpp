@@ -1,4 +1,4 @@
-#include "../../../service/theme/ThemeService.h"
+#include "ThemeService.h"
 
 #include "../../ApplicationContext.h"
 

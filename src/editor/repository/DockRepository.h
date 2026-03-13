@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "../dto/DockDTO.h"
-#include "../../../common/AbstractRuntimeComponent.h"
+#include "../../common/AbstractRuntimeComponent.h"
 
 namespace Metal {
     struct DockRepository final : AbstractRuntimeComponent {

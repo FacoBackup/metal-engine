@@ -1,18 +1,15 @@
-#include "../../../service/mesh/MeshService.h"
+#include "MeshService.h"
 #include "../resource/MeshInstance.h"
 #include "../dto/MeshData.h"
 #include "../../editor/dto/SceneData.h"
 
-#include "../../vulkan/VulkanContext.h"
+#include "../../core/vulkan/VulkanContext.h"
 #include "../../editor/util/FilesUtil.h"
-#include "../../editor/util/serialization-definitions.h"
 #include <cereal/archives/binary.hpp>
 
 #include <fstream>
 
 #include "../../ApplicationContext.h"
-#include "../dto/PrimitiveComponent.h"
-#include "../dto/TransformComponent.h"
 
 namespace Metal {
     MeshInstance *MeshService::create(const std::string &id) {

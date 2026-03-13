@@ -1,10 +1,4 @@
-#include "../../../service/buffer/BufferInstance.h"
-
-#include <cstring>
-#include "../../editor/service/LogService.h"
-#include "../../ApplicationContext.h"
-#include "../../vulkan/VulkanContext.h"
-#include "../../vulkan/VulkanUtils.h"
+#include "BufferInstance.h"
 
 namespace Metal {
     BufferType BufferInstance::getBufferType() {

@@ -1,9 +1,8 @@
-#include "../../../repository/engine/EngineRepository.h"
+#include "EngineRepository.h"
 
-#include "../../../common/Icons.h"
+#include "../../common/Icons.h"
 #include "../../ApplicationContext.h"
 
-#define LEVEL_OF_DETAIL "Level of detail"
 #define PATH_TRACER "Path tracer"
 #define ATMOSPHERE "Atmosphere"
 #define SUN "Sun"

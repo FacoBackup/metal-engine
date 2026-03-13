@@ -208,7 +208,7 @@ add_executable(
         src/engine/resource/FrameBufferAttachment.cpp
         src/engine/repository/EngineRepository.cpp
         src/engine/repository/EngineRepository.h
-        src/editor/util/serialization-definitions.h
+        src/common/serialization-definitions.h
         src/editor/service/NotificationService.cpp
         src/editor/service/NotificationService.h
         src/editor/service/AsyncTaskService.cpp

@@ -1,12 +1,12 @@
-#include "../../../service/descriptor/DescriptorSetService.h"
+#include "DescriptorSetService.h"
 #include "../dto/PipelineBuilder.h"
 #include "../resource/BufferInstance.h"
 #include "../../editor/service/LogService.h"
 #include "../../ApplicationContext.h"
 #include "../resource/FrameBufferAttachment.h"
-#include "../../../service/framebuffer/FrameBufferInstance.h"
+#include "../resource/FrameBufferInstance.h"
 #include "../resource/TextureInstance.h"
-#include "../../vulkan/VulkanUtils.h"
+#include "../../core/vulkan/VulkanUtils.h"
 
 namespace Metal {
     DescriptorInstance *DescriptorSetService::createDescriptor(const PipelineBuilder &pipelineBuilder, const std::string &id, VkShaderStageFlags stageFlags) {

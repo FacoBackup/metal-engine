@@ -1,8 +1,8 @@
 #ifndef ENGINEREPO_H
 #define ENGINEREPO_H
-#include "../../../common/Inspectable.h"
+#include "../../common/Inspectable.h"
 #include <glm/vec3.hpp>
-#include "../../../common/Serializable.h"
+#include "../../common/Serializable.h"
 
 namespace Metal {
     struct EngineRepository final : Inspectable, Serializable {

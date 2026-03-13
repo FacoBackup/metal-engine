@@ -1,6 +1,6 @@
 #include "AbstractPass.h"
 #include "../frame-builder/EngineFrame.h"
-#include "../../../context/ApplicationContext.h"
+#include "../../ApplicationContext.h"
 #include "../resource/PipelineInstance.h"
 
 namespace Metal {

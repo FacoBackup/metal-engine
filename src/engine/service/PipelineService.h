@@ -2,7 +2,7 @@
 #define PIPELINESERVICE_H
 #include <vector>
 
-#include "../../../common/AbstractResourceService.h"
+#include "../../common/AbstractResourceService.h"
 #include "DescriptorSetService.h"
 #include "../resource/PipelineInstance.h"
 

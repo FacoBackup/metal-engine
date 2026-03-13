@@ -4,7 +4,7 @@
 #include <glm/vec4.hpp>
 #include <vector>
 
-#include "../../../common/Serializable.h"
+#include "../../common/Serializable.h"
 
 namespace Metal {
     struct SparseVoxelOctreeData final : Serializable {

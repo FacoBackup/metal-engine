@@ -9,8 +9,8 @@
 #include "../dto/ShortcutDTO.h"
 #include "../enum/engine-definitions.h"
 #include "../enum/ShadingMode.h"
-#include "../../../common/Inspectable.h"
-#include "../../../common/Serializable.h"
+#include "../../common/Inspectable.h"
+#include "../../common/Serializable.h"
 
 namespace Metal {
     struct TransformComponent;

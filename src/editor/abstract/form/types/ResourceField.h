@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "../AbstractFormFieldPanel.h"
-#include "../../../../../common/InspectedField.h"
+#include "../../../../common/InspectedField.h"
 #include "imgui.h"
 
 namespace Metal {

@@ -6,7 +6,7 @@
 #include <glm/ext/matrix_transform.hpp>
 
 #include "AbstractComponent.h"
-#include "../../../common/Serializable.h"
+#include "../../common/Serializable.h"
 
 
 namespace Metal {

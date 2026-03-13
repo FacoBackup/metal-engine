@@ -2,7 +2,7 @@
 
 #include "imgui.h"
 #include "../../../ApplicationContext.h"
-#include "../../../../common/Icons.h"
+#include "../../../common/Icons.h"
 
 namespace Metal {
     ConsolePanel::ConsolePanel() {

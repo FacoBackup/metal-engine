@@ -2,7 +2,7 @@
 #define LIGHTSSERVICE_H
 #include <vector>
 
-#include "../../../common/AbstractRuntimeComponent.h"
+#include "../../common/AbstractRuntimeComponent.h"
 #include "../dto/LightData.h"
 
 namespace Metal {

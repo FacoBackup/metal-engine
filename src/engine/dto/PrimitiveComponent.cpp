@@ -1,4 +1,4 @@
-#include "../../../repository/world/components/PrimitiveComponent.h"
+#include "PrimitiveComponent.h"
 #include "../../ApplicationContext.h"
 #include "../../editor/enum/EntryType.h"
 #include "MeshData.h"

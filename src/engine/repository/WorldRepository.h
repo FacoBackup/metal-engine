@@ -6,8 +6,8 @@
 #include <glm/ext/scalar_constants.hpp>
 #include <entt/entt.hpp>
 
-#include "../../../common/AbstractRuntimeComponent.h"
-#include "../../../common/Serializable.h"
+#include "../../common/AbstractRuntimeComponent.h"
+#include "../../common/Serializable.h"
 #include "../../editor/enum/engine-definitions.h"
 #include "../dto/Camera.h"
 #include "../dto/MetadataComponent.h"

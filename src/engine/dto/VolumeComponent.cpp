@@ -1,4 +1,4 @@
-#include "../../../repository/world/components/VolumeComponent.h"
+#include "VolumeComponent.h"
 #include "../../ApplicationContext.h"
 
 namespace Metal {

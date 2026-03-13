@@ -3,7 +3,7 @@
 #define METAL_ENGINE_METHODFIELD_H
 
 #include "../AbstractFormFieldPanel.h"
-#include "../../../../../common/InspectedMethod.h"
+#include "../../../../common/InspectedMethod.h"
 
 
 namespace Metal {

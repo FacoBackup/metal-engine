@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <imgui.h>
-#include "../../../repository/dock/DockSpace.h"
+#include "DockSpace.h"
 #include "../util/Util.h"
 
 namespace Metal {

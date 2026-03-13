@@ -3,7 +3,7 @@
 #include <glm/vec4.hpp>
 
 #include "../AbstractFormFieldPanel.h"
-#include "../../../../../common/InspectedField.h"
+#include "../../../../common/InspectedField.h"
 
 namespace Metal {
     class Vec4Field final : public AbstractFormFieldPanel {

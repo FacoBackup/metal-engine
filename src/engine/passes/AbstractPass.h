@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 #include <vulkan/vulkan.h>
-#include "../../../common/AbstractRuntimeComponent.h"
+#include "../../common/AbstractRuntimeComponent.h"
 #include "../resource/RuntimeResource.h"
 
 namespace Metal {

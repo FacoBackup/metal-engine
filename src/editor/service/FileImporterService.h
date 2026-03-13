@@ -6,7 +6,7 @@
 #include <string>
 
 #include "../dto/ImportSettingsDTO.h"
-#include "../../../common/AbstractRuntimeComponent.h"
+#include "../../common/AbstractRuntimeComponent.h"
 
 namespace Metal {
     class FileImporterService final : public AbstractRuntimeComponent {

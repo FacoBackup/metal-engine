@@ -1,7 +1,7 @@
 #include "FloatField.h"
 #include <algorithm>
 #include <imgui.h>
-#include "../../../../../common/Inspectable.h"
+#include "../../../../common/Inspectable.h"
 
 namespace Metal {
     void FloatField::onSync() {

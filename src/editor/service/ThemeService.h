@@ -2,7 +2,7 @@
 #define THEMESERVICE_H
 #include <imgui.h>
 #include <glm/vec3.hpp>
-#include "../../../common/AbstractRuntimeComponent.h"
+#include "../../common/AbstractRuntimeComponent.h"
 
 
 namespace Metal {

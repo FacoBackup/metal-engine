@@ -1,7 +1,7 @@
 #include "EditorHeaderPanel.h"
 #include "AsyncTaskPanel.h"
 #include "../../util/UIUtil.h"
-#include "../../../../context/ApplicationContext.h"
+#include "../../../ApplicationContext.h"
 
 namespace Metal {
     void EditorHeaderPanel::onSync() {

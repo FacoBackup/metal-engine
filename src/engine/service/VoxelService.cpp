@@ -1,8 +1,4 @@
-//
-// Created by russi on 2/18/2026.
-//
-
-#include "../../../service/voxel/VoxelService.h"
+#include "VoxelService.h"
 
 #include "../resource/SVOInstance.h"
 

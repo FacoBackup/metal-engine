@@ -1,4 +1,4 @@
-#include "../../../service/volumes/VolumeService.h"
+#include "VolumeService.h"
 #include "../../ApplicationContext.h"
 #include "../dto/VolumeComponent.h"
 #include "../resource/BufferInstance.h"

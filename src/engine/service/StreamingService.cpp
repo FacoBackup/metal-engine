@@ -1,4 +1,4 @@
-#include "../../../repository/streaming/StreamingService.h"
+#include "StreamingService.h"
 
 #include "../../ApplicationContext.h"
 #include "../resource/SVOInstance.h"

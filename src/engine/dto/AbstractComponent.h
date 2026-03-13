@@ -1,6 +1,6 @@
 #ifndef ABSTRACTCOMPONENT_H
 #define ABSTRACTCOMPONENT_H
-#include "../../../common/Inspectable.h"
+#include "../../common/Inspectable.h"
 #include "../enum/ComponentType.h"
 
 namespace Metal {

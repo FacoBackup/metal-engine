@@ -2,7 +2,7 @@
 #define NOTIFICATIONSEVERITY_H
 #include <imgui.h>
 
-#include "../../../common/Icons.h"
+#include "../../common/Icons.h"
 
 namespace Metal::NotificationSeverities {
     enum NotificationSeverity {

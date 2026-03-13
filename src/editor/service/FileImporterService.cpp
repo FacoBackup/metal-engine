@@ -1,4 +1,4 @@
-#include "../../../service/files/FileImporterService.h"
+#include "FileImporterService.h"
 
 #include "../../ApplicationContext.h"
 #include "LogService.h"

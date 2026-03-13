@@ -1,4 +1,4 @@
-#include "../../../service/log/LogService.h"
+#include "LogService.h"
 #include <iostream>
 #include <iomanip>
 #include <chrono>

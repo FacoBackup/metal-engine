@@ -4,7 +4,7 @@
 #include <string>
 #include "../util/Util.h"
 #include "../enum/EntryType.h"
-#include "../../../common/Serializable.h"
+#include "../../common//Serializable.h"
 
 namespace Metal {
     struct EntryMetadata : Serializable {

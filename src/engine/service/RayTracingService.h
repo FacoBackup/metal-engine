@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <vector>
 #include <vulkan/vulkan.h>
-#include "../../../common/AbstractRuntimeComponent.h"
+#include "../../common/AbstractRuntimeComponent.h"
 
 namespace Metal {
     struct BufferInstance;

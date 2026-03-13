@@ -1,6 +1,5 @@
-#include "../../compute-pass/impl/HWRayTracingPass.h"
+#include "HWRayTracingPass.h"
 #include "../../../ApplicationContext.h"
-#include "../../resource/FrameBufferInstance.h"
 #include "../../dto/PipelineBuilder.h"
 #include "../../resource/PipelineInstance.h"
 #include "../../resource/TextureInstance.h"

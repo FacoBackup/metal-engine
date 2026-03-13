@@ -1,7 +1,7 @@
 #include "StringField.h"
 #include <algorithm>
 #include <imgui.h>
-#include "../../../../../common/Inspectable.h"
+#include "../../../../common/Inspectable.h"
 
 namespace Metal {
     StringField::StringField(InspectedField<std::string> &field) : field(field) {

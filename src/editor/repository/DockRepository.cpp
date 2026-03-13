@@ -1,4 +1,4 @@
-#include "../../../repository/dock/DockRepository.h"
+#include "DockRepository.h"
 
 namespace Metal {
     DockRepository::DockRepository() : AbstractRuntimeComponent() {

@@ -1,6 +1,6 @@
-#include "../../../service/mesh/SceneImporterService.h"
+#include "SceneImporterService.h"
 
-#include "../../../dto/file/FSEntry.h"
+#include "../dto/FSEntry.h"
 #include "../../engine/dto/MeshData.h"
 #include "../dto/SceneData.h"
 #include "MaterialImporterService.h"
@@ -12,7 +12,7 @@
 #include "../dto/EntryMetadata.h"
 #include "../enum/engine-definitions.h"
 #include "../../ApplicationContext.h"
-#include "../util/serialization-definitions.h"
+#include "../../common/serialization-definitions.h"
 #include "../dto/SceneImportSettingsDTO.h"
 
 namespace Metal {

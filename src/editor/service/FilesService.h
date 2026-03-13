@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <memory>
 
-#include "../../../common/AbstractRuntimeComponent.h"
+#include "../../common/AbstractRuntimeComponent.h"
 
 namespace Metal {
     struct FSEntry;

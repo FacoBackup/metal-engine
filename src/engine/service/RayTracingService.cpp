@@ -1,11 +1,11 @@
-#include "../../../service/raytracing/RayTracingService.h"
+#include "RayTracingService.h"
 #include "../../ApplicationContext.h"
 #include "../resource/BufferInstance.h"
 #include "../dto/DescriptorInstance.h"
-#include "../../../service/descriptor/DescriptorBinding.h"
+#include "../dto/DescriptorBinding.h"
 #include "../resource/MeshInstance.h"
 #include "../dto/VertexData.h"
-#include "../../vulkan/VulkanUtils.h"
+#include "../../core/vulkan/VulkanUtils.h"
 #include "../../editor/enum/EngineResourceIDs.h"
 #include <cstddef>
 

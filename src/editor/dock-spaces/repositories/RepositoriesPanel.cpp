@@ -1,7 +1,7 @@
 #include "RepositoriesPanel.h"
 #include "../../abstract/form/FormPanel.h"
-#include "../../../../context/ApplicationContext.h"
-#include "../../../../common/Inspectable.h"
+#include "../../../ApplicationContext.h"
+#include "../../../common/Inspectable.h"
 
 namespace Metal {
     void RepositoriesPanel::onInitialize() {

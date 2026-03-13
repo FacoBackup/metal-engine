@@ -2,7 +2,7 @@
 #define PRIMITIVE_COMPONENT_H
 
 #include "AbstractComponent.h"
-#include "../../../common/Serializable.h"
+#include "../../common/Serializable.h"
 #include <glm/glm.hpp>
 
 namespace Metal {

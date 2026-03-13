@@ -1,6 +1,5 @@
-#include "render-pass/AbstractRenderPass.h"
-#include "../../../context/ApplicationContext.h"
-#include "../resource/PipelineInstance.h"
+#include "AbstractRenderPass.h"
+#include "../../ApplicationContext.h"
 #include "../resource/MeshInstance.h"
 #include "../resource/BufferInstance.h"
 

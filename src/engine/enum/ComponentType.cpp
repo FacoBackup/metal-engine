@@ -1,4 +1,4 @@
-#include "../../../enum/ComponentType.h"
+#include "ComponentType.h"
 #include "../repository/WorldRepository.h"
 #include "../../ApplicationContext.h"
 

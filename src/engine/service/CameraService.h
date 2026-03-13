@@ -1,7 +1,7 @@
 #ifndef CAMERASYSTEM_H
 #define CAMERASYSTEM_H
 
-#include "../../../common/AbstractRuntimeComponent.h"
+#include "../../common/AbstractRuntimeComponent.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 

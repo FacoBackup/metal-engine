@@ -1,10 +1,8 @@
 #ifndef TEXTUREINSTANCE_H
 #define TEXTUREINSTANCE_H
-#include <vulkan/vulkan_core.h>
 
 #include "../dto/DescriptorInstance.h"
-#include "../../../common/RuntimeResource.h"
-#include "../../vulkan/VulkanContext.h"
+#include "RuntimeResource.h"
 
 namespace Metal {
     struct TextureInstance final : RuntimeResource {

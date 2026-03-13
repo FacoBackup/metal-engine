@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "SceneEntityData.h"
-#include "../../../common/Serializable.h"
+#include "../../common//Serializable.h"
 
 namespace Metal {
 

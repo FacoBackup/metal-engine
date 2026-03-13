@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include "VertexData.h"
-#include "../../editor/util/serialization-definitions.h"
+#include "../../common/serialization-definitions.h"
 
 namespace Metal {
     struct MeshData final {

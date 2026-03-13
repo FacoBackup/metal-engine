@@ -1,7 +1,7 @@
 #ifndef BOUNDINGBOX_H
 #define BOUNDINGBOX_H
 #include <glm/vec3.hpp>
-#include "../../../common/Serializable.h"
+#include "../../common/Serializable.h"
 
 namespace Metal {
     struct BoundingBox final : Serializable {

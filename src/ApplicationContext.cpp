@@ -1,11 +1,11 @@
-#include "context/ApplicationContext.h"
+#include "ApplicationContext.h"
 
 #include <imgui_impl_glfw.h>
 #include <nfd.h>
 
 #include "editor/util/FilesUtil.h"
-#include "vulkan/VulkanUtils.h"
-#include "editor/util/serialization-definitions.h"
+#include "core/vulkan/VulkanUtils.h"
+#include "common/serialization-definitions.h"
 
 #include "editor/util/FileDialogUtil.h"
 #include <iostream>

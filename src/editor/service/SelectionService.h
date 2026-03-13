@@ -2,7 +2,7 @@
 #define SELECTIONSERVICE_H
 #include <vector>
 
-#include "../../../common/AbstractRuntimeComponent.h"
+#include "../../common/AbstractRuntimeComponent.h"
 #include "../enum/engine-definitions.h"
 
 namespace Metal {

@@ -1,8 +1,8 @@
-#include "../../util/VulkanUtils.h"
+#include "VulkanUtils.h"
 
 #include "../../../dependencies/vk-bootstrap/src/VkBootstrap.h"
-#include "../ApplicationContext.h"
-#include "../editor/service/LogService.h"
+#include "../../ApplicationContext.h"
+#include "../../editor/service/LogService.h"
 
 namespace Metal {
     void VulkanUtils::CheckVKResult(VkResult err) {

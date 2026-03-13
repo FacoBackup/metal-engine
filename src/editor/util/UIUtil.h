@@ -5,7 +5,7 @@
 #include <string>
 #include "../enum/EntryType.h"
 
-#include "../../../common/Icons.h"
+#include "../../common/Icons.h"
 
 namespace Metal::UIUtil {
     static constexpr ImVec4 DIRECTORY_COLOR{188 / 255.f, 128 / 255.f, 78 / 255.f, 1};

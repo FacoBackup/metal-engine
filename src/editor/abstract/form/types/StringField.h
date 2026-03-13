@@ -2,7 +2,7 @@
 #define STRINGFIELD_H
 
 #include "../AbstractFormFieldPanel.h"
-#include "../../../../../common/InspectedField.h"
+#include "../../../../common/InspectedField.h"
 
 
 namespace Metal {

@@ -1,4 +1,4 @@
-#include "../compute-pass/AbstractComputePass.h"
+#include "AbstractComputePass.h"
 #include "../../ApplicationContext.h"
 #include "../resource/PipelineInstance.h"
 #include "../resource/TextureInstance.h"

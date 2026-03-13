@@ -1,7 +1,7 @@
 #include "ColorField.h"
 #include <algorithm>
 #include <imgui.h>
-#include "../../../../../common/Inspectable.h"
+#include "../../../../common/Inspectable.h"
 
 namespace Metal {
     ColorField::ColorField(InspectedField<glm::vec3> &field) : field(field) {

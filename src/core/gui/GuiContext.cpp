@@ -2,10 +2,10 @@
 
 #include <imgui_impl_glfw.h>
 #include "imgui_freetype.h"
-#include "../ApplicationContext.h"
+#include "../../ApplicationContext.h"
 #include "../vulkan/VulkanUtils.h"
-#include "../engine/dto/DescriptorInstance.h"
-#include "../engine/resource/TextureInstance.h"
+#include "../../engine/dto/DescriptorInstance.h"
+#include "../../engine/resource/TextureInstance.h"
 
 namespace Metal {
     void GuiContext::endFrame() {

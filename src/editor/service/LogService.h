@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <mutex>
-#include "../../../common/AbstractRuntimeComponent.h"
+#include "../../common/AbstractRuntimeComponent.h"
 
 namespace Metal {
 

@@ -4,7 +4,7 @@
 #include <glm/vec3.hpp>
 #include <vulkan/vulkan.h>
 
-#include "../../editor/util/serialization-definitions.h"
+#include "../../common/serialization-definitions.h"
 
 namespace Metal {
     struct VertexData final {

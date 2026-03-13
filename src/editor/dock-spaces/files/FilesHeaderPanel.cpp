@@ -2,9 +2,8 @@
 
 #include "../../enum/EntryType.h"
 #include "../../dto/FSEntry.h"
-#include "../../../../common/Icons.h"
-#include "../../util/FilesUtil.h"
-#include "../../../../context/ApplicationContext.h"
+#include "../../../common/Icons.h"
+#include "../../../ApplicationContext.h"
 #include "../../util/UIUtil.h"
 
 namespace Metal {

@@ -1,6 +1,6 @@
 #ifndef MESHSERVICE_H
 #define MESHSERVICE_H
-#include "../../../common/AbstractResourceService.h"
+#include "../../common/AbstractResourceService.h"
 #include "../resource/MeshInstance.h"
 #include "../../editor/enum/engine-definitions.h"
 

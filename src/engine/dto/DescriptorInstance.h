@@ -3,7 +3,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "../resource/RuntimeResource.h"
-#include "../../../service/descriptor/DescriptorBinding.h"
+#include "DescriptorBinding.h"
 
 namespace Metal {
     struct BufferInstance;

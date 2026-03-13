@@ -4,8 +4,8 @@
 #include <iostream>
 
 #include "AbstractDockPanel.h"
-#include "../../../../context/ApplicationContext.h"
-#include "../../../../common/Icons.h"
+#include "../../../ApplicationContext.h"
+#include "../../../common/Icons.h"
 #include "../../dto/DockDTO.h"
 #include "../../util/UIUtil.h"
 #include "../../service/LogService.h"

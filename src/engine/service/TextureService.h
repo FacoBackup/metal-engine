@@ -5,7 +5,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "../dto/TextureData.h"
-#include "../../../common/AbstractResourceService.h"
+#include "../../common/AbstractResourceService.h"
 #include "../resource/TextureInstance.h"
 
 namespace Metal {

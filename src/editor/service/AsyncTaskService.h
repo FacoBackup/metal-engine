@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <mutex>
-#include <atomic>
 #include <functional>
 #include "../dto/AsyncTask.h"
 

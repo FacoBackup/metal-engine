@@ -1,6 +1,6 @@
 #include "GizmoSettingsPanel.h"
 #include "../../util/UIUtil.h"
-#include "../../../../context/ApplicationContext.h"
+#include "../../../ApplicationContext.h"
 #include "ImGuizmo.h"
 
 namespace Metal {

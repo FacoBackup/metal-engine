@@ -7,8 +7,8 @@
 #include <glm/fwd.hpp>
 
 #include "InspectableMember.h"
-#include "../context/editor/util/Util.h"
-#include "../context/editor/enum/EntryType.h"
+#include "../editor/util/Util.h"
+#include "../editor/enum/EntryType.h"
 #include "Changeable.h"
 
 namespace Metal {

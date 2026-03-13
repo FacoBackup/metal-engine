@@ -1,12 +1,12 @@
 #include "PassBuilder.h"
-#include "../../render-pass/impl/PostProcessingPass.h"
+#include "../../passes/impl/PostProcessingPass.h"
 #include "../../passes/impl/HWRayTracingPass.h"
 #include "../../passes/impl/TemporalAccumulationPass.h"
 #include "../../passes/impl/SpatialFilterPass.h"
-#include "../../render-pass/impl/tools/SelectionOutlinePass.h"
-#include "../../render-pass/impl/tools/GridPass.h"
-#include "../../render-pass/impl/tools/IconsPass.h"
-#include "../../render-pass/impl/tools/SelectionIDPass.h"
+#include "../../../editor/passes/SelectionOutlinePass.h"
+#include "../../../editor/passes/GridPass.h"
+#include "../../../editor/passes/IconsPass.h"
+#include "../../../editor/passes/SelectionIDPass.h"
 
 namespace Metal {
     RuntimeResource* PassBuilder::build() {

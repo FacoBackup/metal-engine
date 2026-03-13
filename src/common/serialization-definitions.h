@@ -3,7 +3,7 @@
 
 #include <fstream>
 #include <iostream>
-#include "../../../common/Serializable.h"
+#include "Serializable.h"
 #include <cereal/types/vector.hpp>
 #include <cereal/types/array.hpp>
 #include <cereal/types/atomic.hpp>

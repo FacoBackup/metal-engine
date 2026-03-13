@@ -2,8 +2,8 @@
 
 #include "../../abstract/form/FormPanel.h"
 #include "../../util/UIUtil.h"
-#include "../../../../common/Inspectable.h"
-#include "../../../../context/ApplicationContext.h"
+#include "../../../common/Inspectable.h"
+#include "../../../ApplicationContext.h"
 #include "../../../engine/dto/MetadataComponent.h"
 #include <imgui.h>
 #include <format>

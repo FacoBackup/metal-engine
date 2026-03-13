@@ -4,8 +4,8 @@
 #include <string>
 
 #include "engine/EngineContext.h"
-#include "glfw/GLFWContext.h"
-#include "vulkan/VulkanContext.h"
+#include "core/glfw/GLFWContext.h"
+#include "core/vulkan/VulkanContext.h"
 
 #include "engine/service/MeshService.h"
 #include "engine/service/TextureService.h"
@@ -32,18 +32,18 @@
 #include "editor/repository/EditorRepository.h"
 #include "engine/service/MaterialService.h"
 #include "engine/service/CommandBufferRecorderService.h"
-#include "../service/notification/NotificationService.h"
+#include "editor/service/NotificationService.h"
 #include "editor/service/AsyncTaskService.h"
 #include "editor/service/LogService.h"
 #include "engine/service/TransformService.h"
 #include "editor/service/PickingService.h"
 #include "engine/service/VolumeService.h"
 #include "editor/service/VoxelImporterService.h"
-#include "../service/voxel/VoxelService.h"
+#include "engine/service/VoxelService.h"
 #include "engine/service/LightService.h"
 #include "engine/service/RayTracingService.h"
 #include "editor/EditorPanel.h"
-#include "gui/GuiContext.h"
+#include "core/gui/GuiContext.h"
 
 #define CTX Metal::ApplicationContext::Get()
 

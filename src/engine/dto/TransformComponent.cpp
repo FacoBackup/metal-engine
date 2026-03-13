@@ -1,5 +1,5 @@
-#include "../../../repository/world/components/TransformComponent.h"
-#include "../../../repository/world/components/VolumeComponent.h"
+#include "TransformComponent.h"
+#include "VolumeComponent.h"
 #include "../../ApplicationContext.h"
 
 #define ROTATION "Rotation"

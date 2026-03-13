@@ -2,7 +2,7 @@
 #define QUATFIELD_H
 #include <glm/fwd.hpp>
 #include "../AbstractFormFieldPanel.h"
-#include "../../../../../common/InspectedField.h"
+#include "../../../../common/InspectedField.h"
 
 namespace Metal {
     class QuatField final : public AbstractFormFieldPanel {

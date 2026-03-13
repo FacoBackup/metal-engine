@@ -1,6 +1,6 @@
 #include "CameraPositionPanel.h"
 
-#include "../../../../context/ApplicationContext.h"
+#include "../../../ApplicationContext.h"
 #include "../../util/UIUtil.h"
 #include "../../../engine/dto/Camera.h"
 

@@ -1,7 +1,7 @@
 #include "ViewportHeaderPanel.h"
 
 #include "GizmoSettingsPanel.h"
-#include "../../../../context/ApplicationContext.h"
+#include "../../../ApplicationContext.h"
 #include "../../util/UIUtil.h"
 
 namespace Metal {

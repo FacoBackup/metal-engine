@@ -1,9 +1,9 @@
 #include "WorldPanel.h"
 
 #include "WorldHeaderPanel.h"
-#include "../../../../common/Icons.h"
+#include "../../../common/Icons.h"
 #include "../../util/UIUtil.h"
-#include "../../../../context/ApplicationContext.h"
+#include "../../../ApplicationContext.h"
 #include "../../../engine/dto/MetadataComponent.h"
 #include "../../../engine/enum/ComponentType.h"
 

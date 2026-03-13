@@ -1,9 +1,9 @@
-#include "../../../repository/world/WorldRepository.h"
+#include "WorldRepository.h"
 
 #include "../../ApplicationContext.h"
 #include "../enum/ComponentType.h"
 #include "../../editor/dto/SceneData.h"
-#include "../../editor/util/serialization-definitions.h"
+#include "../../common/serialization-definitions.h"
 
 namespace Metal {
     entt::entity WorldRepository::createEntity() {

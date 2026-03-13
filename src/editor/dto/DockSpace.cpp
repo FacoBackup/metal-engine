@@ -1,5 +1,5 @@
-#include "../../../repository/dock/DockSpace.h"
-#include "../../../common/Icons.h"
+#include "DockSpace.h"
+#include "../../common/Icons.h"
 #include "../dock-spaces/console/ConsolePanel.h"
 #include "../dock-spaces/files/FilesPanel.h"
 #include "../dock-spaces/metrics/MetricsPanel.h"

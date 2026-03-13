@@ -1,4 +1,4 @@
-#include "../../engine/passes/impl/tools/IconsPass.h"
+#include "IconsPass.h"
 
 #include "../../ApplicationContext.h"
 #include "../../engine/dto/PipelineBuilder.h"

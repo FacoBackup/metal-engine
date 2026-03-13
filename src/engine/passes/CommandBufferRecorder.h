@@ -4,7 +4,7 @@
 #include <array>
 #include <vector>
 #include "../resource/PipelineInstance.h"
-#include "../../vulkan/VulkanUtils.h"
+#include "../../core/vulkan/VulkanUtils.h"
 
 namespace Metal {
     class AbstractPass;

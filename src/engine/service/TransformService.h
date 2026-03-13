@@ -5,7 +5,7 @@
 #include <glm/vec3.hpp>
 
 #include "../../editor/enum/engine-definitions.h"
-#include "../../../common/AbstractRuntimeComponent.h"
+#include "../../common/AbstractRuntimeComponent.h"
 
 namespace Metal {
     struct TransformComponent;

@@ -3,7 +3,7 @@
 #include "FilesPanel.h"
 #include "FilesContext.h"
 #include "../../util/UIUtil.h"
-#include "../../../../context/ApplicationContext.h"
+#include "../../../ApplicationContext.h"
 #include "../../dto/FSEntry.h"
 #include "../../service/FilesService.h"
 #include <algorithm>

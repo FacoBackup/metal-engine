@@ -5,7 +5,7 @@
 #include <unordered_map>
 
 #include "AbstractRuntimeComponent.h"
-#include "../context/engine/resource/RuntimeResource.h"
+#include "../engine/resource/RuntimeResource.h"
 
 namespace Metal {
     class VulkanContext;
