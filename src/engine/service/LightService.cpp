@@ -2,6 +2,8 @@
 #include "../../ApplicationContext.h"
 #include "../resource/BufferInstance.h"
 #include "../../editor/enum/EngineResourceIDs.h"
+#include "../EngineContext.h"
+#include "../repository/EngineRepository.h"
 
 namespace Metal {
     void LightService::registerLights() {
@@ -15,19 +17,19 @@ namespace Metal {
         registerLights();
 
         if (!items.empty()) {
-            CTX.engineContext.currentFrame->getResourceAs<BufferInstance>(RID_LIGHT_BUFFER)->update(items.data());
+            engineContext.currentFrame->getResourceAs<BufferInstance>(RID_LIGHT_BUFFER)->update(items.data());
         }
     }
 
     void LightService::computeSunInfo() {
         sunPosition = glm::vec3(0,
-                                std::cos(CTX.engineRepository.elapsedTime),
-                                std::sin(CTX.engineRepository.elapsedTime)) * CTX.engineRepository
+                                std::cos(engineRepository.elapsedTime),
+                                std::sin(engineRepository.elapsedTime)) * engineRepository
                       .sunDistance;
         sunColor = LightService::CalculateSunColor(
-            sunPosition.y / CTX.engineRepository.sunDistance,
-            CTX.engineRepository.nightColor, CTX.engineRepository.dawnColor,
-            CTX.engineRepository.middayColor);
+            sunPosition.y / engineRepository.sunDistance,
+            engineRepository.nightColor, engineRepository.dawnColor,
+            engineRepository.middayColor);
     }
 
     glm::vec3 LightService::CalculateSunColor(const float elevation, glm::vec3 &nightColor, glm::vec3 &dawnColor,

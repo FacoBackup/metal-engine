@@ -5,11 +5,13 @@
 
 #include "../../ApplicationContext.h"
 #include "../dto/TransformComponent.h"
+#include "../repository/WorldRepository.h"
+#include "RayTracingService.h"
 
 namespace Metal {
     void TransformService::onSync() {
-        for (auto entity : CTX.worldRepository.registry.view<TransformComponent>()) {
-            TransformComponent &st = CTX.worldRepository.registry.get<TransformComponent>(entity);
+        for (auto entity : worldRepository.registry.view<TransformComponent>()) {
+            TransformComponent &st = worldRepository.registry.get<TransformComponent>(entity);
             if (st.isNotFrozen()) {
                 transform(&st, nullptr);
                 st.freezeVersion();
@@ -36,8 +38,8 @@ namespace Metal {
         st->model = auxMat4 * auxMat42;
         st->freezeVersion();
 
-        if (CTX.worldRepository.registry.all_of<PrimitiveComponent>(st->getEntityId())) {
-            CTX.rayTracingService.markDirty();
+        if (worldRepository.registry.all_of<PrimitiveComponent>(st->getEntityId())) {
+            rayTracingService.markDirty();
         }
     }
 } // Metal

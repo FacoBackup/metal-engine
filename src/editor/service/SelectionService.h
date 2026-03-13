@@ -10,7 +10,14 @@ namespace Metal {
     struct EditorRepository;
 
     class SelectionService final : public AbstractRuntimeComponent {
+        EditorRepository &editorRepository;
+        WorldRepository &worldRepository;
+
     public:
+        SelectionService(EditorRepository &editorRepository, WorldRepository &worldRepository)
+            : editorRepository(editorRepository), worldRepository(worldRepository) {
+        }
+
         void addSelected(entt::entity entity) const;
 
         void clearSelection() const;

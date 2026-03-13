@@ -14,7 +14,7 @@ namespace Metal {
             return;
         }
 
-        ImGui::PushStyleColor(ImGuiCol_Header, CTX.themeService.neutralPalette);
+        ImGui::PushStyleColor(ImGuiCol_Header, applicationContext->themeService.neutralPalette);
         bool open = ImGui::CollapsingHeader(fixedId.c_str(), ImGuiTreeNodeFlags_None);
         ImGui::PopStyleColor();
 

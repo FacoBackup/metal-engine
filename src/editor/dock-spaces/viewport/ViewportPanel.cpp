@@ -18,40 +18,40 @@ namespace Metal {
         appendChild(cameraPanel = new CameraPositionPanel());
 
         shortcuts = {
-            ShortcutDTO("Change shading mode", ImGuiKey_Q, []() {
-                CTX.editorRepository.shadingMode = ShadingModes::ValueOfIndex(
-                    ShadingModes::IndexOfValue(CTX.editorRepository.shadingMode) + 1);
+            ShortcutDTO("Change shading mode", ImGuiKey_Q, [this]() {
+                applicationContext->editorRepository.shadingMode = ShadingModes::ValueOfIndex(
+                    ShadingModes::IndexOfValue(applicationContext->editorRepository.shadingMode) + 1);
             }),
-            ShortcutDTO("Translate", ImGuiKey_1, []() {
-                CTX.editorRepository.gizmoType = ImGuizmo::OPERATION::TRANSLATE;
+            ShortcutDTO("Translate", ImGuiKey_1, [this]() {
+                applicationContext->editorRepository.gizmoType = ImGuizmo::OPERATION::TRANSLATE;
             }),
-            ShortcutDTO("Scale", ImGuiKey_2, []() {
-                CTX.editorRepository.gizmoType = ImGuizmo::OPERATION::SCALE;
+            ShortcutDTO("Scale", ImGuiKey_2, [this]() {
+                applicationContext->editorRepository.gizmoType = ImGuizmo::OPERATION::SCALE;
             }),
-            ShortcutDTO("Rotate", ImGuiKey_3, []() {
-                CTX.editorRepository.gizmoType = ImGuizmo::OPERATION::ROTATE;
+            ShortcutDTO("Rotate", ImGuiKey_3, [this]() {
+                applicationContext->editorRepository.gizmoType = ImGuizmo::OPERATION::ROTATE;
             }),
             ShortcutDTO("Delete", ImGuiKey_Delete, [this]() {
                 std::vector<entt::entity> entities;
-                for (auto &entry: CTX.editorRepository.selected) {
+                for (auto &entry: applicationContext->editorRepository.selected) {
                     entities.push_back(entry.first);
                 }
-                CTX.worldRepository.deleteEntities(entities);
-                CTX.selectionService.clearSelection();
+                applicationContext->worldRepository.deleteEntities(entities);
+                applicationContext->selectionService.clearSelection();
             }),
             ShortcutDTO("Select All", ImGuiMod_Ctrl | ImGuiKey_A, [this]() {
                 std::vector<entt::entity> entities;
-                auto &storage = CTX.worldRepository.registry.storage<entt::entity>();
+                auto &storage = applicationContext->worldRepository.registry.storage<entt::entity>();
                 for (auto it = storage.begin(); it != storage.end(); ++it) {
                     auto entity = *it;
-                    if (CTX.worldRepository.registry.all_of<MetadataComponent>(entity)) {
+                    if (applicationContext->worldRepository.registry.all_of<MetadataComponent>(entity)) {
                         entities.push_back(entity);
                     }
                 }
-                CTX.selectionService.addAllSelected(entities);
+                applicationContext->selectionService.addAllSelected(entities);
             }),
-            ShortcutDTO("Save", ImGuiMod_Ctrl | ImGuiKey_S, [] {
-                CTX.save();
+            ShortcutDTO("Save", ImGuiMod_Ctrl | ImGuiKey_S, [this] {
+                applicationContext->save();
             })
         };
     }
@@ -68,13 +68,13 @@ namespace Metal {
     }
 
     void ViewportPanel::updateCamera() {
-        auto &worldRepository = CTX.worldRepository;
-        const auto &cameraService = CTX.cameraService;
+        auto &worldRepository = applicationContext->worldRepository;
+        const auto &cameraService = applicationContext->cameraService;
 
         if (ImGui::IsWindowHovered() && !ImGuizmo::IsUsing() && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
             cameraService.handleInput(isFirstMovement);
             if (const auto &io = ImGui::GetIO(); io.MouseWheel != 0) {
-                worldRepository.camera.movementSensitivity += io.MouseWheel * 100 * CTX.
+                worldRepository.camera.movementSensitivity += io.MouseWheel * 100 * applicationContext->
                         engineContext.deltaTime;
                 worldRepository.camera.movementSensitivity =
                         std::max(.1f, worldRepository.camera.movementSensitivity);
@@ -86,7 +86,7 @@ namespace Metal {
     }
 
     void ViewportPanel::updateInputs() const {
-        auto &repo = CTX.runtimeRepository;
+        auto &repo = applicationContext->runtimeRepository;
         const ImVec2 windowSize = ImGui::GetWindowSize();
         size->x = windowSize.x;
         size->y = windowSize.y;

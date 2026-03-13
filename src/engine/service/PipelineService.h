@@ -12,9 +12,20 @@ namespace Metal {
     struct PipelineInstance;
     struct DescriptorInstance;
 
+    class VulkanContext;
+    class FrameBufferService;
+    class BufferService;
+
     class PipelineService final : public AbstractResourceService<PipelineInstance> {
+        VulkanContext &vulkanContext;
+        FrameBufferService &framebufferService;
+        BufferService &bufferService;
+        DescriptorSetService &descriptorSetService;
+
     public:
-        explicit PipelineService(DescriptorSetService &descriptorSetService) : descriptorSetService(descriptorSetService) {}
+        explicit PipelineService(VulkanContext &vulkanContext, FrameBufferService &framebufferService, BufferService &bufferService, DescriptorSetService &descriptorSetService)
+            : vulkanContext(vulkanContext), framebufferService(framebufferService), bufferService(bufferService), descriptorSetService(descriptorSetService) {}
+        PipelineService() = delete;
 
         PipelineInstance *createPipeline(PipelineBuilder &pipelineBuilder);
 
@@ -23,8 +34,6 @@ namespace Metal {
         std::vector<DescriptorInstance *> getAllDescriptors() const;
 
     private:
-        DescriptorSetService &descriptorSetService;
-
         PipelineInstance *createComputePipeline(const PipelineBuilder &pipelineBuilder, PipelineInstance *pipeline);
 
         PipelineInstance *createRenderingPipeline(PipelineBuilder &pipelineBuilder, PipelineInstance *pipeline);

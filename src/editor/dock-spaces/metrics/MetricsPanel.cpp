@@ -22,11 +22,11 @@ namespace Metal {
     }
 
     void MetricsPanel::onSync() {
-        drawResourceList("Meshes", CTX.meshService, id);
-        drawResourceList("Voxels", CTX.voxelService, id);
-        drawResourceList("Framebuffers", CTX.framebufferService, id);
-        drawResourceList("Textures", CTX.textureService, id);
-        drawResourceList("Pipelines", CTX.pipelineService, id);
-        drawResourceList("Buffers", CTX.bufferService, id);
+        drawResourceList("Meshes", applicationContext->meshService, id);
+        drawResourceList("Voxels", applicationContext->voxelService, id);
+        drawResourceList("Framebuffers", applicationContext->framebufferService, id);
+        drawResourceList("Textures", applicationContext->textureService, id);
+        drawResourceList("Pipelines", applicationContext->pipelineService, id);
+        drawResourceList("Buffers", applicationContext->bufferService, id);
     }
 }

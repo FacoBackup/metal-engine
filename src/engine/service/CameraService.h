@@ -13,7 +13,16 @@ namespace Metal {
     class ApplicationContext;
     struct Camera;
 
+    class EngineContext;
+    struct WorldRepository;
+    struct RuntimeRepository;
+    struct Camera;
+
     class CameraService final : public AbstractRuntimeComponent {
+        EngineContext &engineContext;
+        WorldRepository &worldRepository;
+        RuntimeRepository &runtimeRepository;
+
         Camera *camera = nullptr;
         glm::vec3 xAxis{0.0f};
         glm::vec3 yAxis{0.0f};
@@ -38,7 +47,7 @@ namespace Metal {
     public:
         void handleInput(bool isFirstMovement) const;
 
-        explicit CameraService();
+        explicit CameraService(EngineContext &engineContext, WorldRepository &worldRepository, RuntimeRepository &runtimeRepository);
 
         void onSync() override;
     };

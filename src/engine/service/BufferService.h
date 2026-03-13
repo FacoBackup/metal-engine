@@ -12,6 +12,8 @@ namespace Metal {
     class VulkanContext;
 
     class BufferService final : public AbstractResourceService<BufferInstance> {
+        VulkanContext &vulkanContext;
+
         void copyBuffer(const BufferInstance *srcBuffer,
                         const BufferInstance *dstBuffer) const;
 
@@ -19,6 +21,9 @@ namespace Metal {
                             BufferInstance *buffer) const;
 
     public:
+        explicit BufferService(VulkanContext &vulkanContext) : vulkanContext(vulkanContext) {}
+        BufferService() = delete;
+
         [[nodiscard]] unsigned int findMemoryType(unsigned int typeFilter, VkMemoryPropertyFlags properties) const;
 
         BufferInstance *createBuffer(const std::string &id, VkDeviceSize bufferSize,

@@ -9,8 +9,31 @@
 #include "../../common/AbstractRuntimeComponent.h"
 
 namespace Metal {
+    class SceneImporterService;
+    class TextureImporterService;
+    class VoxelImporterService;
+    class NotificationService;
+    class AsyncTaskService;
+
     class FileImporterService final : public AbstractRuntimeComponent {
+        SceneImporterService &sceneImporterService;
+        TextureImporterService &textureImporterService;
+        VoxelImporterService &voxelImporterService;
+        NotificationService &notificationService;
+        AsyncTaskService &asyncTaskService;
+
     public:
+        FileImporterService(SceneImporterService &sceneImporterService,
+                            TextureImporterService &textureImporterService,
+                            VoxelImporterService &voxelImporterService,
+                            NotificationService &notificationService,
+                            AsyncTaskService &asyncTaskService)
+            : sceneImporterService(sceneImporterService),
+              textureImporterService(textureImporterService),
+              voxelImporterService(voxelImporterService),
+              notificationService(notificationService),
+              asyncTaskService(asyncTaskService) {
+        }
 
         using LoadingTask = std::function<void(const std::stop_token &)>;
 

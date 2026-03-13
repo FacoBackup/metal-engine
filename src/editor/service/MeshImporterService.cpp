@@ -1,10 +1,10 @@
 #include "MeshImporterService.h"
+#include "LogService.h"
 #include "../../engine/dto/MeshData.h"
 #include "../../engine/dto/VertexData.h"
 #include "../dto/EntryMetadata.h"
 #include "../enum/engine-definitions.h"
 #include "../util/FilesUtil.h"
-#include "../../ApplicationContext.h"
 #include <cereal/archives/binary.hpp>
 #include "../../common/serialization-definitions.h"
 
@@ -17,7 +17,7 @@ namespace Metal {
             metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.'));
         }
 
-        std::string lod0Path = CTX.getAssetDirectory() + FORMAT_FILE_MESH(metadata.getId());
+        std::string lod0Path = rootDirectory + "/assets/" + FORMAT_FILE_MESH(metadata.getId());
         {
             std::ofstream output(lod0Path, std::ios::binary);
             cereal::BinaryOutputArchive archive(output);

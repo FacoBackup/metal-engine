@@ -13,23 +13,38 @@ namespace Metal {
     struct MeshData;
     struct SceneData;
 
+    class MeshImporterService;
+    class MaterialImporterService;
+
     class SceneImporterService final : public AbstractImporter {
-        static void ProcessNode(SceneData &scene, const aiScene *aiScene, const aiNode *node,
-                                const std::string &targetDir, const std::string &rootDirectory,
-                                const std::unordered_map<unsigned int, MeshId> &meshMap,
-                                const std::stop_token &stopToken);
-
-        static void ProcessMeshes(SceneData &scene, const aiScene *aiScene, const aiNode *node,
-                                  const std::string &targetDir, const std::string &rootDirectory,
-                                  const std::unordered_map<unsigned int, MeshId> &meshMap,
-                                  const std::stop_token &stopToken);
-
-        static void ProcessLights(SceneData &scene, const aiScene *aiScene);
+        MeshImporterService &meshImporterService;
+        MaterialImporterService &materialImporterService;
+        std::string &rootDirectory;
 
     public:
+        SceneImporterService(MeshImporterService &meshImporterService,
+                             MaterialImporterService &materialImporterService,
+                             std::string &rootDirectory)
+            : meshImporterService(meshImporterService),
+              materialImporterService(materialImporterService),
+              rootDirectory(rootDirectory) {
+        }
+
         std::string importData(const std::string &targetDir, const std::string &pathToFile,
                                const std::shared_ptr<ImportSettingsDTO> &settings,
                                const std::stop_token &stopToken) override;
+
+        void processNode(SceneData &scene, const aiScene *aiScene, const aiNode *node,
+                         const std::string &targetDir, const std::string &rootDirectory,
+                         const std::unordered_map<unsigned int, MeshId> &meshMap,
+                         const std::stop_token &stopToken) const;
+
+        void processMeshes(SceneData &scene, const aiScene *aiScene, const aiNode *node,
+                           const std::string &targetDir, const std::string &rootDirectory,
+                           const std::unordered_map<unsigned int, MeshId> &meshMap,
+                           const std::stop_token &stopToken) const;
+
+        static void ProcessLights(SceneData &scene, const aiScene *aiScene);
 
         std::vector<std::string> getSupportedTypes() override;
     };

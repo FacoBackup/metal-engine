@@ -3,7 +3,6 @@
 #include <filesystem>
 #include "../../common/serialization-definitions.h"
 
-#include "../../ApplicationContext.h"
 #include "../dto/EntryMetadata.h"
 #include "../enum/EntryType.h"
 #include "../enum/engine-definitions.h"
@@ -29,7 +28,7 @@ namespace Metal {
             metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.'));
 
 
-            std::string outPath = CTX.getAssetDirectory() + FORMAT_FILE_VOLUME(metadata.getId());
+            std::string outPath = rootDirectory + "/assets/" + FORMAT_FILE_VOLUME(metadata.getId());
             metadata.size = convertToSVO(pathToFile, outPath, stopToken);
 
             DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(metadata.getId()), metadata)

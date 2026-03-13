@@ -8,8 +8,11 @@
 #include <cereal/archives/binary.hpp>
 
 #include <fstream>
+#include <filesystem>
 
 #include "../../ApplicationContext.h"
+#include "BufferService.h"
+#include "RayTracingService.h"
 
 namespace Metal {
     MeshInstance *MeshService::create(const std::string &id) {
@@ -22,14 +25,14 @@ namespace Metal {
         instance->indexCount = data->indices.size();
         instance->vertexCount = data->data.size();
 
-        instance->dataBuffer = CTX.bufferService.createBuffer(
+        instance->dataBuffer = bufferService.createBuffer(
             id + "_data",
             sizeof(VertexData) * data->data.size(),
             VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
             data->data.data(),
             true);
 
-        instance->indexBuffer = CTX.bufferService.createBuffer(
+        instance->indexBuffer = bufferService.createBuffer(
             id + "_indices",
             sizeof(unsigned int) * data->indices.size(),
             VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
@@ -53,7 +56,7 @@ namespace Metal {
     }
 
     MeshData *MeshService::loadMeshData(const std::string &id) const {
-        auto pathToFile = CTX.getAssetDirectory() + FORMAT_FILE_MESH(id);
+        auto pathToFile = rootDirectory + "/assets/" + FORMAT_FILE_MESH(id);
         if (std::filesystem::exists(pathToFile)) {
             auto *data = new MeshData;
             std::ifstream input(pathToFile, std::ios::binary);
@@ -66,8 +69,8 @@ namespace Metal {
 
     void MeshService::disposeResource(MeshInstance *resource) {
         LOG_INFO("Disposing of mesh instance");
-        CTX.rayTracingService.markDirty();
-        CTX.bufferService.dispose(resource->indexBuffer->getId());
-        CTX.bufferService.dispose(resource->dataBuffer->getId());
+        rayTracingService.markDirty();
+        bufferService.dispose(resource->indexBuffer->getId());
+        bufferService.dispose(resource->dataBuffer->getId());
     }
 } // Metal

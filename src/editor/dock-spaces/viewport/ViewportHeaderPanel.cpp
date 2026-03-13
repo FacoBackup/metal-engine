@@ -33,8 +33,8 @@ namespace Metal {
         if (UIUtil::ButtonSimple(Icons::center_focus_strong + id + "centerCamera",
                                  UIUtil::ONLY_ICON_BUTTON_SIZE,
                                  UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            CTX.worldRepository.camera.position = {0, 0, 0};
-            CTX.worldRepository.camera.registerChange();
+            applicationContext->worldRepository.camera.position = {0, 0, 0};
+            applicationContext->worldRepository.camera.registerChange();
         }
         UIUtil::RenderTooltip("Center camera?");
 
@@ -44,19 +44,19 @@ namespace Metal {
         static float speedValues[] = {0.1f, 0.5f, 1.0f, 2.0f, 5.0f, 10.0f};
         int currentSpeedIndex = 2;
         for (int i = 0; i < 6; i++) {
-            if (CTX.worldRepository.camera.movementSensitivity == speedValues[i]) {
+            if (applicationContext->worldRepository.camera.movementSensitivity == speedValues[i]) {
                 currentSpeedIndex = i;
                 break;
             }
         }
         if (ImGui::Combo((id + "speedCamera").c_str(), &currentSpeedIndex, speeds, IM_ARRAYSIZE(speeds))) {
-            CTX.worldRepository.camera.movementSensitivity = speedValues[currentSpeedIndex];
+            applicationContext->worldRepository.camera.movementSensitivity = speedValues[currentSpeedIndex];
         }
         UIUtil::RenderTooltip("Camera speed");
     }
 
     void ViewportHeaderPanel::shadingMode() {
-        auto &editorRepository = CTX.editorRepository;
+        auto &editorRepository = applicationContext->editorRepository;
         ImGui::SetNextItemWidth(150);
         shadingModelOption = ShadingModes::IndexOfValue(editorRepository.shadingMode);
 

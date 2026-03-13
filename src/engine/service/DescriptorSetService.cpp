@@ -2,7 +2,10 @@
 #include "../dto/PipelineBuilder.h"
 #include "../resource/BufferInstance.h"
 #include "../../editor/service/LogService.h"
-#include "../../ApplicationContext.h"
+#include "../../core/vulkan/VulkanContext.h"
+#include "FrameBufferService.h"
+#include "BufferService.h"
+#include "TextureService.h"
 #include "../resource/FrameBufferAttachment.h"
 #include "../resource/FrameBufferInstance.h"
 #include "../resource/TextureInstance.h"
@@ -27,13 +30,13 @@ namespace Metal {
             binding.attachmentIndex = builder.attachmentIndex;
 
             if (builder.type == DescriptorBindingType::FBO_ATTACHMENT) {
-                auto *fbo = CTX.framebufferService.getResource(binding.frameBufferId);
+                auto *fbo = framebufferService.getResource(binding.frameBufferId);
                 if (fbo == nullptr) {
                     throw std::runtime_error("Framebuffer not found: " + binding.frameBufferId);
                 }
                 binding.view = fbo->attachments[binding.attachmentIndex]->vkImageView;
                 if (binding.sampler == VK_NULL_HANDLE) {
-                    binding.sampler = CTX.vulkanContext.vkImageSampler;
+                    binding.sampler = vulkanContext.vkImageSampler;
                 }
             }
 
@@ -42,7 +45,7 @@ namespace Metal {
                     binding.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
                     break;
                 case DescriptorBindingType::BUFFER: {
-                    BufferInstance *buffer = CTX.bufferService.getResource(binding.bufferId);
+                    BufferInstance *buffer = bufferService.getResource(binding.bufferId);
 
                     if (buffer != nullptr) {
                         binding.descriptorType = buffer->getBufferType() == BufferType::UNIFORM_BUFFER
@@ -58,7 +61,7 @@ namespace Metal {
                     binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
                     break;
                 case DescriptorBindingType::STORAGE_IMAGE: {
-                    auto *texture = CTX.textureService.getResource(binding.storageImageId);
+                    auto *texture = textureService.getResource(binding.storageImageId);
                     if (texture == nullptr) {
                         throw std::runtime_error("Storage image texture not found: " + binding.storageImageId);
                     }
@@ -77,7 +80,7 @@ namespace Metal {
 
     void DescriptorSetService::disposeResource(DescriptorInstance *resource) {
         LOG_INFO("Disposing of descriptor set resource");
-        vkDestroyDescriptorSetLayout(CTX.vulkanContext.device.device, resource->vkDescriptorSetLayout, nullptr);
+        vkDestroyDescriptorSetLayout(vulkanContext.device.device, resource->vkDescriptorSetLayout, nullptr);
     }
 
     std::vector<DescriptorInstance *> DescriptorSetService::getAllDescriptors() const {
@@ -96,7 +99,7 @@ namespace Metal {
             attachment->imageDescriptor = createResourceInstance(framebuffer->getId() + std::to_string(attachmentIndex));
             attachment->imageDescriptor->bindings.push_back(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
                 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
-                CTX.vulkanContext.vkImageSampler,
+                vulkanContext.vkImageSampler,
                 attachment->vkImageView));
             updateDescriptor(attachment->imageDescriptor);
         }
@@ -150,27 +153,27 @@ namespace Metal {
         layoutInfo.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT_EXT;
         layoutInfo.pNext = &flagsInfo;
 
-        VulkanUtils::CheckVKResult(vkCreateDescriptorSetLayout(CTX.vulkanContext.device.device, &layoutInfo,
+        VulkanUtils::CheckVKResult(vkCreateDescriptorSetLayout(vulkanContext.device.device, &layoutInfo,
                                                                nullptr,
                                                                &descriptor->vkDescriptorSetLayout));
 
         VkDescriptorSetAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        allocInfo.descriptorPool = CTX.vulkanContext.descriptorPool; // Created during setup
+        allocInfo.descriptorPool = vulkanContext.descriptorPool; // Created during setup
         allocInfo.descriptorSetCount = 1;
         allocInfo.pSetLayouts = &descriptor->vkDescriptorSetLayout;
 
-        VulkanUtils::CheckVKResult(vkAllocateDescriptorSets(CTX.vulkanContext.device.device, &allocInfo, &descriptor->vkDescriptorSet));
+        VulkanUtils::CheckVKResult(vkAllocateDescriptorSets(vulkanContext.device.device, &allocInfo, &descriptor->vkDescriptorSet));
 
         // WRITE
-        Write(descriptor->vkDescriptorSet, descriptor->bindings);
+        Write(vulkanContext, bufferService, descriptor->vkDescriptorSet, descriptor->bindings);
     }
 
     void DescriptorSetService::write(DescriptorInstance *descriptor) {
-        Write(descriptor->vkDescriptorSet, descriptor->bindings);
+        Write(vulkanContext, bufferService, descriptor->vkDescriptorSet, descriptor->bindings);
     }
 
-    void DescriptorSetService::Write(const VkDescriptorSet &vkDescriptorSet,
+    void DescriptorSetService::Write(VulkanContext &vulkanContext, BufferService &bufferService, const VkDescriptorSet &vkDescriptorSet,
                                      const std::vector<DescriptorBinding> &bindings) {
         std::vector<VkWriteDescriptorSet> writeDescriptorSets;
         std::vector<VkDescriptorBufferInfo> bufferInfos;
@@ -204,7 +207,7 @@ namespace Metal {
                     writeDescriptorSets.push_back(descriptorWrite);
                 }
             } else if (!binding.bufferId.empty()) {
-                BufferInstance *buffer = CTX.bufferService.getResource(binding.bufferId);
+                BufferInstance *buffer = bufferService.getResource(binding.bufferId);
 
                 if (buffer == nullptr) {
                     LOG_ERROR("DescriptorSetService Buffer not found: " + binding.bufferId);
@@ -258,7 +261,7 @@ namespace Metal {
 
         if (writeDescriptorSets.empty()) return;
 
-        vkUpdateDescriptorSets(CTX.vulkanContext.device.device,
+        vkUpdateDescriptorSets(vulkanContext.device.device,
                                static_cast<unsigned int>(writeDescriptorSets.size()),
                                writeDescriptorSets.data(),
                                0,

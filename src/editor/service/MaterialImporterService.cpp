@@ -1,5 +1,6 @@
 #include "MaterialImporterService.h"
-#include "../../ApplicationContext.h"
+#include "TextureImporterService.h"
+#include "LogService.h"
 #include "../enum/engine-definitions.h"
 #include "../../engine/dto/PrimitiveComponent.h"
 #include <assimp/material.h>
@@ -21,7 +22,7 @@ namespace Metal {
                 try {
                     const unsigned int embeddedIndex = static_cast<unsigned int>(std::stoul(p.substr(1)));
                     if (scene && embeddedIndex < scene->mNumTextures) {
-                        return CTX.textureImporter.importEmbeddedTexture(
+                        return textureImporterService.importEmbeddedTexture(
                             targetDir, scene->mTextures[embeddedIndex], nameHint);
                     }
                 } catch (std::exception &e) {
@@ -37,7 +38,7 @@ namespace Metal {
             }
             resolved = resolved.lexically_normal();
             try {
-                return CTX.textureImporter.importData(targetDir, resolved.string(), nullptr, stopToken);
+                return textureImporterService.importData(targetDir, resolved.string(), nullptr, stopToken);
             } catch (std::exception &e) {
                 LOG_ERROR("Failed to import texture " + resolved.string() + ": " + e.what());
                 return "";

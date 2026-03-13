@@ -17,8 +17,8 @@
 
 namespace Metal {
     void EngineFramePanel::onInitialize() {
-        const auto gBufferW = CTX.vulkanContext.getWindowWidth() / CTX.engineRepository.shadingResInvScale;
-        const auto gBufferH = CTX.vulkanContext.getWindowHeight() / CTX.engineRepository.shadingResInvScale;
+        const auto gBufferW = applicationContext->vulkanContext.getWindowWidth() / applicationContext->engineRepository.shadingResInvScale;
+        const auto gBufferH = applicationContext->vulkanContext.getWindowHeight() / applicationContext->engineRepository.shadingResInvScale;
 
         engineFrame = EngineFrameBuilder()
                 .addBuffer(RID_GLOBAL_DATA, sizeof(GlobalDataUBO),
@@ -55,7 +55,7 @@ namespace Metal {
                 .addPass(ICONS, RID_POST_PROCESSING_CB)
                 .build();
 
-        CTX.engineContext.registerFrame(engineFrame.get());
+        applicationContext->engineContext.registerFrame(engineFrame.get());
     }
 
     void EngineFramePanel::onSync() {
@@ -64,7 +64,7 @@ namespace Metal {
 
         auto *framebuffer = engineFrame->getResourceAs<FrameBufferInstance>(RID_POST_PROCESSING_FBO);
         if (framebuffer) {
-            CTX.descriptorSetService.setImageDescriptor(framebuffer, 0);
+            applicationContext->descriptorSetService.setImageDescriptor(framebuffer, 0);
             ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet),
                          viewportSize);
 
@@ -105,8 +105,8 @@ namespace Metal {
         const uint32_t pixelX = std::min(static_cast<uint32_t>(u * static_cast<float>(width)), width - 1);
         const uint32_t pixelY = std::min(static_cast<uint32_t>(v * static_cast<float>(height)), height - 1);
 
-        const auto picked = CTX.pickingService.pickEntityFromGBuffer(gBufferPositionIndex, pixelX, pixelY);
-        CTX.selectionService.clearSelection();
-        CTX.selectionService.addSelected(picked.value_or(EMPTY_ENTITY));
+        const auto picked = applicationContext->pickingService.pickEntityFromGBuffer(gBufferPositionIndex, pixelX, pixelY);
+        applicationContext->selectionService.clearSelection();
+        applicationContext->selectionService.addSelected(picked.value_or(EMPTY_ENTITY));
     }
 } // Metal

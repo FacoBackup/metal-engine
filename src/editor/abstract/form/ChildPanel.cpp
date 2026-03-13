@@ -9,7 +9,7 @@ namespace Metal {
     }
 
     void ChildPanel::onSync() {
-        ImGui::PushStyleColor(ImGuiCol_ChildBg, CTX.themeService.palette0);
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, applicationContext->themeService.palette0);
         if (!title.empty()) {
             ImGui::Spacing();
             ImGui::Text(title.c_str());

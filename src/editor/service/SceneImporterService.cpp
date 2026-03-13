@@ -1,5 +1,7 @@
 #include "SceneImporterService.h"
-
+#include "MeshImporterService.h"
+#include "MaterialImporterService.h"
+#include "LogService.h"
 #include "../dto/FSEntry.h"
 #include "../../engine/dto/MeshData.h"
 #include "../dto/SceneData.h"
@@ -11,7 +13,6 @@
 #include "../util/FilesUtil.h"
 #include "../dto/EntryMetadata.h"
 #include "../enum/engine-definitions.h"
-#include "../../ApplicationContext.h"
 #include "../../common/serialization-definitions.h"
 #include "../dto/SceneImportSettingsDTO.h"
 
@@ -49,7 +50,7 @@ namespace Metal {
         sceneMetadata.name = sceneData.name =
                              scene->mName.length > 0 ? scene->mName.data : scene->mRootNode->mName.data;
 
-        std::string sceneBlobPath = CTX.getAssetDirectory() + FORMAT_FILE_SCENE(sceneMetadata.getId());
+        std::string sceneBlobPath = rootDirectory + "/assets/" + FORMAT_FILE_SCENE(sceneMetadata.getId());
 
         std::unordered_map<unsigned int, MeshId> meshMap{};
 
@@ -57,7 +58,7 @@ namespace Metal {
             throw std::runtime_error("Import cancelled");
         }
 
-        CTX.meshImporterService.persistAllMeshes(targetDir, scene, meshMap, stopToken);
+        meshImporterService.persistAllMeshes(targetDir, scene, meshMap, stopToken);
 
         if (stopToken.stop_requested()) {
             throw std::runtime_error("Import cancelled");
@@ -66,7 +67,7 @@ namespace Metal {
         fs::path absolutePath = fs::absolute(pathToFile);
         std::string directoryPath = absolutePath.parent_path().string();
 
-        ProcessNode(sceneData, scene, scene->mRootNode, targetDir, directoryPath, meshMap, stopToken);
+        processNode(sceneData, scene, scene->mRootNode, targetDir, directoryPath, meshMap, stopToken);
         ProcessLights(sceneData, scene);
 
         if (stopToken.stop_requested()) {
@@ -88,10 +89,10 @@ namespace Metal {
         return sceneMetadata.getId();
     }
 
-    void SceneImporterService::ProcessNode(SceneData &scene, const aiScene *aiScene, const aiNode *node,
+    void SceneImporterService::processNode(SceneData &scene, const aiScene *aiScene, const aiNode *node,
                                            const std::string &targetDir, const std::string &rootDirectory,
                                            const std::unordered_map<unsigned int, MeshId> &meshMap,
-                                           const std::stop_token &stopToken) {
+                                           const std::stop_token &stopToken) const {
         if (stopToken.stop_requested()) return;
         auto &currentNode = scene.entities.emplace_back();
 
@@ -105,17 +106,17 @@ namespace Metal {
         currentNode.transform.rotation = {rotation.w, rotation.x, rotation.y, rotation.z};
         currentNode.transform.scale = {scaling.x, scaling.y, scaling.z};
 
-        ProcessMeshes(scene, aiScene, node, targetDir, rootDirectory, meshMap, stopToken);
+        processMeshes(scene, aiScene, node, targetDir, rootDirectory, meshMap, stopToken);
 
         for (unsigned int i = 0; i < node->mNumChildren; ++i) {
-            ProcessNode(scene, aiScene, node->mChildren[i], targetDir, rootDirectory, meshMap, stopToken);
+            processNode(scene, aiScene, node->mChildren[i], targetDir, rootDirectory, meshMap, stopToken);
         }
     }
 
-    void SceneImporterService::ProcessMeshes(SceneData &scene, const aiScene *aiScene, const aiNode *node,
+    void SceneImporterService::processMeshes(SceneData &scene, const aiScene *aiScene, const aiNode *node,
                                              const std::string &targetDir, const std::string &rootDirectory,
                                              const std::unordered_map<unsigned int, MeshId> &meshMap,
-                                             const std::stop_token &stopToken) {
+                                             const std::stop_token &stopToken) const {
         for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
             if (stopToken.stop_requested()) return;
             unsigned int meshIndex = node->mMeshes[i];
@@ -131,7 +132,7 @@ namespace Metal {
             childMeshNode.entity.name = assimpMesh->mName.length > 0 ? assimpMesh->mName.data : "Mesh";
 
             const aiMaterial *material = aiScene->mMaterials[assimpMesh->mMaterialIndex];
-            CTX.materialImporterService.importMaterial(targetDir, material, aiScene, rootDirectory,
+            materialImporterService.importMaterial(targetDir, material, aiScene, rootDirectory,
                                                        *childMeshNode.primitive, stopToken);
         }
     }

@@ -7,11 +7,20 @@
 
 namespace Metal {
 
+    struct WorldRepository;
+    class EngineContext;
+
     class VolumeService final : public AbstractRuntimeComponent {
+        WorldRepository &worldRepository;
+        EngineContext &engineContext;
+
         std::vector<VolumeData> items{};
 
         void registerVolumes();
     public:
+        explicit VolumeService(WorldRepository &worldRepository, EngineContext &engineContext)
+            : worldRepository(worldRepository), engineContext(engineContext) {}
+        VolumeService() = delete;
 
         void onSync() override;
 

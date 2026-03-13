@@ -9,12 +9,16 @@
 namespace Metal {
     struct FSEntry;
 
+    class NotificationService;
+
     class FilesService final : public AbstractRuntimeComponent {
         FSEntry *root = nullptr;
+        std::string &rootDirectory;
+        NotificationService &notificationService;
 
     public:
-        explicit FilesService()
-            : AbstractRuntimeComponent() {
+        explicit FilesService(std::string &rootDirectory, NotificationService &notificationService)
+            : AbstractRuntimeComponent(), rootDirectory(rootDirectory), notificationService(notificationService) {
         }
 
         FSEntry *getRoot() {

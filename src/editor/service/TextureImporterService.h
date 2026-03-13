@@ -8,9 +8,11 @@ namespace Metal {
     struct TextureData;
 
     class TextureImporterService final : public AbstractImporter {
+        std::string &rootDirectory;
+
     public:
-        explicit TextureImporterService()
-            : AbstractImporter() {
+        explicit TextureImporterService(std::string &rootDirectory)
+            : AbstractImporter(), rootDirectory(rootDirectory) {
         }
 
         std::vector<std::string> getSupportedTypes() override {

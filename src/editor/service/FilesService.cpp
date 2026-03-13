@@ -1,9 +1,9 @@
 #include "FilesService.h"
+#include "NotificationService.h"
 #include "../dto/FSEntry.h"
 #include "../enum/EntryType.h"
 #include "../enum/engine-definitions.h"
 #include "../util/FilesUtil.h"
-#include "../../ApplicationContext.h"
 #include "LogService.h"
 #include <chrono>
 #include <filesystem>
@@ -14,20 +14,20 @@
 
 namespace fs = std::filesystem;
 
-#define DELETE_F(F)\
+#define DELETE_F(F, rootDir)\
 std::filesystem::remove_all(entry.second->absolutePath);\
-std::filesystem::remove_all(CTX.getAssetDirectory() + F(entry.second->getId()));
+std::filesystem::remove_all(rootDir + "/assets/" + F(entry.second->getId()));
 
-#define DELETE_S(F)\
+#define DELETE_S(F, rootDir)\
 std::filesystem::remove_all(entry.second->absolutePath);\
-std::filesystem::remove_all(CTX.getAssetDirectory() + F(entry.second->getId()));
+std::filesystem::remove_all(rootDir + "/assets/" + F(entry.second->getId()));
 
 #define DATA \
         std::filesystem::file_time_type ftime = last_write_time(entry);
 
 namespace Metal {
     void FilesService::onInitialize() {
-        root = new FSEntry(nullptr, CTX.getAssetRefDirectory(), "");
+        root = new FSEntry(nullptr, rootDirectory + "/assets-ref/", "");
         root->type = EntryType::DIRECTORY;
         root->name = "Files";
         GetEntries(root);
@@ -70,19 +70,19 @@ namespace Metal {
                     break;
                 }
                 case EntryType::MESH: {
-                    DELETE_F(FORMAT_FILE_MESH)
+                    DELETE_F(FORMAT_FILE_MESH, rootDirectory)
                     break;
                 }
                 case EntryType::TEXTURE: {
-                    DELETE_F(FORMAT_FILE_TEXTURE)
+                    DELETE_F(FORMAT_FILE_TEXTURE, rootDirectory)
                     break;
                 }
                 case EntryType::SCENE: {
-                    DELETE_S(FORMAT_FILE_SCENE)
+                    DELETE_S(FORMAT_FILE_SCENE, rootDirectory)
                     break;
                 }
                 case EntryType::VOLUME: {
-                    DELETE_S(FORMAT_FILE_VOLUME)
+                    DELETE_S(FORMAT_FILE_VOLUME, rootDirectory)
                     break;
                 }
                 default: break;;
@@ -116,7 +116,7 @@ namespace Metal {
             fs::rename(sourcePath, targetPath);
         } catch (const fs::filesystem_error &e) {
             LOG_ERROR("Could not move file");
-            CTX.notificationService.pushMessage("Could not move entry", NotificationSeverities::ERROR);
+            notificationService.pushMessage("Could not move entry", NotificationSeverities::ERROR);
             return;
         }
 

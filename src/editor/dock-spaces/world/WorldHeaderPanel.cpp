@@ -28,7 +28,7 @@ namespace Metal {
         ImGui::SameLine();
         if (UIUtil::ButtonSimple(Icons::add + "##hierarchyAdd" + id, UIUtil::ONLY_ICON_BUTTON_SIZE,
                                  UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            CTX.worldRepository.createEntity();
+            applicationContext->worldRepository.createEntity();
         }
         UIUtil::RenderTooltip("Create entity");
     }

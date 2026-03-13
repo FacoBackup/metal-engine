@@ -9,8 +9,19 @@ namespace Metal {
     struct MeshInstance;
     struct EntityAssetData;
 
+    class BufferService;
+    class RayTracingService;
+
     class MeshService final : public AbstractResourceService<MeshInstance> {
+        BufferService &bufferService;
+        RayTracingService &rayTracingService;
+        const std::string &rootDirectory;
+
     public:
+        MeshService(BufferService &bufferService, RayTracingService &rayTracingService, const std::string &rootDirectory)
+            : bufferService(bufferService), rayTracingService(rayTracingService), rootDirectory(rootDirectory) {}
+        MeshService() = delete;
+
         MeshInstance *create(const std::string &id);
 
         MeshInstance *stream(const std::string &id);

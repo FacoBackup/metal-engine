@@ -85,6 +85,7 @@ namespace Metal {
 
         if (validContext) {
             glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+            glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
             window = glfwCreateWindow(1280, 720, ENGINE_NAME, nullptr, nullptr);
 
             if (!glfwVulkanSupported()) {

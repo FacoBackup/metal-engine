@@ -1,13 +1,21 @@
 #include "EngineContext.h"
+#include "service/TransformService.h"
+#include "service/StreamingService.h"
+#include "service/RayTracingService.h"
+#include "service/CameraService.h"
+#include "service/LightService.h"
+#include "service/VolumeService.h"
+#include "repository/WorldRepository.h"
+#include "repository/EngineRepository.h"
+#include "../editor/repository/EditorRepository.h"
 
 #include "../editor/enum/EngineResourceIDs.h"
-#include "../ApplicationContext.h"
 #include "resource/BufferInstance.h"
 #include "dto/TransformComponent.h"
 
 namespace Metal {
     void EngineContext::resetPathTracerAccumulationCount() const {
-        CTX.engineRepository.pathTracerAccumulationCount = 0;
+        engineRepository.pathTracerAccumulationCount = 0;
     }
 
     void EngineContext::onInitialize() {
@@ -36,12 +44,12 @@ namespace Metal {
     void EngineContext::onSync() {
         updateCurrentTime();
 
-        CTX.transformService.onSync();
-        CTX.streamingService.onSync();
-        CTX.rayTracingService.onSync();
-        CTX.cameraService.onSync();
-        CTX.lightService.onSync();
-        CTX.volumeService.onSync();
+        transformService.onSync();
+        streamingService.onSync();
+        rayTracingService.onSync();
+        cameraService.onSync();
+        lightService.onSync();
+        volumeService.onSync();
 
         for (auto *frame: registeredFrames) {
             if (frame->getShouldRender()) {
@@ -58,7 +66,7 @@ namespace Metal {
     }
 
     void EngineContext::updateGlobalData() {
-        auto &camera = CTX.worldRepository.camera;
+        auto &camera = worldRepository.camera;
         globalDataUBO.previousProjView = globalDataUBO.projView;
         globalDataUBO.viewMatrix = camera.viewMatrix;
         globalDataUBO.projectionMatrix = camera.projectionMatrix;
@@ -66,21 +74,21 @@ namespace Metal {
         globalDataUBO.invProj = camera.invProjectionMatrix;
         globalDataUBO.invView = camera.invViewMatrix;
         globalDataUBO.cameraWorldPosition = camera.position;
-        globalDataUBO.volumeCount = CTX.volumeService.getCount();
-        globalDataUBO.lightsCount = CTX.lightService.getCount();
-        globalDataUBO.debugFlag = ShadingModes::IndexOfValue(CTX.editorRepository.shadingMode);
-        CTX.engineRepository.pathTracerAccumulationCount++;
-        globalDataUBO.pathTracerAccumulationCount = CTX.engineRepository.pathTracerAccumulationCount;
+        globalDataUBO.volumeCount = volumeService.getCount();
+        globalDataUBO.lightsCount = lightService.getCount();
+        globalDataUBO.debugFlag = ShadingModes::IndexOfValue(editorRepository.shadingMode);
+        engineRepository.pathTracerAccumulationCount++;
+        globalDataUBO.pathTracerAccumulationCount = engineRepository.pathTracerAccumulationCount;
         globalDataUBO.globalFrameCount++;
-        globalDataUBO.pathTracerMaxSamples = CTX.engineRepository.pathTracerMaxSamples;
-        globalDataUBO.denoiserEnabled = CTX.engineRepository.denoiserEnabled && (
+        globalDataUBO.pathTracerMaxSamples = engineRepository.pathTracerMaxSamples;
+        globalDataUBO.denoiserEnabled = engineRepository.denoiserEnabled && (
                                             globalDataUBO.debugFlag == LIT || globalDataUBO.debugFlag == LIGHTING_ONLY)
                                             ? 1
                                             : 0;
 
-        CTX.lightService.computeSunInfo();
-        globalDataUBO.sunPosition = CTX.lightService.getSunPosition();
-        globalDataUBO.sunColor = CTX.lightService.getSunColor();
+        lightService.computeSunInfo();
+        globalDataUBO.sunPosition = lightService.getSunPosition();
+        globalDataUBO.sunColor = lightService.getSunColor();
         currentFrame->getResourceAs<BufferInstance>(RID_GLOBAL_DATA)->update(&globalDataUBO);
     }
 }

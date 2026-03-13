@@ -3,12 +3,14 @@
 #include "../dto/VolumeComponent.h"
 #include "../resource/BufferInstance.h"
 #include "../../editor/enum/EngineResourceIDs.h"
+#include "../repository/WorldRepository.h"
+#include "../EngineContext.h"
 
 namespace Metal {
     void VolumeService::registerVolumes() {
-        auto view = CTX.worldRepository.registry.view<VolumeComponent, TransformComponent>();
+        auto view = worldRepository.registry.view<VolumeComponent, TransformComponent>();
         for (auto [entityId, l, t]: view.each()) {
-            if (CTX.worldRepository.hiddenEntities.contains(entityId)) {
+            if (worldRepository.hiddenEntities.contains(entityId)) {
                 continue;
             }
 
@@ -30,7 +32,7 @@ namespace Metal {
         registerVolumes();
 
         if (!items.empty()) {
-            CTX.engineContext.currentFrame->getResourceAs<BufferInstance>(RID_VOLUMES_BUFFER)->update(items.data());
+            engineContext.currentFrame->getResourceAs<BufferInstance>(RID_VOLUMES_BUFFER)->update(items.data());
         }
     }
 } // Metal

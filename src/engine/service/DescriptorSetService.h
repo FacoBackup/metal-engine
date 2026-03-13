@@ -8,9 +8,22 @@ namespace Metal {
     struct PipelineBuilder;
     struct TextureInstance;
     struct FrameBufferInstance;
+    class VulkanContext;
+    class FrameBufferService;
+    class BufferService;
+    class TextureService;
 
     class DescriptorSetService final : public AbstractResourceService<DescriptorInstance> {
+        VulkanContext &vulkanContext;
+        FrameBufferService &framebufferService;
+        BufferService &bufferService;
+        TextureService &textureService;
+
     public:
+        DescriptorSetService(VulkanContext &vulkanContext, FrameBufferService &framebufferService, BufferService &bufferService, TextureService &textureService)
+            : vulkanContext(vulkanContext), framebufferService(framebufferService), bufferService(bufferService), textureService(textureService) {}
+        DescriptorSetService() = delete;
+
         DescriptorInstance *createDescriptor(const PipelineBuilder &pipelineBuilder, const std::string &id, VkShaderStageFlags stageFlags);
 
         void disposeResource(DescriptorInstance *resource) override;
@@ -25,7 +38,7 @@ namespace Metal {
 
         void write(DescriptorInstance *descriptor);
 
-        static void Write(const VkDescriptorSet &vkDescriptorSet, const std::vector<DescriptorBinding> &bindings);
+        static void Write(VulkanContext &vulkanContext, BufferService &bufferService, const VkDescriptorSet &vkDescriptorSet, const std::vector<DescriptorBinding> &bindings);
     };
 }
 

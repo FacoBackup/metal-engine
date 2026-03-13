@@ -1,6 +1,6 @@
 #include "WorldRepository.h"
+#include "../service/RayTracingService.h"
 
-#include "../../ApplicationContext.h"
 #include "../enum/ComponentType.h"
 #include "../../editor/dto/SceneData.h"
 #include "../../common/serialization-definitions.h"
@@ -35,7 +35,7 @@ namespace Metal {
 
             registry.destroy(entityId);
         }
-        CTX.rayTracingService.markDirty();
+        rayTracingService.markDirty();
     }
 
     void WorldRepository::changeVisibility(entt::entity entity, bool isVisible) {
@@ -45,12 +45,12 @@ namespace Metal {
         } else {
             hiddenEntities.insert({entity, true});
         }
-        CTX.rayTracingService.markDirty();
+        rayTracingService.markDirty();
     }
 
     void WorldRepository::loadScene(const std::string &sceneId) {
         SceneData sceneData;
-        const auto pathToFile = CTX.getAssetDirectory() + FORMAT_FILE_SCENE(sceneId);
+        const auto pathToFile = rootDirectory + "/assets/" + FORMAT_FILE_SCENE(sceneId);
         PARSE_TEMPLATE(sceneData, pathToFile)
 
         for (auto &entityData: sceneData.entities) {
@@ -86,7 +86,7 @@ namespace Metal {
             }
         }
 
-        CTX.rayTracingService.markDirty();
+        rayTracingService.markDirty();
     }
 
     void WorldRepository::createComponent(const entt::entity entityId, ComponentType type) {

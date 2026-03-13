@@ -80,6 +80,7 @@ namespace Metal {
         vulkanContext.onInitialize();
         guiContext.onInitialize();
         filesService.onInitialize();
+        editorPanel.applicationContext = this;
         editorPanel.onInitialize();
         engineContext.onInitialize();
 

@@ -26,11 +26,11 @@ namespace Metal {
 
             if (ImGui::BeginPopup((id + "AddComponentPopup").c_str())) {
                 for (const auto &compDef: ComponentTypes::getComponents()) {
-                    bool hasComponent = compDef.getInspectable(CTX.worldRepository, selectedId) != nullptr;
+                    bool hasComponent = compDef.getInspectable(applicationContext->worldRepository, selectedId) != nullptr;
                     if (!hasComponent) {
                         if (ImGui::MenuItem(
                             (compDef.icon + " " + compDef.name + id + "adCOmp" + compDef.name).c_str())) {
-                            CTX.worldRepository.createComponent(selectedId, compDef.type);
+                            applicationContext->worldRepository.createComponent(selectedId, compDef.type);
                             selectedId = EMPTY_ENTITY;
                             tick();
                         }
@@ -42,13 +42,13 @@ namespace Metal {
     }
 
     void InspectorPanel::tick() {
-        if (auto &editorRepository = CTX.editorRepository;
+        if (auto &editorRepository = applicationContext->editorRepository;
             editorRepository.mainSelection != selectedId) {
             additionalInspection.clear();
             selectedId = editorRepository.mainSelection;
             formPanel->resetForm();
             if (selectedId != EMPTY_ENTITY) {
-                auto &repo = CTX.worldRepository;
+                auto &repo = applicationContext->worldRepository;
 
                 selectedEntity = repo.getEntity(selectedId);
                 if (selectedEntity != nullptr) {

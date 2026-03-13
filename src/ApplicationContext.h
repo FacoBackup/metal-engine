@@ -34,7 +34,6 @@
 #include "engine/service/CommandBufferRecorderService.h"
 #include "editor/service/NotificationService.h"
 #include "editor/service/AsyncTaskService.h"
-#include "editor/service/LogService.h"
 #include "engine/service/TransformService.h"
 #include "editor/service/PickingService.h"
 #include "engine/service/VolumeService.h"
@@ -67,14 +66,13 @@ namespace Metal {
         // ----------- Services
         NotificationService notificationService;
         AsyncTaskService asyncTaskService;
-        LogService logService{};
-        MeshService meshService{};
-        MaterialService materialService{};
-        TextureService textureService{};
-        FrameBufferService framebufferService{};
-        DescriptorSetService descriptorSetService{};
-        PipelineService pipelineService{descriptorSetService};
-        BufferService bufferService{};
+        MeshService meshService{bufferService, rayTracingService, rootDirectory};
+        MaterialService materialService{textureService};
+        TextureService textureService{vulkanContext, bufferService, pipelineService, descriptorSetService, rootDirectory};
+        FrameBufferService framebufferService{vulkanContext};
+        DescriptorSetService descriptorSetService{vulkanContext, framebufferService, bufferService, textureService};
+        PipelineService pipelineService{vulkanContext, framebufferService, bufferService, descriptorSetService};
+        BufferService bufferService{vulkanContext};
         ThemeService themeService{};
         DockService dockService{};
         SelectionService selectionService{};
@@ -84,21 +82,21 @@ namespace Metal {
         TextureImporterService textureImporter{};
         FilesService filesService{};
         FileImporterService fileImporterService{};
-        CameraService cameraService{};
+        CameraService cameraService{engineContext, worldRepository, runtimeRepository};
         PickingService pickingService{};
-        TransformService transformService{};
-        LightService lightService{};
-        VolumeService volumeService{};
-        RayTracingService rayTracingService{};
+        TransformService transformService{worldRepository, rayTracingService};
+        LightService lightService{engineContext, engineRepository};
+        VolumeService volumeService{worldRepository, engineContext};
+        RayTracingService rayTracingService{vulkanContext, pipelineService, worldRepository, meshService, materialService, bufferService, engineContext};
         CommandBufferRecorderService commandBufferRecorderService{};
-        VoxelImporterService voxelImporterService{};
+        VoxelImporterService voxelImporterService{rootDirectory};
         VoxelService voxelService{};
         // ----------- Services
 
         // ----------- Repository
         WorldRepository worldRepository{};
         RuntimeRepository runtimeRepository{};
-        StreamingService streamingService{};
+        StreamingService streamingService{engineContext, worldRepository, meshService, textureService, voxelService};
         EngineRepository engineRepository{};
         DockRepository dockRepository{};
         EditorRepository editorRepository{};

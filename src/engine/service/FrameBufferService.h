@@ -12,7 +12,11 @@ namespace Metal {
     struct FrameBufferAttachment;
     struct FrameBufferInstance;
 
+    class VulkanContext;
+
     class FrameBufferService final : public AbstractResourceService<FrameBufferInstance> {
+        VulkanContext &vulkanContext;
+
         std::shared_ptr<FrameBufferAttachment> createAttachmentInternal(VkFormat format,
                                                                         VkImageUsageFlagBits usage,
                                                                         FrameBufferInstance *framebuffer) const;
@@ -20,6 +24,9 @@ namespace Metal {
         void createVKFrameBuffer(FrameBufferInstance *framebuffer) const;
 
     public:
+        explicit FrameBufferService(VulkanContext &vulkanContext) : vulkanContext(vulkanContext) {}
+        FrameBufferService() = delete;
+
         FrameBufferInstance *createFrameBuffer(const std::string &id, unsigned int w, unsigned int h,
                                                glm::vec4 clearColor = glm::vec4(0.0f));
 

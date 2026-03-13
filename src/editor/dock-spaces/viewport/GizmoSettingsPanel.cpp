@@ -5,7 +5,7 @@
 
 namespace Metal {
     void GizmoSettingsPanel::onInitialize() {
-        editorRepository = &CTX.editorRepository;
+        editorRepository = &applicationContext->editorRepository;
     }
 
     void GizmoSettingsPanel::onSync() {
@@ -15,9 +15,9 @@ namespace Metal {
         ImGui::SameLine();
         gizmoGrid();
         UIUtil::Spacing();
-        if (selectedEntityId != editorRepository->mainSelection && CTX.worldRepository.registry.all_of(
+        if (selectedEntityId != editorRepository->mainSelection && applicationContext->worldRepository.registry.all_of(
                 editorRepository->mainSelection)) {
-            selectedEntity = CTX.worldRepository.getEntity(editorRepository->mainSelection);
+            selectedEntity = applicationContext->worldRepository.getEntity(editorRepository->mainSelection);
             selectedEntityId = editorRepository->mainSelection;
         }
         if (selectedEntity != nullptr) {

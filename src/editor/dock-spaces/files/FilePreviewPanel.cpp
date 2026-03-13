@@ -21,7 +21,7 @@ namespace Metal {
         ImGui::Separator();
 
         if (selected->type == EntryType::TEXTURE) {
-            auto *texture = CTX.textureService.stream(selected->getId());
+            auto *texture = applicationContext->textureService.stream(selected->getId());
             if (texture != nullptr) {
                 float availWidth = ImGui::GetContentRegionAvail().x;
                 float availHeight = ImGui::GetContentRegionAvail().y * 0.6f; // reserve space for table
@@ -41,7 +41,7 @@ namespace Metal {
                 float offsetX = (availWidth - renderWidth) * 0.5f;
                 if (offsetX > 0) ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offsetX);
 
-                CTX.guiContext.renderImage(texture, renderWidth, renderHeight);
+                applicationContext->guiContext.renderImage(texture, renderWidth, renderHeight);
                 ImGui::Separator();
             }
         }

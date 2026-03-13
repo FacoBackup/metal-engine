@@ -59,6 +59,8 @@ add_executable(
         src/editor/dock-spaces/header/EditorHeaderPanel.h
         src/editor/dock-spaces/header/AsyncTaskPanel.cpp
         src/editor/dock-spaces/header/AsyncTaskPanel.h
+        src/editor/dock-spaces/footer/EditorFooterPanel.cpp
+        src/editor/dock-spaces/footer/EditorFooterPanel.h
         src/common/Icons.h
         src/editor/service/DockService.cpp
         src/editor/service/DockService.h

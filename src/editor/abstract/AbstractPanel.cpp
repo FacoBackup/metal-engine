@@ -3,6 +3,7 @@
 
 namespace Metal {
     void AbstractPanel::appendChild(AbstractPanel *panel) {
+        panel->applicationContext = applicationContext;
         panel->onInitialize();
         children.emplace_back(panel);
     }

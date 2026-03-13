@@ -8,8 +8,9 @@
 
 namespace Metal {
     class ApplicationContext;
-
     class AbstractPanel : public IPanel {
+    public:
+        ApplicationContext *applicationContext{};
     protected:
         std::vector<IPanel *> children;
         const std::string id;

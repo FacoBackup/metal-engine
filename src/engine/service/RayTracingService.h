@@ -11,9 +11,24 @@
 #include "../../common/AbstractRuntimeComponent.h"
 
 namespace Metal {
-    struct BufferInstance;
+    class BufferInstance;
+    class VulkanContext;
+    class PipelineService;
+    struct WorldRepository;
+    class MeshService;
+    class MaterialService;
+    class BufferService;
+    class EngineContext;
 
     class RayTracingService final : public AbstractRuntimeComponent {
+        VulkanContext &vulkanContext;
+        PipelineService &pipelineService;
+        WorldRepository &worldRepository;
+        MeshService &meshService;
+        MaterialService &materialService;
+        BufferService &bufferService;
+        EngineContext &engineContext;
+
         struct BLASEntry {
             VkAccelerationStructureKHR accelerationStructure = VK_NULL_HANDLE;
             BufferInstance *buffer = nullptr;
@@ -51,6 +66,9 @@ namespace Metal {
         void updateMeshMaterials();
 
     public:
+        RayTracingService(VulkanContext &vulkanContext, PipelineService &pipelineService, WorldRepository &worldRepository, MeshService &meshService, MaterialService &materialService, BufferService &bufferService, EngineContext &engineContext)
+            : vulkanContext(vulkanContext), pipelineService(pipelineService), worldRepository(worldRepository), meshService(meshService), materialService(materialService), bufferService(bufferService), engineContext(engineContext) {}
+        RayTracingService() = delete;
 
         void setNeedsMaterialUpdate(bool val) {
             needsMaterialUpdate = val;

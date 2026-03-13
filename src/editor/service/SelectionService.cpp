@@ -1,11 +1,10 @@
 #include "SelectionService.h"
-
-#include "../../ApplicationContext.h"
+#include "../../editor/repository/EditorRepository.h"
+#include "../../engine/repository/WorldRepository.h"
 #include "../../engine/dto/TransformComponent.h"
 
 namespace Metal {
     void SelectionService::addSelected(entt::entity entity) const {
-        auto &editorRepository = CTX.editorRepository;
         if (editorRepository.selected.empty() || entity == EMPTY_ENTITY) {
             editorRepository.mainSelection = entity;
             if (editorRepository.mainSelection != EMPTY_ENTITY) {
@@ -18,14 +17,12 @@ namespace Metal {
     }
 
     void SelectionService::clearSelection() const {
-        auto &editorRepository = CTX.editorRepository;
         editorRepository.selected.clear();
         editorRepository.mainSelection = EMPTY_ENTITY;
         editorRepository.primitiveSelected = nullptr;
     }
 
     void SelectionService::addAllSelected(const std::vector<entt::entity> &all) const {
-        auto &editorRepository = CTX.editorRepository;
         editorRepository.selected.clear();
         const entt::entity first = all.size() > 0 ? all[0] : EMPTY_ENTITY;
         editorRepository.mainSelection = first;
@@ -36,16 +33,14 @@ namespace Metal {
     }
 
     void SelectionService::updatePrimitiveSelected() const {
-        auto &editorRepository = CTX.editorRepository;
-        auto &repo = CTX.worldRepository;
         const auto entityId = editorRepository.mainSelection;
 
-        if (entityId == EMPTY_ENTITY || !repo.registry.valid(entityId)) {
+        if (entityId == EMPTY_ENTITY || !worldRepository.registry.valid(entityId)) {
             return;
         }
 
-        if (repo.registry.all_of<TransformComponent>(entityId)) {
-            editorRepository.primitiveSelected = &repo.registry.get<TransformComponent>(entityId);
+        if (worldRepository.registry.all_of<TransformComponent>(entityId)) {
+            editorRepository.primitiveSelected = &worldRepository.registry.get<TransformComponent>(entityId);
         }
     }
 

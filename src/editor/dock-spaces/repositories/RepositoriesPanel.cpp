@@ -8,9 +8,9 @@ namespace Metal {
         formPanel = new FormPanel();
         appendChild(formPanel);
         
-        repositories.push_back(&CTX.editorRepository);
-        repositories.push_back(&CTX.engineRepository);
-        repositories.push_back(&CTX.worldRepository.camera);
+        repositories.push_back(&applicationContext->editorRepository);
+        repositories.push_back(&applicationContext->engineRepository);
+        repositories.push_back(&applicationContext->worldRepository.camera);
     }
 
     void RepositoriesPanel::onSync() {

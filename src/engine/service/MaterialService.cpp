@@ -2,9 +2,8 @@
 
 #include "../../common/serialization-definitions.h"
 #include "../dto/MeshMetadata.h"
-
-#include "../../ApplicationContext.h"
-
+#include "TextureService.h"
+#include "../dto/PrimitiveComponent.h"
 
 namespace Metal {
     void MaterialService::load(MeshMetadata &materialData, PrimitiveComponent &data) {
@@ -21,21 +20,21 @@ namespace Metal {
         materialData.metallicTextureId = 0;
 
         if (!data.albedo.empty()) {
-            auto *tex = CTX.textureService.stream(data.albedo);
+            auto *tex = textureService.stream(data.albedo);
             if (tex != nullptr) {
-                materialData.albedoTextureId = CTX.textureService.getTextureIndex(data.albedo);
+                materialData.albedoTextureId = textureService.getTextureIndex(data.albedo);
             }
         }
         if (!data.roughness.empty()) {
-            auto *tex = CTX.textureService.stream(data.roughness);
+            auto *tex = textureService.stream(data.roughness);
             if (tex != nullptr) {
-                materialData.roughnessTextureId = CTX.textureService.getTextureIndex(data.roughness);
+                materialData.roughnessTextureId = textureService.getTextureIndex(data.roughness);
             }
         }
         if (!data.metallic.empty()) {
-            auto *tex = CTX.textureService.stream(data.metallic);
+            auto *tex = textureService.stream(data.metallic);
             if (tex != nullptr) {
-                materialData.metallicTextureId = CTX.textureService.getTextureIndex(data.metallic);
+                materialData.metallicTextureId = textureService.getTextureIndex(data.metallic);
             }
         }
     }

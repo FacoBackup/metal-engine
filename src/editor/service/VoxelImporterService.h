@@ -9,7 +9,11 @@ namespace Metal {
     struct SVOInstance;
 
     class VoxelImporterService final : public AbstractImporter {
+        const std::string &rootDirectory;
     public:
+        explicit VoxelImporterService(const std::string &rootDirectory) : rootDirectory(rootDirectory) {}
+        VoxelImporterService() = delete;
+
         std::vector<std::string> getSupportedTypes() override;
 
         size_t convertToSVO(const std::string &sourcePath, const std::string &outPath,

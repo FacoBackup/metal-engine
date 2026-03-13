@@ -11,17 +11,15 @@ namespace Metal {
         }
         shortcuts = {
                 ShortcutDTO("Clear Logs", ImGuiMod_Ctrl | ImGuiKey_L, [this]() {
-                    CTX.logService.clear();
+                    LogService::clear();
                 })
         };
     }
 
     void ConsolePanel::onSync() {
-        LogService& logService = CTX.logService;
-
         // Header
         if (ImGui::Button("Clear")) {
-            logService.clear();
+            LogService::clear();
         }
         ImGui::SameLine();
         bool copyToClipboard = ImGui::Button("Copy");
@@ -48,7 +46,7 @@ namespace Metal {
             ImGui::LogToClipboard();
         }
 
-        const auto entries = logService.getEntriesSnapshot();
+        const auto entries = LogService::getEntriesSnapshot();
         for (const auto& entry : entries) {
             if (!levelFilter[(int)entry.level]) continue;
             if (!filter.PassFilter(entry.message.c_str())) continue;

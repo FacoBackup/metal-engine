@@ -4,12 +4,12 @@
 #include <chrono>
 #include <sstream>
 
-namespace Metal {
+namespace Metal::LogService {
 
-    LogService::LogService() : AbstractRuntimeComponent() {
-    }
+    static std::vector<LogEntry> entries;
+    static std::mutex logMutex;
 
-    void LogService::log(LogLevel level, const std::string &message) const {
+    void log(LogLevel level, const std::string &message) {
         auto now = std::chrono::system_clock::now();
         auto in_time_t = std::chrono::system_clock::to_time_t(now);
 
@@ -25,17 +25,17 @@ namespace Metal {
         std::cout <<  "[" << timestamp << "] [" << getLevelName(level) << "] " << message << std::endl;
     }
 
-    std::vector<LogEntry> LogService::getEntriesSnapshot() const {
+    std::vector<LogEntry> getEntriesSnapshot() {
         std::lock_guard<std::mutex> lock(logMutex);
         return entries;
     }
 
-    void LogService::clear() {
+    void clear() {
         std::lock_guard<std::mutex> lock(logMutex);
         entries.clear();
     }
 
-    const char* LogService::getLevelName(LogLevel level) {
+    const char* getLevelName(LogLevel level) {
         switch (level) {
             case LogLevel::Trace: return "TRACE";
             case LogLevel::Debug: return "DEBUG";
@@ -47,7 +47,7 @@ namespace Metal {
         }
     }
 
-    uint32_t LogService::getLevelColor(LogLevel level) {
+    uint32_t getLevelColor(LogLevel level) {
         switch (level) {
             case LogLevel::Trace: return 0xFF888888; // Grey
             case LogLevel::Debug: return 0xFFAAAAAA; // Light Grey

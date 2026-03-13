@@ -23,30 +23,23 @@ namespace Metal {
         std::string timestamp;
     };
 
-    class LogService : public AbstractRuntimeComponent {
-    public:
-        explicit LogService();
+    namespace LogService {
+        void log(LogLevel level, const std::string &message);
 
-        void log(LogLevel level, const std::string &message) const;
-
-        [[nodiscard]] std::vector<LogEntry> getEntriesSnapshot() const;
+        [[nodiscard]] std::vector<LogEntry> getEntriesSnapshot();
         void clear();
 
-        static const char* getLevelName(LogLevel level);
-        static uint32_t getLevelColor(LogLevel level);
-
-    private:
-        mutable std::vector<LogEntry> entries;
-        mutable std::mutex logMutex;
-    };
+        const char* getLevelName(LogLevel level);
+        uint32_t getLevelColor(LogLevel level);
+    }
 
 }
 
-#define LOG_TRACE(msg) CTX.logService.log(Metal::LogLevel::Trace, msg)
-#define LOG_DEBUG(msg) CTX.logService.log(Metal::LogLevel::Debug, msg)
-#define LOG_INFO(msg)  CTX.logService.log(Metal::LogLevel::Info, msg)
-#define LOG_WARN(msg)  CTX.logService.log(Metal::LogLevel::Warn, msg)
-#define LOG_ERROR(msg) CTX.logService.log(Metal::LogLevel::Error, msg)
-#define LOG_FATAL(msg) CTX.logService.log(Metal::LogLevel::Fatal, msg)
+#define LOG_TRACE(msg) Metal::LogService::log(Metal::LogLevel::Trace, msg)
+#define LOG_DEBUG(msg) Metal::LogService::log(Metal::LogLevel::Debug, msg)
+#define LOG_INFO(msg)  Metal::LogService::log(Metal::LogLevel::Info, msg)
+#define LOG_WARN(msg)  Metal::LogService::log(Metal::LogLevel::Warn, msg)
+#define LOG_ERROR(msg) Metal::LogService::log(Metal::LogLevel::Error, msg)
+#define LOG_FATAL(msg) Metal::LogService::log(Metal::LogLevel::Fatal, msg)
 
 #endif

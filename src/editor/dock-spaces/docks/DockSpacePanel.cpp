@@ -52,13 +52,13 @@ namespace Metal {
         if (view != nullptr) {
             const bool isHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows);
             if (isHovered) {
-                CTX.editorRepository.focusedShortcuts = view->getShortcuts();
-                CTX.editorRepository.focusedWindowName = view->dock->name;
+                applicationContext->editorRepository.focusedShortcuts = view->getShortcuts();
+                applicationContext->editorRepository.focusedWindowName = view->dock->name;
             }
 
             view->isWindowFocused = isHovered;
             if (view->isWindowFocused) {
-                for (const auto &shortcut: CTX.editorRepository.focusedShortcuts) {
+                for (const auto &shortcut: applicationContext->editorRepository.focusedShortcuts) {
                     if (ImGui::IsKeyChordPressed(shortcut.keyChord)) {
                         LOG_INFO("Action called: " + shortcut.name);
                         shortcut.callback();
@@ -116,7 +116,7 @@ namespace Metal {
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, headerPadding);
             const bool isFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
             ImGui::PushStyleColor(ImGuiCol_TabActive,
-                                  isFocused ? CTX.editorRepository.accent : CTX.themeService.palette0);
+                                  isFocused ? applicationContext->editorRepository.accent : applicationContext->themeService.palette0);
 
             if (ImGui::BeginTabBar((id + "dockTabs").c_str(), ImGuiTabBarFlags_AutoSelectNewTabs)) {
                 for (auto *space: dock->dockSpaces) {

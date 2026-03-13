@@ -28,27 +28,27 @@ namespace Metal {
             auto files = FileDialogUtil::PickFiles({
                 {
                     "Files",
-                    CTX.fileImporterService.collectCompatibleFiles().c_str(),
+                    applicationContext->fileImporterService.collectCompatibleFiles().c_str(),
                 }
             });
             if (!files.empty()) {
-                CTX.editorRepository.pendingImports = files;
-                CTX.editorRepository.importSettingsMap.clear();
-                for (const auto& file : CTX.editorRepository.pendingImports) {
-                    if (CTX.sceneImporterService.isCompatible(file)) {
-                        CTX.editorRepository.importSettingsMap.emplace(file, std::make_shared<SceneImportSettingsDTO>());
+                applicationContext->editorRepository.pendingImports = files;
+                applicationContext->editorRepository.importSettingsMap.clear();
+                for (const auto& file : applicationContext->editorRepository.pendingImports) {
+                    if (applicationContext->sceneImporterService.isCompatible(file)) {
+                        applicationContext->editorRepository.importSettingsMap.emplace(file, std::make_shared<SceneImportSettingsDTO>());
                     } else {
-                        CTX.editorRepository.importSettingsMap.emplace(file, std::make_shared<ImportSettingsDTO>());
+                        applicationContext->editorRepository.importSettingsMap.emplace(file, std::make_shared<ImportSettingsDTO>());
                     }
                 }
-                CTX.editorRepository.selectedFileForSettings = CTX.editorRepository.pendingImports[0];
-                CTX.editorRepository.targetImportDirectory = filesContext.currentDirectory;
+                applicationContext->editorRepository.selectedFileForSettings = applicationContext->editorRepository.pendingImports[0];
+                applicationContext->editorRepository.targetImportDirectory = filesContext.currentDirectory;
             }
         };
     }
 
     void FilesPanel::onInitialize() {
-        filesContext.setCurrentDirectory(CTX.filesService.getRoot());
+        filesContext.setCurrentDirectory(applicationContext->filesService.getRoot());
         appendChild(filesHeader = new FilesHeaderPanel(filesContext, getActionLabel(), onAction()));
         filesListPanel = new FilesListPanel(
             filesContext, [
@@ -124,13 +124,13 @@ namespace Metal {
     void FilesPanel::openResource(FSEntry *root) {
         switch (root->type) {
             case EntryType::SCENE: {
-                CTX.notificationService.pushMessage("Loading scene", NotificationSeverities::SUCCESS);
-                CTX.worldRepository.loadScene(root->getId());
+                applicationContext->notificationService.pushMessage("Loading scene", NotificationSeverities::SUCCESS);
+                applicationContext->worldRepository.loadScene(root->getId());
                 break;
             }
             case EntryType::VOLUME: {
-                CTX.notificationService.pushMessage("Loading volume", NotificationSeverities::SUCCESS);
-                CTX.voxelService.create(root->getId());
+                applicationContext->notificationService.pushMessage("Loading volume", NotificationSeverities::SUCCESS);
+                applicationContext->voxelService.create(root->getId());
                 break;
             }
             case EntryType::DIRECTORY: {
@@ -140,7 +140,7 @@ namespace Metal {
                 break;
             }
             default:
-                CTX.notificationService.pushMessage("Unsupported resource type", NotificationSeverities::ERROR);
+                applicationContext->notificationService.pushMessage("Unsupported resource type", NotificationSeverities::ERROR);
                 break;
         }
     }
@@ -174,7 +174,7 @@ namespace Metal {
     }
 
     void FilesPanel::deleteSelected() const {
-        CTX.filesService.deleteFiles(filesContext.selected);
+        applicationContext->filesService.deleteFiles(filesContext.selected);
         FilesService::GetEntries(filesContext.currentDirectory);
     }
 }

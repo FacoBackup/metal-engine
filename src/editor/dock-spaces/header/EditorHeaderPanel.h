@@ -9,9 +9,7 @@ namespace Metal {
 
         void renderFileTab();
 
-        void renderShortcuts();
-
-        static void framerate();
+        void renderWindowControls();
 
     public:
         void onInitialize() override;

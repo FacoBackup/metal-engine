@@ -10,13 +10,23 @@
 namespace Metal {
     struct TransformComponent;
 
+    struct TransformComponent;
+    struct WorldRepository;
+    class RayTracingService;
+
     class TransformService final : AbstractRuntimeComponent {
+        WorldRepository &worldRepository;
+        RayTracingService &rayTracingService;
+
         glm::vec3 distanceAux{};
         glm::mat4x4 auxMat4{};
         glm::vec3 translation{};
         glm::mat4x4 auxMat42{};
 
     public:
+        explicit TransformService(WorldRepository &worldRepository, RayTracingService &rayTracingService)
+            : worldRepository(worldRepository), rayTracingService(rayTracingService) {}
+        TransformService() = delete;
 
         void onSync() override;
 

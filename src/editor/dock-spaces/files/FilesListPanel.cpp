@@ -89,7 +89,7 @@ namespace Metal {
 
             if (!ImGui::IsMouseDown(ImGuiMouseButton_Left) && onDrag != nullptr && fileEntry->type ==
                 EntryType::DIRECTORY) {
-                CTX.filesService.Move(onDrag, fileEntry);
+                applicationContext->filesService.Move(onDrag, fileEntry);
                 onDrag = nullptr;
             }
         }
@@ -280,7 +280,7 @@ namespace Metal {
                     FilesService::GetEntries(filesContext.currentDirectory);
                 }
                 if (ImGui::MenuItem("Delete")) {
-                    CTX.filesService.deleteFiles(filesContext.selected);
+                    applicationContext->filesService.deleteFiles(filesContext.selected);
                     FilesService::GetEntries(filesContext.currentDirectory);
                 }
                 ImGui::Separator();

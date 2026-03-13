@@ -45,9 +45,9 @@ namespace Metal {
         void renderTreeItem(FSEntry *entry);
 
     public:
-        explicit FilesListPanel(FilesContext &ctx, std::function<void(FSEntry *)> onDoubleClick,
+        explicit FilesListPanel(FilesContext &applicationContext-> std::function<void(FSEntry *)> onDoubleClick,
                                 EntryType::EntryType typeFilter)
-            : filesContext(ctx), typeFilter(typeFilter), onDoubleClick(std::move(onDoubleClick)) {
+            : filesContext(applicationContext->, typeFilter(typeFilter), onDoubleClick(std::move(onDoubleClick)) {
         }
 
         void onSync() override;

@@ -7,17 +7,17 @@
 namespace Metal {
     void NotificationsPanel::onSync() {
         int usedIndices = 0;
-        for (int i = 0; i < CTX.notificationService.getNotifications().size(); i++) {
-            auto *notification = CTX.notificationService.getNotifications()[i];
+        for (int i = 0; i < applicationContext->notificationService.getNotifications().size(); i++) {
+            auto *notification = applicationContext->notificationService.getNotifications()[i];
             if (notification == nullptr) {
                 continue;
             }
             if (notification->displayTime < 0) {
-                notification->displayTime = CTX.engineContext.currentTimeMs;
+                notification->displayTime = applicationContext->engineContext.currentTimeMs;
             }
-            if (CTX.engineContext.currentTimeMs - notification->displayTime > MESSAGE_DURATION) {
+            if (applicationContext->engineContext.currentTimeMs - notification->displayTime > MESSAGE_DURATION) {
                 delete notification;
-                CTX.notificationService.getNotifications()[i] = nullptr;
+                applicationContext->notificationService.getNotifications()[i] = nullptr;
                 continue;
             }
             ImGui::SetNextWindowPos(ImVec2(5, ImGui::GetMainViewport()->Size.y - 40 * (usedIndices + 1)));

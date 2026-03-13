@@ -6,7 +6,13 @@
 #include "../dto/LightData.h"
 
 namespace Metal {
+    class EngineContext;
+    struct EngineRepository;
+
     class LightService final : public AbstractRuntimeComponent {
+        EngineContext &engineContext;
+        EngineRepository &engineRepository;
+
         std::vector<LightData> items{};
         glm::vec3 sunColor{};
         glm::vec3 sunPosition{};
@@ -19,6 +25,10 @@ namespace Metal {
         static glm::vec3 BlendColors(glm::vec3 &c1, glm::vec3 &c2, float t);
 
     public:
+        explicit LightService(EngineContext &engineContext, EngineRepository &engineRepository)
+            : engineContext(engineContext), engineRepository(engineRepository) {}
+        LightService() = delete;
+
         void onSync() override;
 
         void computeSunInfo();

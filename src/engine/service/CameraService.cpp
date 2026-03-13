@@ -2,25 +2,26 @@
 
 #include "../dto/Camera.h"
 #include "../../ApplicationContext.h"
+#include "../EngineContext.h"
+#include "../repository/WorldRepository.h"
+#include "../repository/RuntimeRepository.h"
 
 namespace Metal {
     // Per frame
     // TODO - EVENT SYSTEM
     void CameraService::onSync() {
-        camera = &CTX.worldRepository.camera;
+        camera = &worldRepository.camera;
         if (camera != nullptr) {
             updateAspectRatio();
             if (camera->isNotFrozen()) {
                 updateMatrices();
-                CTX.engineContext.setCameraUpdated(true);
+                engineContext.setCameraUpdated(true);
                 camera->freezeVersion();
             }
         }
     }
 
     void CameraService::updateAspectRatio() const {
-        const auto &runtimeRepository = CTX.runtimeRepository;
-
         const float prevAspect = camera->aspectRatio;
         camera->aspectRatio = runtimeRepository.viewportW / runtimeRepository.viewportH;
         if (prevAspect != camera->aspectRatio) {
@@ -56,12 +57,11 @@ namespace Metal {
         camera->invProjectionMatrix = glm::inverse(camera->projectionMatrix);
     }
 
-    CameraService::CameraService() : AbstractRuntimeComponent() {
+    CameraService::CameraService(EngineContext &engineContext, WorldRepository &worldRepository, RuntimeRepository &runtimeRepository)
+        : engineContext(engineContext), worldRepository(worldRepository), runtimeRepository(runtimeRepository) {
     }
 
     void CameraService::handleInputInternal() const {
-        const auto &runtimeRepository = CTX.runtimeRepository;
-
         glm::vec3 forward(
             -std::sin(camera->yaw) * std::cos(camera->pitch),
             std::sin(camera->pitch),
@@ -76,7 +76,7 @@ namespace Metal {
         right = glm::normalize(right);
 
         const float multiplier = 10 * camera->movementSensitivity *
-                                 CTX.engineContext.deltaTime;
+                                 engineContext.deltaTime;
         if (runtimeRepository.leftPressed) {
             camera->position += right * multiplier;
             camera->registerChange();
@@ -118,7 +118,6 @@ namespace Metal {
     }
 
     void CameraService::updateDelta(const bool isFirstMovement) const {
-        const auto &runtimeRepository = CTX.runtimeRepository;
         const float mouseX = runtimeRepository.mouseX;
         const float mouseY = runtimeRepository.mouseY;
 

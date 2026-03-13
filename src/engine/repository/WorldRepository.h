@@ -18,8 +18,16 @@
 
 namespace Metal {
     class Inspectable;
+    class RayTracingService;
 
     struct WorldRepository final : AbstractRuntimeComponent, Serializable {
+        RayTracingService &rayTracingService;
+        std::string &rootDirectory;
+
+        WorldRepository(RayTracingService &rayTracingService, std::string &rootDirectory)
+            : rayTracingService(rayTracingService), rootDirectory(rootDirectory) {
+        }
+
         Camera camera{-(glm::pi<float>() / 4), glm::pi<float>() / 4, {10, 10, 10}};
         entt::registry registry{};
         std::unordered_map<entt::entity, bool> culled{};

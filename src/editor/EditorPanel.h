@@ -9,10 +9,13 @@ namespace Metal {
         static int FLAGS;
         static const char *NAME;
         static const char *NAME_HEADER;
+        static const char *NAME_FOOTER;
         static ImVec2 CENTER;
         static float HEADER_HEIGHT;
+        static float FOOTER_HEIGHT;
         ImGuiID windowId = 0;
         AbstractPanel *headerPanel = nullptr;
+        AbstractPanel *footerPanel = nullptr;
         AbstractPanel *notificationsPanel = nullptr;
         AbstractPanel *fileImportModalPanel = nullptr;
 
@@ -21,6 +24,8 @@ namespace Metal {
         void renderDockSpaces();
 
         void renderHeader(const ImGuiViewport *viewport);
+
+        void renderFooter(const ImGuiViewport *viewport);
 
     public:
         void onInitialize() override;

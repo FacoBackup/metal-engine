@@ -2,6 +2,7 @@
 #include "util/UIUtil.h"
 #include "../ApplicationContext.h"
 #include "dock-spaces/header/EditorHeaderPanel.h"
+#include "dock-spaces/footer/EditorFooterPanel.h"
 #include "panel/FileImportModalPanel.h"
 #include "panel/NotificationsPanel.h"
 
@@ -15,13 +16,16 @@ namespace Metal {
                              ImGuiWindowFlags_NoNavFocus;
     const char *EditorPanel::NAME = "##main_window";
     const char *EditorPanel::NAME_HEADER = "##header_window";
+    const char *EditorPanel::NAME_FOOTER = "##footer_window";
     ImVec2 EditorPanel::CENTER(0.0f, 0.0f);
     float EditorPanel::HEADER_HEIGHT = 25;
+    float EditorPanel::FOOTER_HEIGHT = 30;
 
 
     void EditorPanel::renderDockSpaces() {
         const ImGuiViewport *viewport = ImGui::GetMainViewport();
         renderHeader(viewport);
+        renderFooter(viewport);
 
         // Begin window
         {
@@ -30,7 +34,7 @@ namespace Metal {
             ImGui::SetNextWindowPos(UIUtil::AUX_VEC2);
 
             UIUtil::AUX_VEC2.x = viewport->Size.x;
-            UIUtil::AUX_VEC2.y = viewport->Size.y - HEADER_HEIGHT;
+            UIUtil::AUX_VEC2.y = viewport->Size.y - HEADER_HEIGHT - FOOTER_HEIGHT;
             ImGui::SetNextWindowSize(UIUtil::AUX_VEC2);
             ImGui::SetNextWindowViewport(viewport->ID);
 
@@ -42,7 +46,7 @@ namespace Metal {
 
         ImGui::PopStyleVar(3);
 
-        CTX.dockService.buildViews(windowId, this);
+        applicationContext->dockService.buildViews(windowId, this);
 
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
         ImGui::DockSpace(windowId, CENTER, ImGuiDockNodeFlags_PassthruCentralNode);
@@ -54,7 +58,7 @@ namespace Metal {
 
     void EditorPanel::renderHeader(const ImGuiViewport *viewport) {
         UIUtil::AUX_VEC2.x = viewport->Pos.x;
-        UIUtil::AUX_VEC2.y = 0;
+        UIUtil::AUX_VEC2.y = viewport->Pos.y;
         ImGui::SetNextWindowPos(UIUtil::AUX_VEC2);
 
         UIUtil::AUX_VEC2.x = viewport->Size.x;
@@ -69,6 +73,23 @@ namespace Metal {
         ImGui::End();
     }
 
+    void EditorPanel::renderFooter(const ImGuiViewport *viewport) {
+        UIUtil::AUX_VEC2.x = viewport->Pos.x;
+        UIUtil::AUX_VEC2.y = viewport->Pos.y + viewport->Size.y - FOOTER_HEIGHT;
+        ImGui::SetNextWindowPos(UIUtil::AUX_VEC2);
+
+        UIUtil::AUX_VEC2.x = viewport->Size.x;
+        UIUtil::AUX_VEC2.y = FOOTER_HEIGHT;
+        ImGui::SetNextWindowSize(UIUtil::AUX_VEC2);
+
+        SetWindowStyle();
+        ImGui::Begin(NAME_FOOTER, &UIUtil::OPEN, FLAGS | ImGuiWindowFlags_NoScrollbar);
+        ImGui::PopStyleVar(3);
+
+        footerPanel->onSync();
+        ImGui::End();
+    }
+
     void EditorPanel::SetWindowStyle() {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
@@ -76,19 +97,16 @@ namespace Metal {
     }
 
     void EditorPanel::onSync() {
-        CTX.themeService.onSync();
+        applicationContext->themeService.onSync();
         renderDockSpaces();
         notificationsPanel->onSync();
         fileImportModalPanel->onSync();
     }
 
     void EditorPanel::onInitialize() {
-        headerPanel = new EditorHeaderPanel();
-        headerPanel->onInitialize();
-        notificationsPanel = new NotificationsPanel();
-        notificationsPanel->onInitialize();
-
-        fileImportModalPanel = new FileImportModalPanel();
-        fileImportModalPanel->onInitialize();
+        appendChild(headerPanel = new EditorHeaderPanel());
+        appendChild(footerPanel = new EditorFooterPanel());
+        appendChild(notificationsPanel = new NotificationsPanel());
+        appendChild(fileImportModalPanel = new FileImportModalPanel());
     }
 }

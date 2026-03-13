@@ -13,7 +13,7 @@ namespace Metal {
     }
 
     void FileImportModalPanel::onSync() {
-        auto &editorRepository = CTX.editorRepository;
+        auto &editorRepository = applicationContext->editorRepository;
         if (editorRepository.pendingImports.empty()) {
             isFirst = true;
             return;
@@ -91,10 +91,10 @@ namespace Metal {
 
             if (ImGui::Button(("Approve" + id + "approveImport").c_str(), ImVec2(120, 0))) {
                 for (const std::string &file: editorRepository.pendingImports) {
-                    CTX.fileImporterService.importFile(editorRepository.targetImportDirectory->absolutePath, file,
+                    applicationContext->fileImporterService.importFile(editorRepository.targetImportDirectory->absolutePath, file,
                                                        editorRepository.importSettingsMap.at(file));
                 }
-                CTX.notificationService.pushMessage("Importing files...", NotificationSeverities::WARNING);
+                applicationContext->notificationService.pushMessage("Importing files...", NotificationSeverities::WARNING);
                 FilesService::GetEntries(editorRepository.targetImportDirectory);
                 editorRepository.pendingImports.clear();
                 editorRepository.importSettingsMap.clear();

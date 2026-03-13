@@ -7,6 +7,13 @@
 #include "../dto/VertexData.h"
 #include "../../core/vulkan/VulkanUtils.h"
 #include "../../editor/enum/EngineResourceIDs.h"
+#include "../../core/vulkan/VulkanContext.h"
+#include "PipelineService.h"
+#include "../repository/WorldRepository.h"
+#include "MeshService.h"
+#include "MaterialService.h"
+#include "BufferService.h"
+#include "../EngineContext.h"
 #include <cstddef>
 
 namespace Metal {
@@ -18,7 +25,7 @@ namespace Metal {
     }
 
     void RayTracingService::updateDescriptorSets(VkAccelerationStructureKHR asHandle) {
-        auto descriptors = CTX.pipelineService.getAllDescriptors();
+        auto descriptors = pipelineService.getAllDescriptors();
         for (auto *descriptor: descriptors) {
             bool needsUpdate = false;
             for (auto &binding: descriptor->bindings) {
@@ -29,7 +36,7 @@ namespace Metal {
             }
 
             if (needsUpdate) {
-                DescriptorSetService::Write(descriptor->vkDescriptorSet, descriptor->bindings);
+                DescriptorSetService::Write(vulkanContext, bufferService, descriptor->vkDescriptorSet, descriptor->bindings);
             }
         }
     }
@@ -45,12 +52,12 @@ namespace Metal {
         }
         anyMeshes = false;
         // Check if any mesh is present and streamed
-        auto view = CTX.worldRepository.registry.view<PrimitiveComponent, TransformComponent>();
+        auto view = worldRepository.registry.view<PrimitiveComponent, TransformComponent>();
         for (auto entity: view) {
-            if (CTX.worldRepository.hiddenEntities.contains(entity)) continue;
+            if (worldRepository.hiddenEntities.contains(entity)) continue;
             auto &meshComp = view.get<PrimitiveComponent>(entity);
             if (meshComp.meshId.empty()) continue;
-            auto *instance = CTX.meshService.stream(meshComp.meshId);
+            auto *instance = meshService.stream(meshComp.meshId);
             if (instance != nullptr && instance->dataBuffer != nullptr && instance->indexBuffer != nullptr) {
                 anyMeshes = true;
                 break;
@@ -89,21 +96,21 @@ namespace Metal {
 
     void RayTracingService::updateMeshMaterials() {
         bool changed = false;
-        auto view = CTX.worldRepository.registry.view<PrimitiveComponent>();
+        auto view = worldRepository.registry.view<PrimitiveComponent>();
 
         for (auto entity: view) {
-            if (CTX.worldRepository.hiddenEntities.contains(entity)) continue;
+            if (worldRepository.hiddenEntities.contains(entity)) continue;
             auto &meshComp = view.get<PrimitiveComponent>(entity);
             if (meshComp.meshId.empty()) continue;
 
             if (meshComp.renderIndex < meshMetadata.size()) {
-                CTX.materialService.load(meshMetadata[meshComp.renderIndex], meshComp);
+                materialService.load(meshMetadata[meshComp.renderIndex], meshComp);
                 changed = true;
             }
         }
 
         if (changed) {
-            for (auto *frame : CTX.engineContext.registeredFrames) {
+            for (auto *frame : engineContext.registeredFrames) {
                 auto *meshMetadataBuffer = frame->getResourceAs<BufferInstance>(RID_MESH_METADATA_BUFFER);
                 if (meshMetadataBuffer != nullptr) {
                     meshMetadataBuffer->update(meshMetadata.data());
@@ -113,7 +120,7 @@ namespace Metal {
     }
 
     void RayTracingService::destroyTLAS() {
-        auto &vulkan = CTX.vulkanContext;
+        auto &vulkan = vulkanContext;
         if (vulkan.device.device != VK_NULL_HANDLE) {
             vkDeviceWaitIdle(vulkan.device.device);
         }
@@ -124,15 +131,15 @@ namespace Metal {
         }
 
         if (tlasBuffer) {
-            CTX.bufferService.dispose("tlas_buffer");
+            bufferService.dispose("tlas_buffer");
             tlasBuffer = nullptr;
         }
         if (instancesBuffer) {
-            CTX.bufferService.dispose("tlas_instances");
+            bufferService.dispose("tlas_instances");
             instancesBuffer = nullptr;
         }
         if (tlasScratchBuffer) {
-            CTX.bufferService.dispose("tlas_scratch");
+            bufferService.dispose("tlas_scratch");
             tlasScratchBuffer = nullptr;
         }
 
@@ -140,18 +147,18 @@ namespace Metal {
     }
 
     void RayTracingService::buildBLAS() {
-        auto &vulkan = CTX.vulkanContext;
+        auto &vulkan = vulkanContext;
 
         std::unordered_map<std::string, MeshInstance *> uniqueMeshes;
 
-        auto view = CTX.worldRepository.registry.view<PrimitiveComponent, TransformComponent>();
+        auto view = worldRepository.registry.view<PrimitiveComponent, TransformComponent>();
 
         for (auto entity: view) {
-            if (CTX.worldRepository.hiddenEntities.contains(entity)) continue;
+            if (worldRepository.hiddenEntities.contains(entity)) continue;
             auto &meshComp = view.get<PrimitiveComponent>(entity);
             if (meshComp.meshId.empty()) continue;
             if (uniqueMeshes.contains(meshComp.meshId)) continue;
-            auto *instance = CTX.meshService.stream(meshComp.meshId);
+            auto *instance = meshService.stream(meshComp.meshId);
             if (instance == nullptr || instance->dataBuffer == nullptr || instance->indexBuffer == nullptr) {
                 continue;
             }
@@ -173,9 +180,9 @@ namespace Metal {
                                                              nullptr);
                 }
                 if (existing.buffer)
-                    CTX.bufferService.dispose("blas_" + meshId);
+                    bufferService.dispose("blas_" + meshId);
                 if (existing.scratchBuffer)
-                    CTX.bufferService.dispose("blas_scratch_" + meshId);
+                    bufferService.dispose("blas_scratch_" + meshId);
                 blasEntries.erase(meshId);
             }
             VkDeviceAddress vertexAddress = getDeviceAddress(vulkan, instance->dataBuffer->vkBuffer);
@@ -214,14 +221,14 @@ namespace Metal {
                 &sizeInfo);
 
             BLASEntry entry;
-            entry.buffer = CTX.bufferService.createBuffer(
+            entry.buffer = bufferService.createBuffer(
                 "blas_" + meshId,
                 sizeInfo.accelerationStructureSize,
                 VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                 true);
 
-            entry.scratchBuffer = CTX.bufferService.createBuffer(
+            entry.scratchBuffer = bufferService.createBuffer(
                 "blas_scratch_" + meshId,
                 sizeInfo.buildScratchSize,
                 VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
@@ -258,7 +265,7 @@ namespace Metal {
     }
 
     void RayTracingService::buildTLAS() {
-        auto &vulkan = CTX.vulkanContext;
+        auto &vulkan = vulkanContext;
         meshMetadata.clear();
         if (blasEntries.empty()) return;
 
@@ -267,7 +274,7 @@ namespace Metal {
         }
 
         std::vector<VkAccelerationStructureInstanceKHR> instances;
-        auto view = CTX.worldRepository.registry.view<PrimitiveComponent, TransformComponent>();
+        auto view = worldRepository.registry.view<PrimitiveComponent, TransformComponent>();
 
         unsigned int currentInstanceIndex = 0;
         for (auto entity: view) {
@@ -275,7 +282,7 @@ namespace Metal {
                 LOG_ERROR("Max mesh instances reached for ray tracing: " + std::to_string(MAX_MESH_INSTANCES));
                 break;
             }
-            if (CTX.worldRepository.hiddenEntities.contains(entity)) continue;
+            if (worldRepository.hiddenEntities.contains(entity)) continue;
             auto &meshComp = view.get<PrimitiveComponent>(entity);
             if (meshComp.meshId.empty()) continue;
 
@@ -290,8 +297,8 @@ namespace Metal {
                 vulkan.device.device, &addressInfo);
 
             glm::mat4 model = glm::mat4(1.0f);
-            if (CTX.worldRepository.registry.all_of<TransformComponent>(entity)) {
-                model = CTX.worldRepository.registry.get<TransformComponent>(entity).model;
+            if (worldRepository.registry.all_of<TransformComponent>(entity)) {
+                model = worldRepository.registry.get<TransformComponent>(entity).model;
             }
 
             VkTransformMatrixKHR transform{};
@@ -324,7 +331,7 @@ namespace Metal {
 
         updateMeshMaterials();
 
-        instancesBuffer = CTX.bufferService.createBuffer(
+        instancesBuffer = bufferService.createBuffer(
             "tlas_instances",
             sizeof(VkAccelerationStructureInstanceKHR) * instances.size(),
             VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
@@ -360,7 +367,7 @@ namespace Metal {
             &instanceCount,
             &sizeInfo);
 
-        tlasBuffer = CTX.bufferService.createBuffer(
+        tlasBuffer = bufferService.createBuffer(
             "tlas_buffer",
             sizeInfo.accelerationStructureSize,
             VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
@@ -375,7 +382,7 @@ namespace Metal {
         VulkanUtils::CheckVKResult(
             vulkan.vkCreateAccelerationStructureKHR(vulkan.device.device, &createInfo, nullptr, &tlas));
 
-        tlasScratchBuffer = CTX.bufferService.createBuffer(
+        tlasScratchBuffer = bufferService.createBuffer(
             "tlas_scratch",
             sizeInfo.buildScratchSize,
             VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
@@ -396,7 +403,7 @@ namespace Metal {
 
     void RayTracingService::destroyAccelerationStructures() {
         LOG_INFO("Destroying acceleration structures");
-        auto &vulkan = CTX.vulkanContext;
+        auto &vulkan = vulkanContext;
 
         if (vulkan.device.device != VK_NULL_HANDLE) {
             vkDeviceWaitIdle(vulkan.device.device);
@@ -412,9 +419,9 @@ namespace Metal {
                 entry.accelerationStructure = VK_NULL_HANDLE;
             }
             if (entry.buffer)
-                CTX.bufferService.dispose("blas_" + meshId);
+                bufferService.dispose("blas_" + meshId);
             if (entry.scratchBuffer)
-                CTX.bufferService.dispose("blas_scratch_" + meshId);
+                bufferService.dispose("blas_scratch_" + meshId);
         }
         blasEntries.clear();
 

@@ -16,7 +16,12 @@ namespace Metal {
     struct MeshData;
 
     class MeshImporterService final : public AbstractRuntimeComponent {
+        std::string &rootDirectory;
+
     public:
+        explicit MeshImporterService(std::string &rootDirectory)
+            : rootDirectory(rootDirectory) {
+        }
 
         void persistAllMeshes(const std::string &targetDir, const aiScene *scene,
                               std::unordered_map<unsigned int, MeshId> &meshMap,

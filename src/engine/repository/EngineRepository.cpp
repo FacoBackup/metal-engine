@@ -41,10 +41,11 @@ namespace Metal {
     }
 
     void EngineRepository::onUpdate(InspectableMember *member) {
-        if (member != nullptr && (member->group == PATH_TRACER || member->group == ATMOSPHERE || member->group
-                                  == SUN || member->group == DEPTH_OF_FIELD)) {
-            CTX.engineContext.setGISettingsUpdated(true);
-        }
+        // TODO - EVENT
+        // if (member != nullptr && (member->group == PATH_TRACER || member->group == ATMOSPHERE || member->group
+                                  // == SUN || member->group == DEPTH_OF_FIELD)) {
+            // engineContext.setGISettingsUpdated(true);
+        // }
     }
 
     nlohmann::json EngineRepository::toJson() const {
