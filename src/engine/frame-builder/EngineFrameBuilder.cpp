@@ -7,6 +7,7 @@
 #include "EngineFrame.h"
 #include "../../ApplicationContext.h"
 #include "../passes/CommandBufferRecorder.h"
+#include "../EngineContext.h"
 
 namespace Metal {
     EngineFrameBuilder::EngineFrameBuilder(std::string frameId) : frameId(std::move(frameId)) {
@@ -15,7 +16,7 @@ namespace Metal {
     EngineFrameBuilder &EngineFrameBuilder::addFramebuffer(std::string id, const unsigned w, const unsigned h,
                                                            glm::vec4 clearColor) {
         currentBuilder = std::make_shared<FramebufferBuilder>(frameId + "_" + id, w, h, clearColor);
-        builders.push_back(currentBuilder);
+        storeBuilder();
         return *this;
     }
 
@@ -38,7 +39,7 @@ namespace Metal {
 
     EngineFrameBuilder &EngineFrameBuilder::addTexture(const std::string &id, unsigned w, unsigned h, VkFormat format) {
         currentBuilder = std::make_shared<TextureBuilder>(frameId + "_" + id, w, h, format);
-        builders.push_back(currentBuilder);
+        storeBuilder();
         return *this;
     }
 
@@ -56,7 +57,7 @@ namespace Metal {
                                           ? VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT
                                           : VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
             properties, type);
-        builders.push_back(currentBuilder);
+        storeBuilder();
         return *this;
     }
 
@@ -71,13 +72,18 @@ namespace Metal {
                                                              const bool clearBuffer) {
         currentBuilder = std::make_shared<CommandBufferRecorderBuilder>(
             frameId + "_" + id, frameId + "_" + framebufferId, clearBuffer);
-        builders.push_back(currentBuilder);
+        storeBuilder();
         return *this;
+    }
+
+    void EngineFrameBuilder::storeBuilder() {
+        ctx->injectDependencies(currentBuilder.get());
+        builders.push_back(currentBuilder);
     }
 
     EngineFrameBuilder &EngineFrameBuilder::addComputeCommandBuffer(const std::string &id) {
         currentBuilder = std::make_shared<CommandBufferRecorderBuilder>(frameId + "_" + id);
-        builders.push_back(currentBuilder);
+        storeBuilder();
         return *this;
     }
 
@@ -97,8 +103,9 @@ namespace Metal {
         return false;
     }
 
-    std::unique_ptr<EngineFrame> EngineFrameBuilder::build() {
-        auto frame = std::make_unique<EngineFrame>(frameId);
+    void EngineFrameBuilder::build() {
+        auto *frame = new EngineFrame(frameId);
+        engineContext->registerFrame(frame);
         std::unordered_map<std::string, RuntimeResource *> builtResources;
 
         for (const auto &builder: builders) {
@@ -108,23 +115,23 @@ namespace Metal {
             }
         }
 
-        std::unordered_map<std::string, std::vector<std::unique_ptr<AbstractPass>> > recorderToPasses;
+        std::unordered_map<std::string, std::vector<std::unique_ptr<AbstractPass> > > recorderToPasses;
         std::vector<std::string> recorderOrder;
 
         for (auto &pass: passes) {
             recorderOrder.push_back(pass.commandBufferId);
 
-            pass.pass->frame = frame.get();
+            pass.pass->frame = frame;
+            ctx->injectDependencies(pass.pass.get());
             pass.pass->onInitialize();
             recorderToPasses[pass.commandBufferId].push_back(std::move(pass.pass));
         }
 
         for (const auto &cbId: recorderOrder) {
-            if (auto *recorder = dynamic_cast<CommandBufferRecorder*>(builtResources.at(cbId))) {
+            if (auto *recorder = dynamic_cast<CommandBufferRecorder *>(builtResources.at(cbId))) {
                 frame->addPass(recorder, recorderToPasses[cbId]);
             }
         }
 
-        return frame;
     }
 } // Metal

@@ -9,7 +9,7 @@ namespace Metal {
 
     void StringField::onSync() {
         if (!field.disabled) {
-            strcpy(buffer, field.field->c_str());
+            strcpy_s(buffer, sizeof(buffer), field.field->c_str());
             ImGui::Text(field.name.c_str());
             if (ImGui::InputText(field.id.c_str(), buffer, sizeof(buffer))) {
                 *field.field = buffer;

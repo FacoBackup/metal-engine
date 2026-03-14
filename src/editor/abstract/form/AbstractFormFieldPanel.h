@@ -6,10 +6,20 @@
 #include "../AbstractPanel.h"
 
 namespace Metal {
+    class ThemeService;
+
     class AbstractFormFieldPanel : public AbstractPanel {
     protected:
         const std::string* filter = nullptr;
+
+        ThemeService *themeService = nullptr;
     public:
+
+        std::vector<Dependency> getDependencies() override {
+            return {
+                    {"ThemeService", themeService}
+            };
+        }
         [[nodiscard]] virtual bool isVisible() const = 0;
 
         void onSyncChildren() const override {

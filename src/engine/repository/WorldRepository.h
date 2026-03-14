@@ -15,8 +15,8 @@ namespace Metal {
     class DirectoryService;
 
     struct WorldRepository final : IRepository {
-        RayTracingService *rayTracingService;
-        DirectoryService *directoryService;
+        RayTracingService *rayTracingService = nullptr;
+        DirectoryService *directoryService = nullptr;
 
         Camera camera{-(glm::pi<float>() / 4), glm::pi<float>() / 4, {10, 10, 10}};
         entt::registry registry{};
@@ -25,8 +25,8 @@ namespace Metal {
 
         std::vector<Dependency> getDependencies() override {
             return {
-            {"RayTracingService", rayTracingService},
-            {"DirectoryService", directoryService}
+                {"RayTracingService", rayTracingService},
+                {"DirectoryService", directoryService}
             };
         }
 

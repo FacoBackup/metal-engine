@@ -1,19 +1,19 @@
 #include "TextureBuilder.h"
-#include "../../../ApplicationContext.h"
 #include "../../resource/TextureInstance.h"
+#include "../../service/TextureService.h"
 
 namespace Metal {
     ResourceType TextureBuilder::getType() {
-        return ResourceType::TEXTURE;
+        return TEXTURE;
     }
 
     RuntimeResource *TextureBuilder::build() {
-        auto *texture = CTX.textureService.getResource(id);
+        auto *texture = textureService->getResource(id);
         if (texture != nullptr) {
             return texture;
         }
 
-        texture = CTX.textureService.createForCompute(id, w, h, format);
+        texture = textureService->createForCompute(id, w, h, format);
         texture->setAsNoDisposal();
 
         return texture;

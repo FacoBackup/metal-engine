@@ -1,6 +1,8 @@
 #include "EditorPanel.h"
 #include "util/UIUtil.h"
 #include "../ApplicationContext.h"
+#include "service/DockService.h"
+#include "service/ThemeService.h"
 #include "dock-spaces/header/EditorHeaderPanel.h"
 #include "dock-spaces/footer/EditorFooterPanel.h"
 #include "panel/FileImportModalPanel.h"
@@ -46,7 +48,7 @@ namespace Metal {
 
         ImGui::PopStyleVar(3);
 
-        applicationContext->dockService.buildViews(windowId, this);
+        dockService->buildViews(windowId, this);
 
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
         ImGui::DockSpace(windowId, CENTER, ImGuiDockNodeFlags_PassthruCentralNode);
@@ -97,7 +99,7 @@ namespace Metal {
     }
 
     void EditorPanel::onSync() {
-        applicationContext->themeService.onSync();
+        themeService->onSync();
         renderDockSpaces();
         notificationsPanel->onSync();
         fileImportModalPanel->onSync();

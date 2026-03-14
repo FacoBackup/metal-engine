@@ -6,6 +6,7 @@
 #define MAX_LIGHTS 300
 #define MAX_MESH_INSTANCES 1000
 #define EMPTY_ENTITY entt::null
+#define LARGE_FONT_SIZE 38
 
 #define FILE_METADATA ".mjson"
 #define FILE_SCENE "-scene"

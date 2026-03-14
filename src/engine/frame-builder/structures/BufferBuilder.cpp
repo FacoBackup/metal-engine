@@ -9,12 +9,12 @@ namespace Metal {
     }
 
     RuntimeResource *BufferBuilder::build() {
-        auto *buffer = CTX.bufferService.getResource(id);
+        auto *buffer = bufferService->getResource(id);
         if (buffer != nullptr) {
             return buffer;
         }
 
-        buffer = CTX.bufferService.createBuffer(id, size, usage, properties, type);
+        buffer = bufferService->createBuffer(id, size, usage, properties, type);
         buffer->setAsNoDisposal();
 
         return buffer;

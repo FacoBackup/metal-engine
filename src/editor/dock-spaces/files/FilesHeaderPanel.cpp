@@ -4,14 +4,15 @@
 #include "../../dto/FSEntry.h"
 #include "../../../common/Icons.h"
 #include "../../../ApplicationContext.h"
+#include "../../service/FilesService.h"
 #include "../../util/UIUtil.h"
 
 namespace Metal {
     void FilesHeaderPanel::onSync() {
         if (UIUtil::ButtonSimple(Icons::create_new_folder + id, UIUtil::ONLY_ICON_BUTTON_SIZE,
                                  UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            FilesService::CreateDirectory(filesContext.currentDirectory);
-            FilesService::GetEntries(filesContext.currentDirectory);
+            filesService->CreateDirectory(filesContext.currentDirectory);
+            filesService->GetEntries(filesContext.currentDirectory);
         }
         UIUtil::RenderTooltip("Create folder");
         ImGui::SameLine();
@@ -26,7 +27,7 @@ namespace Metal {
 
         ImGui::SameLine();
         if (UIUtil::ButtonSimple(Icons::refresh, UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            FilesService::GetEntries(filesContext.currentDirectory);
+            filesService->GetEntries(filesContext.currentDirectory);
         }
         UIUtil::RenderTooltip("Refresh");
 

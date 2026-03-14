@@ -7,6 +7,7 @@
 #include <nlohmann/json.hpp>
 
 namespace Metal {
+    class ApplicationContext;
     class Inspectable;
     struct WorldRepository;
 

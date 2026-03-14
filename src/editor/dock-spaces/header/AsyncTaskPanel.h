@@ -4,8 +4,18 @@
 #include "../../abstract/AbstractPanel.h"
 
 namespace Metal {
+    class AsyncTaskService;
+
     class AsyncTaskPanel final : public AbstractPanel {
+        AsyncTaskService *asyncTaskService = nullptr;
+
     public:
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"AsyncTaskService", asyncTaskService}
+            };
+        }
+
         void onSync() override;
     };
 }

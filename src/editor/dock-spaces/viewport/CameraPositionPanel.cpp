@@ -1,8 +1,8 @@
 #include "CameraPositionPanel.h"
-
 #include "../../../ApplicationContext.h"
 #include "../../util/UIUtil.h"
 #include "../../../engine/dto/Camera.h"
+#include "../../../engine/repository/WorldRepository.h"
 
 namespace Metal {
     void CameraPositionPanel::onSync() {
@@ -18,7 +18,7 @@ namespace Metal {
         ImGui::SetNextWindowBgAlpha(.4f);
         if (ImGui::Begin(id.c_str(), &UIUtil::OPEN, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar |
             ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse)) {
-            const auto &positionCamera = applicationContext->worldRepository.camera.position;
+            const auto &positionCamera = worldRepository->camera.position;
             ImGui::TextColored(RED, "X: %i", static_cast<int>(positionCamera.x));
             ImGui::SameLine();
             ImGui::TextColored(GREEN, "Y: %i", static_cast<int>(positionCamera.y));
@@ -27,10 +27,10 @@ namespace Metal {
             ImGui::SameLine();
 
             ImGui::Text(
-                "Yaw: %i", static_cast<int>(applicationContext->worldRepository.camera.yaw * TO_DEG));
+                "Yaw: %i", static_cast<int>(worldRepository->camera.yaw * TO_DEG));
             ImGui::SameLine();
             ImGui::Text("Pitch: %i",
-                        static_cast<int>(applicationContext->worldRepository.camera.pitch * TO_DEG));
+                        static_cast<int>(worldRepository->camera.pitch * TO_DEG));
         }
         ImGui::PopStyleVar();
         ImGui::End();

@@ -1,11 +1,12 @@
 #include "AbstractPanel.h"
 #include "../util/Util.h"
+#include "../../ApplicationContext.h"
 
 namespace Metal {
     void AbstractPanel::appendChild(AbstractPanel *panel) {
-        panel->applicationContext = applicationContext;
+        ctx->injectDependencies(panel);
         panel->onInitialize();
-        children.emplace_back(panel);
+        children.push_back(panel);
     }
 
     void AbstractPanel::onSyncChildren() const {
@@ -25,7 +26,7 @@ namespace Metal {
         children.clear();
     }
 
-    std::vector<IPanel *> &AbstractPanel::getChildren() {
+    std::vector<AbstractPanel *> &AbstractPanel::getChildren() {
         return children;
     }
 }

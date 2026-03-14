@@ -11,6 +11,8 @@ namespace Metal {
     struct DockDTO;
     struct DockSpace;
     class AbstractDockPanel;
+    struct EditorRepository;
+    class ThemeService;
 
     class DockSpacePanel final : public AbstractPanel {
         ImVec2 padding{DEFAULT.x, DEFAULT.y};
@@ -26,11 +28,21 @@ namespace Metal {
         std::unordered_map<int, AbstractDockPanel *> views{};
         ImVec2 headerPadding{0, 3};
 
+        EditorRepository *editorRepository = nullptr;
+        ThemeService *themeService = nullptr;
+
         DockSpace *getSelectedDockSpace() const;
 
         bool hasDockSpace(int index) const;
 
     public:
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"EditorRepository", editorRepository},
+                {"ThemeService", themeService}
+            };
+        }
+
         static constexpr int FLAGS = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_MenuBar;
                 static const ImVec2 DEFAULT;
         static const ImVec2 MAX_SIZE;

@@ -1,4 +1,6 @@
 #include "EngineContext.h"
+
+#include "../ApplicationContext.h"
 #include "service/TransformService.h"
 #include "service/StreamingService.h"
 #include "service/RayTracingService.h"
@@ -30,6 +32,22 @@ namespace Metal {
         if (start == -1) {
             start = currentTimeMs;
         }
+    }
+
+    EngineFrameBuilder EngineContext::createFrame(const std::string &id) {
+        EngineFrameBuilder frameBuilder(id);
+        ctx->injectDependencies(&frameBuilder);
+        return frameBuilder;
+    }
+
+    void EngineContext::setCurrentFrame(const std::string &id) {
+        for (auto *frame : registeredFrames) {
+            if (frame->getId() == id) {
+                currentFrame = frame;
+                return;
+            }
+        }
+        throw std::runtime_error("Frame not found");
     }
 
     void EngineContext::dispose() {

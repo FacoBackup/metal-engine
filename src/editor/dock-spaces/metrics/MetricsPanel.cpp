@@ -1,6 +1,12 @@
 #include "MetricsPanel.h"
 #include "../../../ApplicationContext.h"
 #include "imgui.h"
+#include "../../../engine/service/MeshService.h"
+#include "../../../engine/service/VoxelService.h"
+#include "../../../engine/service/FrameBufferService.h"
+#include "../../../engine/service/TextureService.h"
+#include "../../../engine/service/PipelineService.h"
+#include "../../../engine/service/BufferService.h"
 
 namespace Metal {
     template<typename T>
@@ -22,11 +28,11 @@ namespace Metal {
     }
 
     void MetricsPanel::onSync() {
-        drawResourceList("Meshes", applicationContext->meshService, id);
-        drawResourceList("Voxels", applicationContext->voxelService, id);
-        drawResourceList("Framebuffers", applicationContext->framebufferService, id);
-        drawResourceList("Textures", applicationContext->textureService, id);
-        drawResourceList("Pipelines", applicationContext->pipelineService, id);
-        drawResourceList("Buffers", applicationContext->bufferService, id);
+        if (meshService) drawResourceList("Meshes", *meshService, id);
+        if (voxelService) drawResourceList("Voxels", *voxelService, id);
+        if (framebufferService) drawResourceList("Framebuffers", *framebufferService, id);
+        if (textureService) drawResourceList("Textures", *textureService, id);
+        if (pipelineService) drawResourceList("Pipelines", *pipelineService, id);
+        if (bufferService) drawResourceList("Buffers", *bufferService, id);
     }
 }

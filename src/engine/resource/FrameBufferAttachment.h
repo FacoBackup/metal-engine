@@ -3,7 +3,9 @@
 #include "../dto/DescriptorInstance.h"
 
 namespace Metal {
-    struct FrameBufferAttachment final {
+    class DescriptorSetService;
+
+    struct FrameBufferAttachment final : IContextMember {
         VkImage vkImage = VK_NULL_HANDLE;
         VkDeviceMemory vkImageMemory = VK_NULL_HANDLE;
         VkImageView vkImageView = VK_NULL_HANDLE;
@@ -12,6 +14,10 @@ namespace Metal {
         bool depth = false;
 
         void dispose() const;
+
+    private:
+        VulkanContext *vulkanContext = nullptr;
+        DescriptorSetService *descriptorSetService = nullptr;
     };
 }
 

@@ -10,6 +10,7 @@
 #include "../vulkan/VulkanContext.h"
 #include "../glfw/GLFWContext.h"
 #include "../../engine/service/DescriptorSetService.h"
+#include "../../editor/enum/engine-definitions.h"
 
 namespace Metal {
     void GuiContext::endFrame() {

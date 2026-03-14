@@ -7,6 +7,7 @@
 #include "../../core/vulkan/VulkanUtils.h"
 
 namespace Metal {
+    class FrameService;
     class AbstractPass;
     class ApplicationContext;
     struct FrameBufferInstance;
@@ -18,14 +19,19 @@ namespace Metal {
         VkRenderPassBeginInfo renderPassInfo{};
         std::vector<VkClearValue> clearColors{};
         bool computePassMode;
+        FrameService *frameService = nullptr;
 
         static void RecordCommandsInternal(
-            const std::vector<std::unique_ptr<AbstractPass>> &passes,
+            const std::vector<std::unique_ptr<AbstractPass> > &passes,
             VkCommandBuffer vkCommandBuffer);
 
         void createRenderPassInfo(const FrameBufferInstance *frameBuffer, bool clearBuffer);
 
     public:
+        std::vector<Dependency> getDependencies() override {
+            return {{"FrameService", frameService}, {"VulkanContext", vulkanContext}};
+        }
+
         explicit CommandBufferRecorder(std::string id, FrameBufferInstance *frameBuffer, bool clearBuffer = true);
 
         explicit CommandBufferRecorder(std::string id);
@@ -36,7 +42,7 @@ namespace Metal {
 
         void createCommandBuffer();
 
-        void recordCommands(const std::vector<std::unique_ptr<AbstractPass>> &passes) const;
+        void recordCommands(const std::vector<std::unique_ptr<AbstractPass> > &passes) const;
     };
 } // Metal
 

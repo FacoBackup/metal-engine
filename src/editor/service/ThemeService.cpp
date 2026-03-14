@@ -1,21 +1,23 @@
 #include "ThemeService.h"
 
-#include "../../ApplicationContext.h"
+#include <glm/ext/quaternion_geometric.hpp>
+
+#include "../repository/EditorRepository.h"
 
 namespace Metal {
     glm::vec3 ThemeService::BACKGROUND_COLOR = glm::vec3(0.f);
 
     void ThemeService::onSync() {
-        if (previousTheme == editorRepository.isDarkMode && glm::length(editorRepository.accentColor) == prevLength) {
+        if (previousTheme == editorRepository->isDarkMode && glm::length(editorRepository->accentColor) == prevLength) {
             return;
         }
-        prevLength = glm::length(editorRepository.accentColor);
-        previousTheme = editorRepository.isDarkMode;
+        prevLength = glm::length(editorRepository->accentColor);
+        previousTheme = editorRepository->isDarkMode;
 
         ImGuiStyle &style = ImGui::GetStyle();
         auto &colors = style.Colors;
 
-        if (!editorRepository.isDarkMode) {
+        if (!editorRepository->isDarkMode) {
             ImGui::StyleColorsLight();
             setLightMode();
         } else {
@@ -60,24 +62,24 @@ namespace Metal {
         colors[ImGuiCol_NavWindowingDimBg] = palette2;
         colors[ImGuiCol_ModalWindowDimBg] = palette2;
 
-        editorRepository.accent.y = editorRepository.accentColor.y;
-        editorRepository.accent.z = editorRepository.accentColor.z;
-        editorRepository.accent.x = editorRepository.accentColor.x;
-        editorRepository.accent.w = 1;
-        editorRepository.accentU32 = ImGui::GetColorU32(editorRepository.accent);
+        editorRepository->accent.y = editorRepository->accentColor.y;
+        editorRepository->accent.z = editorRepository->accentColor.z;
+        editorRepository->accent.x = editorRepository->accentColor.x;
+        editorRepository->accent.w = 1;
+        editorRepository->accentU32 = ImGui::GetColorU32(editorRepository->accent);
 
-        colors[ImGuiCol_FrameBgHovered] = editorRepository.accent;
-        colors[ImGuiCol_FrameBgActive] = editorRepository.accent;
-        colors[ImGuiCol_CheckMark] = editorRepository.accent;
-        colors[ImGuiCol_SliderGrabActive] = editorRepository.accent;
+        colors[ImGuiCol_FrameBgHovered] = editorRepository->accent;
+        colors[ImGuiCol_FrameBgActive] = editorRepository->accent;
+        colors[ImGuiCol_CheckMark] = editorRepository->accent;
+        colors[ImGuiCol_SliderGrabActive] = editorRepository->accent;
         colors[ImGuiCol_Button] = palette3;
-        colors[ImGuiCol_ButtonHovered] = editorRepository.accent;
-        colors[ImGuiCol_Header] = editorRepository.accent;
-        colors[ImGuiCol_HeaderHovered] = editorRepository.accent;
-        colors[ImGuiCol_HeaderActive] = editorRepository.accent;
-        colors[ImGuiCol_ResizeGripHovered] = editorRepository.accent;
-        colors[ImGuiCol_ResizeGripActive] = editorRepository.accent;
-        colors[ImGuiCol_TextSelectedBg] = editorRepository.accent;
+        colors[ImGuiCol_ButtonHovered] = editorRepository->accent;
+        colors[ImGuiCol_Header] = editorRepository->accent;
+        colors[ImGuiCol_HeaderHovered] = editorRepository->accent;
+        colors[ImGuiCol_HeaderActive] = editorRepository->accent;
+        colors[ImGuiCol_ResizeGripHovered] = editorRepository->accent;
+        colors[ImGuiCol_ResizeGripActive] = editorRepository->accent;
+        colors[ImGuiCol_TextSelectedBg] = editorRepository->accent;
 
         BACKGROUND_COLOR[0] = colors[ImGuiCol_WindowBg].x;
         BACKGROUND_COLOR[1] = colors[ImGuiCol_WindowBg].y;

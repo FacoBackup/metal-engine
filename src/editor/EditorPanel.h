@@ -5,6 +5,9 @@
 #include "abstract/AbstractPanel.h"
 
 namespace Metal {
+    class DockService;
+    class ThemeService;
+
     class EditorPanel final : public AbstractPanel {
         static int FLAGS;
         static const char *NAME;
@@ -19,6 +22,9 @@ namespace Metal {
         AbstractPanel *notificationsPanel = nullptr;
         AbstractPanel *fileImportModalPanel = nullptr;
 
+        DockService *dockService = nullptr;
+        ThemeService *themeService = nullptr;
+
         static void SetWindowStyle();
 
         void renderDockSpaces();
@@ -28,6 +34,13 @@ namespace Metal {
         void renderFooter(const ImGuiViewport *viewport);
 
     public:
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"DockService", dockService},
+                {"ThemeService", themeService}
+            };
+        }
+
         void onInitialize() override;
 
         void onSync() override;

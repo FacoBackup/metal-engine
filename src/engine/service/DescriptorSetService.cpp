@@ -31,7 +31,7 @@ namespace Metal {
             binding.attachmentIndex = builder.attachmentIndex;
 
             if (builder.type == DescriptorBindingType::FBO_ATTACHMENT) {
-                auto *fbo = framebufferService.getResource(binding.frameBufferId);
+                auto *fbo = framebufferService->getResource(binding.frameBufferId);
                 if (fbo == nullptr) {
                     throw std::runtime_error("Framebuffer not found: " + binding.frameBufferId);
                 }
@@ -62,7 +62,7 @@ namespace Metal {
                     binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
                     break;
                 case DescriptorBindingType::STORAGE_IMAGE: {
-                    auto *texture = textureService.getResource(binding.storageImageId);
+                    auto *texture = textureService->getResource(binding.storageImageId);
                     if (texture == nullptr) {
                         throw std::runtime_error("Storage image texture not found: " + binding.storageImageId);
                     }

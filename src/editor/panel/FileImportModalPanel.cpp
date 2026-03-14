@@ -1,10 +1,14 @@
 #include "FileImportModalPanel.h"
-
 #include <filesystem>
 #include <imgui.h>
 #include "../../ApplicationContext.h"
 #include "../../common/FilesUtil.h"
 #include "../abstract/form/FormPanel.h"
+#include "../repository/EditorRepository.h"
+#include "../service/FileImporterService.h"
+#include "../service/NotificationService.h"
+#include "../service/FilesService.h"
+#include "../dto/FSEntry.h"
 
 namespace Metal {
     void FileImportModalPanel::onInitialize() {
@@ -13,15 +17,14 @@ namespace Metal {
     }
 
     void FileImportModalPanel::onSync() {
-        auto &editorRepository = applicationContext->editorRepository;
-        if (editorRepository.pendingImports.empty()) {
+        if (editorRepository->pendingImports.empty()) {
             isFirst = true;
             return;
         }
 
         if (isFirst) {
             formPanel->setInspection(
-                editorRepository.importSettingsMap.at(editorRepository.selectedFileForSettings).get());
+                editorRepository->importSettingsMap.at(editorRepository->selectedFileForSettings).get());
             isFirst = false;
         }
 
@@ -50,16 +53,16 @@ namespace Metal {
                     ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed, 80.0f);
                     ImGui::TableHeadersRow();
 
-                    for (const auto &filePath: editorRepository.pendingImports) {
+                    for (const auto &filePath: editorRepository->pendingImports) {
                         std::filesystem::path p(filePath);
                         ImGui::TableNextRow();
                         ImGui::TableNextColumn();
-                        bool isSelected = (editorRepository.selectedFileForSettings == filePath);
+                        bool isSelected = (editorRepository->selectedFileForSettings == filePath);
                         if (ImGui::Selectable(p.filename().string().c_str(), isSelected,
                                               ImGuiSelectableFlags_SpanAllColumns)) {
-                            editorRepository.selectedFileForSettings = filePath;
+                            editorRepository->selectedFileForSettings = filePath;
                             formPanel->setInspection(
-                                editorRepository.importSettingsMap.at(editorRepository.selectedFileForSettings).
+                                editorRepository->importSettingsMap.at(editorRepository->selectedFileForSettings).
                                 get());
                         }
                         ImGui::TableNextColumn();
@@ -76,7 +79,7 @@ namespace Metal {
 
                 ImGui::TableNextColumn();
                 ImGui::Text("Settings: %s",
-                            std::filesystem::path(editorRepository.selectedFileForSettings).filename().string().
+                            std::filesystem::path(editorRepository->selectedFileForSettings).filename().string().
                             c_str());
                 ImGui::BeginChild((id + "SettingsFormChild").c_str(), ImVec2(0, maxHeight - 180.0f), true);
                 formPanel->onSync();
@@ -90,20 +93,20 @@ namespace Metal {
             ImGui::Spacing();
 
             if (ImGui::Button(("Approve" + id + "approveImport").c_str(), ImVec2(120, 0))) {
-                for (const std::string &file: editorRepository.pendingImports) {
-                    applicationContext->fileImporterService.importFile(editorRepository.targetImportDirectory->absolutePath, file,
-                                                       editorRepository.importSettingsMap.at(file));
+                for (const std::string &file: editorRepository->pendingImports) {
+                    fileImporterService->importFile(editorRepository->targetImportDirectory->absolutePath, file,
+                                                       editorRepository->importSettingsMap.at(file));
                 }
-                applicationContext->notificationService.pushMessage("Importing files...", NotificationSeverities::WARNING);
-                FilesService::GetEntries(editorRepository.targetImportDirectory);
-                editorRepository.pendingImports.clear();
-                editorRepository.importSettingsMap.clear();
+                notificationService->pushMessage("Importing files...", NotificationSeverities::WARNING);
+                filesService->GetEntries(editorRepository->targetImportDirectory);
+                editorRepository->pendingImports.clear();
+                editorRepository->importSettingsMap.clear();
                 formPanel->resetForm();
             }
             ImGui::SameLine();
             if (ImGui::Button(("Cancel" + id + "cancel").c_str(), ImVec2(120, 0))) {
-                editorRepository.pendingImports.clear();
-                editorRepository.importSettingsMap.clear();
+                editorRepository->pendingImports.clear();
+                editorRepository->importSettingsMap.clear();
                 formPanel->resetForm();
             }
         }

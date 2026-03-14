@@ -1,7 +1,6 @@
 #include "FrameBufferService.h"
 
 #include <array>
-#include <iostream>
 #include <glm/vec3.hpp>
 
 #include "../resource/FrameBufferInstance.h"
@@ -9,6 +8,7 @@
 #include "../../core/vulkan/VulkanUtils.h"
 #include "../resource/FrameBufferAttachment.h"
 #include "../../ApplicationContext.h"
+#include "../../common/LoggerUtil.h"
 
 namespace Metal {
 
@@ -23,7 +23,7 @@ namespace Metal {
     }
 
     void FrameBufferService::createDepthAttachment(FrameBufferInstance *framebuffer) const {
-        VkFormat depthFormat = VulkanUtils::GetValidDepthFormat(vulkanContext.physDevice.physical_device);
+        VkFormat depthFormat = VulkanUtils::GetValidDepthFormat(vulkanContext->physDevice.physical_device);
         const auto att = createAttachmentInternal(depthFormat,
                                                   VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, framebuffer);
         att->depth = true;
@@ -42,6 +42,7 @@ namespace Metal {
         VkImageUsageFlagBits usage,
         FrameBufferInstance *framebuffer) const {
         std::shared_ptr<FrameBufferAttachment> attachment = std::make_shared<FrameBufferAttachment>();
+        ctx->injectDependencies(attachment.get());
         framebuffer->attachments.push_back(attachment);
         attachment->format = format;
 
@@ -73,20 +74,20 @@ namespace Metal {
         image.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
         VulkanUtils::CheckVKResult(
-            vkCreateImage(vulkanContext.device.device, &image, nullptr, &attachment->vkImage));
+            vkCreateImage(vulkanContext->device.device, &image, nullptr, &attachment->vkImage));
 
         VkMemoryAllocateInfo memAlloc{};
         VkMemoryRequirements memReqs;
-        vkGetImageMemoryRequirements(vulkanContext.device.device, attachment->vkImage, &memReqs);
+        vkGetImageMemoryRequirements(vulkanContext->device.device, attachment->vkImage, &memReqs);
         memAlloc.allocationSize = memReqs.size;
-        memAlloc.memoryTypeIndex = VulkanUtils::GetMemTypeIndex(vulkanContext.physicalDeviceMemoryProperties,
+        memAlloc.memoryTypeIndex = VulkanUtils::GetMemTypeIndex(vulkanContext->physicalDeviceMemoryProperties,
                                                                 memReqs.memoryTypeBits,
                                                                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-        VulkanUtils::CheckVKResult(vkAllocateMemory(vulkanContext.device.device, &memAlloc, nullptr,
+        VulkanUtils::CheckVKResult(vkAllocateMemory(vulkanContext->device.device, &memAlloc, nullptr,
                                                     &attachment->vkImageMemory));
         VulkanUtils::CheckVKResult(
-            vkBindImageMemory(vulkanContext.device.device, attachment->vkImage, attachment->vkImageMemory, 0));
+            vkBindImageMemory(vulkanContext->device.device, attachment->vkImage, attachment->vkImageMemory, 0));
 
         VkImageViewCreateInfo imageView{};
         imageView.viewType = VK_IMAGE_VIEW_TYPE_2D;
@@ -98,7 +99,7 @@ namespace Metal {
         imageView.subresourceRange.baseArrayLayer = 0;
         imageView.subresourceRange.layerCount = 1;
         imageView.image = attachment->vkImage;
-        VulkanUtils::CheckVKResult(vkCreateImageView(vulkanContext.device.device, &imageView, nullptr,
+        VulkanUtils::CheckVKResult(vkCreateImageView(vulkanContext->device.device, &imageView, nullptr,
                                                      &attachment->vkImageView));
         return attachment;
     }
@@ -167,7 +168,7 @@ namespace Metal {
         renderPassInfo.dependencyCount = dependencies.size();
         renderPassInfo.pDependencies = dependencies.data();
 
-        VulkanUtils::CheckVKResult(vkCreateRenderPass(vulkanContext.device.device,
+        VulkanUtils::CheckVKResult(vkCreateRenderPass(vulkanContext->device.device,
                                                       &renderPassInfo,
                                                       nullptr,
                                                       &framebuffer->vkRenderPass));
@@ -196,14 +197,14 @@ namespace Metal {
         framebufferInfo.height = framebuffer->bufferHeight;
         framebufferInfo.layers = 1;
 
-        vkCreateFramebuffer(vulkanContext.device.device, &framebufferInfo, nullptr,
+        vkCreateFramebuffer(vulkanContext->device.device, &framebufferInfo, nullptr,
                             &framebuffer->vkFramebuffer);
     }
 
     void FrameBufferService::disposeResource(FrameBufferInstance *resource) {
         LOG_INFO("Disposing framebuffer instance");
-        vkDestroyFramebuffer(vulkanContext.device.device, resource->vkFramebuffer, nullptr);
-        vkDestroyRenderPass(vulkanContext.device.device, resource->vkRenderPass, nullptr);
+        vkDestroyFramebuffer(vulkanContext->device.device, resource->vkFramebuffer, nullptr);
+        vkDestroyRenderPass(vulkanContext->device.device, resource->vkRenderPass, nullptr);
 
         for (int i = 0; i < resource->attachments.size(); i++) {
             LOG_INFO("Disposing of attachment instance " + std::to_string(i));

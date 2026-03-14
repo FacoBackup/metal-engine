@@ -1,9 +1,11 @@
 #include "PostProcessingPass.h"
-
-#include "../../../ApplicationContext.h"
-
 #include "../../dto/PipelineBuilder.h"
+#include "../../service/PipelineService.h"
+#include "../../../core/vulkan/VulkanContext.h"
+#include "../../../engine/repository/WorldRepository.h"
 #include "../../../editor/enum/EngineResourceIDs.h"
+#include "../../frame-builder/EngineFrame.h"
+#include "../../resource/TextureInstance.h"
 
 
 namespace Metal {
@@ -14,12 +16,12 @@ namespace Metal {
                     "PostProcessing.frag"
                 )
                 .setPushConstantsSize(sizeof(PostProcessingPushConstant))
-                .addCombinedImageSamplerBinding(CTX.vulkanContext.vkImageSampler, frame->getResourceAs<TextureInstance>(RID_DENOISED_FRAME)->vkImageView);
-        pipelineInstance = CTX.pipelineService.createPipeline(ppPipelineBuilder);
+                .addCombinedImageSamplerBinding(vulkanContext->vkImageSampler, frame->getResourceAs<TextureInstance>(RID_DENOISED_FRAME)->vkImageView);
+        pipelineInstance = pipelineService->createPipeline(ppPipelineBuilder);
     }
 
     void PostProcessingPass::onSync() {
-        auto &camera = CTX.worldRepository.camera;
+        auto &camera = worldRepository->camera;
         pushConstant.distortionIntensity = camera.distortionIntensity;
         pushConstant.chromaticAberrationIntensity = camera.chromaticAberrationIntensity;
         pushConstant.distortionEnabled = camera.distortionEnabled;

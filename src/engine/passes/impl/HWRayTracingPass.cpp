@@ -1,9 +1,12 @@
 #include "HWRayTracingPass.h"
-#include "../../../ApplicationContext.h"
 #include "../../dto/PipelineBuilder.h"
 #include "../../resource/PipelineInstance.h"
 #include "../../resource/TextureInstance.h"
 #include "../../service/RayTracingService.h"
+#include "../../service/PipelineService.h"
+#include "../../../core/vulkan/VulkanContext.h"
+#include "../../../engine/EngineContext.h"
+#include "../../../engine/repository/EngineRepository.h"
 #include "../../../editor/enum/EngineResourceIDs.h"
 
 namespace Metal {
@@ -14,16 +17,16 @@ namespace Metal {
                     "rt/HWRayTracing.rchit")
                 .setPushConstantsSize(sizeof(HWRayTracingPushConstant))
                 .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
-                .addAccelerationStructureBinding(CTX.rayTracingService.getTLAS())
+                .addAccelerationStructureBinding(rayTracingService->getTLAS())
                 .addStorageImageBinding(getScopedResourceId(RID_ACCUMULATED_FRAME))
                 .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_POSITION_INDEX))
                 .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_NORMAL))
                 .addBufferBinding(getScopedResourceId(RID_LIGHT_BUFFER))
                 .addBufferBinding(getScopedResourceId(RID_VOLUMES_BUFFER))
                 .addBufferBinding(getScopedResourceId(RID_MESH_METADATA_BUFFER))
-                .addCombinedImageSamplerBinding(CTX.vulkanContext.vkImageSampler, VK_NULL_HANDLE,
+                .addCombinedImageSamplerBinding(vulkanContext->vkImageSampler, VK_NULL_HANDLE,
                                                 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1000);
-        pipelineInstance = CTX.pipelineService.createPipeline(builder);
+        pipelineInstance = pipelineService->createPipeline(builder);
     }
 
     void HWRayTracingPass::onSync() {
@@ -33,9 +36,9 @@ namespace Metal {
         auto *previousPositionIndex = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_POSITION_INDEX);
         auto *previousNormal = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_NORMAL);
 
-        if (isFirstRun || CTX.engineContext.isCameraUpdated() || CTX.engineContext.isGISettingsUpdated()) {
+        if (isFirstRun || engineContext->isCameraUpdated() || engineContext->isGISettingsUpdated()) {
             clearTexture(accumulatedFrame->vkImage);
-            CTX.engineContext.resetPathTracerAccumulationCount();
+            engineContext->resetPathTracerAccumulationCount();
             isFirstRun = false;
         }
 
@@ -46,24 +49,24 @@ namespace Metal {
         startWriting(gBufferNormal->vkImage);
 
         // Trace rays
-        pushConstant.pathTracerMultiplier = CTX.engineRepository.pathTracerMultiplier;
-        pushConstant.volumeShadowSteps = CTX.engineRepository.volumeShadowSteps;
-        pushConstant.isAtmosphereEnabled = CTX.engineRepository.atmosphereEnabled;
+        pushConstant.pathTracerMultiplier = engineRepository->pathTracerMultiplier;
+        pushConstant.volumeShadowSteps = engineRepository->volumeShadowSteps;
+        pushConstant.isAtmosphereEnabled = engineRepository->atmosphereEnabled;
 
-        pushConstant.multipleImportanceSampling = CTX.engineRepository.multipleImportanceSampling;
-        pushConstant.pathTracerSamples = CTX.engineRepository.pathTracerSamples;
-        pushConstant.pathTracerBounces = CTX.engineRepository.pathTracerBounces;
-        pushConstant.pathTracingEmissiveFactor = CTX.engineRepository.pathTracingEmissiveFactor;
-        pushConstant.shouldTrace = CTX.rayTracingService.isReady();
+        pushConstant.multipleImportanceSampling = engineRepository->multipleImportanceSampling;
+        pushConstant.pathTracerSamples = engineRepository->pathTracerSamples;
+        pushConstant.pathTracerBounces = engineRepository->pathTracerBounces;
+        pushConstant.pathTracingEmissiveFactor = engineRepository->pathTracingEmissiveFactor;
+        pushConstant.shouldTrace = rayTracingService->isReady();
 
-        pushConstant.dofEnabled = CTX.engineRepository.dofEnabled;
-        pushConstant.dofFocusDistance = CTX.engineRepository.dofFocusDistance;
-        pushConstant.dofAperture = CTX.engineRepository.dofAperture;
-        pushConstant.dofFocalLength = CTX.engineRepository.dofFocalLength;
+        pushConstant.dofEnabled = engineRepository->dofEnabled;
+        pushConstant.dofFocusDistance = engineRepository->dofFocusDistance;
+        pushConstant.dofAperture = engineRepository->dofAperture;
+        pushConstant.dofFocalLength = engineRepository->dofFocalLength;
 
         recordPushConstant(&pushConstant);
 
-        CTX.vulkanContext.vkCmdTraceRaysKHR(
+        vulkanContext->vkCmdTraceRaysKHR(
             vkCommandBuffer,
             &pipelineInstance->raygenRegion,
             &pipelineInstance->missRegion,

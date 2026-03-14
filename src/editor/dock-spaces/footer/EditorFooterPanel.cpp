@@ -1,6 +1,7 @@
 #include "EditorFooterPanel.h"
 #include "../../util/UIUtil.h"
 #include "../../../ApplicationContext.h"
+#include "../../repository/EditorRepository.h"
 
 namespace Metal {
     void EditorFooterPanel::onSync() {
@@ -17,11 +18,11 @@ namespace Metal {
     }
 
     void EditorFooterPanel::renderShortcuts() {
-        auto &shortcuts = applicationContext->editorRepository.focusedShortcuts;
+        auto &shortcuts = editorRepository->focusedShortcuts;
         if (shortcuts.empty()) return;
         
         ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5); // Some padding
-        ImGui::Text(applicationContext->editorRepository.focusedWindowName.c_str());
+        ImGui::Text(editorRepository->focusedWindowName.c_str());
         ImGui::SameLine();
         std::string label;
         for (size_t i = 0; i < std::min(shortcuts.size(), size_t(3)); ++i) {

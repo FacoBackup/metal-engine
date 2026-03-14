@@ -6,6 +6,7 @@
 #include "ResourceBuilder.h"
 
 namespace Metal {
+    class FrameBufferService;
     struct FrameBufferInstance;
 
     struct FramebufferAttachmentBuilder {
@@ -20,8 +21,12 @@ namespace Metal {
         glm::vec4 clearColor;
         std::vector<FramebufferAttachmentBuilder> attachments;
         bool hasDepth = false;
-
+        FrameBufferService *frameBufferService = nullptr;
     public:
+        std::vector<Dependency> getDependencies() override {
+            return {{"FrameBufferService", frameBufferService}};
+        }
+
         explicit FramebufferBuilder(const std::string &id, const unsigned w, const unsigned h, glm::vec4 clearColor)
             : ResourceBuilder(id), clearColor(clearColor), w(w), h(h) {
         }

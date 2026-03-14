@@ -89,7 +89,7 @@ namespace Metal {
 
             if (!ImGui::IsMouseDown(ImGuiMouseButton_Left) && onDrag != nullptr && fileEntry->type ==
                 EntryType::DIRECTORY) {
-                applicationContext->filesService.Move(onDrag, fileEntry);
+                filesService->Move(onDrag, fileEntry);
                 onDrag = nullptr;
             }
         }
@@ -211,7 +211,7 @@ namespace Metal {
 
         if (isDirectory && open) {
             if (!loadedDirectoryPaths.contains(entry->absolutePath)) {
-                FilesService::GetEntries(entry);
+                filesService->GetEntries(entry);
                 loadedDirectoryPaths.insert(entry->absolutePath);
             }
             // After loading, children may change; keep original iteration order to avoid infinite recursion here.
@@ -277,11 +277,11 @@ namespace Metal {
                 }
                 if (ImGui::MenuItem("Paste")) {
                     filesContext.toCut.clear();
-                    FilesService::GetEntries(filesContext.currentDirectory);
+                    filesService->GetEntries(filesContext.currentDirectory);
                 }
                 if (ImGui::MenuItem("Delete")) {
-                    applicationContext->filesService.deleteFiles(filesContext.selected);
-                    FilesService::GetEntries(filesContext.currentDirectory);
+                    filesService->deleteFiles(filesContext.selected);
+                    filesService->GetEntries(filesContext.currentDirectory);
                 }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Select all")) {

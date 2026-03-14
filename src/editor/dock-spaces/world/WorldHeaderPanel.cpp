@@ -1,8 +1,8 @@
 #include "WorldHeaderPanel.h"
-
 #include "../../../ApplicationContext.h"
 #include "../../util/UIUtil.h"
 #include "../../../engine/enum/ComponentType.h"
+#include "../../../engine/repository/WorldRepository.h"
 
 namespace Metal {
     void WorldHeaderPanel::onSync() {
@@ -28,7 +28,7 @@ namespace Metal {
         ImGui::SameLine();
         if (UIUtil::ButtonSimple(Icons::add + "##hierarchyAdd" + id, UIUtil::ONLY_ICON_BUTTON_SIZE,
                                  UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            applicationContext->worldRepository.createEntity();
+            worldRepository->createEntity();
         }
         UIUtil::RenderTooltip("Create entity");
     }

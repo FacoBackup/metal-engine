@@ -10,6 +10,7 @@
 
 namespace Metal {
     struct FSEntry;
+    class FilesService;
 
     class FilesListPanel final : public AbstractPanel {
         FilesContext &filesContext;
@@ -26,6 +27,8 @@ namespace Metal {
         std::unordered_set<std::string> loadedDirectoryPaths{};
 
         std::function<void(FSEntry *)> onDoubleClick;
+
+        FilesService *filesService = nullptr;
 
         void ensureCache();
 
@@ -45,9 +48,15 @@ namespace Metal {
         void renderTreeItem(FSEntry *entry);
 
     public:
-        explicit FilesListPanel(FilesContext &applicationContext-> std::function<void(FSEntry *)> onDoubleClick,
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"FilesService", filesService}
+            };
+        }
+
+        explicit FilesListPanel(FilesContext &filesContext, std::function<void(FSEntry *)> onDoubleClick,
                                 EntryType::EntryType typeFilter)
-            : filesContext(applicationContext->, typeFilter(typeFilter), onDoubleClick(std::move(onDoubleClick)) {
+            : filesContext(filesContext), typeFilter(typeFilter), onDoubleClick(std::move(onDoubleClick)) {
         }
 
         void onSync() override;

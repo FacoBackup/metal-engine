@@ -3,21 +3,23 @@
 #include "../../ApplicationContext.h"
 #include "../util/UIUtil.h"
 #include "../dto/Notification.h"
+#include "../service/NotificationService.h"
+#include "../../engine/EngineContext.h"
 
 namespace Metal {
     void NotificationsPanel::onSync() {
         int usedIndices = 0;
-        for (int i = 0; i < applicationContext->notificationService.getNotifications().size(); i++) {
-            auto *notification = applicationContext->notificationService.getNotifications()[i];
+        for (int i = 0; i < notificationService->getNotifications().size(); i++) {
+            auto *notification = notificationService->getNotifications()[i];
             if (notification == nullptr) {
                 continue;
             }
             if (notification->displayTime < 0) {
-                notification->displayTime = applicationContext->engineContext.currentTimeMs;
+                notification->displayTime = engineContext->currentTimeMs;
             }
-            if (applicationContext->engineContext.currentTimeMs - notification->displayTime > MESSAGE_DURATION) {
+            if (engineContext->currentTimeMs - notification->displayTime > MESSAGE_DURATION) {
                 delete notification;
-                applicationContext->notificationService.getNotifications()[i] = nullptr;
+                notificationService->getNotifications()[i] = nullptr;
                 continue;
             }
             ImGui::SetNextWindowPos(ImVec2(5, ImGui::GetMainViewport()->Size.y - 40 * (usedIndices + 1)));

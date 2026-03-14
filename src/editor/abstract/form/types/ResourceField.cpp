@@ -9,6 +9,7 @@
 #include "../../../dto/FSEntry.h"
 #include "../../../../ApplicationContext.h"
 #include "../../../../common/Inspectable.h"
+#include "../../../service/FilesService.h"
 
 namespace Metal {
     constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoDocking |
@@ -79,7 +80,7 @@ namespace Metal {
 
     void ResourceField::onSync() {
         if (field.field->size() > 0 && (entry == nullptr || entry->getId() != *field.field)) {
-            entry = applicationContext->filesService.getResource(*field.field);
+            entry = filesService->getResource(*field.field);
         }
         if (!field.disabled) {
             renderButton();

@@ -18,12 +18,14 @@
 #include "BufferService.h"
 #include "PipelineService.h"
 #include "DescriptorSetService.h"
+#include "../../core/DirectoryService.h"
+#include "../../common/LoggerUtil.h"
 
 namespace Metal {
 
     void TextureService::copyBufferToImage(const VkBuffer &vkBuffer, const TextureInstance *image,
                                            const int layerCount) const {
-        VkCommandBuffer commandBuffer = vulkanContext.beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = vulkanContext->beginSingleTimeCommands();
 
         VkBufferImageCopy region{};
         region.bufferOffset = 0;
@@ -45,31 +47,31 @@ namespace Metal {
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             1,
             &region);
-        vulkanContext.endSingleTimeCommands(commandBuffer);
+        vulkanContext->endSingleTimeCommands(commandBuffer);
     }
 
     void TextureService::createImageWithInfo(const VkImageCreateInfo &imageInfo,
                                              VkMemoryPropertyFlagBits vkMemoryProperties,
                                              TextureInstance *image) const {
-        if (vkCreateImage(vulkanContext.device.device, &imageInfo, nullptr, &image->vkImage) != VK_SUCCESS) {
+        if (vkCreateImage(vulkanContext->device.device, &imageInfo, nullptr, &image->vkImage) != VK_SUCCESS) {
             throw std::runtime_error("failed to create image!");
         }
 
         VkMemoryRequirements memRequirements;
-        vkGetImageMemoryRequirements(vulkanContext.device.device, image->vkImage, &memRequirements);
+        vkGetImageMemoryRequirements(vulkanContext->device.device, image->vkImage, &memRequirements);
 
         VkMemoryAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         allocInfo.allocationSize = memRequirements.size;
-        allocInfo.memoryTypeIndex = bufferService.findMemoryType(
+        allocInfo.memoryTypeIndex = bufferService->findMemoryType(
             memRequirements.memoryTypeBits, vkMemoryProperties);
 
-        if (vkAllocateMemory(vulkanContext.device.device, &allocInfo, nullptr, &image->vkImageMemory) !=
+        if (vkAllocateMemory(vulkanContext->device.device, &allocInfo, nullptr, &image->vkImageMemory) !=
             VK_SUCCESS) {
             throw std::runtime_error("failed to allocate image memory!");
         }
 
-        if (vkBindImageMemory(vulkanContext.device.device, image->vkImage, image->vkImageMemory, 0) !=
+        if (vkBindImageMemory(vulkanContext->device.device, image->vkImage, image->vkImageMemory, 0) !=
             VK_SUCCESS) {
             throw std::runtime_error("failed to bind image memory!");
         }
@@ -92,7 +94,7 @@ namespace Metal {
         samplerInfo.anisotropyEnable = VK_TRUE;
         samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 
-        vkCreateSampler(vulkanContext.device.device, &samplerInfo, nullptr, &image->vkSampler);
+        vkCreateSampler(vulkanContext->device.device, &samplerInfo, nullptr, &image->vkSampler);
     }
 
     void TextureService::createImageView(VkFormat imageFormat, TextureInstance *image) const {
@@ -110,7 +112,7 @@ namespace Metal {
         imageViewInfo.subresourceRange.levelCount = image->mipLevels;
         imageViewInfo.image = image->vkImage;
 
-        vkCreateImageView(vulkanContext.device.device, &imageViewInfo, nullptr, &image->vkImageView);
+        vkCreateImageView(vulkanContext->device.device, &imageViewInfo, nullptr, &image->vkImageView);
     }
 
     void TextureService::createImage(VkFormat imageFormat, TextureInstance *image, const int width,
@@ -133,7 +135,7 @@ namespace Metal {
     }
 
     TextureData *TextureService::loadTextureData(const std::string &id) const {
-        auto pathToFile = rootDirectory + "/assets/" + FORMAT_FILE_TEXTURE(id);
+        auto pathToFile = directoryService->getAssetDirectory() + FORMAT_FILE_TEXTURE(id);
         if (std::filesystem::exists(pathToFile)) {
             int width, height, channels;
             unsigned char *data = stbi_load(pathToFile.c_str(), &width, &height, &channels, 0);
@@ -171,7 +173,7 @@ namespace Metal {
         image->vkFormat = imageFormat;
         LOG_INFO("Loading texture " + id + " from " + pathToImage);
         LOG_INFO("Texture data: Width " + std::to_string(image->width) + " Height " + std::to_string(image->height));
-        BufferInstance *stagingBuffer = bufferService.createBuffer(
+        BufferInstance *stagingBuffer = bufferService->createBuffer(
             id + "_staging",
             image->width * image->height * 4, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
@@ -192,7 +194,7 @@ namespace Metal {
 
     void TextureService::transitionImageLayout(const TextureInstance *image, VkImageLayout oldLayout,
                                                VkImageLayout newLayout) const {
-        VkCommandBuffer commandBuffer = vulkanContext.beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = vulkanContext->beginSingleTimeCommands();
         VkImageMemoryBarrier barrier{};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier.oldLayout = oldLayout;
@@ -243,19 +245,19 @@ namespace Metal {
             0, nullptr,
             1, &barrier);
 
-        vulkanContext.endSingleTimeCommands(commandBuffer);
+        vulkanContext->endSingleTimeCommands(commandBuffer);
     }
 
     void TextureService::generateMipmaps(const TextureInstance *image) const {
         VkFormatProperties formatProperties;
-        vkGetPhysicalDeviceFormatProperties(vulkanContext.physDevice.physical_device, image->vkFormat,
+        vkGetPhysicalDeviceFormatProperties(vulkanContext->physDevice.physical_device, image->vkFormat,
                                             &formatProperties);
 
         if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT)) {
             throw std::runtime_error("texture image format does not support linear blitting!");
         }
 
-        VkCommandBuffer commandBuffer = vulkanContext.beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = vulkanContext->beginSingleTimeCommands();
 
         VkImageMemoryBarrier barrier{};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -318,11 +320,11 @@ namespace Metal {
         vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0,
                              nullptr, 0, nullptr, 1, &barrier);
 
-        vulkanContext.endSingleTimeCommands(commandBuffer);
+        vulkanContext->endSingleTimeCommands(commandBuffer);
     }
 
     TextureInstance *TextureService::create(const std::string &id) {
-        auto pathToFile = rootDirectory + "/assets/" + FORMAT_FILE_TEXTURE(id);
+        auto pathToFile = directoryService->getAssetDirectory() + FORMAT_FILE_TEXTURE(id);
         if (std::filesystem::exists(pathToFile)) {
             auto *instance = loadTexture(id, pathToFile, true, VK_FORMAT_R8G8B8A8_UNORM);
             if (instance != nullptr) {
@@ -371,7 +373,7 @@ namespace Metal {
             textureIndices[id] = index;
 
             // Update all descriptors that contain a texture array
-            auto descriptors = pipelineService.getAllDescriptors();
+            auto descriptors = pipelineService->getAllDescriptors();
             for (auto *descriptor: descriptors) {
                 for (auto &binding: descriptor->bindings) {
                     if (binding.descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER && binding.descriptorCount > 1) {
@@ -384,12 +386,12 @@ namespace Metal {
                         write.descriptorCount = 1;
 
                         VkDescriptorImageInfo imageInfo{};
-                        imageInfo.sampler = vulkanContext.vkTextureSampler;
+                        imageInfo.sampler = vulkanContext->vkTextureSampler;
                         imageInfo.imageView = texture->vkImageView;
                         imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
                         write.pImageInfo = &imageInfo;
 
-                        vkUpdateDescriptorSets(vulkanContext.device.device, 1, &write, 0, nullptr);
+                        vkUpdateDescriptorSets(vulkanContext->device.device, 1, &write, 0, nullptr);
                     }
                 }
             }
@@ -400,13 +402,13 @@ namespace Metal {
     }
 
     void TextureService::disposeResource(TextureInstance *resource) {
-        vkDestroyImage(vulkanContext.device.device, resource->vkImage, nullptr);
-        vkFreeMemory(vulkanContext.device.device, resource->vkImageMemory, nullptr);
-        vkDestroyImageView(vulkanContext.device.device, resource->vkImageView, nullptr);
-        vkDestroySampler(vulkanContext.device.device, resource->vkSampler, nullptr);
+        vkDestroyImage(vulkanContext->device.device, resource->vkImage, nullptr);
+        vkFreeMemory(vulkanContext->device.device, resource->vkImageMemory, nullptr);
+        vkDestroyImageView(vulkanContext->device.device, resource->vkImageView, nullptr);
+        vkDestroySampler(vulkanContext->device.device, resource->vkSampler, nullptr);
 
         if (resource->imageDescriptor != nullptr) {
-            descriptorSetService.disposeResource(resource->imageDescriptor);
+            descriptorSetService->disposeResource(resource->imageDescriptor);
         }
     }
 
@@ -426,7 +428,7 @@ namespace Metal {
         samplerCreateInfo.maxAnisotropy = 8;
         samplerCreateInfo.anisotropyEnable = VK_TRUE;
         samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
-        VulkanUtils::CheckVKResult(vkCreateSampler(vulkanContext.device.device, &samplerCreateInfo, nullptr,
+        VulkanUtils::CheckVKResult(vkCreateSampler(vulkanContext->device.device, &samplerCreateInfo, nullptr,
                                                    &vkImageSampler));
     }
 

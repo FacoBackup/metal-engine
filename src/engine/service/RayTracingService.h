@@ -11,6 +11,7 @@
 #include "../../common/IDisposable.h"
 
 namespace Metal {
+    class DescriptorSetService;
     class BufferInstance;
     class VulkanContext;
     class PipelineService;
@@ -19,7 +20,6 @@ namespace Metal {
     class MaterialService;
     class BufferService;
     class EngineContext;
-    class DescriptorService;
 
     class RayTracingService final : public IService, public ISync, public IDisposable {
         VulkanContext *vulkanContext = nullptr;
@@ -29,7 +29,7 @@ namespace Metal {
         MaterialService *materialService = nullptr;
         BufferService *bufferService = nullptr;
         EngineContext *engineContext = nullptr;
-        DescriptorService *descriptorService = nullptr;
+        DescriptorSetService *descriptorSetService = nullptr;
 
         struct BLASEntry {
             VkAccelerationStructureKHR accelerationStructure = VK_NULL_HANDLE;
@@ -58,6 +58,8 @@ namespace Metal {
         bool needsRebuild = true;
         bool needsMaterialUpdate = false;
 
+        VkDeviceAddress getDeviceAddress(VkBuffer buffer);
+
         void updateDescriptorSets(VkAccelerationStructureKHR asHandle);
 
         void buildBLAS();
@@ -80,7 +82,7 @@ namespace Metal {
                 {"MaterialService", materialService},
                 {"BufferService", bufferService},
                 {"EngineContext", engineContext},
-                {"DescriptorService", descriptorService}
+                {"DescriptorSetService", descriptorSetService}
             };
         }
 

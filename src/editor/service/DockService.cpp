@@ -8,7 +8,7 @@
 #include "../../ApplicationContext.h"
 
 namespace Metal {
-    DockService::DockService() {
+    void DockService::onInitialize() {
         auto *rightT = new DockDTO{&DockSpace::WORLD};
         auto *leftTop = new DockDTO{&DockSpace::REPOSITORIES};
         auto *leftDown = new DockDTO{&DockSpace::INSPECTOR};
@@ -30,14 +30,14 @@ namespace Metal {
         bottom.push_back(downRight);
     }
 
-    void DockService::buildViews(ImGuiID windowId, AbstractPanel *panel) const {
+    void DockService::buildViews(ImGuiID windowId, AbstractPanel *panel) {
         if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DockingEnable) {
-            if (dockRepository.isInitialized) {
+            if (isInitialized) {
                 return;
             }
-            dockRepository.isInitialized = true;
+            isInitialized = true;
 
-            std::vector<IPanel *> toKeep{};
+            std::vector<AbstractPanel *> toKeep{};
             for (auto *child: panel->getChildren()) {
                 auto *p = dynamic_cast<DockSpacePanel *>(child);
                 if (p == nullptr) {
@@ -58,7 +58,6 @@ namespace Metal {
             ImGui::DockBuilderAddNode(windowId, ImGuiDockNodeFlags_NoTabBar);
             ImGui::DockBuilderSetNodeSize(windowId, ImGui::GetMainViewport()->Size);
 
-            const auto &left = dockRepository.left;
             for (size_t i = 0; i < left.size(); i++) {
                 DockDTO *dockSpace = left[i];
                 if (i == 0) {
@@ -75,7 +74,6 @@ namespace Metal {
                 addWindow(dockSpace, panel);
             }
 
-            const auto &right = dockRepository.right;
             for (size_t i = 0; i < right.size(); i++) {
                 DockDTO *dockSpace = right[i];
                 if (i == 0) {
@@ -92,7 +90,6 @@ namespace Metal {
                 addWindow(dockSpace, panel);
             }
 
-            const auto &bottom = dockRepository.bottom;
             for (size_t i = 0, bottomSize = bottom.size(); i < bottomSize; i++) {
                 DockDTO *dockSpace = bottom[i];
                 if (i == 0) {
@@ -109,10 +106,10 @@ namespace Metal {
                 addWindow(dockSpace, panel);
             }
 
-            dockRepository.center.nodeId = windowId;
-            addWindow(&dockRepository.center, panel);
+            center.nodeId = windowId;
+            addWindow(&center, panel);
 
-            ImGui::DockBuilderDockWindow(dockRepository.center.internalId.c_str(), windowId);
+            ImGui::DockBuilderDockWindow(center.internalId.c_str(), windowId);
             ImGui::DockBuilderFinish(windowId);
         }
     }

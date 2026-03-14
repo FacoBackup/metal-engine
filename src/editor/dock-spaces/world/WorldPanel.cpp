@@ -1,26 +1,27 @@
 #include "WorldPanel.h"
-
 #include "WorldHeaderPanel.h"
 #include "../../../common/Icons.h"
 #include "../../util/UIUtil.h"
 #include "../../../ApplicationContext.h"
 #include "../../../engine/dto/MetadataComponent.h"
 #include "../../../engine/enum/ComponentType.h"
+#include "../../../engine/repository/WorldRepository.h"
+#include "../../repository/EditorRepository.h"
+#include "../../service/SelectionService.h"
+#include "../../../core/DirectoryService.h"
 
 namespace Metal {
     void WorldPanel::onInitialize() {
         appendChild(headerPanel = new WorldHeaderPanel());
-        world = &applicationContext->worldRepository;
-        editorRepository = &applicationContext->editorRepository;
 
         shortcuts = {
             ShortcutDTO("Delete", ImGuiKey_Delete, [this]() {
                 std::vector<entt::entity> entities;
-                for (auto &entry: applicationContext->editorRepository.selected) {
+                for (auto &entry: editorRepository->selected) {
                     entities.push_back(entry.first);
                 }
-                applicationContext->worldRepository.deleteEntities(entities);
-                applicationContext->selectionService.clearSelection();
+                world->deleteEntities(entities);
+                selectionService->clearSelection();
             }),
             ShortcutDTO("Select All", ImGuiMod_Ctrl | ImGuiKey_A, [this]() {
                 std::vector<entt::entity> entities;
@@ -29,10 +30,10 @@ namespace Metal {
                         entities.push_back(entity);
                     }
                 }
-                applicationContext->selectionService.addAllSelected(entities);
+                selectionService->addAllSelected(entities);
             }),
             ShortcutDTO("Save", ImGuiMod_Ctrl | ImGuiKey_S, [this] {
-                applicationContext->save();
+                directoryService->save();
             }),
         };
     }
@@ -41,11 +42,11 @@ namespace Metal {
         if (ImGui::BeginPopupContextItem((id + "contextMenu").c_str())) {
             if (ImGui::MenuItem("Delete")) {
                 std::vector<entt::entity> entities;
-                for (auto &entry: applicationContext->editorRepository.selected) {
+                for (auto &entry: editorRepository->selected) {
                     entities.push_back(entry.first);
                 }
-                applicationContext->worldRepository.deleteEntities(entities);
-                applicationContext->selectionService.clearSelection();
+                world->deleteEntities(entities);
+                selectionService->clearSelection();
             }
             ImGui::EndPopup();
         }
@@ -73,7 +74,7 @@ namespace Metal {
 
             ImGui::EndTable();
         }
-        if (!applicationContext->editorRepository.selected.empty()) {
+        if (!editorRepository->selected.empty()) {
             contextMenu();
         }
     }
@@ -172,7 +173,7 @@ namespace Metal {
         const bool isVisible = !world->hiddenEntities.contains(entityId);
         if (UIUtil::ButtonSimple((isVisible ? Icons::visibility : Icons::visibility_off) + ("##v") +
                                  std::to_string(static_cast<uint32_t>(entt::to_integral(entityId))) + id, 20, 15)) {
-            applicationContext->worldRepository.changeVisibility(entityId, !isVisible);
+            world->changeVisibility(entityId, !isVisible);
         }
         ImGui::PopStyleColor();
         ImGui::PopStyleVar(2);
@@ -182,9 +183,9 @@ namespace Metal {
     void WorldPanel::handleClick(const entt::entity entityId) const {
         if (ImGui::IsItemClicked()) {
             if (const bool isMultiSelect = ImGui::IsKeyDown(ImGuiKey_LeftCtrl); !isMultiSelect) {
-                applicationContext->selectionService.clearSelection();
+                selectionService->clearSelection();
             }
-            applicationContext->selectionService.addSelected(entityId);
+            selectionService->addSelected(entityId);
         }
     }
 

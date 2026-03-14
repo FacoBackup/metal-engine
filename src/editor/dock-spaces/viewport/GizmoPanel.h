@@ -2,6 +2,7 @@
 #define GIZMOPANEL_H
 #include <array>
 #include <imgui.h>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/fwd.hpp>
 #include <glm/detail/type_quat.hpp>
 
@@ -9,6 +10,8 @@
 
 namespace Metal {
     struct EditorRepository;
+    struct WorldRepository;
+    class SelectionService;
 }
 
 namespace Metal {
@@ -31,9 +34,20 @@ namespace Metal {
         TransformComponent *localSelected = nullptr;
         int localChangeId{};
         bool isGizmoOver = false;
+
         EditorRepository *editorRepository = nullptr;
+        WorldRepository *worldRepository = nullptr;
+        SelectionService *selectionService = nullptr;
 
     public:
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"EditorRepository", editorRepository},
+                {"WorldRepository", worldRepository},
+                {"SelectionService", selectionService}
+            };
+        }
+
         explicit GizmoPanel(ImVec2 *position, glm::vec2 *size);
 
         void onInitialize() override;

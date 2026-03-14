@@ -9,6 +9,8 @@
 #include "../../dto/DockDTO.h"
 #include "../../util/UIUtil.h"
 #include "../../../common/LoggerUtil.h"
+#include "../../repository/EditorRepository.h"
+#include "../../service/ThemeService.h"
 
 namespace Metal {
     const ImVec2 DockSpacePanel::DEFAULT{-1.f, -1.f};
@@ -52,13 +54,13 @@ namespace Metal {
         if (view != nullptr) {
             const bool isHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows);
             if (isHovered) {
-                applicationContext->editorRepository.focusedShortcuts = view->getShortcuts();
-                applicationContext->editorRepository.focusedWindowName = view->dock->name;
+                editorRepository->focusedShortcuts = view->getShortcuts();
+                editorRepository->focusedWindowName = view->dock->name;
             }
 
             view->isWindowFocused = isHovered;
             if (view->isWindowFocused) {
-                for (const auto &shortcut: applicationContext->editorRepository.focusedShortcuts) {
+                for (const auto &shortcut: editorRepository->focusedShortcuts) {
                     if (ImGui::IsKeyChordPressed(shortcut.keyChord)) {
                         LOG_INFO("Action called: " + shortcut.name);
                         shortcut.callback();
@@ -116,7 +118,7 @@ namespace Metal {
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, headerPadding);
             const bool isFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
             ImGui::PushStyleColor(ImGuiCol_TabActive,
-                                  isFocused ? applicationContext->editorRepository.accent : applicationContext->themeService.palette0);
+                                  isFocused ? editorRepository->accent : themeService->palette0);
 
             if (ImGui::BeginTabBar((id + "dockTabs").c_str(), ImGuiTabBarFlags_AutoSelectNewTabs)) {
                 for (auto *space: dock->dockSpaces) {

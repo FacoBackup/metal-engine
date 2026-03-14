@@ -8,14 +8,20 @@
 #include "imgui.h"
 
 namespace Metal {
+    class FilesService;
     struct FSEntry;
 
     class ResourceField final : public AbstractFormFieldPanel {
         InspectedField<std::string> &field;
         std::unique_ptr<FSEntry> entry = nullptr;
         mutable bool open = false;
+        FilesService *filesService = nullptr;
 
     public:
+        std::vector<Dependency> getDependencies() override {
+            return {{"FilesService", filesService}};
+        }
+
         void onInitialize() override;
 
         void renderButton();

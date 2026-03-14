@@ -1,7 +1,8 @@
 #include "GridPass.h"
-
 #include "../../ApplicationContext.h"
 #include "../../engine/dto/PipelineBuilder.h"
+#include "../../engine/service/PipelineService.h"
+#include "../repository/EditorRepository.h"
 #include "../enum/EngineResourceIDs.h"
 
 namespace Metal {
@@ -15,18 +16,18 @@ namespace Metal {
                 .setPushConstantsSize(sizeof(GridPushConstant))
                 .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
                 .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_POSITION_INDEX));
-        pipelineInstance = CTX.pipelineService.createPipeline(gridPipelineBuilder);
+        pipelineInstance = pipelineService->createPipeline(gridPipelineBuilder);
     }
 
     bool GridPass::shouldRun() {
-        return CTX.isDebugMode() && CTX.editorRepository.showGrid;
+        return applicationContext->isDebugMode() && editorRepository->showGrid;
     }
 
     void GridPass::onSync() {
-        pushConstant.scale = CTX.editorRepository.gridScale;
-        pushConstant.overlayObjects = CTX.editorRepository.gridOverlayObjects;
-        pushConstant.threshold = CTX.editorRepository.gridThreshold;
-        pushConstant.thickness = CTX.editorRepository.gridThickness;
+        pushConstant.scale = editorRepository->gridScale;
+        pushConstant.overlayObjects = editorRepository->gridOverlayObjects;
+        pushConstant.threshold = editorRepository->gridThreshold;
+        pushConstant.thickness = editorRepository->gridThickness;
         recordPushConstant(&pushConstant);
         recordDrawSimpleInstanced(3, 1);
     }

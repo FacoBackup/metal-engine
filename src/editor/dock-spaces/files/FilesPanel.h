@@ -12,6 +12,13 @@ namespace Metal {
     struct FSEntry;
     class FilePreviewPanel;
     class FormPanel;
+    class FileImporterService;
+    struct EditorRepository;
+    class SceneImporterService;
+    class FilesService;
+    class NotificationService;
+    struct WorldRepository;
+    class VoxelService;
 
     class FilesPanel : public AbstractDockPanel {
     protected:
@@ -21,7 +28,27 @@ namespace Metal {
         AbstractPanel *filesListPanel = nullptr;
         float previewWidth = 200.0f;
 
+        FileImporterService *fileImporterService = nullptr;
+        EditorRepository *editorRepository = nullptr;
+        SceneImporterService *sceneImporterService = nullptr;
+        FilesService *filesService = nullptr;
+        NotificationService *notificationService = nullptr;
+        WorldRepository *worldRepository = nullptr;
+        VoxelService *voxelService = nullptr;
+
     public:
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"FileImporterService", fileImporterService},
+                {"EditorRepository", editorRepository},
+                {"SceneImporterService", sceneImporterService},
+                {"FilesService", filesService},
+                {"NotificationService", notificationService},
+                {"WorldRepository", worldRepository},
+                {"VoxelService", voxelService}
+            };
+        }
+
         virtual bool renderPreview() {
             return true;
         }

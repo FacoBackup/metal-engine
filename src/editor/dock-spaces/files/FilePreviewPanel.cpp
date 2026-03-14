@@ -4,6 +4,8 @@
 #include "../../dto/FSEntry.h"
 #include "../../../ApplicationContext.h"
 #include "../../../engine/resource/TextureInstance.h"
+#include "../../../engine/service/TextureService.h"
+#include "../../../core/gui/GuiContext.h"
 
 namespace Metal {
     FilePreviewPanel::FilePreviewPanel(FilesContext &filesContext) : filesContext(filesContext) {
@@ -21,7 +23,7 @@ namespace Metal {
         ImGui::Separator();
 
         if (selected->type == EntryType::TEXTURE) {
-            auto *texture = applicationContext->textureService.stream(selected->getId());
+            auto *texture = textureService->stream(selected->getId());
             if (texture != nullptr) {
                 float availWidth = ImGui::GetContentRegionAvail().x;
                 float availHeight = ImGui::GetContentRegionAvail().y * 0.6f; // reserve space for table
@@ -41,7 +43,7 @@ namespace Metal {
                 float offsetX = (availWidth - renderWidth) * 0.5f;
                 if (offsetX > 0) ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offsetX);
 
-                applicationContext->guiContext.renderImage(texture, renderWidth, renderHeight);
+                guiContext->renderImage(texture, renderWidth, renderHeight);
                 ImGui::Separator();
             }
         }

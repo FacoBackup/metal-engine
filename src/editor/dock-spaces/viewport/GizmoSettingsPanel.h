@@ -9,6 +9,7 @@
 namespace Metal {
     struct MetadataComponent;
     struct EditorRepository;
+    struct WorldRepository;
 
     class GizmoSettingsPanel final : public AbstractPanel {
         static constexpr ImVec2 SPACING = ImVec2(0, 0);
@@ -19,10 +20,18 @@ namespace Metal {
         static constexpr const char *SNAP_SCALE_OPTIONS = "0.5\0 1\0 2\0 5\0 10\0";
         static constexpr std::array<float, 5> SNAP_SCALE_OPTIONS_A = {0.5, 1, 2, 5, 10};
         EditorRepository *editorRepository = nullptr;
+        WorldRepository *worldRepository = nullptr;
         MetadataComponent *selectedEntity = nullptr;
         entt::entity selectedEntityId = EMPTY_ENTITY;
 
     public:
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"EditorRepository", editorRepository},
+                {"WorldRepository", worldRepository}
+            };
+        }
+
         void onInitialize() override;
 
         void gizmoGrid() const;

@@ -9,7 +9,6 @@ add_executable(
         src/main.cpp
         src/editor/EditorPanel.cpp
         src/editor/EditorPanel.h
-        src/editor/abstract/IPanel.h
         src/engine/EngineContext.cpp
         src/engine/EngineContext.h
         src/core/vulkan/VulkanUtils.cpp

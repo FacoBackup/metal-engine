@@ -6,25 +6,21 @@
 #include <typeindex>
 #include <stdexcept>
 #include <filesystem>
+#include <iostream>
 #include <vector>
 
 #include "common/IInit.h"
 #include "common/IContextMember.h"
 #include "common/IDisposable.h"
 
-#define CTX ApplicationContext::CONTEXT
 #define ENGINE_NAME "Metal Engine"
 
 namespace Metal {
     namespace fs = std::filesystem;
 
-    class ApplicationContext : public IInit, public IDisposable {
-    public:
-        static ApplicationContext *CONTEXT;
-
-    private:
+    class ApplicationContext : public IContextMember, public IInit, public IDisposable {
         std::unordered_map<std::string, IContextMember *> singletons;
-        std::vector<std::unique_ptr<IContextMember> > instances;
+        std::vector<std::shared_ptr<IContextMember> > instances;
         bool debugMode;
 
     public:
@@ -33,7 +29,7 @@ namespace Metal {
         void onInitialize() override;
 
         template<typename T>
-        void registerSingleton(std::unique_ptr<T> instance) {
+        void registerSingleton(std::shared_ptr<T> instance) {
             static_assert(std::is_base_of_v<IContextMember, T>, "T must derive from IContextMember");
             T *ptr = instance.get();
             singletons[typeid(T).name()] = static_cast<IContextMember *>(ptr);
@@ -55,6 +51,11 @@ namespace Metal {
                 throw std::runtime_error(std::string("Singleton not registered: ") + name);
             }
             return it->second;
+        }
+
+        void injectDependencies(IContextMember *member) {
+            std::cout << "Injecting dependencies for: " << typeid(*member).name() << std::endl;
+            member->setDependencies(*this);
         }
 
         [[nodiscard]] bool isDebugMode() const;

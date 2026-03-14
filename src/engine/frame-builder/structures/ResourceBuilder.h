@@ -2,10 +2,12 @@
 #define METAL_ENGINE_RESOURCEBUILDER_H
 #include <string>
 #include "../../enum/ResourceType.h"
+#include "../../../common/IContextMember.h"
 
 namespace Metal {
     class RuntimeResource;
-    class ResourceBuilder {
+
+    class ResourceBuilder : public IContextMember {
     protected:
         std::string id;
 
@@ -16,9 +18,10 @@ namespace Metal {
         [[nodiscard]] std::string getId() const {
             return id;
         }
+
         virtual ~ResourceBuilder() = default;
 
-        virtual RuntimeResource* build() = 0;
+        virtual RuntimeResource *build() = 0;
 
         virtual ResourceType getType() = 0;
     };

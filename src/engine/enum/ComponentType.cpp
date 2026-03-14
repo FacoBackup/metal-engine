@@ -1,6 +1,13 @@
 #include "ComponentType.h"
+
+#include "../EngineContext.h"
 #include "../repository/WorldRepository.h"
+#include "../service/RayTracingService.h"
 #include "../../ApplicationContext.h"
+#include "../dto/TransformComponent.h"
+#include "../dto/PrimitiveComponent.h"
+#include "../dto/VolumeComponent.h"
+#include "../dto/MetadataComponent.h"
 
 #define DEFINE_COMPONENT(TYPE, NAME, JSON_KEY, ICON, DEPS, CLASS, CREATOR) \
 { \
@@ -31,7 +38,7 @@ namespace Metal::ComponentTypes {
                 [](WorldRepository &repo, entt::entity entityId) {
                 auto &mesh = repo.registry.emplace_or_replace<PrimitiveComponent>(entityId);
                 mesh.setEntityId(entityId);
-                CTX.rayTracingService.markDirty();
+                repo.rayTracingService->markDirty();
                 }
             ),
             DEFINE_COMPONENT(
@@ -55,7 +62,7 @@ namespace Metal::ComponentTypes {
                 [](WorldRepository &repo, entt::entity entityId) {
                 auto &atmo = repo.registry.emplace_or_replace<MetadataComponent>(entityId);
                 atmo.setEntityId(entityId);
-                CTX.engineContext.setGISettingsUpdated(true);
+                repo.ctx->getSingleton<EngineContext>().setGISettingsUpdated(true);
                 }
             )
         };

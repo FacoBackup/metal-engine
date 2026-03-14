@@ -8,6 +8,9 @@
 #include "../../core/vulkan/VulkanUtils.h"
 #include "../../editor/enum/EngineResourceIDs.h"
 #include "../../core/vulkan/VulkanContext.h"
+#include "../../common/LoggerUtil.h"
+#include "../dto/TransformComponent.h"
+#include "../dto/PrimitiveComponent.h"
 #include "PipelineService.h"
 #include "../repository/WorldRepository.h"
 #include "MeshService.h"
@@ -18,11 +21,11 @@
 #include <cstddef>
 
 namespace Metal {
-    static VkDeviceAddress getDeviceAddress(const VulkanContext &ctx, VkBuffer buffer) {
+    VkDeviceAddress RayTracingService::getDeviceAddress(VkBuffer buffer) {
         VkBufferDeviceAddressInfo info{};
         info.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
         info.buffer = buffer;
-        return ctx.vkGetBufferDeviceAddressKHR(ctx.device.device, &info);
+        return vulkanContext->vkGetBufferDeviceAddressKHR(vulkanContext->device.device, &info);
     }
 
     void RayTracingService::updateDescriptorSets(VkAccelerationStructureKHR asHandle) {
@@ -37,7 +40,7 @@ namespace Metal {
             }
 
             if (needsUpdate) {
-                descriptorService->Write(vulkanContext, bufferService, descriptor->vkDescriptorSet, descriptor->bindings);
+                descriptorSetService->Write(descriptor->vkDescriptorSet, descriptor->bindings);
             }
         }
     }
@@ -53,12 +56,12 @@ namespace Metal {
         }
         anyMeshes = false;
         // Check if any mesh is present and streamed
-        auto view = worldRepository.registry.view<PrimitiveComponent, TransformComponent>();
+        auto view = worldRepository->registry.view<PrimitiveComponent, TransformComponent>();
         for (auto entity: view) {
-            if (worldRepository.hiddenEntities.contains(entity)) continue;
+            if (worldRepository->hiddenEntities.contains(entity)) continue;
             auto &meshComp = view.get<PrimitiveComponent>(entity);
             if (meshComp.meshId.empty()) continue;
-            auto *instance = meshService.stream(meshComp.meshId);
+            auto *instance = meshService->stream(meshComp.meshId);
             if (instance != nullptr && instance->dataBuffer != nullptr && instance->indexBuffer != nullptr) {
                 anyMeshes = true;
                 break;
@@ -67,7 +70,7 @@ namespace Metal {
 
         if (!anyMeshes) {
             // No meshes – destroy all structures and set descriptor to null
-            dispose();   // destroys BLAS and TLAS (waits for idle)
+            dispose(); // destroys BLAS and TLAS (waits for idle)
             updateDescriptorSets(VK_NULL_HANDLE);
             accelerationStructureBuilt = false;
             needsRebuild = false;
@@ -75,9 +78,9 @@ namespace Metal {
         }
 
         // At least one mesh exists: rebuild acceleration structures safely
-        destroyTLAS();          // Destroy old TLAS (waits for idle) before modifying BLAS
-        buildBLAS();            // Rebuild BLAS (incremental, safe because TLAS is gone)
-        buildTLAS();            // Build new TLAS
+        destroyTLAS(); // Destroy old TLAS (waits for idle) before modifying BLAS
+        buildBLAS(); // Rebuild BLAS (incremental, safe because TLAS is gone)
+        buildTLAS(); // Build new TLAS
 
         if (tlas != VK_NULL_HANDLE) {
             LOG_INFO("Updating acceleration structures");
@@ -97,21 +100,21 @@ namespace Metal {
 
     void RayTracingService::updateMeshMaterials() {
         bool changed = false;
-        auto view = worldRepository.registry.view<PrimitiveComponent>();
+        auto view = worldRepository->registry.view<PrimitiveComponent>();
 
         for (auto entity: view) {
-            if (worldRepository.hiddenEntities.contains(entity)) continue;
+            if (worldRepository->hiddenEntities.contains(entity)) continue;
             auto &meshComp = view.get<PrimitiveComponent>(entity);
             if (meshComp.meshId.empty()) continue;
 
             if (meshComp.renderIndex < meshMetadata.size()) {
-                materialService.load(meshMetadata[meshComp.renderIndex], meshComp);
+                materialService->load(meshMetadata[meshComp.renderIndex], meshComp);
                 changed = true;
             }
         }
 
         if (changed) {
-            for (auto *frame : engineContext.registeredFrames) {
+            for (auto *frame: engineContext->registeredFrames) {
                 auto *meshMetadataBuffer = frame->getResourceAs<BufferInstance>(RID_MESH_METADATA_BUFFER);
                 if (meshMetadataBuffer != nullptr) {
                     meshMetadataBuffer->update(meshMetadata.data());
@@ -121,26 +124,25 @@ namespace Metal {
     }
 
     void RayTracingService::destroyTLAS() {
-        auto &vulkan = vulkanContext;
-        if (vulkan.device.device != VK_NULL_HANDLE) {
-            vkDeviceWaitIdle(vulkan.device.device);
+        if (vulkanContext->device.device != VK_NULL_HANDLE) {
+            vkDeviceWaitIdle(vulkanContext->device.device);
         }
 
         if (tlas != VK_NULL_HANDLE) {
-            vulkan.vkDestroyAccelerationStructureKHR(vulkan.device.device, tlas, nullptr);
+            vulkanContext->vkDestroyAccelerationStructureKHR(vulkanContext->device.device, tlas, nullptr);
             tlas = VK_NULL_HANDLE;
         }
 
         if (tlasBuffer) {
-            bufferService.dispose("tlas_buffer");
+            bufferService->dispose("tlas_buffer");
             tlasBuffer = nullptr;
         }
         if (instancesBuffer) {
-            bufferService.dispose("tlas_instances");
+            bufferService->dispose("tlas_instances");
             instancesBuffer = nullptr;
         }
         if (tlasScratchBuffer) {
-            bufferService.dispose("tlas_scratch");
+            bufferService->dispose("tlas_scratch");
             tlasScratchBuffer = nullptr;
         }
 
@@ -152,14 +154,14 @@ namespace Metal {
 
         std::unordered_map<std::string, MeshInstance *> uniqueMeshes;
 
-        auto view = worldRepository.registry.view<PrimitiveComponent, TransformComponent>();
+        auto view = worldRepository->registry.view<PrimitiveComponent, TransformComponent>();
 
         for (auto entity: view) {
-            if (worldRepository.hiddenEntities.contains(entity)) continue;
+            if (worldRepository->hiddenEntities.contains(entity)) continue;
             auto &meshComp = view.get<PrimitiveComponent>(entity);
             if (meshComp.meshId.empty()) continue;
             if (uniqueMeshes.contains(meshComp.meshId)) continue;
-            auto *instance = meshService.stream(meshComp.meshId);
+            auto *instance = meshService->stream(meshComp.meshId);
             if (instance == nullptr || instance->dataBuffer == nullptr || instance->indexBuffer == nullptr) {
                 continue;
             }
@@ -176,18 +178,19 @@ namespace Metal {
                 }
                 // If mesh buffers changed, we need to rebuild this BLAS
                 // For now, let's just destroy and re-create below by removing it
-                if (vulkan.device.device != VK_NULL_HANDLE) {
-                    vulkan.vkDestroyAccelerationStructureKHR(vulkan.device.device, existing.accelerationStructure,
-                                                             nullptr);
+                if (vulkanContext->device.device != VK_NULL_HANDLE) {
+                    vulkanContext->vkDestroyAccelerationStructureKHR(vulkanContext->device.device,
+                                                                     existing.accelerationStructure,
+                                                                     nullptr);
                 }
                 if (existing.buffer)
-                    bufferService.dispose("blas_" + meshId);
+                    bufferService->dispose("blas_" + meshId);
                 if (existing.scratchBuffer)
-                    bufferService.dispose("blas_scratch_" + meshId);
+                    bufferService->dispose("blas_scratch_" + meshId);
                 blasEntries.erase(meshId);
             }
-            VkDeviceAddress vertexAddress = getDeviceAddress(vulkan, instance->dataBuffer->vkBuffer);
-            VkDeviceAddress indexAddress = getDeviceAddress(vulkan, instance->indexBuffer->vkBuffer);
+            VkDeviceAddress vertexAddress = getDeviceAddress(instance->dataBuffer->vkBuffer);
+            VkDeviceAddress indexAddress = getDeviceAddress(instance->indexBuffer->vkBuffer);
 
             VkAccelerationStructureGeometryKHR geometry{};
             geometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
@@ -214,22 +217,22 @@ namespace Metal {
 
             VkAccelerationStructureBuildSizesInfoKHR sizeInfo{};
             sizeInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
-            vulkan.vkGetAccelerationStructureBuildSizesKHR(
-                vulkan.device.device,
+            vulkanContext->vkGetAccelerationStructureBuildSizesKHR(
+                vulkanContext->device.device,
                 VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
                 &buildInfo,
                 &primitiveCount,
                 &sizeInfo);
 
             BLASEntry entry;
-            entry.buffer = bufferService.createBuffer(
+            entry.buffer = bufferService->createBuffer(
                 "blas_" + meshId,
                 sizeInfo.accelerationStructureSize,
                 VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                 true);
 
-            entry.scratchBuffer = bufferService.createBuffer(
+            entry.scratchBuffer = bufferService->createBuffer(
                 "blas_scratch_" + meshId,
                 sizeInfo.buildScratchSize,
                 VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
@@ -242,11 +245,11 @@ namespace Metal {
             createInfo.size = sizeInfo.accelerationStructureSize;
             createInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
             VulkanUtils::CheckVKResult(
-                vulkan.vkCreateAccelerationStructureKHR(vulkan.device.device, &createInfo, nullptr,
-                                                        &entry.accelerationStructure));
+                vulkanContext->vkCreateAccelerationStructureKHR(vulkanContext->device.device, &createInfo, nullptr,
+                                                                &entry.accelerationStructure));
 
             buildInfo.dstAccelerationStructure = entry.accelerationStructure;
-            buildInfo.scratchData.deviceAddress = getDeviceAddress(vulkan, entry.scratchBuffer->vkBuffer);
+            buildInfo.scratchData.deviceAddress = getDeviceAddress(entry.scratchBuffer->vkBuffer);
 
             VkAccelerationStructureBuildRangeInfoKHR rangeInfo{};
             rangeInfo.primitiveCount = primitiveCount;
@@ -255,9 +258,9 @@ namespace Metal {
             rangeInfo.transformOffset = 0;
             const VkAccelerationStructureBuildRangeInfoKHR *pRangeInfo = &rangeInfo;
 
-            VkCommandBuffer cmd = vulkan.beginSingleTimeCommands();
-            vulkan.vkCmdBuildAccelerationStructuresKHR(cmd, 1, &buildInfo, &pRangeInfo);
-            vulkan.endSingleTimeCommands(cmd);
+            VkCommandBuffer cmd = vulkanContext->beginSingleTimeCommands();
+            vulkanContext->vkCmdBuildAccelerationStructuresKHR(cmd, 1, &buildInfo, &pRangeInfo);
+            vulkanContext->endSingleTimeCommands(cmd);
 
             entry.vertexData = instance->dataBuffer;
             entry.indexData = instance->indexBuffer;
@@ -266,16 +269,15 @@ namespace Metal {
     }
 
     void RayTracingService::buildTLAS() {
-        auto &vulkan = vulkanContext;
         meshMetadata.clear();
         if (blasEntries.empty()) return;
 
-        if (vulkan.device.device != VK_NULL_HANDLE) {
-            vkDeviceWaitIdle(vulkan.device.device);
+        if (vulkanContext->device.device != VK_NULL_HANDLE) {
+            vkDeviceWaitIdle(vulkanContext->device.device);
         }
 
         std::vector<VkAccelerationStructureInstanceKHR> instances;
-        auto view = worldRepository.registry.view<PrimitiveComponent, TransformComponent>();
+        auto view = worldRepository->registry.view<PrimitiveComponent, TransformComponent>();
 
         unsigned int currentInstanceIndex = 0;
         for (auto entity: view) {
@@ -283,7 +285,7 @@ namespace Metal {
                 LOG_ERROR("Max mesh instances reached for ray tracing: " + std::to_string(MAX_MESH_INSTANCES));
                 break;
             }
-            if (worldRepository.hiddenEntities.contains(entity)) continue;
+            if (worldRepository->hiddenEntities.contains(entity)) continue;
             auto &meshComp = view.get<PrimitiveComponent>(entity);
             if (meshComp.meshId.empty()) continue;
 
@@ -294,12 +296,12 @@ namespace Metal {
             VkAccelerationStructureDeviceAddressInfoKHR addressInfo{};
             addressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
             addressInfo.accelerationStructure = it->second.accelerationStructure;
-            VkDeviceAddress blasAddress = vulkan.vkGetAccelerationStructureDeviceAddressKHR(
-                vulkan.device.device, &addressInfo);
+            VkDeviceAddress blasAddress = vulkanContext->vkGetAccelerationStructureDeviceAddressKHR(
+                vulkanContext->device.device, &addressInfo);
 
             glm::mat4 model = glm::mat4(1.0f);
-            if (worldRepository.registry.all_of<TransformComponent>(entity)) {
-                model = worldRepository.registry.get<TransformComponent>(entity).model;
+            if (worldRepository->registry.all_of<TransformComponent>(entity)) {
+                model = worldRepository->registry.get<TransformComponent>(entity).model;
             }
 
             VkTransformMatrixKHR transform{};
@@ -309,8 +311,8 @@ namespace Metal {
                 }
             }
 
-            VkDeviceAddress vertexAddress = getDeviceAddress(vulkan, it->second.vertexData->vkBuffer);
-            VkDeviceAddress indexAddress = getDeviceAddress(vulkan, it->second.indexData->vkBuffer);
+            VkDeviceAddress vertexAddress = getDeviceAddress(it->second.vertexData->vkBuffer);
+            VkDeviceAddress indexAddress = getDeviceAddress(it->second.indexData->vkBuffer);
 
             meshComp.renderIndex = currentInstanceIndex;
             meshMetadata.push_back({meshComp.renderIndex, vertexAddress, indexAddress});
@@ -332,14 +334,14 @@ namespace Metal {
 
         updateMeshMaterials();
 
-        instancesBuffer = bufferService.createBuffer(
+        instancesBuffer = bufferService->createBuffer(
             "tlas_instances",
             sizeof(VkAccelerationStructureInstanceKHR) * instances.size(),
             VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
             instances.data(),
             true);
 
-        VkDeviceAddress instancesAddress = getDeviceAddress(vulkan, instancesBuffer->vkBuffer);
+        VkDeviceAddress instancesAddress = getDeviceAddress(instancesBuffer->vkBuffer);
 
         VkAccelerationStructureGeometryKHR tlasGeometry{};
         tlasGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
@@ -361,14 +363,14 @@ namespace Metal {
 
         VkAccelerationStructureBuildSizesInfoKHR sizeInfo{};
         sizeInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
-        vulkan.vkGetAccelerationStructureBuildSizesKHR(
-            vulkan.device.device,
+        vulkanContext->vkGetAccelerationStructureBuildSizesKHR(
+            vulkanContext->device.device,
             VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
             &buildInfo,
             &instanceCount,
             &sizeInfo);
 
-        tlasBuffer = bufferService.createBuffer(
+        tlasBuffer = bufferService->createBuffer(
             "tlas_buffer",
             sizeInfo.accelerationStructureSize,
             VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
@@ -381,9 +383,9 @@ namespace Metal {
         createInfo.size = sizeInfo.accelerationStructureSize;
         createInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
         VulkanUtils::CheckVKResult(
-            vulkan.vkCreateAccelerationStructureKHR(vulkan.device.device, &createInfo, nullptr, &tlas));
+            vulkanContext->vkCreateAccelerationStructureKHR(vulkanContext->device.device, &createInfo, nullptr, &tlas));
 
-        tlasScratchBuffer = bufferService.createBuffer(
+        tlasScratchBuffer = bufferService->createBuffer(
             "tlas_scratch",
             sizeInfo.buildScratchSize,
             VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
@@ -391,23 +393,23 @@ namespace Metal {
             true);
 
         buildInfo.dstAccelerationStructure = tlas;
-        buildInfo.scratchData.deviceAddress = getDeviceAddress(vulkan, tlasScratchBuffer->vkBuffer);
+        buildInfo.scratchData.deviceAddress = getDeviceAddress(tlasScratchBuffer->vkBuffer);
 
         VkAccelerationStructureBuildRangeInfoKHR rangeInfo{};
         rangeInfo.primitiveCount = instanceCount;
         const VkAccelerationStructureBuildRangeInfoKHR *pRangeInfo = &rangeInfo;
 
-        VkCommandBuffer cmd = vulkan.beginSingleTimeCommands();
-        vulkan.vkCmdBuildAccelerationStructuresKHR(cmd, 1, &buildInfo, &pRangeInfo);
-        vulkan.endSingleTimeCommands(cmd);
+        VkCommandBuffer cmd = vulkanContext->beginSingleTimeCommands();
+        vulkanContext->vkCmdBuildAccelerationStructuresKHR(cmd, 1, &buildInfo, &pRangeInfo);
+        vulkanContext->endSingleTimeCommands(cmd);
     }
 
     void RayTracingService::dispose() {
         LOG_INFO("Destroying acceleration structures");
         auto &vulkan = vulkanContext;
 
-        if (vulkan.device.device != VK_NULL_HANDLE) {
-            vkDeviceWaitIdle(vulkan.device.device);
+        if (vulkanContext->device.device != VK_NULL_HANDLE) {
+            vkDeviceWaitIdle(vulkanContext->device.device);
         }
 
         // Destroy TLAS and its buffers
@@ -416,13 +418,14 @@ namespace Metal {
         // Destroy all BLAS entries
         for (auto &[meshId, entry]: blasEntries) {
             if (entry.accelerationStructure != VK_NULL_HANDLE) {
-                vulkan.vkDestroyAccelerationStructureKHR(vulkan.device.device, entry.accelerationStructure, nullptr);
+                vulkanContext->vkDestroyAccelerationStructureKHR(vulkanContext->device.device,
+                                                                 entry.accelerationStructure, nullptr);
                 entry.accelerationStructure = VK_NULL_HANDLE;
             }
             if (entry.buffer)
-                bufferService.dispose("blas_" + meshId);
+                bufferService->dispose("blas_" + meshId);
             if (entry.scratchBuffer)
-                bufferService.dispose("blas_scratch_" + meshId);
+                bufferService->dispose("blas_scratch_" + meshId);
         }
         blasEntries.clear();
 

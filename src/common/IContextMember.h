@@ -13,6 +13,8 @@ namespace Metal {
 
     class IContextMember {
     public:
+        ApplicationContext *ctx = nullptr;
+    public:
         virtual ~IContextMember() = default;
 
         /**

@@ -1,7 +1,8 @@
 #include "TemporalAccumulationPass.h"
-#include "../../../ApplicationContext.h"
 #include "../../dto/PipelineBuilder.h"
 #include "../../resource/TextureInstance.h"
+#include "../../service/PipelineService.h"
+#include "../../frame-builder/EngineFrame.h"
 #include "../../../editor/enum/EngineResourceIDs.h"
 
 namespace Metal {
@@ -15,7 +16,7 @@ namespace Metal {
                 .addStorageImageBinding(getScopedResourceId(RID_PREVIOUS_POSITION_INDEX))
                 .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_NORMAL))
                 .addStorageImageBinding(getScopedResourceId(RID_PREVIOUS_NORMAL));
-        pipelineInstance = CTX.pipelineService.createPipeline(temporalBuilder);
+        pipelineInstance = pipelineService->createPipeline(temporalBuilder);
     }
 
     void TemporalAccumulationPass::onSync() {

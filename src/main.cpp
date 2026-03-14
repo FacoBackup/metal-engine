@@ -50,59 +50,60 @@
 #include "engine/EngineContext.h"
 
 int main(int, char **) {
-    Metal::ApplicationContext context{true};
+    std::shared_ptr<Metal::ApplicationContext> context{};
 
     // --- ORDER MATTERS
-    context.registerSingleton(std::make_unique<Metal::GLFWContext>());
-    context.registerSingleton(std::make_unique<Metal::VulkanContext>());
-    context.registerSingleton(std::make_unique<Metal::GuiContext>());
-    context.registerSingleton(std::make_unique<Metal::DirectoryService>());
+    context->registerSingleton(context);
+    context->registerSingleton(std::make_shared<Metal::GLFWContext>());
+    context->registerSingleton(std::make_shared<Metal::VulkanContext>());
+    context->registerSingleton(std::make_shared<Metal::GuiContext>());
+    context->registerSingleton(std::make_shared<Metal::DirectoryService>());
     // --- ORDER MATTERS
 
-    context.registerSingleton(std::make_unique<Metal::FilesService>());
-    context.registerSingleton(std::make_unique<Metal::EngineContext>());
-    context.registerSingleton(std::make_unique<Metal::EngineRepository>());
-    context.registerSingleton(std::make_unique<Metal::EditorRepository>());
-    context.registerSingleton(std::make_unique<Metal::RuntimeRepository>());
-    context.registerSingleton(std::make_unique<Metal::WorldRepository>());
-    context.registerSingleton(std::make_unique<Metal::MeshService>());
-    context.registerSingleton(std::make_unique<Metal::TextureService>());
-    context.registerSingleton(std::make_unique<Metal::FrameBufferService>());
-    context.registerSingleton(std::make_unique<Metal::PipelineService>());
-    context.registerSingleton(std::make_unique<Metal::BufferService>());
-    context.registerSingleton(std::make_unique<Metal::CommandBufferRecorderService>());
-    context.registerSingleton(std::make_unique<Metal::NotificationService>());
-    context.registerSingleton(std::make_unique<Metal::DescriptorSetService>());
-    context.registerSingleton(std::make_unique<Metal::ThemeService>());
-    context.registerSingleton(std::make_unique<Metal::DockService>());
-    context.registerSingleton(std::make_unique<Metal::MaterialService>());
-    context.registerSingleton(std::make_unique<Metal::AsyncTaskService>());
-    context.registerSingleton(std::make_unique<Metal::SceneImporterService>());
+    context->registerSingleton(std::make_shared<Metal::FilesService>());
+    context->registerSingleton(std::make_shared<Metal::EngineContext>());
+    context->registerSingleton(std::make_shared<Metal::EngineRepository>());
+    context->registerSingleton(std::make_shared<Metal::EditorRepository>());
+    context->registerSingleton(std::make_shared<Metal::RuntimeRepository>());
+    context->registerSingleton(std::make_shared<Metal::WorldRepository>());
+    context->registerSingleton(std::make_shared<Metal::MeshService>());
+    context->registerSingleton(std::make_shared<Metal::TextureService>());
+    context->registerSingleton(std::make_shared<Metal::FrameBufferService>());
+    context->registerSingleton(std::make_shared<Metal::PipelineService>());
+    context->registerSingleton(std::make_shared<Metal::BufferService>());
+    context->registerSingleton(std::make_shared<Metal::CommandBufferRecorderService>());
+    context->registerSingleton(std::make_shared<Metal::NotificationService>());
+    context->registerSingleton(std::make_shared<Metal::DescriptorSetService>());
+    context->registerSingleton(std::make_shared<Metal::ThemeService>());
+    context->registerSingleton(std::make_shared<Metal::DockService>());
+    context->registerSingleton(std::make_shared<Metal::MaterialService>());
+    context->registerSingleton(std::make_shared<Metal::AsyncTaskService>());
+    context->registerSingleton(std::make_shared<Metal::SceneImporterService>());
 
-    context.registerSingleton(std::make_unique<Metal::SelectionService>());
-    context.registerSingleton(std::make_unique<Metal::MeshImporterService>());
-    context.registerSingleton(std::make_unique<Metal::MaterialImporterService>());
-    context.registerSingleton(std::make_unique<Metal::TextureImporterService>());
-    context.registerSingleton(std::make_unique<Metal::FileImporterService>());
-    context.registerSingleton(std::make_unique<Metal::CameraService>());
-    context.registerSingleton(std::make_unique<Metal::TransformService>());
-    context.registerSingleton(std::make_unique<Metal::PickingService>());
-    context.registerSingleton(std::make_unique<Metal::VolumeService>());
-    context.registerSingleton(std::make_unique<Metal::VoxelImporterService>());
-    context.registerSingleton(std::make_unique<Metal::LightService>());
-    context.registerSingleton(std::make_unique<Metal::StreamingService>());
+    context->registerSingleton(std::make_shared<Metal::SelectionService>());
+    context->registerSingleton(std::make_shared<Metal::MeshImporterService>());
+    context->registerSingleton(std::make_shared<Metal::MaterialImporterService>());
+    context->registerSingleton(std::make_shared<Metal::TextureImporterService>());
+    context->registerSingleton(std::make_shared<Metal::FileImporterService>());
+    context->registerSingleton(std::make_shared<Metal::CameraService>());
+    context->registerSingleton(std::make_shared<Metal::TransformService>());
+    context->registerSingleton(std::make_shared<Metal::PickingService>());
+    context->registerSingleton(std::make_shared<Metal::VolumeService>());
+    context->registerSingleton(std::make_shared<Metal::VoxelImporterService>());
+    context->registerSingleton(std::make_shared<Metal::LightService>());
+    context->registerSingleton(std::make_shared<Metal::StreamingService>());
 
-    context.registerSingleton(std::make_unique<Metal::VoxelService>());
-    context.registerSingleton(std::make_unique<Metal::RayTracingService>());
-    context.registerSingleton(std::make_unique<Metal::ShaderService>());
-    context.registerSingleton(std::make_unique<Metal::EditorPanel>());
-    context.registerSingleton(std::make_unique<Metal::FrameService>());
+    context->registerSingleton(std::make_shared<Metal::VoxelService>());
+    context->registerSingleton(std::make_shared<Metal::RayTracingService>());
+    context->registerSingleton(std::make_shared<Metal::ShaderService>());
+    context->registerSingleton(std::make_shared<Metal::FrameService>());
 
-    context.onInitialize();
-    auto &frameService = context.getSingleton<Metal::FrameService>();
-    auto &directoryService = context.getSingleton<Metal::DirectoryService>();
+    context->onInitialize();
+    auto &frameService = context->getSingleton<Metal::FrameService>();
+    auto &directoryService = context->getSingleton<Metal::DirectoryService>();
     directoryService.updateRootPath(false);
-    auto &editor = context.getSingleton<Metal::EditorPanel>();
+    Metal::EditorPanel editor{};
+    context->injectDependencies(&editor);
 
     frameService.setPanel(&editor);
     if (!frameService.isValidContext()) {
@@ -110,6 +111,6 @@ int main(int, char **) {
         return 1;
     }
     frameService.onInitialize();
-    context.dispose();
+    context->dispose();
     return 0;
 }

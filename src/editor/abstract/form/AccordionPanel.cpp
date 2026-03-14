@@ -1,6 +1,7 @@
 #include "AccordionPanel.h"
 #include "imgui.h"
 #include "../../../ApplicationContext.h"
+#include "../../service/ThemeService.h"
 
 namespace Metal {
     void AccordionPanel::setTitle(const std::string &t) {
@@ -14,7 +15,7 @@ namespace Metal {
             return;
         }
 
-        ImGui::PushStyleColor(ImGuiCol_Header, applicationContext->themeService.neutralPalette);
+        ImGui::PushStyleColor(ImGuiCol_Header, themeService->neutralPalette);
         bool open = ImGui::CollapsingHeader(fixedId.c_str(), ImGuiTreeNodeFlags_None);
         ImGui::PopStyleColor();
 

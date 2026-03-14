@@ -254,7 +254,7 @@ namespace Metal {
     }
 
     void VulkanContext::onInitialize() {
-        this->debugMode = CTX->isDebugMode();
+        this->debugMode = ctx->isDebugMode();
         this->window = glfwContext->getWindow();
         
         imguiVulkanWindow.ClearValue.color.float32[0] = 0;

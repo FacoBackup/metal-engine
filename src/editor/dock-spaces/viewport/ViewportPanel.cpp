@@ -1,5 +1,4 @@
 #include "ViewportPanel.h"
-
 #include "CameraPositionPanel.h"
 #include "GizmoPanel.h"
 #include "ImGuizmo.h"
@@ -9,6 +8,14 @@
 #include "../../../engine/dto/Camera.h"
 #include "../../../engine/frame-builder/EngineFrameBuilder.h"
 #include <algorithm>
+#include "../../repository/EditorRepository.h"
+#include "../../../engine/repository/WorldRepository.h"
+#include "../../service/SelectionService.h"
+#include "../../../engine/service/CameraService.h"
+#include "../../../engine/repository/RuntimeRepository.h"
+#include "../../../engine/EngineContext.h"
+#include "../../../core/DirectoryService.h"
+#include "../../../engine/dto/MetadataComponent.h"
 
 namespace Metal {
     void ViewportPanel::onInitialize() {
@@ -19,39 +26,39 @@ namespace Metal {
 
         shortcuts = {
             ShortcutDTO("Change shading mode", ImGuiKey_Q, [this]() {
-                applicationContext->editorRepository.shadingMode = ShadingModes::ValueOfIndex(
-                    ShadingModes::IndexOfValue(applicationContext->editorRepository.shadingMode) + 1);
+                editorRepository->shadingMode = ShadingModes::ValueOfIndex(
+                    ShadingModes::IndexOfValue(editorRepository->shadingMode) + 1);
             }),
             ShortcutDTO("Translate", ImGuiKey_1, [this]() {
-                applicationContext->editorRepository.gizmoType = ImGuizmo::OPERATION::TRANSLATE;
+                editorRepository->gizmoType = ImGuizmo::OPERATION::TRANSLATE;
             }),
             ShortcutDTO("Scale", ImGuiKey_2, [this]() {
-                applicationContext->editorRepository.gizmoType = ImGuizmo::OPERATION::SCALE;
+                editorRepository->gizmoType = ImGuizmo::OPERATION::SCALE;
             }),
             ShortcutDTO("Rotate", ImGuiKey_3, [this]() {
-                applicationContext->editorRepository.gizmoType = ImGuizmo::OPERATION::ROTATE;
+                editorRepository->gizmoType = ImGuizmo::OPERATION::ROTATE;
             }),
             ShortcutDTO("Delete", ImGuiKey_Delete, [this]() {
                 std::vector<entt::entity> entities;
-                for (auto &entry: applicationContext->editorRepository.selected) {
+                for (auto &entry: editorRepository->selected) {
                     entities.push_back(entry.first);
                 }
-                applicationContext->worldRepository.deleteEntities(entities);
-                applicationContext->selectionService.clearSelection();
+                worldRepository->deleteEntities(entities);
+                selectionService->clearSelection();
             }),
             ShortcutDTO("Select All", ImGuiMod_Ctrl | ImGuiKey_A, [this]() {
                 std::vector<entt::entity> entities;
-                auto &storage = applicationContext->worldRepository.registry.storage<entt::entity>();
+                auto &storage = worldRepository->registry.storage<entt::entity>();
                 for (auto it = storage.begin(); it != storage.end(); ++it) {
                     auto entity = *it;
-                    if (applicationContext->worldRepository.registry.all_of<MetadataComponent>(entity)) {
+                    if (worldRepository->registry.all_of<MetadataComponent>(entity)) {
                         entities.push_back(entity);
                     }
                 }
-                applicationContext->selectionService.addAllSelected(entities);
+                selectionService->addAllSelected(entities);
             }),
             ShortcutDTO("Save", ImGuiMod_Ctrl | ImGuiKey_S, [this] {
-                applicationContext->save();
+                directoryService->save();
             })
         };
     }
@@ -68,16 +75,12 @@ namespace Metal {
     }
 
     void ViewportPanel::updateCamera() {
-        auto &worldRepository = applicationContext->worldRepository;
-        const auto &cameraService = applicationContext->cameraService;
-
         if (ImGui::IsWindowHovered() && !ImGuizmo::IsUsing() && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-            cameraService.handleInput(isFirstMovement);
+            cameraService->handleInput(isFirstMovement);
             if (const auto &io = ImGui::GetIO(); io.MouseWheel != 0) {
-                worldRepository.camera.movementSensitivity += io.MouseWheel * 100 * applicationContext->
-                        engineContext.deltaTime;
-                worldRepository.camera.movementSensitivity =
-                        std::max(.1f, worldRepository.camera.movementSensitivity);
+                worldRepository->camera.movementSensitivity += io.MouseWheel * 100 * engineContext->deltaTime;
+                worldRepository->camera.movementSensitivity =
+                        std::max(.1f, worldRepository->camera.movementSensitivity);
             }
             isFirstMovement = false;
         } else {
@@ -86,33 +89,28 @@ namespace Metal {
     }
 
     void ViewportPanel::updateInputs() const {
-        auto &repo = applicationContext->runtimeRepository;
-        const ImVec2 windowSize = ImGui::GetWindowSize();
-        size->x = windowSize.x;
-        size->y = windowSize.y;
-
-        repo.viewportH = size->y;
-        repo.viewportW = size->x;
+        runtimeRepository->viewportH = size->y;
+        runtimeRepository->viewportW = size->x;
 
         const ImVec2 windowPos = ImGui::GetWindowPos();
-        repo.viewportX = windowPos.x;
-        repo.viewportY = windowPos.y;
+        runtimeRepository->viewportX = windowPos.x;
+        runtimeRepository->viewportY = windowPos.y;
 
-        repo.isFocused = ImGui::IsWindowHovered();
-        repo.forwardPressed = ImGui::IsKeyDown(ImGuiKey_W);
-        repo.backwardPressed = ImGui::IsKeyDown(ImGuiKey_S);
-        repo.leftPressed = ImGui::IsKeyDown(ImGuiKey_A);
-        repo.rightPressed = ImGui::IsKeyDown(ImGuiKey_D);
-        repo.upPressed = ImGui::IsKeyDown(ImGuiKey_Space);
-        repo.downPressed = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
-        repo.mousePressed = ImGui::IsWindowFocused() && ImGui::IsWindowHovered() && ImGui::IsMouseDown(
+        runtimeRepository->isFocused = ImGui::IsWindowHovered();
+        runtimeRepository->forwardPressed = ImGui::IsKeyDown(ImGuiKey_W);
+        runtimeRepository->backwardPressed = ImGui::IsKeyDown(ImGuiKey_S);
+        runtimeRepository->leftPressed = ImGui::IsKeyDown(ImGuiKey_A);
+        runtimeRepository->rightPressed = ImGui::IsKeyDown(ImGuiKey_D);
+        runtimeRepository->upPressed = ImGui::IsKeyDown(ImGuiKey_Space);
+        runtimeRepository->downPressed = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
+        runtimeRepository->mousePressed = ImGui::IsWindowFocused() && ImGui::IsWindowHovered() && ImGui::IsMouseDown(
                                 ImGuiMouseButton_Left);
 
         const ImVec2 mousePos = ImGui::GetMousePos();
-        repo.mouseX = mousePos.x;
-        repo.mouseY = mousePos.y;
+        runtimeRepository->mouseX = mousePos.x;
+        runtimeRepository->mouseY = mousePos.y;
 
-        repo.normalizedMouseX = (repo.mouseX + repo.viewportX) / repo.viewportW;
-        repo.normalizedMouseY = (repo.viewportH - repo.mouseY + repo.viewportY) / repo.viewportH;
+        runtimeRepository->normalizedMouseX = (runtimeRepository->mouseX + runtimeRepository->viewportX) / runtimeRepository->viewportW;
+        runtimeRepository->normalizedMouseY = (runtimeRepository->viewportH - runtimeRepository->mouseY + runtimeRepository->viewportY) / runtimeRepository->viewportH;
     }
 }

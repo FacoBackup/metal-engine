@@ -1,7 +1,6 @@
 #ifndef METAL_ENGINE_ENGINECONTEXT_H
 #define METAL_ENGINE_ENGINECONTEXT_H
 
-#include "frame-builder/EngineFrame.h"
 #include <chrono>
 #include <memory>
 
@@ -9,6 +8,8 @@
 #include "../common/IService.h"
 #include "../common/IDisposable.h"
 #include "../common/ISync.h"
+#include "frame-builder/EngineFrame.h"
+#include "frame-builder/EngineFrameBuilder.h"
 
 using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
@@ -23,6 +24,8 @@ namespace Metal {
     struct WorldRepository;
     struct EditorRepository;
     struct EngineRepository;
+    class EngineFrame;
+    class EngineFrameBuilder;
 
     class EngineContext final : public IService, public ISync, public IDisposable {
         TransformService *transformService = nullptr;
@@ -76,6 +79,10 @@ namespace Metal {
         }
 
         void updateCurrentTime();
+
+        EngineFrameBuilder createFrame(const std::string &id);
+
+        void setCurrentFrame(const std::string & id);
 
         long long currentTimeMs = 0;
         TimePoint currentTime;

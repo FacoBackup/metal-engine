@@ -18,7 +18,7 @@ namespace Metal {
     void ResourceFilesPanel::openResource(FSEntry *root) {
         if (root->type == EntryType::DIRECTORY) {
             filesContext.setCurrentDirectory(root);
-            FilesService::GetEntries(root);
+            filesService->GetEntries(root);
             filesContext.selected.clear();
         } else {
             callback(root);

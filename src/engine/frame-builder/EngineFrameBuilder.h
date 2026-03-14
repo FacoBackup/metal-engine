@@ -1,16 +1,17 @@
 #ifndef METAL_ENGINE_ENGINEFRAMEBUILDER_H
 #define METAL_ENGINE_ENGINEFRAMEBUILDER_H
-#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
 #include <glm/vec4.hpp>
 #include <vulkan/vulkan_core.h>
 
+#include "../../common/IContextMember.h"
 #include "structures/ResourceBuilder.h"
 #include "../resource/BufferInstance.h"
 
 namespace Metal {
+    class EngineContext;
     class AbstractPass;
     class CommandBufferRecorder;
     struct FrameBufferInstance;
@@ -23,14 +24,20 @@ namespace Metal {
         std::string commandBufferId;
     };
 
-    class EngineFrameBuilder final {
+    class EngineFrameBuilder final : public IContextMember {
         std::string frameId;
         std::vector<std::shared_ptr<ResourceBuilder> > builders{};
         std::vector<PassData> passes{};
         std::shared_ptr<ResourceBuilder> currentBuilder{};
+        EngineContext *engineContext = nullptr;
 
     public:
+        std::vector<Dependency> getDependencies() override {
+            return {{"EngineContext", engineContext}};
+        }
+
         explicit EngineFrameBuilder(std::string frameId = Util::uuidV4());
+
         EngineFrameBuilder &addFramebuffer(std::string id, unsigned w, unsigned h, glm::vec4 clearColor);
 
         EngineFrameBuilder &addFramebuffer(const std::string &id);
@@ -39,7 +46,8 @@ namespace Metal {
 
         EngineFrameBuilder &addDepth();
 
-        EngineFrameBuilder &addTexture(const std::string &id, unsigned w, unsigned h, VkFormat format = VK_FORMAT_R16G16B16A16_SFLOAT);
+        EngineFrameBuilder &addTexture(const std::string &id, unsigned w, unsigned h,
+                                       VkFormat format = VK_FORMAT_R16G16B16A16_SFLOAT);
 
         EngineFrameBuilder &addTexture(const std::string &id);
 
@@ -48,7 +56,10 @@ namespace Metal {
 
         EngineFrameBuilder &addBuffer(const std::string &id);
 
-        EngineFrameBuilder &addCommandBuffer(const std::string &id, const std::string &framebufferId, bool clearBuffer = true);
+        EngineFrameBuilder &addCommandBuffer(const std::string &id, const std::string &framebufferId,
+                                             bool clearBuffer = true);
+
+        void storeBuilder();
 
         EngineFrameBuilder &addComputeCommandBuffer(const std::string &id);
 
@@ -56,7 +67,7 @@ namespace Metal {
 
         bool tryMatch(const std::string &id, ResourceType type);
 
-        std::unique_ptr<EngineFrame> build();
+        void build();
     };
 } // Metal
 

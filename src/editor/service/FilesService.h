@@ -35,9 +35,9 @@ namespace Metal {
 
         void Move(FSEntry *toMove, FSEntry *targetDir);
 
-        static void CreateDirectory(FSEntry *currentDirectory);
+        void CreateDirectory(FSEntry *currentDirectory);
 
-        static void GetEntries(FSEntry *root);
+        void GetEntries(FSEntry *root);
     };
 } // Metal
 

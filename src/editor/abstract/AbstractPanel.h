@@ -4,15 +4,15 @@
 #include <string>
 #include <vector>
 
-#include "IPanel.h"
+#include "../../common/IContextMember.h"
+#include "../../common/ISync.h"
+#include "../../common/IInit.h"
 
 namespace Metal {
     class ApplicationContext;
-    class AbstractPanel : public IPanel {
-    public:
-        ApplicationContext *applicationContext{};
+    class AbstractPanel : public IContextMember, public ISync, public IInit  {
     protected:
-        std::vector<IPanel *> children;
+        std::vector<AbstractPanel *> children;
         const std::string id;
 
         virtual void onSyncChildren() const;
@@ -20,11 +20,11 @@ namespace Metal {
     public:
         explicit AbstractPanel();
 
-        std::vector<IPanel *> &getChildren();
+        std::vector<AbstractPanel *> &getChildren();
 
         void appendChild(AbstractPanel *panel);
 
-        void removeAllChildren() override;
+        void removeAllChildren();
 
         virtual void onRemove() {
         }

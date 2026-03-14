@@ -167,7 +167,7 @@ namespace Metal {
     }
 
     VkShaderModule ShaderService::createShaderModule(const std::string &pFilename) {
-        this->isDebugMode = CTX->isDebugMode();
+        this->isDebugMode = ctx->isDebugMode();
         std::string source = ProcessShader(BASE_PATH + pFilename, BASE_PATH);
         if (isDebugMode) {
             source = "#define DEBUG\n" + source;

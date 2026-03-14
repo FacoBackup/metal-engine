@@ -1,5 +1,4 @@
 #include "InspectorPanel.h"
-
 #include "../../abstract/form/FormPanel.h"
 #include "../../util/UIUtil.h"
 #include "../../../common/Inspectable.h"
@@ -7,6 +6,8 @@
 #include "../../../engine/dto/MetadataComponent.h"
 #include <imgui.h>
 #include <format>
+#include "../../repository/EditorRepository.h"
+#include "../../../engine/repository/WorldRepository.h"
 
 namespace Metal {
     void InspectorPanel::onInitialize() {
@@ -26,11 +27,11 @@ namespace Metal {
 
             if (ImGui::BeginPopup((id + "AddComponentPopup").c_str())) {
                 for (const auto &compDef: ComponentTypes::getComponents()) {
-                    bool hasComponent = compDef.getInspectable(applicationContext->worldRepository, selectedId) != nullptr;
+                    bool hasComponent = compDef.getInspectable(*worldRepository, selectedId) != nullptr;
                     if (!hasComponent) {
                         if (ImGui::MenuItem(
                             (compDef.icon + " " + compDef.name + id + "adCOmp" + compDef.name).c_str())) {
-                            applicationContext->worldRepository.createComponent(selectedId, compDef.type);
+                            worldRepository->createComponent(selectedId, compDef.type);
                             selectedId = EMPTY_ENTITY;
                             tick();
                         }
@@ -42,20 +43,17 @@ namespace Metal {
     }
 
     void InspectorPanel::tick() {
-        if (auto &editorRepository = applicationContext->editorRepository;
-            editorRepository.mainSelection != selectedId) {
+        if (editorRepository->mainSelection != selectedId) {
             additionalInspection.clear();
-            selectedId = editorRepository.mainSelection;
+            selectedId = editorRepository->mainSelection;
             formPanel->resetForm();
             if (selectedId != EMPTY_ENTITY) {
-                auto &repo = applicationContext->worldRepository;
-
-                selectedEntity = repo.getEntity(selectedId);
+                selectedEntity = worldRepository->getEntity(selectedId);
                 if (selectedEntity != nullptr) {
                     additionalInspection.push_back(selectedEntity);
 
                     for (const auto &compDef: ComponentTypes::getComponents()) {
-                        if (Inspectable *inspectable = compDef.getInspectable(repo, selectedId)) {
+                        if (Inspectable *inspectable = compDef.getInspectable(*worldRepository, selectedId)) {
                             additionalInspection.push_back(inspectable);
                         }
                     }

@@ -13,6 +13,8 @@ namespace Metal {
     struct AbstractComponent;
     struct MetadataComponent;
     class WorldHeaderPanel;
+    class SelectionService;
+    struct DirectoryService;
 
     class WorldPanel final : public AbstractDockPanel {
         static constexpr auto TRANSPARENT = ImVec4(0, 0, 0, 0);
@@ -26,7 +28,19 @@ namespace Metal {
         EditorRepository *editorRepository = nullptr;
         bool isSomethingHovered = false;
 
+        SelectionService *selectionService = nullptr;
+        DirectoryService *directoryService = nullptr;
+
     public:
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"WorldRepository", world},
+                {"EditorRepository", editorRepository},
+                {"SelectionService", selectionService},
+                {"DirectoryService", directoryService}
+            };
+        }
+
         void onInitialize() override;
 
         void contextMenu() const;

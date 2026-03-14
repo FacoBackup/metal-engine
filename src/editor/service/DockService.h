@@ -9,7 +9,7 @@
 namespace Metal {
     class AbstractPanel;
 
-    class DockService final : public IService {
+    class DockService final : public IService, public IInit {
         DockDTO center{&DockSpace::VIEWPORT};
         std::vector<DockDTO *> bottom;
         std::vector<DockDTO *> left;
@@ -17,10 +17,11 @@ namespace Metal {
 
 
         bool isInitialized = false;
-    public:
-        explicit DockService();
 
-        void buildViews(ImGuiID windowId, AbstractPanel *panel) const;
+    public:
+        void onInitialize() override;
+
+        void buildViews(ImGuiID windowId, AbstractPanel *panel);
 
         static void createDockSpace(DockDTO *dockSpace, ImGuiID *dockMainId);
 

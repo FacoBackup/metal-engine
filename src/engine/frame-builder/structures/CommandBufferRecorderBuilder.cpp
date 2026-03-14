@@ -1,12 +1,13 @@
 #include "CommandBufferRecorderBuilder.h"
-#include "../../../ApplicationContext.h"
+#include "../../service/CommandBufferRecorderService.h"
+#include "../../service/FrameBufferService.h"
 
 namespace Metal {
     RuntimeResource *CommandBufferRecorderBuilder::build() {
         if (computeMode) {
-            return CTX.commandBufferRecorderService.createCompute(id);
+            return commandBufferRecorderService->createCompute(id);
         }
-        auto *fbo = CTX.framebufferService.getResource(framebufferId);
-        return CTX.commandBufferRecorderService.create(id, fbo, clearBuffer);
+        auto *fbo = framebufferService->getResource(framebufferId);
+        return commandBufferRecorderService->create(id, fbo, clearBuffer);
     }
 }

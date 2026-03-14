@@ -1,22 +1,23 @@
 #include "FilesPanel.h"
-
-
 #include "FilesHeaderPanel.h"
 #include "FilesListPanel.h"
 #include "../../../common/Icons.h"
-#include "../../../ApplicationContext.h"
-#include "../../dto/SceneData.h"
 #include "../../util/UIUtil.h"
 #include "../../dto/FSEntry.h"
 #include "../../dto/SceneImportSettingsDTO.h"
 #include "FilesContext.h"
 #include "../../../common/FileDialogUtil.h"
-
 #include "FilePreviewPanel.h"
-#include "../../abstract/form/FormPanel.h"
 #include <string>
 #include <filesystem>
 #include "../../../common/FilesUtil.h"
+#include "../../service/FileImporterService.h"
+#include "../../repository/EditorRepository.h"
+#include "../../service/SceneImporterService.h"
+#include "../../service/FilesService.h"
+#include "../../service/NotificationService.h"
+#include "../../../engine/repository/WorldRepository.h"
+#include "../../../engine/service/VoxelService.h"
 
 namespace Metal {
     std::string FilesPanel::getActionLabel() {
@@ -28,27 +29,27 @@ namespace Metal {
             auto files = FileDialogUtil::PickFiles({
                 {
                     "Files",
-                    applicationContext->fileImporterService.collectCompatibleFiles().c_str(),
+                    fileImporterService->collectCompatibleFiles().c_str(),
                 }
             });
             if (!files.empty()) {
-                applicationContext->editorRepository.pendingImports = files;
-                applicationContext->editorRepository.importSettingsMap.clear();
-                for (const auto& file : applicationContext->editorRepository.pendingImports) {
-                    if (applicationContext->sceneImporterService.isCompatible(file)) {
-                        applicationContext->editorRepository.importSettingsMap.emplace(file, std::make_shared<SceneImportSettingsDTO>());
+                editorRepository->pendingImports = files;
+                editorRepository->importSettingsMap.clear();
+                for (const auto& file : editorRepository->pendingImports) {
+                    if (sceneImporterService->isCompatible(file)) {
+                        editorRepository->importSettingsMap.emplace(file, std::make_shared<SceneImportSettingsDTO>());
                     } else {
-                        applicationContext->editorRepository.importSettingsMap.emplace(file, std::make_shared<ImportSettingsDTO>());
+                        editorRepository->importSettingsMap.emplace(file, std::make_shared<ImportSettingsDTO>());
                     }
                 }
-                applicationContext->editorRepository.selectedFileForSettings = applicationContext->editorRepository.pendingImports[0];
-                applicationContext->editorRepository.targetImportDirectory = filesContext.currentDirectory;
+                editorRepository->selectedFileForSettings = editorRepository->pendingImports[0];
+                editorRepository->targetImportDirectory = filesContext.currentDirectory;
             }
         };
     }
 
     void FilesPanel::onInitialize() {
-        filesContext.setCurrentDirectory(applicationContext->filesService.getRoot());
+        filesContext.setCurrentDirectory(filesService->getRoot());
         appendChild(filesHeader = new FilesHeaderPanel(filesContext, getActionLabel(), onAction()));
         filesListPanel = new FilesListPanel(
             filesContext, [
@@ -124,23 +125,23 @@ namespace Metal {
     void FilesPanel::openResource(FSEntry *root) {
         switch (root->type) {
             case EntryType::SCENE: {
-                applicationContext->notificationService.pushMessage("Loading scene", NotificationSeverities::SUCCESS);
-                applicationContext->worldRepository.loadScene(root->getId());
+                notificationService->pushMessage("Loading scene", NotificationSeverities::SUCCESS);
+                worldRepository->loadScene(root->getId());
                 break;
             }
             case EntryType::VOLUME: {
-                applicationContext->notificationService.pushMessage("Loading volume", NotificationSeverities::SUCCESS);
-                applicationContext->voxelService.create(root->getId());
+                notificationService->pushMessage("Loading volume", NotificationSeverities::SUCCESS);
+                voxelService->create(root->getId());
                 break;
             }
             case EntryType::DIRECTORY: {
                 filesContext.setCurrentDirectory(root);
-                FilesService::GetEntries(root);
+                filesService->GetEntries(root);
                 filesContext.selected.clear();
                 break;
             }
             default:
-                applicationContext->notificationService.pushMessage("Unsupported resource type", NotificationSeverities::ERROR);
+                notificationService->pushMessage("Unsupported resource type", NotificationSeverities::ERROR);
                 break;
         }
     }
@@ -150,7 +151,7 @@ namespace Metal {
             //
         }
         filesContext.toCut.clear();
-        FilesService::GetEntries(filesContext.currentDirectory);
+        filesService->GetEntries(filesContext.currentDirectory);
     }
 
     void FilesPanel::openSelected() {
@@ -162,7 +163,7 @@ namespace Metal {
     void FilesPanel::cutSelected() {
         filesContext.toCut.clear();
         filesContext.toCut = filesContext.selected;
-        FilesService::GetEntries(filesContext.currentDirectory);
+        filesService->GetEntries(filesContext.currentDirectory);
     }
 
     void FilesPanel::selectAll() {
@@ -174,7 +175,7 @@ namespace Metal {
     }
 
     void FilesPanel::deleteSelected() const {
-        applicationContext->filesService.deleteFiles(filesContext.selected);
-        FilesService::GetEntries(filesContext.currentDirectory);
+        filesService->deleteFiles(filesContext.selected);
+        filesService->GetEntries(filesContext.currentDirectory);
     }
 }

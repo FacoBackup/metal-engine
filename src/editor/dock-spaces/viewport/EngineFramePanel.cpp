@@ -14,7 +14,6 @@
 #include "ViewportHeaderPanel.h"
 #include "ImGuizmo.h"
 #include <algorithm>
-
 #include "../../../engine/passes/impl/HWRayTracingPass.h"
 #include "../../../engine/passes/impl/PostProcessingPass.h"
 #include "../../../engine/passes/impl/SpatialFilterPass.h"
@@ -22,15 +21,21 @@
 #include "../../passes/GridPass.h"
 #include "../../passes/SelectionIDPass.h"
 #include "../../passes/SelectionOutlinePass.h"
+#include "../../../core/vulkan/VulkanContext.h"
+#include "../../../engine/repository/EngineRepository.h"
+#include "../../../engine/EngineContext.h"
+#include "../../../engine/service/DescriptorSetService.h"
+#include "../../service/SelectionService.h"
+#include "../../../engine/resource/TextureInstance.h"
 
 namespace Metal {
     void EngineFramePanel::onInitialize() {
-        const auto gBufferW = applicationContext->vulkanContext.getWindowWidth() / applicationContext->engineRepository.
+        const auto gBufferW = vulkanContext->getWindowWidth() / engineRepository->
                               shadingResInvScale;
-        const auto gBufferH = applicationContext->vulkanContext.getWindowHeight() / applicationContext->engineRepository
-                              .shadingResInvScale;
+        const auto gBufferH = vulkanContext->getWindowHeight() / engineRepository
+                              ->shadingResInvScale;
 
-        engineFrame = EngineFrameBuilder()
+        engineContext->createFrame(id)
                 .addBuffer(RID_GLOBAL_DATA, sizeof(GlobalDataUBO),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, UNIFORM_BUFFER)
                 .addBuffer(RID_LIGHT_BUFFER, MAX_LIGHTS * sizeof(LightData),
@@ -62,17 +67,15 @@ namespace Metal {
                 .addPass(std::make_unique<SelectionOutlinePass>(), RID_POST_PROCESSING_CB)
                 .addPass(std::make_unique<GridPass>(), RID_POST_PROCESSING_CB)
                 .build();
-
-        applicationContext->engineContext.registerFrame(engineFrame.get());
     }
 
     void EngineFramePanel::onSync() {
-        engineFrame->setShouldRender(true);
+        engineContext->setCurrentFrame(id);
         const ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 
-        auto *framebuffer = engineFrame->getResourceAs<FrameBufferInstance>(RID_POST_PROCESSING_FBO);
+        auto *framebuffer = engineContext->currentFrame->getResourceAs<FrameBufferInstance>(RID_POST_PROCESSING_FBO);
         if (framebuffer) {
-            applicationContext->descriptorSetService.setImageDescriptor(framebuffer, 0);
+            descriptorSetService->setImageDescriptor(framebuffer, 0);
             ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet),
                          viewportSize);
 
@@ -103,7 +106,7 @@ namespace Metal {
             return;
         }
 
-        auto *gBufferPositionIndex = engineFrame->getResourceAs<TextureInstance>(RID_GBUFFER_POSITION_INDEX);
+        auto *gBufferPositionIndex = engineContext->currentFrame->getResourceAs<TextureInstance>(RID_GBUFFER_POSITION_INDEX);
         if (!gBufferPositionIndex) {
             return;
         }
@@ -113,9 +116,9 @@ namespace Metal {
         const uint32_t pixelX = std::min(static_cast<uint32_t>(u * static_cast<float>(width)), width - 1);
         const uint32_t pixelY = std::min(static_cast<uint32_t>(v * static_cast<float>(height)), height - 1);
 
-        const auto picked = applicationContext->pickingService.pickEntityFromGBuffer(
+        const auto picked = pickingService->pickEntityFromGBuffer(
             gBufferPositionIndex, pixelX, pixelY);
-        applicationContext->selectionService.clearSelection();
-        applicationContext->selectionService.addSelected(picked.value_or(EMPTY_ENTITY));
+        selectionService->clearSelection();
+        selectionService->addSelected(picked.value_or(EMPTY_ENTITY));
     }
 } // Metal

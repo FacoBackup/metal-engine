@@ -1,6 +1,7 @@
 #include "ChildPanel.h"
 #include "imgui.h"
 #include "../../../ApplicationContext.h"
+#include "../../service/ThemeService.h"
 
 namespace Metal {
     void ChildPanel::setTitle(const std::string &t) {
@@ -9,7 +10,7 @@ namespace Metal {
     }
 
     void ChildPanel::onSync() {
-        ImGui::PushStyleColor(ImGuiCol_ChildBg, applicationContext->themeService.palette0);
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, themeService->palette0);
         if (!title.empty()) {
             ImGui::Spacing();
             ImGui::Text(title.c_str());

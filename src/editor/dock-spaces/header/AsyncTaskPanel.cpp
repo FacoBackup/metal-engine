@@ -2,10 +2,12 @@
 #include "../../../ApplicationContext.h"
 #include "../../util/UIUtil.h"
 #include <cmath>
+#include "../../service/AsyncTaskService.h"
+#include "../../dto/AsyncTask.h"
 
 namespace Metal {
     void AsyncTaskPanel::onSync() {
-        auto tasks = applicationContext->asyncTaskService.getActiveTasks();
+        auto tasks = asyncTaskService->getActiveTasks();
         if (tasks.empty()) {
             UIUtil::DynamicSpacing(90);
             return;
@@ -56,7 +58,7 @@ namespace Metal {
 
                 ImGui::SameLine();
                 if (ImGui::Button((Icons::close + "##" + task->id).c_str(), ImVec2(UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE))) {
-                    applicationContext->asyncTaskService.endTask(task->id, true);
+                    asyncTaskService->endTask(task->id, true);
                 }
                 ImGui::EndGroup();
             }

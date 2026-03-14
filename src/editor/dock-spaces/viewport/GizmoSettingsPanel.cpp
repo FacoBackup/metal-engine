@@ -2,10 +2,12 @@
 #include "../../util/UIUtil.h"
 #include "../../../ApplicationContext.h"
 #include "ImGuizmo.h"
+#include "../../repository/EditorRepository.h"
+#include "../../../engine/repository/WorldRepository.h"
+#include "../../../engine/dto/MetadataComponent.h"
 
 namespace Metal {
     void GizmoSettingsPanel::onInitialize() {
-        editorRepository = &applicationContext->editorRepository;
     }
 
     void GizmoSettingsPanel::onSync() {
@@ -15,9 +17,9 @@ namespace Metal {
         ImGui::SameLine();
         gizmoGrid();
         UIUtil::Spacing();
-        if (selectedEntityId != editorRepository->mainSelection && applicationContext->worldRepository.registry.all_of(
+        if (selectedEntityId != editorRepository->mainSelection && worldRepository->registry.valid(
                 editorRepository->mainSelection)) {
-            selectedEntity = applicationContext->worldRepository.getEntity(editorRepository->mainSelection);
+            selectedEntity = worldRepository->getEntity(editorRepository->mainSelection);
             selectedEntityId = editorRepository->mainSelection;
         }
         if (selectedEntity != nullptr) {
@@ -119,7 +121,7 @@ namespace Metal {
         ImGui::SetNextItemWidth(50);
         if (ImGui::Combo((id + "scaleSnapAngle").c_str(), &editorRepository->gizmoSnapScaleOption, SNAP_SCALE_OPTIONS,
                          ImGuiComboFlags_NoArrowButton)) {
-            editorRepository->gizmoSnapScale = SNAP_SCALE_OPTIONS[editorRepository->gizmoSnapScaleOption];
+            editorRepository->gizmoSnapScale = SNAP_SCALE_OPTIONS_A[editorRepository->gizmoSnapScaleOption];
         }
     }
 } // Metal

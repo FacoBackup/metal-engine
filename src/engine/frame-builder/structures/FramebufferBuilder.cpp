@@ -5,27 +5,26 @@
 
 namespace Metal {
     ResourceType FramebufferBuilder::getType() {
-        return ResourceType::FRAMEBUFFER;
+        return FRAMEBUFFER;
     }
 
-    RuntimeResource* FramebufferBuilder::build() {
-        auto &framebufferService = CTX.framebufferService;
-        FrameBufferInstance* fbo = framebufferService.getResource(id);
+    RuntimeResource *FramebufferBuilder::build() {
+        FrameBufferInstance *fbo = frameBufferService->getResource(id);
         if (fbo != nullptr) {
             return fbo;
         }
 
-        fbo = framebufferService.createFrameBuffer(id, w, h, clearColor);
+        fbo = frameBufferService->createFrameBuffer(id, w, h, clearColor);
 
-        for (const auto& attachment : attachments) {
-            framebufferService.createAttachment(attachment.format, attachment.usage, fbo);
+        for (const auto &attachment: attachments) {
+            frameBufferService->createAttachment(attachment.format, attachment.usage, fbo);
         }
 
         if (hasDepth) {
-            framebufferService.createDepthAttachment(fbo);
+            frameBufferService->createDepthAttachment(fbo);
         }
 
-        framebufferService.createRenderPass(fbo);
+        frameBufferService->createRenderPass(fbo);
 
         return fbo;
     }

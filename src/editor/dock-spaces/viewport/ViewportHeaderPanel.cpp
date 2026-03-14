@@ -1,8 +1,9 @@
 #include "ViewportHeaderPanel.h"
-
 #include "GizmoSettingsPanel.h"
 #include "../../../ApplicationContext.h"
 #include "../../util/UIUtil.h"
+#include "../../repository/EditorRepository.h"
+#include "../../../engine/repository/WorldRepository.h"
 
 namespace Metal {
     void ViewportHeaderPanel::onInitialize() {
@@ -33,8 +34,8 @@ namespace Metal {
         if (UIUtil::ButtonSimple(Icons::center_focus_strong + id + "centerCamera",
                                  UIUtil::ONLY_ICON_BUTTON_SIZE,
                                  UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            applicationContext->worldRepository.camera.position = {0, 0, 0};
-            applicationContext->worldRepository.camera.registerChange();
+            worldRepository->camera.position = {0, 0, 0};
+            worldRepository->camera.registerChange();
         }
         UIUtil::RenderTooltip("Center camera?");
 
@@ -44,21 +45,20 @@ namespace Metal {
         static float speedValues[] = {0.1f, 0.5f, 1.0f, 2.0f, 5.0f, 10.0f};
         int currentSpeedIndex = 2;
         for (int i = 0; i < 6; i++) {
-            if (applicationContext->worldRepository.camera.movementSensitivity == speedValues[i]) {
+            if (worldRepository->camera.movementSensitivity == speedValues[i]) {
                 currentSpeedIndex = i;
                 break;
             }
         }
         if (ImGui::Combo((id + "speedCamera").c_str(), &currentSpeedIndex, speeds, IM_ARRAYSIZE(speeds))) {
-            applicationContext->worldRepository.camera.movementSensitivity = speedValues[currentSpeedIndex];
+            worldRepository->camera.movementSensitivity = speedValues[currentSpeedIndex];
         }
         UIUtil::RenderTooltip("Camera speed");
     }
 
     void ViewportHeaderPanel::shadingMode() {
-        auto &editorRepository = applicationContext->editorRepository;
         ImGui::SetNextItemWidth(150);
-        shadingModelOption = ShadingModes::IndexOfValue(editorRepository.shadingMode);
+        shadingModelOption = ShadingModes::IndexOfValue(editorRepository->shadingMode);
 
         auto currentEntry = ShadingModes::entries[shadingModelOption];
         if (ImGui::BeginCombo((id + "shadingMode").c_str(), (currentEntry.icon + " " + currentEntry.label).c_str())) {
@@ -67,7 +67,7 @@ namespace Metal {
                 auto entry = ShadingModes::entries[i];
                 if (ImGui::Selectable((entry.icon + " " + entry.label).c_str(), is_selected)) {
                     shadingModelOption = i;
-                    editorRepository.shadingMode = ShadingModes::ValueOfIndex(shadingModelOption);
+                    editorRepository->shadingMode = ShadingModes::ValueOfIndex(shadingModelOption);
                 }
                 if (is_selected) {
                     ImGui::SetItemDefaultFocus();

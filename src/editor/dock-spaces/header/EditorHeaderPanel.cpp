@@ -2,6 +2,9 @@
 #include "AsyncTaskPanel.h"
 #include "../../util/UIUtil.h"
 #include "../../../ApplicationContext.h"
+#include "../../../core/DirectoryService.h"
+#include "../../../core/glfw/GLFWContext.h"
+#include "../../../engine/EngineContext.h"
 
 namespace Metal {
     void EditorHeaderPanel::onSync() {
@@ -13,7 +16,7 @@ namespace Metal {
         // Window dragging logic
         if (ImGui::IsWindowHovered() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
             ImVec2 delta = ImGui::GetIO().MouseDelta;
-            GLFWwindow* window = applicationContext->glfwContext.getWindow();
+            GLFWwindow* window = glfwContext->getWindow();
             int x, y;
             glfwGetWindowPos(window, &x, &y);
             glfwSetWindowPos(window, x + (int)delta.x, y + (int)delta.y);
@@ -23,7 +26,7 @@ namespace Metal {
     void EditorHeaderPanel::renderWindowControls() {
         ImGui::SameLine(ImGui::GetWindowWidth() - (UIUtil::ONLY_ICON_BUTTON_SIZE * 3 + 10));
         
-        GLFWwindow* window = applicationContext->glfwContext.getWindow();
+        GLFWwindow* window = glfwContext->getWindow();
 
         if (UIUtil::ButtonSimple(Icons::minimize, UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
             glfwIconifyWindow(window);
@@ -48,16 +51,16 @@ namespace Metal {
     void EditorHeaderPanel::renderFileTab() {
         if (ImGui::BeginMainMenuBar()) {
             if (UIUtil::ButtonSimple(Icons::save, UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-                applicationContext->save();
+                directoryService->save();
             }
             ImGui::SameLine();
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Open", "Ctrl+O")) {
-                    applicationContext->engineContext.dispose();
-                    applicationContext->updateRootPath(true);
+                    engineContext->dispose();
+                    directoryService->updateRootPath(true);
                 }
                 if (ImGui::MenuItem("Save", "Ctrl+S")) {
-                    applicationContext->save();
+                    directoryService->save();
                 }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Exit")) {
@@ -69,7 +72,7 @@ namespace Metal {
             // Create an "Edit" menu
             if (ImGui::BeginMenu("Edit")) {
                 if (ImGui::MenuItem("Compile shaders")) {
-                    applicationContext->engineContext.dispose();
+                    engineContext->dispose();
                     // TODO - CREATE NEW FRAME
                 }
                 ImGui::EndMenu();

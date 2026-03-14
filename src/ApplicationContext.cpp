@@ -7,10 +7,7 @@
 #include "core/glfw/GLFWContext.h"
 
 namespace Metal {
-    ApplicationContext *ApplicationContext::CONTEXT = nullptr;
-
     ApplicationContext::ApplicationContext(bool debugMode) : debugMode(debugMode) {
-        CONTEXT = this;
     }
 
     void ApplicationContext::onInitialize() {
@@ -37,7 +34,6 @@ namespace Metal {
                 if (disposable) {
                     disposable->dispose();
                 }
-                delete it->release();
             }
         } catch (std::exception &e) {
             LOG_ERROR(e.what());

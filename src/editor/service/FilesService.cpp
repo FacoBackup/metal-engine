@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iostream>
 #include "../../common/serialization-definitions.h"
+#include "../../core/DirectoryService.h"
 
 namespace fs = std::filesystem;
 
@@ -26,14 +27,14 @@ std::filesystem::remove_all(rootDir + "/assets/" + F(entry.second->getId()));
         std::filesystem::file_time_type ftime = last_write_time(entry);
 
 namespace Metal {
-    void FilesService::onInitialize() {
-        root = new FSEntry(nullptr, rootDirectory + "/assets-ref/", "");
+    void filesService->onInitialize() {
+        root = new FSEntry(nullptr, directoryService->getAssetRefDirectory(), "");
         root->type = EntryType::DIRECTORY;
         root->name = "Files";
         GetEntries(root);
     }
 
-    std::unique_ptr<FSEntry> FilesService::getResource(const std::string &id) {
+    std::unique_ptr<FSEntry> filesService->getResource(const std::string &id) {
         try {
             for (const auto &entry: fs::recursive_directory_iterator(root->absolutePath)) {
                 if (entry.is_regular_file() &&
@@ -56,11 +57,11 @@ namespace Metal {
         return nullptr;
     }
 
-    void FilesService::deleteFiles(const std::unordered_map<std::string, FSEntry *> &selected) {
+    void filesService->deleteFiles(const std::unordered_map<std::string, FSEntry *> &selected) {
         for (auto &entry: selected) {
             switch (entry.second->type) {
                 case EntryType::DIRECTORY: {
-                    FilesService::GetEntries(entry.second);
+                    GetEntries(entry.second);
                     std::unordered_map<std::string, FSEntry *> files;
                     for (auto *f: entry.second->children) {
                         files.insert({f->getId(), f});
@@ -70,19 +71,19 @@ namespace Metal {
                     break;
                 }
                 case EntryType::MESH: {
-                    DELETE_F(FORMAT_FILE_MESH, rootDirectory)
+                    DELETE_F(FORMAT_FILE_MESH, directoryService->getRootDirectory())
                     break;
                 }
                 case EntryType::TEXTURE: {
-                    DELETE_F(FORMAT_FILE_TEXTURE, rootDirectory)
+                    DELETE_F(FORMAT_FILE_TEXTURE, directoryService->getRootDirectory())
                     break;
                 }
                 case EntryType::SCENE: {
-                    DELETE_S(FORMAT_FILE_SCENE, rootDirectory)
+                    DELETE_S(FORMAT_FILE_SCENE, directoryService->getRootDirectory())
                     break;
                 }
                 case EntryType::VOLUME: {
-                    DELETE_S(FORMAT_FILE_VOLUME, rootDirectory)
+                    DELETE_S(FORMAT_FILE_VOLUME, directoryService->getRootDirectory())
                     break;
                 }
                 default: break;;
@@ -90,7 +91,7 @@ namespace Metal {
         }
     }
 
-    void FilesService::CreateDirectory(FSEntry *currentDirectory) {
+    void filesService->CreateDirectory(FSEntry *currentDirectory) {
         int count = 0;
         for (FSEntry *child: currentDirectory->children) {
             if (child->type == EntryType::DIRECTORY && child->name == "New Directory (" + std::to_string(count) + ")") {
@@ -104,7 +105,7 @@ namespace Metal {
         std::filesystem::create_directory(pathToDir);
     }
 
-    void FilesService::Move(FSEntry *toMove, FSEntry *targetDir) {
+    void filesService->Move(FSEntry *toMove, FSEntry *targetDir) {
         if (!targetDir || targetDir->type != EntryType::DIRECTORY) {
             return;
         }
@@ -116,7 +117,7 @@ namespace Metal {
             fs::rename(sourcePath, targetPath);
         } catch (const fs::filesystem_error &e) {
             LOG_ERROR("Could not move file");
-            notificationService.pushMessage("Could not move entry", NotificationSeverities::ERROR);
+            notificationService->pushMessage("Could not move entry", NotificationSeverities::ERROR);
             return;
         }
 
@@ -132,7 +133,7 @@ namespace Metal {
         targetDir->children.push_back(toMove);
     }
 
-    void FilesService::GetEntries(FSEntry *root) {
+    void filesService->GetEntries(FSEntry *root) {
         if (root->type != EntryType::DIRECTORY) {
             return;
         }

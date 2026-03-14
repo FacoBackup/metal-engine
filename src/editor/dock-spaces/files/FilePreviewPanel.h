@@ -5,10 +5,23 @@
 #include "FilesContext.h"
 
 namespace Metal {
+    class TextureService;
+    class GuiContext;
+
     class FilePreviewPanel final : public AbstractPanel {
         FilesContext &filesContext;
 
+        TextureService *textureService = nullptr;
+        GuiContext *guiContext = nullptr;
+
     public:
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"TextureService", textureService},
+                {"GuiContext", guiContext}
+            };
+        }
+
         explicit FilePreviewPanel(FilesContext &filesContext);
 
         void onSync() override;

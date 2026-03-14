@@ -1,19 +1,19 @@
 #include "GizmoPanel.h"
-
 #include "../../../ApplicationContext.h"
 #include "../../../engine/dto/TransformComponent.h"
 #include "../../../engine/dto/Camera.h"
 #include "ImGuizmo.h"
 #include <glm/gtc/type_ptr.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
+#include "../../repository/EditorRepository.h"
+#include "../../../engine/repository/WorldRepository.h"
+#include "../../service/SelectionService.h"
 
 namespace Metal {
     GizmoPanel::GizmoPanel(ImVec2 *position, glm::vec2 *size): size(size), position(position) {
     }
 
     void GizmoPanel::onInitialize() {
-        editorRepository = &applicationContext->editorRepository;
     }
 
     void GizmoPanel::onSync() {
@@ -22,7 +22,7 @@ namespace Metal {
             localSelected = nullptr;
             localChangeId = 0;
             if (editorRepository->mainSelection != EMPTY_ENTITY) {
-                applicationContext->selectionService.updatePrimitiveSelected();
+                selectionService->updatePrimitiveSelected();
             }
             return;
         }
@@ -40,7 +40,7 @@ namespace Metal {
         }
 
         recomposeMatrix();
-        ImGuizmo::SetOrthographic(applicationContext->worldRepository.camera.isOrthographic);
+        ImGuizmo::SetOrthographic(worldRepository->camera.isOrthographic);
         ImGuizmo::SetDrawlist();
         ImVec2 viewportMin = ImGui::GetItemRectMin();
         ImVec2 viewportSize = ImGui::GetItemRectSize();
@@ -113,8 +113,8 @@ namespace Metal {
     }
 
     void GizmoPanel::recomposeMatrix() {
-        viewMatrixCache = glm::value_ptr(applicationContext->worldRepository.camera.viewMatrix);
-        cacheProjection = applicationContext->worldRepository.camera.projectionMatrix;
+        viewMatrixCache = glm::value_ptr(worldRepository->camera.viewMatrix);
+        cacheProjection = worldRepository->camera.projectionMatrix;
 
         cacheProjection[1][1] *= -1;
 

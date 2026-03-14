@@ -1,7 +1,6 @@
 #ifndef METAL_ENGINE_GUICONTEXT_H
 #define METAL_ENGINE_GUICONTEXT_H
 
-#define LARGE_FONT_SIZE 38
 #include <imgui.h>
 #include <imgui_impl_vulkan.h>
 #include "../../common/IService.h"
