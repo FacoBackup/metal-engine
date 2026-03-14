@@ -12,7 +12,7 @@ namespace Metal {
         PipelineBuilder builder = PipelineBuilder::Of(
                     getScopedResourceId(RID_POST_PROCESSING_FBO),
                     "QUAD.vert",
-                    "tools/SelectedDot.frag"
+                    "tools/SelectionOutline.frag"
                 )
                 .setBlendEnabled()
                 .setPushConstantsSize(sizeof(SelectedDotPushConstant))

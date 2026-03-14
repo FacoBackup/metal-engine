@@ -1,5 +1,4 @@
 #include "GridPass.h"
-#include "../../ApplicationContext.h"
 #include "../../engine/dto/PipelineBuilder.h"
 #include "../../engine/service/PipelineService.h"
 #include "../repository/EditorRepository.h"
@@ -20,7 +19,7 @@ namespace Metal {
     }
 
     bool GridPass::shouldRun() {
-        return applicationContext->isDebugMode() && editorRepository->showGrid;
+        return editorRepository->showGrid;
     }
 
     void GridPass::onSync() {

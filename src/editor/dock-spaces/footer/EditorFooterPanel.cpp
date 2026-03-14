@@ -1,12 +1,20 @@
 #include "EditorFooterPanel.h"
+#include "../header/AsyncTaskPanel.h"
 #include "../../util/UIUtil.h"
 #include "../../../ApplicationContext.h"
 #include "../../repository/EditorRepository.h"
 
 namespace Metal {
     void EditorFooterPanel::onSync() {
+        ImGui::Separator();
+        asyncTaskPanel->onSync();
+        ImGui::SameLine();
         renderShortcuts();
         framerate();
+    }
+
+    void EditorFooterPanel::onInitialize() {
+        initializePanel(asyncTaskPanel = new AsyncTaskPanel(), false);
     }
 
     void EditorFooterPanel::framerate() {
@@ -21,10 +29,8 @@ namespace Metal {
         auto &shortcuts = editorRepository->focusedShortcuts;
         if (shortcuts.empty()) return;
 
-        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5); // Some padding
+        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2); // Some padding
 
-        ImGui::Text(editorRepository->focusedWindowName.c_str());
-        ImGui::SameLine();
         std::string label;
         for (size_t i = 0; i < std::min(shortcuts.size(), size_t(3)); ++i) {
             if (i > 0) label += " | ";

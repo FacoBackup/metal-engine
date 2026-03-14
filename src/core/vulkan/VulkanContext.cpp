@@ -211,7 +211,7 @@ namespace Metal {
                                       const ImVector<const char *> &instanceExtensions) const {
         if (auto sysInfoResult = vkb::SystemInfo::get_system_info(); sysInfoResult) {
             const auto &sysInfo = sysInfoResult.value();
-            if (sysInfo.validation_layers_available && debugMode) {
+            if (sysInfo.validation_layers_available && ctx->isDebugMode()) {
                 if (sysInfo.is_layer_available("VK_LAYER_LUNARG_api_dump")) {
                     // instanceBuilder.enable_layer("VK_LAYER_LUNARG_api_dump");
                 }
@@ -252,7 +252,6 @@ namespace Metal {
     }
 
     void VulkanContext::onInitialize() {
-        this->debugMode = ctx->isDebugMode();
         this->window = glfwContext->getWindow();
         
         imguiVulkanWindow.ClearValue.color.float32[0] = 0;

@@ -29,10 +29,6 @@ namespace Metal {
 
         void renderDockSpaces();
 
-        void renderHeader(const ImGuiViewport *viewport);
-
-        void renderFooter(const ImGuiViewport *viewport);
-
     public:
         std::vector<Dependency> getDependencies() override {
             return {

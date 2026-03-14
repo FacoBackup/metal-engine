@@ -1,5 +1,8 @@
 #ifndef METAL_ENGINE_APPLICATIONCONTEXT_H
 #define METAL_ENGINE_APPLICATIONCONTEXT_H
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+
 #include <string>
 #include <memory>
 #include <unordered_map>

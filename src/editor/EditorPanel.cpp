@@ -26,10 +26,26 @@ namespace Metal {
 
     void EditorPanel::renderDockSpaces() {
         const ImGuiViewport *viewport = ImGui::GetMainViewport();
-        renderHeader(viewport);
-        renderFooter(viewport);
 
-        // Begin window
+        // Header
+        {
+            UIUtil::AUX_VEC2.x = viewport->Pos.x;
+            UIUtil::AUX_VEC2.y = viewport->Pos.y;
+            ImGui::SetNextWindowPos(UIUtil::AUX_VEC2);
+
+            UIUtil::AUX_VEC2.x = viewport->Size.x;
+            UIUtil::AUX_VEC2.y = HEADER_HEIGHT;
+            ImGui::SetNextWindowSize(UIUtil::AUX_VEC2);
+
+            SetWindowStyle();
+            ImGui::Begin(NAME_HEADER, &UIUtil::OPEN, FLAGS | ImGuiWindowFlags_NoScrollbar);
+            ImGui::PopStyleVar(3);
+
+            headerPanel->onSync();
+            ImGui::End();
+        }
+
+        // Main Window (DockSpace)
         {
             UIUtil::AUX_VEC2.x = viewport->Pos.x;
             UIUtil::AUX_VEC2.y = viewport->Pos.y + HEADER_HEIGHT;
@@ -41,55 +57,37 @@ namespace Metal {
             ImGui::SetNextWindowViewport(viewport->ID);
 
             SetWindowStyle();
+            ImGui::Begin(NAME, &UIUtil::OPEN, FLAGS);
+            windowId = ImGui::GetID(NAME);
+            ImGui::PopStyleVar(3);
+
+            dockService->buildViews(windowId, this);
+
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+            ImGui::DockSpace(windowId, CENTER, ImGuiDockNodeFlags_PassthruCentralNode);
+            ImGui::PopStyleVar(1);
+
+            onSyncChildren();
+            ImGui::End();
         }
 
-        ImGui::Begin(NAME, &UIUtil::OPEN, FLAGS);
-        windowId = ImGui::GetID(NAME);
+        // Footer
+        {
+            UIUtil::AUX_VEC2.x = viewport->Pos.x;
+            UIUtil::AUX_VEC2.y = viewport->Pos.y + viewport->Size.y - FOOTER_HEIGHT;
+            ImGui::SetNextWindowPos(UIUtil::AUX_VEC2);
 
-        ImGui::PopStyleVar(3);
+            UIUtil::AUX_VEC2.x = viewport->Size.x;
+            UIUtil::AUX_VEC2.y = FOOTER_HEIGHT;
+            ImGui::SetNextWindowSize(UIUtil::AUX_VEC2);
 
-        dockService->buildViews(windowId, this);
+            SetWindowStyle();
+            ImGui::Begin(NAME_FOOTER, &UIUtil::OPEN, FLAGS | ImGuiWindowFlags_NoScrollbar);
+            ImGui::PopStyleVar(3);
 
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-        ImGui::DockSpace(windowId, CENTER, ImGuiDockNodeFlags_PassthruCentralNode);
-        ImGui::PopStyleVar(1);
-
-        onSyncChildren();
-        ImGui::End();
-    }
-
-    void EditorPanel::renderHeader(const ImGuiViewport *viewport) {
-        UIUtil::AUX_VEC2.x = viewport->Pos.x;
-        UIUtil::AUX_VEC2.y = viewport->Pos.y;
-        ImGui::SetNextWindowPos(UIUtil::AUX_VEC2);
-
-        UIUtil::AUX_VEC2.x = viewport->Size.x;
-        UIUtil::AUX_VEC2.y = HEADER_HEIGHT;
-        ImGui::SetNextWindowSize(UIUtil::AUX_VEC2);
-
-        SetWindowStyle();
-        ImGui::Begin(NAME_HEADER, &UIUtil::OPEN, FLAGS | ImGuiWindowFlags_NoScrollbar);
-        ImGui::PopStyleVar(3);
-
-        headerPanel->onSync();
-        ImGui::End();
-    }
-
-    void EditorPanel::renderFooter(const ImGuiViewport *viewport) {
-        UIUtil::AUX_VEC2.x = viewport->Pos.x;
-        UIUtil::AUX_VEC2.y = viewport->Pos.y + viewport->Size.y - FOOTER_HEIGHT;
-        ImGui::SetNextWindowPos(UIUtil::AUX_VEC2);
-
-        UIUtil::AUX_VEC2.x = viewport->Size.x;
-        UIUtil::AUX_VEC2.y = FOOTER_HEIGHT;
-        ImGui::SetNextWindowSize(UIUtil::AUX_VEC2);
-
-        SetWindowStyle();
-        ImGui::Begin(NAME_FOOTER, &UIUtil::OPEN, FLAGS | ImGuiWindowFlags_NoScrollbar);
-        ImGui::PopStyleVar(3);
-
-        footerPanel->onSync();
-        ImGui::End();
+            footerPanel->onSync();
+            ImGui::End();
+        }
     }
 
     void EditorPanel::SetWindowStyle() {

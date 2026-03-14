@@ -8,37 +8,28 @@
 namespace Metal {
     void AsyncTaskPanel::onSync() {
         auto tasks = asyncTaskService->getActiveTasks();
-        if (tasks.empty()) {
-            UIUtil::DynamicSpacing(90);
-            return;
-        }
-        UIUtil::DynamicSpacing(250);
-        ImGui::SameLine();
+        bool hasTasks = !tasks.empty();
 
-        float time = (float)ImGui::GetTime();
-        float t = 0.5f + 0.5f * std::sin(time * 3.0f); // 0.0 to 1.0
-
-        ImVec4 color = ImVec4(
-            0.0f + t * 0.4f,
-            0.2f + t * 0.5f,
-            0.6f + t * 0.4f,
-            1.0f
-        );
-
+        ImGui::BeginGroup();
         ImVec2 pos = ImGui::GetCursorScreenPos();
-        float width = 150.0f;
-        float height = 10.0f;
+        float size = (float)UIUtil::ONLY_ICON_BUTTON_SIZE;
 
-        pos.y += (UIUtil::ONLY_ICON_BUTTON_SIZE - height) / 2.0f;
-
-        ImGui::GetWindowDrawList()->AddRectFilled(pos, ImVec2(pos.x + width, pos.y + height), ImGui::ColorConvertFloat4ToU32(color), 5.0f);
-
-        ImGui::SetCursorScreenPos(pos);
-        if (ImGui::InvisibleButton("##AsyncTaskLine", ImVec2(width, height))) {
+        if (ImGui::InvisibleButton("##AsyncTaskIcon", ImVec2(size, size))) {
             ImGui::OpenPopup("AsyncTasksPopup");
         }
-        ImGui::SameLine();
-        ImGui::Dummy(ImVec2(0, UIUtil::ONLY_ICON_BUTTON_SIZE));
+
+        ImU32 iconColor = ImGui::GetColorU32(ImGuiCol_Text);
+        ImGui::GetWindowDrawList()->AddText(ImGui::GetFont(), ImGui::GetFontSize(),
+                                            ImVec2(pos.x + (size - ImGui::CalcTextSize(Icons::sync.c_str()).x) / 2,
+                                                   pos.y + (size - ImGui::GetFontSize()) / 2),
+                                            iconColor, Icons::sync.c_str());
+
+        if (hasTasks) {
+            float circleRadius = 3.0f;
+            ImVec2 circlePos = ImVec2(pos.x + size / 2.0f, pos.y + size - circleRadius - 2.0f);
+            ImGui::GetWindowDrawList()->AddCircleFilled(circlePos, circleRadius, IM_COL32(0, 200, 255, 255));
+        }
+        ImGui::EndGroup();
 
         UIUtil::RenderTooltip(Icons::sync + " " + std::to_string(tasks.size()) + " processes running...");
 
@@ -52,8 +43,9 @@ namespace Metal {
                 ImGui::Text("%s", task->name.c_str());
 
                 ImVec2 p = ImGui::GetCursorScreenPos();
+                float height = 10.0f;
                 float w = ImGui::GetContentRegionAvail().x - UIUtil::ONLY_ICON_BUTTON_SIZE - ImGui::GetStyle().ItemSpacing.x;
-                ImGui::GetWindowDrawList()->AddRectFilled(p, ImVec2(p.x + w, p.y + height), ImGui::ColorConvertFloat4ToU32(color), 5.0f);
+                ImGui::GetWindowDrawList()->AddRectFilled(p, ImVec2(p.x + w, p.y + height), IM_COL32(50, 150, 255, 255), 5.0f);
                 ImGui::Dummy(ImVec2(w, height));
 
                 ImGui::SameLine();

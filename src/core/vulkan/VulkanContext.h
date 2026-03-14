@@ -58,7 +58,6 @@ namespace Metal {
 
         unsigned int w{}, h{};
         GLFWwindow *window = nullptr;
-        bool debugMode = false;
         std::vector<VkCommandBuffer> commandBuffers{};
 
     public:

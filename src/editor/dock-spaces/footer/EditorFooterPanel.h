@@ -6,8 +6,11 @@
 namespace Metal {
     struct EditorRepository;
 
+    class AsyncTaskPanel;
+
     class EditorFooterPanel final : public AbstractPanel {
         EditorRepository *editorRepository = nullptr;
+        AsyncTaskPanel *asyncTaskPanel = nullptr;
 
         void renderShortcuts();
         static void framerate();
@@ -18,6 +21,8 @@ namespace Metal {
                 {"EditorRepository", &editorRepository}
             };
         }
+
+        void onInitialize() override;
 
         void onSync() override;
     };
