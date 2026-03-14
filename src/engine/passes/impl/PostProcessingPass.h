@@ -18,9 +18,9 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"VulkanContext", vulkanContext},
-                {"PipelineService", pipelineService},
-                {"WorldRepository", worldRepository}
+                {"VulkanContext", &vulkanContext},
+                {"PipelineService", &pipelineService},
+                {"WorldRepository", &worldRepository}
             };
         }
 

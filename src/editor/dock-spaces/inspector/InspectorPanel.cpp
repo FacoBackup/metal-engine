@@ -12,7 +12,7 @@
 namespace Metal {
     void InspectorPanel::onInitialize() {
         formPanel = new FormPanel();
-        appendChild(formPanel);
+        initializePanel(formPanel);
     }
 
     void InspectorPanel::onSync() {

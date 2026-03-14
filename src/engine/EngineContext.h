@@ -46,15 +46,15 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"TransformService", transformService},
-                {"StreamingService", streamingService},
-                {"RayTracingService", rayTracingService},
-                {"CameraService", cameraService},
-                {"LightService", lightService},
-                {"VolumeService", volumeService},
-                {"WorldRepository", worldRepository},
-                {"EditorRepository", editorRepository},
-                {"EngineRepository", engineRepository}
+                {"TransformService", &transformService},
+                {"StreamingService", &streamingService},
+                {"RayTracingService", &rayTracingService},
+                {"CameraService", &cameraService},
+                {"LightService", &lightService},
+                {"VolumeService", &volumeService},
+                {"WorldRepository", &worldRepository},
+                {"EditorRepository", &editorRepository},
+                {"EngineRepository", &engineRepository}
             };
         }
 

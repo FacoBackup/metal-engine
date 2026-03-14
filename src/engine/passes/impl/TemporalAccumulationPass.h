@@ -11,7 +11,7 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"PipelineService", pipelineService}
+                {"PipelineService", &pipelineService}
             };
         }
 

@@ -12,7 +12,7 @@
 
 namespace Metal {
     void WorldPanel::onInitialize() {
-        appendChild(headerPanel = new WorldHeaderPanel());
+        initializePanel(headerPanel = new WorldHeaderPanel());
 
         shortcuts = {
             ShortcutDTO("Delete", ImGuiKey_Delete, [this]() {

@@ -17,8 +17,8 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"TextureService", textureService},
-                {"GuiContext", guiContext}
+                {"TextureService", &textureService},
+                {"GuiContext", &guiContext}
             };
         }
 

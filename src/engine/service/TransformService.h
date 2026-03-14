@@ -25,8 +25,8 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"WorldRepository", worldRepository},
-                {"RayTracingService", rayTracingService}
+                {"WorldRepository", &worldRepository},
+                {"RayTracingService", &rayTracingService}
             };
         }
 

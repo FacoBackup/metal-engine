@@ -23,9 +23,9 @@ namespace Metal {
 
         std::vector<Dependency> getDependencies() override {
             return {
-                {"BufferService", bufferService},
-                {"RayTracingService", rayTracingService},
-                {"DirectoryService", directoryService}
+                {"BufferService", &bufferService},
+                {"RayTracingService", &rayTracingService},
+                {"DirectoryService", &directoryService}
             };
         }
 

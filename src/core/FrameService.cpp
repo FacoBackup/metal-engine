@@ -15,10 +15,6 @@ namespace Metal {
         return vulkanContext->imguiVulkanWindow.FrameIndex;
     }
 
-    void FrameService::dispose() {
-        NFD_Quit();
-    }
-
     bool FrameService::isValidContext() const {
         return glfwContext->isValidContext();
     }
@@ -27,9 +23,7 @@ namespace Metal {
         this->panel = panel;
     }
 
-    void FrameService::onInitialize() {
-        NFD_Init();
-
+    void FrameService::start() const {
         GLFWwindow *window = glfwContext->getWindow();
         while (!glfwWindowShouldClose(window)) {
             if (glfwContext->beginFrame()) {

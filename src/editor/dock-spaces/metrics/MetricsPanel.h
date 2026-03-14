@@ -23,12 +23,12 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"MeshService", meshService},
-                {"VoxelService", voxelService},
-                {"FrameBufferService", framebufferService},
-                {"TextureService", textureService},
-                {"PipelineService", pipelineService},
-                {"BufferService", bufferService}
+                {"MeshService", &meshService},
+                {"VoxelService", &voxelService},
+                {"FrameBufferService", &framebufferService},
+                {"TextureService", &textureService},
+                {"PipelineService", &pipelineService},
+                {"BufferService", &bufferService}
             };
         }
 

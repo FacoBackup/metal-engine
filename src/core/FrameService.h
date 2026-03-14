@@ -11,7 +11,7 @@ namespace Metal {
     class GuiContext;
     class AbstractPanel;
 
-    class FrameService final : public IService, public IInit, public IDisposable {
+    class FrameService final : public IService {
         GLFWContext *glfwContext = nullptr;
         VulkanContext *vulkanContext = nullptr;
         EngineContext *engineContext = nullptr;
@@ -21,22 +21,20 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"GLFWContext", glfwContext},
-                {"VulkanContext", vulkanContext},
-                {"GuiContext", guiContext},
-                {"EngineContext", engineContext}
+                {"GLFWContext", &glfwContext},
+                {"VulkanContext", &vulkanContext},
+                {"GuiContext", &guiContext},
+                {"EngineContext", &engineContext}
             };
         }
 
         void setPanel(AbstractPanel *panel);
 
-        void onInitialize() override;
+        void start() const;
 
         [[nodiscard]] bool isValidContext() const;
 
         [[nodiscard]] unsigned int getFrameIndex() const;
-
-        void dispose() override;
     };
 } // Metal
 

@@ -9,8 +9,6 @@
 #include "../../engine/service/MeshService.h"
 #include "../../engine/service/TextureService.h"
 #include "../../engine/service/FrameBufferService.h"
-#include "../../engine/service/PipelineService.h"
-#include "../../engine/service/RayTracingService.h"
 
 namespace Metal {
 
@@ -292,12 +290,7 @@ namespace Metal {
         // ------- CORE INITIALIZATION
     }
 
-    void VulkanContext::dispose() {
-        pipelineService->disposeAll();
-        textureService->disposeAll();
-        meshService->disposeAll();
-        framebufferService->disposeAll();
-        rayTracingService->dispose();
+    void VulkanContext::disposeManually() {
 
         vkDestroySampler(device.device, vkImageSampler, nullptr);
         vkDestroySampler(device.device, vkTextureSampler, nullptr);
@@ -308,12 +301,11 @@ namespace Metal {
                              nullptr);
 
         vkDestroyDevice(device.device, nullptr);
-        vkDestroySurfaceKHR(instance.instance, surface, nullptr);
         vkb::destroy_instance(instance);
     }
 
     void VulkanContext::createDescriptorPool() const {
-        const std::array<VkDescriptorPoolSize, 5> sizes{
+        const std::array sizes{
             VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 100}, // 1 for imgui
             VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 100},
             VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 100},

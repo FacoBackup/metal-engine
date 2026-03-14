@@ -20,7 +20,9 @@ namespace Metal {
 
     public:
         std::vector<Dependency> getDependencies() override {
-            return {{"DirectoryService", directoryService}, {"NotificationService", notificationService}};
+            return {
+                {"DirectoryService", &directoryService},
+                {"NotificationService", &notificationService}};
         }
 
         FSEntry *getRoot() const {

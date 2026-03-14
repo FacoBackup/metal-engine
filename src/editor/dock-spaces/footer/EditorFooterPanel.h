@@ -15,7 +15,7 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"EditorRepository", editorRepository}
+                {"EditorRepository", &editorRepository}
             };
         }
 

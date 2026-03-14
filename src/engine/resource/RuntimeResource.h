@@ -21,7 +21,7 @@ namespace Metal {
 
     public:
         std::vector<Dependency> getDependencies() override {
-            return {{"VulkanContext", vulkanContext}};
+            return {{"VulkanContext", &vulkanContext}};
         }
 
         virtual ~RuntimeResource() = default;

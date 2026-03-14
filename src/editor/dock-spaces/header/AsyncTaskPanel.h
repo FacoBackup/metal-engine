@@ -12,7 +12,7 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"AsyncTaskService", asyncTaskService}
+                {"AsyncTaskService", &asyncTaskService}
             };
         }
 

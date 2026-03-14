@@ -19,10 +19,10 @@
 
 namespace Metal {
     void ViewportPanel::onInitialize() {
-        appendChild(headerPanel = new ViewportHeaderPanel());
-        appendChild(engineFramePanel = new EngineFramePanel());
-        appendChild(gizmoPanel = new GizmoPanel(position, size));
-        appendChild(cameraPanel = new CameraPositionPanel());
+        initializePanel(headerPanel = new ViewportHeaderPanel());
+        initializePanel(engineFramePanel = new EngineFramePanel());
+        initializePanel(gizmoPanel = new GizmoPanel(position, size));
+        initializePanel(cameraPanel = new CameraPositionPanel());
 
         shortcuts = {
             ShortcutDTO("Change shading mode", ImGuiKey_Q, [this]() {

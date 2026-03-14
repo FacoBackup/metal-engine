@@ -17,8 +17,8 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"FrameBufferService", framebufferService},
-                {"CommandBufferRecorderService", commandBufferRecorderService}
+                {"FrameBufferService", &framebufferService},
+                {"CommandBufferRecorderService", &commandBufferRecorderService}
             };
         }
 

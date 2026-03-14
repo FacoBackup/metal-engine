@@ -28,8 +28,8 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"EngineContext", engineContext},
-                {"EngineRepository", engineRepository}
+                {"EngineContext", &engineContext},
+                {"EngineRepository", &engineRepository}
             };
         }
 

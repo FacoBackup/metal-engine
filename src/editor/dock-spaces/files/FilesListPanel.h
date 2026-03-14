@@ -50,7 +50,7 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"FilesService", filesService}
+                {"FilesService", &filesService}
             };
         }
 

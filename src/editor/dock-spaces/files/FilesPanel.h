@@ -39,13 +39,13 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"FileImporterService", fileImporterService},
-                {"EditorRepository", editorRepository},
-                {"SceneImporterService", sceneImporterService},
-                {"FilesService", filesService},
-                {"NotificationService", notificationService},
-                {"WorldRepository", worldRepository},
-                {"VoxelService", voxelService}
+                {"FileImporterService", &fileImporterService},
+                {"EditorRepository", &editorRepository},
+                {"SceneImporterService", &sceneImporterService},
+                {"FilesService", &filesService},
+                {"NotificationService", &notificationService},
+                {"WorldRepository", &worldRepository},
+                {"VoxelService", &voxelService}
             };
         }
 

@@ -45,11 +45,11 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"VulkanContext", vulkanContext},
-                {"BufferService", bufferService},
-                {"PipelineService", pipelineService},
-                {"DescriptorSetService", descriptorSetService},
-                {"DirectoryService", directoryService}
+                {"VulkanContext", &vulkanContext},
+                {"BufferService", &bufferService},
+                {"PipelineService", &pipelineService},
+                {"DescriptorSetService", &descriptorSetService},
+                {"DirectoryService", &directoryService}
             };
         }
 

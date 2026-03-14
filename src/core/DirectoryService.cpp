@@ -11,6 +11,15 @@
 #include "../engine/repository/WorldRepository.h"
 
 namespace Metal {
+    void DirectoryService::onInitialize() {
+        NFD_Init();
+        updateRootPath(false);
+    }
+
+    void DirectoryService::dispose() {
+        NFD_Quit();
+    }
+
     void DirectoryService::updateRootPath(bool forceSelection) {
         std::string cachedPath;
         std::string cachePathFile = std::filesystem::current_path().string() + CACHED_PATH;

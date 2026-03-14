@@ -14,7 +14,7 @@ namespace Metal {
         TextureService *textureService = nullptr;
     public:
         std::vector<Dependency> getDependencies() override {
-            return {{"TextureService", textureService}};
+            return {{"TextureService", &textureService}};
         }
 
         explicit TextureBuilder(const std::string &id, unsigned w, unsigned h, VkFormat format = VK_FORMAT_R16G16B16A16_SFLOAT)

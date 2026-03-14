@@ -20,14 +20,14 @@ namespace Metal {
         std::unordered_map<std::string, AccordionPanel *> groups{};
         const auto rootPanel = new ChildPanel();
         rootPanel->setFilter(&searchFilter);
-        appendChild(rootPanel);
+        initializePanel(rootPanel);
         rootPanel->setTitle(std::string(inspection->getIcon()) + " " + inspection->getTitle());
         for (const auto &field: inspection->getFields()) {
             if (!groups.contains(field->group)) {
                 const auto panel = new AccordionPanel();
                 panel->setFilter(&searchFilter);
                 groups[field->group] = panel;
-                rootPanel->appendChild(panel);
+                rootPanel->initializePanel(panel);
             }
             AccordionPanel *group = groups[field->group];
             group->setTitle(field->group);
@@ -71,7 +71,7 @@ namespace Metal {
             }
             if (fieldPanel) {
                 fieldPanel->setFilter(&searchFilter);
-                group->appendChild(fieldPanel);
+                group->initializePanel(fieldPanel);
             }
         }
     }

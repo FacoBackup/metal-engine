@@ -18,7 +18,7 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"TextureImporterService", textureImporterService}
+                {"TextureImporterService", &textureImporterService}
             };
         }
 

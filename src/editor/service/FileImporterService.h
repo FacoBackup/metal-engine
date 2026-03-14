@@ -25,11 +25,11 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"SceneImporterService", sceneImporterService},
-                {"TextureImporterService", textureImporterService},
-                {"VoxelImporterService", voxelImporterService},
-                {"NotificationService", notificationService},
-                {"AsyncTaskService", asyncTaskService}
+                {"SceneImporterService", &sceneImporterService},
+                {"TextureImporterService", &textureImporterService},
+                {"VoxelImporterService", &voxelImporterService},
+                {"NotificationService", &notificationService},
+                {"AsyncTaskService", &asyncTaskService}
             };
         }
 

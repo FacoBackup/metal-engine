@@ -405,9 +405,6 @@ namespace Metal {
     }
 
     void RayTracingService::dispose() {
-        LOG_INFO("Destroying acceleration structures");
-        auto &vulkan = vulkanContext;
-
         if (vulkanContext->device.device != VK_NULL_HANDLE) {
             vkDeviceWaitIdle(vulkanContext->device.device);
         }

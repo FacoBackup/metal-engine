@@ -11,14 +11,18 @@ namespace Metal {
     }
 
     void ApplicationContext::onInitialize() {
-        for (auto &instance : instances) {
-            instance->setDependencies(*this);
+        for (auto &instance: instances) {
+            if (instance.get() != this) {
+                instance->setDependencies(*this);
+            }
         }
 
-        for (auto &instance : instances) {
-            auto *init = dynamic_cast<IInit *>(instance.get());
-            if (init) {
-                init->onInitialize();
+        for (auto &instance: instances) {
+            if (instance.get() != this) {
+                auto *init = dynamic_cast<IInit *>(instance.get());
+                if (init) {
+                    init->onInitialize();
+                }
             }
         }
     }
@@ -30,6 +34,9 @@ namespace Metal {
     void ApplicationContext::dispose() {
         try {
             for (auto it = instances.rbegin(); it != instances.rend(); ++it) {
+                if (it->get() == this) {
+                    continue;
+                }
                 auto *disposable = dynamic_cast<IDisposable *>(it->get());
                 if (disposable) {
                     disposable->dispose();

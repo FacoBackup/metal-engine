@@ -25,7 +25,7 @@ namespace Metal {
 
     public:
         std::vector<Dependency> getDependencies() override {
-            return {{"VulkanContext", vulkanContext}};
+            return {{"VulkanContext", &vulkanContext}};
         }
 
         FrameBufferInstance *createFrameBuffer(const std::string &id, unsigned int w, unsigned int h,

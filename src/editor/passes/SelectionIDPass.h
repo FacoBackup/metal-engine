@@ -21,10 +21,10 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"PipelineService", pipelineService},
-                {"EditorRepository", editorRepository},
-                {"WorldRepository", worldRepository},
-                {"MeshService", meshService}
+                {"PipelineService", &pipelineService},
+                {"EditorRepository", &editorRepository},
+                {"WorldRepository", &worldRepository},
+                {"MeshService", &meshService}
             };
         }
 

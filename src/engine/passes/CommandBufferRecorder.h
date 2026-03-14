@@ -3,6 +3,8 @@
 #include "../resource/RuntimeResource.h"
 #include <array>
 #include <vector>
+
+#include "../../common/IInit.h"
 #include "../resource/PipelineInstance.h"
 #include "../../core/vulkan/VulkanUtils.h"
 
@@ -12,7 +14,7 @@ namespace Metal {
     class ApplicationContext;
     struct FrameBufferInstance;
 
-    class CommandBufferRecorder final : public RuntimeResource {
+    class CommandBufferRecorder final : public RuntimeResource, public IInit {
         std::array<VkCommandBuffer, MAX_FRAMES_IN_FLIGHT> _commandBuffers{};
         VkViewport viewport{};
         VkRect2D scissor{};
@@ -29,12 +31,14 @@ namespace Metal {
 
     public:
         std::vector<Dependency> getDependencies() override {
-            return {{"FrameService", frameService}, {"VulkanContext", vulkanContext}};
+            return {{"FrameService", &frameService}, {"VulkanContext", &vulkanContext}};
         }
+
+        void onInitialize() override;
 
         explicit CommandBufferRecorder(std::string id, FrameBufferInstance *frameBuffer, bool clearBuffer = true);
 
-        explicit CommandBufferRecorder(std::string id);
+        explicit CommandBufferRecorder(const std::string &id);
 
         ResourceType resourceType() override {
             return COMMAND_BUFFER_RECORDER;

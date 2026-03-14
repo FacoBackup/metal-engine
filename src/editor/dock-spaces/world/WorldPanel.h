@@ -34,10 +34,10 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"WorldRepository", world},
-                {"EditorRepository", editorRepository},
-                {"SelectionService", selectionService},
-                {"DirectoryService", directoryService}
+                {"WorldRepository", &world},
+                {"EditorRepository", &editorRepository},
+                {"SelectionService", &selectionService},
+                {"DirectoryService", &directoryService}
             };
         }
 

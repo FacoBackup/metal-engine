@@ -5,7 +5,10 @@ namespace Metal {
     void IContextMember::setDependencies(ApplicationContext &ctx) {
         this->ctx = &ctx;
         for (auto &dep : getDependencies()) {
-            dep.ptr = ctx.getSingletonByName(dep.name);
+            void* singleton = ctx.getSingletonByName(dep.name);
+            if (dep.ptr != nullptr) {
+                *static_cast<void**>(dep.ptr) = singleton;
+            }
         }
     }
 }

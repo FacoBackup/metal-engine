@@ -16,7 +16,7 @@ namespace Metal {
 
     public:
         std::vector<Dependency> getDependencies() override {
-            return {{"FilesService", filesService}};
+            return {{"FilesService", &filesService}};
         }
 
         explicit FilesHeaderPanel(FilesContext &files_context, const std::string &actionLabel,

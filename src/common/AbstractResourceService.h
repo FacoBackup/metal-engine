@@ -5,13 +5,14 @@
 #include <unordered_map>
 
 #include "IService.h"
+#include "../ApplicationContext.h"
 #include "../engine/resource/RuntimeResource.h"
 
 namespace Metal {
     class VulkanContext;
 
     template<typename T>
-    class AbstractResourceService : public IService {
+    class AbstractResourceService : public IService, public IDisposable {
         static_assert(std::is_base_of_v<RuntimeResource, T>, "T must be a subclass of RuntimeResource");
 
     protected:
@@ -23,6 +24,10 @@ namespace Metal {
             std::lock_guard lock(resourceMutex);
             auto *resource = new T(id, std::forward<Args>(args)...);
             resources[id] = resource;
+            ctx->injectDependencies(resource);
+            if (auto *initializable = dynamic_cast<IInit *>(resource)) {
+                initializable->onInitialize();
+            }
             return resource;
         }
 
@@ -52,7 +57,7 @@ namespace Metal {
             }
         }
 
-        void disposeAll() {
+        void dispose() override {
             std::lock_guard lock(resourceMutex);
             for (auto it = resources.begin(); it != resources.end();) {
                 auto *r = it->second;

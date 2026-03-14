@@ -14,7 +14,7 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"DirectoryService", directoryService}
+                {"DirectoryService", &directoryService}
             };
         }
 

@@ -25,9 +25,9 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"MeshImporterService", meshImporterService},
-                {"MaterialImporterService", materialImporterService},
-                {"DirectoryService", directoryService}
+                {"MeshImporterService", &meshImporterService},
+                {"MaterialImporterService", &materialImporterService},
+                {"DirectoryService", &directoryService}
             };
         }
 

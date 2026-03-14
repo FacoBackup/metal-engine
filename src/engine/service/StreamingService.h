@@ -33,11 +33,11 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"EngineContext", engineContext},
-                {"WorldRepository", worldRepository},
-                {"MeshService", meshService},
-                {"TextureService", textureService},
-                {"VoxelService", voxelService}
+                {"EngineContext", &engineContext},
+                {"WorldRepository", &worldRepository},
+                {"MeshService", &meshService},
+                {"TextureService", &textureService},
+                {"VoxelService", &voxelService}
             };
         }
 

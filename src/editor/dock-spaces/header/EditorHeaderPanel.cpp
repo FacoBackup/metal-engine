@@ -16,25 +16,27 @@ namespace Metal {
         // Window dragging logic
         if (ImGui::IsWindowHovered() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
             ImVec2 delta = ImGui::GetIO().MouseDelta;
-            GLFWwindow* window = glfwContext->getWindow();
+            GLFWwindow *window = glfwContext->getWindow();
             int x, y;
             glfwGetWindowPos(window, &x, &y);
-            glfwSetWindowPos(window, x + (int)delta.x, y + (int)delta.y);
+            glfwSetWindowPos(window, x + (int) delta.x, y + (int) delta.y);
         }
     }
 
     void EditorHeaderPanel::renderWindowControls() {
         ImGui::SameLine(ImGui::GetWindowWidth() - (UIUtil::ONLY_ICON_BUTTON_SIZE * 3 + 10));
-        
-        GLFWwindow* window = glfwContext->getWindow();
 
-        if (UIUtil::ButtonSimple(Icons::minimize, UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
+        GLFWwindow *window = glfwContext->getWindow();
+
+        if (UIUtil::ButtonSimple((Icons::minimize + id + "min"), UIUtil::ONLY_ICON_BUTTON_SIZE,
+                                 UIUtil::ONLY_ICON_BUTTON_SIZE)) {
             glfwIconifyWindow(window);
         }
         ImGui::SameLine();
 
         bool isMaximized = glfwGetWindowAttrib(window, GLFW_MAXIMIZED);
-        if (UIUtil::ButtonSimple(isMaximized ? Icons::filter_none : Icons::crop_square, UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
+        if (UIUtil::ButtonSimple((isMaximized ? Icons::filter_none : Icons::crop_square) + id + "max",
+                                 UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
             if (isMaximized) {
                 glfwRestoreWindow(window);
             } else {
@@ -43,7 +45,8 @@ namespace Metal {
         }
         ImGui::SameLine();
 
-        if (UIUtil::ButtonSimple(Icons::close, UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
+        if (UIUtil::ButtonSimple(Icons::close + id + "close", UIUtil::ONLY_ICON_BUTTON_SIZE,
+                                 UIUtil::ONLY_ICON_BUTTON_SIZE)) {
             glfwSetWindowShouldClose(window, GLFW_TRUE);
         }
     }
@@ -89,6 +92,6 @@ namespace Metal {
     }
 
     void EditorHeaderPanel::onInitialize() {
-        appendChild(asyncTask = new AsyncTaskPanel());
+        initializePanel(asyncTask = new AsyncTaskPanel());
     }
 }

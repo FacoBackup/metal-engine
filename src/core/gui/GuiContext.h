@@ -15,7 +15,7 @@ namespace Metal {
     class VulkanContext;
     class DescriptorSetService;
 
-    class GuiContext final : public IService, public IDisposable, public IInit {
+    class GuiContext final : public IService, public IInit {
         VulkanContext *vulkanContext = nullptr;
         GLFWContext *glfwContext = nullptr;
         DescriptorSetService *descriptorSetService = nullptr;
@@ -32,9 +32,9 @@ namespace Metal {
 
         std::vector<Dependency> getDependencies() override {
             return {
-                {"VulkanContext", vulkanContext},
-                {"GLFWContext", glfwContext},
-                {"DescriptorSetService", descriptorSetService}
+                {"VulkanContext", &vulkanContext},
+                {"GLFWContext", &glfwContext},
+                {"DescriptorSetService", &descriptorSetService}
             };
         }
 
@@ -42,7 +42,7 @@ namespace Metal {
             return largeIconsFont;
         }
 
-        void dispose() override;
+        void disposeManually();
 
         void onInitialize() override;
 

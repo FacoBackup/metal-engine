@@ -17,7 +17,7 @@ namespace Metal {
 
         std::vector<Dependency> getDependencies() override {
             return {
-                    {"ThemeService", themeService}
+                    {"ThemeService", &themeService}
             };
         }
         [[nodiscard]] virtual bool isVisible() const = 0;

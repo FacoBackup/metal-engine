@@ -21,7 +21,7 @@ namespace Metal {
     class PipelineService;
     class RayTracingService;
 
-    class VulkanContext final : public IService, public IDisposable, public IInit {
+    class VulkanContext final : public IService, public IInit {
         GLFWContext *glfwContext = nullptr;
         EngineRepository *engineRepository = nullptr;
         MeshService *meshService = nullptr;
@@ -70,13 +70,13 @@ namespace Metal {
 
         std::vector<Dependency> getDependencies() override {
             return {
-                {"GLFWContext", glfwContext},
-                {"EngineRepository", engineRepository},
-                {"MeshService", meshService},
-                {"TextureService", textureService},
-                {"FrameBufferService", framebufferService},
-                {"PipelineService", pipelineService},
-                {"RayTracingService", rayTracingService}
+                {"GLFWContext", &glfwContext},
+                {"EngineRepository", &engineRepository},
+                {"MeshService", &meshService},
+                {"TextureService", &textureService},
+                {"FrameBufferService", &framebufferService},
+                {"PipelineService", &pipelineService},
+                {"RayTracingService", &rayTracingService}
             };
         }
 
@@ -108,7 +108,7 @@ namespace Metal {
         PFN_vkGetRayTracingShaderGroupHandlesKHR vkGetRayTracingShaderGroupHandlesKHR = nullptr;
         PFN_vkCmdTraceRaysKHR vkCmdTraceRaysKHR = nullptr;
 
-        void dispose() override;
+        void disposeManually();
 
         void onInitialize() override;
 

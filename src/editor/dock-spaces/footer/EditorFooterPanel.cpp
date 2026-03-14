@@ -20,14 +20,15 @@ namespace Metal {
     void EditorFooterPanel::renderShortcuts() {
         auto &shortcuts = editorRepository->focusedShortcuts;
         if (shortcuts.empty()) return;
-        
+
         ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5); // Some padding
+
         ImGui::Text(editorRepository->focusedWindowName.c_str());
         ImGui::SameLine();
         std::string label;
         for (size_t i = 0; i < std::min(shortcuts.size(), size_t(3)); ++i) {
             if (i > 0) label += " | ";
-            label += UIUtil::GetKeyChordName(shortcuts[i].keyChord);
+            label += UIUtil::GetKeyChordName(shortcuts[i].keyChord) + " " + shortcuts[i].name;
         }
 
         if (ImGui::Button(label.c_str())) {

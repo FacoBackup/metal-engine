@@ -22,10 +22,10 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"VulkanContext", vulkanContext},
-                {"FrameBufferService", framebufferService},
-                {"BufferService", bufferService},
-                {"TextureService", textureService}
+                {"VulkanContext", &vulkanContext},
+                {"FrameBufferService", &framebufferService},
+                {"BufferService", &bufferService},
+                {"TextureService", &textureService}
             };
         }
 

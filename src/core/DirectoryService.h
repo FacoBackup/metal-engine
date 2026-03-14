@@ -1,5 +1,7 @@
 #ifndef METAL_ENGINE_DIRECTORYSERVICE_H
 #define METAL_ENGINE_DIRECTORYSERVICE_H
+#include "../common/IDisposable.h"
+#include "../common/IInit.h"
 #include "../common/IService.h"
 
 namespace Metal {
@@ -8,7 +10,7 @@ namespace Metal {
     struct WorldRepository;
     class NotificationService;
 
-    struct DirectoryService final : IService {
+    struct DirectoryService final : IService, IInit, IDisposable{
         EditorRepository *editorRepository = nullptr;
         EngineRepository *engineRepository = nullptr;
         WorldRepository *worldRepository = nullptr;
@@ -18,12 +20,16 @@ namespace Metal {
 
         std::vector<Dependency> getDependencies() override {
             return {
-                {"EditorRepository", editorRepository},
-                {"EngineRepository", engineRepository},
-                {"WorldRepository", worldRepository},
-                {"NotificationService", notificationService}
+                {"EditorRepository", &editorRepository},
+                {"EngineRepository", &engineRepository},
+                {"WorldRepository", &worldRepository},
+                {"NotificationService", &notificationService}
             };
         }
+
+        void onInitialize() override;
+
+        void dispose() override;
 
         void updateRootPath(bool forceSelection);
 

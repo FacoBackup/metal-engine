@@ -25,12 +25,12 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"VulkanContext", vulkanContext},
-                {"EngineRepository", engineRepository},
-                {"EngineContext", engineContext},
-                {"DescriptorSetService", descriptorSetService},
-                {"PickingService", pickingService},
-                {"SelectionService", selectionService}
+                {"VulkanContext", &vulkanContext},
+                {"EngineRepository", &engineRepository},
+                {"EngineContext", &engineContext},
+                {"DescriptorSetService", &descriptorSetService},
+                {"PickingService", &pickingService},
+                {"SelectionService", &selectionService}
             };
         }
 

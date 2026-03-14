@@ -15,10 +15,9 @@
 #include "../../editor/enum/ShadingMode.h"
 #include "glslang/Include/glslang_c_interface.h"
 #include "glslang/Public/resource_limits_c.h"
-#define BASE_PATH directoryService->getShadersDirectory()
-
 #include "../../core/DirectoryService.h"
 #include "../../core/vulkan/VulkanContext.h"
+#define BASE_PATH "../resources/shaders/"
 
 namespace Metal {
     void ShaderService::CheckShaderCompilation(glslang_shader_t *shader) {
@@ -134,7 +133,7 @@ namespace Metal {
         throw std::runtime_error("Unknown shader stage in file");
     }
 
-    std::string ShaderService::ProcessIncludes(const std::string &input, const std::string &basePath) {
+    std::string ShaderService::ProcessIncludes(const std::string &input) {
         std::string result = input;
         std::regex includePattern(R"(#include\s+"(.+))");
         std::smatch match;
@@ -147,7 +146,7 @@ namespace Metal {
             }
             try {
                 std::string source;
-                FilesUtil::ReadFile((basePath + includeFile).c_str(), source);
+                FilesUtil::ReadFile((BASE_PATH + includeFile).c_str(), source);
                 result.replace(match.position(0), match.length(0), source);
             } catch (const std::exception &e) {
                 LOG_ERROR("Error loading included shader: " + std::string(e.what()));
@@ -155,21 +154,20 @@ namespace Metal {
             }
         }
         if (result.find("#include") != std::string::npos) {
-            result = ProcessIncludes(result, basePath);
+            result = ProcessIncludes(result);
         }
         return result;
     }
 
-    std::string ShaderService::ProcessShader(const std::string &file, const std::string &basePath) {
+    std::string ShaderService::ProcessShader(const std::string &file) {
         std::string source;
         FilesUtil::ReadFile(file.c_str(), source);
-        return ProcessIncludes(source, basePath);
+        return ProcessIncludes(source);
     }
 
     VkShaderModule ShaderService::createShaderModule(const std::string &pFilename) {
-        this->isDebugMode = ctx->isDebugMode();
-        std::string source = ProcessShader(BASE_PATH + pFilename, BASE_PATH);
-        if (isDebugMode) {
+        std::string source = ProcessShader(BASE_PATH + pFilename);
+        if (ctx->isDebugMode()) {
             source = "#define DEBUG\n" + source;
         }
         for (auto &entry: ShadingModes::getShaderEntries()) {
@@ -181,9 +179,8 @@ namespace Metal {
         const size_t sourceHash = std::hash<std::string>{}(source);
         const std::string part(BASE_PATH + pFilename);
         const std::string shaderName = part.substr(part.find_last_of('/') + 1, part.size());
-        const std::string shadersDirectory = directoryService->getShadersDirectory();
-        const std::string binaryFilename = shadersDirectory + shaderName + ".spv";
-        const std::string hashFilename = shadersDirectory + shaderName + ".hash";
+        const std::string binaryFilename = directoryService->getShadersDirectory() + shaderName + ".spv";
+        const std::string hashFilename = directoryService->getShadersDirectory() + shaderName + ".hash";
 
         ShaderModule shader{};
 

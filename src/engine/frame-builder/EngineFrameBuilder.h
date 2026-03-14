@@ -33,7 +33,7 @@ namespace Metal {
 
     public:
         std::vector<Dependency> getDependencies() override {
-            return {{"EngineContext", engineContext}};
+            return {{"EngineContext", &engineContext}};
         }
 
         explicit EngineFrameBuilder(std::string frameId = Util::uuidV4());

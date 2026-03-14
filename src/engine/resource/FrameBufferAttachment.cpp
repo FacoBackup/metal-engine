@@ -7,9 +7,5 @@ namespace Metal {
         vkDestroyImage(vulkanContext->device.device, vkImage, nullptr);
         vkDestroyImageView(vulkanContext->device.device, vkImageView, nullptr);
         vkFreeMemory(vulkanContext->device.device, vkImageMemory, nullptr);
-
-        if (imageDescriptor != nullptr) {
-            descriptorSetService->disposeResource(imageDescriptor);
-        }
     }
 }

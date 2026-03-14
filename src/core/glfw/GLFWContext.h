@@ -18,7 +18,7 @@ namespace Metal {
     class ApplicationContext;
     class VulkanContext;
 
-    class GLFWContext final : public IContextMember, public IInit, public IDisposable {
+    class GLFWContext final : public IContextMember, public IInit {
         VulkanContext *vulkanContext = nullptr;
         GLFWwindow *window = nullptr;
         bool validContext = true;
@@ -27,7 +27,7 @@ namespace Metal {
 
     public:
         std::vector<Dependency> getDependencies() override {
-            return {{"VulkanContext", vulkanContext}};
+            return {{"VulkanContext", &vulkanContext}};
         }
 
         void setSwapChainRebuild(bool val);
@@ -44,7 +44,7 @@ namespace Metal {
 
         bool beginFrame();
 
-        void dispose() override;
+        void disposeManually();
 
         [[nodiscard]] ImGui_ImplVulkanH_Window &getGUIWindow() const;
     };

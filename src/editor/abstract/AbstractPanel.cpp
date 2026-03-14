@@ -3,10 +3,13 @@
 #include "../../ApplicationContext.h"
 
 namespace Metal {
-    void AbstractPanel::appendChild(AbstractPanel *panel) {
+    void AbstractPanel::initializePanel(AbstractPanel *panel, bool addToChildList) {
+        panel->ctx = ctx;
         ctx->injectDependencies(panel);
         panel->onInitialize();
-        children.push_back(panel);
+        if (addToChildList) {
+            children.push_back(panel);
+        }
     }
 
     void AbstractPanel::onSyncChildren() const {

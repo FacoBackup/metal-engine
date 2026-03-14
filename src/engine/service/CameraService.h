@@ -51,9 +51,9 @@ namespace Metal {
 
         std::vector<Dependency> getDependencies() override {
             return {
-                {"EngineContext", engineContext},
-                {"WorldRepository", worldRepository},
-                {"RuntimeRepository", runtimeRepository}
+                {"EngineContext", &engineContext},
+                {"WorldRepository", &worldRepository},
+                {"RuntimeRepository", &runtimeRepository}
             };
         }
 

@@ -36,8 +36,8 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"DockService", dockService},
-                {"ThemeService", themeService}
+                {"DockService", &dockService},
+                {"ThemeService", &themeService}
             };
         }
 

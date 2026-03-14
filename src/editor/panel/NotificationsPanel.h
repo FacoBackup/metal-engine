@@ -13,8 +13,8 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"NotificationService", notificationService},
-                {"EngineContext", engineContext}
+                {"NotificationService", &notificationService},
+                {"EngineContext", &engineContext}
             };
         }
 

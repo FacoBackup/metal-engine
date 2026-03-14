@@ -141,7 +141,7 @@ namespace Metal {
         delete fontConfig;
     }
 
-    void GuiContext::dispose() {
+    void GuiContext::disposeManually() {
         const VkResult err = vkDeviceWaitIdle(vulkanContext->device.device);
         VulkanUtils::CheckVKResult(err);
         ImGui_ImplVulkan_Shutdown();

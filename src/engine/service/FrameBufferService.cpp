@@ -111,6 +111,7 @@ namespace Metal {
         for (unsigned int i = 0; i < framebuffer->attachments.size(); i++) {
             VkAttachmentDescription &attachmentDescription = attachmentDescriptions.emplace_back();
             const std::shared_ptr<FrameBufferAttachment> fbAttachment = framebuffer->attachments[i];
+            ctx->injectDependencies(fbAttachment.get());
             attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
             attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
             attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;

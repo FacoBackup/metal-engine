@@ -22,7 +22,7 @@ namespace Metal {
 
         std::vector<AbstractPanel *> &getChildren();
 
-        void appendChild(AbstractPanel *panel);
+        void initializePanel(AbstractPanel *panel, bool addToChildList = true);
 
         void removeAllChildren();
 

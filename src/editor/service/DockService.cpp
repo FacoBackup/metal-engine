@@ -135,10 +135,10 @@ namespace Metal {
         ImGui::DockBuilderDockWindow(d->internalId.c_str(), d->nodeId);
         for (auto *l: panel->getChildren()) {
             if (dynamic_cast<DockSpacePanel *>(l)) {
-                panel->appendChild(new DockSpacePanel(dynamic_cast<DockSpacePanel *>(l), d));
+                panel->initializePanel(new DockSpacePanel(dynamic_cast<DockSpacePanel *>(l), d));
                 return;
             }
         }
-        panel->appendChild(new DockSpacePanel(nullptr, d));
+        panel->initializePanel(new DockSpacePanel(nullptr, d));
     }
 }

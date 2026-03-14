@@ -21,13 +21,14 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"EditorRepository", editorRepository},
-                {"EngineRepository", engineRepository},
-                {"WorldRepository", worldRepository}
+                {"EditorRepository", &editorRepository},
+                {"EngineRepository", &engineRepository},
+                {"WorldRepository", &worldRepository}
             };
         }
 
         void onInitialize() override;
+
         void onSync() override;
     };
 }

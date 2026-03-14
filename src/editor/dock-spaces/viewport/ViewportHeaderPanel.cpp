@@ -7,7 +7,7 @@
 
 namespace Metal {
     void ViewportHeaderPanel::onInitialize() {
-        appendChild(gizmo = new GizmoSettingsPanel());
+        initializePanel(gizmo = new GizmoSettingsPanel());
     }
 
     void ViewportHeaderPanel::onSync() {

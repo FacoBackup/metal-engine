@@ -23,11 +23,11 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"RayTracingService", rayTracingService},
-                {"PipelineService", pipelineService},
-                {"VulkanContext", vulkanContext},
-                {"EngineContext", engineContext},
-                {"EngineRepository", engineRepository}
+                {"RayTracingService", &rayTracingService},
+                {"PipelineService", &pipelineService},
+                {"VulkanContext", &vulkanContext},
+                {"EngineContext", &engineContext},
+                {"EngineRepository", &engineRepository}
             };
         }
 

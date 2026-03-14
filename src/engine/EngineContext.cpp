@@ -41,9 +41,10 @@ namespace Metal {
     }
 
     void EngineContext::setCurrentFrame(const std::string &id) {
-        for (auto *frame : registeredFrames) {
+        for (auto *frame: registeredFrames) {
             if (frame->getId() == id) {
                 currentFrame = frame;
+                currentFrame->setShouldRender(true);
                 return;
             }
         }

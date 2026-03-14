@@ -22,9 +22,9 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"GLFWContext", glfwContext},
-                {"EngineContext", engineContext},
-                {"DirectoryService", directoryService}
+                {"GLFWContext", &glfwContext},
+                {"EngineContext", &engineContext},
+                {"DirectoryService", &directoryService}
             };
         }
 

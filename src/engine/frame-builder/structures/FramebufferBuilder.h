@@ -24,7 +24,7 @@ namespace Metal {
         FrameBufferService *frameBufferService = nullptr;
     public:
         std::vector<Dependency> getDependencies() override {
-            return {{"FrameBufferService", frameBufferService}};
+            return {{"FrameBufferService", &frameBufferService}};
         }
 
         explicit FramebufferBuilder(const std::string &id, const unsigned w, const unsigned h, glm::vec4 clearColor)

@@ -31,7 +31,7 @@ namespace Metal {
         void onSync() override;
 
         std::vector<Dependency> getDependencies() override {
-            return {{"EditorRepository", editorRepository}};
+            return {{"EditorRepository", &editorRepository}};
         }
     };
 } // Metal

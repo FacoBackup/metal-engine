@@ -104,13 +104,18 @@ int main(int, char **) {
     directoryService.updateRootPath(false);
     Metal::EditorPanel editor{};
     context->injectDependencies(&editor);
+    editor.onInitialize();
 
     frameService.setPanel(&editor);
     if (!frameService.isValidContext()) {
         printf("GLFW: Vulkan Not Supported\n");
         return 1;
     }
-    frameService.onInitialize();
+    frameService.start();
     context->dispose();
+    context->getSingleton<Metal::GuiContext>().disposeManually();
+    context->getSingleton<Metal::VulkanContext>().disposeManually();
+    context->getSingleton<Metal::GLFWContext>().disposeManually();
+
     return 0;
 }

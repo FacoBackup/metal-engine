@@ -36,7 +36,7 @@ namespace Metal {
             newView->size = &size;
             newView->dock = selectedSpace;
             newView->position = &position;
-            appendChild(newView);
+            initializePanel(newView);
             views.emplace(selectedSpace->index, newView);
             view = newView;
         } else {

@@ -30,13 +30,13 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"CameraService", cameraService},
-                {"SelectionService", selectionService},
-                {"EditorRepository", editorRepository},
-                {"WorldRepository", worldRepository},
-                {"RuntimeRepository", runtimeRepository},
-                {"EngineContext", engineContext},
-                {"DirectoryService", directoryService}
+                {"CameraService", &cameraService},
+                {"SelectionService", &selectionService},
+                {"EditorRepository", &editorRepository},
+                {"WorldRepository", &worldRepository},
+                {"RuntimeRepository", &runtimeRepository},
+                {"EngineContext", &engineContext},
+                {"DirectoryService", &directoryService}
             };
         }
 

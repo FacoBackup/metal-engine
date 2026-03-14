@@ -18,7 +18,7 @@ namespace Metal {
 
     public:
         std::vector<Dependency> getDependencies() override {
-            return {{"BufferService", bufferService}};
+            return {{"BufferService", &bufferService}};
         }
 
         explicit BufferBuilder(const std::string &id, VkDeviceSize size, VkBufferUsageFlags usage,

@@ -75,14 +75,14 @@ namespace Metal {
 
         std::vector<Dependency> getDependencies() override {
             return {
-                {"VulkanContext", vulkanContext},
-                {"PipelineService", pipelineService},
-                {"WorldRepository", worldRepository},
-                {"MeshService", meshService},
-                {"MaterialService", materialService},
-                {"BufferService", bufferService},
-                {"EngineContext", engineContext},
-                {"DescriptorSetService", descriptorSetService}
+                {"VulkanContext", &vulkanContext},
+                {"PipelineService", &pipelineService},
+                {"WorldRepository", &worldRepository},
+                {"MeshService", &meshService},
+                {"MaterialService", &materialService},
+                {"BufferService", &bufferService},
+                {"EngineContext", &engineContext},
+                {"DescriptorSetService", &descriptorSetService}
             };
         }
 

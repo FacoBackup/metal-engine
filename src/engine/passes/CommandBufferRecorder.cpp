@@ -11,7 +11,7 @@
 #include "../../core/FrameService.h"
 
 namespace Metal {
-    void CommandBufferRecorder::createCommandBuffer() {
+    void CommandBufferRecorder::onInitialize() {
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocInfo.commandPool = vulkanContext->commandPool;
@@ -36,12 +36,10 @@ namespace Metal {
         scissor.extent.width = frameBuffer->bufferWidth;
         scissor.extent.height = frameBuffer->bufferHeight;
 
-        createCommandBuffer();
         computePassMode = false;
     }
 
-    CommandBufferRecorder::CommandBufferRecorder(std::string id) : RuntimeResource(std::move(id)) {
-        createCommandBuffer();
+    CommandBufferRecorder::CommandBufferRecorder(const std::string &id) : RuntimeResource(id) {
         computePassMode = true;
     }
 

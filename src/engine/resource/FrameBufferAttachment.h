@@ -15,6 +15,13 @@ namespace Metal {
 
         void dispose() const;
 
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"VulkanContext", &vulkanContext},
+                {"DescriptorSetService", &descriptorSetService}
+            };
+        }
+
     private:
         VulkanContext *vulkanContext = nullptr;
         DescriptorSetService *descriptorSetService = nullptr;

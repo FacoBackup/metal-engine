@@ -19,7 +19,7 @@ namespace Metal {
     }
 
     void ResourceField::onInitialize() {
-        appendChild(new ResourceFilesPanel([this](FSEntry *file) {
+        initializePanel(new ResourceFilesPanel([this](FSEntry *file) {
             if (file == nullptr) {
                 open = false;
                 return;
