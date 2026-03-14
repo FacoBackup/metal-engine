@@ -50,7 +50,7 @@
 #include "engine/EngineContext.h"
 
 int main(int, char **) {
-    std::shared_ptr<Metal::ApplicationContext> context{};
+    std::shared_ptr<Metal::ApplicationContext> context = std::make_shared<Metal::ApplicationContext>(false);
 
     // --- ORDER MATTERS
     context->registerSingleton(context);

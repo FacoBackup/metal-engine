@@ -59,7 +59,7 @@ namespace Metal {
             throw std::runtime_error("Import cancelled");
         }
 
-        meshImporterService.persistAllMeshes(targetDir, scene, meshMap, stopToken);
+        meshImporterService->persistAllMeshes(targetDir, scene, meshMap, stopToken);
 
         if (stopToken.stop_requested()) {
             throw std::runtime_error("Import cancelled");
@@ -133,7 +133,7 @@ namespace Metal {
             childMeshNode.entity.name = assimpMesh->mName.length > 0 ? assimpMesh->mName.data : "Mesh";
 
             const aiMaterial *material = aiScene->mMaterials[assimpMesh->mMaterialIndex];
-            materialImporterService.importMaterial(targetDir, material, aiScene, rootDirectory,
+            materialImporterService->importMaterial(targetDir, material, aiScene, rootDirectory,
                                                        *childMeshNode.primitive, stopToken);
         }
     }

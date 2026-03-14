@@ -12,9 +12,9 @@ namespace Metal {
         }
     }
 
-    void EngineFrame::addPass(CommandBufferRecorder *recorder, const std::vector<std::unique_ptr<AbstractPass>> &p) {
+    void EngineFrame::addPass(CommandBufferRecorder *recorder, std::vector<std::unique_ptr<AbstractPass>> p) {
         if (recorder) {
-            passes.emplace_back(recorder, p);
+            passes.emplace_back(recorder, std::move(p));
         }
     }
 

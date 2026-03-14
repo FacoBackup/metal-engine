@@ -21,9 +21,11 @@ namespace Metal {
                             BufferInstance *buffer) const;
 
     public:
-        BufferService() = default;
-
-        std::vector<Dependency> getDependencies() override;
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"VulkanContext", &vulkanContext}
+            };
+        }
 
         [[nodiscard]] unsigned int findMemoryType(unsigned int typeFilter, VkMemoryPropertyFlags properties) const;
 

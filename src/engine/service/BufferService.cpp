@@ -5,6 +5,8 @@
 #include "../resource/BufferInstance.h"
 
 namespace Metal {
+
+
     BufferInstance *BufferService::createBuffer(const std::string &id, VkDeviceSize bufferSize,
                                                 VkBufferUsageFlags usageFlags,
                                                 VkMemoryPropertyFlags memoryPropertyFlags, BufferType type) {

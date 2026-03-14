@@ -129,7 +129,10 @@ namespace Metal {
 
         for (const auto &cbId: recorderOrder) {
             if (auto *recorder = dynamic_cast<CommandBufferRecorder *>(builtResources.at(cbId))) {
-                frame->addPass(recorder, recorderToPasses[cbId]);
+                auto it = recorderToPasses.find(cbId);
+                if (it != recorderToPasses.end() && !it->second.empty()) {
+                    frame->addPass(recorder, std::move(it->second));
+                }
             }
         }
 

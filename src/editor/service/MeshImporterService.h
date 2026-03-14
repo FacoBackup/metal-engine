@@ -9,6 +9,8 @@
 #include <glm/vec3.hpp>
 
 namespace Metal {
+    struct DirectoryService;
+
     struct MeshId {
         std::string id;
         glm::vec3 gizmoCenter;

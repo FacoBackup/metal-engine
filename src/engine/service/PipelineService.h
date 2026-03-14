@@ -27,7 +27,15 @@ namespace Metal {
     public:
         PipelineService() = default;
 
-        std::vector<Dependency> getDependencies() override;
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"VulkanContext", &vulkanContext},
+                {"FramebufferService", &framebufferService},
+                {"BufferService", &bufferService},
+                {"DescriptorSetService", &descriptorSetService},
+                {"ShaderService", &shaderService}
+            };
+        }
 
         PipelineInstance *createPipeline(PipelineBuilder &pipelineBuilder);
 

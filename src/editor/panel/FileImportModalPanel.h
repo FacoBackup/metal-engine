@@ -3,6 +3,7 @@
 #include "../abstract/AbstractPanel.h"
 
 namespace Metal {
+    class FilesService;
     class FormPanel;
     struct EditorRepository;
     class FileImporterService;
@@ -15,13 +16,15 @@ namespace Metal {
         EditorRepository *editorRepository = nullptr;
         FileImporterService *fileImporterService = nullptr;
         NotificationService *notificationService = nullptr;
+        FilesService *filesService = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
             return {
                 {"EditorRepository", editorRepository},
                 {"FileImporterService", fileImporterService},
-                {"NotificationService", notificationService}
+                {"NotificationService", notificationService},
+                {"FilesService", filesService}
             };
         }
 

@@ -8,6 +8,8 @@
 #include <filesystem>
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <cctype>
 
 #include "common/IInit.h"
 #include "common/IContextMember.h"
@@ -23,6 +25,22 @@ namespace Metal {
         std::vector<std::shared_ptr<IContextMember> > instances;
         bool debugMode;
 
+        template<typename T>
+        static std::string getTypeName() {
+            std::string name = typeid(T).name();
+            size_t lastSpace = name.find_last_of(' ');
+            if (lastSpace != std::string::npos) {
+                name = name.substr(lastSpace + 1);
+            }
+            size_t lastColon = name.find_last_of(':');
+            if (lastColon != std::string::npos) {
+                name = name.substr(lastColon + 1);
+            }
+            std::transform(name.begin(), name.end(), name.begin(),
+                           [](unsigned char c) { return std::tolower(c); });
+            return name;
+        }
+
     public:
         explicit ApplicationContext(bool debugMode);
 
@@ -32,23 +50,27 @@ namespace Metal {
         void registerSingleton(std::shared_ptr<T> instance) {
             static_assert(std::is_base_of_v<IContextMember, T>, "T must derive from IContextMember");
             T *ptr = instance.get();
-            singletons[typeid(T).name()] = static_cast<IContextMember *>(ptr);
+            singletons[getTypeName<T>()] = static_cast<IContextMember *>(ptr);
             instances.push_back(std::move(instance));
         }
 
         template<typename T>
         T &getSingleton() {
-            auto it = singletons.find(typeid(T).name());
+            auto name = getTypeName<T>();
+            auto it = singletons.find(name);
             if (it == singletons.end()) {
-                throw std::runtime_error(std::string("Singleton not registered: ") + typeid(T).name());
+                throw std::runtime_error(std::string("Singleton not registered: ") + name);
             }
             return *static_cast<T *>(it->second);
         }
 
         void *getSingletonByName(const std::string &name) {
-            auto it = singletons.find(name);
+            std::string lowerName = name;
+            std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(),
+                           [](unsigned char c) { return std::tolower(c); });
+            auto it = singletons.find(lowerName);
             if (it == singletons.end()) {
-                throw std::runtime_error(std::string("Singleton not registered: ") + name);
+                throw std::runtime_error(std::string("Singleton not registered: ") + lowerName);
             }
             return it->second;
         }

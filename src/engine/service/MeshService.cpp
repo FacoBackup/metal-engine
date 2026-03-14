@@ -5,6 +5,7 @@
 
 #include "../../core/vulkan/VulkanContext.h"
 #include "../../common/FilesUtil.h"
+#include "../../common/LoggerUtil.h"
 #include "../../core/DirectoryService.h"
 #include <cereal/archives/binary.hpp>
 

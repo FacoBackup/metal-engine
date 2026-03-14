@@ -27,14 +27,14 @@ std::filesystem::remove_all(rootDir + "/assets/" + F(entry.second->getId()));
         std::filesystem::file_time_type ftime = last_write_time(entry);
 
 namespace Metal {
-    void filesService->onInitialize() {
+    void FilesService::onInitialize() {
         root = new FSEntry(nullptr, directoryService->getAssetRefDirectory(), "");
         root->type = EntryType::DIRECTORY;
         root->name = "Files";
         GetEntries(root);
     }
 
-    std::unique_ptr<FSEntry> filesService->getResource(const std::string &id) {
+    std::unique_ptr<FSEntry> FilesService::getResource(const std::string &id) {
         try {
             for (const auto &entry: fs::recursive_directory_iterator(root->absolutePath)) {
                 if (entry.is_regular_file() &&
@@ -57,7 +57,7 @@ namespace Metal {
         return nullptr;
     }
 
-    void filesService->deleteFiles(const std::unordered_map<std::string, FSEntry *> &selected) {
+    void FilesService::deleteFiles(const std::unordered_map<std::string, FSEntry *> &selected) {
         for (auto &entry: selected) {
             switch (entry.second->type) {
                 case EntryType::DIRECTORY: {
@@ -91,7 +91,7 @@ namespace Metal {
         }
     }
 
-    void filesService->CreateDirectory(FSEntry *currentDirectory) {
+    void FilesService::CreateDirectory(FSEntry *currentDirectory) {
         int count = 0;
         for (FSEntry *child: currentDirectory->children) {
             if (child->type == EntryType::DIRECTORY && child->name == "New Directory (" + std::to_string(count) + ")") {
@@ -105,7 +105,7 @@ namespace Metal {
         std::filesystem::create_directory(pathToDir);
     }
 
-    void filesService->Move(FSEntry *toMove, FSEntry *targetDir) {
+    void FilesService::Move(FSEntry *toMove, FSEntry *targetDir) {
         if (!targetDir || targetDir->type != EntryType::DIRECTORY) {
             return;
         }
@@ -133,7 +133,7 @@ namespace Metal {
         targetDir->children.push_back(toMove);
     }
 
-    void filesService->GetEntries(FSEntry *root) {
+    void FilesService::GetEntries(FSEntry *root) {
         if (root->type != EntryType::DIRECTORY) {
             return;
         }

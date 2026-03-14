@@ -38,7 +38,7 @@ namespace Metal {
             return nullptr;
         }
 
-        void addPass(CommandBufferRecorder *recorder, const std::vector<std::unique_ptr<AbstractPass>> &p);
+        void addPass(CommandBufferRecorder *recorder, std::vector<std::unique_ptr<AbstractPass>> p);
 
         void onSync();
 
