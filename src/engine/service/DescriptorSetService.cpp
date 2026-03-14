@@ -1,7 +1,7 @@
 #include "DescriptorSetService.h"
 #include "../dto/PipelineBuilder.h"
 #include "../resource/BufferInstance.h"
-#include "../../editor/service/LogService.h"
+#include "../../common/LoggerUtil.h"
 #include "../../core/vulkan/VulkanContext.h"
 #include "FrameBufferService.h"
 #include "BufferService.h"
@@ -12,10 +12,11 @@
 #include "../../core/vulkan/VulkanUtils.h"
 
 namespace Metal {
-    DescriptorInstance *DescriptorSetService::createDescriptor(const PipelineBuilder &pipelineBuilder, const std::string &id, VkShaderStageFlags stageFlags) {
+    DescriptorInstance *DescriptorSetService::createDescriptor(const PipelineBuilder &pipelineBuilder,
+                                                               const std::string &id, VkShaderStageFlags stageFlags) {
         auto *descriptorInstance = createResourceInstance(id);
 
-        for (auto &builder : pipelineBuilder.resourceBindings) {
+        for (auto &builder: pipelineBuilder.resourceBindings) {
             DescriptorBinding binding{};
             binding.bindingPoint = builder.bindingPoint;
             binding.descriptorCount = builder.descriptorCount;
@@ -36,7 +37,7 @@ namespace Metal {
                 }
                 binding.view = fbo->attachments[binding.attachmentIndex]->vkImageView;
                 if (binding.sampler == VK_NULL_HANDLE) {
-                    binding.sampler = vulkanContext.vkImageSampler;
+                    binding.sampler = vulkanContext->vkImageSampler;
                 }
             }
 
@@ -45,7 +46,7 @@ namespace Metal {
                     binding.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
                     break;
                 case DescriptorBindingType::BUFFER: {
-                    BufferInstance *buffer = bufferService.getResource(binding.bufferId);
+                    BufferInstance *buffer = bufferService->getResource(binding.bufferId);
 
                     if (buffer != nullptr) {
                         binding.descriptorType = buffer->getBufferType() == BufferType::UNIFORM_BUFFER
@@ -80,26 +81,27 @@ namespace Metal {
 
     void DescriptorSetService::disposeResource(DescriptorInstance *resource) {
         LOG_INFO("Disposing of descriptor set resource");
-        vkDestroyDescriptorSetLayout(vulkanContext.device.device, resource->vkDescriptorSetLayout, nullptr);
+        vkDestroyDescriptorSetLayout(vulkanContext->device.device, resource->vkDescriptorSetLayout, nullptr);
     }
 
     std::vector<DescriptorInstance *> DescriptorSetService::getAllDescriptors() const {
         std::vector<DescriptorInstance *> descriptors;
         std::lock_guard lock(resourceMutex);
-        for (auto const& [id, descriptor] : resources) {
+        for (auto const &[id, descriptor]: resources) {
             descriptors.emplace_back(descriptor);
         }
         return descriptors;
     }
 
     void DescriptorSetService::setImageDescriptor(const FrameBufferInstance *framebuffer,
-                                               unsigned int attachmentIndex) {
+                                                  unsigned int attachmentIndex) {
         auto attachment = framebuffer->attachments[attachmentIndex];
         if (attachment->imageDescriptor == nullptr) {
-            attachment->imageDescriptor = createResourceInstance(framebuffer->getId() + std::to_string(attachmentIndex));
+            attachment->imageDescriptor =
+                    createResourceInstance(framebuffer->getId() + std::to_string(attachmentIndex));
             attachment->imageDescriptor->bindings.push_back(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
                 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
-                vulkanContext.vkImageSampler,
+                vulkanContext->vkImageSampler,
                 attachment->vkImageView));
             updateDescriptor(attachment->imageDescriptor);
         }
@@ -109,14 +111,15 @@ namespace Metal {
         if (texture->imageDescriptor == nullptr) {
             texture->imageDescriptor = createResourceInstance(texture->getId() + "_descriptor");
             texture->imageDescriptor->bindings.push_back(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                                             VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                                             0,
-                                                                             texture->vkSampler,
-                                                                             texture->vkImageView
+                                                                               VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                                                               0,
+                                                                               texture->vkSampler,
+                                                                               texture->vkImageView
             ));
             updateDescriptor(texture->imageDescriptor);
         }
     }
+
     void DescriptorSetService::updateDescriptor(DescriptorInstance *descriptor) {
         if (descriptor->bindings.empty()) {
             throw std::runtime_error("No descriptor layout sets were created");
@@ -134,7 +137,8 @@ namespace Metal {
             samplerLayoutBinding.pImmutableSamplers = nullptr;
 
             if (binding.descriptorCount > 1) {
-                bindingFlags.push_back(VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT);
+                bindingFlags.push_back(
+                    VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT);
             } else {
                 bindingFlags.push_back(0);
             }
@@ -153,31 +157,32 @@ namespace Metal {
         layoutInfo.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT_EXT;
         layoutInfo.pNext = &flagsInfo;
 
-        VulkanUtils::CheckVKResult(vkCreateDescriptorSetLayout(vulkanContext.device.device, &layoutInfo,
+        VulkanUtils::CheckVKResult(vkCreateDescriptorSetLayout(vulkanContext->device.device, &layoutInfo,
                                                                nullptr,
                                                                &descriptor->vkDescriptorSetLayout));
 
         VkDescriptorSetAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        allocInfo.descriptorPool = vulkanContext.descriptorPool; // Created during setup
+        allocInfo.descriptorPool = vulkanContext->descriptorPool; // Created during setup
         allocInfo.descriptorSetCount = 1;
         allocInfo.pSetLayouts = &descriptor->vkDescriptorSetLayout;
 
-        VulkanUtils::CheckVKResult(vkAllocateDescriptorSets(vulkanContext.device.device, &allocInfo, &descriptor->vkDescriptorSet));
+        VulkanUtils::CheckVKResult(
+            vkAllocateDescriptorSets(vulkanContext->device.device, &allocInfo, &descriptor->vkDescriptorSet));
 
         // WRITE
-        Write(vulkanContext, bufferService, descriptor->vkDescriptorSet, descriptor->bindings);
+        Write(descriptor->vkDescriptorSet, descriptor->bindings);
     }
 
     void DescriptorSetService::write(DescriptorInstance *descriptor) {
-        Write(vulkanContext, bufferService, descriptor->vkDescriptorSet, descriptor->bindings);
+        Write(descriptor->vkDescriptorSet, descriptor->bindings);
     }
 
-    void DescriptorSetService::Write(VulkanContext &vulkanContext, BufferService &bufferService, const VkDescriptorSet &vkDescriptorSet,
+    void DescriptorSetService::Write(const VkDescriptorSet &vkDescriptorSet,
                                      const std::vector<DescriptorBinding> &bindings) {
         std::vector<VkWriteDescriptorSet> writeDescriptorSets;
         std::vector<VkDescriptorBufferInfo> bufferInfos;
-        std::vector<std::vector<VkDescriptorImageInfo>> imageInfosPool;
+        std::vector<std::vector<VkDescriptorImageInfo> > imageInfosPool;
         std::vector<VkWriteDescriptorSetAccelerationStructureKHR> asInfos;
 
         bufferInfos.reserve(bindings.size());
@@ -207,7 +212,7 @@ namespace Metal {
                     writeDescriptorSets.push_back(descriptorWrite);
                 }
             } else if (!binding.bufferId.empty()) {
-                BufferInstance *buffer = bufferService.getResource(binding.bufferId);
+                BufferInstance *buffer = bufferService->getResource(binding.bufferId);
 
                 if (buffer == nullptr) {
                     LOG_ERROR("DescriptorSetService Buffer not found: " + binding.bufferId);
@@ -261,7 +266,7 @@ namespace Metal {
 
         if (writeDescriptorSets.empty()) return;
 
-        vkUpdateDescriptorSets(vulkanContext.device.device,
+        vkUpdateDescriptorSets(vulkanContext->device.device,
                                static_cast<unsigned int>(writeDescriptorSets.size()),
                                writeDescriptorSets.data(),
                                0,

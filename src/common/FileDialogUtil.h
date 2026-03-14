@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 #include <nfd.hpp>
-#include "../service/LogService.h"
-#include "../../ApplicationContext.h"
+#include "LoggerUtil.h"
+#include "../ApplicationContext.h"
 
 namespace Metal:: FileDialogUtil {
     static std::vector<std::string> PickFiles(std::vector<nfdu8filteritem_t> filtersToApply) {

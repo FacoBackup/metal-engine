@@ -4,24 +4,26 @@
 #include <unordered_map>
 #include <memory>
 
-#include "../../common/AbstractRuntimeComponent.h"
+#include "../../common/IInit.h"
+#include "../../common/IService.h"
 
 namespace Metal {
+    struct DirectoryService;
     struct FSEntry;
 
     class NotificationService;
 
-    class FilesService final : public AbstractRuntimeComponent {
+    class FilesService final : public IService, public IInit {
         FSEntry *root = nullptr;
-        std::string &rootDirectory;
-        NotificationService &notificationService;
+        DirectoryService *directoryService = nullptr;
+        NotificationService *notificationService = nullptr;
 
     public:
-        explicit FilesService(std::string &rootDirectory, NotificationService &notificationService)
-            : AbstractRuntimeComponent(), rootDirectory(rootDirectory), notificationService(notificationService) {
+        std::vector<Dependency> getDependencies() override {
+            return {{"DirectoryService", directoryService}, {"NotificationService", notificationService}};
         }
 
-        FSEntry *getRoot() {
+        FSEntry *getRoot() const {
             return root;
         }
 

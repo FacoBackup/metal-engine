@@ -2,7 +2,7 @@
 #define FILESUTIL_H
 #include <filesystem>
 #include <format>
-#include "../dto/FSEntry.h"
+#include "../editor/dto/FSEntry.h"
 
 namespace fs = std::filesystem;
 

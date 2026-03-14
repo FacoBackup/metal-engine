@@ -6,30 +6,33 @@
 #include <GLFW/glfw3.h>
 
 #include <imgui.h>
-#include "../../common/AbstractRuntimeComponent.h"
+
+#include "../../common/IContextMember.h"
+#include "../../common/IDisposable.h"
+#include "../../common/IInit.h"
 
 
 struct ImGui_ImplVulkanH_Window;
 
 namespace Metal {
     class ApplicationContext;
-
     class VulkanContext;
 
-    class GLFWContext final : public Initializable {
+    class GLFWContext final : public IContextMember, public IInit, public IDisposable {
         VulkanContext *vulkanContext = nullptr;
         GLFWwindow *window = nullptr;
         bool validContext = true;
-        ;
         bool swapChainRebuild = false;
         ImVector<const char *> instance_extensions{};
 
     public:
+        std::vector<Dependency> getDependencies() override {
+            return {{"VulkanContext", vulkanContext}};
+        }
+
         void setSwapChainRebuild(bool val);
 
         void presentFrame();
-
-        explicit GLFWContext() = default;
 
         [[nodiscard]] const ImVector<const char *> &getInstanceExtensions() const;
 
@@ -41,13 +44,9 @@ namespace Metal {
 
         bool beginFrame();
 
-        void dispose() const;
+        void dispose() override;
 
         [[nodiscard]] ImGui_ImplVulkanH_Window &getGUIWindow() const;
-
-        void setVulkanContext(VulkanContext *vulkanContext) {
-            this->vulkanContext = vulkanContext;
-        }
     };
 }
 

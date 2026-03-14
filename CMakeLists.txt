@@ -29,7 +29,7 @@ add_executable(
         src/ApplicationContext.h
         src/editor/abstract/AbstractPanel.h
         src/editor/abstract/AbstractPanel.cpp
-        src/common/Synchornizable.h
+        src/common/ISync.h
         src/engine/service/CameraService.cpp
         src/engine/service/CameraService.h
         src/engine/dto/Camera.h
@@ -45,7 +45,6 @@ add_executable(
         src/editor/abstract/form/AccordionPanel.h
         src/common/FieldType.h
         src/common/InspectableMember.h
-        src/common/AbstractRuntimeComponent.h
         src/editor/abstract/form/types/BooleanField.cpp
         src/editor/abstract/form/types/BooleanField.h
         src/editor/abstract/form/types/IntField.cpp
@@ -64,7 +63,6 @@ add_executable(
         src/common/Icons.h
         src/editor/service/DockService.cpp
         src/editor/service/DockService.h
-        src/editor/repository/DockRepository.h
         src/editor/dto/DockDTO.h
         src/editor/dto/DockSpace.h
         src/editor/dock-spaces/docks/DockSpacePanel.cpp
@@ -84,8 +82,8 @@ add_executable(
         src/editor/dock-spaces/console/ConsolePanel.h
         src/editor/dock-spaces/metrics/MetricsPanel.cpp
         src/editor/dock-spaces/metrics/MetricsPanel.h
-        src/editor/service/LogService.cpp
-        src/editor/service/LogService.h
+        src/common/LoggerUtil.cpp
+        src/common/LoggerUtil.h
         src/editor/dock-spaces/world/WorldPanel.cpp
         src/editor/dock-spaces/world/WorldPanel.h
         src/engine/resource/RuntimeResource.h
@@ -97,7 +95,6 @@ add_executable(
         src/engine/passes/AbstractRenderPass.h
         src/common/AbstractResourceService.h
         src/engine/resource/FrameBufferAttachment.h
-        src/common/AbstractCoreRepository.h
         src/engine/service/FrameBufferService.cpp
         src/engine/service/FrameBufferService.h
         src/engine/resource/FrameBufferInstance.h
@@ -117,11 +114,11 @@ add_executable(
         src/engine/service/MeshService.h
         src/engine/dto/MeshData.h
         src/engine/resource/MeshInstance.h
-        src/editor/util/FilesUtil.h
+        src/common/FilesUtil.h
         src/editor/dto/FSEntry.h
         src/editor/enum/EntryType.h
         src/editor/dock-spaces/files/FilesContext.h
-        src/editor/util/FileDialogUtil.h
+        src/common/FileDialogUtil.h
         src/editor/dock-spaces/files/FilesHeaderPanel.cpp
         src/editor/dock-spaces/files/FilesHeaderPanel.h
         src/editor/service/MaterialImporterService.cpp
@@ -223,7 +220,6 @@ add_executable(
         src/editor/service/PickingService.cpp
         src/editor/service/PickingService.h
         src/engine/resource/SVOInstance.h
-        src/engine/dto/TileInfoUBO.h
         src/engine/dto/LightData.h
         src/editor/passes/SelectionIDPass.cpp
         src/editor/passes/SelectionIDPass.h
@@ -247,7 +243,7 @@ add_executable(
         src/engine/dto/VolumeData.h
         src/engine/service/VoxelService.cpp
         src/engine/service/VoxelService.h
-        src/common/Serializable.cpp
+        src/common/ISerialize.cpp
         src/editor/abstract/form/ChildPanel.cpp
         src/editor/abstract/form/ChildPanel.h
         src/editor/dto/SceneImportSettingsDTO.h
@@ -269,7 +265,6 @@ add_executable(
         src/engine/dto/PipelineBuilder.cpp
         src/engine/service/DescriptorSetService.cpp
         src/engine/frame-builder/structures/CommandBufferRecorderBuilder.cpp
-        src/common/Changeable.h
         src/engine/passes/impl/TemporalAccumulationPass.cpp
         src/engine/passes/impl/TemporalAccumulationPass.h
         src/engine/passes/impl/SpatialFilterPass.cpp
@@ -280,7 +275,15 @@ add_executable(
         src/editor/dock-spaces/repositories/RepositoriesPanel.h
         src/engine/service/VolumeService.cpp
         src/engine/service/VolumeService.h
-        src/editor/repository/DockRepository.cpp
+        src/common/IContextMember.h
+        src/common/IService.h
+        src/common/IRepository.h
+        src/common/IContextMember.cpp
+        src/core/DirectoryService.cpp
+        src/core/DirectoryService.h
+        src/common/IDisposable.h
+        src/core/FrameService.cpp
+        src/core/FrameService.h
 )
 
 

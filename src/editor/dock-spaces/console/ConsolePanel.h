@@ -1,7 +1,7 @@
 #ifndef CONSOLEPANEL_H
 #define CONSOLEPANEL_H
 #include "../docks/AbstractDockPanel.h"
-#include "../../service/LogService.h"
+#include "../../../common/LoggerUtil.h"
 #include "imgui.h"
 
 namespace Metal {

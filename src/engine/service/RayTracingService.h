@@ -2,13 +2,13 @@
 #define RAYTRACINGSERVICE_H
 
 #include "../dto/MeshMetadata.h"
-#include "../../editor/enum/engine-definitions.h"
-#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
 #include <vulkan/vulkan.h>
-#include "../../common/AbstractRuntimeComponent.h"
+#include "../../common/IService.h"
+#include "../../common/ISync.h"
+#include "../../common/IDisposable.h"
 
 namespace Metal {
     class BufferInstance;
@@ -19,15 +19,17 @@ namespace Metal {
     class MaterialService;
     class BufferService;
     class EngineContext;
+    class DescriptorService;
 
-    class RayTracingService final : public AbstractRuntimeComponent {
-        VulkanContext &vulkanContext;
-        PipelineService &pipelineService;
-        WorldRepository &worldRepository;
-        MeshService &meshService;
-        MaterialService &materialService;
-        BufferService &bufferService;
-        EngineContext &engineContext;
+    class RayTracingService final : public IService, public ISync, public IDisposable {
+        VulkanContext *vulkanContext = nullptr;
+        PipelineService *pipelineService = nullptr;
+        WorldRepository *worldRepository = nullptr;
+        MeshService *meshService = nullptr;
+        MaterialService *materialService = nullptr;
+        BufferService *bufferService = nullptr;
+        EngineContext *engineContext = nullptr;
+        DescriptorService *descriptorService = nullptr;
 
         struct BLASEntry {
             VkAccelerationStructureKHR accelerationStructure = VK_NULL_HANDLE;
@@ -36,6 +38,7 @@ namespace Metal {
             BufferInstance *vertexData = nullptr;
             BufferInstance *indexData = nullptr;
         };
+
         bool anyMeshes = false;
 
         // One BLAS per unique mesh ID
@@ -66,15 +69,26 @@ namespace Metal {
         void updateMeshMaterials();
 
     public:
-        RayTracingService(VulkanContext &vulkanContext, PipelineService &pipelineService, WorldRepository &worldRepository, MeshService &meshService, MaterialService &materialService, BufferService &bufferService, EngineContext &engineContext)
-            : vulkanContext(vulkanContext), pipelineService(pipelineService), worldRepository(worldRepository), meshService(meshService), materialService(materialService), bufferService(bufferService), engineContext(engineContext) {}
-        RayTracingService() = delete;
+        RayTracingService() = default;
+
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"VulkanContext", vulkanContext},
+                {"PipelineService", pipelineService},
+                {"WorldRepository", worldRepository},
+                {"MeshService", meshService},
+                {"MaterialService", materialService},
+                {"BufferService", bufferService},
+                {"EngineContext", engineContext},
+                {"DescriptorService", descriptorService}
+            };
+        }
 
         void setNeedsMaterialUpdate(bool val) {
             needsMaterialUpdate = val;
         }
 
-        void destroyAccelerationStructures();
+        void dispose() override;
 
         void onSync() override;
 

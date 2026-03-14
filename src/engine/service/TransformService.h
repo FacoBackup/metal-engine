@@ -4,19 +4,18 @@
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 
-#include "../../editor/enum/engine-definitions.h"
-#include "../../common/AbstractRuntimeComponent.h"
+#include "../../common/ISync.h"
+#include "../../common/IService.h"
 
 namespace Metal {
     struct TransformComponent;
 
-    struct TransformComponent;
     struct WorldRepository;
     class RayTracingService;
 
-    class TransformService final : AbstractRuntimeComponent {
-        WorldRepository &worldRepository;
-        RayTracingService &rayTracingService;
+    class TransformService final : public IService, public ISync {
+        WorldRepository *worldRepository = nullptr;
+        RayTracingService *rayTracingService = nullptr;
 
         glm::vec3 distanceAux{};
         glm::mat4x4 auxMat4{};
@@ -24,9 +23,12 @@ namespace Metal {
         glm::mat4x4 auxMat42{};
 
     public:
-        explicit TransformService(WorldRepository &worldRepository, RayTracingService &rayTracingService)
-            : worldRepository(worldRepository), rayTracingService(rayTracingService) {}
-        TransformService() = delete;
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"WorldRepository", worldRepository},
+                {"RayTracingService", rayTracingService}
+            };
+        }
 
         void onSync() override;
 

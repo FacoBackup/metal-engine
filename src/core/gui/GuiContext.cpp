@@ -7,17 +7,16 @@
 #include "../../engine/dto/DescriptorInstance.h"
 #include "../../engine/resource/TextureInstance.h"
 
+#include "../vulkan/VulkanContext.h"
+#include "../glfw/GLFWContext.h"
+#include "../../engine/service/DescriptorSetService.h"
+
 namespace Metal {
-    #include "../vulkan/VulkanContext.h"
-    #include "../glfw/GLFWContext.h"
-    #include "../../engine/service/DescriptorSetService.h"
-
     void GuiContext::endFrame() {
-
     }
 
     void GuiContext::renderImage(TextureInstance *texture, const float sizeX, const float sizeY) const {
-        descriptorSetService.setImageDescriptor(texture);
+        descriptorSetService->setImageDescriptor(texture);
         ImGui::Image(reinterpret_cast<ImTextureID>(texture->imageDescriptor->vkDescriptorSet), ImVec2{sizeX, sizeY});
     }
 
@@ -33,7 +32,8 @@ namespace Metal {
         info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         info.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
         err = vkBeginCommandBuffer(fd->CommandBuffer, &info);
-        VulkanUtils::CheckVKResult(err); {
+        VulkanUtils::CheckVKResult(err);
+        {
             VkRenderPassBeginInfo info = {};
             info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
             info.renderPass = wd.RenderPass;
@@ -65,19 +65,19 @@ namespace Metal {
         io.ConfigWindowsResizeFromEdges = true;
 
         // Setup Platform/Renderer backends
-        ImGui_ImplGlfw_InitForVulkan(glfwContext.getWindow(), true);
+        ImGui_ImplGlfw_InitForVulkan(glfwContext->getWindow(), true);
         ImGui_ImplVulkan_InitInfo init_info = {};
-        init_info.Instance = vulkanContext.instance.instance;
-        init_info.PhysicalDevice = vulkanContext.physDevice.physical_device;
-        init_info.Device = vulkanContext.device.device;
-        init_info.QueueFamily = vulkanContext.queueFamily;
-        init_info.Queue = vulkanContext.graphicsQueue;
-        init_info.PipelineCache = vulkanContext.pipelineCache;
-        init_info.DescriptorPool = vulkanContext.descriptorPool;
-        init_info.RenderPass = vulkanContext.imguiVulkanWindow.RenderPass;
+        init_info.Instance = vulkanContext->instance.instance;
+        init_info.PhysicalDevice = vulkanContext->physDevice.physical_device;
+        init_info.Device = vulkanContext->device.device;
+        init_info.QueueFamily = vulkanContext->queueFamily;
+        init_info.Queue = vulkanContext->graphicsQueue;
+        init_info.PipelineCache = vulkanContext->pipelineCache;
+        init_info.DescriptorPool = vulkanContext->descriptorPool;
+        init_info.RenderPass = vulkanContext->imguiVulkanWindow.RenderPass;
         init_info.Subpass = 0;
         init_info.MinImageCount = MAX_FRAMES_IN_FLIGHT;
-        init_info.ImageCount = vulkanContext.imguiVulkanWindow.ImageCount;
+        init_info.ImageCount = vulkanContext->imguiVulkanWindow.ImageCount;
         init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
         init_info.Allocator = nullptr;
         init_info.CheckVkResultFn = VulkanUtils::CheckVKResult;
@@ -140,23 +140,14 @@ namespace Metal {
         delete fontConfig;
     }
 
-    void GuiContext::dispose() const {
-        const VkResult err = vkDeviceWaitIdle(vulkanContext.device.device);
+    void GuiContext::dispose() {
+        const VkResult err = vkDeviceWaitIdle(vulkanContext->device.device);
         VulkanUtils::CheckVKResult(err);
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
-        ImGui_ImplVulkanH_DestroyWindow(vulkanContext.instance, vulkanContext.device.device,
-                                        &glfwContext.getGUIWindow(),
+        ImGui_ImplVulkanH_DestroyWindow(vulkanContext->instance.instance, vulkanContext->device.device,
+                                        &glfwContext->getGUIWindow(),
                                         nullptr);
-    }
-
-    GuiContext::GuiContext(VulkanContext &vulkanContext,
-                           GLFWContext &glfwContext,
-                           DescriptorSetService &descriptorSetService)
-            : AbstractRuntimeComponent(),
-              vulkanContext(vulkanContext),
-              glfwContext(glfwContext),
-              descriptorSetService(descriptorSetService) {
     }
 }

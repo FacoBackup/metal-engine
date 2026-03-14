@@ -2,12 +2,13 @@
 #define METAL_ENGINE_VULKANCONTEXT_H
 
 #include "vk_mem_alloc.h"
-#include <unordered_map>
 
 #include "imgui_impl_vulkan.h"
 #include <GLFW/glfw3.h>
 #include "VkBootstrap.h"
-#include "../../common/AbstractRuntimeComponent.h"
+#include "../../common/IInit.h"
+#include "../../common/IService.h"
+#include "../../common/IDisposable.h"
 
 #define VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME "VK_KHR_portability_subset"
 
@@ -20,14 +21,14 @@ namespace Metal {
     class PipelineService;
     class RayTracingService;
 
-    class VulkanContext final : public AbstractRuntimeComponent {
-        GLFWContext &glfwContext;
-        EngineRepository &engineRepository;
-        MeshService &meshService;
-        TextureService &textureService;
-        FrameBufferService &framebufferService;
-        PipelineService &pipelineService;
-        RayTracingService &rayTracingService;
+    class VulkanContext final : public IService, public IDisposable, public IInit {
+        GLFWContext *glfwContext = nullptr;
+        EngineRepository *engineRepository = nullptr;
+        MeshService *meshService = nullptr;
+        TextureService *textureService = nullptr;
+        FrameBufferService *framebufferService = nullptr;
+        PipelineService *pipelineService = nullptr;
+        RayTracingService *rayTracingService = nullptr;
 
         static VkBool32 DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
                                       VkDebugUtilsMessageTypeFlagsEXT messageType,
@@ -67,14 +68,17 @@ namespace Metal {
 
         std::vector<VkCommandBuffer> &getCommandBuffers() { return commandBuffers; }
 
-        explicit VulkanContext(bool debugMode,
-                               GLFWContext &glfwContext,
-                               EngineRepository &engineRepository,
-                               MeshService &meshService,
-                               TextureService &textureService,
-                               FrameBufferService &framebufferService,
-                               PipelineService &pipelineService,
-                               RayTracingService &rayTracingService);
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"GLFWContext", glfwContext},
+                {"EngineRepository", engineRepository},
+                {"MeshService", meshService},
+                {"TextureService", textureService},
+                {"FrameBufferService", framebufferService},
+                {"PipelineService", pipelineService},
+                {"RayTracingService", rayTracingService}
+            };
+        }
 
         VkPhysicalDeviceProperties physicalDeviceProperties{};
         VkPhysicalDeviceMemoryProperties physicalDeviceMemoryProperties{};
@@ -104,7 +108,7 @@ namespace Metal {
         PFN_vkGetRayTracingShaderGroupHandlesKHR vkGetRayTracingShaderGroupHandlesKHR = nullptr;
         PFN_vkCmdTraceRaysKHR vkCmdTraceRaysKHR = nullptr;
 
-        void dispose() const;
+        void dispose() override;
 
         void onInitialize() override;
 

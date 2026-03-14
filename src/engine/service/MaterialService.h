@@ -1,16 +1,21 @@
 #ifndef MATERIALSERVICE_H
 #define MATERIALSERVICE_H
+#include "../../common/IService.h"
 
 namespace Metal {
     struct PrimitiveComponent;
     struct MeshMetadata;
     class TextureService;
 
-    class MaterialService final {
-        TextureService &textureService;
+    class MaterialService final : public IService {
+        TextureService *textureService = nullptr;
+
     public:
-        explicit MaterialService(TextureService &textureService) : textureService(textureService) {}
-        MaterialService() = delete;
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"TextureService", textureService}
+            };
+        }
 
         void load(MeshMetadata &data, PrimitiveComponent &component);
     };

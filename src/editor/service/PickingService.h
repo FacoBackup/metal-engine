@@ -1,7 +1,7 @@
 #ifndef PICKINGSERVICE_H
 #define PICKINGSERVICE_H
 
-#include "../../common/AbstractResourceService.h"
+#include "../../common/IService.h"
 #include "../enum/engine-definitions.h"
 #include <optional>
 
@@ -11,15 +11,19 @@ namespace Metal {
     class BufferService;
     struct WorldRepository;
 
-    class PickingService final : public AbstractRuntimeComponent {
-        VulkanContext &vulkanContext;
-        BufferService &bufferService;
-        WorldRepository &worldRepository;
+    class PickingService final : public IService {
+        VulkanContext *vulkanContext = nullptr;
+        BufferService *bufferService = nullptr;
+        WorldRepository *worldRepository = nullptr;
 
     public:
-        PickingService(VulkanContext &vulkanContext, BufferService &bufferService, WorldRepository &worldRepository)
-            : vulkanContext(vulkanContext), bufferService(bufferService), worldRepository(worldRepository) {}
-        PickingService() = delete;
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"VulkanContext", vulkanContext},
+                {"BufferService", bufferService},
+                {"WorldRepository", worldRepository}
+            };
+        }
 
         [[nodiscard]] std::optional<entt::entity> pickEntityFromGBuffer(TextureInstance *attachment, uint32_t pixelX, uint32_t pixelY) const;
     };

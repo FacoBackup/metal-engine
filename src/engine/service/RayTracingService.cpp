@@ -12,6 +12,7 @@
 #include "../repository/WorldRepository.h"
 #include "MeshService.h"
 #include "MaterialService.h"
+#include "DescriptorSetService.h"
 #include "BufferService.h"
 #include "../EngineContext.h"
 #include <cstddef>
@@ -25,7 +26,7 @@ namespace Metal {
     }
 
     void RayTracingService::updateDescriptorSets(VkAccelerationStructureKHR asHandle) {
-        auto descriptors = pipelineService.getAllDescriptors();
+        auto descriptors = pipelineService->getAllDescriptors();
         for (auto *descriptor: descriptors) {
             bool needsUpdate = false;
             for (auto &binding: descriptor->bindings) {
@@ -36,7 +37,7 @@ namespace Metal {
             }
 
             if (needsUpdate) {
-                DescriptorSetService::Write(vulkanContext, bufferService, descriptor->vkDescriptorSet, descriptor->bindings);
+                descriptorService->Write(vulkanContext, bufferService, descriptor->vkDescriptorSet, descriptor->bindings);
             }
         }
     }
@@ -66,7 +67,7 @@ namespace Metal {
 
         if (!anyMeshes) {
             // No meshes – destroy all structures and set descriptor to null
-            destroyAccelerationStructures();   // destroys BLAS and TLAS (waits for idle)
+            dispose();   // destroys BLAS and TLAS (waits for idle)
             updateDescriptorSets(VK_NULL_HANDLE);
             accelerationStructureBuilt = false;
             needsRebuild = false;
@@ -401,7 +402,7 @@ namespace Metal {
         vulkan.endSingleTimeCommands(cmd);
     }
 
-    void RayTracingService::destroyAccelerationStructures() {
+    void RayTracingService::dispose() {
         LOG_INFO("Destroying acceleration structures");
         auto &vulkan = vulkanContext;
 

@@ -2,16 +2,17 @@
 #define LIGHTSSERVICE_H
 #include <vector>
 
-#include "../../common/AbstractRuntimeComponent.h"
+#include "../../common/IService.h"
+#include "../../common/ISync.h"
 #include "../dto/LightData.h"
 
 namespace Metal {
     class EngineContext;
     struct EngineRepository;
 
-    class LightService final : public AbstractRuntimeComponent {
-        EngineContext &engineContext;
-        EngineRepository &engineRepository;
+    class LightService final : public IService, public ISync{
+        EngineContext *engineContext = nullptr;
+        EngineRepository *engineRepository = nullptr;
 
         std::vector<LightData> items{};
         glm::vec3 sunColor{};
@@ -25,9 +26,12 @@ namespace Metal {
         static glm::vec3 BlendColors(glm::vec3 &c1, glm::vec3 &c2, float t);
 
     public:
-        explicit LightService(EngineContext &engineContext, EngineRepository &engineRepository)
-            : engineContext(engineContext), engineRepository(engineRepository) {}
-        LightService() = delete;
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"EngineContext", engineContext},
+                {"EngineRepository", engineRepository}
+            };
+        }
 
         void onSync() override;
 

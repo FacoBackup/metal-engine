@@ -3,11 +3,11 @@
 #include <vector>
 
 #include "SceneEntityData.h"
-#include "../../common//Serializable.h"
+#include "../../common//ISerialize.h"
 
 namespace Metal {
 
-    struct SceneData final : Serializable {
+    struct SceneData final : ISerialize {
         std::vector<SceneEntityData> entities;
         std::string name;
 

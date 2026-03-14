@@ -4,17 +4,21 @@
 #include "imgui.h"
 #include "../dto/DockDTO.h"
 #include "../dock-spaces/docks/DockSpacePanel.h"
-#include "../../common/AbstractRuntimeComponent.h"
+#include "../../common/IService.h"
 
 namespace Metal {
     class AbstractPanel;
 
-    class DockService final : public AbstractRuntimeComponent {
-        DockRepository &dockRepository;
+    class DockService final : public IService {
+        DockDTO center{&DockSpace::VIEWPORT};
+        std::vector<DockDTO *> bottom;
+        std::vector<DockDTO *> left;
+        std::vector<DockDTO *> right;
+
+
+        bool isInitialized = false;
     public:
-        explicit DockService(DockRepository &dockRepository)
-            : AbstractRuntimeComponent(), dockRepository(dockRepository) {
-        }
+        explicit DockService();
 
         void buildViews(ImGuiID windowId, AbstractPanel *panel) const;
 

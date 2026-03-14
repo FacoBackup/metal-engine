@@ -10,16 +10,18 @@
 
 namespace Metal {
     struct TextureInstance;
+    class VulkanContext;
     class BufferService;
     class PipelineService;
     class DescriptorSetService;
+    class DirectoryService;
 
     class TextureService final : public AbstractResourceService<TextureInstance> {
-        VulkanContext &vulkanContext;
-        BufferService &bufferService;
-        PipelineService &pipelineService;
-        DescriptorSetService &descriptorSetService;
-        const std::string &rootDirectory;
+        VulkanContext *vulkanContext = nullptr;
+        BufferService *bufferService = nullptr;
+        PipelineService *pipelineService = nullptr;
+        DescriptorSetService *descriptorSetService = nullptr;
+        DirectoryService *directoryService = nullptr;
 
         unsigned int nextTextureIndex = 1;
         std::unordered_map<std::string, unsigned int> textureIndices{};
@@ -41,9 +43,15 @@ namespace Metal {
         void generateMipmaps(const TextureInstance *image) const;
 
     public:
-        TextureService(VulkanContext &vulkanContext, BufferService &bufferService, PipelineService &pipelineService, DescriptorSetService &descriptorSetService, const std::string &rootDirectory)
-            : vulkanContext(vulkanContext), bufferService(bufferService), pipelineService(pipelineService), descriptorSetService(descriptorSetService), rootDirectory(rootDirectory) {}
-        TextureService() = delete;
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"VulkanContext", vulkanContext},
+                {"BufferService", bufferService},
+                {"PipelineService", pipelineService},
+                {"DescriptorSetService", descriptorSetService},
+                {"DirectoryService", directoryService}
+            };
+        }
 
         [[nodiscard]] TextureData *loadTextureData(const std::string &id) const;
 

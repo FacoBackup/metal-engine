@@ -3,6 +3,7 @@
 #include <string>
 #include <array>
 #include "../enum/NotificationSeverity.h"
+#include "../../common/IService.h"
 
 #define MAX_notifications  4
 #define  MESSAGE_DURATION  3000
@@ -10,7 +11,7 @@
 namespace Metal {
     struct Notification;
 
-    class NotificationService {
+    class NotificationService : public IService {
         std::array<Notification *, MAX_notifications> notifications{};
 
     public:

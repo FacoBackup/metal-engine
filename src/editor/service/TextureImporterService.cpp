@@ -1,5 +1,7 @@
 #include "TextureImporterService.h"
-#include "LogService.h"
+#include "../../core/DirectoryService.h"
+#include "../../common/LoggerUtil.h"
+#include "../enum/engine-definitions.h"
 
 #include "../../../../dependencies/stb/stb_image.h"
 #include "../../../../dependencies/stb/stb_image_write.h"
@@ -9,7 +11,7 @@
 
 #include "../dto/EntryMetadata.h"
 #include "../enum/EntryType.h"
-#include "../util/FilesUtil.h"
+#include "../../common/FilesUtil.h"
 #include "../../engine/dto/TextureData.h"
 
 namespace fs = std::filesystem;
@@ -103,7 +105,7 @@ namespace Metal {
 
     size_t TextureImporterService::saveImage(const std::string &fileId,
                                              const TextureData &textureData) const {
-        std::string texturePath = rootDirectory + "/assets/" + FORMAT_FILE_TEXTURE(fileId);
+        std::string texturePath = directoryService->getAssetDirectory() + FORMAT_FILE_TEXTURE(fileId);
         if (!stbi_write_png(texturePath.c_str(),
                             textureData.width, textureData.height, textureData.channels, textureData.data,
                             textureData.width * textureData.channels)) {

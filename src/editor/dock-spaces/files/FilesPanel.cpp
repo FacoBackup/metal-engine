@@ -10,13 +10,13 @@
 #include "../../dto/FSEntry.h"
 #include "../../dto/SceneImportSettingsDTO.h"
 #include "FilesContext.h"
-#include "../../util/FileDialogUtil.h"
+#include "../../../common/FileDialogUtil.h"
 
 #include "FilePreviewPanel.h"
 #include "../../abstract/form/FormPanel.h"
 #include <string>
 #include <filesystem>
-#include "../../util/FilesUtil.h"
+#include "../../../common/FilesUtil.h"
 
 namespace Metal {
     std::string FilesPanel::getActionLabel() {

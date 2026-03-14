@@ -1,9 +1,11 @@
 #ifndef CAMERASYSTEM_H
 #define CAMERASYSTEM_H
 
-#include "../../common/AbstractRuntimeComponent.h"
+#include "../../common/ISync.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+#include "../../common/IService.h"
 
 constexpr float PI_OVER_2 = glm::pi<float>() / 2.0f;
 constexpr float PI_2 = glm::pi<float>() * 2.0f;
@@ -18,10 +20,10 @@ namespace Metal {
     struct RuntimeRepository;
     struct Camera;
 
-    class CameraService final : public AbstractRuntimeComponent {
-        EngineContext &engineContext;
-        WorldRepository &worldRepository;
-        RuntimeRepository &runtimeRepository;
+    class CameraService final : public IService, public ISync {
+        EngineContext *engineContext = nullptr;
+        WorldRepository *worldRepository = nullptr;
+        RuntimeRepository *runtimeRepository = nullptr;
 
         Camera *camera = nullptr;
         glm::vec3 xAxis{0.0f};
@@ -47,7 +49,13 @@ namespace Metal {
     public:
         void handleInput(bool isFirstMovement) const;
 
-        explicit CameraService(EngineContext &engineContext, WorldRepository &worldRepository, RuntimeRepository &runtimeRepository);
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"EngineContext", engineContext},
+                {"WorldRepository", worldRepository},
+                {"RuntimeRepository", runtimeRepository}
+            };
+        }
 
         void onSync() override;
     };

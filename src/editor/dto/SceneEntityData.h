@@ -7,7 +7,7 @@
 
 namespace Metal {
 
-    struct SceneEntityData final : Serializable {
+    struct SceneEntityData final : ISerialize {
         MetadataComponent entity;
         TransformComponent transform;
         std::optional<PrimitiveComponent> primitive;

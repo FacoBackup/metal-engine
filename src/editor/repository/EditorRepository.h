@@ -9,15 +9,14 @@
 #include "../dto/ShortcutDTO.h"
 #include "../enum/engine-definitions.h"
 #include "../enum/ShadingMode.h"
-#include "../../common/Inspectable.h"
-#include "../../common/Serializable.h"
+#include "../../common/IRepository.h"
 
 namespace Metal {
     struct TransformComponent;
     struct FSEntry;
     struct ImportSettingsDTO;
 
-    struct EditorRepository final : Inspectable, Serializable {
+    struct EditorRepository final : IRepository {
         ImVec4 accent{};
         ImU32 accentU32 = 0;
 

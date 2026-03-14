@@ -2,9 +2,9 @@
 #define METAL_ENGINE_SYNCHORNIZABLE_H
 
 namespace Metal {
-    class Syncronizable {
+    class ISync {
     public:
-        virtual ~Syncronizable() = default;
+        virtual ~ISync() = default;
 
         virtual void onSync() {}
     };

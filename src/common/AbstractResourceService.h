@@ -4,14 +4,14 @@
 #include <string>
 #include <unordered_map>
 
-#include "AbstractRuntimeComponent.h"
+#include "IService.h"
 #include "../engine/resource/RuntimeResource.h"
 
 namespace Metal {
     class VulkanContext;
 
     template<typename T>
-    class AbstractResourceService : public AbstractRuntimeComponent {
+    class AbstractResourceService : public IService {
         static_assert(std::is_base_of_v<RuntimeResource, T>, "T must be a subclass of RuntimeResource");
 
     protected:

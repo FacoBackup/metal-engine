@@ -6,6 +6,7 @@
 #include "../dto/PrimitiveComponent.h"
 
 namespace Metal {
+
     void MaterialService::load(MeshMetadata &materialData, PrimitiveComponent &data) {
         materialData.albedo = data.albedoColor;
         materialData.roughness = data.roughnessFactor;
@@ -20,21 +21,21 @@ namespace Metal {
         materialData.metallicTextureId = 0;
 
         if (!data.albedo.empty()) {
-            auto *tex = textureService.stream(data.albedo);
+            auto *tex = textureService->stream(data.albedo);
             if (tex != nullptr) {
-                materialData.albedoTextureId = textureService.getTextureIndex(data.albedo);
+                materialData.albedoTextureId = textureService->getTextureIndex(data.albedo);
             }
         }
         if (!data.roughness.empty()) {
-            auto *tex = textureService.stream(data.roughness);
+            auto *tex = textureService->stream(data.roughness);
             if (tex != nullptr) {
-                materialData.roughnessTextureId = textureService.getTextureIndex(data.roughness);
+                materialData.roughnessTextureId = textureService->getTextureIndex(data.roughness);
             }
         }
         if (!data.metallic.empty()) {
-            auto *tex = textureService.stream(data.metallic);
+            auto *tex = textureService->stream(data.metallic);
             if (tex != nullptr) {
-                materialData.metallicTextureId = textureService.getTextureIndex(data.metallic);
+                materialData.metallicTextureId = textureService->getTextureIndex(data.metallic);
             }
         }
     }

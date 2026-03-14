@@ -2,11 +2,11 @@
 #define VOLUMECOMPONENT_H
 
 #include "AbstractComponent.h"
-#include "../../common/Serializable.h"
+#include "../../common/ISerialize.h"
 #include <glm/vec3.hpp>
 
 namespace Metal {
-    struct VolumeComponent final : AbstractComponent, Serializable {
+    struct VolumeComponent final : AbstractComponent, ISerialize {
         glm::vec3 albedo = glm::vec3(1.0f);
         float density = 1;
         float g = 0;

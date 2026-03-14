@@ -6,7 +6,7 @@
 #include <string>
 
 #include "../dto/ImportSettingsDTO.h"
-#include "../../common/AbstractRuntimeComponent.h"
+#include "../../common/IService.h"
 
 namespace Metal {
     class SceneImporterService;
@@ -15,24 +15,22 @@ namespace Metal {
     class NotificationService;
     class AsyncTaskService;
 
-    class FileImporterService final : public AbstractRuntimeComponent {
-        SceneImporterService &sceneImporterService;
-        TextureImporterService &textureImporterService;
-        VoxelImporterService &voxelImporterService;
-        NotificationService &notificationService;
-        AsyncTaskService &asyncTaskService;
+    class FileImporterService final : public IService {
+        SceneImporterService *sceneImporterService = nullptr;
+        TextureImporterService *textureImporterService = nullptr;
+        VoxelImporterService *voxelImporterService = nullptr;
+        NotificationService *notificationService = nullptr;
+        AsyncTaskService *asyncTaskService = nullptr;
 
     public:
-        FileImporterService(SceneImporterService &sceneImporterService,
-                            TextureImporterService &textureImporterService,
-                            VoxelImporterService &voxelImporterService,
-                            NotificationService &notificationService,
-                            AsyncTaskService &asyncTaskService)
-            : sceneImporterService(sceneImporterService),
-              textureImporterService(textureImporterService),
-              voxelImporterService(voxelImporterService),
-              notificationService(notificationService),
-              asyncTaskService(asyncTaskService) {
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"SceneImporterService", sceneImporterService},
+                {"TextureImporterService", textureImporterService},
+                {"VoxelImporterService", voxelImporterService},
+                {"NotificationService", notificationService},
+                {"AsyncTaskService", asyncTaskService}
+            };
         }
 
         using LoadingTask = std::function<void(const std::stop_token &)>;

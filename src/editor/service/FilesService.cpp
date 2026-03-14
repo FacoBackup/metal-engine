@@ -3,8 +3,8 @@
 #include "../dto/FSEntry.h"
 #include "../enum/EntryType.h"
 #include "../enum/engine-definitions.h"
-#include "../util/FilesUtil.h"
-#include "LogService.h"
+#include "../../common/FilesUtil.h"
+#include "../../common/LoggerUtil.h"
 #include <chrono>
 #include <filesystem>
 #include <format>
@@ -162,4 +162,5 @@ namespace Metal {
             }
         }
     }
+
 } // Metal

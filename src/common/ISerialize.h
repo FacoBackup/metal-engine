@@ -4,9 +4,9 @@
 #include <nlohmann/json.hpp>
 
 namespace Metal {
-    class Serializable {
+    class ISerialize {
     public:
-        virtual ~Serializable() = default;
+        virtual ~ISerialize() = default;
 
         virtual nlohmann::json toJson() const = 0;
 

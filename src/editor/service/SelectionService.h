@@ -2,20 +2,23 @@
 #define SELECTIONSERVICE_H
 #include <vector>
 
-#include "../../common/AbstractRuntimeComponent.h"
+#include "../../common/IService.h"
 #include "../enum/engine-definitions.h"
 
 namespace Metal {
     struct WorldRepository;
     struct EditorRepository;
 
-    class SelectionService final : public AbstractRuntimeComponent {
-        EditorRepository &editorRepository;
-        WorldRepository &worldRepository;
+    class SelectionService final : public IService {
+        EditorRepository *editorRepository = nullptr;
+        WorldRepository *worldRepository = nullptr;
 
     public:
-        SelectionService(EditorRepository &editorRepository, WorldRepository &worldRepository)
-            : editorRepository(editorRepository), worldRepository(worldRepository) {
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"EditorRepository", editorRepository},
+                {"WorldRepository", worldRepository}
+            };
         }
 
         void addSelected(entt::entity entity) const;

@@ -8,7 +8,7 @@
 #include "../../../common/Icons.h"
 #include "../../dto/DockDTO.h"
 #include "../../util/UIUtil.h"
-#include "../../service/LogService.h"
+#include "../../../common/LoggerUtil.h"
 
 namespace Metal {
     const ImVec2 DockSpacePanel::DEFAULT{-1.f, -1.f};

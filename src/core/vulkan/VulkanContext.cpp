@@ -2,27 +2,17 @@
 #include "VkBootstrap.h"
 #include "VulkanUtils.h"
 #include "../../ApplicationContext.h"
-#include "../../editor/service/LogService.h"
+#include "../../common/LoggerUtil.h"
+
+#include "../glfw/GLFWContext.h"
+#include "../../engine/repository/EngineRepository.h"
+#include "../../engine/service/MeshService.h"
+#include "../../engine/service/TextureService.h"
+#include "../../engine/service/FrameBufferService.h"
+#include "../../engine/service/PipelineService.h"
+#include "../../engine/service/RayTracingService.h"
 
 namespace Metal {
-    VulkanContext::VulkanContext(bool debugMode,
-                                 GLFWContext &glfwContext,
-                                 EngineRepository &engineRepository,
-                                 MeshService &meshService,
-                                 TextureService &textureService,
-                                 FrameBufferService &framebufferService,
-                                 PipelineService &pipelineService,
-                                 RayTracingService &rayTracingService)
-            : AbstractRuntimeComponent(),
-              glfwContext(glfwContext),
-              engineRepository(engineRepository),
-              meshService(meshService),
-              textureService(textureService),
-              framebufferService(framebufferService),
-              pipelineService(pipelineService),
-              rayTracingService(rayTracingService),
-              debugMode(debugMode) {
-    }
 
     void VulkanContext::createSwapChain() {
         int w{}, h{};
@@ -177,7 +167,7 @@ namespace Metal {
     }
 
     void VulkanContext::createPresentMode() {
-        VkPresentModeKHR presentModes = !engineRepository.vsync
+        VkPresentModeKHR presentModes = !engineRepository->vsync
                                             ? VK_PRESENT_MODE_IMMEDIATE_KHR
                                             : VK_PRESENT_MODE_FIFO_KHR;
         imguiVulkanWindow.PresentMode = ImGui_ImplVulkanH_SelectPresentMode(
@@ -264,17 +254,18 @@ namespace Metal {
     }
 
     void VulkanContext::onInitialize() {
+        this->debugMode = CTX->isDebugMode();
+        this->window = glfwContext->getWindow();
+        
         imguiVulkanWindow.ClearValue.color.float32[0] = 0;
         imguiVulkanWindow.ClearValue.color.float32[1] = 0;
         imguiVulkanWindow.ClearValue.color.float32[2] = 0;
         imguiVulkanWindow.ClearValue.color.float32[3] = 1;
-
-        this->window = glfwContext.getWindow();
         vkb::InstanceBuilder instanceBuilder;
 
         // ------- CORE INITIALIZATION
         // ----- INSTANCE AND EXTENSIONS
-        addExtensions(instanceBuilder, glfwContext.getInstanceExtensions());
+        addExtensions(instanceBuilder, glfwContext->getInstanceExtensions());
         auto vkbResult = instanceBuilder
                 .set_app_name(ENGINE_NAME)
                 .set_engine_name(ENGINE_NAME)
@@ -296,17 +287,17 @@ namespace Metal {
         createMemoryAllocator();
         createCommandPool();
         createDescriptorPool();
-        textureService.createSampler(false, vkImageSampler, VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER);
-        textureService.createSampler(true, vkTextureSampler, VK_SAMPLER_ADDRESS_MODE_REPEAT);
+        textureService->createSampler(false, vkImageSampler, VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER);
+        textureService->createSampler(true, vkTextureSampler, VK_SAMPLER_ADDRESS_MODE_REPEAT);
         // ------- CORE INITIALIZATION
     }
 
-    void VulkanContext::dispose() const {
-        pipelineService.disposeAll();
-        textureService.disposeAll();
-        meshService.disposeAll();
-        framebufferService.disposeAll();
-        rayTracingService.destroyAccelerationStructures();
+    void VulkanContext::dispose() {
+        pipelineService->disposeAll();
+        textureService->disposeAll();
+        meshService->disposeAll();
+        framebufferService->disposeAll();
+        rayTracingService->dispose();
 
         vkDestroySampler(device.device, vkImageSampler, nullptr);
         vkDestroySampler(device.device, vkTextureSampler, nullptr);
@@ -322,7 +313,7 @@ namespace Metal {
     }
 
     void VulkanContext::createDescriptorPool() const {
-        const std::array sizes{
+        const std::array<VkDescriptorPoolSize, 5> sizes{
             VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 100}, // 1 for imgui
             VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 100},
             VkDescriptorPoolSize{VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 100},
@@ -332,13 +323,14 @@ namespace Metal {
 
         VkDescriptorPoolCreateInfo poolInfo{};
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        poolInfo.poolSizeCount = sizes.size();
+        poolInfo.poolSizeCount = static_cast<uint32_t>(sizes.size());
         poolInfo.pPoolSizes = sizes.data();
-        poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT | VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
+        poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT |
+                         VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
         poolInfo.maxSets = 500;
 
         VulkanUtils::CheckVKResult(vkCreateDescriptorPool(device.device, &poolInfo,
-                                                          nullptr, &descriptorPool));
+                                                          nullptr, const_cast<VkDescriptorPool*>(&descriptorPool)));
     }
 
     VkCommandBuffer VulkanContext::beginSingleTimeCommands() const {
@@ -375,7 +367,7 @@ namespace Metal {
 
 
     void VulkanContext::submitFrame(VkSemaphore image_acquired_semaphore, VkSemaphore render_complete_semaphore,
-                                    ImGui_ImplVulkanH_Frame *fd)  {
+                                    ImGui_ImplVulkanH_Frame *fd) {
         VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         VkSubmitInfo info = {};
         pushCommandBuffer(fd->CommandBuffer);

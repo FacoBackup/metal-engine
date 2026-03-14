@@ -5,17 +5,13 @@
 #include <vector>
 
 #include "../editor/dto/ImportSettingsDTO.h"
-#include "AbstractRuntimeComponent.h"
+#include "IService.h"
 
 namespace Metal {
-    class AbstractImporter : public AbstractRuntimeComponent {
+    class AbstractImporter : public IService {
     public:
         virtual std::vector<std::string> getSupportedTypes() {
             return {};
-        }
-
-        explicit AbstractImporter()
-            : AbstractRuntimeComponent() {
         }
 
         virtual std::string importData(const std::string &targetDir, const std::string &pathToFile,

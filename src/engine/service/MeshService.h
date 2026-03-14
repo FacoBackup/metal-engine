@@ -11,16 +11,23 @@ namespace Metal {
 
     class BufferService;
     class RayTracingService;
+    class DirectoryService;
 
     class MeshService final : public AbstractResourceService<MeshInstance> {
-        BufferService &bufferService;
-        RayTracingService &rayTracingService;
-        const std::string &rootDirectory;
+        BufferService *bufferService = nullptr;
+        RayTracingService *rayTracingService = nullptr;
+        DirectoryService *directoryService = nullptr;
 
     public:
-        MeshService(BufferService &bufferService, RayTracingService &rayTracingService, const std::string &rootDirectory)
-            : bufferService(bufferService), rayTracingService(rayTracingService), rootDirectory(rootDirectory) {}
-        MeshService() = delete;
+        MeshService() = default;
+
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"BufferService", bufferService},
+                {"RayTracingService", rayTracingService},
+                {"DirectoryService", directoryService}
+            };
+        }
 
         MeshInstance *create(const std::string &id);
 
@@ -29,7 +36,6 @@ namespace Metal {
         MeshData *loadMeshData(const std::string &id) const;
 
         void disposeResource(MeshInstance *resource) override;
-
     };
 } // Metal
 

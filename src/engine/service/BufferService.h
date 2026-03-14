@@ -12,7 +12,7 @@ namespace Metal {
     class VulkanContext;
 
     class BufferService final : public AbstractResourceService<BufferInstance> {
-        VulkanContext &vulkanContext;
+        VulkanContext *vulkanContext = nullptr;
 
         void copyBuffer(const BufferInstance *srcBuffer,
                         const BufferInstance *dstBuffer) const;
@@ -21,8 +21,9 @@ namespace Metal {
                             BufferInstance *buffer) const;
 
     public:
-        explicit BufferService(VulkanContext &vulkanContext) : vulkanContext(vulkanContext) {}
-        BufferService() = delete;
+        BufferService() = default;
+
+        std::vector<Dependency> getDependencies() override;
 
         [[nodiscard]] unsigned int findMemoryType(unsigned int typeFilter, VkMemoryPropertyFlags properties) const;
 

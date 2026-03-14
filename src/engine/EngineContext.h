@@ -6,8 +6,9 @@
 #include <memory>
 
 #include "dto/GlobalDataUBO.h"
-#include "../common/AbstractRuntimeComponent.h"
-#include "dto/TileInfoUBO.h"
+#include "../common/IService.h"
+#include "../common/IDisposable.h"
+#include "../common/ISync.h"
 
 using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
@@ -23,16 +24,16 @@ namespace Metal {
     struct EditorRepository;
     struct EngineRepository;
 
-    class EngineContext final : public AbstractRuntimeComponent {
-        TransformService &transformService;
-        StreamingService &streamingService;
-        RayTracingService &rayTracingService;
-        CameraService &cameraService;
-        LightService &lightService;
-        VolumeService &volumeService;
-        WorldRepository &worldRepository;
-        EditorRepository &editorRepository;
-        EngineRepository &engineRepository;
+    class EngineContext final : public IService, public ISync, public IDisposable {
+        TransformService *transformService = nullptr;
+        StreamingService *streamingService = nullptr;
+        RayTracingService *rayTracingService = nullptr;
+        CameraService *cameraService = nullptr;
+        LightService *lightService = nullptr;
+        VolumeService *volumeService = nullptr;
+        WorldRepository *worldRepository = nullptr;
+        EditorRepository *editorRepository = nullptr;
+        EngineRepository *engineRepository = nullptr;
 
         GlobalDataUBO globalDataUBO{};
         long long start = -1;
@@ -40,25 +41,20 @@ namespace Metal {
         bool giSettingsUpdated = true;
 
     public:
-        EngineContext(TransformService &transformService,
-                      StreamingService &streamingService,
-                      RayTracingService &rayTracingService,
-                      CameraService &cameraService,
-                      LightService &lightService,
-                      VolumeService &volumeService,
-                      WorldRepository &worldRepository,
-                      EditorRepository &editorRepository,
-                      EngineRepository &engineRepository)
-            : transformService(transformService),
-              streamingService(streamingService),
-              rayTracingService(rayTracingService),
-              cameraService(cameraService),
-              lightService(lightService),
-              volumeService(volumeService),
-              worldRepository(worldRepository),
-              editorRepository(editorRepository),
-              engineRepository(engineRepository) {
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"TransformService", transformService},
+                {"StreamingService", streamingService},
+                {"RayTracingService", rayTracingService},
+                {"CameraService", cameraService},
+                {"LightService", lightService},
+                {"VolumeService", volumeService},
+                {"WorldRepository", worldRepository},
+                {"EditorRepository", editorRepository},
+                {"EngineRepository", engineRepository}
+            };
         }
+
         GlobalDataUBO &getGlobalDataUBO() { return globalDataUBO; }
 
         void setCameraUpdated(const bool val) {
@@ -79,8 +75,6 @@ namespace Metal {
             return giSettingsUpdated;
         }
 
-        void onInitialize() override;
-
         void updateCurrentTime();
 
         long long currentTimeMs = 0;
@@ -90,6 +84,7 @@ namespace Metal {
 
         std::vector<EngineFrame *> registeredFrames;
         EngineFrame *currentFrame = nullptr;
+
         void updateGlobalData();
 
         void registerFrame(EngineFrame *frame) {
@@ -102,7 +97,7 @@ namespace Metal {
 
         void onSync() override;
 
-        void dispose();
+        void dispose() override;
     };
 }
 #endif

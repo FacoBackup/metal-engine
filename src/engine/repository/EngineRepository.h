@@ -1,11 +1,11 @@
 #ifndef ENGINEREPO_H
 #define ENGINEREPO_H
-#include "../../common/Inspectable.h"
 #include <glm/vec3.hpp>
-#include "../../common/Serializable.h"
+
+#include "../../common/IRepository.h"
 
 namespace Metal {
-    struct EngineRepository final : Inspectable, Serializable {
+    struct EngineRepository final : IRepository {
         bool vsync = true;
 
         bool denoiserEnabled = false;

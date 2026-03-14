@@ -1,125 +1,46 @@
 #include "ApplicationContext.h"
 
-#include <imgui_impl_glfw.h>
-#include <nfd.h>
-
-#include "editor/util/FilesUtil.h"
-#include "core/vulkan/VulkanUtils.h"
 #include "common/serialization-definitions.h"
+#include "common/LoggerUtil.h"
 
-#include "editor/util/FileDialogUtil.h"
-#include <iostream>
+#include "engine/EngineContext.h"
+#include "core/glfw/GLFWContext.h"
 
 namespace Metal {
+    ApplicationContext *ApplicationContext::CONTEXT = nullptr;
 
-    void ApplicationContext::updateRootPath(bool forceSelection) {
-        std::string cachedPath;
-        std::string cachePathFile = std::filesystem::current_path().string() + CACHED_PATH;
-        FilesUtil::ReadFile(cachePathFile.c_str(), cachedPath);
-        cachedPath.erase(std::ranges::remove(cachedPath, '\n').begin(), cachedPath.cend());
-        if (cachedPath.empty() || forceSelection || !fs::exists(cachedPath)) {
-            rootDirectory = FileDialogUtil::SelectDirectory();
-            rootDirectory.erase(std::ranges::remove(rootDirectory, '\n').begin(), rootDirectory.cend());
-            if (rootDirectory.empty()) {
-                throw std::runtime_error("No directory selected.");
-            }
-            save();
-            FilesUtil::WriteFile(cachePathFile.c_str(), rootDirectory.c_str());
-        } else {
-            rootDirectory = cachedPath;
-        }
-        PARSE_TEMPLATE(editorRepository, rootDirectory + "/" + HASH_OF_CLASS_NAME(EditorRepository) + ".json")
-        PARSE_TEMPLATE(engineRepository, rootDirectory + "/" + HASH_OF_CLASS_NAME(EngineRepository) + ".json")
-        PARSE_TEMPLATE(worldRepository, rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository) + ".json")
-
-
-        FilesUtil::CreateDirectory(getShadersDirectory());
-        FilesUtil::CreateDirectory(getAssetRefDirectory());
-        FilesUtil::CreateDirectory(getAssetDirectory());
+    ApplicationContext::ApplicationContext(bool debugMode) : debugMode(debugMode) {
+        CONTEXT = this;
     }
 
-    unsigned int ApplicationContext::getFrameIndex() const {
-        return vulkanContext.imguiVulkanWindow.FrameIndex;
+    void ApplicationContext::onInitialize() {
+        for (auto &instance : instances) {
+            instance->setDependencies(*this);
+        }
+
+        for (auto &instance : instances) {
+            auto *init = dynamic_cast<IInit *>(instance.get());
+            if (init) {
+                init->onInitialize();
+            }
+        }
+    }
+
+    bool ApplicationContext::isDebugMode() const {
+        return debugMode;
     }
 
     void ApplicationContext::dispose() {
-        NFD_Quit();
         try {
-            rayTracingService.destroyAccelerationStructures();
-            asyncTaskService.endAll();
-            engineContext.dispose();
-            guiContext.dispose();
-            vulkanContext.dispose();
-            glfwContext.dispose();
-        } catch (std::exception &e) {
-            std::cerr << e.what() << std::endl;
-        }
-    }
-
-    void ApplicationContext::start() {
-        NFD_Init();
-
-        updateRootPath(false);
-
-        glfwContext.onInitialize();
-        if (!glfwContext.isValidContext()) {
-            throw std::runtime_error("Could not create window");
-        }
-        vulkanContext.onInitialize();
-        guiContext.onInitialize();
-        filesService.onInitialize();
-        editorPanel.applicationContext = this;
-        editorPanel.onInitialize();
-        engineContext.onInitialize();
-
-        GLFWwindow *window = glfwContext.getWindow();
-        while (!glfwWindowShouldClose(window)) {
-            if (glfwContext.beginFrame()) {
-                GuiContext::BeginFrame();
-                editorPanel.onSync();
-                ImGui::Render();
-                auto *drawData = ImGui::GetDrawData();
-                const bool main_is_minimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
-                if (!main_is_minimized) {
-                    vulkanContext.getCommandBuffers().clear();
-                    auto &wd = vulkanContext.imguiVulkanWindow;
-                    VkSemaphore imageAcquiredSemaphore = wd.FrameSemaphores[wd.SemaphoreIndex].ImageAcquiredSemaphore;
-                    VkResult err = vkAcquireNextImageKHR(vulkanContext.device.device, wd.Swapchain, UINT64_MAX,
-                                                         imageAcquiredSemaphore, VK_NULL_HANDLE,
-                                                         &wd.FrameIndex);
-                    if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR) {
-                        glfwContext.setSwapChainRebuild(true);
-                        return;
-                    }
-
-                    VulkanUtils::CheckVKResult(err);
-                    ImGui_ImplVulkanH_Frame *fd = &wd.Frames[getFrameIndex()];
-                    VulkanUtils::CheckVKResult(vkWaitForFences(vulkanContext.device.device, 1, &fd->Fence, VK_TRUE,
-                                                               UINT64_MAX));
-                    VulkanUtils::CheckVKResult(vkResetFences(vulkanContext.device.device, 1, &fd->Fence));
-                    VulkanUtils::CheckVKResult(vkResetCommandPool(vulkanContext.device.device, fd->CommandPool,
-                                                                  VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT));
-                    engineContext.onSync();
-                    GuiContext::RecordImguiCommandBuffer(drawData, err, wd, fd);
-                    vulkanContext.submitFrame(imageAcquiredSemaphore, wd.FrameSemaphores[wd.SemaphoreIndex].
-                                              RenderCompleteSemaphore, fd);
+            for (auto it = instances.rbegin(); it != instances.rend(); ++it) {
+                auto *disposable = dynamic_cast<IDisposable *>(it->get());
+                if (disposable) {
+                    disposable->dispose();
                 }
-                if (!main_is_minimized)
-                    glfwContext.presentFrame();
+                delete it->release();
             }
-        }
-        dispose();
-    }
-
-    void ApplicationContext::save() {
-        try {
-            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(EditorRepository) + ".json", editorRepository)
-            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(EngineRepository) + ".json", engineRepository)
-            DUMP_TEMPLATE(rootDirectory + "/" + HASH_OF_CLASS_NAME(WorldRepository) + ".json", worldRepository)
-            notificationService.pushMessage("Project saved", NotificationSeverities::SUCCESS);
-        } catch (const std::exception &e) {
+        } catch (std::exception &e) {
             LOG_ERROR(e.what());
-            notificationService.pushMessage("Could not save project", NotificationSeverities::ERROR);
         }
     }
 }

@@ -1,7 +1,7 @@
 #include "SceneImporterService.h"
 #include "MeshImporterService.h"
 #include "MaterialImporterService.h"
-#include "LogService.h"
+#include "../../common/LoggerUtil.h"
 #include "../dto/FSEntry.h"
 #include "../../engine/dto/MeshData.h"
 #include "../dto/SceneData.h"
@@ -10,10 +10,11 @@
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
-#include "../util/FilesUtil.h"
+#include "../../common/FilesUtil.h"
 #include "../dto/EntryMetadata.h"
 #include "../enum/engine-definitions.h"
 #include "../../common/serialization-definitions.h"
+#include "../../core/DirectoryService.h"
 #include "../dto/SceneImportSettingsDTO.h"
 
 namespace Metal {
@@ -50,7 +51,7 @@ namespace Metal {
         sceneMetadata.name = sceneData.name =
                              scene->mName.length > 0 ? scene->mName.data : scene->mRootNode->mName.data;
 
-        std::string sceneBlobPath = rootDirectory + "/assets/" + FORMAT_FILE_SCENE(sceneMetadata.getId());
+        std::string sceneBlobPath = directoryService->getAssetDirectory() + FORMAT_FILE_SCENE(sceneMetadata.getId());
 
         std::unordered_map<unsigned int, MeshId> meshMap{};
 

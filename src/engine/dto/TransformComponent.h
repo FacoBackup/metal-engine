@@ -6,11 +6,11 @@
 #include <glm/ext/matrix_transform.hpp>
 
 #include "AbstractComponent.h"
-#include "../../common/Serializable.h"
+#include "../../common/ISerialize.h"
 
 
 namespace Metal {
-    struct TransformComponent final : AbstractComponent, Serializable {
+    struct TransformComponent final : AbstractComponent, ISerialize {
         glm::mat4x4 model = glm::identity<glm::mat4x4>();
         glm::vec3 translation{};
         glm::vec3 rotationEuler = {0, 0, 0};

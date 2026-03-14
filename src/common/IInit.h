@@ -2,9 +2,9 @@
 #define METAL_ENGINE_INITIALIZABLE_H
 
 namespace Metal {
-    class Initializable {
+    class IInit {
     public:
-        virtual ~Initializable() = default;
+        virtual ~IInit() = default;
 
         virtual void onInitialize() {}
     };

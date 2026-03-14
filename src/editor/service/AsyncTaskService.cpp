@@ -40,7 +40,7 @@ namespace Metal {
         return !tasks.empty();
     }
 
-    void AsyncTaskService::endAll() {
+    void AsyncTaskService::dispose() {
         for (std::shared_ptr<AsyncTask> &task: tasksArray) {
             endTask(task->id, true);
         }

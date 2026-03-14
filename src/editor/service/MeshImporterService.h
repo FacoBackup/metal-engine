@@ -1,7 +1,7 @@
 #ifndef MESHIMPORTERSERVICE_H
 #define MESHIMPORTERSERVICE_H
 
-#include "../../common/AbstractResourceService.h"
+#include "../../common/IService.h"
 #include <assimp/scene.h>
 #include <unordered_map>
 #include <string>
@@ -15,12 +15,14 @@ namespace Metal {
     };
     struct MeshData;
 
-    class MeshImporterService final : public AbstractRuntimeComponent {
-        std::string &rootDirectory;
+    class MeshImporterService final : public IService {
+        DirectoryService *directoryService = nullptr;
 
     public:
-        explicit MeshImporterService(std::string &rootDirectory)
-            : rootDirectory(rootDirectory) {
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"DirectoryService", directoryService}
+            };
         }
 
         void persistAllMeshes(const std::string &targetDir, const aiScene *scene,

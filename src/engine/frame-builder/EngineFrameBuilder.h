@@ -8,7 +8,6 @@
 #include <vulkan/vulkan_core.h>
 
 #include "structures/ResourceBuilder.h"
-#include "../enum/PassType.h"
 #include "../resource/BufferInstance.h"
 
 namespace Metal {

@@ -18,21 +18,16 @@ namespace Metal {
     class BufferService;
 
     class PipelineService final : public AbstractResourceService<PipelineInstance> {
-        VulkanContext &vulkanContext;
-        FrameBufferService &framebufferService;
-        BufferService &bufferService;
-        DescriptorSetService &descriptorSetService;
-        ShaderService &shaderService;
+        VulkanContext *vulkanContext = nullptr;
+        FrameBufferService *framebufferService = nullptr;
+        BufferService *bufferService = nullptr;
+        DescriptorSetService *descriptorSetService = nullptr;
+        ShaderService *shaderService = nullptr;
 
     public:
-        explicit PipelineService(ShaderService &shaderService, VulkanContext &vulkanContext,
-                                 FrameBufferService &framebufferService, BufferService &bufferService,
-                                 DescriptorSetService &descriptorSetService)
-            : shaderService(shaderService), vulkanContext(vulkanContext), framebufferService(framebufferService),
-              bufferService(bufferService), descriptorSetService(descriptorSetService) {
-        }
+        PipelineService() = default;
 
-        PipelineService() = delete;
+        std::vector<Dependency> getDependencies() override;
 
         PipelineInstance *createPipeline(PipelineBuilder &pipelineBuilder);
 

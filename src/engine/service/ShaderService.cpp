@@ -10,12 +10,15 @@
 #include "../../core/vulkan/VulkanUtils.h"
 #include "../../editor/util/Util.h"
 #include "../../ApplicationContext.h"
-#include "../../editor/util/FilesUtil.h"
-#include "../../editor/service/LogService.h"
+#include "../../common/FilesUtil.h"
+#include "../../common/LoggerUtil.h"
 #include "../../editor/enum/ShadingMode.h"
 #include "glslang/Include/glslang_c_interface.h"
 #include "glslang/Public/resource_limits_c.h"
-#define BASE_PATH "../resources/shaders/"
+#define BASE_PATH directoryService->getShadersDirectory()
+
+#include "../../core/DirectoryService.h"
+#include "../../core/vulkan/VulkanContext.h"
 
 namespace Metal {
     void ShaderService::CheckShaderCompilation(glslang_shader_t *shader) {
@@ -81,7 +84,7 @@ namespace Metal {
         shaderCreateInfo.codeSize = shaderModule->SPIRV.size() * sizeof(unsigned int);
         shaderCreateInfo.pCode = static_cast<const unsigned int *>(shaderModule->SPIRV.data());
 
-        VulkanUtils::CheckVKResult(vkCreateShaderModule(vulkanContext.device.device, &shaderCreateInfo,
+        VulkanUtils::CheckVKResult(vkCreateShaderModule(vulkanContext->device.device, &shaderCreateInfo,
                                                         nullptr,
                                                         &shaderModule->vkShaderModule));
         glslang_program_delete(program);
@@ -131,7 +134,7 @@ namespace Metal {
         throw std::runtime_error("Unknown shader stage in file");
     }
 
-    std::string ShaderService::ProcessIncludes(const std::string &input) {
+    std::string ShaderService::ProcessIncludes(const std::string &input, const std::string &basePath) {
         std::string result = input;
         std::regex includePattern(R"(#include\s+"(.+))");
         std::smatch match;
@@ -144,7 +147,7 @@ namespace Metal {
             }
             try {
                 std::string source;
-                FilesUtil::ReadFile((BASE_PATH + includeFile).c_str(), source);
+                FilesUtil::ReadFile((basePath + includeFile).c_str(), source);
                 result.replace(match.position(0), match.length(0), source);
             } catch (const std::exception &e) {
                 LOG_ERROR("Error loading included shader: " + std::string(e.what()));
@@ -152,19 +155,20 @@ namespace Metal {
             }
         }
         if (result.find("#include") != std::string::npos) {
-            result = ProcessIncludes(result);
+            result = ProcessIncludes(result, basePath);
         }
         return result;
     }
 
-    std::string ShaderService::ProcessShader(const std::string &file) {
+    std::string ShaderService::ProcessShader(const std::string &file, const std::string &basePath) {
         std::string source;
         FilesUtil::ReadFile(file.c_str(), source);
-        return ProcessIncludes(source);
+        return ProcessIncludes(source, basePath);
     }
 
     VkShaderModule ShaderService::createShaderModule(const std::string &pFilename) {
-        std::string source = ProcessShader(BASE_PATH + pFilename);
+        this->isDebugMode = CTX->isDebugMode();
+        std::string source = ProcessShader(BASE_PATH + pFilename, BASE_PATH);
         if (isDebugMode) {
             source = "#define DEBUG\n" + source;
         }
@@ -177,6 +181,7 @@ namespace Metal {
         const size_t sourceHash = std::hash<std::string>{}(source);
         const std::string part(BASE_PATH + pFilename);
         const std::string shaderName = part.substr(part.find_last_of('/') + 1, part.size());
+        const std::string shadersDirectory = directoryService->getShadersDirectory();
         const std::string binaryFilename = shadersDirectory + shaderName + ".spv";
         const std::string hashFilename = shadersDirectory + shaderName + ".hash";
 
@@ -195,7 +200,7 @@ namespace Metal {
                     shaderCreateInfo.codeSize = shader.SPIRV.size() * sizeof(unsigned int);
                     shaderCreateInfo.pCode = static_cast<const unsigned int *>(shader.SPIRV.data());
 
-                    if (vkCreateShaderModule(vulkanContext.device.device, &shaderCreateInfo,
+                    if (vkCreateShaderModule(vulkanContext->device.device, &shaderCreateInfo,
                                              nullptr, &shader.vkShaderModule) == VK_SUCCESS) {
                         needsCompilation = false;
                         LOG_INFO("Loaded cached shader: " + shaderName);

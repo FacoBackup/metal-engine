@@ -2,7 +2,8 @@
 #define VOLUME_SERVICE_H
 #include <vector>
 
-#include "../../common/AbstractRuntimeComponent.h"
+#include "../../common/IService.h"
+#include "../../common/ISync.h"
 #include "../dto/VolumeData.h"
 
 namespace Metal {
@@ -10,17 +11,20 @@ namespace Metal {
     struct WorldRepository;
     class EngineContext;
 
-    class VolumeService final : public AbstractRuntimeComponent {
-        WorldRepository &worldRepository;
-        EngineContext &engineContext;
+    class VolumeService final : public IService, public ISync {
+        WorldRepository *worldRepository = nullptr;
+        EngineContext *engineContext = nullptr;
 
         std::vector<VolumeData> items{};
 
         void registerVolumes();
     public:
-        explicit VolumeService(WorldRepository &worldRepository, EngineContext &engineContext)
-            : worldRepository(worldRepository), engineContext(engineContext) {}
-        VolumeService() = delete;
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"WorldRepository", worldRepository},
+                {"EngineContext", engineContext}
+            };
+        }
 
         void onSync() override;
 

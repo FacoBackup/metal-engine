@@ -6,13 +6,17 @@
 #include "../../engine/dto/SparseVoxelOctreeData.h"
 
 namespace Metal {
+    class DirectoryService;
     struct SVOInstance;
 
     class VoxelImporterService final : public AbstractImporter {
-        const std::string &rootDirectory;
+        DirectoryService *directoryService = nullptr;
     public:
-        explicit VoxelImporterService(const std::string &rootDirectory) : rootDirectory(rootDirectory) {}
-        VoxelImporterService() = delete;
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"DirectoryService", directoryService}
+            };
+        }
 
         std::vector<std::string> getSupportedTypes() override;
 

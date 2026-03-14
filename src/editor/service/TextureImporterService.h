@@ -5,14 +5,17 @@
 struct aiTexture;
 
 namespace Metal {
+    class DirectoryService;
     struct TextureData;
 
     class TextureImporterService final : public AbstractImporter {
-        std::string &rootDirectory;
+        DirectoryService *directoryService = nullptr;
 
     public:
-        explicit TextureImporterService(std::string &rootDirectory)
-            : AbstractImporter(), rootDirectory(rootDirectory) {
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"DirectoryService", directoryService}
+            };
         }
 
         std::vector<std::string> getSupportedTypes() override {

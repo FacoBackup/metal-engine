@@ -1,4 +1,5 @@
 #include "VoxelImporterService.h"
+#include "../../core/DirectoryService.h"
 
 #include <filesystem>
 #include "../../common/serialization-definitions.h"
@@ -6,7 +7,7 @@
 #include "../dto/EntryMetadata.h"
 #include "../enum/EntryType.h"
 #include "../enum/engine-definitions.h"
-#include "LogService.h"
+#include "../../common/LoggerUtil.h"
 #include <openvdb/openvdb.h>
 #include <openvdb/io/File.h>
 #include <glm/glm.hpp>
@@ -28,7 +29,7 @@ namespace Metal {
             metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.'));
 
 
-            std::string outPath = rootDirectory + "/assets/" + FORMAT_FILE_VOLUME(metadata.getId());
+            std::string outPath = directoryService->getAssetDirectory() + FORMAT_FILE_VOLUME(metadata.getId());
             metadata.size = convertToSVO(pathToFile, outPath, stopToken);
 
             DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(metadata.getId()), metadata)

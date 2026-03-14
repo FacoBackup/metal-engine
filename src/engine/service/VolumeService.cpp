@@ -4,13 +4,21 @@
 #include "../resource/BufferInstance.h"
 #include "../../editor/enum/EngineResourceIDs.h"
 #include "../repository/WorldRepository.h"
+#include "../dto/TransformComponent.h"
+#include "../dto/VolumeComponent.h"
 #include "../EngineContext.h"
 
 namespace Metal {
     void VolumeService::registerVolumes() {
-        auto view = worldRepository.registry.view<VolumeComponent, TransformComponent>();
-        for (auto [entityId, l, t]: view.each()) {
-            if (worldRepository.hiddenEntities.contains(entityId)) {
+        auto &registry = worldRepository->registry;
+        auto view = registry.view<VolumeComponent>();
+        for (auto entityId: view) {
+            if (!registry.all_of<TransformComponent>(entityId)) {
+                continue;
+            }
+            auto &l = registry.get<VolumeComponent>(entityId);
+            auto &t = registry.get<TransformComponent>(entityId);
+            if (worldRepository->hiddenEntities.contains(entityId)) {
                 continue;
             }
 
@@ -32,7 +40,7 @@ namespace Metal {
         registerVolumes();
 
         if (!items.empty()) {
-            engineContext.currentFrame->getResourceAs<BufferInstance>(RID_VOLUMES_BUFFER)->update(items.data());
+            engineContext->currentFrame->getResourceAs<BufferInstance>(RID_VOLUMES_BUFFER)->update(items.data());
         }
     }
 } // Metal

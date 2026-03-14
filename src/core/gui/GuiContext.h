@@ -4,19 +4,22 @@
 #define LARGE_FONT_SIZE 38
 #include <imgui.h>
 #include <imgui_impl_vulkan.h>
-#include "../../common/AbstractRuntimeComponent.h"
+#include "../../common/IService.h"
+#include "../../common/IDisposable.h"
+#include "../../common/IInit.h"
 
 namespace Metal {
+    class GLFWContext;
     struct FrameBufferAttachment;
     struct TextureInstance;
 
     class VulkanContext;
     class DescriptorSetService;
 
-    class GuiContext final : public AbstractRuntimeComponent {
-        VulkanContext &vulkanContext;
-        GLFWContext &glfwContext;
-        DescriptorSetService &descriptorSetService;
+    class GuiContext final : public IService, public IDisposable, public IInit {
+        VulkanContext *vulkanContext = nullptr;
+        GLFWContext *glfwContext = nullptr;
+        DescriptorSetService *descriptorSetService = nullptr;
 
         static void applySpacing();
 
@@ -26,15 +29,21 @@ namespace Metal {
         ImFont *largeIconsFont = nullptr;
 
     public:
-        explicit GuiContext(VulkanContext &vulkanContext,
-                            GLFWContext &glfwContext,
-                            DescriptorSetService &descriptorSetService);
+        GuiContext() = default;
+
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"VulkanContext", vulkanContext},
+                {"GLFWContext", glfwContext},
+                {"DescriptorSetService", descriptorSetService}
+            };
+        }
 
         [[ nodiscard]] ImFont *getLargeIconsFont() const {
             return largeIconsFont;
         }
 
-        void dispose() const;
+        void dispose() override;
 
         void onInitialize() override;
 

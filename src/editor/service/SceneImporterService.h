@@ -8,6 +8,7 @@
 #include <stop_token>
 
 namespace Metal {
+    struct DirectoryService;
     struct MeshId;
     struct MaterialData;
     struct MeshData;
@@ -17,17 +18,17 @@ namespace Metal {
     class MaterialImporterService;
 
     class SceneImporterService final : public AbstractImporter {
-        MeshImporterService &meshImporterService;
-        MaterialImporterService &materialImporterService;
-        std::string &rootDirectory;
+        MeshImporterService *meshImporterService = nullptr;
+        MaterialImporterService *materialImporterService = nullptr;
+        DirectoryService *directoryService = nullptr;
 
     public:
-        SceneImporterService(MeshImporterService &meshImporterService,
-                             MaterialImporterService &materialImporterService,
-                             std::string &rootDirectory)
-            : meshImporterService(meshImporterService),
-              materialImporterService(materialImporterService),
-              rootDirectory(rootDirectory) {
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"MeshImporterService", meshImporterService},
+                {"MaterialImporterService", materialImporterService},
+                {"DirectoryService", directoryService}
+            };
         }
 
         std::string importData(const std::string &targetDir, const std::string &pathToFile,

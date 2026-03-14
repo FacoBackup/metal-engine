@@ -9,13 +9,14 @@
 #include "InspectableMember.h"
 #include "../editor/util/Util.h"
 #include "../editor/enum/EntryType.h"
-#include "Changeable.h"
 
 namespace Metal {
-    class Inspectable : public Changeable {
+    class Inspectable {
         std::string uniqueIdentifier = Util::uuidV4();
         std::vector<std::shared_ptr<InspectableMember> > fields{};
         bool fieldsRegistered = false;
+        unsigned long changes = 0;
+        unsigned long frozenVersion = 99999;
 
     public:
         Inspectable &operator=(const Inspectable &other) {
@@ -87,6 +88,22 @@ namespace Metal {
                            std::string group, std::string name, bool disabled = false);
 
     public:
+        [[nodiscard]] unsigned long getChangeId() const {
+            return changes;
+        }
+
+        void registerChange() {
+            changes++;
+        }
+
+        [[nodiscard]] bool isNotFrozen() const {
+            return frozenVersion != getChangeId();
+        }
+
+        void freezeVersion() {
+            frozenVersion = getChangeId();
+        }
+
         std::vector<std::shared_ptr<InspectableMember> > &getFields();
 
         Inspectable() = default;

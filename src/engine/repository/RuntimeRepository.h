@@ -3,8 +3,7 @@
 #include <glm/vec2.hpp>
 
 namespace Metal {
-    struct RuntimeRepository {
-
+    struct RuntimeRepository : IContextMember {
         bool isFocused;
         int displayW;
         int displayH;

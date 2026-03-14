@@ -4,7 +4,7 @@
 #include "VoxelImporterService.h"
 #include "NotificationService.h"
 #include "AsyncTaskService.h"
-#include "LogService.h"
+#include "../../common/LoggerUtil.h"
 
 #include <exception>
 #include <thread>
@@ -17,27 +17,27 @@ namespace Metal {
                  [this, targetDir, file, fileName, settings](const std::stop_token &token) {
                      try {
                          LOG_INFO("Starting file processing: " + fileName);
-                         if (sceneImporterService.isCompatible(file)) {
-                             sceneImporterService.importData(targetDir,
+                         if (sceneImporterService->isCompatible(file)) {
+                             sceneImporterService->importData(targetDir,
                                                                  file, settings, token);
-                         } else if (textureImporterService.isCompatible(file)) {
-                             textureImporterService.importData(targetDir, file, settings, token);
-                         } else if (voxelImporterService.isCompatible(file)) {
-                             voxelImporterService.importData(targetDir, file, settings, token);
+                         } else if (textureImporterService->isCompatible(file)) {
+                             textureImporterService->importData(targetDir, file, settings, token);
+                         } else if (voxelImporterService->isCompatible(file)) {
+                             voxelImporterService->importData(targetDir, file, settings, token);
                          }
 
                          LOG_INFO("Successfully imported file: " + fileName);
-                         notificationService.pushMessage("Successfully imported file: " + fileName,
+                         notificationService->pushMessage("Successfully imported file: " + fileName,
                                                              NotificationSeverities::SUCCESS);
                      } catch (std::exception &e) {
-                         notificationService.pushMessage(e.what(), NotificationSeverities::ERROR);
+                         notificationService->pushMessage(e.what(), NotificationSeverities::ERROR);
                      }
                  });
     }
 
     std::string FileImporterService::runAsync(const std::string &taskName, const LoadingTask &task) const {
         std::stop_source stopSource;
-        std::string taskId = asyncTaskService.registerTask(taskName, [stopSource]() mutable {
+        std::string taskId = asyncTaskService->registerTask(taskName, [stopSource]() mutable {
             stopSource.request_stop();
         });
 
@@ -49,7 +49,7 @@ namespace Metal {
             } catch (...) {
                 LOG_ERROR("Loading task failed with unknown error.");
             }
-            asyncTaskService.endTask(taskId, stopToken.stop_requested());
+            asyncTaskService->endTask(taskId, stopToken.stop_requested());
         }).detach();
 
         return taskId;
@@ -57,13 +57,13 @@ namespace Metal {
 
     std::string FileImporterService::collectCompatibleFiles() const {
         std::string outStr = "";
-        for (std::string type: sceneImporterService.getSupportedTypes()) {
+        for (std::string type: sceneImporterService->getSupportedTypes()) {
             outStr += type + ",";
         };
-        for (std::string type: textureImporterService.getSupportedTypes()) {
+        for (std::string type: textureImporterService->getSupportedTypes()) {
             outStr += type + ",";
         };
-        for (std::string type: voxelImporterService.getSupportedTypes()) {
+        for (std::string type: voxelImporterService->getSupportedTypes()) {
             outStr += type + ",";
         };
         return outStr;

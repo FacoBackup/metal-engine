@@ -7,11 +7,11 @@
 #include <glm/vec3.hpp>
 
 #include "../../common/Inspectable.h"
-#include "../../common/Serializable.h"
+#include "../../common/ISerialize.h"
 
 
 namespace Metal {
-    struct Camera final : Inspectable, Serializable {
+    struct Camera final : Inspectable, ISerialize {
         float rotationSensitivity = 1;
         float movementSensitivity = 1.0f;
         float zoomSensitivity = 1.0f;

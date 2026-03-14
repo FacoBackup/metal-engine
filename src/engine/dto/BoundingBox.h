@@ -1,10 +1,10 @@
 #ifndef BOUNDINGBOX_H
 #define BOUNDINGBOX_H
 #include <glm/vec3.hpp>
-#include "../../common/Serializable.h"
+#include "../../common/ISerialize.h"
 
 namespace Metal {
-    struct BoundingBox final : Serializable {
+    struct BoundingBox final : ISerialize {
         glm::vec3 min = glm::vec3(std::numeric_limits<float>::max());
         glm::vec3 max = glm::vec3(std::numeric_limits<float>::lowest());
         glm::vec3 center = glm::vec3(0.0f);

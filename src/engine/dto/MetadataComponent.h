@@ -7,10 +7,10 @@
 #include "../../editor/enum/engine-definitions.h"
 #include "../enum/ComponentType.h"
 #include "../../common/Inspectable.h"
-#include "../../common/Serializable.h"
+#include "../../common/ISerialize.h"
 
 namespace Metal {
-    struct MetadataComponent final : AbstractComponent, Serializable {
+    struct MetadataComponent final : AbstractComponent, ISerialize {
         std::string name = "New entity";
         glm::vec3 color{1,1,1};
 

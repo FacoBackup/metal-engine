@@ -2,16 +2,19 @@
 #include <entt/entt.hpp>
 #include <iostream>
 #include <glm/gtc/quaternion.hpp>
+#include "../../common/LoggerUtil.h"
 
 #include "../../ApplicationContext.h"
 #include "../dto/TransformComponent.h"
 #include "../repository/WorldRepository.h"
+#include "../dto/TransformComponent.h"
+#include "../dto/PrimitiveComponent.h"
 #include "RayTracingService.h"
 
 namespace Metal {
     void TransformService::onSync() {
-        for (auto entity : worldRepository.registry.view<TransformComponent>()) {
-            TransformComponent &st = worldRepository.registry.get<TransformComponent>(entity);
+        for (auto entity : worldRepository->registry.view<TransformComponent>()) {
+            TransformComponent &st = worldRepository->registry.get<TransformComponent>(entity);
             if (st.isNotFrozen()) {
                 transform(&st, nullptr);
                 st.freezeVersion();
@@ -38,8 +41,8 @@ namespace Metal {
         st->model = auxMat4 * auxMat42;
         st->freezeVersion();
 
-        if (worldRepository.registry.all_of<PrimitiveComponent>(st->getEntityId())) {
-            rayTracingService.markDirty();
+        if (worldRepository->registry.all_of<PrimitiveComponent>(st->getEntityId())) {
+            rayTracingService->markDirty();
         }
     }
 } // Metal

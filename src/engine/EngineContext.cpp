@@ -15,10 +15,7 @@
 
 namespace Metal {
     void EngineContext::resetPathTracerAccumulationCount() const {
-        engineRepository.pathTracerAccumulationCount = 0;
-    }
-
-    void EngineContext::onInitialize() {
+        engineRepository->pathTracerAccumulationCount = 0;
     }
 
     void EngineContext::updateCurrentTime() {
@@ -36,20 +33,17 @@ namespace Metal {
     }
 
     void EngineContext::dispose() {
-        if (currentFrame != nullptr) {
-            currentFrame->dispose();
-        }
     }
 
     void EngineContext::onSync() {
         updateCurrentTime();
 
-        transformService.onSync();
-        streamingService.onSync();
-        rayTracingService.onSync();
-        cameraService.onSync();
-        lightService.onSync();
-        volumeService.onSync();
+        transformService->onSync();
+        streamingService->onSync();
+        rayTracingService->onSync();
+        cameraService->onSync();
+        lightService->onSync();
+        volumeService->onSync();
 
         for (auto *frame: registeredFrames) {
             if (frame->getShouldRender()) {
@@ -66,7 +60,7 @@ namespace Metal {
     }
 
     void EngineContext::updateGlobalData() {
-        auto &camera = worldRepository.camera;
+        auto &camera = worldRepository->camera;
         globalDataUBO.previousProjView = globalDataUBO.projView;
         globalDataUBO.viewMatrix = camera.viewMatrix;
         globalDataUBO.projectionMatrix = camera.projectionMatrix;
@@ -74,21 +68,21 @@ namespace Metal {
         globalDataUBO.invProj = camera.invProjectionMatrix;
         globalDataUBO.invView = camera.invViewMatrix;
         globalDataUBO.cameraWorldPosition = camera.position;
-        globalDataUBO.volumeCount = volumeService.getCount();
-        globalDataUBO.lightsCount = lightService.getCount();
-        globalDataUBO.debugFlag = ShadingModes::IndexOfValue(editorRepository.shadingMode);
-        engineRepository.pathTracerAccumulationCount++;
-        globalDataUBO.pathTracerAccumulationCount = engineRepository.pathTracerAccumulationCount;
+        globalDataUBO.volumeCount = volumeService->getCount();
+        globalDataUBO.lightsCount = lightService->getCount();
+        globalDataUBO.debugFlag = ShadingModes::IndexOfValue(editorRepository->shadingMode);
+        engineRepository->pathTracerAccumulationCount++;
+        globalDataUBO.pathTracerAccumulationCount = engineRepository->pathTracerAccumulationCount;
         globalDataUBO.globalFrameCount++;
-        globalDataUBO.pathTracerMaxSamples = engineRepository.pathTracerMaxSamples;
-        globalDataUBO.denoiserEnabled = engineRepository.denoiserEnabled && (
+        globalDataUBO.pathTracerMaxSamples = engineRepository->pathTracerMaxSamples;
+        globalDataUBO.denoiserEnabled = engineRepository->denoiserEnabled && (
                                             globalDataUBO.debugFlag == LIT || globalDataUBO.debugFlag == LIGHTING_ONLY)
                                             ? 1
                                             : 0;
 
-        lightService.computeSunInfo();
-        globalDataUBO.sunPosition = lightService.getSunPosition();
-        globalDataUBO.sunColor = lightService.getSunColor();
+        lightService->computeSunInfo();
+        globalDataUBO.sunPosition = lightService->getSunPosition();
+        globalDataUBO.sunColor = lightService->getSunColor();
         currentFrame->getResourceAs<BufferInstance>(RID_GLOBAL_DATA)->update(&globalDataUBO);
     }
 }

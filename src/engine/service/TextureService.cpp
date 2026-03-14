@@ -18,9 +18,9 @@
 #include "BufferService.h"
 #include "PipelineService.h"
 #include "DescriptorSetService.h"
-#include "../dto/DescriptorInstance.h"
 
 namespace Metal {
+
     void TextureService::copyBufferToImage(const VkBuffer &vkBuffer, const TextureInstance *image,
                                            const int layerCount) const {
         VkCommandBuffer commandBuffer = vulkanContext.beginSingleTimeCommands();

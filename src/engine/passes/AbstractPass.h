@@ -3,7 +3,8 @@
 #include <vector>
 #include <string>
 #include <vulkan/vulkan.h>
-#include "../../common/AbstractRuntimeComponent.h"
+#include "../../common/ISync.h"
+#include "../../common/IInit.h"
 #include "../resource/RuntimeResource.h"
 
 namespace Metal {
@@ -13,7 +14,7 @@ namespace Metal {
     class StreamingService;
     struct PipelineInstance;
 
-    class AbstractPass : public AbstractRuntimeComponent {
+    class AbstractPass : public ISync, public IInit {
         bool isComputePass;
 
     public:

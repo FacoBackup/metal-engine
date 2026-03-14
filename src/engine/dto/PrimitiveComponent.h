@@ -2,11 +2,11 @@
 #define PRIMITIVE_COMPONENT_H
 
 #include "AbstractComponent.h"
-#include "../../common/Serializable.h"
+#include "../../common/ISerialize.h"
 #include <glm/glm.hpp>
 
 namespace Metal {
-    struct PrimitiveComponent final : AbstractComponent, Serializable {
+    struct PrimitiveComponent final : AbstractComponent, ISerialize {
         std::string meshId;
 
         std::string albedo;

@@ -2,7 +2,7 @@
 
 #include "../../../dependencies/vk-bootstrap/src/VkBootstrap.h"
 #include "../../ApplicationContext.h"
-#include "../../editor/service/LogService.h"
+#include "../../common/LoggerUtil.h"
 
 namespace Metal {
     void VulkanUtils::CheckVKResult(VkResult err) {

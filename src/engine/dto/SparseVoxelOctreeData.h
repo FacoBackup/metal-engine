@@ -4,10 +4,10 @@
 #include <glm/vec4.hpp>
 #include <vector>
 
-#include "../../common/Serializable.h"
+#include "../../common/ISerialize.h"
 
 namespace Metal {
-    struct SparseVoxelOctreeData final : Serializable {
+    struct SparseVoxelOctreeData final : ISerialize {
         std::vector<unsigned int> data{};
         unsigned int voxelBufferOffset;
 

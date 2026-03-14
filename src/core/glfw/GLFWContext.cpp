@@ -42,7 +42,7 @@ namespace Metal {
         return true;
     }
 
-    void GLFWContext::dispose() const {
+    void GLFWContext::dispose() {
         glfwDestroyWindow(window);
         glfwTerminate();
     }

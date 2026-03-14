@@ -5,10 +5,13 @@
 #include <vector>
 #include <mutex>
 #include <functional>
+
+#include "../../common/IDisposable.h"
+#include "../../common/IService.h"
 #include "../dto/AsyncTask.h"
 
 namespace Metal {
-    class AsyncTaskService {
+    class AsyncTaskService final : public IService, IDisposable{
         std::unordered_map<std::string, std::shared_ptr<AsyncTask> > tasks;
         std::vector<std::shared_ptr<AsyncTask> > tasksArray;
         mutable std::mutex tasksMutex;
@@ -22,7 +25,7 @@ namespace Metal {
 
         bool hasActiveTasks();
 
-        void endAll();
+        void dispose() override;
     };
 }
 

@@ -4,10 +4,10 @@
 #include <string>
 #include "../util/Util.h"
 #include "../enum/EntryType.h"
-#include "../../common//Serializable.h"
+#include "../../common//ISerialize.h"
 
 namespace Metal {
-    struct EntryMetadata : Serializable {
+    struct EntryMetadata : ISerialize {
     protected:
         std::string id = Util::uuidV4();
 

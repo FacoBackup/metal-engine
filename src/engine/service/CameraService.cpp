@@ -10,12 +10,12 @@ namespace Metal {
     // Per frame
     // TODO - EVENT SYSTEM
     void CameraService::onSync() {
-        camera = &worldRepository.camera;
+        camera = &worldRepository->camera;
         if (camera != nullptr) {
             updateAspectRatio();
             if (camera->isNotFrozen()) {
                 updateMatrices();
-                engineContext.setCameraUpdated(true);
+                engineContext->setCameraUpdated(true);
                 camera->freezeVersion();
             }
         }
@@ -23,7 +23,7 @@ namespace Metal {
 
     void CameraService::updateAspectRatio() const {
         const float prevAspect = camera->aspectRatio;
-        camera->aspectRatio = runtimeRepository.viewportW / runtimeRepository.viewportH;
+        camera->aspectRatio = runtimeRepository->viewportW / runtimeRepository->viewportH;
         if (prevAspect != camera->aspectRatio) {
             camera->registerChange();
         }
@@ -57,10 +57,6 @@ namespace Metal {
         camera->invProjectionMatrix = glm::inverse(camera->projectionMatrix);
     }
 
-    CameraService::CameraService(EngineContext &engineContext, WorldRepository &worldRepository, RuntimeRepository &runtimeRepository)
-        : engineContext(engineContext), worldRepository(worldRepository), runtimeRepository(runtimeRepository) {
-    }
-
     void CameraService::handleInputInternal() const {
         glm::vec3 forward(
             -std::sin(camera->yaw) * std::cos(camera->pitch),
@@ -76,16 +72,16 @@ namespace Metal {
         right = glm::normalize(right);
 
         const float multiplier = 10 * camera->movementSensitivity *
-                                 engineContext.deltaTime;
-        if (runtimeRepository.leftPressed) {
+                                 engineContext->deltaTime;
+        if (runtimeRepository->leftPressed) {
             camera->position += right * multiplier;
             camera->registerChange();
         }
-        if (runtimeRepository.rightPressed) {
+        if (runtimeRepository->rightPressed) {
             camera->position -= right * multiplier;
             camera->registerChange();
         }
-        if (runtimeRepository.backwardPressed) {
+        if (runtimeRepository->backwardPressed) {
             if (camera->isOrthographic) {
                 camera->orthographicProjectionSize += multiplier;
             } else {
@@ -93,7 +89,7 @@ namespace Metal {
             }
             camera->registerChange();
         }
-        if (runtimeRepository.forwardPressed) {
+        if (runtimeRepository->forwardPressed) {
             if (camera->isOrthographic) {
                 camera->orthographicProjectionSize -= multiplier;
             } else {
@@ -118,8 +114,8 @@ namespace Metal {
     }
 
     void CameraService::updateDelta(const bool isFirstMovement) const {
-        const float mouseX = runtimeRepository.mouseX;
-        const float mouseY = runtimeRepository.mouseY;
+        const float mouseX = runtimeRepository->mouseX;
+        const float mouseY = runtimeRepository->mouseY;
 
         if (isFirstMovement) {
             camera->lastMouseX = mouseX;

@@ -2,13 +2,14 @@
 #define THEMESERVICE_H
 #include <imgui.h>
 #include <glm/vec3.hpp>
-#include "../../common/AbstractRuntimeComponent.h"
+#include "../../common/IService.h"
+#include "../../common/ISync.h"
 
 
 namespace Metal {
     struct EditorRepository;
-    class ThemeService final : public AbstractRuntimeComponent {
-        EditorRepository &editorRepository;
+    class ThemeService final : public IService, public ISync {
+        EditorRepository *editorRepository = nullptr;
     public:
         ImVec4 neutralPalette{};
         ImVec4 palette0{};
@@ -23,15 +24,15 @@ namespace Metal {
         bool previousTheme = false;
         float prevLength = 0.0f;
 
-        explicit ThemeService(EditorRepository &editorRepository)
-            : AbstractRuntimeComponent(), editorRepository(editorRepository) {
-        }
-
         void setDarkMode();
 
         void setLightMode();
 
         void onSync() override;
+
+        std::vector<Dependency> getDependencies() override {
+            return {{"EditorRepository", editorRepository}};
+        }
     };
 } // Metal
 

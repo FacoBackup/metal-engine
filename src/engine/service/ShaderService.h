@@ -2,15 +2,16 @@
 #define SHADERSERVICE_H
 #include <string>
 #include "../dto/ShaderModule.h"
-#include "../../common/AbstractRuntimeComponent.h"
+#include "../../common/IService.h"
 
 namespace Metal {
     class VulkanContext;
 
-    class ShaderService final : public AbstractRuntimeComponent {
-        bool isDebugMode;
-        std::string shadersDirectory;
-        VulkanContext &vulkanContext;
+    class DirectoryService;
+    class ShaderService final : public IService {
+        bool isDebugMode = false;
+        VulkanContext *vulkanContext = nullptr;
+        DirectoryService *directoryService = nullptr;
 
         static void CheckShaderCompilation(glslang_shader_t *shader);
 
@@ -19,13 +20,19 @@ namespace Metal {
 
         static glslang_stage_t ShaderStageFromFilename(const char *pFilename);
 
-        static std::string ProcessIncludes(const std::string &input);
+        static std::string ProcessIncludes(const std::string &input, const std::string &basePath);
 
-        static std::string ProcessShader(const std::string &file);
+        static std::string ProcessShader(const std::string &file, const std::string &basePath);
 
     public:
-        explicit ShaderService(const std::string &shadersDirectory, bool isDebugMode, VulkanContext &vulkanContext) : shadersDirectory(
-            shadersDirectory), isDebugMode(isDebugMode), vulkanContext(vulkanContext){}
+        ShaderService() = default;
+
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"VulkanContext", vulkanContext},
+                {"DirectoryService", directoryService}
+            };
+        }
 
         VkShaderModule createShaderModule(const std::string &pFilename);
     };

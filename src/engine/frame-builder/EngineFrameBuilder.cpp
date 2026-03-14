@@ -3,7 +3,6 @@
 #include "structures/FramebufferBuilder.h"
 #include "structures/TextureBuilder.h"
 #include "structures/BufferBuilder.h"
-#include "structures/PassBuilder.h"
 #include "structures/CommandBufferRecorderBuilder.h"
 #include "EngineFrame.h"
 #include "../../ApplicationContext.h"
@@ -112,16 +111,9 @@ namespace Metal {
         std::unordered_map<std::string, std::vector<std::unique_ptr<AbstractPass>> > recorderToPasses;
         std::vector<std::string> recorderOrder;
 
-        for (const auto &builder: builders) {
-            if (auto *passBuilder = dynamic_cast<PassBuilder *>(builder.get())) {
-                const auto cbId = passBuilder->getCommandBufferId();
-                if (std::ranges::find(recorderOrder, cbId) == recorderOrder.end()) {
-                    recorderOrder.push_back(cbId);
-                }
-            }
-        }
-
         for (auto &pass: passes) {
+            recorderOrder.push_back(pass.commandBufferId);
+
             pass.pass->frame = frame.get();
             pass.pass->onInitialize();
             recorderToPasses[pass.commandBufferId].push_back(std::move(pass.pass));
