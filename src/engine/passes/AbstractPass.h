@@ -13,7 +13,7 @@ namespace Metal {
     class StreamingService;
     struct PipelineInstance;
 
-    class AbstractPass : public AbstractRuntimeComponent, public RuntimeResource {
+    class AbstractPass : public AbstractRuntimeComponent {
         bool isComputePass;
 
     public:
@@ -21,13 +21,7 @@ namespace Metal {
         VkCommandBuffer vkCommandBuffer = VK_NULL_HANDLE;
         PipelineInstance *pipelineInstance = nullptr;
 
-        explicit AbstractPass(const std::string &id, bool isComputePass);
-
-        virtual ~AbstractPass() override;
-
-        ResourceType resourceType() override {
-            return PASS;
-        }
+        explicit AbstractPass( bool isComputePass);
 
         void recordPushConstant(const void *data);
 
@@ -39,7 +33,7 @@ namespace Metal {
             this->vkCommandBuffer = vkCommandBuffer;
         }
 
-        PipelineInstance *getPipeline() {
+        PipelineInstance *getPipeline() const {
             return pipelineInstance;
         }
 

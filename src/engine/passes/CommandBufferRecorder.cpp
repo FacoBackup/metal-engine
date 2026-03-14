@@ -70,7 +70,7 @@ namespace Metal {
     }
 
     void CommandBufferRecorder::recordCommands(
-        const std::vector<AbstractPass *> &passes) const {
+        const std::vector<std::unique_ptr<AbstractPass>> &passes) const {
         auto vkCommandBuffer = _commandBuffers[CTX.getFrameIndex()];
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -91,7 +91,7 @@ namespace Metal {
     }
 
     void CommandBufferRecorder::RecordCommandsInternal(
-        const std::vector<AbstractPass *> &passes,
+        const std::vector<std::unique_ptr<AbstractPass>> &passes,
         VkCommandBuffer vkCommandBuffer) {
         for (auto &pass: passes) {
             pass->setCommandBuffer(vkCommandBuffer);

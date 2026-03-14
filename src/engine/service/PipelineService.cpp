@@ -1,6 +1,6 @@
 #include "PipelineService.h"
 #include "../dto/PipelineBuilder.h"
-#include "../util/ShaderUtil.h"
+#include "ShaderService.h"
 #include "../../core/vulkan/VulkanContext.h"
 #include "../../core/vulkan/VulkanUtils.h"
 #include "FrameBufferService.h"
@@ -73,7 +73,7 @@ namespace Metal {
                                                              PipelineInstance *pipeline) {
         pipeline->isCompute = true;
         pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
-        VkShaderModule computeShaderModule = ShaderUtil::CreateShaderModule(pipelineBuilder.computeShader);
+        VkShaderModule computeShaderModule = shaderService.createShaderModule(pipelineBuilder.computeShader);
         VkPipelineShaderStageCreateInfo computeShaderStageInfo{};
         computeShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         computeShaderStageInfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
@@ -101,8 +101,8 @@ namespace Metal {
         auto meshDescriptions = VertexData::GetAttributeDescriptions();
 
         pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
-        auto fragmentShaderModule = ShaderUtil::CreateShaderModule(pipelineBuilder.fragmentShader);
-        auto vertexShaderModule = ShaderUtil::CreateShaderModule(pipelineBuilder.vertexShader);
+        auto fragmentShaderModule = shaderService.createShaderModule(pipelineBuilder.fragmentShader);
+        auto vertexShaderModule = shaderService.createShaderModule(pipelineBuilder.vertexShader);
         createPipelineLayout(pipelineBuilder.pushConstantsSize, pipeline);
 
         std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages{};
@@ -252,9 +252,9 @@ namespace Metal {
         pipeline->pushConstantsSize = pipelineBuilder.pushConstantsSize;
 
         // Create shader modules
-        auto rayGenModule = ShaderUtil::CreateShaderModule(pipelineBuilder.rayGenShader);
-        auto missModule = ShaderUtil::CreateShaderModule(pipelineBuilder.missShader);
-        auto closestHitModule = ShaderUtil::CreateShaderModule(pipelineBuilder.closestHitShader);
+        auto rayGenModule = shaderService.createShaderModule(pipelineBuilder.rayGenShader);
+        auto missModule = shaderService.createShaderModule(pipelineBuilder.missShader);
+        auto closestHitModule = shaderService.createShaderModule(pipelineBuilder.closestHitShader);
 
         // Shader stages: 0=raygen, 1=miss, 2=closesthit
         std::array<VkPipelineShaderStageCreateInfo, 3> shaderStages{};

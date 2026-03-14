@@ -8,8 +8,6 @@ namespace Metal {
         GridPushConstant pushConstant{};
 
     public:
-        explicit GridPass(const std::string &id) : AbstractRenderPass(id) {}
-
         void onInitialize() override;
 
         bool shouldRun() override;

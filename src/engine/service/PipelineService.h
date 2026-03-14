@@ -7,6 +7,7 @@
 #include "../resource/PipelineInstance.h"
 
 namespace Metal {
+    class ShaderService;
     struct PipelineBuilder;
     struct FrameBufferInstance;
     struct PipelineInstance;
@@ -21,10 +22,16 @@ namespace Metal {
         FrameBufferService &framebufferService;
         BufferService &bufferService;
         DescriptorSetService &descriptorSetService;
+        ShaderService &shaderService;
 
     public:
-        explicit PipelineService(VulkanContext &vulkanContext, FrameBufferService &framebufferService, BufferService &bufferService, DescriptorSetService &descriptorSetService)
-            : vulkanContext(vulkanContext), framebufferService(framebufferService), bufferService(bufferService), descriptorSetService(descriptorSetService) {}
+        explicit PipelineService(ShaderService &shaderService, VulkanContext &vulkanContext,
+                                 FrameBufferService &framebufferService, BufferService &bufferService,
+                                 DescriptorSetService &descriptorSetService)
+            : shaderService(shaderService), vulkanContext(vulkanContext), framebufferService(framebufferService),
+              bufferService(bufferService), descriptorSetService(descriptorSetService) {
+        }
+
         PipelineService() = delete;
 
         PipelineInstance *createPipeline(PipelineBuilder &pipelineBuilder);

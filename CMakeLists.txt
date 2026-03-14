@@ -89,8 +89,8 @@ add_executable(
         src/editor/dock-spaces/world/WorldPanel.cpp
         src/editor/dock-spaces/world/WorldPanel.h
         src/engine/resource/RuntimeResource.h
-        src/engine/util/ShaderUtil.cpp
-        src/engine/util/ShaderUtil.h
+        src/engine/service/ShaderService.cpp
+        src/engine/service/ShaderService.h
         src/engine/dto/ShaderModule.cpp
         src/engine/dto/ShaderModule.h
         src/engine/passes/AbstractRenderPass.cpp
@@ -225,8 +225,6 @@ add_executable(
         src/engine/resource/SVOInstance.h
         src/engine/dto/TileInfoUBO.h
         src/engine/dto/LightData.h
-        src/editor/passes/IconsPass.cpp
-        src/editor/passes/IconsPass.h
         src/editor/passes/SelectionIDPass.cpp
         src/editor/passes/SelectionIDPass.h
         src/editor/repository/EditorRepository.cpp
@@ -270,7 +268,6 @@ add_executable(
         src/engine/frame-builder/structures/ResourceBuilder.h
         src/engine/dto/PipelineBuilder.cpp
         src/engine/service/DescriptorSetService.cpp
-        src/engine/frame-builder/structures/PassBuilder.cpp
         src/engine/frame-builder/structures/CommandBufferRecorderBuilder.cpp
         src/common/Changeable.h
         src/engine/passes/impl/TemporalAccumulationPass.cpp

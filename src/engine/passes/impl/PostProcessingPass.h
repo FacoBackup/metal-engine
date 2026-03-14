@@ -7,8 +7,6 @@ namespace Metal {
     class PostProcessingPass final : public AbstractRenderPass {
         PostProcessingPushConstant pushConstant{};
     public:
-        explicit PostProcessingPass(const std::string &id) : AbstractRenderPass(id) {}
-
         void onInitialize() override;
 
         void onSync() override;

@@ -19,17 +19,18 @@ namespace Metal {
     }
 
     void PrimitiveComponent::onUpdate(InspectableMember *member) {
-        if (member != nullptr && member->name == "meshId") {
-            MeshData *data = CTX.meshService.loadMeshData(meshId);
-            if (data != nullptr) {
-                if (CTX.worldRepository.registry.all_of<TransformComponent>(entityId)) {
-                    CTX.worldRepository.registry.get<TransformComponent>(entityId).gizmoCenter = data->gizmoCenter;
-                }
-                delete data;
-            }
-        }
-        CTX.engineContext.setGISettingsUpdated(true);
-        CTX.rayTracingService.setNeedsMaterialUpdate(true);
+        // TODO - EVENT SYSTEM
+        // if (member != nullptr && member->name == "meshId") {
+        //     MeshData *data = CTX.meshService.loadMeshData(meshId);
+        //     if (data != nullptr) {
+        //         if (CTX.worldRepository.registry.all_of<TransformComponent>(entityId)) {
+        //             CTX.worldRepository.registry.get<TransformComponent>(entityId).gizmoCenter = data->gizmoCenter;
+        //         }
+        //         delete data;
+        //     }
+        // }
+        // CTX.engineContext.setGISettingsUpdated(true);
+        // CTX.rayTracingService.setNeedsMaterialUpdate(true);
     }
 
     ComponentType PrimitiveComponent::getType() {

@@ -18,25 +18,22 @@ namespace Metal {
     DockSpace DockSpace::FILES{3, "Files", Icons::folder_open, 4, 4, CB(FilesPanel)};
     DockSpace DockSpace::METRICS{4, "Metrics", Icons::analytics, 4, 4, CB(MetricsPanel)};
     DockSpace DockSpace::REPOSITORIES{5, "Repositories", Icons::search, 4, 4, CB(RepositoriesPanel)};
-    const char *DockSpace::OPTIONS = "Inspector\0World\0Console\0Files\0Metrics\0Repositories\0";
 
+    const std::vector<DockSpace *> DockSpace::OPTIONS_LIST = {
+            &INSPECTOR,
+            &WORLD,
+            &CONSOLE,
+            &FILES,
+            &METRICS,
+            &REPOSITORIES
+    };
 
     DockSpace *DockSpace::GetOption(const int selected) {
-        switch (selected) {
-            case 0:
-                return &INSPECTOR;
-            case 1:
-                return &WORLD;
-            case 2:
-                return &CONSOLE;
-            case 3:
-                return &FILES;
-            case 4:
-                return &METRICS;
-            case 5:
-                return &REPOSITORIES;
-            default:
-                return nullptr;
+        for (auto *option: OPTIONS_LIST) {
+            if (option->index == selected) {
+                return option;
+            }
         }
+        return nullptr;
     }
 }

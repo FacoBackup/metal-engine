@@ -4,8 +4,7 @@
 #include <string>
 #include <chrono>
 
-#include "../../common/AbstractResourceService.h"
-#include "../../common/AbstractCoreRepository.h"
+#include "../../common/AbstractRuntimeComponent.h"
 
 using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;

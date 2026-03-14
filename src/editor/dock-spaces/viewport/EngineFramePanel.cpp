@@ -15,24 +15,34 @@
 #include "ImGuizmo.h"
 #include <algorithm>
 
+#include "../../../engine/passes/impl/HWRayTracingPass.h"
+#include "../../../engine/passes/impl/PostProcessingPass.h"
+#include "../../../engine/passes/impl/SpatialFilterPass.h"
+#include "../../../engine/passes/impl/TemporalAccumulationPass.h"
+#include "../../passes/GridPass.h"
+#include "../../passes/SelectionIDPass.h"
+#include "../../passes/SelectionOutlinePass.h"
+
 namespace Metal {
     void EngineFramePanel::onInitialize() {
-        const auto gBufferW = applicationContext->vulkanContext.getWindowWidth() / applicationContext->engineRepository.shadingResInvScale;
-        const auto gBufferH = applicationContext->vulkanContext.getWindowHeight() / applicationContext->engineRepository.shadingResInvScale;
+        const auto gBufferW = applicationContext->vulkanContext.getWindowWidth() / applicationContext->engineRepository.
+                              shadingResInvScale;
+        const auto gBufferH = applicationContext->vulkanContext.getWindowHeight() / applicationContext->engineRepository
+                              .shadingResInvScale;
 
         engineFrame = EngineFrameBuilder()
                 .addBuffer(RID_GLOBAL_DATA, sizeof(GlobalDataUBO),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, UNIFORM_BUFFER)
                 .addBuffer(RID_LIGHT_BUFFER, MAX_LIGHTS * sizeof(LightData),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
-        .addBuffer(RID_VOLUMES_BUFFER, MAX_VOLUMES * sizeof(VolumeData),
-                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
+                .addBuffer(RID_VOLUMES_BUFFER, MAX_VOLUMES * sizeof(VolumeData),
+                           VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
                 .addBuffer(RID_MESH_METADATA_BUFFER, MAX_MESH_INSTANCES * sizeof(MeshMetadata),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
                 .addTexture(RID_ACCUMULATED_FRAME, gBufferW, gBufferH)
                 .addTexture(RID_GBUFFER_POSITION_INDEX, gBufferW, gBufferH, VK_FORMAT_R32G32B32A32_SFLOAT)
                 .addTexture(RID_GBUFFER_NORMAL, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
-                .addTexture(RID_PREVIOUS_POSITION_INDEX, gBufferW, gBufferH, VK_FORMAT_R32G32B32_SFLOAT) // I noticed current position is rgba32f, but let's check.
+                .addTexture(RID_PREVIOUS_POSITION_INDEX, gBufferW, gBufferH, VK_FORMAT_R32G32B32A32_SFLOAT)
                 .addTexture(RID_PREVIOUS_NORMAL, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
                 .addTexture(RID_DENOISED_FRAME, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
                 .addTexture(RID_TEMPORAL_OUTPUT, gBufferW, gBufferH, VK_FORMAT_R16G16B16A16_SFLOAT)
@@ -42,17 +52,15 @@ namespace Metal {
                 .addFramebuffer(RID_POST_PROCESSING_FBO, gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
                 .addColor(VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
                 .addComputeCommandBuffer(RID_COMPUTE_CB)
-                .addPass(RAY_TRACING, RID_COMPUTE_CB)
-                .addPass(ACCUMULATION, RID_COMPUTE_CB)
-                .addPass(TEMPORAL_ACCUMULATION, RID_COMPUTE_CB)
-                .addPass(SPATIAL_FILTER, RID_COMPUTE_CB)
+                .addPass(std::make_unique<HWRayTracingPass>(), RID_COMPUTE_CB)
+                .addPass(std::make_unique<TemporalAccumulationPass>(), RID_COMPUTE_CB)
+                .addPass(std::make_unique<SpatialFilterPass>(), RID_COMPUTE_CB)
                 .addCommandBuffer(RID_SELECTION_CB, RID_SELECTION_FBO)
-                .addPass(SELECTION_ID, RID_SELECTION_CB)
+                .addPass(std::make_unique<SelectionIDPass>(), RID_SELECTION_CB)
                 .addCommandBuffer(RID_POST_PROCESSING_CB, RID_POST_PROCESSING_FBO)
-                .addPass(POST_PROCESSING, RID_POST_PROCESSING_CB)
-                .addPass(SELECTION_OUTLINE, RID_POST_PROCESSING_CB)
-                .addPass(GRID, RID_POST_PROCESSING_CB)
-                .addPass(ICONS, RID_POST_PROCESSING_CB)
+                .addPass(std::make_unique<PostProcessingPass>(), RID_POST_PROCESSING_CB)
+                .addPass(std::make_unique<SelectionOutlinePass>(), RID_POST_PROCESSING_CB)
+                .addPass(std::make_unique<GridPass>(), RID_POST_PROCESSING_CB)
                 .build();
 
         applicationContext->engineContext.registerFrame(engineFrame.get());
@@ -105,7 +113,8 @@ namespace Metal {
         const uint32_t pixelX = std::min(static_cast<uint32_t>(u * static_cast<float>(width)), width - 1);
         const uint32_t pixelY = std::min(static_cast<uint32_t>(v * static_cast<float>(height)), height - 1);
 
-        const auto picked = applicationContext->pickingService.pickEntityFromGBuffer(gBufferPositionIndex, pixelX, pixelY);
+        const auto picked = applicationContext->pickingService.pickEntityFromGBuffer(
+            gBufferPositionIndex, pixelX, pixelY);
         applicationContext->selectionService.clearSelection();
         applicationContext->selectionService.addSelected(picked.value_or(EMPTY_ENTITY));
     }

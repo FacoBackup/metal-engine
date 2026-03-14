@@ -14,7 +14,10 @@ struct ImGui_ImplVulkanH_Window;
 namespace Metal {
     class ApplicationContext;
 
+    class VulkanContext;
+
     class GLFWContext final : public Initializable {
+        VulkanContext *vulkanContext = nullptr;
         GLFWwindow *window = nullptr;
         bool validContext = true;
         ;
@@ -41,6 +44,10 @@ namespace Metal {
         void dispose() const;
 
         [[nodiscard]] ImGui_ImplVulkanH_Window &getGUIWindow() const;
+
+        void setVulkanContext(VulkanContext *vulkanContext) {
+            this->vulkanContext = vulkanContext;
+        }
     };
 }
 

@@ -4,14 +4,7 @@
 #include "../resource/PipelineInstance.h"
 
 namespace Metal {
-    AbstractPass::AbstractPass(const std::string &id, bool isComputePass) : RuntimeResource(id),
-                                                                            isComputePass(isComputePass) {
-    }
-
-    AbstractPass::~AbstractPass() {
-        if (pipelineInstance != nullptr) {
-            CTX.pipelineService.dispose(pipelineInstance->getId());
-        }
+    AbstractPass::AbstractPass(bool isComputePass) : isComputePass(isComputePass) {
     }
 
     void AbstractPass::recordPushConstant(const void *data) {

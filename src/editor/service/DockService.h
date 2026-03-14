@@ -10,7 +10,12 @@ namespace Metal {
     class AbstractPanel;
 
     class DockService final : public AbstractRuntimeComponent {
+        DockRepository &dockRepository;
     public:
+        explicit DockService(DockRepository &dockRepository)
+            : AbstractRuntimeComponent(), dockRepository(dockRepository) {
+        }
+
         void buildViews(ImGuiID windowId, AbstractPanel *panel) const;
 
         static void createDockSpace(DockDTO *dockSpace, ImGuiID *dockMainId);

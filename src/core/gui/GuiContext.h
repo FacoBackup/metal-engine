@@ -10,7 +10,14 @@ namespace Metal {
     struct FrameBufferAttachment;
     struct TextureInstance;
 
+    class VulkanContext;
+    class DescriptorSetService;
+
     class GuiContext final : public AbstractRuntimeComponent {
+        VulkanContext &vulkanContext;
+        GLFWContext &glfwContext;
+        DescriptorSetService &descriptorSetService;
+
         static void applySpacing();
 
         void applyFonts();
@@ -19,7 +26,9 @@ namespace Metal {
         ImFont *largeIconsFont = nullptr;
 
     public:
-        explicit GuiContext();
+        explicit GuiContext(VulkanContext &vulkanContext,
+                            GLFWContext &glfwContext,
+                            DescriptorSetService &descriptorSetService);
 
         [[ nodiscard]] ImFont *getLargeIconsFont() const {
             return largeIconsFont;

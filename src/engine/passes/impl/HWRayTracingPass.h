@@ -9,9 +9,6 @@ namespace Metal {
         HWRayTracingPushConstant pushConstant{};
 
     public:
-        explicit HWRayTracingPass(const std::string &id) : AbstractComputePass(id) {
-        }
-
         void onSync() override;
 
         void onInitialize() override;

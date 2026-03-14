@@ -12,7 +12,23 @@
 #define VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME "VK_KHR_portability_subset"
 
 namespace Metal {
+    class GLFWContext;
+    struct EngineRepository;
+    class MeshService;
+    class TextureService;
+    class FrameBufferService;
+    class PipelineService;
+    class RayTracingService;
+
     class VulkanContext final : public AbstractRuntimeComponent {
+        GLFWContext &glfwContext;
+        EngineRepository &engineRepository;
+        MeshService &meshService;
+        TextureService &textureService;
+        FrameBufferService &framebufferService;
+        PipelineService &pipelineService;
+        RayTracingService &rayTracingService;
+
         static VkBool32 DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
                                       VkDebugUtilsMessageTypeFlagsEXT messageType,
                                       const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
@@ -51,7 +67,14 @@ namespace Metal {
 
         std::vector<VkCommandBuffer> &getCommandBuffers() { return commandBuffers; }
 
-        explicit VulkanContext(bool debugMode);
+        explicit VulkanContext(bool debugMode,
+                               GLFWContext &glfwContext,
+                               EngineRepository &engineRepository,
+                               MeshService &meshService,
+                               TextureService &textureService,
+                               FrameBufferService &framebufferService,
+                               PipelineService &pipelineService,
+                               RayTracingService &rayTracingService);
 
         VkPhysicalDeviceProperties physicalDeviceProperties{};
         VkPhysicalDeviceMemoryProperties physicalDeviceMemoryProperties{};
@@ -98,7 +121,7 @@ namespace Metal {
         void endSingleTimeCommands(VkCommandBuffer commandBuffer) const;
 
         void submitFrame(VkSemaphore image_acquired_semaphore, VkSemaphore render_complete_semaphore,
-                         ImGui_ImplVulkanH_Frame *fd) const;
+                         ImGui_ImplVulkanH_Frame *fd);
     };
 } // Metal
 

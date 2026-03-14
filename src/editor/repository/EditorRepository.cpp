@@ -35,14 +35,14 @@ namespace Metal {
         j["gizmoUseSnapRotate"] = gizmoUseSnapRotate;
         j["gizmoUseSnapScale"] = gizmoUseSnapScale;
         j["showOnlyEntitiesHierarchy"] = showOnlyEntitiesHierarchy;
-        j["mainSelection"] = static_cast<uint32_t>(entt::to_integral(mainSelection));
+        j["mainSelection"] = entt::to_integral(mainSelection);
         j["selected"] = nlohmann::json::array();
         for (auto const& [key, val] : selected) {
-            j["selected"].push_back(static_cast<uint32_t>(entt::to_integral(key)));
+            j["selected"].push_back(entt::to_integral(key));
         }
         j["copied"] = nlohmann::json::array();
         for (auto const& entity : copied) {
-            j["copied"].push_back(static_cast<uint32_t>(entt::to_integral(entity)));
+            j["copied"].push_back(entt::to_integral(entity));
         }
         j["shadingMode"] = shadingMode;
         return j;

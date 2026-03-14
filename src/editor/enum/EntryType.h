@@ -1,6 +1,10 @@
 #ifndef FILETYPE_H
 #define FILETYPE_H
 
+#include <string>
+#include <vector>
+#include "../../../common/Icons.h"
+
 namespace Metal::EntryType {
     enum EntryType {
         SCENE,
@@ -11,47 +15,28 @@ namespace Metal::EntryType {
         NONE
     };
 
-    static const char *Names = "Scene\0Mesh\0Texture\0Volume\0Directory\0None\0";
+    struct EntryTypeDTO {
+        EntryType type;
+        std::string name;
+        std::string icon;
+    };
 
-    static EntryType ValueOfIndex(const int option) {
-        if (option == 0) {
-            return EntryType::SCENE;
-        }
-        if (option == 1) {
-            return EntryType::MESH;
-        }
-        if (option == 2) {
-            return EntryType::TEXTURE;
-        }
-        if (option == 3) {
-            return EntryType::VOLUME;
-        }
-        if (option == 4) {
-            return EntryType::DIRECTORY;
-        }
-        return EntryType::NONE;
-    }
+    static const std::vector<EntryTypeDTO> ENTRIES = {
+            {SCENE,     "Scene",     Icons::image},
+            {MESH,      "Mesh",      Icons::view_in_ar},
+            {TEXTURE,   "Texture",   Icons::texture},
+            {VOLUME,    "Volume",    Icons::view_agenda},
+            {DIRECTORY, "Directory", Icons::folder},
+            {NONE,      "None",      Icons::close}
+    };
 
-    static int IndexOfValue(const EntryType mode) {
-        if (mode == SCENE) {
-            return 0;
+    static const EntryTypeDTO& GetDTO(EntryType type) {
+        for (const auto& dto : ENTRIES) {
+            if (dto.type == type) {
+                return dto;
+            }
         }
-        if (mode == MESH) {
-            return 1;
-        }
-        if (mode == TEXTURE) {
-            return 2;
-        }
-        if (mode == VOLUME) {
-            return 3;
-        }
-        if (mode == DIRECTORY) {
-            return 4;
-        }
-        if (mode == NONE) {
-            return 6;
-        }
-        return 6;
+        return ENTRIES.back(); // Return NONE
     }
 }
 #endif

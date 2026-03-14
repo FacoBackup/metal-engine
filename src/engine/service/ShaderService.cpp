@@ -1,7 +1,10 @@
-#include "ShaderUtil.h"
+#include "ShaderService.h"
 
 #include <regex>
 #include <fstream>
+#include <iostream>
+#include <glslang/Include/glslang_c_shader_types.h>
+#include <vulkan/vulkan_core.h>
 
 #include "../dto/ShaderModule.h"
 #include "../../core/vulkan/VulkanUtils.h"
@@ -15,7 +18,7 @@
 #define BASE_PATH "../resources/shaders/"
 
 namespace Metal {
-    void ShaderUtil::CheckShaderCompilation(glslang_shader_t *shader) {
+    void ShaderService::CheckShaderCompilation(glslang_shader_t *shader) {
         const char *infoLog = glslang_shader_get_info_log(shader);
         const char *debugLog = glslang_shader_get_info_debug_log(shader);
         const char *shaderCode = glslang_shader_get_preprocessed_code(shader);
@@ -28,8 +31,8 @@ namespace Metal {
         }
     }
 
-    bool ShaderUtil::CompileShader(glslang_stage_t stage, const char *pShaderCode,
-                                   ShaderModule *shaderModule) {
+    bool ShaderService::CompileShader(glslang_stage_t stage, const char *pShaderCode,
+                                      ShaderModule *shaderModule) const {
         const glslang_input_t input = {
             .language = GLSLANG_SOURCE_GLSL,
             .stage = stage,
@@ -78,7 +81,7 @@ namespace Metal {
         shaderCreateInfo.codeSize = shaderModule->SPIRV.size() * sizeof(unsigned int);
         shaderCreateInfo.pCode = static_cast<const unsigned int *>(shaderModule->SPIRV.data());
 
-        VulkanUtils::CheckVKResult(vkCreateShaderModule(CTX.vulkanContext.device.device, &shaderCreateInfo,
+        VulkanUtils::CheckVKResult(vkCreateShaderModule(vulkanContext.device.device, &shaderCreateInfo,
                                                         nullptr,
                                                         &shaderModule->vkShaderModule));
         glslang_program_delete(program);
@@ -87,7 +90,7 @@ namespace Metal {
         return !shaderModule->SPIRV.empty();
     }
 
-    glslang_stage_t ShaderUtil::ShaderStageFromFilename(const char *pFilename) {
+    glslang_stage_t ShaderService::ShaderStageFromFilename(const char *pFilename) {
         const std::string s(pFilename);
 
         if (s.ends_with(".vert")) {
@@ -128,7 +131,7 @@ namespace Metal {
         throw std::runtime_error("Unknown shader stage in file");
     }
 
-    std::string ShaderUtil::ProcessIncludes(const std::string &input) {
+    std::string ShaderService::ProcessIncludes(const std::string &input) {
         std::string result = input;
         std::regex includePattern(R"(#include\s+"(.+))");
         std::smatch match;
@@ -154,16 +157,15 @@ namespace Metal {
         return result;
     }
 
-    std::string ShaderUtil::ProcessShader(const std::string &file) {
+    std::string ShaderService::ProcessShader(const std::string &file) {
         std::string source;
         FilesUtil::ReadFile(file.c_str(), source);
         return ProcessIncludes(source);
     }
 
-    VkShaderModule ShaderUtil::CreateShaderModule(const std::string &pFilename) {
-        const std::string basePath = CTX.getShadersDirectory();
+    VkShaderModule ShaderService::createShaderModule(const std::string &pFilename) {
         std::string source = ProcessShader(BASE_PATH + pFilename);
-        if (CTX.isDebugMode()) {
+        if (isDebugMode) {
             source = "#define DEBUG\n" + source;
         }
         for (auto &entry: ShadingModes::getShaderEntries()) {
@@ -175,8 +177,8 @@ namespace Metal {
         const size_t sourceHash = std::hash<std::string>{}(source);
         const std::string part(BASE_PATH + pFilename);
         const std::string shaderName = part.substr(part.find_last_of('/') + 1, part.size());
-        const std::string binaryFilename = basePath + shaderName + ".spv";
-        const std::string hashFilename = basePath + shaderName + ".hash";
+        const std::string binaryFilename = shadersDirectory + shaderName + ".spv";
+        const std::string hashFilename = shadersDirectory + shaderName + ".hash";
 
         ShaderModule shader{};
 
@@ -193,7 +195,7 @@ namespace Metal {
                     shaderCreateInfo.codeSize = shader.SPIRV.size() * sizeof(unsigned int);
                     shaderCreateInfo.pCode = static_cast<const unsigned int *>(shader.SPIRV.data());
 
-                    if (vkCreateShaderModule(CTX.vulkanContext.device.device, &shaderCreateInfo,
+                    if (vkCreateShaderModule(vulkanContext.device.device, &shaderCreateInfo,
                                              nullptr, &shader.vkShaderModule) == VK_SUCCESS) {
                         needsCompilation = false;
                         LOG_INFO("Loaded cached shader: " + shaderName);

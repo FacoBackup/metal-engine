@@ -44,70 +44,80 @@
 #include "editor/EditorPanel.h"
 #include "core/gui/GuiContext.h"
 
-#define CTX Metal::ApplicationContext::Get()
-
+#define CTX ApplicationContext::CONTEXT
 namespace Metal {
-    class ApplicationContext {
-        static std::unique_ptr<ApplicationContext> CONTEXT;
-        bool debugMode;
+    class ApplicationContext : public Initializable{
         EditorPanel editorPanel;
         std::string rootDirectory;
 
     public:
-        explicit ApplicationContext(bool debug_mode)
-            : debugMode(debug_mode) {
-        }
+        static ApplicationContext CONTEXT;
 
-        EngineContext engineContext{};
-        VulkanContext vulkanContext{ debugMode};
-        GuiContext guiContext{};
+        VulkanContext vulkanContext{
+            true,
+            glfwContext,
+            engineRepository,
+            meshService,
+            textureService,
+            framebufferService,
+            pipelineService,
+            rayTracingService
+        };
+        GuiContext guiContext{vulkanContext, glfwContext, descriptorSetService};
         GLFWContext glfwContext{};
+
+        EngineContext engineContext{
+            transformService,
+            streamingService,
+            rayTracingService,
+            cameraService,
+            lightService,
+            volumeService,
+            worldRepository,
+            editorRepository,
+            engineRepository
+        };
+
+        // ----------- Repository
+        WorldRepository worldRepository{rayTracingService, rootDirectory};
+        RuntimeRepository runtimeRepository{};
+        EngineRepository engineRepository{};
+        DockRepository dockRepository{};
+        EditorRepository editorRepository{};
 
         // ----------- Services
         NotificationService notificationService;
         AsyncTaskService asyncTaskService;
-        MeshService meshService{bufferService, rayTracingService, rootDirectory};
-        MaterialService materialService{textureService};
-        TextureService textureService{vulkanContext, bufferService, pipelineService, descriptorSetService, rootDirectory};
-        FrameBufferService framebufferService{vulkanContext};
-        DescriptorSetService descriptorSetService{vulkanContext, framebufferService, bufferService, textureService};
-        PipelineService pipelineService{vulkanContext, framebufferService, bufferService, descriptorSetService};
         BufferService bufferService{vulkanContext};
-        ThemeService themeService{};
-        DockService dockService{};
-        SelectionService selectionService{};
-        SceneImporterService sceneImporterService{};
-        MeshImporterService meshImporterService{};
-        MaterialImporterService materialImporterService{};
-        TextureImporterService textureImporter{};
-        FilesService filesService{};
-        FileImporterService fileImporterService{};
+        FrameBufferService framebufferService{vulkanContext};
+        ThemeService themeService{editorRepository};
+        DockService dockService{dockRepository};
+        DescriptorSetService descriptorSetService{vulkanContext, framebufferService, bufferService, textureService};
+        SelectionService selectionService{editorRepository, worldRepository};
+        VoxelImporterService voxelImporterService{rootDirectory};
+        MeshImporterService meshImporterService{rootDirectory};
+        TextureImporterService textureImporter{rootDirectory};
+        MaterialImporterService materialImporterService{textureImporter, rootDirectory};
+        SceneImporterService sceneImporterService{meshImporterService, materialImporterService, rootDirectory};
+        FilesService filesService{rootDirectory, notificationService};
+        FileImporterService fileImporterService{
+            sceneImporterService, textureImporter, voxelImporterService, notificationService, asyncTaskService
+        };
         CameraService cameraService{engineContext, worldRepository, runtimeRepository};
-        PickingService pickingService{};
+        PickingService pickingService{vulkanContext, bufferService, worldRepository};
         TransformService transformService{worldRepository, rayTracingService};
         LightService lightService{engineContext, engineRepository};
         VolumeService volumeService{worldRepository, engineContext};
-        RayTracingService rayTracingService{vulkanContext, pipelineService, worldRepository, meshService, materialService, bufferService, engineContext};
+        RayTracingService rayTracingService{
+            vulkanContext, pipelineService, worldRepository, meshService, materialService, bufferService, engineContext
+        };
         CommandBufferRecorderService commandBufferRecorderService{};
-        VoxelImporterService voxelImporterService{rootDirectory};
         VoxelService voxelService{};
-        // ----------- Services
-
-        // ----------- Repository
-        WorldRepository worldRepository{};
-        RuntimeRepository runtimeRepository{};
         StreamingService streamingService{engineContext, worldRepository, meshService, textureService, voxelService};
-        EngineRepository engineRepository{};
-        DockRepository dockRepository{};
-        EditorRepository editorRepository{};
+        // ----------- Services
         // ----------- Repository
 
-
-        static ApplicationContext &Get();
-
-        static void Init(bool debugMode);
-
-        [[nodiscard]] bool isDebugMode() const { return debugMode; }
+        [[nodiscard]] bool isDebugMode() const { return true; }
 
         void updateRootPath(bool forceSelection);
 

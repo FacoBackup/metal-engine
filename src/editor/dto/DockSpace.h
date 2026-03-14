@@ -1,6 +1,7 @@
 #ifndef METAL_ENGINE_DOCKSPACE_H
 #define METAL_ENGINE_DOCKSPACE_H
 
+#include <vector>
 #include <functional>
 #include <string>
 
@@ -15,7 +16,8 @@ namespace Metal {
         static DockSpace FILES;
         static DockSpace METRICS;
         static DockSpace REPOSITORIES;
-        static const char *OPTIONS;
+
+        static const std::vector<DockSpace*> OPTIONS_LIST;
 
         const int index;
         const std::string name;

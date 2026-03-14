@@ -143,11 +143,7 @@ namespace Metal {
                 if (ImGui::BeginPopup((id + "NewTabDropdown").c_str())) {
                     ImGui::Text("New Tab");
                     ImGui::Separator();
-                    for (int i = 0; i <= 4; i++) {
-                        DockSpace *option = DockSpace::GetOption(i);
-                        if (option == nullptr) {
-                            continue;
-                        }
+                    for (auto *option: DockSpace::OPTIONS_LIST) {
                         const bool exists = hasDockSpace(option->index);
                         const std::string label = option->icon + " " + option->name;
                         if (ImGui::MenuItem(label.c_str(), nullptr, false, !exists)) {

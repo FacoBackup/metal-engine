@@ -10,7 +10,6 @@
 namespace Metal {
     void DockService::buildViews(ImGuiID windowId, AbstractPanel *panel) const {
         if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DockingEnable) {
-            DockRepository &dockRepository = CTX.dockRepository;
             if (dockRepository.isInitialized) {
                 return;
             }

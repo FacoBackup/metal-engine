@@ -9,7 +9,6 @@ namespace Metal {
         SelectedDotPushConstant pushConstant{};
 
     public:
-        explicit SelectionIDPass(const std::string &id) : AbstractRenderPass(id) {}
 
         void onInitialize() override;
 

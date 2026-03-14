@@ -8,8 +8,7 @@ namespace Metal {
         PIPELINE,
         BUFFER,
         DESCRIPTOR_SET,
-        COMMAND_BUFFER_RECORDER,
-        PASS
+        COMMAND_BUFFER_RECORDER
     };
 }
 

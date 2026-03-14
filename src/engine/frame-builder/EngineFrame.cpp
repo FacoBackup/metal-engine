@@ -12,8 +12,7 @@ namespace Metal {
         }
     }
 
-
-    void EngineFrame::addPass(CommandBufferRecorder *recorder, const std::vector<AbstractPass *> &p) {
+    void EngineFrame::addPass(CommandBufferRecorder *recorder, const std::vector<std::unique_ptr<AbstractPass>> &p) {
         if (recorder) {
             passes.emplace_back(recorder, p);
         }
@@ -23,16 +22,6 @@ namespace Metal {
         for (auto &pair: passes) {
             pair.first->recordCommands(pair.second);
         }
-    }
-
-    void EngineFrame::dispose() {
-        for (auto &pair: passes) {
-            delete pair.first;
-            for (auto *pass: pair.second) {
-                delete pass;
-            }
-        }
-        passes.clear();
     }
 
     std::string EngineFrame::getScopedResourceId(const std::string &resourceId) const {

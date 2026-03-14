@@ -5,7 +5,7 @@
 
 namespace Metal {
     ResourceType BufferBuilder::getType() {
-        return ResourceType::BUFFER;
+        return BUFFER;
     }
 
     RuntimeResource *BufferBuilder::build() {

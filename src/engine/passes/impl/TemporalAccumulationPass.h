@@ -5,8 +5,6 @@
 namespace Metal {
     class TemporalAccumulationPass final : public AbstractComputePass {
     public:
-        explicit TemporalAccumulationPass(const std::string &id) : AbstractComputePass(id) {
-        }
 
         void onSync() override;
 

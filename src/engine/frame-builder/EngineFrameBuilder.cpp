@@ -82,9 +82,9 @@ namespace Metal {
         return *this;
     }
 
-    EngineFrameBuilder &EngineFrameBuilder::addPass(PassType type, const std::string &commandBufferId) {
-        currentBuilder = std::make_shared<PassBuilder>(Util::uuidV4(), type, frameId + "_" + commandBufferId);
-        builders.push_back(currentBuilder);
+    EngineFrameBuilder &EngineFrameBuilder::addPass(std::unique_ptr<AbstractPass> pass,
+                                                    const std::string &commandBufferId) {
+        passes.emplace_back(std::move(pass), frameId + "_" + commandBufferId);
         return *this;
     }
 
@@ -103,37 +103,32 @@ namespace Metal {
         std::unordered_map<std::string, RuntimeResource *> builtResources;
 
         for (const auto &builder: builders) {
-            auto *resource = builder->build();
-            if (resource) {
+            if (auto *resource = builder->build()) {
                 frame->addResource(resource);
                 builtResources[builder->getId()] = resource;
             }
         }
 
-        std::unordered_map<std::string, std::vector<AbstractPass *> > recorderToPasses;
+        std::unordered_map<std::string, std::vector<std::unique_ptr<AbstractPass>> > recorderToPasses;
         std::vector<std::string> recorderOrder;
 
         for (const auto &builder: builders) {
             if (auto *passBuilder = dynamic_cast<PassBuilder *>(builder.get())) {
                 const auto cbId = passBuilder->getCommandBufferId();
-                if (std::find(recorderOrder.begin(), recorderOrder.end(), cbId) == recorderOrder.end()) {
+                if (std::ranges::find(recorderOrder, cbId) == recorderOrder.end()) {
                     recorderOrder.push_back(cbId);
-                }
-
-                if (builtResources.contains(builder->getId())) {
-                    auto *pass = dynamic_cast<AbstractPass *>(builtResources.at(builder->getId()));
-                    if (pass) {
-                        pass->frame = frame.get();
-                        pass->onInitialize();
-                        recorderToPasses[cbId].push_back(pass);
-                    }
                 }
             }
         }
 
+        for (auto &pass: passes) {
+            pass.pass->frame = frame.get();
+            pass.pass->onInitialize();
+            recorderToPasses[pass.commandBufferId].push_back(std::move(pass.pass));
+        }
+
         for (const auto &cbId: recorderOrder) {
-            auto *recorder = CTX.commandBufferRecorderService.getResource(cbId);
-            if (recorder) {
+            if (auto *recorder = dynamic_cast<CommandBufferRecorder*>(builtResources.at(cbId))) {
                 frame->addPass(recorder, recorderToPasses[cbId]);
             }
         }

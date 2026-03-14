@@ -12,15 +12,22 @@
 #include "../resource/BufferInstance.h"
 
 namespace Metal {
+    class AbstractPass;
     class CommandBufferRecorder;
     struct FrameBufferInstance;
     struct DescriptorBinding;
     class ResourceBuilder;
     class EngineFrame;
 
+    struct PassData {
+        std::unique_ptr<AbstractPass> pass;
+        std::string commandBufferId;
+    };
+
     class EngineFrameBuilder final {
         std::string frameId;
         std::vector<std::shared_ptr<ResourceBuilder> > builders{};
+        std::vector<PassData> passes{};
         std::shared_ptr<ResourceBuilder> currentBuilder{};
 
     public:
@@ -46,7 +53,7 @@ namespace Metal {
 
         EngineFrameBuilder &addComputeCommandBuffer(const std::string &id);
 
-        EngineFrameBuilder &addPass(PassType type, const std::string &commandBufferId);
+        EngineFrameBuilder &addPass(std::unique_ptr<AbstractPass> pass, const std::string &commandBufferId);
 
         bool tryMatch(const std::string &id, ResourceType type);
 

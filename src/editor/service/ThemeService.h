@@ -6,7 +6,9 @@
 
 
 namespace Metal {
+    struct EditorRepository;
     class ThemeService final : public AbstractRuntimeComponent {
+        EditorRepository &editorRepository;
     public:
         ImVec4 neutralPalette{};
         ImVec4 palette0{};
@@ -21,7 +23,8 @@ namespace Metal {
         bool previousTheme = false;
         float prevLength = 0.0f;
 
-        explicit ThemeService() : AbstractRuntimeComponent() {
+        explicit ThemeService(EditorRepository &editorRepository)
+            : AbstractRuntimeComponent(), editorRepository(editorRepository) {
         }
 
         void setDarkMode();

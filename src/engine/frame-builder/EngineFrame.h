@@ -16,7 +16,7 @@ namespace Metal {
         std::string id;
         bool shouldRender = false;
         std::unordered_map<std::string, RuntimeResource *> resources;
-        std::vector<std::pair<CommandBufferRecorder *, std::vector<AbstractPass *> > > passes;
+        std::vector<std::pair<CommandBufferRecorder *, std::vector<std::unique_ptr<AbstractPass> > > > passes;
 
     public:
         explicit EngineFrame(std::string id);
@@ -38,19 +38,9 @@ namespace Metal {
             return nullptr;
         }
 
-        void addPass(CommandBufferRecorder *recorder, const std::vector<AbstractPass *> &p);
-
-        [[nodiscard]] const std::vector<std::pair<CommandBufferRecorder *, std::vector<AbstractPass *> > > &
-        getPasses() const {
-            return passes;
-        }
+        void addPass(CommandBufferRecorder *recorder, const std::vector<std::unique_ptr<AbstractPass>> &p);
 
         void onSync();
-
-        void dispose();
-
-        void destroy() {
-        }
 
         [[nodiscard]] std::string getScopedResourceId(const std::string &resourceId) const;
     };

@@ -22,7 +22,6 @@ namespace Metal {
                 filesContext.setCurrentDirectory(filesContext.currentDirectory->parent);
             }
             UIUtil::RenderTooltip("Go to parent folder");
-
         }
 
         ImGui::SameLine();
@@ -37,9 +36,18 @@ namespace Metal {
         UIUtil::DynamicSpacing(200);
 
         ImGui::SetNextItemWidth(100);
-        editorMode = IndexOfValue(filesContext.filterType);
-        if (ImGui::Combo((id + "filter").c_str(), &editorMode, EntryType::Names)) {
-            filesContext.filterType = EntryType::ValueOfIndex(editorMode);
+        const auto &currentDTO = EntryType::GetDTO(filesContext.filterType);
+        std::string filterLabel = currentDTO.icon + " " + currentDTO.name;
+        if (ImGui::Button((filterLabel + id + "filter").c_str(), ImVec2(100, 0))) {
+            ImGui::OpenPopup((id + "FilterPopup").c_str());
+        }
+        if (ImGui::BeginPopup((id + "FilterPopup").c_str())) {
+            for (const auto &dto: EntryType::ENTRIES) {
+                if (ImGui::MenuItem((dto.icon + " " + dto.name).c_str())) {
+                    filesContext.filterType = dto.type;
+                }
+            }
+            ImGui::EndPopup();
         }
         ImGui::SameLine();
         if (UIUtil::ButtonSimple(actionLabel + id, 100,
