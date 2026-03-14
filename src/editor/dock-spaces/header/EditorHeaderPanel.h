@@ -14,18 +14,6 @@ namespace Metal {
         EngineContext *engineContext = nullptr;
         DirectoryService *directoryService = nullptr;
 
-        ImVec2 dragStartMousePos;
-        int dragStartWindowX = 0;
-        int dragStartWindowY = 0;
-        bool isDragging = false;
-
-        double dragStartGlobalMouseX = 0;
-        double dragStartGlobalMouseY = 0;
-        int lastWindowX = 0;
-        int lastWindowY = 0;
-
-        ImVec2 dragHandleScreenPos;
-
         void renderFileTab();
 
         void renderWindowControls();
