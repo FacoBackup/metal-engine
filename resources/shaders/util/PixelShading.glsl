@@ -3,95 +3,92 @@
 
 #include "../CreateRay.glsl"
 
-struct BounceInfo {
+struct PathInfo {
     MaterialInfo material;
     SurfaceInteraction interaction;
     vec3 throughput;
-    vec3 indirectLight;
+    vec3 radiance;
 };
 
-void computeRadiance(inout BounceInfo bounceInfo)
-{
-    if (bounceInfo.material.isEmissive)
-    {
-        vec3 emission = bounceInfo.material.baseColor * pushConstants.pathTracingEmissiveFactor;
-        bounceInfo.indirectLight += bounceInfo.throughput * emission;
-        return;
-    }
+void addDirectLighting(inout PathInfo pathInfo) {
+    if (globalData.lightsCount == 0) return;
 
-    vec3 directRadiance = vec3(0);
+    int lightIndex = int(random() * globalData.lightsCount);
+    Light l = lightBuffer.items[lightIndex];
 
-    for (int i = 0; i < int(globalData.lightsCount); ++i)
-    {
-        Light l = lightBuffer.items[i];
-        l.color.rgb *= l.color.a;
-
-        vec3 wi;
-        vec3 f;
-        float scatteringPdf;
-
-        directRadiance += calculateDirectLight(l, bounceInfo.interaction, bounceInfo.material, wi, f, scatteringPdf);
-    }
-
-    bounceInfo.indirectLight += bounceInfo.throughput * directRadiance;
+    vec3 wi, f;
+    float scatteringPdf;
+    pathInfo.radiance += pathInfo.throughput * calculateDirectLight(l, pathInfo.interaction, pathInfo.material, wi, f, scatteringPdf);
 }
 
-vec3 calculateIndirectLighting(MaterialInfo material, SurfaceInteraction interaction) {
-    if (pushConstants.pathTracerBounces == 0) return vec3(0);
+vec3 tracePath(vec3 rayDirection, MaterialInfo material, SurfaceInteraction interaction) {
+    PathInfo pathInfo;
+    pathInfo.radiance = vec3(0);
+    pathInfo.throughput = vec3(1);
+    pathInfo.material = material;
+    pathInfo.interaction = interaction;
+    pathInfo.interaction.incomingRayDir = rayDirection;
 
-    BounceInfo bounceInfo;
-    bounceInfo.indirectLight = vec3(0);
-    bounceInfo.throughput = vec3(1);
-    bounceInfo.material = material;
-    bounceInfo.interaction = interaction;
+    // First hit might be emissive
+    if (pathInfo.material.isEmissive) {
+        return pathInfo.material.baseColor * pushConstants.pathTracingEmissiveFactor;
+    }
 
     for (uint j = 0; j < pushConstants.pathTracerBounces; j++) {
+        // Direct Lighting
+        addDirectLighting(pathInfo);
+
+        // Sample next direction
         vec3 wi;
         float pdf;
         vec3 X = vec3(0.), Y = vec3(0.);
-        directionOfAnisotropicity(bounceInfo.interaction.normal, X, Y);
-        bounceInfo.interaction.tangent = X;
-        bounceInfo.interaction.binormal = Y;
+        directionOfAnisotropicity(pathInfo.interaction.normal, X, Y);
+        pathInfo.interaction.tangent = X;
+        pathInfo.interaction.binormal = Y;
 
-        vec3 f = bsdfSample(wi, -bounceInfo.interaction.incomingRayDir, X, Y, pdf, bounceInfo.interaction, bounceInfo.material);
-        f *= abs(dot(wi, bounceInfo.interaction.normal));
+        vec3 f = bsdfSample(wi, -pathInfo.interaction.incomingRayDir, X, Y, pdf, pathInfo.interaction, pathInfo.material);
+        f *= abs(dot(wi, pathInfo.interaction.normal));
 
         if (pdf < EPSILON || dot(f, f) < EPSILON) break;
 
-        bounceInfo.throughput *= f / pdf;
+        pathInfo.throughput *= f / pdf;
+
+        // Russian Roulette
+        if (j >= 3) {
+            float q = max(0.05, 1.0 - max(pathInfo.throughput.r, max(pathInfo.throughput.g, pathInfo.throughput.b)));
+            if (random() < q) break;
+            pathInfo.throughput /= (1.0 - q);
+        }
 
         float bias = 0.001;
-        vec3 rayOrigin = bounceInfo.interaction.point + (dot(wi, bounceInfo.interaction.normal) > 0.0 ? 1.0 : -1.0) * bounceInfo.interaction.normal * bias;
+        vec3 rayOrigin = pathInfo.interaction.point + (dot(wi, pathInfo.interaction.normal) > 0.0 ? 1.0 : -1.0) * pathInfo.interaction.normal * bias;
 
-        payload.hit = true;
-        traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xFF, 0, 0, 0, rayOrigin, 0.001, wi, 1000.0, 0);
+        payload.hit = false;
+        traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xFF, 0, 0, 0, rayOrigin, 0.001, wi, 10000.0, 0);
 
         if (!payload.hit) {
             if (pushConstants.isAtmosphereEnabled != 0) {
-                bounceInfo.material.baseColor = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), wi, 2.0f) * 0.05f;
-                bounceInfo.material.isEmissive = true;
-                bounceInfo.interaction.point = rayOrigin + wi * 1000.0; // Placeholder point for atmosphere
-                computeRadiance(bounceInfo);
+                vec3 skyLuminance = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), wi, 2.0f) * 0.05f;
+                pathInfo.radiance += pathInfo.throughput * skyLuminance;
             }
             break;
         }
 
-        bounceInfo.material = payload.material;
-        bounceInfo.interaction.normal = payload.hitNormal;
-        bounceInfo.interaction.point = payload.hitPosition;
-        bounceInfo.interaction.incomingRayDir = wi;
+        pathInfo.material = payload.material;
+        pathInfo.interaction.normal = payload.hitNormal;
+        pathInfo.interaction.point = payload.hitPosition;
+        pathInfo.interaction.incomingRayDir = wi;
 
-        computeRadiance(bounceInfo);
+        if (pathInfo.material.isEmissive) {
+            pathInfo.radiance += pathInfo.throughput * pathInfo.material.baseColor * pushConstants.pathTracingEmissiveFactor;
+            break; // Stop at emissive for now, or continue if you want multiple emissive hits
+        }
     }
-    return bounceInfo.indirectLight;
+    return pathInfo.radiance;
 }
 
 vec3 calculatePixelColor(vec3 rayDirection, in vec2 texCoords, MaterialInfo material, SurfaceInteraction interaction) {
     vec3 L = vec3(0.);
-    vec3 beta = vec3(1.);
-
-    vec3 wi;
-    interaction.incomingRayDir = rayDirection;
 
     material.subsurface = 0.;
     material.specular = 0.;
@@ -102,33 +99,8 @@ vec3 calculatePixelColor(vec3 rayDirection, in vec2 texCoords, MaterialInfo mate
     material.sheen = 0.;
     material.sheenTint = 0.;
 
-    vec3 X = vec3(0.), Y = vec3(0.);
-    directionOfAnisotropicity(interaction.normal, X, Y);
-    interaction.tangent = X;
-    interaction.binormal = Y;
-
     for (uint i = 0; i < pushConstants.pathTracerSamples; i++) {
-        vec3 f = vec3(0.);
-        float scatteringPdf = 0.;
-        vec3 Ld = vec3(0);
-        for (uint i = 0; i < globalData.lightsCount; i++) {
-            Light l = lightBuffer.items[i];
-            l.color.rgb *= l.color.a;
-            Ld += beta * calculateDirectLight(l, interaction, material, wi, f, scatteringPdf) ;
-        }
-
-        L += Ld;
-
-        if (pushConstants.pathTracerBounces > 0 && pushConstants.pathTracerMultiplier > 0) {
-            L += beta * calculateIndirectLighting(material, interaction) * pushConstants.pathTracerMultiplier;
-        }
-
-        if (scatteringPdf > EPSILON && dot(f, f) > EPSILON) {
-            beta *= f / scatteringPdf;
-
-            float bias = 0.001;
-            interaction.point += (dot(wi, interaction.normal) > 0.0 ? 1.0 : -1.0) * interaction.normal * bias;
-        }
+        L += tracePath(rayDirection, material, interaction);
     }
 
     return L / pushConstants.pathTracerSamples;

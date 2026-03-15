@@ -1,0 +1,22 @@
+{
+  "dark": {
+    "palette0": "#18191b",
+    "palette1": "#000000",
+    "palette2": "#161616",
+    "palette3": "#232323",
+    "palette4": "#414141",
+    "palette5": "#777777",
+    "palette6": "#E0E0E0",
+    "neutralPalette": "#161616"
+  },
+  "light": {
+    "palette0": "#e0e0e0",
+    "palette1": "#ffffff",
+    "palette2": "#E1E1E1",
+    "palette3": "#C8C8C8",
+    "palette4": "#A0A0A0",
+    "palette5": "#787878",
+    "palette6": "#0A0A0A",
+    "neutralPalette": "#E1E1E1"
+  }
+}

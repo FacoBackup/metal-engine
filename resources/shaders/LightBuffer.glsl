@@ -1,11 +1,8 @@
 #ifndef L_V
 #define L_V
 struct Light {
-    vec4 color;
-    vec3 position;
-    vec3 dataA;
-    vec3 dataB;
-    uint itemType;
+    uint triangleIndex;
+    uint meshIndex;
 };
 
 layout(set = 0, binding = LIGHT_SET) readonly buffer Lights {

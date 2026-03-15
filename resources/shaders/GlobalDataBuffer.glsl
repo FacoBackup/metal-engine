@@ -10,7 +10,6 @@ layout (set = 0, binding = 0) uniform GlobalDataBlock {
     vec3 cameraWorldPosition;
     vec3 sunColor;
     vec3 sunPosition;
-    vec2 outputRes;
 
     uint volumeCount;
     uint lightsCount;

@@ -1,16 +1,9 @@
-vec3 RandomUnitVector();
-
 vec2 sampleDisk() {
     float u = random();
     float v = random();
     float r = sqrt(u);
     float theta = 2.0 * 3.14159265359 * v;
     return vec2(r * cos(theta), r * sin(theta));
-}
-
-void computeOrthonormalBasis(in vec3 n, out vec3 tangent, out vec3 bitangent) {
-    tangent = normalize(cross(n, abs(n.x) < 0.99 ? vec3(1, 0, 0) : vec3(0, 1, 0)));
-    bitangent = cross(n, tangent);
 }
 
 float hash(vec3 p) {
@@ -65,36 +58,34 @@ vec4 integrateVolume(vec3 ro, vec3 rd, in Volume volume, float sceneDepth) {
         float extinctionCoefficient  = scatteringCoefficient + absorptionCoefficient;
 
         vec3 inScattered = vec3(0.0);
-        for (int li = 0; li < int(globalData.lightsCount); li++) {
+        if (globalData.lightsCount > 0) {
+            int li = int(random() * globalData.lightsCount);
             Light light = lightBuffer.items[li];
-            vec3 samplePos;
+            
+            vec3 L, emission;
+            float lightPdfValue, lightDist;
+            
+            SurfaceInteraction volumeInteraction;
+            volumeInteraction.point = pos;
+            volumeInteraction.incomingRayDir = rd;
+            
+            vec3 Li = lightSample(light, volumeInteraction, L, lightPdfValue, emission, lightDist);
 
-            if (light.itemType == ITEM_TYPE_SPHERE) {
-                vec3 randDir = RandomUnitVector();
-                samplePos = light.position + randDir * light.dataB.x;
-            } else if (light.itemType == ITEM_TYPE_PLANE) {
-                vec3 normal = normalize(light.dataA);
-                vec3 tangent, bitangent;
-                computeOrthonormalBasis(normal, tangent, bitangent);
-                vec2 diskSample = sampleDisk();
-                samplePos = light.position + (tangent * diskSample.x + bitangent * diskSample.y) * light.dataB.x * light.dataB.z;
+            if (lightPdfValue > EPSILON) {
+                float dtShadow = lightDist / float(pushConstants.volumeShadowSteps);
+                float opticalDepth = 0.0;
+                for (int j = 0; j < int(pushConstants.volumeShadowSteps); j++) {
+                    float tShadow = float(j) * dtShadow;
+                    vec3 posShadow = pos + L * tShadow;
+                    vec3 localShadow = posShadow - volume.position;
+                    opticalDepth += densityVariation(localShadow, volume.dataB.x) * dtShadow;
+                }
+                float lightTransmittance = exp(-opticalDepth);
+                float g = volume.dataB.z;
+                float phase = phaseHenyeyGreenstein(rd, L, g);
+                
+                inScattered = Li * lightTransmittance * phase * float(globalData.lightsCount) / lightPdfValue;
             }
-
-            vec3 L = normalize(samplePos - pos);
-            float lightDist = length(samplePos - pos);
-
-            float dtShadow = lightDist / float(pushConstants.volumeShadowSteps);
-            float opticalDepth = 0.0;
-            for (int j = 0; j < int(pushConstants.volumeShadowSteps); j++) {
-                float tShadow = float(j) * dtShadow;
-                vec3 posShadow = pos + L * tShadow;
-                vec3 localShadow = posShadow - volume.position;
-                opticalDepth += densityVariation(localShadow, volume.dataB.x) * dtShadow;
-            }
-            float lightTransmittance = exp(-opticalDepth);
-            float g = volume.dataB.z;// phase function asymmetry parameter; 0.0 for isotropic
-            float phase = phaseHenyeyGreenstein(rd, L, g);
-            inScattered += light.color.rgb * light.color.a * lightTransmittance * phase;
         }
         scattering += viewTransmittance * scatteringCoefficient * inScattered * dt;
         viewTransmittance *= exp(-extinctionCoefficient * dt);

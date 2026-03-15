@@ -5,9 +5,20 @@
 
 struct MeshMetadata {
     uint renderIndex;
-    uint materialIndex;
     uint64_t vertexBufferAddress;
     uint64_t indexBufferAddress;
+
+    vec3 albedo;
+    float roughness;
+    float metallic;
+    float transmission;
+    float thickness;
+    float ior;
+    uint isEmissive;
+
+    uint albedoTexture;
+    uint roughnessTexture;
+    uint metallicTexture;
 };
 
 layout (set = 0, binding = MESH_METADATA_SET) readonly buffer MeshMetadatas {
