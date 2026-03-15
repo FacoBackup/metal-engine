@@ -3,10 +3,10 @@
 #include "../../util/UIUtil.h"
 #include "../../../ApplicationContext.h"
 #include "../../repository/EditorRepository.h"
+#include "../../service/ThemeService.h"
 
 namespace Metal {
     void EditorFooterPanel::onSync() {
-        ImGui::Separator();
         asyncTaskPanel->onSync();
         ImGui::SameLine();
         renderShortcuts();
@@ -20,8 +20,13 @@ namespace Metal {
     void EditorFooterPanel::framerate() {
         const int framerate = static_cast<int>(round(ImGui::GetIO().Framerate));
         if (framerate > 0) {
-            ImGui::SameLine(ImGui::GetWindowWidth() - 100);
+            ImGui::SameLine(ImGui::GetWindowWidth() - 130);
             ImGui::Text("%i ms | %i fps", 1000 / framerate, framerate);
+            ImGui::SameLine();
+            if (UIUtil::ButtonSimple((editorRepository->isDarkMode ? Icons::light_mode : Icons::dark_mode) + id + "theme",
+                                     UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
+                editorRepository->isDarkMode = !editorRepository->isDarkMode;
+            }
         }
     }
 

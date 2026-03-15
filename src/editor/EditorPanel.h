@@ -25,7 +25,7 @@ namespace Metal {
         DockService *dockService = nullptr;
         ThemeService *themeService = nullptr;
 
-        static void SetWindowStyle();
+        static void SetWindowStyle(const ImVec2 &padding);
 
         void renderDockSpaces();
 

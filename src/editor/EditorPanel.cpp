@@ -20,7 +20,7 @@ namespace Metal {
     const char *EditorPanel::NAME_HEADER = "##header_window";
     const char *EditorPanel::NAME_FOOTER = "##footer_window";
     ImVec2 EditorPanel::CENTER(0.0f, 0.0f);
-    float EditorPanel::HEADER_HEIGHT = 25;
+    float EditorPanel::HEADER_HEIGHT = 35;
     float EditorPanel::FOOTER_HEIGHT = 30;
 
 
@@ -37,7 +37,7 @@ namespace Metal {
             UIUtil::AUX_VEC2.y = HEADER_HEIGHT;
             ImGui::SetNextWindowSize(UIUtil::AUX_VEC2);
 
-            SetWindowStyle();
+            SetWindowStyle(UIUtil::VEC2_ZERO);
             ImGui::Begin(NAME_HEADER, &UIUtil::OPEN, FLAGS | ImGuiWindowFlags_NoScrollbar);
             ImGui::PopStyleVar(3);
 
@@ -56,7 +56,9 @@ namespace Metal {
             ImGui::SetNextWindowSize(UIUtil::AUX_VEC2);
             ImGui::SetNextWindowViewport(viewport->ID);
 
-            SetWindowStyle();
+            UIUtil::AUX_VEC2.x = 4.0f;
+            UIUtil::AUX_VEC2.y = .0f;
+            SetWindowStyle(UIUtil::AUX_VEC2);
             ImGui::Begin(NAME, &UIUtil::OPEN, FLAGS);
             windowId = ImGui::GetID(NAME);
             ImGui::PopStyleVar(3);
@@ -81,7 +83,7 @@ namespace Metal {
             UIUtil::AUX_VEC2.y = FOOTER_HEIGHT;
             ImGui::SetNextWindowSize(UIUtil::AUX_VEC2);
 
-            SetWindowStyle();
+            SetWindowStyle(UIUtil::VEC2_ZERO);
             ImGui::Begin(NAME_FOOTER, &UIUtil::OPEN, FLAGS | ImGuiWindowFlags_NoScrollbar);
             ImGui::PopStyleVar(3);
 
@@ -90,10 +92,10 @@ namespace Metal {
         }
     }
 
-    void EditorPanel::SetWindowStyle() {
+    void EditorPanel::SetWindowStyle(const ImVec2 &padding) {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, UIUtil::VEC2_ZERO);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, padding);
     }
 
     void EditorPanel::onSync() {

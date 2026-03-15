@@ -76,11 +76,17 @@ namespace Metal {
         auto *framebuffer = engineContext->currentFrame->getResourceAs<FrameBufferInstance>(RID_POST_PROCESSING_FBO);
         if (framebuffer) {
             descriptorSetService->setImageDescriptor(framebuffer, 0);
-            ImGui::Image(reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet),
-                         viewportSize);
+            
+            const ImVec2 pos = ImGui::GetCursorScreenPos();
+            const auto textureId = reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet);
+            
+            ImGui::GetWindowDrawList()->AddImageRounded(textureId, pos, ImVec2(pos.x + viewportSize.x, pos.y + viewportSize.y),
+                                                     ImVec2(0, 0), ImVec2(1, 1), IM_COL32_WHITE, 8.0f);
+            
+            ImGui::Dummy(viewportSize);
 
-            const ImVec2 imageMin = ImGui::GetItemRectMin();
-            const ImVec2 imageMax = ImGui::GetItemRectMax();
+            const ImVec2 imageMin = pos;
+            const ImVec2 imageMax = ImVec2(pos.x + viewportSize.x, pos.y + viewportSize.y);
             handleViewportPicking(imageMin, imageMax);
         }
     }

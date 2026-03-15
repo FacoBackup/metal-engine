@@ -9,6 +9,7 @@
 
 namespace Metal {
     struct DockDTO {
+        bool isCenter = false;
         const std::string id = Util::uuidV4();
         ImGuiID nodeId{};
         int selectedOption;

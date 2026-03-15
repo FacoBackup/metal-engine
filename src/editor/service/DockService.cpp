@@ -10,24 +10,26 @@
 namespace Metal {
     void DockService::onInitialize() {
         auto *rightT = new DockDTO{&DockSpace::WORLD};
-        auto *leftTop = new DockDTO{&DockSpace::REPOSITORIES};
-        auto *leftDown = new DockDTO{&DockSpace::INSPECTOR};
-        auto *downLeft = new DockDTO{&DockSpace::CONSOLE};
-        auto *downRight = new DockDTO{&DockSpace::FILES};
+        auto *leftT = new DockDTO{&DockSpace::REPOSITORIES};
+        auto *leftB = new DockDTO{&DockSpace::INSPECTOR};
+        auto *rightB = new DockDTO{&DockSpace::CONSOLE};
+        auto *b = new DockDTO{&DockSpace::FILES};
 
+        center.isCenter = true;
         center.sizeRatioForNodeAtDir = 0.5f;
         rightT->sizeRatioForNodeAtDir = 0.25f;
-        leftTop->sizeRatioForNodeAtDir = 0.2f;
-        leftDown->sizeRatioForNodeAtDir = 0.5f;
-        downLeft->sizeRatioForNodeAtDir = 0.25f;
-        downRight->sizeRatioForNodeAtDir = 0.5f;
+        leftT->sizeRatioForNodeAtDir = 0.2f;
+        leftB->sizeRatioForNodeAtDir = 0.5f;
+        rightB->sizeRatioForNodeAtDir = 0.25f;
+        b->sizeRatioForNodeAtDir = 0.25f;
 
         right.push_back(rightT);
-        left.push_back(leftTop);
-        left.push_back(leftDown);
+        right.push_back(rightB);
 
-        bottom.push_back(downLeft);
-        bottom.push_back(downRight);
+        left.push_back(leftT);
+        left.push_back(leftB);
+
+        bottom.push_back(b);
     }
 
     void DockService::buildViews(ImGuiID windowId, AbstractPanel *panel) {

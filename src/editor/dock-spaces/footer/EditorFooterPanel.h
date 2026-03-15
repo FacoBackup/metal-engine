@@ -5,20 +5,22 @@
 
 namespace Metal {
     struct EditorRepository;
-
+    class ThemeService;
     class AsyncTaskPanel;
 
     class EditorFooterPanel final : public AbstractPanel {
         EditorRepository *editorRepository = nullptr;
+        ThemeService *themeService = nullptr;
         AsyncTaskPanel *asyncTaskPanel = nullptr;
 
         void renderShortcuts();
-        static void framerate();
+        void framerate();
 
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"EditorRepository", &editorRepository}
+                {"EditorRepository", &editorRepository},
+                {"ThemeService", &themeService}
             };
         }
 

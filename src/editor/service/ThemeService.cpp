@@ -1,13 +1,57 @@
 #include "ThemeService.h"
 
 #include <glm/ext/quaternion_geometric.hpp>
+#include <fstream>
+#include <filesystem>
+#include <iostream>
 
 #include "../repository/EditorRepository.h"
 
 namespace Metal {
     glm::vec3 ThemeService::BACKGROUND_COLOR = glm::vec3(0.f);
 
+    void ThemeService::loadTheme() {
+        if (themeLoaded) return;
+
+        std::string filename = "theme.json";
+        if (!std::filesystem::exists(filename)) {
+            filename = "resources/theme.json";
+        }
+
+        if (std::filesystem::exists(filename)) {
+            try {
+                std::ifstream f(filename);
+                themeData = nlohmann::json::parse(f);
+                themeLoaded = true;
+            } catch (const std::exception& e) {
+                std::cerr << "Failed to parse theme.json: " << e.what() << std::endl;
+            }
+        } else {
+            std::cerr << "theme.json not found in root or resources directory." << std::endl;
+        }
+    }
+
+    ImVec4 ThemeService::hexToRGBA(const std::string& hex) {
+        std::string h = hex;
+        if (h[0] == '#') h = h.substr(1);
+
+        if (h.length() == 6) {
+            int r = std::stoi(h.substr(0, 2), nullptr, 16);
+            int g = std::stoi(h.substr(2, 2), nullptr, 16);
+            int b = std::stoi(h.substr(4, 2), nullptr, 16);
+            return ImVec4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
+        } else if (h.length() == 8) {
+            int r = std::stoi(h.substr(0, 2), nullptr, 16);
+            int g = std::stoi(h.substr(2, 2), nullptr, 16);
+            int b = std::stoi(h.substr(4, 2), nullptr, 16);
+            int a = std::stoi(h.substr(6, 2), nullptr, 16);
+            return ImVec4(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
+        }
+        return ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // Default white
+    }
+
     void ThemeService::onSync() {
+        loadTheme();
         if (previousTheme == editorRepository->isDarkMode && glm::length(editorRepository->accentColor) == prevLength) {
             return;
         }
@@ -31,7 +75,7 @@ namespace Metal {
         colors[ImGuiCol_WindowBg] = palette1;
         colors[ImGuiCol_ChildBg] = palette1;
         colors[ImGuiCol_PopupBg] = palette1;
-        colors[ImGuiCol_Border] = palette3;
+        colors[ImGuiCol_Border] = palette1;
         colors[ImGuiCol_BorderShadow] = ImVec4(0.f, 0.f, 0.f, 0.f);
         colors[ImGuiCol_FrameBg] = palette2;
         colors[ImGuiCol_TitleBg] = palette1;
@@ -44,10 +88,8 @@ namespace Metal {
         colors[ImGuiCol_ScrollbarGrabActive] = palette2;
         colors[ImGuiCol_SliderGrab] = palette4;
         colors[ImGuiCol_ButtonActive] = palette2;
-        colors[ImGuiCol_Separator] = palette5;
-        colors[ImGuiCol_SeparatorHovered] = palette6;
-        colors[ImGuiCol_SeparatorActive] = palette6;
-        colors[ImGuiCol_ResizeGrip] = palette4;
+        colors[ImGuiCol_Separator] = palette1;
+        colors[ImGuiCol_ResizeGrip] = palette1;
         colors[ImGuiCol_Tab] = palette2;
         colors[ImGuiCol_TabHovered] = palette3;
         colors[ImGuiCol_DockingPreview] = palette4;
@@ -87,24 +129,30 @@ namespace Metal {
     }
 
     void ThemeService::setDarkMode() {
-        palette0 = ImVec4(10.0f / 255.0f, 10.0f / 255.0f, 10.0f / 255.0f, 1.0f);
-        palette1 = ImVec4(18.0f / 255.0f, 18.0f / 255.0f, 18.0f / 255.0f, 1.0f);
-        palette2 = ImVec4(22.0f / 255.0f, 22.0f / 255.0f, 22.0f / 255.0f, 1.0f);
-        neutralPalette = palette2;
-        palette3 = ImVec4(35.0f / 255.0f, 35.0f / 255.0f, 35.0f / 255.0f, 1.0f);
-        palette4 = ImVec4(65.0f / 255.0f, 65.0f / 255.0f, 65.0f / 255.0f, 1.0f);
-        palette5 = ImVec4(119.0f / 255.0f, 119.0f / 255.0f, 119.0f / 255.0f, 1.0f);
-        palette6 = ImVec4(224.0f / 255.0f, 224.0f / 255.0f, 224.0f / 255.0f, 1.0f);
+        if (themeLoaded && themeData.contains("dark")) {
+            auto& dark = themeData["dark"];
+            palette0 = hexToRGBA(dark.value("palette0", "#121212"));
+            palette1 = hexToRGBA(dark.value("palette1", "#0A0A0A"));
+            palette2 = hexToRGBA(dark.value("palette2", "#161616"));
+            palette3 = hexToRGBA(dark.value("palette3", "#232323"));
+            palette4 = hexToRGBA(dark.value("palette4", "#414141"));
+            palette5 = hexToRGBA(dark.value("palette5", "#777777"));
+            palette6 = hexToRGBA(dark.value("palette6", "#E0E0E0"));
+            neutralPalette = hexToRGBA(dark.value("neutralPalette", "#161616"));
+        }
     }
 
     void ThemeService::setLightMode() {
-        palette0 = ImVec4(245.0f / 255.0f, 245.0f / 255.0f, 245.0f / 255.0f, 1.0f); // light gray
-        palette1 = ImVec4(235.0f / 255.0f, 235.0f / 255.0f, 235.0f / 255.0f, 1.0f); // slightly darker gray
-        palette2 = ImVec4(225.0f / 255.0f, 225.0f / 255.0f, 225.0f / 255.0f, 1.0f); // medium gray
-        neutralPalette = palette2;
-        palette3 = ImVec4(200.0f / 255.0f, 200.0f / 255.0f, 200.0f / 255.0f, 1.0f); // darker gray
-        palette4 = ImVec4(160.0f / 255.0f, 160.0f / 255.0f, 160.0f / 255.0f, 1.0f); // even darker gray
-        palette5 = ImVec4(120.0f / 255.0f, 120.0f / 255.0f, 120.0f / 255.0f, 1.0f); // dark gray
-        palette6 = ImVec4(10.0f / 255.0f, 10.0f / 255.0f, 10.0f / 255.0f, 1.0f); // very dark gray
+        if (themeLoaded && themeData.contains("light")) {
+            auto& light = themeData["light"];
+            palette0 = hexToRGBA(light.value("palette0", "#EBEBEB"));
+            palette1 = hexToRGBA(light.value("palette1", "#F5F5F5"));
+            palette2 = hexToRGBA(light.value("palette2", "#E1E1E1"));
+            palette3 = hexToRGBA(light.value("palette3", "#C8C8C8"));
+            palette4 = hexToRGBA(light.value("palette4", "#A0A0A0"));
+            palette5 = hexToRGBA(light.value("palette5", "#787878"));
+            palette6 = hexToRGBA(light.value("palette6", "#0A0A0A"));
+            neutralPalette = hexToRGBA(light.value("neutralPalette", "#E1E1E1"));
+        }
     }
 } // Metal

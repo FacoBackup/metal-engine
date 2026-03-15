@@ -2,14 +2,24 @@
 #define THEMESERVICE_H
 #include <imgui.h>
 #include <glm/vec3.hpp>
+#include <nlohmann/json.hpp>
+#include <string>
+
 #include "../../common/IService.h"
 #include "../../common/ISync.h"
 
-
 namespace Metal {
     struct EditorRepository;
+
     class ThemeService final : public IService, public ISync {
         EditorRepository *editorRepository = nullptr;
+        nlohmann::json themeData;
+        bool themeLoaded = false;
+
+        void loadTheme();
+
+        static ImVec4 hexToRGBA(const std::string &hex);
+
     public:
         ImVec4 neutralPalette{};
         ImVec4 palette0{};

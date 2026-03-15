@@ -22,11 +22,13 @@ namespace Metal {
         bool isDownDirection = false;
         bool sizeInitialized = false;
         int stylePushCount = 0;
+        int styleColorPushCount = 0;
         DockSpacePanel *mainWindow = nullptr;
         DockDTO *dock = nullptr;
         AbstractDockPanel *view = nullptr;
         std::unordered_map<int, AbstractDockPanel *> views{};
         ImVec2 headerPadding{0, 3};
+        float headerHeight = 25.0f;
 
         EditorRepository *editorRepository = nullptr;
         ThemeService *themeService = nullptr;
@@ -34,6 +36,8 @@ namespace Metal {
         DockSpace *getSelectedDockSpace() const;
 
         bool hasDockSpace(int index) const;
+
+        void renderCustomHeader();
 
     public:
         std::vector<Dependency> getDependencies() override {
@@ -66,8 +70,6 @@ namespace Metal {
         void onSync() override;
 
         [[nodiscard]] AbstractDockPanel *getView() const;
-
-        void renderHeader();
 
         void beforeWindow() const;
 

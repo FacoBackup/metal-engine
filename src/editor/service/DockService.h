@@ -15,7 +15,6 @@ namespace Metal {
         std::vector<DockDTO *> left;
         std::vector<DockDTO *> right;
 
-
         bool isInitialized = false;
 
     public:

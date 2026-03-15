@@ -288,6 +288,9 @@ target_link_libraries(metal_engine_lib PUBLIC ${COMMON_LIBRARIES})
 
 add_executable(metal_engine main.cpp)
 target_link_libraries(metal_engine PRIVATE metal_engine_lib)
+if (WIN32)
+    target_link_libraries(metal_engine PRIVATE dwmapi)
+endif()
 add_dependencies(metal_engine copy_resources)
 
 add_custom_command(TARGET metal_engine POST_BUILD
