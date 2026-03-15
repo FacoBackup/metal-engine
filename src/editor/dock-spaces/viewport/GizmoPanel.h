@@ -1,0 +1,65 @@
+#ifndef GIZMOPANEL_H
+#define GIZMOPANEL_H
+#include <array>
+#include <imgui.h>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/fwd.hpp>
+#include <glm/detail/type_quat.hpp>
+
+#include "../../abstract/AbstractPanel.h"
+
+namespace Metal {
+    struct EditorRepository;
+    struct WorldRepository;
+    class SelectionService;
+}
+
+namespace Metal {
+    struct TransformComponent;
+
+    class GizmoPanel final : public AbstractPanel {
+        std::array<float, 3> translationSnap;
+        glm::mat4x4 auxMat4{};
+        glm::mat4x4 cacheProjection{};
+        glm::mat4x4 cacheMatrixMat4{};
+        glm::vec3 auxTranslation{};
+        glm::vec3 auxScale{};
+        glm::quat auxRot{};
+
+        float *cacheMatrix = new float[16];
+        float *viewMatrixCache = new float[16];
+        float *projectionMatrixCache = new float[16];
+        glm::vec2 *size = nullptr;
+        ImVec2 *position = nullptr;
+        TransformComponent *localSelected = nullptr;
+        int localChangeId{};
+        bool isGizmoOver = false;
+
+        EditorRepository *editorRepository = nullptr;
+        WorldRepository *worldRepository = nullptr;
+        SelectionService *selectionService = nullptr;
+
+    public:
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"EditorRepository", &editorRepository},
+                {"WorldRepository", &worldRepository},
+                {"SelectionService", &selectionService}
+            };
+        }
+
+        explicit GizmoPanel(ImVec2 *position, glm::vec2 *size);
+
+        void onInitialize() override;
+
+        void onSync() override;
+
+        float *getSnapValues();
+
+        void decomposeMatrix();
+
+        void recomposeMatrix();
+    };
+} // Metal
+
+#endif //GIZMOPANEL_H
