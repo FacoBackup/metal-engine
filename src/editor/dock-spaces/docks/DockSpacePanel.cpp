@@ -11,9 +11,9 @@
 #include "../../../common/LoggerUtil.h"
 #include "../../repository/EditorRepository.h"
 #include "../../service/ThemeService.h"
-#define BORDER_RADIUS  8.0f
+#define BORDER_RADIUS  6.0f
 #define OUTSIDE_PADDING  2.0f
-#define INSIDE_PADDING  8.0f
+#define INSIDE_PADDING  4.0f
 
 namespace Metal {
     const ImVec2 DockSpacePanel::DEFAULT{-1.f, -1.f};
@@ -109,7 +109,7 @@ namespace Metal {
             ImGui::PushStyleColor(ImGuiCol_ChildBg, themeService->palette0);
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(INSIDE_PADDING, INSIDE_PADDING));
             if (ImGui::BeginChild((dock->internalId + "island").c_str(), ImVec2(size.x - OUTSIDE_PADDING * 2, size.y - OUTSIDE_PADDING * 2),
-                                  ImGuiChildFlags_None, ImGuiWindowFlags_None)) {
+                                  dock->isCenter ? ImGuiChildFlags_None : ImGuiChildFlags_AlwaysUseWindowPadding, ImGuiWindowFlags_None)) {
                 if (!dock->isCenter) {
                     renderCustomHeader();
                 }
@@ -203,11 +203,9 @@ namespace Metal {
 
         ImGui::SameLine();
 
-        // Add Tab Button
         if (UIUtil::ButtonSimple(Icons::add + "##addTab" + id, buttonWidth, headerHeight)) {
             ImGui::OpenPopup((id + "NewTabDropdown").c_str());
         }
-
         if (ImGui::BeginPopup((id + "NewTabDropdown").c_str())) {
             ImGui::Text("New Tab");
             ImGui::Separator();
@@ -225,8 +223,6 @@ namespace Metal {
 
         ImGui::EndGroup();
         ImGui::PopStyleVar();
-
-        ImGui::Separator();
     }
 
     DockSpace *DockSpacePanel::getSelectedDockSpace() const {

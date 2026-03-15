@@ -20,7 +20,7 @@ namespace Metal {
     const char *EditorPanel::NAME_HEADER = "##header_window";
     const char *EditorPanel::NAME_FOOTER = "##footer_window";
     ImVec2 EditorPanel::CENTER(0.0f, 0.0f);
-    float EditorPanel::HEADER_HEIGHT = 35;
+    float EditorPanel::HEADER_HEIGHT = 30;
     float EditorPanel::FOOTER_HEIGHT = 30;
 
 

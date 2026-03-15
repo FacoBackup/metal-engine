@@ -236,8 +236,6 @@ set(ENGINE_SOURCES
         engine/service/VoxelService.cpp
         engine/service/VoxelService.h
         common/ISerialize.cpp
-        editor/abstract/form/ChildPanel.cpp
-        editor/abstract/form/ChildPanel.h
         editor/dto/SceneImportSettingsDTO.h
         editor/panel/NotificationsPanel.cpp
         editor/panel/NotificationsPanel.h

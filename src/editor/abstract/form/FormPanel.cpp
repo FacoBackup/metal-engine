@@ -1,6 +1,5 @@
 #include "FormPanel.h"
 #include "AccordionPanel.h"
-#include "ChildPanel.h"
 #include "../../../common/FieldType.h"
 #include "../../../common/Inspectable.h"
 #include "types/IntField.h"
@@ -18,7 +17,7 @@
 namespace Metal {
     void FormPanel::processFields(Inspectable *inspection) {
         std::unordered_map<std::string, AccordionPanel *> groups{};
-        const auto rootPanel = new ChildPanel();
+        const auto rootPanel = new AccordionPanel();
         rootPanel->setFilter(&searchFilter);
         initializePanel(rootPanel);
         rootPanel->setTitle(std::string(inspection->getIcon()) + " " + inspection->getTitle());

@@ -1,7 +1,7 @@
 {
   "dark": {
     "palette0": "#18191b",
-    "palette1": "#08080a",
+    "palette1": "#000000",
     "palette2": "#161616",
     "palette3": "#232323",
     "palette4": "#414141",
@@ -10,8 +10,8 @@
     "neutralPalette": "#161616"
   },
   "light": {
-    "palette0": "#EBEBEB",
-    "palette1": "#F5F5F5",
+    "palette0": "#e0e0e0",
+    "palette1": "#ffffff",
     "palette2": "#E1E1E1",
     "palette3": "#C8C8C8",
     "palette4": "#A0A0A0",

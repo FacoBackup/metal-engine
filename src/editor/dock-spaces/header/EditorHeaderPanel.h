@@ -22,8 +22,6 @@ namespace Metal {
 
         void renderFileTab();
 
-        void renderWindowControls();
-
         void renderMenu(const char *label, std::function<void()> itemsFunc);
 
     public:
