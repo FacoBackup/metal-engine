@@ -14,6 +14,8 @@ namespace Metal {
     class AbstractDockPanel;
     struct EditorRepository;
     class ThemeService;
+    class HistoryService;
+    struct DirectoryService;
 
     class DockSpacePanel final : public AbstractPanel {
         ImVec2 padding{DEFAULT.x, DEFAULT.y};
@@ -34,6 +36,8 @@ namespace Metal {
         EditorRepository *editorRepository = nullptr;
         ThemeService *themeService = nullptr;
         DockService *dockService = nullptr;
+        HistoryService *historyService = nullptr;
+        DirectoryService *directoryService = nullptr;
 
         DockSpace *getSelectedDockSpace() const;
 
@@ -46,7 +50,9 @@ namespace Metal {
             return {
                 {"EditorRepository", &editorRepository},
                 {"ThemeService", &themeService},
-                {"DockService", &dockService}
+                {"DockService", &dockService},
+                {"HistoryService", &historyService},
+                {"DirectoryService", &directoryService}
             };
         }
 

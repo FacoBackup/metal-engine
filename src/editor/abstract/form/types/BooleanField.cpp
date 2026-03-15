@@ -3,6 +3,7 @@
 #include <imgui.h>
 
 #include "../../../../common/Inspectable.h"
+#include "../../../service/HistoryService.h"
 
 namespace Metal {
     BooleanField::BooleanField(InspectedField<bool> &field) : field(field) {
@@ -10,9 +11,12 @@ namespace Metal {
 
     void BooleanField::onSync() {
         if (!field.disabled) {
-            if(ImGui::Checkbox(field.nameWithId.c_str(), field.field)){
+            bool oldValue = *field.field;
+            if (ImGui::Checkbox(field.nameWithId.c_str(), field.field)) {
                 field.instance->registerChange();
                 field.instance->onUpdate(&field);
+
+                historyService->recordChange(field.instance, field.path, oldValue, *field.field);
             }
         } else {
             ImGui::Text("%s: %b", field.name.c_str(), *field.field);

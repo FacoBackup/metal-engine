@@ -11,6 +11,7 @@
 #include "../../../../ApplicationContext.h"
 #include "../../../../common/Inspectable.h"
 #include "../../../service/FilesService.h"
+#include "../../../service/HistoryService.h"
 
 namespace Metal {
     constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoDocking |
@@ -26,9 +27,12 @@ namespace Metal {
                 return;
             }
             if (file->type == field.resourceType) {
+                std::string oldValue = *field.field;
                 *field.field = file->getId();
                 field.instance->registerChange();
                 field.instance->onUpdate(&field);
+
+                historyService->recordChange(field.instance, field.path, oldValue, *field.field);
                 open = false;
             }
         }, field.resourceType);
@@ -46,10 +50,13 @@ namespace Metal {
                 Icons::close + id,
                 UIUtil::ONLY_ICON_BUTTON_SIZE,
                 UIUtil::ONLY_ICON_BUTTON_SIZE)) {
+            std::string oldValue = *field.field;
             entry = nullptr;
             *field.field = "";
             field.instance->registerChange();
             field.instance->onUpdate(&field);
+
+            historyService->recordChange(field.instance, field.path, oldValue, *field.field);
         }
         ImGui::SameLine();
         if (entry != nullptr) {

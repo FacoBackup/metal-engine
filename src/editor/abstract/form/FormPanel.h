@@ -8,10 +8,14 @@
 namespace Metal {
     class Inspectable;
 
+    class HistoryService;
+
     class FormPanel final : public AbstractPanel {
         std::unordered_map<std::string, Inspectable *> inspectionMap{};
         std::string searchFilter;
         char searchBuffer[256] = "";
+
+        HistoryService *historyService = nullptr;
 
         void processFields(Inspectable *inspection);
 
@@ -21,6 +25,12 @@ namespace Metal {
         void onSync() override;
 
         void resetForm();
+
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"HistoryService", &historyService}
+            };
+        }
     };
 }
 

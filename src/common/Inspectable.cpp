@@ -16,6 +16,7 @@
         field->id = "##" + Util::uuidV4();\
         field->nameWithId = field->name + field->id;\
         field->group = std::move(group);\
+        field->path = group + "/" + field->name;\
         field->disabled = disabled;\
         field->type = V;\
         field->instance = this;

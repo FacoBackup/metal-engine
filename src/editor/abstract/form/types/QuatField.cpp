@@ -4,6 +4,7 @@
 #include <glm/detail/type_quat.hpp>
 #include "../../../../common/Inspectable.h"
 #include "../../../util/UIUtil.h"
+#include "../../../service/HistoryService.h"
 
 namespace Metal {
     QuatField::QuatField(InspectedField<glm::quat> &field) : field(field) {
@@ -15,6 +16,8 @@ namespace Metal {
             values[1] = field.field->y;
             values[2] = field.field->z;
             values[3] = field.field->w;
+
+            glm::quat oldValue = *field.field;
             if (UIUtil::DrawQuatControl(field.name, field.id, values, field.incrementF.value())) {
                 field.field->x = values[0];
                 field.field->y = values[1];
@@ -22,6 +25,15 @@ namespace Metal {
                 field.field->w = values[3];
                 field.instance->registerChange();
                 field.instance->onUpdate(&field);
+
+                historyService->recordChange(field.instance, field.path, oldValue, *field.field);
+            }
+
+            if (ImGui::IsItemActivated()) {
+                historyService->startTransaction("Change " + field.name);
+            }
+            if (ImGui::IsItemDeactivatedAfterEdit()) {
+                historyService->endTransaction();
             }
         } else {
             ImGui::Text("%s: <%f, %f, %f, %f>", field.name.c_str(), field.field->x, field.field->y, field.field->z,

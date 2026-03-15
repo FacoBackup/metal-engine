@@ -13,10 +13,12 @@ namespace Metal {
     class Inspectable;
     class RayTracingService;
     class DirectoryService;
+    class HistoryService;
 
     struct WorldRepository final : IRepository {
         RayTracingService *rayTracingService = nullptr;
         DirectoryService *directoryService = nullptr;
+        HistoryService *historyService = nullptr;
 
         Camera camera{-(glm::pi<float>() / 4), glm::pi<float>() / 4, {10, 10, 10}};
         entt::registry registry{};
@@ -26,7 +28,8 @@ namespace Metal {
         std::vector<Dependency> getDependencies() override {
             return {
                 {"RayTracingService", &rayTracingService},
-                {"DirectoryService", &directoryService}
+                {"DirectoryService", &directoryService},
+                {"HistoryService", &historyService}
             };
         }
 

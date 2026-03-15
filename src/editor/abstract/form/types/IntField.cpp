@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <imgui.h>
 #include "../../../../common/Inspectable.h"
+#include "../../../service/HistoryService.h"
 
 namespace Metal {
     void IntField::onSync() {
@@ -10,9 +11,19 @@ namespace Metal {
             ImGui::TextDisabled("%i", field.field);
         } else {
             ImGui::Text("%s", field.name.c_str());
+            int oldValue = *field.field;
             if (ImGui::DragInt(id.c_str(), field.field, .01f, field.min.value(), field.max.value())) {
                 field.instance->registerChange();
                 field.instance->onUpdate(&field);
+
+                    historyService->recordChange(field.instance, field.path, oldValue, *field.field);
+            }
+
+            if (ImGui::IsItemActivated()) {
+                historyService->startTransaction("Change " + field.name);
+            }
+            if (ImGui::IsItemDeactivatedAfterEdit()) {
+                historyService->endTransaction();
             }
         }
     }

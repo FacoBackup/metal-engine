@@ -12,6 +12,8 @@
 #include "../../repository/EditorRepository.h"
 #include "../../service/ThemeService.h"
 #include "../../service/DockService.h"
+#include "editor/service/HistoryService.h"
+#include "core/DirectoryService.h"
 #define BORDER_RADIUS  6.0f
 #define OUTSIDE_PADDING  2.0f
 #define INSIDE_PADDING  4.0f
@@ -41,6 +43,17 @@ namespace Metal {
             newView->dock = selectedSpace;
             newView->position = &position;
             initializePanel(newView);
+
+            newView->shortcuts.emplace_back("Undo", ImGuiMod_Ctrl | ImGuiKey_Z, [this] {
+                historyService->undo();
+            });
+            newView->shortcuts.emplace_back("Redo", ImGuiMod_Ctrl | ImGuiKey_Y, [this] {
+                historyService->redo();
+            });
+            newView->shortcuts.emplace_back("Save", ImGuiMod_Ctrl | ImGuiKey_S, [this] {
+                directoryService->save();
+            });
+
             views.emplace(selectedSpace->index, newView);
             view = newView;
         } else {
@@ -55,8 +68,9 @@ namespace Metal {
     }
 
     void DockSpacePanel::handleShortcut() const {
+        const bool isHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows);
+
         if (view != nullptr) {
-            const bool isHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows);
             if (isHovered) {
                 editorRepository->focusedShortcuts = view->getShortcuts();
                 editorRepository->focusedWindowName = view->dock->icon + " " + view->dock->name;

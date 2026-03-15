@@ -17,6 +17,8 @@ namespace Metal {
 namespace Metal {
     struct TransformComponent;
 
+    class HistoryService;
+
     class GizmoPanel final : public AbstractPanel {
         std::array<float, 3> translationSnap;
         glm::mat4x4 auxMat4{};
@@ -25,6 +27,7 @@ namespace Metal {
         glm::vec3 auxTranslation{};
         glm::vec3 auxScale{};
         glm::quat auxRot{};
+        bool wasUsing = false;
 
         float *cacheMatrix = new float[16];
         float *viewMatrixCache = new float[16];
@@ -38,13 +41,15 @@ namespace Metal {
         EditorRepository *editorRepository = nullptr;
         WorldRepository *worldRepository = nullptr;
         SelectionService *selectionService = nullptr;
+        HistoryService *historyService = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
             return {
                 {"EditorRepository", &editorRepository},
                 {"WorldRepository", &worldRepository},
-                {"SelectionService", &selectionService}
+                {"SelectionService", &selectionService},
+                {"HistoryService", &historyService}
             };
         }
 

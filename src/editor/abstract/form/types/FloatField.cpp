@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <imgui.h>
 #include "../../../../common/Inspectable.h"
+#include "../../../service/HistoryService.h"
 
 namespace Metal {
     void FloatField::onSync() {
@@ -10,10 +11,21 @@ namespace Metal {
             ImGui::TextDisabled("%f", field.field);
         } else {
             ImGui::Text("%s", field.name.c_str());
+
+            float oldValue = *field.field;
             if (ImGui::DragFloat(id.c_str(), field.field, field.incrementF.value(), field.minF.value(),
                                  field.maxF.value())) {
                 field.instance->registerChange();
                 field.instance->onUpdate(&field);
+
+                historyService->recordChange(field.instance, field.path, oldValue, *field.field);
+            }
+
+            if (ImGui::IsItemActivated()) {
+                historyService->startTransaction("Change " + field.name);
+            }
+            if (ImGui::IsItemDeactivatedAfterEdit()) {
+                historyService->endTransaction();
             }
         }
     }

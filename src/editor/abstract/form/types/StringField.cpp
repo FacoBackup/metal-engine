@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <imgui.h>
 #include "../../../../common/Inspectable.h"
+#include "../../../service/HistoryService.h"
 
 namespace Metal {
     StringField::StringField(InspectedField<std::string> &field) : field(field) {
@@ -11,10 +12,13 @@ namespace Metal {
         if (!field.disabled) {
             strcpy_s(buffer, sizeof(buffer), field.field->c_str());
             ImGui::Text(field.name.c_str());
+            std::string oldValue = *field.field;
             if (ImGui::InputText(field.id.c_str(), buffer, sizeof(buffer))) {
                 *field.field = buffer;
                 field.instance->registerChange();
-field.instance->onUpdate(&field);
+                field.instance->onUpdate(&field);
+
+                historyService->recordChange(field.instance, field.path, oldValue, *field.field);
             }
         } else {
             ImGui::Text("%s: %s", field.name.c_str(), field.field->c_str());

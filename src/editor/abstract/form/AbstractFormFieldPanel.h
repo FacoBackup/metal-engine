@@ -8,16 +8,20 @@
 namespace Metal {
     class ThemeService;
 
+    class HistoryService;
+
     class AbstractFormFieldPanel : public AbstractPanel {
     protected:
         const std::string* filter = nullptr;
 
         ThemeService *themeService = nullptr;
+        HistoryService *historyService = nullptr;
     public:
 
         std::vector<Dependency> getDependencies() override {
             return {
-                    {"ThemeService", &themeService}
+                    {"ThemeService", &themeService},
+                    {"HistoryService", &historyService}
             };
         }
         [[nodiscard]] virtual bool isVisible() const = 0;

@@ -12,6 +12,7 @@ namespace Metal {
         std::string nameWithId;
         std::string id;
         std::string group;
+        std::string path;
         FieldType type = BOOLEAN;
         Inspectable *instance = nullptr;
 

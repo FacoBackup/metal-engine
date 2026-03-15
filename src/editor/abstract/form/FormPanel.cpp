@@ -5,6 +5,7 @@
 #include "AccordionPanel.h"
 #include "../../../common/FieldType.h"
 #include "../../../common/Inspectable.h"
+#include "../../service/HistoryService.h"
 #include "types/IntField.h"
 #include "types/FloatField.h"
 #include "types/BooleanField.h"

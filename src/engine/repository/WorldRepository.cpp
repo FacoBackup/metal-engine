@@ -1,5 +1,6 @@
 #include "WorldRepository.h"
 #include "../service/RayTracingService.h"
+#include "../../editor/service/HistoryService.h"
 
 #include "../enum/ComponentType.h"
 #include "../../editor/dto/SceneData.h"
@@ -12,6 +13,29 @@ namespace Metal {
 
         const auto entity = registry.create();
         createComponent(entity, METADATA);
+
+        if (historyService) {
+            historyService->recordAction(
+                [this, entity]() {
+                    // Undo: Delete entity
+                    if (registry.valid(entity)) {
+                        registry.destroy(entity);
+                        if (hiddenEntities.contains(entity)) hiddenEntities.erase(entity);
+                        if (culled.contains(entity)) culled.erase(entity);
+                        rayTracingService->markDirty();
+                    }
+                },
+                [this, entity]() {
+                    // Redo: Restore entity (simplified, just recreate)
+                    if (!registry.valid(entity)) {
+                        registry.create(entity);
+                        createComponent(entity, METADATA);
+                        rayTracingService->markDirty();
+                    }
+                }
+            );
+        }
+
         return entity;
     }
 
@@ -24,7 +48,63 @@ namespace Metal {
 
     void WorldRepository::deleteEntities(const std::vector<entt::entity> &entities) {
         registerChange();
-        for (entt::entity entityId: entities) {
+
+        if (historyService) {
+            struct EntityState {
+                entt::entity id;
+                nlohmann::json data;
+            };
+            std::vector<EntityState> deletedStates;
+            for (auto entityId : entities) {
+                if (registry.valid(entityId)) {
+                    nlohmann::json ej;
+                    if (registry.all_of<MetadataComponent>(entityId)) {
+                        ej["entity"] = registry.get<MetadataComponent>(entityId).toJson();
+                    }
+                    for (const auto &compDef : ComponentTypes::getComponents()) {
+                        auto cj = compDef.toJson(*this, entityId);
+                        if (!cj.is_null()) {
+                            ej[compDef.jsonKey] = std::move(cj);
+                        }
+                    }
+                    deletedStates.push_back({entityId, ej});
+                }
+            }
+
+            historyService->recordAction(
+                [this, deletedStates]() {
+                    // Undo: Restore entities
+                    for (const auto &state : deletedStates) {
+                        if (!registry.valid(state.id)) {
+                            const auto entity = registry.create(state.id);
+                            if (state.data.contains("entity")) {
+                                registry.emplace<MetadataComponent>(entity).fromJson(state.data.at("entity"));
+                            }
+                            for (const auto &compDef : ComponentTypes::getComponents()) {
+                                if (state.data.contains(compDef.jsonKey)) {
+                                    compDef.creator(*this, state.id);
+                                    compDef.fromJson(*this, state.id, state.data.at(compDef.jsonKey));
+                                }
+                            }
+                        }
+                    }
+                    rayTracingService->markDirty();
+                },
+                [this, entities]() {
+                    // Redo: Delete entities
+                    for (entt::entity entityId : entities) {
+                        if (registry.valid(entityId)) {
+                            if (hiddenEntities.contains(entityId)) hiddenEntities.erase(entityId);
+                            if (culled.contains(entityId)) culled.erase(entityId);
+                            registry.destroy(entityId);
+                        }
+                    }
+                    rayTracingService->markDirty();
+                }
+            );
+        }
+
+        for (entt::entity entityId : entities) {
             if (!registry.valid(entityId)) continue;
 
             if (hiddenEntities.contains(entityId)) {
@@ -41,6 +121,20 @@ namespace Metal {
 
     void WorldRepository::changeVisibility(entt::entity entity, bool isVisible) {
         registerChange();
+        bool wasVisible = !hiddenEntities.contains(entity);
+        if (isVisible == wasVisible) return;
+
+        if (historyService) {
+            historyService->recordAction(
+                [this, entity, wasVisible]() {
+                    this->changeVisibility(entity, wasVisible);
+                },
+                [this, entity, isVisible]() {
+                    this->changeVisibility(entity, isVisible);
+                }
+            );
+        }
+
         if (isVisible) {
             hiddenEntities.erase(entity);
         } else {

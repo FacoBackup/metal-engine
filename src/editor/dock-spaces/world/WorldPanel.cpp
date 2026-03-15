@@ -31,10 +31,7 @@ namespace Metal {
                     }
                 }
                 selectionService->addAllSelected(entities);
-            }),
-            ShortcutDTO("Save", ImGuiMod_Ctrl | ImGuiKey_S, [this] {
-                directoryService->save();
-            }),
+            })
         };
     }
 

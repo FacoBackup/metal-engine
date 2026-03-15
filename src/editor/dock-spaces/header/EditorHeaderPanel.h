@@ -7,6 +7,7 @@
 #include <imgui.h>
 
 namespace Metal {
+    class HistoryService;
     class ThemeService;
     class GLFWContext;
     class EngineContext;
@@ -17,12 +18,11 @@ namespace Metal {
         GLFWContext *glfwContext = nullptr;
         EngineContext *engineContext = nullptr;
         DirectoryService *directoryService = nullptr;
+        HistoryService *historyService = nullptr;
         ThemeService *themeService = nullptr;
         DockService *dockService = nullptr;
 
         float menuBarHeight = 0;
-
-        void renderFileTab();
 
         void renderMenu(const char *label, std::function<void()> itemsFunc);
         
@@ -35,6 +35,7 @@ namespace Metal {
                 {"EngineContext", &engineContext},
                 {"DirectoryService", &directoryService},
                 {"ThemeService", &themeService},
+                {"historyService", &historyService},
                 {"DockService", &dockService}
             };
         }

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <imgui.h>
 #include "../../../../common/Inspectable.h"
+#include "../../../service/HistoryService.h"
 
 namespace Metal {
     ColorField::ColorField(InspectedField<glm::vec3> &field) : field(field) {
@@ -13,12 +14,23 @@ namespace Metal {
             values[1] = field.field->y;
             values[2] = field.field->z;
             ImGui::Text(field.name.c_str());
+
+            glm::vec3 oldValue = *field.field;
             if (ImGui::ColorPicker3(field.id.c_str(), values, ImGuiColorEditFlags_NoSidePreview)) {
                 field.field->x = values[0];
                 field.field->y = values[1];
                 field.field->z = values[2];
                 field.instance->registerChange();
                 field.instance->onUpdate(&field);
+
+                historyService->recordChange(field.instance, field.path, oldValue, *field.field);
+            }
+
+            if (ImGui::IsItemActivated()) {
+                historyService->startTransaction("Change " + field.name);
+            }
+            if (ImGui::IsItemDeactivatedAfterEdit()) {
+                historyService->endTransaction();
             }
         } else {
             ImGui::ColorButton("%s", ImVec4(field.field->x, field.field->y, field.field->z, 1.));

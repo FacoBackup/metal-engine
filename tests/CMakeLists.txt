@@ -4,6 +4,7 @@ add_executable(metal_engine_tests
         ApplicationContextTest.cpp
         WorldRepositoryTest.cpp
         DockServiceTest.cpp
+        HistoryServiceTest.cpp
 )
 
 target_link_libraries(metal_engine_tests

@@ -275,6 +275,7 @@ set(ENGINE_SOURCES
         core/FrameService.cpp
         core/FrameService.h
         common/Icons.cpp
+        editor/service/HistoryService.cpp
 )
 
 # Extract non-main sources for testing

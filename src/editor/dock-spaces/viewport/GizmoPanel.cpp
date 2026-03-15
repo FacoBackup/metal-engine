@@ -8,6 +8,7 @@
 #include "../../repository/EditorRepository.h"
 #include "../../../engine/repository/WorldRepository.h"
 #include "../../service/SelectionService.h"
+#include "../../service/HistoryService.h"
 
 namespace Metal {
     GizmoPanel::GizmoPanel(ImVec2 *position, glm::vec2 *size): size(size), position(position) {
@@ -54,8 +55,15 @@ namespace Metal {
             nullptr,
             getSnapValues());
         if (ImGuizmo::IsUsing()) {
+            if (!wasUsing) {
+                historyService->startTransaction("Gizmo Transform");
+            }
             decomposeMatrix();
+        } else if (wasUsing) {
+            historyService->endTransaction();
         }
+
+        wasUsing = ImGuizmo::IsUsing();
         isGizmoOver = ImGuizmo::IsOver();
     }
 
@@ -93,6 +101,10 @@ namespace Metal {
         glm::vec3 skew;
         glm::vec4 perspective;
 
+        glm::vec3 oldTranslation = localSelected->translation;
+        glm::vec3 oldScale = localSelected->scale;
+        glm::vec3 oldRotationEuler = localSelected->rotationEuler;
+
         // Decompose the matrix into its components
         glm::decompose(auxMat4, auxScale, auxRot, auxTranslation, skew, perspective);
 
@@ -104,12 +116,22 @@ namespace Metal {
         localSelected->translation += auxTranslation;
         localSelected->scale += auxScale;
         localSelected->rotation += auxRot;
-        localSelected->rotationEuler = glm::eulerAngles(localSelected->rotation);
+        localSelected->rotationEuler = glm::eulerAngles(localSelected->rotation) * (180.f / glm::pi<float>());
 
         localSelected->registerChange();
         localChangeId = localSelected->getChangeId();
         localSelected->forceTransform = true;
         localSelected->onUpdate(nullptr);
+
+        if (oldTranslation != localSelected->translation) {
+            historyService->recordChange(localSelected, "/Translation", oldTranslation, localSelected->translation);
+        }
+        if (oldScale != localSelected->scale) {
+            historyService->recordChange(localSelected, "/Scale", oldScale, localSelected->scale);
+        }
+        if (oldRotationEuler != localSelected->rotationEuler) {
+            historyService->recordChange(localSelected, "/Rotation", oldRotationEuler, localSelected->rotationEuler);
+        }
     }
 
     void GizmoPanel::recomposeMatrix() {
