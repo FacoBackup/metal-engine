@@ -11,16 +11,17 @@
 #include <functional>
 
 #include "NotificationService.h"
+#include "HistoryEventService.h"
 #include "../../common/IService.h"
 
 namespace Metal {
     class Inspectable;
+    struct InspectableMember;
 
     using PropertyValue = std::variant<std::string, int, float, bool, glm::vec2, glm::vec3, glm::vec4, glm::quat>;
 
     struct PropertyChange {
-        Inspectable *instance;
-        std::string propertyPath;
+        InspectableMember *field;
         PropertyValue oldValue;
         PropertyValue newValue;
     };
@@ -42,11 +43,13 @@ namespace Metal {
         std::vector<Transaction> redoStack;
         std::unique_ptr<Transaction> currentTransaction = nullptr;
         NotificationService *notificationService = nullptr;
+        HistoryEventService *historyEventService = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"notificationService", &notificationService}
+                {"notificationService", &notificationService},
+                {"historyEventService", &historyEventService}
             };
         }
 
@@ -56,8 +59,7 @@ namespace Metal {
 
         bool isTransactionActive() const;
 
-        void recordChange(Inspectable *instance, const std::string &propertyPath,
-                          const PropertyValue &oldValue, const PropertyValue &newValue);
+        void recordChange(InspectableMember *field, const PropertyValue &oldValue);
 
         void recordAction(const std::function<void()> &undoAction, const std::function<void()> &redoAction);
 

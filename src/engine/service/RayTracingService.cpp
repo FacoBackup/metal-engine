@@ -21,14 +21,30 @@
 #include <cstddef>
 
 namespace Metal {
-    VkDeviceAddress RayTracingService::getDeviceAddress(VkBuffer buffer) {
+    void RayTracingService::onInitialize() {
+        historyEventService->subscribe<TransformComponent>([this](const HistoryEvent &event) {
+            auto *abstractComp = dynamic_cast<AbstractComponent *>(event.instance);
+            if (abstractComp && worldRepository->hasComponent(abstractComp->getEntityId(), PRIMITIVE)) {
+                markDirty();
+            }
+        });
+        historyEventService->subscribe<PrimitiveComponent>([this](const HistoryEvent &) {
+            markDirty();
+            updateMeshMaterials();
+        });
+        historyEventService->subscribeGeneric([this](const HistoryEvent &) {
+            markDirty();
+        });
+    }
+
+    VkDeviceAddress RayTracingService::getDeviceAddress(VkBuffer buffer) const {
         VkBufferDeviceAddressInfo info{};
         info.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
         info.buffer = buffer;
         return vulkanContext->vkGetBufferDeviceAddressKHR(vulkanContext->device.device, &info);
     }
 
-    void RayTracingService::updateDescriptorSets(VkAccelerationStructureKHR asHandle) {
+    void RayTracingService::updateDescriptorSets(VkAccelerationStructureKHR asHandle) const {
         auto descriptors = pipelineService->getAllDescriptors();
         for (auto *descriptor: descriptors) {
             bool needsUpdate = false;
@@ -45,12 +61,7 @@ namespace Metal {
         }
     }
 
-    // TODO - EVENT SYSTEM BASED ON WORLD CHANGE AND ENTITY CHANGE
     void RayTracingService::onSync() {
-        if (needsMaterialUpdate) {
-            updateMeshMaterials();
-            needsMaterialUpdate = false;
-        }
         if (!needsRebuild) {
             return;
         }

@@ -16,12 +16,12 @@ namespace Metal {
         return TRANSFORM;
     }
 
-    void TransformComponent::onUpdate(InspectableMember *member) {
-        if (member != nullptr && member->name == ROTATION) {
-            rotation = normalize(glm::quat(rotationEuler * (glm::pi<float>() / 180.f)));
-        }
-        forceTransform = true;
-    }
+    // void TransformComponent::onUpdate(InspectableMember *member) {
+    //     if (member != nullptr && member->name == ROTATION) {
+    //         rotation = normalize(glm::quat(rotationEuler * (glm::pi<float>() / 180.f)));
+    //     }
+    //     forceTransform = true;
+    // }
 
     nlohmann::json TransformComponent::toJson() const {
         nlohmann::json j;

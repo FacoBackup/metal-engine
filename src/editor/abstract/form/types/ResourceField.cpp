@@ -29,10 +29,9 @@ namespace Metal {
             if (file->type == field.resourceType) {
                 std::string oldValue = *field.field;
                 *field.field = file->getId();
-                field.instance->registerChange();
-                field.instance->onUpdate(&field);
 
-                historyService->recordChange(field.instance, field.path, oldValue, *field.field);
+
+                historyService->recordChange(&field, oldValue);
                 open = false;
             }
         }, field.resourceType);
@@ -53,10 +52,9 @@ namespace Metal {
             std::string oldValue = *field.field;
             entry = nullptr;
             *field.field = "";
-            field.instance->registerChange();
-            field.instance->onUpdate(&field);
 
-            historyService->recordChange(field.instance, field.path, oldValue, *field.field);
+
+            historyService->recordChange(&field, oldValue);
         }
         ImGui::SameLine();
         if (entry != nullptr) {

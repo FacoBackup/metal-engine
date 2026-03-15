@@ -104,6 +104,8 @@ namespace Metal {
             frozenVersion = getChangeId();
         }
 
+        std::shared_ptr<InspectableMember> getFieldByPointer(void *ptr);
+
         std::vector<std::shared_ptr<InspectableMember> > &getFields();
 
         Inspectable() = default;
@@ -120,9 +122,6 @@ namespace Metal {
 
         virtual const char *getTitle() {
             throw std::logic_error("Not implemented");
-        }
-
-        virtual void onUpdate(InspectableMember *member) {
         }
     };
 }

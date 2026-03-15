@@ -15,6 +15,7 @@ using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
 
 namespace Metal {
+    class HistoryEventService;
     class TransformService;
     class StreamingService;
     class RayTracingService;
@@ -41,7 +42,6 @@ namespace Metal {
         GlobalDataUBO globalDataUBO{};
         long long start = -1;
         bool cameraUpdated = true;
-        bool giSettingsUpdated = true;
 
     public:
         std::vector<Dependency> getDependencies() override {
@@ -68,21 +68,13 @@ namespace Metal {
             return cameraUpdated;
         }
 
-        void setGISettingsUpdated(const bool val) {
-            giSettingsUpdated = val;
-        }
-
         void resetPathTracerAccumulationCount() const;
-
-        bool isGISettingsUpdated() const {
-            return giSettingsUpdated;
-        }
 
         void updateCurrentTime();
 
         EngineFrameBuilder createFrame(const std::string &id);
 
-        void setCurrentFrame(const std::string & id);
+        void setCurrentFrame(const std::string &id);
 
         long long currentTimeMs = 0;
         TimePoint currentTime;

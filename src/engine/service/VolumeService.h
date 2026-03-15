@@ -5,26 +5,34 @@
 #include "../../common/IService.h"
 #include "../../common/ISync.h"
 #include "../dto/VolumeData.h"
+#include "common/IInit.h"
 
 namespace Metal {
-
+    class HistoryEventService;
     struct WorldRepository;
     class EngineContext;
 
-    class VolumeService final : public IService, public ISync {
+    class VolumeService final : public IService, public IInit, public ISync {
         WorldRepository *worldRepository = nullptr;
+        HistoryEventService *historyEventService = nullptr;
         EngineContext *engineContext = nullptr;
-
+        bool needsUpdate = true;
         std::vector<VolumeData> items{};
 
         void registerVolumes();
+
     public:
         std::vector<Dependency> getDependencies() override {
             return {
                 {"WorldRepository", &worldRepository},
-                {"EngineContext", &engineContext}
+                {"WorldRepository", &worldRepository},
+                {"EngineContext", &engineContext},
+                {"HistoryEventService", &historyEventService}
+
             };
         }
+
+        void onInitialize() override;
 
         void onSync() override;
 

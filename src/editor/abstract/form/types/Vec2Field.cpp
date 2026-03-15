@@ -18,10 +18,9 @@ namespace Metal {
             if (UIUtil::DrawVec2Control(field.name, field.id, values, field.incrementF.value())) {
                 field.field->x = values[0];
                 field.field->y = values[1];
-                field.instance->registerChange();
-                field.instance->onUpdate(&field);
 
-                historyService->recordChange(field.instance, field.path, oldValue, *field.field);
+
+                historyService->recordChange(&field, oldValue);
             }
 
             if (ImGui::IsItemActivated()) {

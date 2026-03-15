@@ -6,32 +6,31 @@
 
 namespace Metal {
     ConsolePanel::ConsolePanel() {
-        for (bool & i : levelFilter) {
+        for (bool &i: levelFilter) {
             i = true;
         }
         shortcuts = {
-                ShortcutDTO("Clear Logs", ImGuiMod_Ctrl | ImGuiKey_L, [this]() {
-                    LogService::clear();
-                })
+            ShortcutDTO("Clear Logs", ImGuiMod_Ctrl | ImGuiKey_L, [this]() {
+                LogService::clear();
+            })
         };
     }
 
     void ConsolePanel::onSync() {
         // Header
-        if (ImGui::Button("Clear")) {
+        if (ImGui::Button((Icons::clear_all + id + "Clear_Logs").c_str())) {
             LogService::clear();
         }
-        ImGui::SameLine();
-        bool copyToClipboard = ImGui::Button("Copy");
         ImGui::SameLine();
         filter.Draw(Icons::search.c_str(), 180);
         ImGui::SameLine();
 
         // Log level filter
-        if (ImGui::BeginCombo((id + "##LogLevel").c_str(), "Filters")) {
-            for (int i = 0; i <= (int)LogLevel::Fatal; i++) {
-                LogLevel level = (LogLevel)i;
-                ImGui::Selectable(LogService::getLevelName(level), &levelFilter[i], ImGuiSelectableFlags_DontClosePopups);
+        if (ImGui::BeginCombo((id + "LogLevel").c_str(), "Filters")) {
+            for (int i = 0; i <= (int) LogLevel::Fatal; i++) {
+                LogLevel level = (LogLevel) i;
+                ImGui::Selectable(LogService::getLevelName(level), &levelFilter[i],
+                                  ImGuiSelectableFlags_DontClosePopups);
             }
             ImGui::EndCombo();
         }
@@ -40,15 +39,12 @@ namespace Metal {
 
         // Log content
         const float footerHeightToReserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
-        ImGui::BeginChild("ScrollingRegion", ImVec2(0, -footerHeightToReserve), false, ImGuiWindowFlags_HorizontalScrollbar);
-
-        if (copyToClipboard) {
-            ImGui::LogToClipboard();
-        }
+        ImGui::BeginChild((id + "ScrollingRegion").c_str(), ImVec2(0, -footerHeightToReserve), false,
+                          ImGuiWindowFlags_HorizontalScrollbar);
 
         const auto entries = LogService::getEntriesSnapshot();
-        for (const auto& entry : entries) {
-            if (!levelFilter[(int)entry.level]) continue;
+        for (const auto &entry: entries) {
+            if (!levelFilter[(int) entry.level]) continue;
             if (!filter.PassFilter(entry.message.c_str())) continue;
 
             ImGui::PushStyleColor(ImGuiCol_Text, LogService::getLevelColor(entry.level));
@@ -64,10 +60,6 @@ namespace Metal {
             ImGui::PopStyleColor();
         }
 
-        if (copyToClipboard) {
-            ImGui::LogFinish();
-        }
-
         if (autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) {
             ImGui::SetScrollHereY(1.0f);
         }
@@ -76,6 +68,6 @@ namespace Metal {
         ImGui::Separator();
 
         // Footer
-        ImGui::Checkbox("Auto-scroll", &autoScroll);
+        ImGui::Checkbox(("Auto-scroll" + id + "autoScroll").c_str(), &autoScroll);
     }
 } // Metal

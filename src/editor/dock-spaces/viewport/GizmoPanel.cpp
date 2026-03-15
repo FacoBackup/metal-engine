@@ -121,16 +121,19 @@ namespace Metal {
         localSelected->registerChange();
         localChangeId = localSelected->getChangeId();
         localSelected->forceTransform = true;
-        localSelected->onUpdate(nullptr);
 
         if (oldTranslation != localSelected->translation) {
-            historyService->recordChange(localSelected, "/Translation", oldTranslation, localSelected->translation);
+            auto field = localSelected->getFieldByPointer(&localSelected->translation);
+            std::cout << "Gizmo: " << field->name << std::endl;
+            if (field) historyService->recordChange(field.get(), oldTranslation);
         }
         if (oldScale != localSelected->scale) {
-            historyService->recordChange(localSelected, "/Scale", oldScale, localSelected->scale);
+            auto field = localSelected->getFieldByPointer(&localSelected->scale);
+            if (field) historyService->recordChange(field.get(), oldScale);
         }
         if (oldRotationEuler != localSelected->rotationEuler) {
-            historyService->recordChange(localSelected, "/Rotation", oldRotationEuler, localSelected->rotationEuler);
+            auto field = localSelected->getFieldByPointer(&localSelected->rotationEuler);
+            if (field) historyService->recordChange(field.get(), oldRotationEuler);
         }
     }
 

@@ -14,9 +14,7 @@ namespace Metal {
             bool oldValue = *field.field;
             if (ImGui::Checkbox(field.nameWithId.c_str(), field.field)) {
                 field.instance->registerChange();
-                field.instance->onUpdate(&field);
-
-                historyService->recordChange(field.instance, field.path, oldValue, *field.field);
+                historyService->recordChange(&field, oldValue);
             }
         } else {
             ImGui::Text("%s: %b", field.name.c_str(), *field.field);

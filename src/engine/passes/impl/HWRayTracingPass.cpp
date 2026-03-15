@@ -8,9 +8,17 @@
 #include "../../../engine/EngineContext.h"
 #include "../../../engine/repository/EngineRepository.h"
 #include "../../../editor/enum/EngineResourceIDs.h"
+#include "../../../editor/service/HistoryEventService.h"
 
 namespace Metal {
     void HWRayTracingPass::onInitialize() {
+        eventService->subscribeGeneric([this](const HistoryEvent &) {
+            needsUpdate = true;
+        });
+        eventService->subscribe<EngineRepository>([this](const HistoryEvent &) {
+            needsUpdate = true;
+        });
+
         PipelineBuilder builder = PipelineBuilder::OfRayTracing(
                     "rt/HWRayTracing.rgen",
                     "rt/HWRayTracing.rmiss",
@@ -36,7 +44,7 @@ namespace Metal {
         auto *previousPositionIndex = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_POSITION_INDEX);
         auto *previousNormal = frame->getResourceAs<TextureInstance>(RID_PREVIOUS_NORMAL);
 
-        if (isFirstRun || engineContext->isCameraUpdated() || engineContext->isGISettingsUpdated()) {
+        if (isFirstRun || engineContext->isCameraUpdated() || needsUpdate) {
             clearTexture(accumulatedFrame->vkImage);
             engineContext->resetPathTracerAccumulationCount();
             isFirstRun = false;

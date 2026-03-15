@@ -3,6 +3,8 @@
 #include "../../common/AbstractResourceService.h"
 #include "../resource/MeshInstance.h"
 #include "../../editor/enum/engine-definitions.h"
+#include "../../common/IInit.h"
+#include "../../editor/service/HistoryEventService.h"
 
 namespace Metal {
     struct MeshData;
@@ -12,11 +14,15 @@ namespace Metal {
     class BufferService;
     class RayTracingService;
     class DirectoryService;
+    class HistoryEventService;
+    struct WorldRepository;
 
-    class MeshService final : public AbstractResourceService<MeshInstance> {
+    class MeshService final : public AbstractResourceService<MeshInstance>, public IInit {
         BufferService *bufferService = nullptr;
         RayTracingService *rayTracingService = nullptr;
         DirectoryService *directoryService = nullptr;
+        HistoryEventService *historyEventService = nullptr;
+        WorldRepository *worldRepository = nullptr;
 
     public:
         MeshService() = default;
@@ -25,9 +31,13 @@ namespace Metal {
             return {
                 {"BufferService", &bufferService},
                 {"RayTracingService", &rayTracingService},
-                {"DirectoryService", &directoryService}
+                {"DirectoryService", &directoryService},
+                {"HistoryEventService", &historyEventService},
+                {"WorldRepository", &worldRepository}
             };
         }
+
+        void onInitialize() override;
 
         MeshInstance *create(const std::string &id);
 

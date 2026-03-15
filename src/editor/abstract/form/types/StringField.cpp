@@ -15,10 +15,9 @@ namespace Metal {
             std::string oldValue = *field.field;
             if (ImGui::InputText(field.id.c_str(), buffer, sizeof(buffer))) {
                 *field.field = buffer;
-                field.instance->registerChange();
-                field.instance->onUpdate(&field);
 
-                historyService->recordChange(field.instance, field.path, oldValue, *field.field);
+
+                historyService->recordChange(&field, oldValue);
             }
         } else {
             ImGui::Text("%s: %s", field.name.c_str(), field.field->c_str());

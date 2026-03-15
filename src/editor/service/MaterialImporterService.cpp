@@ -68,10 +68,6 @@ namespace Metal {
             primitive.albedoColor = {color.r, color.g, color.b};
         }
 
-        if (material->Get(AI_MATKEY_COLOR_EMISSIVE, color) == AI_SUCCESS) {
-            primitive.isEmissive = (color.r > 0 || color.g > 0 || color.b > 0);
-        }
-
         // float factor;
         // if (material->Get(AI_MATKEY_METALLIC_FACTOR, factor) == AI_SUCCESS) {
         //     primitive.metallicFactor = factor;

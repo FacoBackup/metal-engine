@@ -276,6 +276,10 @@ set(ENGINE_SOURCES
         core/FrameService.h
         common/Icons.cpp
         editor/service/HistoryService.cpp
+        editor/service/HistoryEventService.cpp
+        editor/service/HistoryEventService.h
+        engine/dto/LightComponent.cpp
+        engine/dto/LightComponent.h
 )
 
 # Extract non-main sources for testing

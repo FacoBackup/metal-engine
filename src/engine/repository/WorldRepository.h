@@ -38,6 +38,7 @@ namespace Metal {
         entt::entity createEntity();
 
         [[nodiscard]] MetadataComponent *getEntity(entt::entity node);
+        [[nodiscard]] bool hasComponent(entt::entity entity, ComponentType type) const;
 
         void deleteEntities(const std::vector<entt::entity> &entities);
 

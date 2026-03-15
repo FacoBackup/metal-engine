@@ -8,6 +8,7 @@
 #include "../dto/PrimitiveComponent.h"
 #include "../dto/VolumeComponent.h"
 #include "../dto/MetadataComponent.h"
+#include "engine/dto/LightComponent.h"
 
 #define DEFINE_COMPONENT(TYPE, NAME, JSON_KEY, ICON, DEPS, CLASS, CREATOR) \
 { \
@@ -27,6 +28,9 @@ if (auto *comp = repo.registry.try_get<CLASS>(entityId)) { \
 return static_cast<Inspectable *>(comp); \
 } \
 return nullptr; \
+}, \
+[](const WorldRepository &repo, entt::entity entityId) { \
+return repo.registry.all_of<CLASS>(entityId); \
 } \
 }
 
@@ -38,7 +42,6 @@ namespace Metal::ComponentTypes {
                 [](WorldRepository &repo, entt::entity entityId) {
                 auto &mesh = repo.registry.emplace_or_replace<PrimitiveComponent>(entityId);
                 mesh.setEntityId(entityId);
-                repo.rayTracingService->markDirty();
                 }
             ),
             DEFINE_COMPONENT(
@@ -58,11 +61,18 @@ namespace Metal::ComponentTypes {
                 }
             ),
             DEFINE_COMPONENT(
+                LIGHT, "Light Component", "light", Icons::lightbulb, std::vector({TRANSFORM, PRIMITIVE}),
+                LightComponent,
+                [](WorldRepository &repo, entt::entity entityId) {
+                auto &vol = repo.registry.emplace_or_replace<LightComponent>(entityId);
+                vol.setEntityId(entityId);
+                }
+            ),
+            DEFINE_COMPONENT(
                 METADATA, "Metadata", "metadata", Icons::data_array, {}, MetadataComponent,
                 [](WorldRepository &repo, entt::entity entityId) {
                 auto &atmo = repo.registry.emplace_or_replace<MetadataComponent>(entityId);
                 atmo.setEntityId(entityId);
-                repo.ctx->getSingleton<EngineContext>().setGISettingsUpdated(true);
                 }
             )
         };

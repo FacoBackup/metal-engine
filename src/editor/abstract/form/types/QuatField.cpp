@@ -23,10 +23,9 @@ namespace Metal {
                 field.field->y = values[1];
                 field.field->z = values[2];
                 field.field->w = values[3];
-                field.instance->registerChange();
-                field.instance->onUpdate(&field);
 
-                historyService->recordChange(field.instance, field.path, oldValue, *field.field);
+
+                historyService->recordChange(&field, oldValue);
             }
 
             if (ImGui::IsItemActivated()) {

@@ -7,6 +7,8 @@
 #include "../dto/TransformComponent.h"
 #include "../dto/VolumeComponent.h"
 #include "../EngineContext.h"
+#include "common/LoggerUtil.h"
+#include "editor/service/HistoryEventService.h"
 
 namespace Metal {
     void VolumeService::registerVolumes() {
@@ -33,8 +35,22 @@ namespace Metal {
         }
     }
 
-    // TODO - ADD EVENT SYSTEM THAT TRIGGERS THIS UPDATE
+    void VolumeService::onInitialize() {
+        historyEventService->subscribe<VolumeComponent>([this](const HistoryEvent &) {
+            needsUpdate = true;
+        });
+
+        historyEventService->subscribeGeneric([this](const HistoryEvent &) {
+            needsUpdate = true;
+        });
+    }
+
     void VolumeService::onSync() {
+        if (!needsUpdate) return;
+        needsUpdate = false;
+
+        LOG_INFO("Updating volumes");
+
         items.clear();
 
         registerVolumes();

@@ -41,7 +41,7 @@ namespace Metal {
         st->model = auxMat4 * auxMat42;
         st->freezeVersion();
 
-        if (worldRepository->registry.all_of<PrimitiveComponent>(st->getEntityId())) {
+        if (worldRepository->hasComponent(st->getEntityId(), PRIMITIVE) || worldRepository->hasComponent(st->getEntityId(), LIGHT)) {
             rayTracingService->markDirty();
         }
     }

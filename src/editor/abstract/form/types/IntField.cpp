@@ -14,9 +14,7 @@ namespace Metal {
             int oldValue = *field.field;
             if (ImGui::DragInt(id.c_str(), field.field, .01f, field.min.value(), field.max.value())) {
                 field.instance->registerChange();
-                field.instance->onUpdate(&field);
-
-                    historyService->recordChange(field.instance, field.path, oldValue, *field.field);
+                historyService->recordChange(&field, oldValue);
             }
 
             if (ImGui::IsItemActivated()) {

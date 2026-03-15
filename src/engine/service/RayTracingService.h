@@ -9,6 +9,8 @@
 #include "../../common/IService.h"
 #include "../../common/ISync.h"
 #include "../../common/IDisposable.h"
+#include "../../common/IInit.h"
+#include "../../editor/service/HistoryEventService.h"
 
 namespace Metal {
     class DescriptorSetService;
@@ -21,7 +23,9 @@ namespace Metal {
     class BufferService;
     class EngineContext;
 
-    class RayTracingService final : public IService, public ISync, public IDisposable {
+    class HistoryEventService;
+
+    class RayTracingService final : public IService, public ISync, public IDisposable, public IInit {
         VulkanContext *vulkanContext = nullptr;
         PipelineService *pipelineService = nullptr;
         WorldRepository *worldRepository = nullptr;
@@ -30,6 +34,7 @@ namespace Metal {
         BufferService *bufferService = nullptr;
         EngineContext *engineContext = nullptr;
         DescriptorSetService *descriptorSetService = nullptr;
+        HistoryEventService *historyEventService = nullptr;
 
         struct BLASEntry {
             VkAccelerationStructureKHR accelerationStructure = VK_NULL_HANDLE;
@@ -56,11 +61,10 @@ namespace Metal {
 
         bool accelerationStructureBuilt = false;
         bool needsRebuild = true;
-        bool needsMaterialUpdate = false;
 
-        VkDeviceAddress getDeviceAddress(VkBuffer buffer);
+        VkDeviceAddress getDeviceAddress(VkBuffer buffer) const;
 
-        void updateDescriptorSets(VkAccelerationStructureKHR asHandle);
+        void updateDescriptorSets(VkAccelerationStructureKHR asHandle) const;
 
         void buildBLAS();
 
@@ -82,17 +86,16 @@ namespace Metal {
                 {"MaterialService", &materialService},
                 {"BufferService", &bufferService},
                 {"EngineContext", &engineContext},
-                {"DescriptorSetService", &descriptorSetService}
+                {"DescriptorSetService", &descriptorSetService},
+                {"HistoryEventService", &historyEventService}
             };
-        }
-
-        void setNeedsMaterialUpdate(bool val) {
-            needsMaterialUpdate = val;
         }
 
         void dispose() override;
 
         void onSync() override;
+
+        void onInitialize() override;
 
         [[nodiscard]] bool isReady() const;
 

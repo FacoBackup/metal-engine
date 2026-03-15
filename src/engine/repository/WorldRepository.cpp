@@ -17,7 +17,6 @@ namespace Metal {
         if (historyService) {
             historyService->recordAction(
                 [this, entity]() {
-                    // Undo: Delete entity
                     if (registry.valid(entity)) {
                         registry.destroy(entity);
                         if (hiddenEntities.contains(entity)) hiddenEntities.erase(entity);
@@ -26,11 +25,9 @@ namespace Metal {
                     }
                 },
                 [this, entity]() {
-                    // Redo: Restore entity (simplified, just recreate)
                     if (!registry.valid(entity)) {
                         registry.create(entity);
                         createComponent(entity, METADATA);
-                        rayTracingService->markDirty();
                     }
                 }
             );
@@ -88,7 +85,6 @@ namespace Metal {
                             }
                         }
                     }
-                    rayTracingService->markDirty();
                 },
                 [this, entities]() {
                     // Redo: Delete entities
@@ -99,7 +95,6 @@ namespace Metal {
                             registry.destroy(entityId);
                         }
                     }
-                    rayTracingService->markDirty();
                 }
             );
         }
@@ -116,7 +111,6 @@ namespace Metal {
 
             registry.destroy(entityId);
         }
-        rayTracingService->markDirty();
     }
 
     void WorldRepository::changeVisibility(entt::entity entity, bool isVisible) {
@@ -140,7 +134,6 @@ namespace Metal {
         } else {
             hiddenEntities.insert({entity, true});
         }
-        rayTracingService->markDirty();
     }
 
     void WorldRepository::loadScene(const std::string &sceneId) {
@@ -177,11 +170,8 @@ namespace Metal {
                 primitive.transmissionFactor = entityData.primitive->transmissionFactor;
                 primitive.thicknessFactor = entityData.primitive->thicknessFactor;
                 primitive.ior = entityData.primitive->ior;
-                primitive.isEmissive = entityData.primitive->isEmissive;
             }
         }
-
-        rayTracingService->markDirty();
     }
 
     void WorldRepository::createComponent(const entt::entity entityId, ComponentType type) {
@@ -200,6 +190,17 @@ namespace Metal {
                 break;
             }
         }
+    }
+
+    bool WorldRepository::hasComponent(entt::entity entity, ComponentType type) const {
+        if (!registry.valid(entity)) return false;
+
+        for (const auto &compDef: ComponentTypes::getComponents()) {
+            if (compDef.type == type) {
+                return compDef.hasComponent(*this, entity);
+            }
+        }
+        return false;
     }
 
     nlohmann::json WorldRepository::toJson() const {

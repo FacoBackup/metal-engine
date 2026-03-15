@@ -9,9 +9,11 @@ namespace Metal {
     class VulkanContext;
     class EngineContext;
     struct EngineRepository;
+    class HistoryEventService;
 
     class HWRayTracingPass final : public AbstractComputePass {
         bool isFirstRun = true;
+        bool needsUpdate = true;
         HWRayTracingPushConstant pushConstant{};
 
         RayTracingService *rayTracingService = nullptr;
@@ -19,6 +21,7 @@ namespace Metal {
         VulkanContext *vulkanContext = nullptr;
         EngineContext *engineContext = nullptr;
         EngineRepository *engineRepository = nullptr;
+        HistoryEventService *eventService = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
@@ -27,6 +30,7 @@ namespace Metal {
                 {"PipelineService", &pipelineService},
                 {"VulkanContext", &vulkanContext},
                 {"EngineContext", &engineContext},
+                {"HistoryEventService", &eventService},
                 {"EngineRepository", &engineRepository}
             };
         }

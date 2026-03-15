@@ -15,8 +15,26 @@
 #include "../../ApplicationContext.h"
 #include "BufferService.h"
 #include "RayTracingService.h"
+#include "../dto/PrimitiveComponent.h"
+#include "../dto/TransformComponent.h"
+#include "../repository/WorldRepository.h"
 
 namespace Metal {
+
+    void MeshService::onInitialize() {
+        historyEventService->subscribe<PrimitiveComponent>([this](const HistoryEvent &event) {
+            if (event.propertyPath.find("Mesh") != std::string::npos) {
+                auto *primitive = dynamic_cast<PrimitiveComponent *>(event.instance);
+                if (primitive && worldRepository->registry.all_of<TransformComponent>(primitive->getEntityId())) {
+                    MeshData *data = loadMeshData(primitive->meshId);
+                    if (data != nullptr) {
+                        worldRepository->registry.get<TransformComponent>(primitive->getEntityId()).gizmoCenter = data->gizmoCenter;
+                        delete data;
+                    }
+                }
+            }
+        }, "Mesh");
+    }
 
     MeshInstance *MeshService::create(const std::string &id) {
         MeshData *data = loadMeshData(id);
@@ -72,7 +90,6 @@ namespace Metal {
 
     void MeshService::disposeResource(MeshInstance *resource) {
         LOG_INFO("Disposing of mesh instance");
-        rayTracingService->markDirty();
         bufferService->dispose(resource->indexBuffer->getId());
         bufferService->dispose(resource->dataBuffer->getId());
     }

@@ -13,8 +13,6 @@ public:
     bool boolField = false;
     glm::vec3 vec3Field = {0, 0, 0};
 
-    bool updated = false;
-
     void registerFields() override {
         registerInt(intField, "Group", "IntField");
         registerFloat(floatField, "Group", "FloatField");
@@ -22,11 +20,6 @@ public:
         registerBool(boolField, "Group", "BoolField");
         registerVec3(vec3Field, "Group", "Vec3Field");
     }
-
-    void onUpdate(InspectableMember* member) override {
-        updated = true;
-    }
-
     const char* getIcon() override { return ""; }
     const char* getTitle() override { return "Mock"; }
 };
@@ -37,10 +30,7 @@ protected:
     MockInspectable mock;
 
     void SetUp() override {
-        // Trigger field registration
         mock.getFields();
-        // Reset updated flag which might be set during registration
-        mock.updated = false;
     }
 };
 
@@ -50,7 +40,9 @@ TEST_F(HistoryServiceTest, RecordSingleChange) {
     
     // Note: recordChange only records the fact that a change happened from oldValue to newValue.
     // It doesn't modify the field itself.
-    historyService.recordChange(&mock, "/IntField", oldValue, newValue);
+    auto field = mock.getFieldByPointer(&mock.intField);
+    mock.intField = newValue;
+    historyService.recordChange(field.get(), oldValue);
     
     EXPECT_TRUE(historyService.canUndo());
     EXPECT_FALSE(historyService.canRedo());
@@ -61,18 +53,16 @@ TEST_F(HistoryServiceTest, UndoRedoSingleChange) {
     int newValue = 42;
     mock.intField = newValue; // Simulated change
     
-    historyService.recordChange(&mock, "/IntField", oldValue, newValue);
+    auto field = mock.getFieldByPointer(&mock.intField);
+    historyService.recordChange(field.get(), oldValue);
     
     historyService.undo();
     EXPECT_EQ(mock.intField, oldValue);
-    EXPECT_TRUE(mock.updated);
     EXPECT_FALSE(historyService.canUndo());
     EXPECT_TRUE(historyService.canRedo());
     
-    mock.updated = false;
     historyService.redo();
     EXPECT_EQ(mock.intField, newValue);
-    EXPECT_TRUE(mock.updated);
     EXPECT_TRUE(historyService.canUndo());
     EXPECT_FALSE(historyService.canRedo());
 }
@@ -80,8 +70,10 @@ TEST_F(HistoryServiceTest, UndoRedoSingleChange) {
 TEST_F(HistoryServiceTest, TransactionMultipleChanges) {
     historyService.startTransaction("MultiChange");
     
-    historyService.recordChange(&mock, "/IntField", 0, 10);
-    historyService.recordChange(&mock, "/FloatField", 0.0f, 1.0f);
+    mock.intField = 10;
+    historyService.recordChange(mock.getFieldByPointer(&mock.intField).get(), 0);
+    mock.floatField = 1.0f;
+    historyService.recordChange(mock.getFieldByPointer(&mock.floatField).get(), 0.0f);
     historyService.endTransaction();
     
     EXPECT_TRUE(historyService.canUndo());
@@ -100,8 +92,11 @@ TEST_F(HistoryServiceTest, TransactionMultipleChanges) {
 
 TEST_F(HistoryServiceTest, TransactionCollapseSameField) {
     historyService.startTransaction("Collapse");
-    historyService.recordChange(&mock, "/IntField", 0, 10);
-    historyService.recordChange(&mock, "/IntField", 10, 20);
+    auto field = mock.getFieldByPointer(&mock.intField).get();
+    mock.intField = 10;
+    historyService.recordChange(field, 0);
+    mock.intField = 20;
+    historyService.recordChange(field, 10);
     historyService.endTransaction();
     
     mock.intField = 20;
@@ -115,11 +110,14 @@ TEST_F(HistoryServiceTest, TransactionCollapseSameField) {
 }
 
 TEST_F(HistoryServiceTest, RedoStackClearedOnNewChange) {
-    historyService.recordChange(&mock, "/IntField", 0, 10);
+    auto field = mock.getFieldByPointer(&mock.intField).get();
+    mock.intField = 10;
+    historyService.recordChange(field, 0);
     historyService.undo();
     EXPECT_TRUE(historyService.canRedo());
     
-    historyService.recordChange(&mock, "/IntField", 0, 20);
+    mock.intField = 20;
+    historyService.recordChange(field, 0);
     EXPECT_FALSE(historyService.canRedo());
 }
 
@@ -128,7 +126,7 @@ TEST_F(HistoryServiceTest, Vec3Change) {
     glm::vec3 newVal{1, 2, 3};
     mock.vec3Field = newVal;
     
-    historyService.recordChange(&mock, "/Vec3Field", oldVal, newVal);
+    historyService.recordChange(mock.getFieldByPointer(&mock.vec3Field).get(), oldVal);
     
     historyService.undo();
     EXPECT_EQ(mock.vec3Field, oldVal);
@@ -159,7 +157,8 @@ TEST_F(HistoryServiceTest, MixedTransaction) {
     mock.intField = 0;
     
     historyService.startTransaction("Mixed");
-    historyService.recordChange(&mock, "/IntField", 0, 10);
+    mock.intField = 10;
+    historyService.recordChange(mock.getFieldByPointer(&mock.intField).get(), 0);
     historyService.recordAction([&]() { value = 0; }, [&]() { value = 100; });
     historyService.endTransaction();
     

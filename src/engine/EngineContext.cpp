@@ -75,7 +75,6 @@ namespace Metal {
         }
 
         setCameraUpdated(false);
-        setGISettingsUpdated(false);
     }
 
     void EngineContext::updateGlobalData() {
@@ -101,7 +100,6 @@ namespace Metal {
 
         lightService->computeSunInfo();
         globalDataUBO.sunPosition = lightService->getSunPosition();
-        globalDataUBO.sunColor = lightService->getSunColor();
         currentFrame->getResourceAs<BufferInstance>(RID_GLOBAL_DATA)->update(&globalDataUBO);
     }
 }
