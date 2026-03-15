@@ -1,6 +1,7 @@
 #ifndef LIGHTSSERVICE_H
 #define LIGHTSSERVICE_H
 #include <vector>
+#include <glm/glm.hpp>
 
 #include "../../common/IService.h"
 #include "../../common/ISync.h"
@@ -10,9 +11,14 @@ namespace Metal {
     class EngineContext;
     struct EngineRepository;
 
+    class MeshService;
+    struct WorldRepository;
+
     class LightService final : public IService, public ISync{
         EngineContext *engineContext = nullptr;
         EngineRepository *engineRepository = nullptr;
+        WorldRepository *worldRepository = nullptr;
+        MeshService *meshService = nullptr;
 
         std::vector<LightData> items{};
         glm::vec3 sunColor{};
@@ -20,16 +26,18 @@ namespace Metal {
 
         void registerLights();
 
-        static glm::vec3 CalculateSunColor(float elevation, glm::vec3 &nightColor, glm::vec3 &dawnColor,
-                                           glm::vec3 &middayColor);
+        static glm::vec3 CalculateSunColor(float elevation, const glm::vec3 &nightColor, const glm::vec3 &dawnColor,
+                                           const glm::vec3 &middayColor);
 
-        static glm::vec3 BlendColors(glm::vec3 &c1, glm::vec3 &c2, float t);
+        static glm::vec3 BlendColors(const glm::vec3 &c1, const glm::vec3 &c2, float t);
 
     public:
         std::vector<Dependency> getDependencies() override {
             return {
                 {"EngineContext", &engineContext},
-                {"EngineRepository", &engineRepository}
+                {"EngineRepository", &engineRepository},
+                {"WorldRepository", &worldRepository},
+                {"MeshService", &meshService}
             };
         }
 

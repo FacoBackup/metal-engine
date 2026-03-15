@@ -22,7 +22,6 @@ namespace Metal {
         registerInt(pathTracerMaxSamples, PATH_TRACER, "Maximum accumulation", 1, 10000);
         registerInt(pathTracerSamples, PATH_TRACER, "Samples per pixel", 1, 32);
         registerInt(pathTracerBounces, PATH_TRACER, "Bounces", 0, 7);
-        registerBool(multipleImportanceSampling, PATH_TRACER, "Enable multiple importance sampling?");
         registerFloat(pathTracingEmissiveFactor, PATH_TRACER, "Emissive surface factor", 0);
 
         registerBool(dofEnabled, DEPTH_OF_FIELD, "Enable depth of field?");
@@ -52,7 +51,6 @@ namespace Metal {
         nlohmann::json j;
         j["vsync"] = vsync;
         j["pathTracerSamples"] = pathTracerSamples;
-        j["multipleImportanceSampling"] = multipleImportanceSampling;
         j["pathTracerBounces"] = pathTracerBounces;
         j["atmosphereEnabled"] = atmosphereEnabled;
         j["elapsedTime"] = elapsedTime;
@@ -79,7 +77,6 @@ namespace Metal {
     void EngineRepository::fromJson(const nlohmann::json &j) {
         vsync = j.at("vsync").get<bool>();
         pathTracerSamples = j.at("pathTracerSamples").get<int>();
-        multipleImportanceSampling = j.at("multipleImportanceSampling").get<bool>();
         pathTracerBounces = j.at("pathTracerBounces").get<int>();
         atmosphereEnabled = j.at("atmosphereEnabled").get<bool>();
         elapsedTime = j.at("elapsedTime").get<float>();

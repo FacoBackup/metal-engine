@@ -1,6 +1,4 @@
 #extension GL_EXT_ray_tracing: require
-#define ITEM_TYPE_SPHERE 0
-#define ITEM_TYPE_PLANE 1
 
 #include "../GlobalDataBuffer.glsl"
 #include "../rt/HWRayTracingPushConstant.glsl"
@@ -23,6 +21,11 @@ layout (location = 0) rayPayloadEXT RayPayload payload;
 
 #define MESH_METADATA_SET 7
 #include "../MeshMetadata.glsl"
+
+layout (set = 0, binding = 8) uniform sampler2D textureArray[];
+
+#include "../MeshDataSampling.glsl"
+
 
 #include "../util/DisneyBSDF.glsl"
 #include "../util/PixelShading.glsl"

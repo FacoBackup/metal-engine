@@ -11,21 +11,14 @@ struct PathInfo {
 };
 
 void addDirectLighting(inout PathInfo pathInfo) {
-    vec3 wo = -pathInfo.interaction.incomingRayDir;
-    vec3 Ld = vec3(0);
+    if (globalData.lightsCount == 0) return;
 
-    for (int i = 0; i < int(globalData.lightsCount); ++i) {
-        Light l = lightBuffer.items[i];
-        l.color.rgb *= l.color.a;
+    int lightIndex = int(random() * globalData.lightsCount);
+    Light l = lightBuffer.items[lightIndex];
 
-        vec3 wi;
-        vec3 f;
-        float scatteringPdf;
-
-        Ld += calculateDirectLight(l, pathInfo.interaction, pathInfo.material, wi, f, scatteringPdf);
-    }
-
-    pathInfo.radiance += pathInfo.throughput * Ld;
+    vec3 wi, f;
+    float scatteringPdf;
+    pathInfo.radiance += pathInfo.throughput * calculateDirectLight(l, pathInfo.interaction, pathInfo.material, wi, f, scatteringPdf);
 }
 
 vec3 tracePath(vec3 rayDirection, MaterialInfo material, SurfaceInteraction interaction) {

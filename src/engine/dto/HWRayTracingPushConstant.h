@@ -7,7 +7,6 @@ namespace Metal {
         alignas(4) unsigned int volumeShadowSteps = 0;
         alignas(4) unsigned int isAtmosphereEnabled{};
 
-        alignas(4) unsigned int multipleImportanceSampling{};
         alignas(4) unsigned int pathTracerSamples{};
         alignas(4) unsigned int pathTracerBounces{};
         alignas(4) float pathTracingEmissiveFactor{};

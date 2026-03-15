@@ -4,21 +4,41 @@
 #include "../../editor/enum/EngineResourceIDs.h"
 #include "../EngineContext.h"
 #include "../repository/EngineRepository.h"
+#include "../repository/WorldRepository.h"
+#include "../dto/PrimitiveComponent.h"
+#include "../dto/MeshData.h"
+#include "MeshService.h"
 
 namespace Metal {
     void LightService::registerLights() {
-
+        unsigned int currentRenderIndex = 0;
+        for (const auto entity: worldRepository->registry.view<PrimitiveComponent>()) {
+            auto &primitive = worldRepository->registry.get<PrimitiveComponent>(entity);
+            primitive.renderIndex = currentRenderIndex++;
+            if (primitive.isEmissive && !primitive.meshId.empty()) {
+                MeshData *meshData = meshService->loadMeshData(primitive.meshId);
+                if (meshData) {
+                    for (size_t i = 0; i < meshData->indices.size(); i += 3) {
+                        LightData light{};
+                        light.triangleIndex = static_cast<unsigned int>(i);
+                        light.meshIndex = primitive.renderIndex;
+                        items.push_back(light);
+                    }
+                    delete meshData;
+                }
+            }
+        }
     }
 
- // TODO - ADD EVENT SYSTEM THAT TRIGGERS THIS UPDATE
+    // TODO - ADD EVENT SYSTEM THAT TRIGGERS THIS UPDATE
     void LightService::onSync() {
-        items.clear();
-
-        registerLights();
-
-        if (!items.empty()) {
-            engineContext->currentFrame->getResourceAs<BufferInstance>(RID_LIGHT_BUFFER)->update(items.data());
-        }
+        // items.clear();
+        //
+        // registerLights();
+        //
+        // if (!items.empty()) {
+        //     engineContext->currentFrame->getResourceAs<BufferInstance>(RID_LIGHT_BUFFER)->update(items.data());
+        // }
     }
 
     void LightService::computeSunInfo() {
@@ -31,8 +51,9 @@ namespace Metal {
             engineRepository->middayColor);
     }
 
-    glm::vec3 LightService::CalculateSunColor(const float elevation, glm::vec3 &nightColor, glm::vec3 &dawnColor,
-                                              glm::vec3 &middayColor) {
+    glm::vec3 LightService::CalculateSunColor(const float elevation, const glm::vec3 &nightColor,
+                                              const glm::vec3 &dawnColor,
+                                              const glm::vec3 &middayColor) {
         if (elevation <= -0.1f) {
             return nightColor;
         }
@@ -47,7 +68,7 @@ namespace Metal {
         return middayColor;
     }
 
-    glm::vec3 LightService::BlendColors(glm::vec3 &c1, glm::vec3 &c2, float t) {
+    glm::vec3 LightService::BlendColors(const glm::vec3 &c1, const glm::vec3 &c2, float t) {
         return {
             (c1.x * (1 - t) + c2.x * t),
             (c1.y * (1 - t) + c2.y * t),

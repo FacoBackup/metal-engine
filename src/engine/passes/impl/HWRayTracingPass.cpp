@@ -53,7 +53,6 @@ namespace Metal {
         pushConstant.volumeShadowSteps = engineRepository->volumeShadowSteps;
         pushConstant.isAtmosphereEnabled = engineRepository->atmosphereEnabled;
 
-        pushConstant.multipleImportanceSampling = engineRepository->multipleImportanceSampling;
         pushConstant.pathTracerSamples = engineRepository->pathTracerSamples;
         pushConstant.pathTracerBounces = engineRepository->pathTracerBounces;
         pushConstant.pathTracingEmissiveFactor = engineRepository->pathTracingEmissiveFactor;

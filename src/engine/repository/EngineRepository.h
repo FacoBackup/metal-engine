@@ -14,7 +14,6 @@ namespace Metal {
         float dofAperture = 1.2f;
         float dofFocalLength = 5;
 
-        bool multipleImportanceSampling = false;
         int volumeShadowSteps = 8;
         int shadingResInvScale = 2;
         int pathTracerMaxSamples = 200;
