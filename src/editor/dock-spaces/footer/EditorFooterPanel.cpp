@@ -14,7 +14,7 @@ namespace Metal {
     }
 
     void EditorFooterPanel::onInitialize() {
-        initializePanel(asyncTaskPanel = new AsyncTaskPanel(), false);
+        asyncTaskPanel = initializePanel<AsyncTaskPanel>(false);
     }
 
     void EditorFooterPanel::framerate() {

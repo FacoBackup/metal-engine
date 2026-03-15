@@ -11,18 +11,12 @@ namespace Metal {
     class NotificationService;
 
     struct DirectoryService final : IService, IInit, IDisposable{
-        EditorRepository *editorRepository = nullptr;
-        EngineRepository *engineRepository = nullptr;
-        WorldRepository *worldRepository = nullptr;
         NotificationService *notificationService = nullptr;
 
         std::string rootDirectory;
 
         std::vector<Dependency> getDependencies() override {
             return {
-                {"EditorRepository", &editorRepository},
-                {"EngineRepository", &engineRepository},
-                {"WorldRepository", &worldRepository},
                 {"NotificationService", &notificationService}
             };
         }

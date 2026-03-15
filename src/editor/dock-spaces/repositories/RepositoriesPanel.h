@@ -12,7 +12,7 @@ namespace Metal {
 
     class RepositoriesPanel final : public AbstractDockPanel {
         std::vector<Inspectable *> repositories{};
-        FormPanel *formPanel = nullptr;
+        std::shared_ptr<FormPanel> formPanel = nullptr;
 
         EditorRepository *editorRepository = nullptr;
         EngineRepository *engineRepository = nullptr;

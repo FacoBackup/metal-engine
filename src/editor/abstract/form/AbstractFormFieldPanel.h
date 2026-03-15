@@ -23,8 +23,8 @@ namespace Metal {
         [[nodiscard]] virtual bool isVisible() const = 0;
 
         void onSyncChildren() const override {
-            for (const auto panel: children) {
-                if (dynamic_cast<AbstractFormFieldPanel *>(panel)->isVisible()) {
+            for (const auto &panel: children) {
+                if (std::dynamic_pointer_cast<AbstractFormFieldPanel>(panel)->isVisible()) {
                     panel->onSync();
                 }
             }

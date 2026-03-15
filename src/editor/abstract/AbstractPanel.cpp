@@ -3,17 +3,8 @@
 #include "../../ApplicationContext.h"
 
 namespace Metal {
-    void AbstractPanel::initializePanel(AbstractPanel *panel, bool addToChildList) {
-        panel->ctx = ctx;
-        ctx->injectDependencies(panel);
-        panel->onInitialize();
-        if (addToChildList) {
-            children.push_back(panel);
-        }
-    }
-
     void AbstractPanel::onSyncChildren() const {
-        for (const auto panel: children) {
+        for (const auto &panel: children) {
             panel->onSync();
         }
     }
@@ -22,14 +13,20 @@ namespace Metal {
     }
 
     void AbstractPanel::removeAllChildren() {
-        for (const auto panel: children) {
+        for (const auto &panel: children) {
             panel->removeAllChildren();
-            delete panel;
         }
         children.clear();
     }
 
-    std::vector<AbstractPanel *> &AbstractPanel::getChildren() {
+    std::vector<std::shared_ptr<AbstractPanel>> &AbstractPanel::getChildren() {
         return children;
+    }
+
+    void AbstractPanel::removePanel(std::shared_ptr<AbstractPanel> panel) {
+        auto it = std::find(children.begin(), children.end(), panel);
+        if (it != children.end()) {
+            children.erase(it);
+        }
     }
 }

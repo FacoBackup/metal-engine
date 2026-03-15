@@ -21,7 +21,7 @@ namespace Metal {
         static constexpr auto PADDING = ImVec2(0, 0);
         static constexpr auto TABLE_FLAGS = ImGuiTableFlags_ScrollY | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg
                                             | ImGuiTableFlags_NoBordersInBody;
-        WorldHeaderPanel *headerPanel = nullptr;
+        std::shared_ptr<WorldHeaderPanel> headerPanel = nullptr;
         entt::entity onDrag = EMPTY_ENTITY;
         bool isOnSearch = false;
         WorldRepository *world = nullptr;

@@ -1,6 +1,7 @@
 #ifndef METAL_ENGINE_INSPECTABLEMEMBER_H
 #define METAL_ENGINE_INSPECTABLEMEMBER_H
 
+#include <string>
 #include "FieldType.h"
 
 namespace Metal {

@@ -9,8 +9,7 @@
 
 namespace Metal {
     void RepositoriesPanel::onInitialize() {
-        formPanel = new FormPanel();
-        initializePanel(formPanel);
+        formPanel = initializePanel<FormPanel>();
         
         repositories.push_back(editorRepository);
         repositories.push_back(engineRepository);

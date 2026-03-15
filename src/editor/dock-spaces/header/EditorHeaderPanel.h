@@ -11,18 +11,22 @@ namespace Metal {
     class GLFWContext;
     class EngineContext;
     struct DirectoryService;
+    class DockService;
 
     class EditorHeaderPanel final : public AbstractPanel {
         GLFWContext *glfwContext = nullptr;
         EngineContext *engineContext = nullptr;
         DirectoryService *directoryService = nullptr;
         ThemeService *themeService = nullptr;
+        DockService *dockService = nullptr;
 
         float menuBarHeight = 0;
 
         void renderFileTab();
 
         void renderMenu(const char *label, std::function<void()> itemsFunc);
+        
+        void renderDockAdders();
 
     public:
         std::vector<Dependency> getDependencies() override {
@@ -30,7 +34,8 @@ namespace Metal {
                 {"GLFWContext", &glfwContext},
                 {"EngineContext", &engineContext},
                 {"DirectoryService", &directoryService},
-                {"ThemeService", &themeService}
+                {"ThemeService", &themeService},
+                {"DockService", &dockService}
             };
         }
 

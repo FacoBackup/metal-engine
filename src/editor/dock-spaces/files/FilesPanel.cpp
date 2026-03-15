@@ -50,16 +50,15 @@ namespace Metal {
 
     void FilesPanel::onInitialize() {
         filesContext.setCurrentDirectory(filesService->getRoot());
-        initializePanel(filesHeader = new FilesHeaderPanel(filesContext, getActionLabel(), onAction()));
-        filesListPanel = new FilesListPanel(
+        filesHeader = initializePanel<FilesHeaderPanel>(true, filesContext, getActionLabel(), onAction());
+        filesListPanel = initializePanel<FilesListPanel>(
+            true,
             filesContext, [
                 this](FSEntry *entry) {
                 openResource(entry);
             },
             getTypeFilter());
-        initializePanel(filesListPanel);
-        previewPanel = new FilePreviewPanel(filesContext);
-        initializePanel(previewPanel);
+        previewPanel = initializePanel<FilePreviewPanel>(true, filesContext);
 
         shortcuts = {
             ShortcutDTO("Cut", ImGuiMod_Ctrl | ImGuiKey_X, [this]() {

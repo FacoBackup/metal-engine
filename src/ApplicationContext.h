@@ -85,6 +85,8 @@ namespace Metal {
 
         [[nodiscard]] bool isDebugMode() const;
 
+        [[nodiscard]] const std::vector<std::shared_ptr<IContextMember> > &getInstances() const { return instances; }
+
         void dispose() override;
     };
 }

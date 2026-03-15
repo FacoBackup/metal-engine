@@ -11,8 +11,7 @@
 
 namespace Metal {
     void InspectorPanel::onInitialize() {
-        formPanel = new FormPanel();
-        initializePanel(formPanel);
+        formPanel = initializePanel<FormPanel>();
     }
 
     void InspectorPanel::onSync() {

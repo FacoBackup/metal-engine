@@ -274,6 +274,7 @@ set(ENGINE_SOURCES
         common/IDisposable.h
         core/FrameService.cpp
         core/FrameService.h
+        common/Icons.cpp
 )
 
 # Extract non-main sources for testing

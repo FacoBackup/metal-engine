@@ -17,10 +17,10 @@ namespace Metal {
         static float HEADER_HEIGHT;
         static float FOOTER_HEIGHT;
         ImGuiID windowId = 0;
-        AbstractPanel *headerPanel = nullptr;
-        AbstractPanel *footerPanel = nullptr;
-        AbstractPanel *notificationsPanel = nullptr;
-        AbstractPanel *fileImportModalPanel = nullptr;
+        std::shared_ptr<AbstractPanel> headerPanel = nullptr;
+        std::shared_ptr<AbstractPanel> footerPanel = nullptr;
+        std::shared_ptr<AbstractPanel> notificationsPanel = nullptr;
+        std::shared_ptr<AbstractPanel> fileImportModalPanel = nullptr;
 
         DockService *dockService = nullptr;
         ThemeService *themeService = nullptr;

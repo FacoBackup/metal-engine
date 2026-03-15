@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "ResourceFilesPanel.h"
+#include <memory>
 #include "../../../../common/Icons.h"
 #include "../../../util/UIUtil.h"
 #include "../../../dto/FSEntry.h"
@@ -19,7 +20,7 @@ namespace Metal {
     }
 
     void ResourceField::onInitialize() {
-        initializePanel(new ResourceFilesPanel([this](FSEntry *file) {
+        initializePanel<ResourceFilesPanel>(true, [this](FSEntry *file) {
             if (file == nullptr) {
                 open = false;
                 return;
@@ -30,7 +31,7 @@ namespace Metal {
                 field.instance->onUpdate(&field);
                 open = false;
             }
-        }, field.resourceType));
+        }, field.resourceType);
     }
 
     void ResourceField::renderButton() {

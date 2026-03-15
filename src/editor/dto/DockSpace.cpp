@@ -8,10 +8,10 @@
 #include "../dock-spaces/viewport/ViewportPanel.h"
 #include "../dock-spaces/world/WorldPanel.h"
 
-#define CB(clazz) []() { return new clazz; }
+#define CB(clazz) []() { return std::make_shared<clazz>(); }
 
 namespace Metal {
-    DockSpace DockSpace::VIEWPORT{-1, "Viewport", Icons::ipublic, 0, 0,CB(ViewportPanel)};
+    DockSpace DockSpace::VIEWPORT{-1, "Viewport", Icons::i_public, 0, 0,CB(ViewportPanel)};
     DockSpace DockSpace::INSPECTOR{0, "Inspector", Icons::search, 4, 4,CB(InspectorPanel)};
     DockSpace DockSpace::WORLD{1, "World", Icons::account_tree, 4, 4, CB(WorldPanel)};
     DockSpace DockSpace::CONSOLE{2, "Console", Icons::terminal, 4, 4, CB(ConsolePanel)};

@@ -106,9 +106,9 @@ namespace Metal {
     }
 
     void EditorPanel::onInitialize() {
-        initializePanel(headerPanel = new EditorHeaderPanel(), false);
-        initializePanel(footerPanel = new EditorFooterPanel(), false);
-        initializePanel(notificationsPanel = new NotificationsPanel(), false);
-        initializePanel(fileImportModalPanel = new FileImportModalPanel(), false);
+        headerPanel = initializePanel<EditorHeaderPanel>(false);
+        footerPanel = initializePanel<EditorFooterPanel>(false);
+        notificationsPanel = initializePanel<NotificationsPanel>(false);
+        fileImportModalPanel = initializePanel<FileImportModalPanel>(false);
     }
 }

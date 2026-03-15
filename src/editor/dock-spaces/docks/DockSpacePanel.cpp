@@ -11,6 +11,7 @@
 #include "../../../common/LoggerUtil.h"
 #include "../../repository/EditorRepository.h"
 #include "../../service/ThemeService.h"
+#include "../../service/DockService.h"
 #define BORDER_RADIUS  6.0f
 #define OUTSIDE_PADDING  2.0f
 #define INSIDE_PADDING  4.0f
@@ -35,7 +36,7 @@ namespace Metal {
 
         const auto it = views.find(selectedSpace->index);
         if (it == views.end()) {
-            auto *newView = selectedSpace->getPanel();
+            auto newView = selectedSpace->getPanel();
             newView->size = &size;
             newView->dock = selectedSpace;
             newView->position = &position;
@@ -58,7 +59,7 @@ namespace Metal {
             const bool isHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows);
             if (isHovered) {
                 editorRepository->focusedShortcuts = view->getShortcuts();
-                editorRepository->focusedWindowName = view->dock->name;
+                editorRepository->focusedWindowName = view->dock->icon + " " + view->dock->name;
             }
 
             view->isWindowFocused = isHovered;
@@ -93,7 +94,8 @@ namespace Metal {
         styleColorPushCount = 2;
         beforeWindow();
         if (ImGui::Begin(dock->internalId.c_str(), &UIUtil::OPEN,
-                         (FLAGS & ~ImGuiWindowFlags_MenuBar) | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
+                         (FLAGS & ~ImGuiWindowFlags_MenuBar) | ImGuiWindowFlags_NoBackground |
+                         ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
             handleShortcut();
             sizeInternal = ImGui::GetWindowSize();
             size.x = sizeInternal.x;
@@ -108,13 +110,16 @@ namespace Metal {
             ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, BORDER_RADIUS);
             ImGui::PushStyleColor(ImGuiCol_ChildBg, themeService->palette0);
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(INSIDE_PADDING, INSIDE_PADDING));
-            if (ImGui::BeginChild((dock->internalId + "island").c_str(), ImVec2(size.x - OUTSIDE_PADDING * 2, size.y - OUTSIDE_PADDING * 2),
-                                  dock->isCenter ? ImGuiChildFlags_None : ImGuiChildFlags_AlwaysUseWindowPadding, ImGuiWindowFlags_None)) {
+            if (ImGui::BeginChild((dock->internalId + "island").c_str(),
+                                  ImVec2(size.x - OUTSIDE_PADDING * 2, size.y - OUTSIDE_PADDING * 2),
+                                  dock->isCenter ? ImGuiChildFlags_None : ImGuiChildFlags_AlwaysUseWindowPadding,
+                                  ImGuiWindowFlags_None)) {
                 if (!dock->isCenter) {
                     renderCustomHeader();
                 }
 
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, padding.x != DEFAULT.x ? padding : ImVec2(INSIDE_PADDING, INSIDE_PADDING));
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,
+                                    padding.x != DEFAULT.x ? padding : ImVec2(INSIDE_PADDING, INSIDE_PADDING));
                 if (ImGui::BeginChild((dock->internalId + "content").c_str(), ImVec2(0, 0), ImGuiChildFlags_None,
                                       ImGuiWindowFlags_None)) {
                     if (view != nullptr) {
@@ -136,7 +141,7 @@ namespace Metal {
         styleColorPushCount = 0;
     }
 
-    AbstractDockPanel *DockSpacePanel::getView() const {
+    std::shared_ptr<AbstractDockPanel> DockSpacePanel::getView() const {
         return view;
     }
 
@@ -158,7 +163,6 @@ namespace Metal {
             for (auto *space: dock->dockSpaces) {
                 if (space == nullptr) continue;
 
-                const std::string label = space->icon + " " + space->name + "##" + std::to_string(space->index);
                 const bool isSelected = (dock->selectedOption == space->index);
 
                 if (isSelected) {
@@ -168,27 +172,35 @@ namespace Metal {
                     ImGui::PushStyleColor(ImGuiCol_Button, themeService->palette3);
                 }
 
-                if (ImGui::Button(label.c_str(), ImVec2(0, headerHeight))) {
+                if (ImGui::Button((space->icon + " " + space->name + id + std::to_string(space->index)).c_str(), ImVec2(0, headerHeight))) {
                     dock->selectedOption = space->index;
                     initializeView();
                 }
 
-                if (dock->dockSpaces.size() > 1) {
+                if ( !dock->isCenter) {
                     ImGui::SameLine(0, 0);
-                    ImGui::PushStyleColor(ImGuiCol_Button, isSelected ? (isFocused ? editorRepository->accent : themeService->palette3) : themeService->palette3);
-                    if (ImGui::Button((Icons::close + "##close" + std::to_string(space->index) + id).c_str(), ImVec2(0, headerHeight))) {
+                    ImGui::PushStyleColor(ImGuiCol_Button,
+                                          isSelected
+                                              ? (isFocused ? editorRepository->accent : themeService->palette3)
+                                              : themeService->palette3);
+                    if (ImGui::Button((Icons::close + "##close" + std::to_string(space->index) + id).c_str(),
+                                      ImVec2(0, headerHeight))) {
                         int indexToRemove = -1;
-                        for (int i = 0; i < dock->dockSpaces.size(); i++) {
+                        for (int i = 0; i < (int) dock->dockSpaces.size(); i++) {
                             if (dock->dockSpaces[i]->index == space->index) {
                                 indexToRemove = i;
                                 break;
                             }
                         }
                         if (indexToRemove != -1) {
-                            dock->dockSpaces.erase(dock->dockSpaces.begin() + indexToRemove);
-                            if (isSelected && !dock->dockSpaces.empty()) {
-                                dock->selectedOption = dock->dockSpaces.front()->index;
-                                initializeView();
+                            if (dock->dockSpaces.size() == 1) {
+                                dockService->removeDock(dock);
+                            } else {
+                                dock->dockSpaces.erase(dock->dockSpaces.begin() + indexToRemove);
+                                if (isSelected && !dock->dockSpaces.empty()) {
+                                    dock->selectedOption = dock->dockSpaces.front()->index;
+                                    initializeView();
+                                }
                             }
                         }
                     }
@@ -249,7 +261,7 @@ namespace Metal {
     }
 
     void DockSpacePanel::beforeWindow() const {
-        if (mainWindow != nullptr && mainWindow != this) {
+        if (mainWindow != nullptr && mainWindow.get() != this) {
             const ImVec2 &pos = mainWindow->getPosition();
             const ImVec2 &sze = mainWindow->getSize();
             UIUtil::AUX_VEC2.x = pos.x + sze.x * 0.5f;

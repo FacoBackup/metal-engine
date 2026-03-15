@@ -5,6 +5,7 @@
 
 #include "../AbstractFormFieldPanel.h"
 #include "../../../../common/InspectedField.h"
+#include "../../../dto/FSEntry.h"
 #include "imgui.h"
 
 namespace Metal {

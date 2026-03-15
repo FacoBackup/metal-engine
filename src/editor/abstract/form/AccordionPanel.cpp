@@ -32,8 +32,8 @@ namespace Metal {
     bool AccordionPanel::isVisible() const {
         if (!filter || filter->empty()) return true;
 
-        for (const auto panel : children) {
-            if (auto abstractPanel = dynamic_cast<AbstractFormFieldPanel*>(panel)) {
+        for (const auto &panel : children) {
+            if (auto abstractPanel = std::dynamic_pointer_cast<AbstractFormFieldPanel>(panel)) {
                 if (abstractPanel->isVisible()) return true;
             }
         }

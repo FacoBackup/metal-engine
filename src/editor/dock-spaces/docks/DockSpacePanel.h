@@ -8,6 +8,7 @@
 #include "../../abstract/AbstractPanel.h"
 
 namespace Metal {
+    class DockService;
     struct DockDTO;
     struct DockSpace;
     class AbstractDockPanel;
@@ -23,15 +24,16 @@ namespace Metal {
         bool sizeInitialized = false;
         int stylePushCount = 0;
         int styleColorPushCount = 0;
-        DockSpacePanel *mainWindow = nullptr;
-        DockDTO *dock = nullptr;
-        AbstractDockPanel *view = nullptr;
-        std::unordered_map<int, AbstractDockPanel *> views{};
+        std::shared_ptr<DockSpacePanel> mainWindow = nullptr;
+        std::shared_ptr<DockDTO> dock = nullptr;
+        std::shared_ptr<AbstractDockPanel> view = nullptr;
+        std::unordered_map<int, std::shared_ptr<AbstractDockPanel>> views{};
         ImVec2 headerPadding{0, 3};
         float headerHeight = 25.0f;
 
         EditorRepository *editorRepository = nullptr;
         ThemeService *themeService = nullptr;
+        DockService *dockService = nullptr;
 
         DockSpace *getSelectedDockSpace() const;
 
@@ -43,21 +45,22 @@ namespace Metal {
         std::vector<Dependency> getDependencies() override {
             return {
                 {"EditorRepository", &editorRepository},
-                {"ThemeService", &themeService}
+                {"ThemeService", &themeService},
+                {"DockService", &dockService}
             };
         }
 
         static constexpr int FLAGS = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_MenuBar;
-                static const ImVec2 DEFAULT;
+        static const ImVec2 DEFAULT;
         static const ImVec2 MAX_SIZE;
         static const ImVec2 PIVOT;
         static const float FRAME_SIZE;
         static const ImVec2 MIN_SIZE;
 
-        explicit DockSpacePanel(DockSpacePanel *mainWindow, DockDTO *dock) : mainWindow(mainWindow), dock(dock) {
+        explicit DockSpacePanel(std::shared_ptr<DockSpacePanel> mainWindow, std::shared_ptr<DockDTO> dock) : mainWindow(mainWindow), dock(dock) {
         }
 
-        [[nodiscard]] DockDTO *getDock() const {
+        [[nodiscard]] std::shared_ptr<DockDTO> getDock() const {
             return dock;
         }
 
@@ -69,7 +72,7 @@ namespace Metal {
 
         void onSync() override;
 
-        [[nodiscard]] AbstractDockPanel *getView() const;
+        [[nodiscard]] std::shared_ptr<AbstractDockPanel> getView() const;
 
         void beforeWindow() const;
 

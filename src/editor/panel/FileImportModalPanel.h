@@ -10,7 +10,7 @@ namespace Metal {
     class NotificationService;
 
     class FileImportModalPanel final : public AbstractPanel {
-        FormPanel *formPanel = nullptr;
+        std::shared_ptr<FormPanel> formPanel = nullptr;
         bool isFirst = false;
 
         EditorRepository *editorRepository = nullptr;

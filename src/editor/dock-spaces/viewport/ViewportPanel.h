@@ -14,10 +14,10 @@ namespace Metal {
 
     class ViewportPanel final : public AbstractDockPanel {
         bool isFirstMovement = false;
-        AbstractPanel *headerPanel = nullptr;
-        AbstractPanel *gizmoPanel = nullptr;
-        AbstractPanel *cameraPanel = nullptr;
-        AbstractPanel *engineFramePanel = nullptr;
+        std::shared_ptr<AbstractPanel> headerPanel = nullptr;
+        std::shared_ptr<AbstractPanel> gizmoPanel = nullptr;
+        std::shared_ptr<AbstractPanel> cameraPanel = nullptr;
+        std::shared_ptr<AbstractPanel> engineFramePanel = nullptr;
 
         CameraService *cameraService = nullptr;
         SelectionService *selectionService = nullptr;

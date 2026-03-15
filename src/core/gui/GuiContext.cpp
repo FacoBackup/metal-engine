@@ -131,7 +131,7 @@ namespace Metal {
         fontConfig->MergeMode = true;
         fontConfig->GlyphOffset = ImVec2(-2, 4);
         constexpr auto MIN = static_cast<ImWchar16>(0xF1000);
-        constexpr auto MAX = static_cast<ImWchar16>(0xFF000);
+        constexpr auto MAX = static_cast<ImWchar16>(0xFFFFD);
         constexpr ImWchar RANGES[] = {MIN, MAX, 0};
         io.Fonts->AddFontFromFileTTF("resources/fonts/MaterialIcons.ttf", 18, fontConfig, RANGES);
         largeIconsFont = io.Fonts->AddFontFromFileTTF("resources/fonts/MaterialIcons.ttf", LARGE_FONT_SIZE, nullptr,

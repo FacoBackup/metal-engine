@@ -34,9 +34,9 @@ namespace Metal {
         ImGui::SameLine();
 
         ImGui::Text(filesContext.pathToCurrentDirectory.c_str());
-        UIUtil::DynamicSpacing(200);
+        UIUtil::DynamicSpacing(212);
 
-        ImGui::SetNextItemWidth(100);
+        ImGui::SetNextItemWidth(112);
         const auto &currentDTO = EntryType::GetDTO(filesContext.filterType);
         std::string filterLabel = currentDTO.icon + " " + currentDTO.name;
         if (ImGui::Button((filterLabel + id + "filter").c_str(), ImVec2(100, 0))) {

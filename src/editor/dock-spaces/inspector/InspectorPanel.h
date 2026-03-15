@@ -14,7 +14,7 @@ namespace Metal {
         std::vector<Inspectable *> additionalInspection{};
         Inspectable *selectedEntity = nullptr;
 
-        FormPanel *formPanel = nullptr;
+        std::shared_ptr<FormPanel> formPanel = nullptr;
         entt::entity selectedId = EMPTY_ENTITY;
 
         EditorRepository *editorRepository = nullptr;

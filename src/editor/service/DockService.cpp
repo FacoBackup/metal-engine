@@ -9,14 +9,14 @@
 
 namespace Metal {
     void DockService::onInitialize() {
-        auto *rightT = new DockDTO{&DockSpace::WORLD};
-        auto *leftT = new DockDTO{&DockSpace::REPOSITORIES};
-        auto *leftB = new DockDTO{&DockSpace::INSPECTOR};
-        auto *rightB = new DockDTO{&DockSpace::CONSOLE};
-        auto *b = new DockDTO{&DockSpace::FILES};
+        auto rightT = std::make_shared<DockDTO>(&DockSpace::WORLD);
+        auto leftT = std::make_shared<DockDTO>(&DockSpace::REPOSITORIES);
+        auto leftB = std::make_shared<DockDTO>(&DockSpace::INSPECTOR);
+        auto rightB = std::make_shared<DockDTO>(&DockSpace::CONSOLE);
+        auto b = std::make_shared<DockDTO>(&DockSpace::FILES);
 
-        center.isCenter = true;
-        center.sizeRatioForNodeAtDir = 0.5f;
+        center->isCenter = true;
+        center->sizeRatioForNodeAtDir = 0.5f;
         rightT->sizeRatioForNodeAtDir = 0.25f;
         leftT->sizeRatioForNodeAtDir = 0.2f;
         leftB->sizeRatioForNodeAtDir = 0.5f;
@@ -39,35 +39,34 @@ namespace Metal {
             }
             isInitialized = true;
 
-            std::vector<AbstractPanel *> toKeep{};
-            for (auto *child: panel->getChildren()) {
-                auto *p = dynamic_cast<DockSpacePanel *>(child);
-                if (p == nullptr) {
-                    toKeep.push_back(child);
-                } else {
-                    p->removeAllChildren();
-                    delete p->getDock();
-                    delete p;
-                }
-            }
+            std::vector<std::shared_ptr<DockDTO>> allDocks;
+            allDocks.insert(allDocks.end(), left.begin(), left.end());
+            allDocks.insert(allDocks.end(), right.begin(), right.end());
+            allDocks.insert(allDocks.end(), bottom.begin(), bottom.end());
+            allDocks.push_back(center);
 
-            panel->getChildren().clear();
-            for (auto *child: toKeep) {
-                panel->getChildren().push_back(child);
-            }
+            auto &children = panel->getChildren();
+            children.erase(
+                std::remove_if(children.begin(), children.end(), [&](const std::shared_ptr<AbstractPanel> &child) {
+                    auto dsPanel = std::dynamic_pointer_cast<DockSpacePanel>(child);
+                    if (dsPanel == nullptr) return false;
+                    auto it = std::find(allDocks.begin(), allDocks.end(), dsPanel->getDock());
+                    return it == allDocks.end();
+                }),
+                children.end());
 
             ImGui::DockBuilderRemoveNode(windowId);
             ImGui::DockBuilderAddNode(windowId, ImGuiDockNodeFlags_NoTabBar);
             ImGui::DockBuilderSetNodeSize(windowId, ImGui::GetMainViewport()->Size);
 
             for (size_t i = 0; i < left.size(); i++) {
-                DockDTO *dockSpace = left[i];
+                auto dockSpace = left[i];
                 if (i == 0) {
                     dockSpace->origin = nullptr;
                     dockSpace->outAtOppositeDir = nullptr;
                     dockSpace->splitDir = ImGuiDir_Left;
                 } else {
-                    DockDTO *previous = left[i - 1];
+                    auto previous = left[i - 1];
                     dockSpace->origin = previous;
                     dockSpace->outAtOppositeDir = previous;
                     dockSpace->splitDir = ImGuiDir_Down;
@@ -77,13 +76,13 @@ namespace Metal {
             }
 
             for (size_t i = 0; i < right.size(); i++) {
-                DockDTO *dockSpace = right[i];
+                auto dockSpace = right[i];
                 if (i == 0) {
                     dockSpace->origin = nullptr;
                     dockSpace->outAtOppositeDir = nullptr;
                     dockSpace->splitDir = ImGuiDir_Right;
                 } else {
-                    DockDTO *previous = right[i - 1];
+                    auto previous = right[i - 1];
                     dockSpace->origin = previous;
                     dockSpace->outAtOppositeDir = previous;
                     dockSpace->splitDir = ImGuiDir_Down;
@@ -93,13 +92,13 @@ namespace Metal {
             }
 
             for (size_t i = 0, bottomSize = bottom.size(); i < bottomSize; i++) {
-                DockDTO *dockSpace = bottom[i];
+                auto dockSpace = bottom[i];
                 if (i == 0) {
                     dockSpace->origin = nullptr;
                     dockSpace->outAtOppositeDir = nullptr;
                     dockSpace->splitDir = ImGuiDir_Down;
                 } else {
-                    DockDTO *previous = bottom[i - 1];
+                    auto previous = bottom[i - 1];
                     dockSpace->origin = previous;
                     dockSpace->outAtOppositeDir = previous;
                     dockSpace->splitDir = ImGuiDir_Right;
@@ -108,15 +107,60 @@ namespace Metal {
                 addWindow(dockSpace, panel);
             }
 
-            center.nodeId = windowId;
-            addWindow(&center, panel);
+            center->nodeId = windowId;
+            addWindow(center, panel);
 
-            ImGui::DockBuilderDockWindow(center.internalId.c_str(), windowId);
+            ImGui::DockBuilderDockWindow(center->internalId.c_str(), windowId);
             ImGui::DockBuilderFinish(windowId);
         }
     }
 
-    void DockService::createDockSpace(DockDTO *dockSpace, ImGuiID *dockMainId) {
+    void DockService::removeDock(std::shared_ptr<DockDTO> dock) {
+        if (dock == nullptr || dock->isCenter) {
+            return;
+        }
+
+        auto removeIt = [&](std::vector<std::shared_ptr<DockDTO>> &vec) {
+            auto it = std::find(vec.begin(), vec.end(), dock);
+            if (it != vec.end()) {
+                vec.erase(it);
+                return true;
+            }
+            return false;
+        };
+
+        bool removed = false;
+        if (removeIt(left)) removed = true;
+        else if (removeIt(right)) removed = true;
+        else if (removeIt(bottom)) removed = true;
+
+        if (removed) {
+            isInitialized = false;
+        }
+    }
+
+    void DockService::addLeftDock() {
+        auto d = std::make_shared<DockDTO>(&DockSpace::CONSOLE);
+        d->sizeRatioForNodeAtDir = 0.25f;
+        left.push_back(d);
+        isInitialized = false;
+    }
+
+    void DockService::addBottomDock() {
+        auto d = std::make_shared<DockDTO>(&DockSpace::CONSOLE);
+        d->sizeRatioForNodeAtDir = 0.25f;
+        bottom.push_back(d);
+        isInitialized = false;
+    }
+
+    void DockService::addRightDock() {
+        auto d = std::make_shared<DockDTO>(&DockSpace::CONSOLE);
+        d->sizeRatioForNodeAtDir = 0.25f;
+        right.push_back(d);
+        isInitialized = false;
+    }
+
+    void DockService::createDockSpace(std::shared_ptr<DockDTO> dockSpace, ImGuiID *dockMainId) {
         ImGuiID origin = *dockMainId;
         if (dockSpace->origin != nullptr) {
             origin = dockSpace->origin->nodeId;
@@ -133,14 +177,22 @@ namespace Metal {
         imGuiDockNode->LocalFlags = ImGuiDockNodeFlags_NoTabBar;
     }
 
-    void DockService::addWindow(DockDTO *d, AbstractPanel *panel) {
+    void DockService::addWindow(std::shared_ptr<DockDTO> d, AbstractPanel *panel) {
         ImGui::DockBuilderDockWindow(d->internalId.c_str(), d->nodeId);
-        for (auto *l: panel->getChildren()) {
-            if (dynamic_cast<DockSpacePanel *>(l)) {
-                panel->initializePanel(new DockSpacePanel(dynamic_cast<DockSpacePanel *>(l), d));
+        for (auto &l: panel->getChildren()) {
+            auto dsPanel = std::dynamic_pointer_cast<DockSpacePanel>(l);
+            if (dsPanel != nullptr && dsPanel->getDock() == d) {
                 return;
             }
         }
-        panel->initializePanel(new DockSpacePanel(nullptr, d));
+        
+        for (auto &l: panel->getChildren()) {
+            auto dsPanel = std::dynamic_pointer_cast<DockSpacePanel>(l);
+            if (dsPanel != nullptr) {
+                panel->initializePanel<DockSpacePanel>(true, dsPanel, d);
+                return;
+            }
+        }
+        panel->initializePanel<DockSpacePanel>(true, nullptr, d);
     }
 }

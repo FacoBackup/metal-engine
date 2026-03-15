@@ -19,13 +19,14 @@ namespace Metal {
     class NotificationService;
     struct WorldRepository;
     class VoxelService;
+    class FilesListPanel;
 
     class FilesPanel : public AbstractDockPanel {
     protected:
         FilesContext filesContext{nullptr};
-        FilePreviewPanel *previewPanel = nullptr;
-        AbstractPanel *filesHeader = nullptr;
-        AbstractPanel *filesListPanel = nullptr;
+        std::shared_ptr<FilePreviewPanel> previewPanel = nullptr;
+        std::shared_ptr<AbstractPanel> filesHeader = nullptr;
+        std::shared_ptr<FilesListPanel> filesListPanel = nullptr;
         float previewWidth = 200.0f;
 
         FileImporterService *fileImporterService = nullptr;

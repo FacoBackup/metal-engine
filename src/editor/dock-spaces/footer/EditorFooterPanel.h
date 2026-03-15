@@ -11,7 +11,7 @@ namespace Metal {
     class EditorFooterPanel final : public AbstractPanel {
         EditorRepository *editorRepository = nullptr;
         ThemeService *themeService = nullptr;
-        AsyncTaskPanel *asyncTaskPanel = nullptr;
+        std::shared_ptr<AsyncTaskPanel> asyncTaskPanel = nullptr;
 
         void renderShortcuts();
         void framerate();

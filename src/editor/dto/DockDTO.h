@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <imgui.h>
+#include <memory>
 #include "DockSpace.h"
 #include "../util/Util.h"
 
@@ -18,8 +19,8 @@ namespace Metal {
         float sizeX{};
         float sizeY{};
         float sizeRatioForNodeAtDir{};
-        DockDTO *outAtOppositeDir = nullptr;
-        DockDTO *origin = nullptr;
+        std::shared_ptr<DockDTO> outAtOppositeDir = nullptr;
+        std::shared_ptr<DockDTO> origin = nullptr;
         std::vector<DockSpace *> dockSpaces{};
 
 

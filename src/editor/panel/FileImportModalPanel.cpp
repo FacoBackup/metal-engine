@@ -12,8 +12,7 @@
 
 namespace Metal {
     void FileImportModalPanel::onInitialize() {
-        formPanel = new FormPanel();
-        initializePanel(formPanel);
+        formPanel = initializePanel<FormPanel>();
     }
 
     void FileImportModalPanel::onSync() {

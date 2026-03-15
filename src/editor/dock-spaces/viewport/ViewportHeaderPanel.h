@@ -11,7 +11,7 @@ namespace Metal {
     class ViewportHeaderPanel final : public AbstractPanel {
         static constexpr int FLAGS = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground |
                                      ImGuiWindowFlags_NoCollapse;
-        AbstractPanel *gizmo = nullptr;
+        std::shared_ptr<AbstractPanel> gizmo = nullptr;
         int shadingModelOption = 0;
 
         EditorRepository *editorRepository = nullptr;
