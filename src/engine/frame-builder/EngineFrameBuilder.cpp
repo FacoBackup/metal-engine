@@ -1,6 +1,6 @@
 #include "EngineFrameBuilder.h"
 
-#include "../../core/vulkan/VulkanContext.h"
+#include "../../core/VulkanContext.h"
 #include "structures/FramebufferBuilder.h"
 #include "structures/TextureBuilder.h"
 #include "structures/BufferBuilder.h"

@@ -1,6 +1,6 @@
 #include "ShaderModule.h"
 
-#include "../../core/vulkan/VulkanContext.h"
+#include "../../core/VulkanContext.h"
 
 namespace Metal {
     void ShaderModule::initialize(glslang_program_t *program) {

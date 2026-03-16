@@ -4,7 +4,7 @@
 #include "../../resource/TextureInstance.h"
 #include "../../service/RayTracingService.h"
 #include "../../service/PipelineService.h"
-#include "../../../core/vulkan/VulkanContext.h"
+#include "../../../core/VulkanContext.h"
 #include "../../../engine/EngineContext.h"
 #include "../../../engine/repository/EngineRepository.h"
 #include "../../../editor/enum/EngineResourceIDs.h"

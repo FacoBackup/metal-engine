@@ -3,7 +3,7 @@
 #include "../../engine/resource/BufferInstance.h"
 #include "../../engine/resource/TextureInstance.h"
 #include "../../ApplicationContext.h"
-#include "../../core/vulkan/VulkanContext.h"
+#include "../../core/VulkanContext.h"
 #include "../../engine/service/BufferService.h"
 #include "../../engine/repository/WorldRepository.h"
 #include "../../engine/dto/PrimitiveComponent.h"

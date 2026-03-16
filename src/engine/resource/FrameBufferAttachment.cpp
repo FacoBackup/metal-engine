@@ -1,6 +1,6 @@
 #include "FrameBufferAttachment.h"
 #include "../service/DescriptorSetService.h"
-#include "../../core/vulkan/VulkanContext.h"
+#include "../../core/VulkanContext.h"
 
 namespace Metal {
     void FrameBufferAttachment::dispose() const {

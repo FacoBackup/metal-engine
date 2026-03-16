@@ -3,37 +3,40 @@
 
 #include <imgui.h>
 #include <imgui_impl_vulkan.h>
-#include "../../common/IService.h"
-#include "../../common/IDisposable.h"
-#include "../../common/IInit.h"
+#include "../common/IService.h"
+#include "../common/IDisposable.h"
+#include "../common/IInit.h"
 
 namespace Metal {
-    class GLFWContext;
+    class WindowService;
     struct FrameBufferAttachment;
     struct TextureInstance;
 
     class VulkanContext;
     class DescriptorSetService;
 
-    class GuiContext final : public IService, public IInit {
+    class ImGuiService final : public IService, public IInit {
         VulkanContext *vulkanContext = nullptr;
-        GLFWContext *glfwContext = nullptr;
+        WindowService *windowService = nullptr;
         DescriptorSetService *descriptorSetService = nullptr;
 
         static void applySpacing();
 
         void applyFonts();
 
+        bool swapChainRebuild = false;
         ImDrawData *drawData = nullptr;
         ImFont *largeIconsFont = nullptr;
 
     public:
-        GuiContext() = default;
+        void setSwapChainRebuild(const bool val) {
+            swapChainRebuild = val;
+        }
 
         std::vector<Dependency> getDependencies() override {
             return {
                 {"VulkanContext", &vulkanContext},
-                {"GLFWContext", &glfwContext},
+                {"WindowService", &windowService},
                 {"DescriptorSetService", &descriptorSetService}
             };
         }
@@ -44,13 +47,15 @@ namespace Metal {
 
         void disposeManually();
 
+        bool beginFrame();
+
+        void presentFrame();
+
         void onInitialize() override;
 
         void endFrame();
 
         void renderImage(TextureInstance *texture, float sizeX, float sizeY) const;
-
-        static void BeginFrame();
 
         static void RecordImguiCommandBuffer(ImDrawData *drawData, VkResult &err, ImGui_ImplVulkanH_Window &wd,
                                              ImGui_ImplVulkanH_Frame *fd);

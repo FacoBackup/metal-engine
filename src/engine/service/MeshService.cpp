@@ -3,7 +3,7 @@
 #include "../dto/MeshData.h"
 #include "../../editor/dto/SceneData.h"
 
-#include "../../core/vulkan/VulkanContext.h"
+#include "../../core/VulkanContext.h"
 #include "../../common/FilesUtil.h"
 #include "../../common/LoggerUtil.h"
 #include "../../core/DirectoryService.h"

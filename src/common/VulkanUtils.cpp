@@ -1,8 +1,8 @@
 #include "VulkanUtils.h"
 
-#include "../../../dependencies/vk-bootstrap/src/VkBootstrap.h"
-#include "../../ApplicationContext.h"
-#include "../../common/LoggerUtil.h"
+#include "../../dependencies/vk-bootstrap/src/VkBootstrap.h"
+#include "../ApplicationContext.h"
+#include "LoggerUtil.h"
 
 namespace Metal {
     void VulkanUtils::CheckVKResult(VkResult err) {

@@ -3,12 +3,12 @@
 #include <nfd.h>
 #include <GLFW/glfw3.h>
 
-#include "gui/GuiContext.h"
-#include "vulkan/VulkanContext.h"
-#include "glfw/GLFWContext.h"
+#include "ImGuiService.h"
+#include "VulkanContext.h"
+#include "WindowService.h"
 #include "../editor/abstract/AbstractPanel.h"
 #include "../engine/EngineContext.h"
-#include "vulkan/VulkanUtils.h"
+#include "../common/VulkanUtils.h"
 
 namespace Metal {
     unsigned int FrameService::getFrameIndex() const {
@@ -16,7 +16,7 @@ namespace Metal {
     }
 
     bool FrameService::isValidContext() const {
-        return glfwContext->isValidContext();
+        return windowService->isValidContext();
     }
 
     void FrameService::setPanel(AbstractPanel *panel) {
@@ -24,10 +24,10 @@ namespace Metal {
     }
 
     void FrameService::start() const {
-        GLFWwindow *window = glfwContext->getWindow();
+        GLFWwindow *window = windowService->getWindow();
         while (!glfwWindowShouldClose(window)) {
-            if (glfwContext->beginFrame()) {
-                GuiContext::BeginFrame();
+            glfwPollEvents();
+            if (imguiService->beginFrame()) {
                 panel->onSync();
                 ImGui::Render();
                 auto *drawData = ImGui::GetDrawData();
@@ -40,7 +40,7 @@ namespace Metal {
                                                          imageAcquiredSemaphore, VK_NULL_HANDLE,
                                                          &wd.FrameIndex);
                     if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR) {
-                        glfwContext->setSwapChainRebuild(true);
+                        imguiService->setSwapChainRebuild(true);
                         return;
                     }
 
@@ -52,12 +52,12 @@ namespace Metal {
                     VulkanUtils::CheckVKResult(vkResetCommandPool(vulkanContext->device.device, fd->CommandPool,
                                                                   VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT));
                     engineContext->onSync();
-                    GuiContext::RecordImguiCommandBuffer(drawData, err, wd, fd);
+                    ImGuiService::RecordImguiCommandBuffer(drawData, err, wd, fd);
                     vulkanContext->submitFrame(imageAcquiredSemaphore, wd.FrameSemaphores[wd.SemaphoreIndex].
-                                              RenderCompleteSemaphore, fd);
+                                               RenderCompleteSemaphore, fd);
                 }
                 if (!main_is_minimized)
-                    glfwContext->presentFrame();
+                    imguiService->presentFrame();
             }
         }
     }

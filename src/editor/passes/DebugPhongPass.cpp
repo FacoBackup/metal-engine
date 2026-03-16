@@ -7,7 +7,7 @@
 #include "../../engine/repository/WorldRepository.h"
 #include "../../engine/service/MeshService.h"
 #include "../enum/EngineResourceIDs.h"
-#include "core/vulkan/VulkanContext.h"
+#include "../../core/VulkanContext.h"
 
 namespace Metal {
     void DebugPhongPass::onInitialize() {

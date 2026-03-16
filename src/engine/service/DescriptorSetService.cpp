@@ -2,14 +2,14 @@
 #include "../dto/PipelineBuilder.h"
 #include "../resource/BufferInstance.h"
 #include "../../common/LoggerUtil.h"
-#include "../../core/vulkan/VulkanContext.h"
+#include "../../core/VulkanContext.h"
 #include "FrameBufferService.h"
 #include "BufferService.h"
 #include "TextureService.h"
 #include "../resource/FrameBufferAttachment.h"
 #include "../resource/FrameBufferInstance.h"
 #include "../resource/TextureInstance.h"
-#include "../../core/vulkan/VulkanUtils.h"
+#include "../../common/VulkanUtils.h"
 
 namespace Metal {
     DescriptorInstance *DescriptorSetService::createDescriptor(const PipelineBuilder &pipelineBuilder,

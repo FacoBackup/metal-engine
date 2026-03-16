@@ -1,7 +1,7 @@
 #include "EditorHeaderPanel.h"
 #include "../../util/UIUtil.h"
 #include "../../../core/DirectoryService.h"
-#include "../../../core/glfw/GLFWContext.h"
+#include "../../../core/WindowService.h"
 #include "../../../engine/EngineContext.h"
 #include "../../service/DockService.h"
 #include "editor/service/HistoryService.h"

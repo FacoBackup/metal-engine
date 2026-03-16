@@ -11,8 +11,8 @@
 #include <string>
 
 #include "../dto/TextureData.h"
-#include "../../core/vulkan/VulkanContext.h"
-#include "../../core/vulkan/VulkanUtils.h"
+#include "../../core/VulkanContext.h"
+#include "../../common/VulkanUtils.h"
 #include "../resource/TextureInstance.h"
 #include "../resource/BufferInstance.h"
 #include "BufferService.h"

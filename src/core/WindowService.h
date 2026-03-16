@@ -8,9 +8,9 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
-#include "../../common/IContextMember.h"
-#include "../../common/IDisposable.h"
-#include "../../common/IInit.h"
+#include "../common/IContextMember.h"
+#include "../common/IDisposable.h"
+#include "../common/IInit.h"
 
 
 #include <functional>
@@ -23,25 +23,21 @@ namespace Metal {
     class VulkanContext;
     class ThemeService;
 
-    class GLFWContext final : public IContextMember, public IInit {
+    class WindowService final : public IContextMember, public IInit {
         VulkanContext *vulkanContext = nullptr;
         ThemeService *themeService = nullptr;
         GLFWwindow *window = nullptr;
         bool validContext = true;
-        bool swapChainRebuild = false;
         ImVector<const char *> instance_extensions{};
 
         std::vector<std::function<void(int button, int action, int mods)>> mouseButtonCallbacks;
         std::vector<std::function<void(double xpos, double ypos)>> cursorPosCallbacks;
 
     public:
+
         std::vector<Dependency> getDependencies() override {
             return {{"VulkanContext", &vulkanContext}, {"ThemeService", &themeService}};
         }
-
-        void setSwapChainRebuild(bool val);
-
-        void presentFrame();
 
         [[nodiscard]] const ImVector<const char *> &getInstanceExtensions() const;
 
@@ -51,11 +47,7 @@ namespace Metal {
 
         [[nodiscard]] bool isValidContext() const;
 
-        bool beginFrame();
-
         void disposeManually();
-
-        [[nodiscard]] ImGui_ImplVulkanH_Window &getGUIWindow() const;
 
         void addMouseButtonCallback(std::function<void(int button, int action, int mods)> callback) {
             mouseButtonCallbacks.push_back(std::move(callback));

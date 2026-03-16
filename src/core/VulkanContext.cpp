@@ -1,14 +1,14 @@
 #include "VulkanContext.h"
 #include "VkBootstrap.h"
-#include "VulkanUtils.h"
-#include "../../ApplicationContext.h"
-#include "../../common/LoggerUtil.h"
+#include "../common/VulkanUtils.h"
+#include "../ApplicationContext.h"
+#include "../common/LoggerUtil.h"
 
-#include "../glfw/GLFWContext.h"
-#include "../../engine/repository/EngineRepository.h"
-#include "../../engine/service/MeshService.h"
-#include "../../engine/service/TextureService.h"
-#include "../../engine/service/FrameBufferService.h"
+#include "WindowService.h"
+#include "../engine/repository/EngineRepository.h"
+#include "../engine/service/MeshService.h"
+#include "../engine/service/TextureService.h"
+#include "../engine/service/FrameBufferService.h"
 
 namespace Metal {
 
@@ -256,7 +256,7 @@ namespace Metal {
     }
 
     void VulkanContext::onInitialize() {
-        this->window = glfwContext->getWindow();
+        this->window = windowService->getWindow();
         
         imguiVulkanWindow.ClearValue.color.float32[0] = 0;
         imguiVulkanWindow.ClearValue.color.float32[1] = 0;
@@ -266,7 +266,7 @@ namespace Metal {
 
         // ------- CORE INITIALIZATION
         // ----- INSTANCE AND EXTENSIONS
-        addExtensions(instanceBuilder, glfwContext->getInstanceExtensions());
+        addExtensions(instanceBuilder, windowService->getInstanceExtensions());
         auto vkbResult = instanceBuilder
                 .set_app_name(ENGINE_NAME)
                 .set_engine_name(ENGINE_NAME)

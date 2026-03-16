@@ -1,34 +1,28 @@
-#include "GuiContext.h"
+#include "ImGuiService.h"
 
 #include <imgui_impl_glfw.h>
 #include "imgui_freetype.h"
-#include "../../ApplicationContext.h"
-#include "../vulkan/VulkanUtils.h"
-#include "../../engine/dto/DescriptorInstance.h"
-#include "../../engine/resource/TextureInstance.h"
+#include "../ApplicationContext.h"
+#include "../common/VulkanUtils.h"
+#include "../engine/dto/DescriptorInstance.h"
+#include "../engine/resource/TextureInstance.h"
 
-#include "../vulkan/VulkanContext.h"
-#include "../glfw/GLFWContext.h"
-#include "../../engine/service/DescriptorSetService.h"
-#include "../../editor/enum/engine-definitions.h"
+#include "VulkanContext.h"
+#include "WindowService.h"
+#include "../engine/service/DescriptorSetService.h"
+#include "../editor/enum/engine-definitions.h"
 
 namespace Metal {
-    void GuiContext::endFrame() {
+    void ImGuiService::endFrame() {
     }
 
-    void GuiContext::renderImage(TextureInstance *texture, const float sizeX, const float sizeY) const {
+    void ImGuiService::renderImage(TextureInstance *texture, const float sizeX, const float sizeY) const {
         descriptorSetService->setImageDescriptor(texture);
         ImGui::Image(reinterpret_cast<ImTextureID>(texture->imageDescriptor->vkDescriptorSet), ImVec2{sizeX, sizeY});
     }
 
-    void GuiContext::BeginFrame() {
-        ImGui_ImplVulkan_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-    }
-
-    void GuiContext::RecordImguiCommandBuffer(ImDrawData *drawData, VkResult &err, ImGui_ImplVulkanH_Window &wd,
-                                              ImGui_ImplVulkanH_Frame *fd) {
+    void ImGuiService::RecordImguiCommandBuffer(ImDrawData *drawData, VkResult &err, ImGui_ImplVulkanH_Window &wd,
+                                                ImGui_ImplVulkanH_Frame *fd) {
         VkCommandBufferBeginInfo info = {};
         info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         info.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
@@ -53,7 +47,7 @@ namespace Metal {
         vkCmdEndRenderPass(fd->CommandBuffer);
     }
 
-    void GuiContext::onInitialize() {
+    void ImGuiService::onInitialize() {
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -66,7 +60,7 @@ namespace Metal {
         io.ConfigWindowsResizeFromEdges = true;
 
         // Setup Platform/Renderer backends
-        ImGui_ImplGlfw_InitForVulkan(glfwContext->getWindow(), true);
+        ImGui_ImplGlfw_InitForVulkan(windowService->getWindow(), true);
         ImGui_ImplVulkan_InitInfo init_info = {};
         init_info.Instance = vulkanContext->instance.instance;
         init_info.PhysicalDevice = vulkanContext->physDevice.physical_device;
@@ -88,7 +82,7 @@ namespace Metal {
         applyFonts();
     }
 
-    void GuiContext::applySpacing() {
+    void ImGuiService::applySpacing() {
         ImGuiStyle &style = ImGui::GetStyle();
         constexpr float borderRadius = 3.f;
         constexpr float borderWidth = 1;
@@ -119,7 +113,7 @@ namespace Metal {
         style.Alpha = 1;
     }
 
-    void GuiContext::applyFonts() {
+    void ImGuiService::applyFonts() {
         ImGuiIO &io = ImGui::GetIO();
         io.Fonts->FontBuilderIO = ImGuiFreeType::GetBuilderForFreeType();
 
@@ -141,14 +135,67 @@ namespace Metal {
         delete fontConfig;
     }
 
-    void GuiContext::disposeManually() {
+    void ImGuiService::disposeManually() {
         const VkResult err = vkDeviceWaitIdle(vulkanContext->device.device);
         VulkanUtils::CheckVKResult(err);
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
         ImGui_ImplVulkanH_DestroyWindow(vulkanContext->instance.instance, vulkanContext->device.device,
-                                        &glfwContext->getGUIWindow(),
+                                        &vulkanContext->imguiVulkanWindow,
                                         nullptr);
+    }
+
+    bool ImGuiService::beginFrame() {
+        // Resize swap chain
+        int fb_width, fb_height;
+        glfwGetFramebufferSize(windowService->getWindow(), &fb_width, &fb_height);
+        if (fb_width > 0 && fb_height > 0 &&
+            (swapChainRebuild || vulkanContext->imguiVulkanWindow.Width !=
+             fb_width ||
+             vulkanContext->imguiVulkanWindow.Height != fb_height)) {
+            ImGui_ImplVulkan_SetMinImageCount(MAX_FRAMES_IN_FLIGHT);
+            ImGui_ImplVulkanH_CreateOrResizeWindow(vulkanContext->instance.instance,
+                                                   vulkanContext->physDevice.physical_device,
+                                                   vulkanContext->device.device,
+                                                   &vulkanContext->imguiVulkanWindow,
+                                                   vulkanContext->queueFamily,
+                                                   nullptr, fb_width,
+                                                   fb_height,
+                                                   MAX_FRAMES_IN_FLIGHT);
+            vulkanContext->imguiVulkanWindow.FrameIndex = 0;
+            swapChainRebuild = false;
+        }
+        if (glfwGetWindowAttrib(windowService->getWindow(), GLFW_ICONIFIED) != 0) {
+            ImGui_ImplGlfw_Sleep(10);
+            return false;
+        }
+        ImGui_ImplVulkan_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        return true;
+    }
+
+    void ImGuiService::presentFrame() {
+        if (swapChainRebuild) {
+            return;
+        }
+        auto &wd = vulkanContext->imguiVulkanWindow;
+        VkSemaphore semaphore = wd.FrameSemaphores[wd.SemaphoreIndex].RenderCompleteSemaphore;
+        VkPresentInfoKHR info = {};
+        info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        info.waitSemaphoreCount = 1;
+        info.pWaitSemaphores = &semaphore;
+        info.swapchainCount = 1;
+        info.pSwapchains = &wd.Swapchain;
+        info.pImageIndices = &wd.FrameIndex;
+        VkResult err = vkQueuePresentKHR(vulkanContext->graphicsQueue, &info);
+        if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR) {
+            swapChainRebuild = true;
+            return;
+        }
+        VulkanUtils::CheckVKResult(err);
+        wd.SemaphoreIndex =
+                (wd.SemaphoreIndex + 1) % wd.SemaphoreCount; // Now we can use the next set of semaphores
     }
 }

@@ -22,7 +22,7 @@
 #include "../../passes/SelectionIDPass.h"
 #include "../../passes/DebugPhongPass.h"
 #include "../../passes/SelectionOutlinePass.h"
-#include "../../../core/vulkan/VulkanContext.h"
+#include "../../../core/VulkanContext.h"
 #include "../../../engine/repository/EngineRepository.h"
 #include "../../../engine/EngineContext.h"
 #include "../../../engine/service/DescriptorSetService.h"

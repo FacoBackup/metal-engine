@@ -6,14 +6,14 @@
 #include "imgui_impl_vulkan.h"
 #include <GLFW/glfw3.h>
 #include "VkBootstrap.h"
-#include "../../common/IInit.h"
-#include "../../common/IService.h"
-#include "../../common/IDisposable.h"
+#include "../common/IInit.h"
+#include "../common/IService.h"
+#include "../common/IDisposable.h"
 
 #define VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME "VK_KHR_portability_subset"
 
 namespace Metal {
-    class GLFWContext;
+    class WindowService;
     struct EngineRepository;
     class MeshService;
     class TextureService;
@@ -22,7 +22,7 @@ namespace Metal {
     class RayTracingService;
 
     class VulkanContext final : public IService, public IInit {
-        GLFWContext *glfwContext = nullptr;
+        WindowService *windowService = nullptr;
         EngineRepository *engineRepository = nullptr;
         MeshService *meshService = nullptr;
         TextureService *textureService = nullptr;
@@ -69,7 +69,7 @@ namespace Metal {
 
         std::vector<Dependency> getDependencies() override {
             return {
-                {"GLFWContext", &glfwContext},
+                {"WindowService", &windowService},
                 {"EngineRepository", &engineRepository},
                 {"MeshService", &meshService},
                 {"TextureService", &textureService},

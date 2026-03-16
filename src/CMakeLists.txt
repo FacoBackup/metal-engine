@@ -4,14 +4,14 @@ set(ENGINE_SOURCES
         editor/EditorPanel.h
         engine/EngineContext.cpp
         engine/EngineContext.h
-        core/vulkan/VulkanUtils.cpp
-        core/vulkan/VulkanUtils.h
-        core/vulkan/VulkanContext.cpp
-        core/vulkan/VulkanContext.h
-        core/glfw/GLFWContext.cpp
-        core/glfw/GLFWContext.h
-        core/gui/GuiContext.cpp
-        core/gui/GuiContext.h
+        common/VulkanUtils.cpp
+        common/VulkanUtils.h
+        core/VulkanContext.cpp
+        core/VulkanContext.h
+        core/WindowService.cpp
+        core/WindowService.h
+        core/ImGuiService.cpp
+        core/ImGuiService.h
         editor/dock-spaces/viewport/ViewportPanel.cpp
         editor/dock-spaces/viewport/ViewportPanel.h
         editor/dock-spaces/viewport/EngineFramePanel.cpp

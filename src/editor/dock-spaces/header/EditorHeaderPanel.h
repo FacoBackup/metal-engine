@@ -9,13 +9,13 @@
 namespace Metal {
     class HistoryService;
     class ThemeService;
-    class GLFWContext;
+    class WindowService;
     class EngineContext;
     struct DirectoryService;
     class DockService;
 
     class EditorHeaderPanel final : public AbstractPanel {
-        GLFWContext *glfwContext = nullptr;
+        WindowService *windowService = nullptr;
         EngineContext *engineContext = nullptr;
         DirectoryService *directoryService = nullptr;
         HistoryService *historyService = nullptr;
@@ -31,7 +31,7 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"GLFWContext", &glfwContext},
+                {"WindowService", &windowService},
                 {"EngineContext", &engineContext},
                 {"DirectoryService", &directoryService},
                 {"ThemeService", &themeService},
