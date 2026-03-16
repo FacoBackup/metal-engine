@@ -2,14 +2,14 @@
 #define SELECTEDDOTPASS_H
 
 #include "../../engine/passes/AbstractRenderPass.h"
-#include "../dto/SelectedDotPushConstant.h"
+#include "../dto/SelectionOutlinePushConstant.h"
 
 namespace Metal {
     class PipelineService;
     struct EditorRepository;
 
     class SelectionOutlinePass final : public AbstractRenderPass {
-        SelectedDotPushConstant pushConstant{};
+        SelectionOutlinePushConstant pushConstant{};
 
         PipelineService *pipelineService = nullptr;
         EditorRepository *editorRepository = nullptr;

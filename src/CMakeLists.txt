@@ -215,6 +215,8 @@ set(ENGINE_SOURCES
         engine/dto/LightData.h
         editor/passes/SelectionIDPass.cpp
         editor/passes/SelectionIDPass.h
+        editor/passes/DebugPhongPass.cpp
+        editor/passes/DebugPhongPass.h
         editor/repository/EditorRepository.cpp
         editor/dto/GridPushConstant.h
         engine/passes/AbstractComputePass.cpp

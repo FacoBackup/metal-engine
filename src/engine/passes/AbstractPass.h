@@ -28,6 +28,10 @@ namespace Metal {
 
         void recordPushConstant(const void *data);
 
+        virtual bool requiresRayTracing() {
+            return false;
+        }
+
         virtual bool shouldRun() {
             return true;
         }

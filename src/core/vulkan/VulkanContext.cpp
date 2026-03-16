@@ -51,21 +51,23 @@ namespace Metal {
     void VulkanContext::createDevice() {
         vkb::DeviceBuilder deviceBuilder{physDevice};
 
-        VkPhysicalDeviceBufferDeviceAddressFeatures bufferDeviceAddressFeatures{};
-        bufferDeviceAddressFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
-        bufferDeviceAddressFeatures.bufferDeviceAddress = VK_TRUE;
+        if (rayTracingSupported) {
+            VkPhysicalDeviceBufferDeviceAddressFeatures bufferDeviceAddressFeatures{};
+            bufferDeviceAddressFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
+            bufferDeviceAddressFeatures.bufferDeviceAddress = VK_TRUE;
 
-        VkPhysicalDeviceAccelerationStructureFeaturesKHR accelFeatures{};
-        accelFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
-        accelFeatures.accelerationStructure = VK_TRUE;
+            VkPhysicalDeviceAccelerationStructureFeaturesKHR accelFeatures{};
+            accelFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+            accelFeatures.accelerationStructure = VK_TRUE;
 
-        VkPhysicalDeviceRayTracingPipelineFeaturesKHR rtPipelineFeatures{};
-        rtPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
-        rtPipelineFeatures.rayTracingPipeline = VK_TRUE;
+            VkPhysicalDeviceRayTracingPipelineFeaturesKHR rtPipelineFeatures{};
+            rtPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
+            rtPipelineFeatures.rayTracingPipeline = VK_TRUE;
 
-        deviceBuilder.add_pNext(&bufferDeviceAddressFeatures);
-        deviceBuilder.add_pNext(&accelFeatures);
-        deviceBuilder.add_pNext(&rtPipelineFeatures);
+            deviceBuilder.add_pNext(&bufferDeviceAddressFeatures);
+            deviceBuilder.add_pNext(&accelFeatures);
+            deviceBuilder.add_pNext(&rtPipelineFeatures);
+        }
 
         auto deviceResult = deviceBuilder.build();
         if (!deviceResult) {
@@ -73,30 +75,32 @@ namespace Metal {
         }
         device = deviceResult.value();
 
-        vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(
-            vkGetDeviceProcAddr(device.device, "vkGetBufferDeviceAddressKHR"));
-        vkCreateAccelerationStructureKHR = reinterpret_cast<PFN_vkCreateAccelerationStructureKHR>(
-            vkGetDeviceProcAddr(device.device, "vkCreateAccelerationStructureKHR"));
-        vkDestroyAccelerationStructureKHR = reinterpret_cast<PFN_vkDestroyAccelerationStructureKHR>(
-            vkGetDeviceProcAddr(device.device, "vkDestroyAccelerationStructureKHR"));
-        vkGetAccelerationStructureBuildSizesKHR = reinterpret_cast<PFN_vkGetAccelerationStructureBuildSizesKHR>(
-            vkGetDeviceProcAddr(device.device, "vkGetAccelerationStructureBuildSizesKHR"));
-        vkCmdBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(
-            vkGetDeviceProcAddr(device.device, "vkCmdBuildAccelerationStructuresKHR"));
-        vkGetAccelerationStructureDeviceAddressKHR = reinterpret_cast<PFN_vkGetAccelerationStructureDeviceAddressKHR>(
-            vkGetDeviceProcAddr(device.device, "vkGetAccelerationStructureDeviceAddressKHR"));
-        vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(
-            vkGetDeviceProcAddr(device.device, "vkCreateRayTracingPipelinesKHR"));
-        vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(
-            vkGetDeviceProcAddr(device.device, "vkGetRayTracingShaderGroupHandlesKHR"));
-        vkCmdTraceRaysKHR = reinterpret_cast<PFN_vkCmdTraceRaysKHR>(
-            vkGetDeviceProcAddr(device.device, "vkCmdTraceRaysKHR"));
+        if (rayTracingSupported) {
+            vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(
+                vkGetDeviceProcAddr(device.device, "vkGetBufferDeviceAddressKHR"));
+            vkCreateAccelerationStructureKHR = reinterpret_cast<PFN_vkCreateAccelerationStructureKHR>(
+                vkGetDeviceProcAddr(device.device, "vkCreateAccelerationStructureKHR"));
+            vkDestroyAccelerationStructureKHR = reinterpret_cast<PFN_vkDestroyAccelerationStructureKHR>(
+                vkGetDeviceProcAddr(device.device, "vkDestroyAccelerationStructureKHR"));
+            vkGetAccelerationStructureBuildSizesKHR = reinterpret_cast<PFN_vkGetAccelerationStructureBuildSizesKHR>(
+                vkGetDeviceProcAddr(device.device, "vkGetAccelerationStructureBuildSizesKHR"));
+            vkCmdBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(
+                vkGetDeviceProcAddr(device.device, "vkCmdBuildAccelerationStructuresKHR"));
+            vkGetAccelerationStructureDeviceAddressKHR = reinterpret_cast<PFN_vkGetAccelerationStructureDeviceAddressKHR>(
+                vkGetDeviceProcAddr(device.device, "vkGetAccelerationStructureDeviceAddressKHR"));
+            vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(
+                vkGetDeviceProcAddr(device.device, "vkCreateRayTracingPipelinesKHR"));
+            vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(
+                vkGetDeviceProcAddr(device.device, "vkGetRayTracingShaderGroupHandlesKHR"));
+            vkCmdTraceRaysKHR = reinterpret_cast<PFN_vkCmdTraceRaysKHR>(
+                vkGetDeviceProcAddr(device.device, "vkCmdTraceRaysKHR"));
 
-        rayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
-        VkPhysicalDeviceProperties2 deviceProperties2{};
-        deviceProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-        deviceProperties2.pNext = &rayTracingPipelineProperties;
-        vkGetPhysicalDeviceProperties2(physDevice.physical_device, &deviceProperties2);
+            rayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
+            VkPhysicalDeviceProperties2 deviceProperties2{};
+            deviceProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+            deviceProperties2.pNext = &rayTracingPipelineProperties;
+            vkGetPhysicalDeviceProperties2(physDevice.physical_device, &deviceProperties2);
+        }
     }
 
     void VulkanContext::createPhysicalDevice() {
@@ -151,7 +155,7 @@ namespace Metal {
         physDevice.enable_extension_if_present(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
         // Ray tracing extensions
-        bool rayTracingSupported =
+        rayTracingSupported =
                 physDevice.enable_extension_if_present(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) &&
                 physDevice.enable_extension_if_present(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME) &&
                 physDevice.enable_extension_if_present(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME) &&
@@ -160,7 +164,7 @@ namespace Metal {
         if (rayTracingSupported) {
             LOG_INFO("Ray tracing extensions enabled");
         } else {
-            throw std::runtime_error("Ray tracing extensions NOT supported");
+            LOG_INFO("Ray tracing extensions NOT supported");
         }
     }
 

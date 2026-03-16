@@ -96,6 +96,7 @@ namespace Metal {
         VkPhysicalDeviceRayTracingPipelinePropertiesKHR rayTracingPipelineProperties{};
         VkSampler vkImageSampler = VK_NULL_HANDLE;
         VkSampler vkTextureSampler = VK_NULL_HANDLE;
+        bool rayTracingSupported = false;
 
         PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR = nullptr;
         PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR = nullptr;
@@ -117,6 +118,10 @@ namespace Metal {
 
         [[nodiscard]] unsigned int getWindowWidth() const {
             return w;
+        }
+
+        [[nodiscard]] bool isRayTracingSupported() const {
+            return rayTracingSupported;
         }
 
         [[nodiscard]] VkCommandBuffer beginSingleTimeCommands() const;

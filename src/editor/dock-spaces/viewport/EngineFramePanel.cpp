@@ -20,6 +20,7 @@
 #include "../../../engine/passes/impl/TemporalAccumulationPass.h"
 #include "../../passes/GridPass.h"
 #include "../../passes/SelectionIDPass.h"
+#include "../../passes/DebugPhongPass.h"
 #include "../../passes/SelectionOutlinePass.h"
 #include "../../../core/vulkan/VulkanContext.h"
 #include "../../../engine/repository/EngineRepository.h"
@@ -63,6 +64,7 @@ namespace Metal {
                 .addCommandBuffer(RID_SELECTION_CB, RID_SELECTION_FBO)
                 .addPass(std::make_unique<SelectionIDPass>(), RID_SELECTION_CB)
                 .addCommandBuffer(RID_POST_PROCESSING_CB, RID_POST_PROCESSING_FBO)
+                .addPass(std::make_unique<DebugPhongPass>(), RID_POST_PROCESSING_CB)
                 .addPass(std::make_unique<PostProcessingPass>(), RID_POST_PROCESSING_CB)
                 .addPass(std::make_unique<SelectionOutlinePass>(), RID_POST_PROCESSING_CB)
                 .addPass(std::make_unique<GridPass>(), RID_POST_PROCESSING_CB)

@@ -47,6 +47,9 @@ namespace Metal {
 
     // TODO - EVENT SYSTEM BASED ON WORLD CHANGE AND ENTITY CHANGE
     void RayTracingService::onSync() {
+        if (!vulkanContext->rayTracingSupported) {
+            return;
+        }
         if (needsMaterialUpdate) {
             updateMeshMaterials();
             needsMaterialUpdate = false;
@@ -95,7 +98,7 @@ namespace Metal {
     }
 
     bool RayTracingService::isReady() const {
-        return accelerationStructureBuilt && anyMeshes && tlas != VK_NULL_HANDLE;
+        return vulkanContext->rayTracingSupported && accelerationStructureBuilt && anyMeshes && tlas != VK_NULL_HANDLE;
     }
 
     void RayTracingService::updateMeshMaterials() {
@@ -124,6 +127,9 @@ namespace Metal {
     }
 
     void RayTracingService::destroyTLAS() {
+        if (!vulkanContext->rayTracingSupported) {
+            return;
+        }
         if (vulkanContext->device.device != VK_NULL_HANDLE) {
             vkDeviceWaitIdle(vulkanContext->device.device);
         }
@@ -405,6 +411,9 @@ namespace Metal {
     }
 
     void RayTracingService::dispose() {
+        if (!vulkanContext->rayTracingSupported) {
+            return;
+        }
         if (vulkanContext->device.device != VK_NULL_HANDLE) {
             vkDeviceWaitIdle(vulkanContext->device.device);
         }
