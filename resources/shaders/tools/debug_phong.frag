@@ -22,5 +22,5 @@ void main() {
     vec3 ambient = 0.1 * push.color.rgb;
     vec3 color = ambient + push.color.rgb * diffuse + vec3(specular);
 
-    outFragColor = vec4(color, push.color.a);
+    outFragColor = vec4(1, 0, 1, 1);
 }

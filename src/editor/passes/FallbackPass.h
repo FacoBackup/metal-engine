@@ -16,7 +16,7 @@ namespace Metal {
         glm::vec4 color;
     };
 
-    class DebugPhongPass final : public AbstractRenderPass {
+    class FallbackPass final : public AbstractRenderPass {
         DebugPhongPushConstant pushConstant{};
 
         PipelineService *pipelineService = nullptr;

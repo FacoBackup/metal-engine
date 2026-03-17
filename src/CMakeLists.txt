@@ -173,6 +173,8 @@ set(ENGINE_SOURCES
         engine/enum/ResourceType.h
         editor/dock-spaces/viewport/GizmoPanel.cpp
         editor/dock-spaces/viewport/GizmoPanel.h
+        editor/dock-spaces/viewport/GizmoTransformStrategy.cpp
+        editor/dock-spaces/viewport/GizmoTransformStrategy.h
         editor/dock-spaces/viewport/ViewportHeaderPanel.cpp
         editor/dock-spaces/viewport/ViewportHeaderPanel.h
         editor/dock-spaces/viewport/GizmoSettingsPanel.cpp
@@ -214,8 +216,8 @@ set(ENGINE_SOURCES
         engine/dto/LightData.h
         editor/passes/SelectionIDPass.cpp
         editor/passes/SelectionIDPass.h
-        editor/passes/DebugPhongPass.cpp
-        editor/passes/DebugPhongPass.h
+        editor/passes/FallbackPass.cpp
+        editor/passes/FallbackPass.h
         editor/repository/EditorRepository.cpp
         editor/dto/GridPushConstant.h
         engine/passes/AbstractComputePass.cpp

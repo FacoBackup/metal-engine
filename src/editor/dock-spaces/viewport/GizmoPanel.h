@@ -19,19 +19,11 @@ namespace Metal {
 
     class HistoryService;
 
-    class GizmoPanel final : public AbstractPanel {
-        std::array<float, 3> translationSnap;
-        glm::mat4x4 auxMat4{};
-        glm::mat4x4 cacheProjection{};
-        glm::mat4x4 cacheMatrixMat4{};
-        glm::vec3 auxTranslation{};
-        glm::vec3 auxScale{};
-        glm::quat auxRot{};
-        bool wasUsing = false;
+    class GizmoTransformStrategy;
 
-        float *cacheMatrix = new float[16];
-        float *viewMatrixCache = new float[16];
-        float *projectionMatrixCache = new float[16];
+    class GizmoPanel final : public AbstractPanel {
+        GizmoTransformStrategy *gizmoStrategy = nullptr;
+
         glm::vec2 *size = nullptr;
         ImVec2 *position = nullptr;
         TransformComponent *localSelected = nullptr;
@@ -54,16 +46,11 @@ namespace Metal {
         }
 
         explicit GizmoPanel(ImVec2 *position, glm::vec2 *size);
+        ~GizmoPanel() override;
 
         void onInitialize() override;
 
         void onSync() override;
-
-        float *getSnapValues();
-
-        void decomposeMatrix();
-
-        void recomposeMatrix();
     };
 } // Metal
 

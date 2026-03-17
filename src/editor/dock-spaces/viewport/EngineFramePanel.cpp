@@ -20,7 +20,7 @@
 #include "../../../engine/passes/impl/TemporalAccumulationPass.h"
 #include "../../passes/GridPass.h"
 #include "../../passes/SelectionIDPass.h"
-#include "../../passes/DebugPhongPass.h"
+#include "../../passes/FallbackPass.h"
 #include "../../passes/SelectionOutlinePass.h"
 #include "../../../core/VulkanContext.h"
 #include "../../../engine/repository/EngineRepository.h"
@@ -64,10 +64,10 @@ namespace Metal {
                 .addCommandBuffer(RID_SELECTION_CB, RID_SELECTION_FBO)
                 .addPass(std::make_unique<SelectionIDPass>(), RID_SELECTION_CB)
                 .addCommandBuffer(RID_POST_PROCESSING_CB, RID_POST_PROCESSING_FBO)
-                .addPass(std::make_unique<DebugPhongPass>(), RID_POST_PROCESSING_CB)
                 .addPass(std::make_unique<PostProcessingPass>(), RID_POST_PROCESSING_CB)
-                .addPass(std::make_unique<SelectionOutlinePass>(), RID_POST_PROCESSING_CB)
                 .addPass(std::make_unique<GridPass>(), RID_POST_PROCESSING_CB)
+                .addPass(std::make_unique<FallbackPass>(), RID_POST_PROCESSING_CB)
+                .addPass(std::make_unique<SelectionOutlinePass>(), RID_POST_PROCESSING_CB)
                 .build();
     }
 
@@ -78,13 +78,15 @@ namespace Metal {
         auto *framebuffer = engineContext->currentFrame->getResourceAs<FrameBufferInstance>(RID_POST_PROCESSING_FBO);
         if (framebuffer) {
             descriptorSetService->setImageDescriptor(framebuffer, 0);
-            
+
             const ImVec2 pos = ImGui::GetCursorScreenPos();
-            const auto textureId = reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->vkDescriptorSet);
-            
-            ImGui::GetWindowDrawList()->AddImageRounded(textureId, pos, ImVec2(pos.x + viewportSize.x, pos.y + viewportSize.y),
-                                                     ImVec2(0, 0), ImVec2(1, 1), IM_COL32_WHITE, 8.0f);
-            
+            const auto textureId = reinterpret_cast<ImTextureID>(framebuffer->attachments[0]->imageDescriptor->
+                vkDescriptorSet);
+
+            ImGui::GetWindowDrawList()->AddImageRounded(textureId, pos,
+                                                        ImVec2(pos.x + viewportSize.x, pos.y + viewportSize.y),
+                                                        ImVec2(0, 0), ImVec2(1, 1), IM_COL32_WHITE, 8.0f);
+
             ImGui::Dummy(viewportSize);
 
             const ImVec2 imageMin = pos;
@@ -114,7 +116,8 @@ namespace Metal {
             return;
         }
 
-        auto *gBufferPositionIndex = engineContext->currentFrame->getResourceAs<TextureInstance>(RID_GBUFFER_POSITION_INDEX);
+        auto *gBufferPositionIndex = engineContext->currentFrame->getResourceAs<TextureInstance>(
+            RID_GBUFFER_POSITION_INDEX);
         if (!gBufferPositionIndex) {
             return;
         }
