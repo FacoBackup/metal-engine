@@ -1,0 +1,1366 @@
+[2/120] Scanning C:\Users\GustavoRoque...WindowService.cpp for CXX dependencies
+Observação: incluindo arquivo: C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_stdinc.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_platform_defines.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\winapifamily.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\winpackagefamily.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\stdarg.h
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\vcruntime.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\sal.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\concurrencysal.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\vadefs.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\stdint.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_memory.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_memcpy_s.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\errno.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\vcruntime_string.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wstring.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\wchar.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wconio.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_stdio_config.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wctype.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wdirect.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wio.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_share.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wprocess.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wstdio.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wstdlib.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wtime.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\sys/stat.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\sys/types.h
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\intrin.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\intrin0.inl.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\setjmp.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\immintrin.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\wmmintrin.h
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\nmmintrin.h
+Observação: incluindo arquivo:        C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\smmintrin.h
+Observação: incluindo arquivo:         C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\tmmintrin.h
+Observação: incluindo arquivo:          C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\pmmintrin.h
+Observação: incluindo arquivo:           C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\emmintrin.h
+Observação: incluindo arquivo:            C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xmmintrin.h
+Observação: incluindo arquivo:             C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\mmintrin.h
+Observação: incluindo arquivo:             C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\malloc.h
+Observação: incluindo arquivo:              C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_malloc.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\zmmintrin.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\ammintrin.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_assert.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_asyncio.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_atomic.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_audio.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_endian.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_error.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_mutex.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_thread.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_properties.h
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\process.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_startup.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\math.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_math.h
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\vcruntime_startup.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_iostream.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_bits.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_blendmode.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_camera.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_pixels.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_surface.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_rect.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_clipboard.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_cpuinfo.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_dialog.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_video.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_events.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_gamepad.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_guid.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_joystick.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_power.h
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_sensor.h
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_keyboard.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_keycode.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_scancode.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_mouse.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_pen.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_touch.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_filesystem.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_gpu.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_haptic.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_hidapi.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_hints.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_init.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_loadso.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_locale.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_log.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_messagebox.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_metal.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_misc.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_platform.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_process.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_render.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_storage.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_system.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_time.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_timer.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_tray.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_version.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_oldnames.h
+Observação: incluindo arquivo: C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_vulkan.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo: C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\dwmapi.h
+Observação: incluindo arquivo:  C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\wtypes.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\rpc.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\windows.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\sdkddkver.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\excpt.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\windef.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\minwindef.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\specstrings.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\specstrings_strict.h
+Observação: incluindo arquivo:         C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\specstrings_undef.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\driverspecs.h
+Observação: incluindo arquivo:         C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\sdv_driverspecs.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winnt.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\ctype.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\kernelspecs.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\basetsd.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\guiddef.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack4.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack4.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack4.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack2.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack2.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack2.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\apiset.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\ktmtypes.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winbase.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\apisetcconv.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\minwinbase.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\apiquery2.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\processenv.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\fileapifromapp.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\fileapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\debugapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\utilapiset.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\handleapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\errhandlingapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\fibersapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\namedpipeapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\profileapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\heapapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\ioapiset.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\synchapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\interlockedapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\processthreadsapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\sysinfoapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\memoryapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\enclaveapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\threadpoollegacyapiset.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\threadpoolapiset.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\jobapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\jobapi2.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\wow64apiset.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\libloaderapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\securitybaseapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\namespaceapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\systemtopologyapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\processtopologyapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\securityappcontainer.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\realtimeapiset.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\winerror.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\timezoneapi.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\wingdi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack2.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack2.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack4.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack4.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winuser.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack2.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\tvout.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winnls.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\datetimeapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\stringapiset.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winnls.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\wincon.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\wincontypes.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\consoleapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\consoleapi2.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\consoleapi3.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winver.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\verrsrc.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winreg.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\reason.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winnetwk.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\wnnc.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\cderr.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\dde.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\ddeml.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\dlgs.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\lzexpand.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmsystem.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmsyscom.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mciapi.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmsyscom.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmiscapi.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmsyscom.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmiscapi2.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmsyscom.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\playsoundapi.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmsyscom.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmeapi.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmsyscom.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\timeapi.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmsyscom.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\joystickapi.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmsyscom.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\nb30.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\rpc.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\rpcdce.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\rpcdcep.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\rpcnsi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\rpcnterr.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\rpcasync.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\shellapi.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winperf.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winsock.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\inaddr.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\wincrypt.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\bcrypt.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\ncrypt.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\dpapi.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winefs.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winscard.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\wtypes.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\rpcndr.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\rpcnsip.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\rpcsal.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\wtypesbase.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\guiddef.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winioctl.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\winsmcrd.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winspool.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\prsht.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\ole2.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\objbase.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\combaseapi.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\stdlib.h
+Observação: incluindo arquivo:         C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_search.h
+Observação: incluindo arquivo:          C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\stddef.h
+Observação: incluindo arquivo:         C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\limits.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\unknwnbase.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\objidlbase.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\guiddef.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\cguid.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\coml2api.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\objidl.h
+Observação: incluindo arquivo:         C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\unknwn.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\propidlbase.h
+Observação: incluindo arquivo:         C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\oaidl.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\urlmon.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\oleidl.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\servprov.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\msxml.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\propidl.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\oleauto.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\commdlg.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\prsht.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\stralign.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winsvc.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mcx.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\imm.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\ime_cmodes.h
+Observação: incluindo arquivo:  C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\uxtheme.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\commctrl.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\prsht.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\dpa_dsa.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:  C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:  C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo: C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\algorithm
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\yvals_core.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xkeycheck.h
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_heap_algorithms.hpp
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xutility
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\yvals.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\crtdbg.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\vcruntime_new_debug.h
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\vcruntime_new.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\crtdefs.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\use_ansi.h
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_iter_core.hpp
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\utility
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\initializer_list
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cstddef
+Observação: incluindo arquivo:        C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xtr1common
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\type_traits
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cstdint
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\compare
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\concepts
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\climits
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cstdlib
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\math.h
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cstring
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cwchar
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cstdio
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\stdio.h
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_minmax.hpp
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xmemory
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\limits
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cfloat
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\float.h
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\intrin0.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\new
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\exception
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\vcruntime_exception.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\eh.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_terminate.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xatomic.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\tuple
+Observação: incluindo arquivo: C:\Users\GustavoRoque\CLionProjects\metal-engine\src\core\WindowService.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\imgui.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\imconfig.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\assert.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\imgui_internal.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\math.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\src\core\../common/IContextMember.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\vector
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_bit_utils.hpp
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_sanitizer_annotate_container.hpp
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xpolymorphic_allocator.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\string
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xstring
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\iosfwd
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cctype
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\src\core\../common/IDisposable.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\src\core\../common/IInit.h
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\functional
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\typeinfo
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\vcruntime_typeinfo.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\unordered_map
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xhash
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cmath
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\list
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xbit_ops.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xnode_handle.h
+Observação: incluindo arquivo: C:\Users\GustavoRoque\CLionProjects\metal-engine\src\core\../ApplicationContext.h
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\memory
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\atomic
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xatomic_wait.h
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xthreads.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_threads_core.hpp
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xtimec.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\ctime
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\time.h
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\typeindex
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\stdexcept
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\filesystem
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\chrono
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_chrono.hpp
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\ratio
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\system_error
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_system_error_abi.hpp
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cerrno
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xcall_once.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xerrc.h
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xfilesystem_abi.h
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_tzdb.hpp
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\format
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_format_ucd_tables.hpp
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_formatter.hpp
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_print.hpp
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_ranges_tuple_formatter.hpp
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\bit
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\iterator
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xlocale
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xfacet
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xlocinfo
+Observação: incluindo arquivo:        C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_xlocinfo_types.hpp
+Observação: incluindo arquivo:        C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\clocale
+Observação: incluindo arquivo:         C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\locale.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\charconv
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xcharconv.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xcharconv_ryu.h
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xcharconv_ryu_tables.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xcharconv_tables.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\locale
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xlocbuf
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\streambuf
+Observação: incluindo arquivo:        C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xiosbase
+Observação: incluindo arquivo:         C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\share.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xlocmes
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xlocmon
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xlocnum
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xloctime
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\forward_list
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\iomanip
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\istream
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_ostream.hpp
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\ios
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\optional
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xsmf_control.h
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\sstream
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\iostream
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\ostream
+Observação: incluindo arquivo: C:\Users\GustavoRoque\CLionProjects\metal-engine\src\core\VulkanContext.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vma\vk_mem_alloc.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vulkan/vulkan.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vulkan\vk_platform.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vulkan\vulkan_core.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vk_video/vulkan_video_codec_h264std.h
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vk_video\vulkan_video_codecs_common.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vk_video/vulkan_video_codec_h264std_encode.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vk_video/vulkan_video_codec_h265std.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vk_video/vulkan_video_codec_h265std_encode.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vk_video/vulkan_video_codec_h264std_decode.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vk_video/vulkan_video_codec_h265std_decode.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vk_video/vulkan_video_codec_av1std.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vk_video/vulkan_video_codec_av1std_decode.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\imgui_impl_vulkan.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\dependencies\vk-bootstrap\src\VkBootstrap.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cassert
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\assert.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\dependencies\vk-bootstrap\src\VkBootstrapDispatch.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\src\core\../common/IService.h
+Observação: incluindo arquivo: C:\Users\GustavoRoque\CLionProjects\metal-engine\src\core\../editor/service/ThemeService.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm/vec3.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_bool3.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\ext\../detail/type_vec3.hpp
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\detail\qualifier.hpp
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\detail\setup.hpp
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cassert
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\assert.h
+Observação: incluindo arquivo:       C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\detail\../simd/platform.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\detail\type_vec3.inl
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\detail\compute_vector_relational.hpp
+Observação: incluindo arquivo:       C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\detail\setup.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_bool3_precision.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_float3.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_float3_precision.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_double3.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_double3_precision.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_int3.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_int3_sized.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\ext\../ext/scalar_int_sized.hpp
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\ext\../detail/setup.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_uint3.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_uint3_sized.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\ext\../ext/scalar_uint_sized.hpp
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\ext\../detail/setup.hpp
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/json.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/adl_serializer.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/abi_macros.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/conversions/from_json.hpp
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\array
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\map
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xtree
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\valarray
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/exceptions.hpp
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/value_t.hpp
+Observação: incluindo arquivo:       C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/macro_scope.hpp
+Observação: incluindo arquivo:        C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/meta/detected.hpp
+Observação: incluindo arquivo:         C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/meta/void_t.hpp
+Observação: incluindo arquivo:        C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/thirdparty/hedley/hedley.hpp
+Observação: incluindo arquivo:        C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\version
+Observação: incluindo arquivo:        C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cassert
+Observação: incluindo arquivo:         C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\assert.h
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/string_escape.hpp
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/input/position_t.hpp
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/meta/cpp_future.hpp
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/meta/type_traits.hpp
+Observação: incluindo arquivo:       C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/iterators/iterator_traits.hpp
+Observação: incluindo arquivo:       C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/meta/call_std/begin.hpp
+Observação: incluindo arquivo:       C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/meta/call_std/end.hpp
+Observação: incluindo arquivo:       C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/json_fwd.hpp
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/string_concat.hpp
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/meta/identity_tag.hpp
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/meta/std_fs.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/conversions/to_json.hpp
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/iterators/iteration_proxy.hpp
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\ranges
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_int128.hpp
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_ranges_to.hpp
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\span
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\string_view
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/byte_container_with_subtype.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/hash.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/input/binary_reader.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/input/input_adapters.hpp
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\numeric
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/input/json_sax.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/input/lexer.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/meta/is_sax.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/input/parser.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/iterators/internal_iterator.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/iterators/primitive_iterator.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/iterators/iter_impl.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/iterators/json_reverse_iterator.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/json_custom_base_class.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/json_pointer.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/json_ref.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/output/binary_writer.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/output/output_adapters.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/output/serializer.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/conversions/to_chars.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/ordered_map.hpp
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\any
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/macro_unscope.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/thirdparty/hedley/hedley_undef.hpp
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\src\editor\service\../../common/ISync.h
+[4/6] Building CXX object src\CMakeFil...ine_lib.dir\core\WindowService.cpp.obj
+Observação: incluindo arquivo: C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_stdinc.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_platform_defines.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\winapifamily.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\winpackagefamily.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\stdarg.h
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\vcruntime.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\sal.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\concurrencysal.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\vadefs.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\stdint.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_memory.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_memcpy_s.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\errno.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\vcruntime_string.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wstring.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\wchar.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wconio.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_stdio_config.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wctype.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wdirect.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wio.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_share.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wprocess.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wstdio.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wstdlib.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wtime.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\sys/stat.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\sys/types.h
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\intrin.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\intrin0.inl.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\setjmp.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\immintrin.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\wmmintrin.h
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\nmmintrin.h
+Observação: incluindo arquivo:        C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\smmintrin.h
+Observação: incluindo arquivo:         C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\tmmintrin.h
+Observação: incluindo arquivo:          C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\pmmintrin.h
+Observação: incluindo arquivo:           C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\emmintrin.h
+Observação: incluindo arquivo:            C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xmmintrin.h
+Observação: incluindo arquivo:             C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\mmintrin.h
+Observação: incluindo arquivo:             C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\malloc.h
+Observação: incluindo arquivo:              C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_malloc.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\zmmintrin.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\ammintrin.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_assert.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_asyncio.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_atomic.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_audio.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_endian.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_error.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_mutex.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_thread.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_properties.h
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\process.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_startup.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\math.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_math.h
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\vcruntime_startup.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_iostream.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_bits.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_blendmode.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_camera.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_pixels.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_surface.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_rect.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_clipboard.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_cpuinfo.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_dialog.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_video.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_events.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_gamepad.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_guid.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_joystick.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_power.h
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_sensor.h
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_keyboard.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_keycode.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_scancode.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_mouse.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_pen.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_touch.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_filesystem.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_gpu.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_haptic.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_hidapi.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_hints.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_init.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_loadso.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_locale.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_log.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_messagebox.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_metal.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_misc.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_platform.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_process.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_render.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_storage.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_system.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_time.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_timer.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_tray.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_version.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_oldnames.h
+Observação: incluindo arquivo: C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_vulkan.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_begin_code.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\SDL3/SDL_close_code.h
+Observação: incluindo arquivo: C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\dwmapi.h
+Observação: incluindo arquivo:  C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\wtypes.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\rpc.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\windows.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\sdkddkver.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\excpt.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\windef.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\minwindef.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\specstrings.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\specstrings_strict.h
+Observação: incluindo arquivo:         C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\specstrings_undef.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\driverspecs.h
+Observação: incluindo arquivo:         C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\sdv_driverspecs.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winnt.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\ctype.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\kernelspecs.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\basetsd.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\guiddef.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack4.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack4.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack4.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack2.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack2.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack2.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\apiset.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\ktmtypes.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winbase.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\apisetcconv.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\minwinbase.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\apiquery2.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\processenv.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\fileapifromapp.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\fileapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\debugapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\utilapiset.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\handleapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\errhandlingapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\fibersapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\namedpipeapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\profileapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\heapapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\ioapiset.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\synchapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\interlockedapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\processthreadsapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\sysinfoapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\memoryapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\enclaveapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\threadpoollegacyapiset.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\threadpoolapiset.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\jobapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\jobapi2.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\wow64apiset.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\libloaderapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\securitybaseapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\namespaceapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\systemtopologyapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\processtopologyapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\securityappcontainer.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\realtimeapiset.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\winerror.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\timezoneapi.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\wingdi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack2.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack2.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack4.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack4.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winuser.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack2.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\tvout.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winnls.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\datetimeapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\stringapiset.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winnls.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\wincon.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\wincontypes.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\consoleapi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\consoleapi2.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\consoleapi3.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winver.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\verrsrc.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winreg.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\reason.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winnetwk.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\wnnc.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\cderr.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\dde.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\ddeml.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\dlgs.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\lzexpand.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmsystem.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmsyscom.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mciapi.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmsyscom.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmiscapi.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmsyscom.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmiscapi2.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmsyscom.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\playsoundapi.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmsyscom.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmeapi.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmsyscom.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\timeapi.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmsyscom.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\joystickapi.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mmsyscom.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\nb30.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\rpc.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\rpcdce.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\rpcdcep.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\rpcnsi.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\rpcnterr.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\rpcasync.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\shellapi.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winperf.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winsock.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\inaddr.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\wincrypt.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\bcrypt.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\ncrypt.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\dpapi.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winefs.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winscard.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\wtypes.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\rpcndr.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\rpcnsip.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\rpcsal.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\wtypesbase.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\guiddef.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winioctl.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\winsmcrd.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winspool.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\prsht.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\ole2.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\objbase.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\combaseapi.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\stdlib.h
+Observação: incluindo arquivo:         C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_search.h
+Observação: incluindo arquivo:          C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\stddef.h
+Observação: incluindo arquivo:         C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\limits.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\unknwnbase.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\objidlbase.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\guiddef.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\cguid.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\coml2api.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\objidl.h
+Observação: incluindo arquivo:         C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\unknwn.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\propidlbase.h
+Observação: incluindo arquivo:         C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\oaidl.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\urlmon.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\oleidl.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\servprov.h
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\msxml.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\propidl.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\oleauto.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\commdlg.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\prsht.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\stralign.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\winsvc.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\mcx.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\imm.h
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\ime_cmodes.h
+Observação: incluindo arquivo:  C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\uxtheme.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\commctrl.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\prsht.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\um\dpa_dsa.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack8.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo:  C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\pshpack1.h
+Observação: incluindo arquivo:  C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\shared\poppack.h
+Observação: incluindo arquivo: C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\algorithm
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\yvals_core.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xkeycheck.h
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_heap_algorithms.hpp
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xutility
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\yvals.h
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\crtdbg.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\vcruntime_new_debug.h
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\vcruntime_new.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\crtdefs.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\use_ansi.h
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_iter_core.hpp
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\utility
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\initializer_list
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cstddef
+Observação: incluindo arquivo:        C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xtr1common
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\type_traits
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cstdint
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\compare
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\concepts
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\climits
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cstdlib
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\math.h
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cstring
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cwchar
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cstdio
+Observação: incluindo arquivo:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\stdio.h
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_minmax.hpp
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xmemory
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\limits
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cfloat
+Observação: incluindo arquivo:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\float.h
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\intrin0.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\new
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\exception
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\vcruntime_exception.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\eh.h
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_terminate.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xatomic.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\tuple
+Observação: incluindo arquivo: C:\Users\GustavoRoque\CLionProjects\metal-engine\src\core\WindowService.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\imgui.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\imconfig.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\assert.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\imgui_internal.h
+Observação: incluindo arquivo:   C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\math.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\src\core\../common/IContextMember.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\vector
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_bit_utils.hpp
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_sanitizer_annotate_container.hpp
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xpolymorphic_allocator.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\string
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xstring
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\iosfwd
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cctype
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\src\core\../common/IDisposable.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\src\core\../common/IInit.h
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\functional
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\typeinfo
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\vcruntime_typeinfo.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\unordered_map
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xhash
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cmath
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\list
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xbit_ops.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xnode_handle.h
+Observação: incluindo arquivo: C:\Users\GustavoRoque\CLionProjects\metal-engine\src\core\../ApplicationContext.h
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\memory
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\atomic
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xatomic_wait.h
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xthreads.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_threads_core.hpp
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xtimec.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\ctime
+Observação: incluindo arquivo:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\time.h
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\typeindex
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\stdexcept
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\filesystem
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\chrono
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_chrono.hpp
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\ratio
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\system_error
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_system_error_abi.hpp
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cerrno
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xcall_once.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xerrc.h
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xfilesystem_abi.h
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_tzdb.hpp
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\format
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_format_ucd_tables.hpp
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_formatter.hpp
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_print.hpp
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_ranges_tuple_formatter.hpp
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\bit
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\iterator
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xlocale
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xfacet
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xlocinfo
+Observação: incluindo arquivo:        C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_xlocinfo_types.hpp
+Observação: incluindo arquivo:        C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\clocale
+Observação: incluindo arquivo:         C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\locale.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\charconv
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xcharconv.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xcharconv_ryu.h
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xcharconv_ryu_tables.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xcharconv_tables.h
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\locale
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xlocbuf
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\streambuf
+Observação: incluindo arquivo:        C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xiosbase
+Observação: incluindo arquivo:         C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\share.h
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xlocmes
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xlocmon
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xlocnum
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xloctime
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\forward_list
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\iomanip
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\istream
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_ostream.hpp
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\ios
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\optional
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xsmf_control.h
+Observação: incluindo arquivo:    C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\sstream
+Observação: incluindo arquivo:  C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\iostream
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\ostream
+Observação: incluindo arquivo: C:\Users\GustavoRoque\CLionProjects\metal-engine\src\core\VulkanContext.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vma\vk_mem_alloc.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vulkan/vulkan.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vulkan\vk_platform.h
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vulkan\vulkan_core.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vk_video/vulkan_video_codec_h264std.h
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vk_video\vulkan_video_codecs_common.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vk_video/vulkan_video_codec_h264std_encode.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vk_video/vulkan_video_codec_h265std.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vk_video/vulkan_video_codec_h265std_encode.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vk_video/vulkan_video_codec_h264std_decode.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vk_video/vulkan_video_codec_h265std_decode.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vk_video/vulkan_video_codec_av1std.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\vk_video/vulkan_video_codec_av1std_decode.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\imgui_impl_vulkan.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\dependencies\vk-bootstrap\src\VkBootstrap.h
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cassert
+Observação: incluindo arquivo:    C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\assert.h
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\dependencies\vk-bootstrap\src\VkBootstrapDispatch.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\src\core\../common/IService.h
+Observação: incluindo arquivo: C:\Users\GustavoRoque\CLionProjects\metal-engine\src\core\../editor/service/ThemeService.h
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm/vec3.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_bool3.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\ext\../detail/type_vec3.hpp
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\detail\qualifier.hpp
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\detail\setup.hpp
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cassert
+Observação: incluindo arquivo:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\assert.h
+Observação: incluindo arquivo:       C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\detail\../simd/platform.h
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\detail\type_vec3.inl
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\detail\compute_vector_relational.hpp
+Observação: incluindo arquivo:       C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\detail\setup.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_bool3_precision.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_float3.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_float3_precision.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_double3.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_double3_precision.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_int3.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_int3_sized.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\ext\../ext/scalar_int_sized.hpp
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\ext\../detail/setup.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_uint3.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\./ext/vector_uint3_sized.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\ext\../ext/scalar_uint_sized.hpp
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\glm\ext\../detail/setup.hpp
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/json.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/adl_serializer.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/abi_macros.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/conversions/from_json.hpp
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\array
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\map
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\xtree
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\valarray
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/exceptions.hpp
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/value_t.hpp
+Observação: incluindo arquivo:       C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/macro_scope.hpp
+Observação: incluindo arquivo:        C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/meta/detected.hpp
+Observação: incluindo arquivo:         C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/meta/void_t.hpp
+Observação: incluindo arquivo:        C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/thirdparty/hedley/hedley.hpp
+Observação: incluindo arquivo:        C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\version
+Observação: incluindo arquivo:        C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\cassert
+Observação: incluindo arquivo:         C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\assert.h
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/string_escape.hpp
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/input/position_t.hpp
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/meta/cpp_future.hpp
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/meta/type_traits.hpp
+Observação: incluindo arquivo:       C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/iterators/iterator_traits.hpp
+Observação: incluindo arquivo:       C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/meta/call_std/begin.hpp
+Observação: incluindo arquivo:       C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/meta/call_std/end.hpp
+Observação: incluindo arquivo:       C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/json_fwd.hpp
+Observação: incluindo arquivo:      C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/string_concat.hpp
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/meta/identity_tag.hpp
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/meta/std_fs.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/conversions/to_json.hpp
+Observação: incluindo arquivo:     C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/iterators/iteration_proxy.hpp
+Observação: incluindo arquivo:      C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\ranges
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_int128.hpp
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_ranges_to.hpp
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\span
+Observação: incluindo arquivo:       C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\string_view
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/byte_container_with_subtype.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/hash.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/input/binary_reader.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/input/input_adapters.hpp
+Observação: incluindo arquivo:     C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\numeric
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/input/json_sax.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/input/lexer.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/meta/is_sax.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/input/parser.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/iterators/internal_iterator.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/iterators/primitive_iterator.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/iterators/iter_impl.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/iterators/json_reverse_iterator.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/json_custom_base_class.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/json_pointer.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/json_ref.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/output/binary_writer.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/output/output_adapters.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/output/serializer.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/conversions/to_chars.hpp
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/ordered_map.hpp
+Observação: incluindo arquivo:   C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\any
+Observação: incluindo arquivo:   C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/detail/macro_unscope.hpp
+Observação: incluindo arquivo:    C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\vcpkg_installed\x64-windows\include\nlohmann/thirdparty/hedley/hedley_undef.hpp
+Observação: incluindo arquivo:  C:\Users\GustavoRoque\CLionProjects\metal-engine\src\editor\service\../../common/ISync.h
+[6/6] Linking CXX executable src\metal_engine.exe
+FAILED: src/metal_engine.exe
+C:\WINDOWS\system32\cmd.exe /C "cd . && "C:\Program Files\JetBrains\CLion 2025.3.3\bin\cmake\win\x64\bin\cmake.exe" -E vs_link_exe --msvc-ver=1950 --intdir=src\CMakeFiles\metal_engine.dir --rc=C:\PROGRA~2\WI3CF2~1\10\bin\100261~1.0\x64\rc.exe --mt=C:\PROGRA~2\WI3CF2~1\10\bin\100261~1.0\x64\mt.exe --manifests  -- C:\PROGRA~1\MIB055~1\18\COMMUN~1\VC\Tools\MSVC\1450~1.357\bin\Hostx64\x64\link.exe /nologo src\CMakeFiles\metal_engine.dir\main.cpp.obj  /out:src\metal_engine.exe /implib:src\metal_engine.lib /pdb:src\metal_engine.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console  src\metal_engine_lib.lib  dwmapi.lib  vcpkg_installed\x64-windows\debug\lib\nfd.lib  vcpkg_installed\x64-windows\debug\lib\meshoptimizer.lib  vcpkg_installed\x64-windows\debug\lib\assimp-vc143-mtd.lib  dependencies\vk-bootstrap\vk-bootstrap.lib  vcpkg_installed\x64-windows\debug\lib\glm.lib  vcpkg_installed\x64-windows\debug\lib\imguid.lib  vcpkg_installed\x64-windows\debug\lib\SDL3.lib  vcpkg_installed\x64-windows\debug\lib\vulkan-1.lib  vcpkg_installed\x64-windows\debug\lib\freetyped.lib  vcpkg_installed\x64-windows\debug\lib\imguizmo.lib  vcpkg_installed\x64-windows\debug\lib\glslangd.lib  vcpkg_installed\x64-windows\debug\lib\glslang-default-resource-limitsd.lib  vcpkg_installed\x64-windows\debug\lib\SPVRemapperd.lib  vcpkg_installed\x64-windows\debug\lib\openvdb.lib  vcpkg_installed\x64-windows\debug\lib\boost_iostreams-vc145-mt-gd-x64-1_86.lib  vcpkg_installed\x64-windows\debug\lib\boost_random-vc145-mt-gd-x64-1_86.lib  vcpkg_installed\x64-windows\debug\lib\boost_system-vc145-mt-gd-x64-1_86.lib  vcpkg_installed\x64-windows\debug\lib\boost_regex-vc145-mt-gd-x64-1_86.lib  vcpkg_installed\x64-windows\debug\lib\Imath-3_1_d.lib  vcpkg_installed\x64-windows\debug\lib\tbb12_debug.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && C:\WINDOWS\system32\cmd.exe /C "cd /D C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\src && C:\Users\GustavoRoque\AppData\Local\Microsoft\WindowsApps\pwsh.exe -noprofile -executionpolicy Bypass -file C:/Users/GustavoRoque/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Users/GustavoRoque/CLionProjects/metal-engine/cmake-build-debug/src/metal_engine.exe -installedDir C:/Users/GustavoRoque/CLionProjects/metal-engine/cmake-build-debug/vcpkg_installed/x64-windows/debug/bin -OutVariable out && cd /D C:\Users\GustavoRoque\CLionProjects\metal-engine\cmake-build-debug\src && "C:\Program Files\JetBrains\CLion 2025.3.3\bin\cmake\win\x64\bin\cmake.exe" -E copy_directory C:/Users/GustavoRoque/CLionProjects/metal-engine/cmake-build-debug/resources C:/Users/GustavoRoque/CLionProjects/metal-engine/cmake-build-debug/src/resources""
+LINK Pass 1: command "C:\PROGRA~1\MIB055~1\18\COMMUN~1\VC\Tools\MSVC\1450~1.357\bin\Hostx64\x64\link.exe /nologo src\CMakeFiles\metal_engine.dir\main.cpp.obj /out:src\metal_engine.exe /implib:src\metal_engine.lib /pdb:src\metal_engine.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console src\metal_engine_lib.lib dwmapi.lib vcpkg_installed\x64-windows\debug\lib\nfd.lib vcpkg_installed\x64-windows\debug\lib\meshoptimizer.lib vcpkg_installed\x64-windows\debug\lib\assimp-vc143-mtd.lib dependencies\vk-bootstrap\vk-bootstrap.lib vcpkg_installed\x64-windows\debug\lib\glm.lib vcpkg_installed\x64-windows\debug\lib\imguid.lib vcpkg_installed\x64-windows\debug\lib\SDL3.lib vcpkg_installed\x64-windows\debug\lib\vulkan-1.lib vcpkg_installed\x64-windows\debug\lib\freetyped.lib vcpkg_installed\x64-windows\debug\lib\imguizmo.lib vcpkg_installed\x64-windows\debug\lib\glslangd.lib vcpkg_installed\x64-windows\debug\lib\glslang-default-resource-limitsd.lib vcpkg_installed\x64-windows\debug\lib\SPVRemapperd.lib vcpkg_installed\x64-windows\debug\lib\openvdb.lib vcpkg_installed\x64-windows\debug\lib\boost_iostreams-vc145-mt-gd-x64-1_86.lib vcpkg_installed\x64-windows\debug\lib\boost_random-vc145-mt-gd-x64-1_86.lib vcpkg_installed\x64-windows\debug\lib\boost_system-vc145-mt-gd-x64-1_86.lib vcpkg_installed\x64-windows\debug\lib\boost_regex-vc145-mt-gd-x64-1_86.lib vcpkg_installed\x64-windows\debug\lib\Imath-3_1_d.lib vcpkg_installed\x64-windows\debug\lib\tbb12_debug.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:src\CMakeFiles\metal_engine.dir/intermediate.manifest src\CMakeFiles\metal_engine.dir/manifest.res" failed (exit code 1168) with the following output:
+LINK : fatal error LNK1168: não foi possível abrir src\metal_engine.exe para escrita
+ninja: build stopped: subcommand failed.

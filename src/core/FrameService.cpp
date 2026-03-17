@@ -36,38 +36,40 @@ namespace Metal {
                 if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == SDL_GetWindowID(window))
                     done = true;
             }
-            if (imguiService->beginFrame()) {
-                panel->onSync();
-                ImGui::Render();
-                auto *drawData = ImGui::GetDrawData();
-                const bool main_is_minimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
-                if (!main_is_minimized) {
-                    vulkanContext->getCommandBuffers().clear();
-                    auto &wd = vulkanContext->imguiVulkanWindow;
-                    VkSemaphore imageAcquiredSemaphore = wd.FrameSemaphores[wd.SemaphoreIndex].ImageAcquiredSemaphore;
-                    VkResult err = vkAcquireNextImageKHR(vulkanContext->device.device, wd.Swapchain, UINT64_MAX,
-                                                         imageAcquiredSemaphore, VK_NULL_HANDLE,
-                                                         &wd.FrameIndex);
-                    if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR) {
-                        imguiService->setSwapChainRebuild(true);
-                        return;
-                    }
-
-                    VulkanUtils::CheckVKResult(err);
-                    ImGui_ImplVulkanH_Frame *fd = &wd.Frames[getFrameIndex()];
-                    VulkanUtils::CheckVKResult(vkWaitForFences(vulkanContext->device.device, 1, &fd->Fence, VK_TRUE,
-                                                               UINT64_MAX));
-                    VulkanUtils::CheckVKResult(vkResetFences(vulkanContext->device.device, 1, &fd->Fence));
-                    VulkanUtils::CheckVKResult(vkResetCommandPool(vulkanContext->device.device, fd->CommandPool,
-                                                                  VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT));
-                    engineContext->onSync();
-                    ImGuiService::RecordImguiCommandBuffer(drawData, err, wd, fd);
-                    vulkanContext->submitFrame(imageAcquiredSemaphore, wd.FrameSemaphores[wd.SemaphoreIndex].
-                                               RenderCompleteSemaphore, fd);
-                }
-                if (!main_is_minimized)
-                    imguiService->presentFrame();
+            if (!imguiService->beginFrame()) {
+                continue;
             }
+
+            panel->onSync();
+            ImGui::Render();
+            auto *drawData = ImGui::GetDrawData();
+            if (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f) {
+                continue;
+            }
+
+            vulkanContext->getCommandBuffers().clear();
+            auto &wd = vulkanContext->imguiVulkanWindow;
+            VkSemaphore imageAcquiredSemaphore = wd.FrameSemaphores[wd.SemaphoreIndex].ImageAcquiredSemaphore;
+            VkResult err = vkAcquireNextImageKHR(vulkanContext->device.device, wd.Swapchain, UINT64_MAX,
+                                                 imageAcquiredSemaphore, VK_NULL_HANDLE,
+                                                 &wd.FrameIndex);
+            if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR) {
+                imguiService->setSwapChainRebuild(true);
+                continue;
+            }
+
+            VulkanUtils::CheckVKResult(err);
+            ImGui_ImplVulkanH_Frame *fd = &wd.Frames[getFrameIndex()];
+            VulkanUtils::CheckVKResult(vkWaitForFences(vulkanContext->device.device, 1, &fd->Fence, VK_TRUE,
+                                                       UINT64_MAX));
+            VulkanUtils::CheckVKResult(vkResetFences(vulkanContext->device.device, 1, &fd->Fence));
+            VulkanUtils::CheckVKResult(vkResetCommandPool(vulkanContext->device.device, fd->CommandPool,
+                                                          VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT));
+            engineContext->onSync();
+            ImGuiService::RecordImguiCommandBuffer(drawData, err, wd, fd);
+            vulkanContext->submitFrame(imageAcquiredSemaphore, wd.FrameSemaphores[wd.SemaphoreIndex].
+                                       RenderCompleteSemaphore, fd);
+            imguiService->presentFrame();
         }
     }
 } // Metal

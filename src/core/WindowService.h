@@ -22,16 +22,34 @@ namespace Metal {
     class ThemeService;
 
     class WindowService final : public IContextMember, public IInit {
+    public:
+        struct WindowControlRects {
+            SDL_Rect dragArea;
+            SDL_Rect minimizeButton;
+            SDL_Rect maximizeButton;
+            SDL_Rect closeButton;
+        };
+
+    private:
         VulkanContext *vulkanContext = nullptr;
         ThemeService *themeService = nullptr;
         SDL_Window *window = nullptr;
         bool validContext = true;
         std::vector<const char *> instance_extensions{};
 
-        std::vector<std::function<void(int button, int action, int mods)>> mouseButtonCallbacks;
-        std::vector<std::function<void(double xpos, double ypos)>> cursorPosCallbacks;
+        std::vector<std::function<void(int button, int action, int mods)> > mouseButtonCallbacks;
+        std::vector<std::function<void(double xpos, double ypos)> > cursorPosCallbacks;
+
+        WindowControlRects controlRects{};
 
     public:
+        void setWindowControlRects(const WindowControlRects &rects) {
+            controlRects = rects;
+        }
+
+        const WindowControlRects &getWindowControlRects() const {
+            return controlRects;
+        }
 
         std::vector<Dependency> getDependencies() override {
             return {{"VulkanContext", &vulkanContext}, {"ThemeService", &themeService}};
@@ -55,13 +73,21 @@ namespace Metal {
             cursorPosCallbacks.push_back(std::move(callback));
         }
 
-        const std::vector<std::function<void(int, int, int)>> &getMouseButtonCallbacks() const {
+        const std::vector<std::function<void(int, int, int)> > &getMouseButtonCallbacks() const {
             return mouseButtonCallbacks;
         }
 
-        const std::vector<std::function<void(double, double)>> &getCursorPosCallbacks() const {
+        const std::vector<std::function<void(double, double)> > &getCursorPosCallbacks() const {
             return cursorPosCallbacks;
         }
+
+        void close() const;
+
+        [[nodiscard]] bool isMaximized() const;
+
+        void maximize() const;
+
+        void minimize() const;
     };
 }
 

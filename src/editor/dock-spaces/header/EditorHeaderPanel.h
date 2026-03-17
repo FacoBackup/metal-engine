@@ -24,9 +24,11 @@ namespace Metal {
 
         float menuBarHeight = 0;
 
-        void renderMenu(const char *label, std::function<void()> itemsFunc);
+        static void RenderMenu(const char *label, const std::function<void()> &itemsFunc);
         
-        void renderDockAdders();
+        void renderDockAdders() const;
+
+        static void RenderWindowControl(const std::string& icon, const char* id, float xPos, float width, ImU32 hoverColor, std::function<void()> action);
 
     public:
         std::vector<Dependency> getDependencies() override {
