@@ -15,9 +15,9 @@ namespace Metal {
             abort();
     }
 
-    void VulkanUtils::GLFWErrorCallback(int error, const char *description) {
+    void VulkanUtils::SDLErrorCallback(int error, const char *description) {
         char buffer[1024];
-        snprintf(buffer, sizeof(buffer), "GLFW Error %d: %s", error, description);
+        snprintf(buffer, sizeof(buffer), "SDL Error %d: %s", error, description);
         LOG_ERROR(buffer);
     }
 

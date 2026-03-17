@@ -1,7 +1,8 @@
 #include "FrameService.h"
 
 #include <nfd.h>
-#include <GLFW/glfw3.h>
+#include <SDL3/SDL.h>
+#include <imgui_impl_sdl3.h>
 
 #include "ImGuiService.h"
 #include "VulkanContext.h"
@@ -24,9 +25,17 @@ namespace Metal {
     }
 
     void FrameService::start() const {
-        GLFWwindow *window = windowService->getWindow();
-        while (!glfwWindowShouldClose(window)) {
-            glfwPollEvents();
+        SDL_Window *window = windowService->getWindow();
+        bool done = false;
+        while (!done) {
+            SDL_Event event;
+            while (SDL_PollEvent(&event)) {
+                ImGui_ImplSDL3_ProcessEvent(&event);
+                if (event.type == SDL_EVENT_QUIT)
+                    done = true;
+                if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == SDL_GetWindowID(window))
+                    done = true;
+            }
             if (imguiService->beginFrame()) {
                 panel->onSync();
                 ImGui::Render();

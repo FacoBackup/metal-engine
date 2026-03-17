@@ -3,8 +3,9 @@
 
 #include "vk_mem_alloc.h"
 
-#include "imgui_impl_vulkan.h"
-#include <GLFW/glfw3.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_vulkan.h>
+#include <imgui_impl_vulkan.h>
 #include "VkBootstrap.h"
 #include "../common/IInit.h"
 #include "../common/IService.h"
@@ -36,7 +37,7 @@ namespace Metal {
                                       void *pUserData);
 
         void addExtensions(vkb::InstanceBuilder &instanceBuilder,
-                           const ImVector<const char *> &instanceExtensions) const;
+                           const std::vector<const char *> &instanceExtensions) const;
 
         void createSwapChain();
 
@@ -57,7 +58,7 @@ namespace Metal {
         void createDescriptorPool() const;
 
         unsigned int w{}, h{};
-        GLFWwindow *window = nullptr;
+        SDL_Window *window = nullptr;
         std::vector<VkCommandBuffer> commandBuffers{};
 
     public:

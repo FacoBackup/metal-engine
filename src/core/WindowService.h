@@ -1,10 +1,8 @@
 #ifndef METAL_ENGINE_GLFWCONTEXT_H
 #define METAL_ENGINE_GLFWCONTEXT_H
 
-#define GLFW_INCLUDE_NONE
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_vulkan.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 
@@ -26,9 +24,9 @@ namespace Metal {
     class WindowService final : public IContextMember, public IInit {
         VulkanContext *vulkanContext = nullptr;
         ThemeService *themeService = nullptr;
-        GLFWwindow *window = nullptr;
+        SDL_Window *window = nullptr;
         bool validContext = true;
-        ImVector<const char *> instance_extensions{};
+        std::vector<const char *> instance_extensions{};
 
         std::vector<std::function<void(int button, int action, int mods)>> mouseButtonCallbacks;
         std::vector<std::function<void(double xpos, double ypos)>> cursorPosCallbacks;
@@ -39,11 +37,11 @@ namespace Metal {
             return {{"VulkanContext", &vulkanContext}, {"ThemeService", &themeService}};
         }
 
-        [[nodiscard]] const ImVector<const char *> &getInstanceExtensions() const;
+        [[nodiscard]] const std::vector<const char *> &getInstanceExtensions() const;
 
         void onInitialize() override;
 
-        [[nodiscard]] GLFWwindow *getWindow() const;
+        [[nodiscard]] SDL_Window *getWindow() const;
 
         [[nodiscard]] bool isValidContext() const;
 

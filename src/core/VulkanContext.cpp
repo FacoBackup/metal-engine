@@ -14,7 +14,7 @@ namespace Metal {
 
     void VulkanContext::createSwapChain() {
         int w{}, h{};
-        glfwGetFramebufferSize(window, &w, &h);
+        SDL_GetWindowSizeInPixels(window, &w, &h);
         ImGui_ImplVulkanH_CreateOrResizeWindow(instance.instance, physDevice.physical_device,
                                                device.device, &imguiVulkanWindow, queueFamily,
                                                nullptr,
@@ -22,7 +22,7 @@ namespace Metal {
         swapChain = imguiVulkanWindow.Swapchain;
 
         int wW{}, hW{};
-        glfwGetWindowSize(window, &wW, &hW);
+        SDL_GetWindowSize(window, &wW, &hW);
         this->w = static_cast<unsigned int>(wW);
         this->h = static_cast<unsigned int>(hW);
     }
@@ -212,7 +212,7 @@ namespace Metal {
     }
 
     void VulkanContext::addExtensions(vkb::InstanceBuilder &instanceBuilder,
-                                      const ImVector<const char *> &instanceExtensions) const {
+                                      const std::vector<const char *> &instanceExtensions) const {
         if (auto sysInfoResult = vkb::SystemInfo::get_system_info(); sysInfoResult) {
             const auto &sysInfo = sysInfoResult.value();
             if (sysInfo.validation_layers_available && ctx->isDebugMode()) {
@@ -277,8 +277,9 @@ namespace Metal {
             throw std::runtime_error("Failed to create runtime instance.");
         }
         instance = vkbResult.value();
-        VulkanUtils::CheckVKResult(
-            glfwCreateWindowSurface(instance.instance, window, nullptr, &surface));
+        if (!SDL_Vulkan_CreateSurface(window, instance.instance, nullptr, &surface)) {
+            VulkanUtils::CheckVKResult(VK_ERROR_INITIALIZATION_FAILED);
+        }
         createPhysicalDevice();
         createDevice();
         createQueue();

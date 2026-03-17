@@ -1,6 +1,7 @@
 #include "ImGuiService.h"
 
-#include <imgui_impl_glfw.h>
+#include <imgui_impl_sdl3.h>
+#include <SDL3/SDL.h>
 #include "imgui_freetype.h"
 #include "../ApplicationContext.h"
 #include "../common/VulkanUtils.h"
@@ -60,7 +61,7 @@ namespace Metal {
         io.ConfigWindowsResizeFromEdges = true;
 
         // Setup Platform/Renderer backends
-        ImGui_ImplGlfw_InitForVulkan(windowService->getWindow(), true);
+        ImGui_ImplSDL3_InitForVulkan(windowService->getWindow());
         ImGui_ImplVulkan_InitInfo init_info = {};
         init_info.Instance = vulkanContext->instance.instance;
         init_info.PhysicalDevice = vulkanContext->physDevice.physical_device;
@@ -139,7 +140,7 @@ namespace Metal {
         const VkResult err = vkDeviceWaitIdle(vulkanContext->device.device);
         VulkanUtils::CheckVKResult(err);
         ImGui_ImplVulkan_Shutdown();
-        ImGui_ImplGlfw_Shutdown();
+        ImGui_ImplSDL3_Shutdown();
         ImGui::DestroyContext();
         ImGui_ImplVulkanH_DestroyWindow(vulkanContext->instance.instance, vulkanContext->device.device,
                                         &vulkanContext->imguiVulkanWindow,
@@ -149,7 +150,7 @@ namespace Metal {
     bool ImGuiService::beginFrame() {
         // Resize swap chain
         int fb_width, fb_height;
-        glfwGetFramebufferSize(windowService->getWindow(), &fb_width, &fb_height);
+        SDL_GetWindowSizeInPixels(windowService->getWindow(), &fb_width, &fb_height);
         if (fb_width > 0 && fb_height > 0 &&
             (swapChainRebuild || vulkanContext->imguiVulkanWindow.Width !=
              fb_width ||
@@ -166,12 +167,12 @@ namespace Metal {
             vulkanContext->imguiVulkanWindow.FrameIndex = 0;
             swapChainRebuild = false;
         }
-        if (glfwGetWindowAttrib(windowService->getWindow(), GLFW_ICONIFIED) != 0) {
-            ImGui_ImplGlfw_Sleep(10);
+        if (SDL_GetWindowFlags(windowService->getWindow()) & SDL_WINDOW_MINIMIZED) {
+            SDL_Delay(10);
             return false;
         }
         ImGui_ImplVulkan_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
+        ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
         return true;
     }

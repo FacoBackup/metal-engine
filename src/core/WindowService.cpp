@@ -1,7 +1,6 @@
-#include <imgui_impl_glfw.h>
-#define GLFW_EXPOSE_NATIVE_WIN32
-#include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_vulkan.h>
+#include <SDL3/SDL_system.h>
 #include <dwmapi.h>
 #include "WindowService.h"
 #include "../ApplicationContext.h"
@@ -10,7 +9,7 @@
 #include "../editor/service/ThemeService.h"
 
 namespace Metal {
-    GLFWwindow *WindowService::getWindow() const {
+    SDL_Window *WindowService::getWindow() const {
         return window;
     }
 
@@ -19,65 +18,58 @@ namespace Metal {
     }
 
     void WindowService::disposeManually() {
-        glfwDestroyWindow(window);
-        glfwTerminate();
+        if (window) {
+            SDL_DestroyWindow(window);
+            window = nullptr;
+        }
+        SDL_Quit();
     }
 
     void WindowService::onInitialize() {
-        glfwSetErrorCallback(VulkanUtils::GLFWErrorCallback);
-        if (!glfwInit()) {
+        if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
+            SDL_Log("SDL_Init Error: %s", SDL_GetError());
             validContext = false;
+            return;
         }
 
-        if (validContext) {
-            glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-            window = glfwCreateWindow(1280, 720, ENGINE_NAME, nullptr, nullptr);
-            if (!glfwVulkanSupported()) {
-                validContext = false;
-            } else {
-                validContext = true;
-                unsigned int extensions_count = 0;
-                const char **glfw_extensions = glfwGetRequiredInstanceExtensions(&extensions_count);
-                for (unsigned int i = 0; i < extensions_count; i++)
-                    instance_extensions.push_back(glfw_extensions[i]);
+        SDL_WindowFlags window_flags = SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
+        window = SDL_CreateWindow(ENGINE_NAME, 1280, 720, window_flags);
 
-                glfwSetWindowUserPointer(window, this);
-                glfwSetMouseButtonCallback(window, [](GLFWwindow *win, int button, int action, int mods) {
-                    auto *ctx = static_cast<WindowService *>(glfwGetWindowUserPointer(win));
-                    for (auto &callback: ctx->getMouseButtonCallbacks()) {
-                        callback(button, action, mods);
-                    }
-                });
-                glfwSetCursorPosCallback(window, [](GLFWwindow *win, double xpos, double ypos) {
-                    auto *ctx = static_cast<WindowService *>(glfwGetWindowUserPointer(win));
-                    for (auto &callback: ctx->getCursorPosCallbacks()) {
-                        callback(xpos, ypos);
-                    }
-                });
+        if (!window) {
+            SDL_Log("SDL_CreateWindow Error: %s", SDL_GetError());
+            validContext = false;
+            return;
+        }
 
-                // Enable Windows 11 rounded corners and title bar color
-                HWND hwnd = glfwGetWin32Window(window);
-                if (hwnd) {
-                    DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_ROUND;
-                    DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
+        uint32_t extensions_count = 0;
+        const char *const *sdl_extensions = SDL_Vulkan_GetInstanceExtensions(&extensions_count);
+        for (uint32_t i = 0; i < extensions_count; i++) {
+            instance_extensions.push_back(sdl_extensions[i]);
+        }
 
-                    if (themeService) {
-                        COLORREF color = RGB(
-                            static_cast<int>(themeService->palette1.x * 255),
-                            static_cast<int>(themeService->palette1.y * 255),
-                            static_cast<int>(themeService->palette1.z * 255)
-                        );
-                        DwmSetWindowAttribute(hwnd, DWMWA_CAPTION_COLOR, &color, sizeof(color));
+        SDL_ShowWindow(window);
 
-                        COLORREF textColor = RGB(255, 255, 255);
-                        DwmSetWindowAttribute(hwnd, DWMWA_TEXT_COLOR, &textColor, sizeof(textColor));
-                    }
-                }
+        // Enable Windows 11 rounded corners and title bar color
+        HWND hwnd = (HWND)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
+        if (hwnd) {
+            DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_ROUND;
+            DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
+
+            if (themeService) {
+                COLORREF color = RGB(
+                    static_cast<int>(themeService->palette1.x * 255),
+                    static_cast<int>(themeService->palette1.y * 255),
+                    static_cast<int>(themeService->palette1.z * 255)
+                );
+                DwmSetWindowAttribute(hwnd, DWMWA_CAPTION_COLOR, &color, sizeof(color));
+
+                COLORREF textColor = RGB(255, 255, 255);
+                DwmSetWindowAttribute(hwnd, DWMWA_TEXT_COLOR, &textColor, sizeof(textColor));
             }
         }
     }
 
-    const ImVector<const char *> &WindowService::getInstanceExtensions() const {
+    const std::vector<const char *> &WindowService::getInstanceExtensions() const {
         return instance_extensions;
     }
 }
