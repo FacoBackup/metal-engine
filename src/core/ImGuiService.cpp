@@ -14,9 +14,6 @@
 #include "../editor/enum/engine-definitions.h"
 
 namespace Metal {
-    void ImGuiService::endFrame() {
-    }
-
     void ImGuiService::renderImage(TextureInstance *texture, const float sizeX, const float sizeY) const {
         descriptorSetService->setImageDescriptor(texture);
         ImGui::Image(reinterpret_cast<ImTextureID>(texture->imageDescriptor->vkDescriptorSet), ImVec2{sizeX, sizeY});
@@ -125,8 +122,8 @@ namespace Metal {
                                      io.Fonts->GetGlyphRangesDefault());
         fontConfig->MergeMode = true;
         fontConfig->GlyphOffset = ImVec2(-2, 4);
-        constexpr auto MIN = static_cast<ImWchar16>(0xF1000);
-        constexpr auto MAX = static_cast<ImWchar16>(0xFFFFD);
+        constexpr auto MIN = static_cast<ImWchar16>(0xE000);
+        constexpr auto MAX = static_cast<ImWchar16>(0xF8FF);
         constexpr ImWchar RANGES[] = {MIN, MAX, 0};
         io.Fonts->AddFontFromFileTTF("resources/fonts/MaterialIcons.ttf", 18, fontConfig, RANGES);
         largeIconsFont = io.Fonts->AddFontFromFileTTF("resources/fonts/MaterialIcons.ttf", LARGE_FONT_SIZE, nullptr,

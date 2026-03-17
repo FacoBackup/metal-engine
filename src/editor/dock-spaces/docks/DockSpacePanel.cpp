@@ -73,7 +73,8 @@ namespace Metal {
         if (view != nullptr) {
             if (isHovered) {
                 editorRepository->focusedShortcuts = view->getShortcuts();
-                editorRepository->focusedWindowName = view->dock->icon + " " + view->dock->name;
+                editorRepository->focusedWindowName =
+                        UIUtil::GetDockSpaceIcon(view->dock->index) + " " + view->dock->name;
             }
 
             view->isWindowFocused = isHovered;
@@ -94,9 +95,7 @@ namespace Metal {
         }
         ImGui::SetNextWindowSizeConstraints(MIN_SIZE, MAX_SIZE);
         if (!sizeInitialized && dock->sizeX > 0 && dock->sizeY > 0) {
-            UIUtil::AUX_VEC2.x = dock->sizeX;
-            UIUtil::AUX_VEC2.y = dock->sizeY;
-            ImGui::SetNextWindowSize(UIUtil::AUX_VEC2);
+            ImGui::SetNextWindowSize(ImVec2(dock->sizeX, dock->sizeY));
             sizeInitialized = true;
         }
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
@@ -186,19 +185,20 @@ namespace Metal {
                     ImGui::PushStyleColor(ImGuiCol_Button, themeService->palette3);
                 }
 
-                if (ImGui::Button((space->icon + " " + space->name + id + std::to_string(space->index)).c_str(), ImVec2(0, headerHeight))) {
+                if (ImGui::Button(
+                    (UIUtil::GetDockSpaceIcon(space->index) + space->name + id + std::to_string(space->index)).c_str(),
+                    ImVec2(0, headerHeight))) {
                     dock->selectedOption = space->index;
                     initializeView();
                 }
 
-                if ( !dock->isCenter) {
+                if (!dock->isCenter) {
                     ImGui::SameLine(0, 0);
-                    ImGui::PushStyleColor(ImGuiCol_Button,
-                                          isSelected
-                                              ? (isFocused ? editorRepository->accent : themeService->palette3)
-                                              : themeService->palette3);
-                    if (ImGui::Button((Icons::close + "##close" + std::to_string(space->index) + id).c_str(),
-                                      ImVec2(0, headerHeight))) {
+                    ImGui::PushStyleColor(ImGuiCol_Button, themeService->palette0);
+                    ImGui::PushStyleColor(ImGuiCol_Border, themeService->palette0);
+
+                    if (UIUtil::ButtonSimple(Icons::close + "##close" + std::to_string(space->index) + id, headerHeight,
+                                             headerHeight)) {
                         int indexToRemove = -1;
                         for (int i = 0; i < (int) dock->dockSpaces.size(); i++) {
                             if (dock->dockSpaces[i]->index == space->index) {
@@ -218,7 +218,7 @@ namespace Metal {
                             }
                         }
                     }
-                    ImGui::PopStyleColor();
+                    ImGui::PopStyleColor(2);
                 }
 
                 ImGui::PopStyleColor();
@@ -237,7 +237,7 @@ namespace Metal {
             ImGui::Separator();
             for (auto *option: DockSpace::OPTIONS_LIST) {
                 const bool exists = hasDockSpace(option->index);
-                const std::string label = option->icon + " " + option->name;
+                const std::string label = UIUtil::GetDockSpaceIcon(option->index) + " " + option->name;
                 if (ImGui::MenuItem(label.c_str(), nullptr, false, !exists)) {
                     dock->dockSpaces.emplace_back(option);
                     dock->selectedOption = option->index;
@@ -278,9 +278,9 @@ namespace Metal {
         if (mainWindow != nullptr && mainWindow.get() != this) {
             const ImVec2 &pos = mainWindow->getPosition();
             const ImVec2 &sze = mainWindow->getSize();
-            UIUtil::AUX_VEC2.x = pos.x + sze.x * 0.5f;
-            UIUtil::AUX_VEC2.y = pos.y + sze.y * 0.5f;
-            ImGui::SetNextWindowPos(UIUtil::AUX_VEC2, ImGuiCond_FirstUseEver, PIVOT);
+            ImGui::SetNextWindowPos(ImVec2(
+                                        pos.x + sze.x * 0.5f,
+                                        pos.y + sze.y * 0.5f), ImGuiCond_FirstUseEver, PIVOT);
         }
     }
 

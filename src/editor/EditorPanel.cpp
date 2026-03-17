@@ -29,13 +29,13 @@ namespace Metal {
 
         // Header
         {
-            UIUtil::AUX_VEC2.x = viewport->Pos.x;
-            UIUtil::AUX_VEC2.y = viewport->Pos.y;
-            ImGui::SetNextWindowPos(UIUtil::AUX_VEC2);
+            ImGui::SetNextWindowPos(ImVec2(
+                viewport->Pos.x,
+                viewport->Pos.y));
 
-            UIUtil::AUX_VEC2.x = viewport->Size.x;
-            UIUtil::AUX_VEC2.y = HEADER_HEIGHT;
-            ImGui::SetNextWindowSize(UIUtil::AUX_VEC2);
+            ImGui::SetNextWindowSize(ImVec2(
+                viewport->Size.x,
+                HEADER_HEIGHT));
 
             SetWindowStyle(UIUtil::VEC2_ZERO);
             ImGui::Begin(NAME_HEADER, &UIUtil::OPEN, FLAGS | ImGuiWindowFlags_NoScrollbar);
@@ -44,21 +44,22 @@ namespace Metal {
             headerPanel->onSync();
             ImGui::End();
         }
+        ImVec2 tempVec2{};
 
         // Main Window (DockSpace)
         {
-            UIUtil::AUX_VEC2.x = viewport->Pos.x;
-            UIUtil::AUX_VEC2.y = viewport->Pos.y + HEADER_HEIGHT;
-            ImGui::SetNextWindowPos(UIUtil::AUX_VEC2);
+            tempVec2.x = viewport->Pos.x;
+            tempVec2.y = viewport->Pos.y + HEADER_HEIGHT;
+            ImGui::SetNextWindowPos(tempVec2);
 
-            UIUtil::AUX_VEC2.x = viewport->Size.x;
-            UIUtil::AUX_VEC2.y = viewport->Size.y - HEADER_HEIGHT - FOOTER_HEIGHT;
-            ImGui::SetNextWindowSize(UIUtil::AUX_VEC2);
+            tempVec2.x = viewport->Size.x;
+            tempVec2.y = viewport->Size.y - HEADER_HEIGHT - FOOTER_HEIGHT;
+            ImGui::SetNextWindowSize(tempVec2);
             ImGui::SetNextWindowViewport(viewport->ID);
 
-            UIUtil::AUX_VEC2.x = 4.0f;
-            UIUtil::AUX_VEC2.y = .0f;
-            SetWindowStyle(UIUtil::AUX_VEC2);
+            tempVec2.x = 4.0f;
+            tempVec2.y = .0f;
+            SetWindowStyle(tempVec2);
             ImGui::Begin(NAME, &UIUtil::OPEN, FLAGS);
             windowId = ImGui::GetID(NAME);
             ImGui::PopStyleVar(3);
@@ -75,13 +76,13 @@ namespace Metal {
 
         // Footer
         {
-            UIUtil::AUX_VEC2.x = viewport->Pos.x;
-            UIUtil::AUX_VEC2.y = viewport->Pos.y + viewport->Size.y - FOOTER_HEIGHT;
-            ImGui::SetNextWindowPos(UIUtil::AUX_VEC2);
+            tempVec2.x = viewport->Pos.x;
+            tempVec2.y = viewport->Pos.y + viewport->Size.y - FOOTER_HEIGHT;
+            ImGui::SetNextWindowPos(tempVec2);
 
-            UIUtil::AUX_VEC2.x = viewport->Size.x;
-            UIUtil::AUX_VEC2.y = FOOTER_HEIGHT;
-            ImGui::SetNextWindowSize(UIUtil::AUX_VEC2);
+            tempVec2.x = viewport->Size.x;
+            tempVec2.y = FOOTER_HEIGHT;
+            ImGui::SetNextWindowSize(tempVec2);
 
             SetWindowStyle(UIUtil::VEC2_ZERO);
             ImGui::Begin(NAME_FOOTER, &UIUtil::OPEN, FLAGS | ImGuiWindowFlags_NoScrollbar);

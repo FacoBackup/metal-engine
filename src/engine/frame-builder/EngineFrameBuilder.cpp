@@ -82,7 +82,7 @@ namespace Metal {
         builders.push_back(currentBuilder);
     }
 
-    EngineFrameBuilder &EngineFrameBuilder::addComputeCommandBuffer(const std::string &id) {
+    EngineFrameBuilder &EngineFrameBuilder::addComputeCommandBuffer(const std::string &id, bool requiresRayTracing) {
         currentBuilder = std::make_shared<CommandBufferRecorderBuilder>(frameId + "_" + id);
         storeBuilder();
         return *this;

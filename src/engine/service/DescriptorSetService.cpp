@@ -102,7 +102,8 @@ namespace Metal {
             attachment->imageDescriptor->bindings.push_back(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
                 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
                 vulkanContext->vkImageSampler,
-                attachment->vkImageView));
+                attachment->vkImageView,
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
             updateDescriptor(attachment->imageDescriptor);
         }
     }
@@ -114,7 +115,8 @@ namespace Metal {
                                                                                VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                                                0,
                                                                                texture->vkSampler,
-                                                                               texture->vkImageView
+                                                                               texture->vkImageView,
+                                                                               VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
             ));
             updateDescriptor(texture->imageDescriptor);
         }
@@ -154,8 +156,10 @@ namespace Metal {
         layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         layoutInfo.bindingCount = descriptorSetLayoutBindings.size();
         layoutInfo.pBindings = descriptorSetLayoutBindings.data();
-        layoutInfo.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT_EXT;
-        layoutInfo.pNext = &flagsInfo;
+        if (descriptor->bindings.size() == 1 && descriptor->bindings[0].descriptorCount > 1) {
+            layoutInfo.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT_EXT;
+            layoutInfo.pNext = &flagsInfo;
+        }
 
         VulkanUtils::CheckVKResult(vkCreateDescriptorSetLayout(vulkanContext->device.device, &layoutInfo,
                                                                nullptr,

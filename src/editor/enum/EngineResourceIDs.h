@@ -14,7 +14,7 @@ namespace Metal {
     inline constexpr const char* RID_TEMPORAL_OUTPUT = "temporalOutput";
     inline constexpr const char* RID_PREVIOUS_DENOISED_FRAME = "previousDenoisedFrame";
     inline constexpr const char* RID_POST_PROCESSING_FBO = "postProcessingFBO";
-    inline constexpr const char* RID_COMPUTE_CB = "ComputeCB";
+    inline constexpr const char* RID_RT_COMPUTE_CB = "ComputeCB";
     inline constexpr const char* RID_POST_PROCESSING_CB = "PostProcessingCB";
     inline constexpr const char* RID_VOLUMES_BUFFER = "volumesBuffer";
     inline constexpr const char* RID_SELECTION_FBO = "selectionFBO";

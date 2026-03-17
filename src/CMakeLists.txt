@@ -46,6 +46,7 @@ set(ENGINE_SOURCES
         editor/abstract/form/types/MethodField.cpp
         editor/abstract/form/types/MethodField.h
         editor/util/UIUtil.h
+        editor/util/UIUtil.cpp
         editor/dock-spaces/header/EditorHeaderPanel.cpp
         editor/dock-spaces/header/EditorHeaderPanel.h
         editor/dock-spaces/header/AsyncTaskPanel.cpp
@@ -132,8 +133,6 @@ set(ENGINE_SOURCES
         editor/service/FileImporterService.h
         editor/dock-spaces/files/FilesContext.cpp
         engine/dto/VertexData.h
-        editor/dock-spaces/viewport/CameraPositionPanel.cpp
-        editor/dock-spaces/viewport/CameraPositionPanel.h
         editor/passes/GridPass.cpp
         editor/passes/GridPass.h
         engine/passes/CommandBufferRecorder.cpp

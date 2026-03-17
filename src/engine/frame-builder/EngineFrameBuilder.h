@@ -66,7 +66,7 @@ namespace Metal {
 
         void storeBuilder();
 
-        EngineFrameBuilder &addComputeCommandBuffer(const std::string &id);
+        EngineFrameBuilder &addComputeCommandBuffer(const std::string &id, bool requiresRayTracing = false);
 
         EngineFrameBuilder &addPass(std::unique_ptr<AbstractPass> pass, const std::string &commandBufferId);
 
