@@ -1,8 +1,9 @@
-#ifndef SELECTIONIDPASS_H
-#define SELECTIONIDPASS_H
+#ifndef DEBUGPHONGPASS_H
+#define DEBUGPHONGPASS_H
 
 #include "../../engine/passes/AbstractRenderPass.h"
-#include "../dto/SelectionOutlinePushConstant.h"
+#include <glm/mat4x4.hpp>
+#include <glm/vec4.hpp>
 
 namespace Metal {
     class PipelineService;
@@ -10,13 +11,19 @@ namespace Metal {
     struct WorldRepository;
     class MeshService;
 
-    class SelectionIDPass final : public AbstractRenderPass {
-        SelectionOutlinePushConstant pushConstant{};
+    struct DebugPhongPushConstant {
+        glm::mat4 model;
+        glm::vec4 color;
+    };
+
+    class FallbackPass final : public AbstractRenderPass {
+        DebugPhongPushConstant pushConstant{};
 
         PipelineService *pipelineService = nullptr;
         EditorRepository *editorRepository = nullptr;
         WorldRepository *worldRepository = nullptr;
         MeshService *meshService = nullptr;
+        VulkanContext *vulkanContext = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
@@ -24,6 +31,7 @@ namespace Metal {
                 {"PipelineService", &pipelineService},
                 {"EditorRepository", &editorRepository},
                 {"WorldRepository", &worldRepository},
+                {"VulkanContext", &vulkanContext},
                 {"MeshService", &meshService}
             };
         }
@@ -36,4 +44,4 @@ namespace Metal {
     };
 } // Metal
 
-#endif // SELECTIONIDPASS_H
+#endif // DEBUGPHONGPASS_H

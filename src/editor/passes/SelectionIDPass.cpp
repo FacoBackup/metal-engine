@@ -1,7 +1,7 @@
 #include "SelectionIDPass.h"
 #include "../../engine/dto/TransformComponent.h"
 #include "../../engine/dto/PrimitiveComponent.h"
-#include "../dto/SelectedDotPushConstant.h"
+#include "../dto/SelectionOutlinePushConstant.h"
 #include "../../engine/dto/PipelineBuilder.h"
 #include "../../engine/service/PipelineService.h"
 #include "../repository/EditorRepository.h"
@@ -16,9 +16,9 @@ namespace Metal {
                     "tools/SelectionID.vert",
                     "tools/SelectionID.frag"
                 )
-                .setPrepareForMesh()
+                .enablePrimitiveRendering()
                 .setCullMode(VK_CULL_MODE_NONE)
-                .setPushConstantsSize(sizeof(SelectedDotPushConstant))
+                .setPushConstantsSize(sizeof(SelectionOutlinePushConstant))
                 .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA));
         pipelineInstance = pipelineService->createPipeline(builder);
     }

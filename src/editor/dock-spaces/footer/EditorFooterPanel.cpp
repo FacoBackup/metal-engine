@@ -7,10 +7,19 @@
 
 namespace Metal {
     void EditorFooterPanel::onSync() {
-        asyncTaskPanel->onSync();
         ImGui::SameLine();
         renderShortcuts();
+        ImGui::SameLine(ImGui::GetWindowWidth() - 150);
+
         framerate();
+        ImGui::SameLine();
+        if (UIUtil::ButtonSimple(
+            (editorRepository->isDarkMode ? Icons::light_mode : Icons::dark_mode) + id + "theme",
+            UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
+            editorRepository->isDarkMode = !editorRepository->isDarkMode;
+        }
+        ImGui::SameLine();
+        asyncTaskPanel->onSync();
     }
 
     void EditorFooterPanel::onInitialize() {
@@ -20,13 +29,7 @@ namespace Metal {
     void EditorFooterPanel::framerate() {
         const int framerate = static_cast<int>(round(ImGui::GetIO().Framerate));
         if (framerate > 0) {
-            ImGui::SameLine(ImGui::GetWindowWidth() - 130);
             ImGui::Text("%i ms | %i fps", 1000 / framerate, framerate);
-            ImGui::SameLine();
-            if (UIUtil::ButtonSimple((editorRepository->isDarkMode ? Icons::light_mode : Icons::dark_mode) + id + "theme",
-                                     UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-                editorRepository->isDarkMode = !editorRepository->isDarkMode;
-            }
         }
     }
 

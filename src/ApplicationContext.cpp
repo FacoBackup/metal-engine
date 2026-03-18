@@ -11,7 +11,7 @@
 #include "common/LoggerUtil.h"
 
 #include "engine/EngineContext.h"
-#include "core/glfw/GLFWContext.h"
+#include "core/WindowService.h"
 
 namespace Metal {
     ApplicationContext::ApplicationContext(bool debugMode) : debugMode(debugMode) {

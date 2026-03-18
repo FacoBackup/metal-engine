@@ -3,17 +3,18 @@
 
 #include "vk_mem_alloc.h"
 
-#include "imgui_impl_vulkan.h"
-#include <GLFW/glfw3.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_vulkan.h>
+#include <imgui_impl_vulkan.h>
 #include "VkBootstrap.h"
-#include "../../common/IInit.h"
-#include "../../common/IService.h"
-#include "../../common/IDisposable.h"
+#include "../common/IInit.h"
+#include "../common/IService.h"
+#include "../common/IDisposable.h"
 
 #define VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME "VK_KHR_portability_subset"
 
 namespace Metal {
-    class GLFWContext;
+    class WindowService;
     struct EngineRepository;
     class MeshService;
     class TextureService;
@@ -22,7 +23,7 @@ namespace Metal {
     class RayTracingService;
 
     class VulkanContext final : public IService, public IInit {
-        GLFWContext *glfwContext = nullptr;
+        WindowService *windowService = nullptr;
         EngineRepository *engineRepository = nullptr;
         MeshService *meshService = nullptr;
         TextureService *textureService = nullptr;
@@ -36,7 +37,7 @@ namespace Metal {
                                       void *pUserData);
 
         void addExtensions(vkb::InstanceBuilder &instanceBuilder,
-                           const ImVector<const char *> &instanceExtensions) const;
+                           const std::vector<const char *> &instanceExtensions) const;
 
         void createSwapChain();
 
@@ -57,7 +58,7 @@ namespace Metal {
         void createDescriptorPool() const;
 
         unsigned int w{}, h{};
-        GLFWwindow *window = nullptr;
+        SDL_Window *window = nullptr;
         std::vector<VkCommandBuffer> commandBuffers{};
 
     public:
@@ -69,7 +70,7 @@ namespace Metal {
 
         std::vector<Dependency> getDependencies() override {
             return {
-                {"GLFWContext", &glfwContext},
+                {"WindowService", &windowService},
                 {"EngineRepository", &engineRepository},
                 {"MeshService", &meshService},
                 {"TextureService", &textureService},
@@ -96,6 +97,7 @@ namespace Metal {
         VkPhysicalDeviceRayTracingPipelinePropertiesKHR rayTracingPipelineProperties{};
         VkSampler vkImageSampler = VK_NULL_HANDLE;
         VkSampler vkTextureSampler = VK_NULL_HANDLE;
+        bool rayTracingSupported = false;
 
         PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR = nullptr;
         PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR = nullptr;
@@ -117,6 +119,10 @@ namespace Metal {
 
         [[nodiscard]] unsigned int getWindowWidth() const {
             return w;
+        }
+
+        [[nodiscard]] bool isRayTracingSupported() const {
+            return rayTracingSupported;
         }
 
         [[nodiscard]] VkCommandBuffer beginSingleTimeCommands() const;

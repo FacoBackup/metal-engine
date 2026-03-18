@@ -1,9 +1,9 @@
 #include "ApplicationContext.h"
 #include "core/DirectoryService.h"
 #include "core/FrameService.h"
-#include "core/glfw/GLFWContext.h"
-#include "core/gui/GuiContext.h"
-#include "core/vulkan/VulkanContext.h"
+#include "core/WindowService.h"
+#include "core/ImGuiService.h"
+#include "core/VulkanContext.h"
 #include "editor/EditorPanel.h"
 #include "editor/service/AsyncTaskService.h"
 #include "editor/service/DockService.h"
@@ -49,9 +49,9 @@ int main(int, char **) {
 
     // --- ORDER MATTERS
     context->registerSingleton(context);
-    context->registerSingleton(std::make_shared<Metal::GLFWContext>());
+    context->registerSingleton(std::make_shared<Metal::WindowService>());
     context->registerSingleton(std::make_shared<Metal::VulkanContext>());
-    context->registerSingleton(std::make_shared<Metal::GuiContext>());
+    context->registerSingleton(std::make_shared<Metal::ImGuiService>());
     context->registerSingleton(std::make_shared<Metal::DirectoryService>());
     // --- ORDER MATTERS
 
@@ -110,9 +110,9 @@ int main(int, char **) {
     }
     frameService.start();
     context->dispose();
-    context->getSingleton<Metal::GuiContext>().disposeManually();
+    context->getSingleton<Metal::ImGuiService>().disposeManually();
     context->getSingleton<Metal::VulkanContext>().disposeManually();
-    context->getSingleton<Metal::GLFWContext>().disposeManually();
+    context->getSingleton<Metal::WindowService>().disposeManually();
 
     return 0;
 }

@@ -17,6 +17,7 @@ namespace Metal {
     struct FrameBufferInstance;
     struct DescriptorBinding;
     class ResourceBuilder;
+    class VulkanContext;
     class EngineFrame;
 
     struct PassData {
@@ -30,10 +31,14 @@ namespace Metal {
         std::vector<PassData> passes{};
         std::shared_ptr<ResourceBuilder> currentBuilder{};
         EngineContext *engineContext = nullptr;
+        VulkanContext *vulkanContext = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
-            return {{"EngineContext", &engineContext}};
+            return {
+                {"EngineContext", &engineContext},
+                {"VulkanContext", &vulkanContext}
+            };
         }
 
         explicit EngineFrameBuilder(std::string frameId = Util::uuidV4());
@@ -61,7 +66,7 @@ namespace Metal {
 
         void storeBuilder();
 
-        EngineFrameBuilder &addComputeCommandBuffer(const std::string &id);
+        EngineFrameBuilder &addComputeCommandBuffer(const std::string &id, bool requiresRayTracing = false);
 
         EngineFrameBuilder &addPass(std::unique_ptr<AbstractPass> pass, const std::string &commandBufferId);
 

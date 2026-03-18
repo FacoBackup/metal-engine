@@ -7,23 +7,23 @@
 namespace Metal {
     class EngineContext;
     class VulkanContext;
-    class GLFWContext;
-    class GuiContext;
+    class WindowService;
+    class ImGuiService;
     class AbstractPanel;
 
     class FrameService final : public IService {
-        GLFWContext *glfwContext = nullptr;
+        WindowService *windowService = nullptr;
         VulkanContext *vulkanContext = nullptr;
         EngineContext *engineContext = nullptr;
-        GuiContext *guiContext = nullptr;
+        ImGuiService *imguiService = nullptr;
         AbstractPanel *panel = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"GLFWContext", &glfwContext},
+                {"WindowService", &windowService},
                 {"VulkanContext", &vulkanContext},
-                {"GuiContext", &guiContext},
+                {"ImguiService", &imguiService},
                 {"EngineContext", &engineContext}
             };
         }

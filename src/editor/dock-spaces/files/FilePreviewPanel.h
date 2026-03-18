@@ -6,19 +6,19 @@
 
 namespace Metal {
     class TextureService;
-    class GuiContext;
+    class ImGuiService;
 
     class FilePreviewPanel final : public AbstractPanel {
         FilesContext &filesContext;
 
         TextureService *textureService = nullptr;
-        GuiContext *guiContext = nullptr;
+        ImGuiService *guiContext = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
             return {
                 {"TextureService", &textureService},
-                {"GuiContext", &guiContext}
+                {"ImguiService", &guiContext}
             };
         }
 

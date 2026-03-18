@@ -11,7 +11,7 @@ namespace Metal {
                     "QUAD.vert",
                     "tools/Grid.frag"
                 )
-                .setBlendEnabled()
+                .enableBlending()
                 .setPushConstantsSize(sizeof(GridPushConstant))
                 .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
                 .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_POSITION_INDEX));

@@ -68,10 +68,10 @@ namespace Metal {
 
     void FilesListPanel::handleDrag() const {
         if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && onDrag != nullptr) {
-            UIUtil::AUX_VEC2 = ImGui::GetMousePos();
-            UIUtil::AUX_VEC2.x += 10;
-            UIUtil::AUX_VEC2.y += 10;
-            ImGui::SetNextWindowPos(UIUtil::AUX_VEC2);
+            ImVec2 mousePos = ImGui::GetMousePos();
+            mousePos.x += 10;
+            mousePos.y += 10;
+            ImGui::SetNextWindowPos(mousePos);
             ImGui::Begin((onDrag->getId() + std::string("drag")).c_str(), &UIUtil::OPEN,
                          ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
             ImGui::Text("Dragging Node %s", onDrag->name.c_str());

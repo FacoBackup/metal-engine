@@ -5,9 +5,9 @@
 #include "../dto/DescriptorBinding.h"
 #include "../resource/MeshInstance.h"
 #include "../dto/VertexData.h"
-#include "../../core/vulkan/VulkanUtils.h"
+#include "../../common/VulkanUtils.h"
 #include "../../editor/enum/EngineResourceIDs.h"
-#include "../../core/vulkan/VulkanContext.h"
+#include "../../core/VulkanContext.h"
 #include "../../common/LoggerUtil.h"
 #include "../dto/TransformComponent.h"
 #include "../dto/PrimitiveComponent.h"
@@ -21,30 +21,14 @@
 #include <cstddef>
 
 namespace Metal {
-    void RayTracingService::onInitialize() {
-        historyEventService->subscribe<TransformComponent>([this](const HistoryEvent &event) {
-            auto *abstractComp = dynamic_cast<AbstractComponent *>(event.instance);
-            if (abstractComp && worldRepository->hasComponent(abstractComp->getEntityId(), PRIMITIVE)) {
-                markDirty();
-            }
-        });
-        historyEventService->subscribe<PrimitiveComponent>([this](const HistoryEvent &) {
-            markDirty();
-            updateMeshMaterials();
-        });
-        historyEventService->subscribeGeneric([this](const HistoryEvent &) {
-            markDirty();
-        });
-    }
-
-    VkDeviceAddress RayTracingService::getDeviceAddress(VkBuffer buffer) const {
+    VkDeviceAddress RayTracingService::getDeviceAddress(VkBuffer buffer) {
         VkBufferDeviceAddressInfo info{};
         info.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
         info.buffer = buffer;
         return vulkanContext->vkGetBufferDeviceAddressKHR(vulkanContext->device.device, &info);
     }
 
-    void RayTracingService::updateDescriptorSets(VkAccelerationStructureKHR asHandle) const {
+    void RayTracingService::updateDescriptorSets(VkAccelerationStructureKHR asHandle) {
         auto descriptors = pipelineService->getAllDescriptors();
         for (auto *descriptor: descriptors) {
             bool needsUpdate = false;
@@ -61,7 +45,15 @@ namespace Metal {
         }
     }
 
+    // TODO - EVENT SYSTEM BASED ON WORLD CHANGE AND ENTITY CHANGE
     void RayTracingService::onSync() {
+        if (!vulkanContext->rayTracingSupported) {
+            return;
+        }
+        if (needsMaterialUpdate) {
+            updateMeshMaterials();
+            needsMaterialUpdate = false;
+        }
         if (!needsRebuild) {
             return;
         }
@@ -106,7 +98,7 @@ namespace Metal {
     }
 
     bool RayTracingService::isReady() const {
-        return accelerationStructureBuilt && anyMeshes && tlas != VK_NULL_HANDLE;
+        return vulkanContext->rayTracingSupported && accelerationStructureBuilt && anyMeshes && tlas != VK_NULL_HANDLE;
     }
 
     void RayTracingService::updateMeshMaterials() {
@@ -135,6 +127,9 @@ namespace Metal {
     }
 
     void RayTracingService::destroyTLAS() {
+        if (!vulkanContext->rayTracingSupported) {
+            return;
+        }
         if (vulkanContext->device.device != VK_NULL_HANDLE) {
             vkDeviceWaitIdle(vulkanContext->device.device);
         }
@@ -416,6 +411,9 @@ namespace Metal {
     }
 
     void RayTracingService::dispose() {
+        if (!vulkanContext->rayTracingSupported) {
+            return;
+        }
         if (vulkanContext->device.device != VK_NULL_HANDLE) {
             vkDeviceWaitIdle(vulkanContext->device.device);
         }

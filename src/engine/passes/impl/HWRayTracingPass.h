@@ -38,6 +38,10 @@ namespace Metal {
         void onSync() override;
 
         void onInitialize() override;
+
+        bool requiresRayTracing() override {
+            return true;
+        }
     };
 } // Metal
 

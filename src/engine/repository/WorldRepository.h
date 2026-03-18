@@ -15,6 +15,11 @@ namespace Metal {
     class DirectoryService;
     class HistoryService;
 
+    struct EntityState {
+        entt::entity id;
+        nlohmann::json data;
+    };
+
     struct WorldRepository final : IRepository {
         RayTracingService *rayTracingService = nullptr;
         DirectoryService *directoryService = nullptr;
@@ -40,6 +45,8 @@ namespace Metal {
         [[nodiscard]] MetadataComponent *getEntity(entt::entity node);
         [[nodiscard]] bool hasComponent(entt::entity entity, ComponentType type) const;
 
+        EntityState serializeEntityComplete(std::vector<entt::entity>::value_type entityId);
+
         void deleteEntities(const std::vector<entt::entity> &entities);
 
         void changeVisibility(entt::entity entity, bool isVisible);
@@ -49,6 +56,8 @@ namespace Metal {
         nlohmann::json toJson() const override;
 
         void fromJson(const nlohmann::json &j) override;
+
+        void deserializeEntityComplete(const EntityState & state);
     };
 } // Metal
 

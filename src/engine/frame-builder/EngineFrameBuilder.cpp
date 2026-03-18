@@ -1,5 +1,6 @@
 #include "EngineFrameBuilder.h"
 
+#include "../../core/VulkanContext.h"
 #include "structures/FramebufferBuilder.h"
 #include "structures/TextureBuilder.h"
 #include "structures/BufferBuilder.h"
@@ -81,7 +82,7 @@ namespace Metal {
         builders.push_back(currentBuilder);
     }
 
-    EngineFrameBuilder &EngineFrameBuilder::addComputeCommandBuffer(const std::string &id) {
+    EngineFrameBuilder &EngineFrameBuilder::addComputeCommandBuffer(const std::string &id, bool requiresRayTracing) {
         currentBuilder = std::make_shared<CommandBufferRecorderBuilder>(frameId + "_" + id);
         storeBuilder();
         return *this;
@@ -89,6 +90,9 @@ namespace Metal {
 
     EngineFrameBuilder &EngineFrameBuilder::addPass(std::unique_ptr<AbstractPass> pass,
                                                     const std::string &commandBufferId) {
+        if (pass->requiresRayTracing() && !vulkanContext->isRayTracingSupported()) {
+            return *this;
+        }
         passes.emplace_back(std::move(pass), frameId + "_" + commandBufferId);
         return *this;
     }
@@ -135,6 +139,5 @@ namespace Metal {
                 }
             }
         }
-
     }
 } // Metal
