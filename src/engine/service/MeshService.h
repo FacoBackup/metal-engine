@@ -21,7 +21,6 @@ namespace Metal {
         BufferService *bufferService = nullptr;
         RayTracingService *rayTracingService = nullptr;
         DirectoryService *directoryService = nullptr;
-        EventService *eventService = nullptr;
         WorldRepository *worldRepository = nullptr;
 
     public:
@@ -32,7 +31,6 @@ namespace Metal {
                 {"BufferService", &bufferService},
                 {"RayTracingService", &rayTracingService},
                 {"DirectoryService", &directoryService},
-                {"EventService", &eventService},
                 {"WorldRepository", &worldRepository}
             };
         }

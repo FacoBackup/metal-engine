@@ -5,6 +5,7 @@
 #include "../dto/Notification.h"
 #include "../service/NotificationService.h"
 #include "../../engine/EngineContext.h"
+#include "editor/enum/NotificationSeverity.h"
 
 namespace Metal {
     void NotificationsPanel::onSync() {

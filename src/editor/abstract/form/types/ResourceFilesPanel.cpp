@@ -2,7 +2,7 @@
 
 #include "../../../../common/Icons.h"
 #include "../../../dto/FSEntry.h"
-#include "../../../service/FilesService.h"
+#include "editor/service/FilesService.h"
 
 namespace Metal {
     std::function<void()> ResourceFilesPanel::onAction() {

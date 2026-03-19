@@ -36,21 +36,9 @@ namespace Metal {
     }
 
     void VolumeService::onInitialize() {
-        eventService->subscribe("VolumeComponent", [this](const Event &) {
+        eventListener([this](const Event &) {
             needsUpdate = true;
-        });
-
-        eventService->subscribe("Action", [this](const Event &) {
-            needsUpdate = true;
-        });
-
-        eventService->subscribe("Undo", [this](const Event &) {
-            needsUpdate = true;
-        });
-
-        eventService->subscribe("Redo", [this](const Event &) {
-            needsUpdate = true;
-        });
+        }, "VolumeComponent");
     }
 
     void VolumeService::onSync() {

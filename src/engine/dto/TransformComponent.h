@@ -14,7 +14,6 @@ namespace Metal {
         glm::mat4x4 model = glm::identity<glm::mat4x4>();
         glm::vec3 translation{};
         glm::vec3 rotationEuler = {0, 0, 0};
-        glm::quat rotation = {0, 0, 0, 1};
         glm::vec3 scale{1, 1, 1};
         glm::vec3 gizmoCenter{0, 0, 0};
         bool forceTransform = false;

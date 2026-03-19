@@ -13,21 +13,9 @@
 
 namespace Metal {
     void LightService::onInitialize() {
-        eventService->subscribe("LightComponent", [this](const Event &) {
+        eventListener([this](const Event &) {
             needsUpdate = true;
-        });
-
-        eventService->subscribe("Action", [this](const Event &) {
-            needsUpdate = true;
-        });
-
-        eventService->subscribe("Undo", [this](const Event &) {
-            needsUpdate = true;
-        });
-
-        eventService->subscribe("Redo", [this](const Event &) {
-            needsUpdate = true;
-        });
+        }, "LightComponent");
     }
 
     void LightService::registerLights() {

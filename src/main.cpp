@@ -9,7 +9,6 @@
 #include "editor/service/DockService.h"
 #include "editor/service/FileImporterService.h"
 #include "editor/service/FilesService.h"
-#include "editor/service/EventService.h"
 #include "editor/service/HistoryService.h"
 #include "editor/service/MaterialImporterService.h"
 #include "editor/service/MeshImporterService.h"
@@ -68,7 +67,6 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::BufferService>());
     context->registerSingleton(std::make_shared<Metal::CommandBufferRecorderService>());
     context->registerSingleton(std::make_shared<Metal::NotificationService>());
-    context->registerSingleton(std::make_shared<Metal::EventService>());
     context->registerSingleton(std::make_shared<Metal::HistoryService>());
     context->registerSingleton(std::make_shared<Metal::DescriptorSetService>());
     context->registerSingleton(std::make_shared<Metal::ThemeService>());

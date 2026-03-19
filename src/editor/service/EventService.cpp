@@ -2,6 +2,9 @@
 #include "common/LoggerUtil.h"
 
 namespace Metal {
+    std::map<int, EventService::Subscription> EventService::subscribers;
+    int EventService::nextId = 0;
+
     int EventService::subscribe(const std::string &key, const std::function<void(const Event &)> &callback) {
         int id = nextId++;
         subscribers[id] = {callback, key};

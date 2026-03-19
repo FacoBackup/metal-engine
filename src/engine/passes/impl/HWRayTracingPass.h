@@ -21,7 +21,6 @@ namespace Metal {
         VulkanContext *vulkanContext = nullptr;
         EngineContext *engineContext = nullptr;
         EngineRepository *engineRepository = nullptr;
-        EventService *eventService = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
@@ -30,7 +29,6 @@ namespace Metal {
                 {"PipelineService", &pipelineService},
                 {"VulkanContext", &vulkanContext},
                 {"EngineContext", &engineContext},
-                {"EventService", &eventService},
                 {"EngineRepository", &engineRepository}
             };
         }

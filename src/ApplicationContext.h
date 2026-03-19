@@ -17,6 +17,7 @@
 #include "common/IInit.h"
 #include "common/IContextMember.h"
 #include "common/IDisposable.h"
+#include "common/Util.h"
 
 #define ENGINE_NAME "Metal Engine"
 
@@ -28,21 +29,6 @@ namespace Metal {
         std::vector<std::shared_ptr<IContextMember> > instances;
         bool debugMode;
 
-        template<typename T>
-        static std::string getTypeName() {
-            std::string name = typeid(T).name();
-            size_t lastSpace = name.find_last_of(' ');
-            if (lastSpace != std::string::npos) {
-                name = name.substr(lastSpace + 1);
-            }
-            size_t lastColon = name.find_last_of(':');
-            if (lastColon != std::string::npos) {
-                name = name.substr(lastColon + 1);
-            }
-            std::transform(name.begin(), name.end(), name.begin(),
-                           [](unsigned char c) { return std::tolower(c); });
-            return name;
-        }
 
     public:
         explicit ApplicationContext(bool debugMode);
@@ -53,13 +39,13 @@ namespace Metal {
         void registerSingleton(std::shared_ptr<T> instance) {
             static_assert(std::is_base_of_v<IContextMember, T>, "T must derive from IContextMember");
             T *ptr = instance.get();
-            singletons[getTypeName<T>()] = static_cast<IContextMember *>(ptr);
+            singletons[getTypeName(typeid(T).name())] = static_cast<IContextMember *>(ptr);
             instances.push_back(std::move(instance));
         }
 
         template<typename T>
         T &getSingleton() {
-            auto name = getTypeName<T>();
+            auto name = getTypeName(typeid(T).name());
             auto it = singletons.find(name);
             if (it == singletons.end()) {
                 throw std::runtime_error(std::string("Singleton not registered: ") + name);

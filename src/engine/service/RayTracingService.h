@@ -34,7 +34,6 @@ namespace Metal {
         BufferService *bufferService = nullptr;
         EngineContext *engineContext = nullptr;
         DescriptorSetService *descriptorSetService = nullptr;
-        EventService *eventService = nullptr;
 
         struct BLASEntry {
             VkAccelerationStructureKHR accelerationStructure = VK_NULL_HANDLE;
@@ -86,8 +85,7 @@ namespace Metal {
                 {"MaterialService", &materialService},
                 {"BufferService", &bufferService},
                 {"EngineContext", &engineContext},
-                {"DescriptorSetService", &descriptorSetService},
-                {"EventService", &eventService}
+                {"DescriptorSetService", &descriptorSetService}
             };
         }
 

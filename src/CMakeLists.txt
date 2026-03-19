@@ -1,5 +1,4 @@
 set(ENGINE_SOURCES
-        main.cpp
         editor/EditorPanel.cpp
         editor/EditorPanel.h
         engine/EngineContext.cpp
@@ -283,11 +282,13 @@ set(ENGINE_SOURCES
         editor/service/EventService.h
         engine/dto/LightComponent.cpp
         engine/dto/LightComponent.h
+        common/Util.h
+        common/Util.cpp
+        editor/dto/FieldModificationEvent.h
 )
 
 # Extract non-main sources for testing
 set(ENGINE_LIB_SOURCES ${ENGINE_SOURCES})
-list(REMOVE_ITEM ENGINE_LIB_SOURCES main.cpp)
 
 add_library(metal_engine_lib STATIC ${ENGINE_LIB_SOURCES})
 target_include_directories(metal_engine_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

@@ -14,7 +14,6 @@ namespace Metal {
 
     class VolumeService final : public IService, public IInit, public ISync {
         WorldRepository *worldRepository = nullptr;
-        EventService *eventService = nullptr;
         EngineContext *engineContext = nullptr;
         bool needsUpdate = true;
         std::vector<VolumeData> items{};
@@ -25,10 +24,7 @@ namespace Metal {
         std::vector<Dependency> getDependencies() override {
             return {
                 {"WorldRepository", &worldRepository},
-                {"WorldRepository", &worldRepository},
-                {"EngineContext", &engineContext},
-                {"EventService", &eventService}
-
+                {"EngineContext", &engineContext}
             };
         }
 

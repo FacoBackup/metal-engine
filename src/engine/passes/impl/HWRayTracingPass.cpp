@@ -12,12 +12,9 @@
 
 namespace Metal {
     void HWRayTracingPass::onInitialize() {
-        // eventService->subscribeGeneric([this](const HistoryEvent &) {
-        //     needsUpdate = true;
-        // });
-        // eventService->subscribe<EngineRepository>([this](const HistoryEvent &) {
-        //     needsUpdate = true;
-        // });
+        eventListener([this](const Event &) {
+            needsUpdate = true;
+        }, "EngineRepository");
 
         PipelineBuilder builder = PipelineBuilder::OfRayTracing(
                     "rt/HWRayTracing.rgen",

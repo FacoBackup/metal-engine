@@ -23,7 +23,6 @@ namespace Metal {
         EngineRepository *engineRepository = nullptr;
         WorldRepository *worldRepository = nullptr;
         MeshService *meshService = nullptr;
-        EventService *eventService = nullptr;
 
         std::vector<LightData> items{};
         glm::vec3 sunPosition{};
@@ -43,8 +42,7 @@ namespace Metal {
                 {"EngineContext", &engineContext},
                 {"EngineRepository", &engineRepository},
                 {"WorldRepository", &worldRepository},
-                {"MeshService", &meshService},
-                {"EventService", &eventService}
+                {"MeshService", &meshService}
             };
         }
 

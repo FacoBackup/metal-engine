@@ -3,7 +3,9 @@
 #include <imgui.h>
 
 #include "../../../../common/Inspectable.h"
-#include "../../../service/HistoryService.h"
+#include "editor/service/HistoryService.h"
+#include "editor/service/EventService.h"
+#include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
     BooleanField::BooleanField(InspectedField<bool> &field) : field(field) {
@@ -15,6 +17,8 @@ namespace Metal {
             if (ImGui::Checkbox(field.nameWithId.c_str(), field.field)) {
                 field.instance->registerChange();
                 historyService->recordChange(&field, oldValue);
+                EventService::dispatch(field.instance->getClassName(),
+                                       std::make_shared<FieldModificationPayload>(field));
             }
         } else {
             ImGui::Text("%s: %b", field.name.c_str(), *field.field);

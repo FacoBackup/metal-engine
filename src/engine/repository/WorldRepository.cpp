@@ -147,7 +147,6 @@ namespace Metal {
             createComponent(entityId, TRANSFORM);
             auto &transform = registry.get<TransformComponent>(entityId);
             transform.translation = entityData.transform.translation;
-            transform.rotation = entityData.transform.rotation;
             transform.rotationEuler = entityData.transform.rotationEuler;
             transform.scale = entityData.transform.scale;
             transform.gizmoCenter = entityData.transform.gizmoCenter;

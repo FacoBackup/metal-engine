@@ -22,22 +22,14 @@
 
 namespace Metal {
     void RayTracingService::onInitialize() {
-        eventService->subscribe("TransformComponent", [this](const Event &) {
+        eventListener([this](const Event &) {
             markDirty();
-        });
-        eventService->subscribe("PrimitiveComponent", [this](const Event &) {
+        }, "TransformComponent", "Action", "Undo", "Redo");
+
+        eventListener([this](const Event &) {
             markDirty();
             updateMeshMaterials();
-        });
-        eventService->subscribe("Action", [this](const Event &) {
-            markDirty();
-        });
-        eventService->subscribe("Undo", [this](const Event &) {
-            markDirty();
-        });
-        eventService->subscribe("Redo", [this](const Event &) {
-            markDirty();
-        });
+        }, "PrimitiveComponent");
     }
 
     VkDeviceAddress RayTracingService::getDeviceAddress(VkBuffer buffer) const {

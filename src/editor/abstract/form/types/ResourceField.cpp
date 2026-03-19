@@ -10,8 +10,10 @@
 #include "../../../dto/FSEntry.h"
 #include "../../../../ApplicationContext.h"
 #include "../../../../common/Inspectable.h"
-#include "../../../service/FilesService.h"
-#include "../../../service/HistoryService.h"
+#include "editor/service/FilesService.h"
+#include "editor/service/HistoryService.h"
+#include "editor/service/EventService.h"
+#include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
     constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoDocking |
@@ -32,6 +34,7 @@ namespace Metal {
 
 
                 historyService->recordChange(&field, oldValue);
+                EventService::dispatch(field.instance->getClassName(), std::make_shared<FieldModificationPayload>(field));
                 open = false;
             }
         }, field.resourceType);
@@ -55,6 +58,7 @@ namespace Metal {
 
 
             historyService->recordChange(&field, oldValue);
+            EventService::dispatch(field.instance->getClassName(), std::make_shared<FieldModificationPayload>(field));
         }
         ImGui::SameLine();
         if (entry != nullptr) {

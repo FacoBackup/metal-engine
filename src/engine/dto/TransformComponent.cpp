@@ -16,18 +16,10 @@ namespace Metal {
         return TRANSFORM;
     }
 
-    // void TransformComponent::onUpdate(InspectableMember *member) {
-    //     if (member != nullptr && member->name == ROTATION) {
-    //         rotation = normalize(glm::quat(rotationEuler * (glm::pi<float>() / 180.f)));
-    //     }
-    //     forceTransform = true;
-    // }
-
     nlohmann::json TransformComponent::toJson() const {
         nlohmann::json j;
         j["entityId"] = entityId;
         j["translation"] = {translation.x, translation.y, translation.z};
-        j["rotation"] = {rotation.x, rotation.y, rotation.z, rotation.w};
         j["rotationEuler"] = {rotationEuler.x, rotationEuler.y, rotationEuler.z};
         j["scale"] = {scale.x, scale.y, scale.z};
         j["gizmoCenter"] = {gizmoCenter.x, gizmoCenter.y, gizmoCenter.z};
@@ -43,7 +35,6 @@ namespace Metal {
     void TransformComponent::fromJson(const nlohmann::json &j) {
         entityId = j.at("entityId").get<entt::entity>();
         translation = {j.at("translation")[0], j.at("translation")[1], j.at("translation")[2]};
-        rotation = {j.at("rotation")[3], j.at("rotation")[0], j.at("rotation")[1], j.at("rotation")[2]};
         rotationEuler = {j.at("rotationEuler")[0], j.at("rotationEuler")[1], j.at("rotationEuler")[2]};
         scale = {j.at("scale")[0], j.at("scale")[1], j.at("scale")[2]};
         gizmoCenter = {j.at("gizmoCenter")[0], j.at("gizmoCenter")[1], j.at("gizmoCenter")[2]};
