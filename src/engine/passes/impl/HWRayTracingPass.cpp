@@ -8,16 +8,16 @@
 #include "../../../engine/EngineContext.h"
 #include "../../../engine/repository/EngineRepository.h"
 #include "../../../editor/enum/EngineResourceIDs.h"
-#include "../../../editor/service/HistoryEventService.h"
+#include "../../../editor/service/EventService.h"
 
 namespace Metal {
     void HWRayTracingPass::onInitialize() {
-        eventService->subscribeGeneric([this](const HistoryEvent &) {
-            needsUpdate = true;
-        });
-        eventService->subscribe<EngineRepository>([this](const HistoryEvent &) {
-            needsUpdate = true;
-        });
+        // eventService->subscribeGeneric([this](const HistoryEvent &) {
+        //     needsUpdate = true;
+        // });
+        // eventService->subscribe<EngineRepository>([this](const HistoryEvent &) {
+        //     needsUpdate = true;
+        // });
 
         PipelineBuilder builder = PipelineBuilder::OfRayTracing(
                     "rt/HWRayTracing.rgen",

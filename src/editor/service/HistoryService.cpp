@@ -32,15 +32,10 @@ namespace Metal {
 
             undoStack.push_back(std::move(*currentTransaction));
             redoStack.clear();
-            
-            HistoryEvent event;
-            event.key = key;
-            event.instance = instance;
-            event.propertyPath = propertyPath;
-            if (instance) {
-                event.instanceType = typeid(*instance);
+
+            if (eventService) {
+                eventService->dispatch(key, std::make_shared<InspectableEventPayload>(instance, propertyPath));
             }
-            if (historyEventService) historyEventService->trigger(event);
         }
         currentTransaction = nullptr;
     }
@@ -105,12 +100,10 @@ namespace Metal {
             undoStack.push_back(std::move(trans));
             redoStack.clear();
 
-            HistoryEvent event;
-            event.key = field->instance->getTitle();
-            event.instance = field->instance;
-            event.propertyPath = field->path;
-            event.instanceType = typeid(*field->instance);
-            if (historyEventService) historyEventService->trigger(event);
+            if (eventService) {
+                eventService->dispatch(field->instance->getTitle(),
+                                              std::make_shared<InspectableEventPayload>(field->instance, field->path));
+            }
         }
     }
 
@@ -126,10 +119,8 @@ namespace Metal {
             trans.changes.push_back(change);
             undoStack.push_back(std::move(trans));
             redoStack.clear();
-            
-            HistoryEvent event;
-            event.key = "Action";
-            if (historyEventService) historyEventService->trigger(event);
+
+            if (eventService) eventService->dispatch("Action");
         }
     }
 
@@ -186,10 +177,8 @@ namespace Metal {
         }
 
         redoStack.push_back(std::move(trans));
-        
-        HistoryEvent event;
-        event.key = "Undo";
-        if (historyEventService) historyEventService->trigger(event);
+
+        if (eventService) eventService->dispatch("Undo");
     }
 
     void HistoryService::redo() {
@@ -216,9 +205,7 @@ namespace Metal {
         }
 
         undoStack.push_back(std::move(trans));
-        
-        HistoryEvent event;
-        event.key = "Redo";
-        if (historyEventService) historyEventService->trigger(event);
+
+        if (eventService) eventService->dispatch("Redo");
     }
 }

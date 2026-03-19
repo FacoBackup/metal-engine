@@ -8,13 +8,13 @@
 #include "common/IInit.h"
 
 namespace Metal {
-    class HistoryEventService;
+    class EventService;
     struct WorldRepository;
     class EngineContext;
 
     class VolumeService final : public IService, public IInit, public ISync {
         WorldRepository *worldRepository = nullptr;
-        HistoryEventService *historyEventService = nullptr;
+        EventService *eventService = nullptr;
         EngineContext *engineContext = nullptr;
         bool needsUpdate = true;
         std::vector<VolumeData> items{};
@@ -27,7 +27,7 @@ namespace Metal {
                 {"WorldRepository", &worldRepository},
                 {"WorldRepository", &worldRepository},
                 {"EngineContext", &engineContext},
-                {"HistoryEventService", &historyEventService}
+                {"EventService", &eventService}
 
             };
         }

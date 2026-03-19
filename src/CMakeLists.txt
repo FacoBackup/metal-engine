@@ -279,8 +279,8 @@ set(ENGINE_SOURCES
         core/FrameService.h
         common/Icons.cpp
         editor/service/HistoryService.cpp
-        editor/service/HistoryEventService.cpp
-        editor/service/HistoryEventService.h
+        editor/service/EventService.cpp
+        editor/service/EventService.h
         engine/dto/LightComponent.cpp
         engine/dto/LightComponent.h
 )

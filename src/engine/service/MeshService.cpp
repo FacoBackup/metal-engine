@@ -15,6 +15,7 @@
 #include "../../ApplicationContext.h"
 #include "BufferService.h"
 #include "RayTracingService.h"
+#include "../../editor/service/HistoryService.h"
 #include "../dto/PrimitiveComponent.h"
 #include "../dto/TransformComponent.h"
 #include "../repository/WorldRepository.h"
@@ -22,9 +23,10 @@
 namespace Metal {
 
     void MeshService::onInitialize() {
-        historyEventService->subscribe<PrimitiveComponent>([this](const HistoryEvent &event) {
-            if (event.propertyPath.find("Mesh") != std::string::npos) {
-                auto *primitive = dynamic_cast<PrimitiveComponent *>(event.instance);
+        eventService->subscribe("PrimitiveComponent", [this](const Event &event) {
+            auto payload = std::dynamic_pointer_cast<InspectableEventPayload>(event.payload);
+            if (payload && payload->propertyPath.find("Mesh") != std::string::npos) {
+                auto *primitive = dynamic_cast<PrimitiveComponent *>(payload->instance);
                 if (primitive && worldRepository->registry.all_of<TransformComponent>(primitive->getEntityId())) {
                     MeshData *data = loadMeshData(primitive->meshId);
                     if (data != nullptr) {
@@ -33,7 +35,7 @@ namespace Metal {
                     }
                 }
             }
-        }, "Mesh");
+        });
     }
 
     MeshInstance *MeshService::create(const std::string &id) {

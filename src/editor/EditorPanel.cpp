@@ -3,6 +3,7 @@
 #include "../ApplicationContext.h"
 #include "service/DockService.h"
 #include "service/ThemeService.h"
+#include "repository/EditorRepository.h"
 #include "dock-spaces/header/EditorHeaderPanel.h"
 #include "dock-spaces/footer/EditorFooterPanel.h"
 #include "panel/FileImportModalPanel.h"
@@ -20,12 +21,17 @@ namespace Metal {
     const char *EditorPanel::NAME_HEADER = "##header_window";
     const char *EditorPanel::NAME_FOOTER = "##footer_window";
     ImVec2 EditorPanel::CENTER(0.0f, 0.0f);
-    float EditorPanel::HEADER_HEIGHT = 30;
+    float EditorPanel::HEADER_HEIGHT = 28;
     float EditorPanel::FOOTER_HEIGHT = 30;
 
 
     void EditorPanel::renderDockSpaces() {
         const ImGuiViewport *viewport = ImGui::GetMainViewport();
+
+        ImU32 accentColorRaw = editorRepository->accentU32;
+        ImU32 accentColor = (accentColorRaw & 0x00FFFFFF) | (0x60000000);
+        ImU32 transparentColor = accentColorRaw & 0x00FFFFFF;
+        ImVec2 gradientSize(viewport->Size.x * 0.35f, viewport->Size.y * 0.15f);
 
         // Header
         {
@@ -40,6 +46,15 @@ namespace Metal {
             SetWindowStyle(UIUtil::VEC2_ZERO);
             ImGui::Begin(NAME_HEADER, &UIUtil::OPEN, FLAGS | ImGuiWindowFlags_NoScrollbar);
             ImGui::PopStyleVar(3);
+
+            ImGui::GetWindowDrawList()->AddRectFilledMultiColor(
+                viewport->Pos,
+                ImVec2(viewport->Pos.x + gradientSize.x, viewport->Pos.y + gradientSize.y),
+                accentColor,
+                transparentColor,
+                transparentColor,
+                transparentColor
+            );
 
             headerPanel->onSync();
             ImGui::End();
@@ -63,6 +78,15 @@ namespace Metal {
             ImGui::Begin(NAME, &UIUtil::OPEN, FLAGS);
             windowId = ImGui::GetID(NAME);
             ImGui::PopStyleVar(3);
+
+            ImGui::GetWindowDrawList()->AddRectFilledMultiColor(
+                viewport->Pos,
+                ImVec2(viewport->Pos.x + gradientSize.x, viewport->Pos.y + gradientSize.y),
+                accentColor,
+                transparentColor,
+                transparentColor,
+                transparentColor
+            );
 
             dockService->buildViews(windowId, this);
 

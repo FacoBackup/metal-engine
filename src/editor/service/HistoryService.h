@@ -2,6 +2,7 @@
 #define HISTORYSERVICE_H
 
 #include <string>
+#include <utility>
 #include <vector>
 #include <memory>
 #include <variant>
@@ -11,7 +12,6 @@
 #include <functional>
 
 #include "NotificationService.h"
-#include "HistoryEventService.h"
 #include "../../common/IService.h"
 
 namespace Metal {
@@ -43,13 +43,11 @@ namespace Metal {
         std::vector<Transaction> redoStack;
         std::unique_ptr<Transaction> currentTransaction = nullptr;
         NotificationService *notificationService = nullptr;
-        HistoryEventService *historyEventService = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"notificationService", &notificationService},
-                {"historyEventService", &historyEventService}
+                {"notificationService", &notificationService}
             };
         }
 

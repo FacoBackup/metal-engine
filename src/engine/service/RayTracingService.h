@@ -10,7 +10,7 @@
 #include "../../common/ISync.h"
 #include "../../common/IDisposable.h"
 #include "../../common/IInit.h"
-#include "../../editor/service/HistoryEventService.h"
+#include "../../editor/service/EventService.h"
 
 namespace Metal {
     class DescriptorSetService;
@@ -23,7 +23,7 @@ namespace Metal {
     class BufferService;
     class EngineContext;
 
-    class HistoryEventService;
+    class EventService;
 
     class RayTracingService final : public IService, public ISync, public IDisposable, public IInit {
         VulkanContext *vulkanContext = nullptr;
@@ -34,7 +34,7 @@ namespace Metal {
         BufferService *bufferService = nullptr;
         EngineContext *engineContext = nullptr;
         DescriptorSetService *descriptorSetService = nullptr;
-        HistoryEventService *historyEventService = nullptr;
+        EventService *eventService = nullptr;
 
         struct BLASEntry {
             VkAccelerationStructureKHR accelerationStructure = VK_NULL_HANDLE;
@@ -87,7 +87,7 @@ namespace Metal {
                 {"BufferService", &bufferService},
                 {"EngineContext", &engineContext},
                 {"DescriptorSetService", &descriptorSetService},
-                {"HistoryEventService", &historyEventService}
+                {"EventService", &eventService}
             };
         }
 

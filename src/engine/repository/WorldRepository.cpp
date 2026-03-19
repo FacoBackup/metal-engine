@@ -154,6 +154,7 @@ namespace Metal {
             transform.isStatic = entityData.transform.isStatic;
 
             if (entityData.primitive) {
+
                 createComponent(entityId, PRIMITIVE);
                 auto &primitive = registry.get<PrimitiveComponent>(entityId);
                 primitive.meshId = entityData.primitive->meshId;
@@ -166,11 +167,8 @@ namespace Metal {
                 primitive.transmissionFactor = entityData.primitive->transmissionFactor;
                 primitive.thicknessFactor = entityData.primitive->thicknessFactor;
                 primitive.ior = entityData.primitive->ior;
-                primitive.isEmissive = entityData.primitive->isEmissive;
             }
         }
-
-        rayTracingService->markDirty();
     }
 
     void WorldRepository::createComponent(const entt::entity entityId, ComponentType type) {
@@ -189,6 +187,17 @@ namespace Metal {
                 break;
             }
         }
+    }
+
+    bool WorldRepository::hasComponent(entt::entity entity, ComponentType type) const {
+        if (!registry.valid(entity)) return false;
+
+        for (const auto &compDef: ComponentTypes::getComponents()) {
+            if (compDef.type == type) {
+                return compDef.hasComponent(*this, entity);
+            }
+        }
+        return false;
     }
 
     nlohmann::json WorldRepository::toJson() const {

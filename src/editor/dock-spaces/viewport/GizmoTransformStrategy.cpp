@@ -67,16 +67,15 @@ namespace Metal {
         selected->registerChange();
         localChangeId = selected->getChangeId();
         selected->forceTransform = true;
-        selected->onUpdate(nullptr);
 
         if (oldTranslation != selected->translation) {
-            historyService->recordChange(selected, "/Translation", oldTranslation, selected->translation);
+            historyService->recordChange(selected->getFieldByPointer(&selected->translation).get(), oldTranslation);
         }
         if (oldScale != selected->scale) {
-            historyService->recordChange(selected, "/Scale", oldScale, selected->scale);
+            historyService->recordChange(selected->getFieldByPointer(&selected->scale).get(), oldScale);
         }
         if (oldRotationEuler != selected->rotationEuler) {
-            historyService->recordChange(selected, "/Rotation", oldRotationEuler, selected->rotationEuler);
+            historyService->recordChange(selected->getFieldByPointer(&selected->rotation).get(), oldRotationEuler);
         }
     }
 

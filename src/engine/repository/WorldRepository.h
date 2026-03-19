@@ -43,6 +43,7 @@ namespace Metal {
         entt::entity createEntity();
 
         [[nodiscard]] MetadataComponent *getEntity(entt::entity node);
+
         [[nodiscard]] bool hasComponent(entt::entity entity, ComponentType type) const;
 
         EntityState serializeEntityComplete(std::vector<entt::entity>::value_type entityId);
@@ -57,7 +58,7 @@ namespace Metal {
 
         void fromJson(const nlohmann::json &j) override;
 
-        void deserializeEntityComplete(const EntityState & state);
+        void deserializeEntityComplete(const EntityState &state);
     };
 } // Metal
 

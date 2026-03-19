@@ -4,7 +4,7 @@
 #include "../resource/MeshInstance.h"
 #include "../../editor/enum/engine-definitions.h"
 #include "../../common/IInit.h"
-#include "../../editor/service/HistoryEventService.h"
+#include "../../editor/service/EventService.h"
 
 namespace Metal {
     struct MeshData;
@@ -14,14 +14,14 @@ namespace Metal {
     class BufferService;
     class RayTracingService;
     class DirectoryService;
-    class HistoryEventService;
+    class EventService;
     struct WorldRepository;
 
     class MeshService final : public AbstractResourceService<MeshInstance>, public IInit {
         BufferService *bufferService = nullptr;
         RayTracingService *rayTracingService = nullptr;
         DirectoryService *directoryService = nullptr;
-        HistoryEventService *historyEventService = nullptr;
+        EventService *eventService = nullptr;
         WorldRepository *worldRepository = nullptr;
 
     public:
@@ -32,7 +32,7 @@ namespace Metal {
                 {"BufferService", &bufferService},
                 {"RayTracingService", &rayTracingService},
                 {"DirectoryService", &directoryService},
-                {"HistoryEventService", &historyEventService},
+                {"EventService", &eventService},
                 {"WorldRepository", &worldRepository}
             };
         }

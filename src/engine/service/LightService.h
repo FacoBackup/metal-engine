@@ -8,7 +8,7 @@
 #include "../dto/LightData.h"
 
 #include "../../common/IInit.h"
-#include "../../editor/service/HistoryEventService.h"
+#include "../../editor/service/EventService.h"
 
 namespace Metal {
     class EngineContext;
@@ -16,14 +16,14 @@ namespace Metal {
 
     class MeshService;
     struct WorldRepository;
-    class HistoryEventService;
+    class EventService;
 
     class LightService final : public IService, public IInit, public ISync {
         EngineContext *engineContext = nullptr;
         EngineRepository *engineRepository = nullptr;
         WorldRepository *worldRepository = nullptr;
         MeshService *meshService = nullptr;
-        HistoryEventService *historyEventService = nullptr;
+        EventService *eventService = nullptr;
 
         std::vector<LightData> items{};
         glm::vec3 sunPosition{};
@@ -44,7 +44,7 @@ namespace Metal {
                 {"EngineRepository", &engineRepository},
                 {"WorldRepository", &worldRepository},
                 {"MeshService", &meshService},
-                {"HistoryEventService", &historyEventService}
+                {"EventService", &eventService}
             };
         }
 

@@ -13,11 +13,19 @@
 
 namespace Metal {
     void LightService::onInitialize() {
-        historyEventService->subscribe<LightComponent>([this](const HistoryEvent &) {
+        eventService->subscribe("LightComponent", [this](const Event &) {
             needsUpdate = true;
         });
 
-        historyEventService->subscribeGeneric([this](const HistoryEvent &) {
+        eventService->subscribe("Action", [this](const Event &) {
+            needsUpdate = true;
+        });
+
+        eventService->subscribe("Undo", [this](const Event &) {
+            needsUpdate = true;
+        });
+
+        eventService->subscribe("Redo", [this](const Event &) {
             needsUpdate = true;
         });
     }

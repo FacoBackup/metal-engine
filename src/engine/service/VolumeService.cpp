@@ -8,7 +8,7 @@
 #include "../dto/VolumeComponent.h"
 #include "../EngineContext.h"
 #include "common/LoggerUtil.h"
-#include "editor/service/HistoryEventService.h"
+#include "editor/service/EventService.h"
 
 namespace Metal {
     void VolumeService::registerVolumes() {
@@ -36,11 +36,19 @@ namespace Metal {
     }
 
     void VolumeService::onInitialize() {
-        historyEventService->subscribe<VolumeComponent>([this](const HistoryEvent &) {
+        eventService->subscribe("VolumeComponent", [this](const Event &) {
             needsUpdate = true;
         });
 
-        historyEventService->subscribeGeneric([this](const HistoryEvent &) {
+        eventService->subscribe("Action", [this](const Event &) {
+            needsUpdate = true;
+        });
+
+        eventService->subscribe("Undo", [this](const Event &) {
+            needsUpdate = true;
+        });
+
+        eventService->subscribe("Redo", [this](const Event &) {
             needsUpdate = true;
         });
     }
