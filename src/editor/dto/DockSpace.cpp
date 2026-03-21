@@ -8,7 +8,7 @@
 #include "../dock-spaces/viewport/ViewportPanel.h"
 #include "../dock-spaces/world/WorldPanel.h"
 #include "../dock-spaces/lua-editor/LuaEditorPanel.h"
-#include "../dock-spaces/mcp/MCPPanel.h"
+#include "../dock-spaces/mcp/AIAssistantPanel.h"
 
 #define CB(clazz) []() { return std::make_shared<clazz>(); }
 
@@ -21,7 +21,7 @@ namespace Metal {
     DockSpace DockSpace::METRICS{4, "Metrics", 4, 4, ImVec4{0.2f, 0.8f, 0.8f, 1}, CB(MetricsPanel)};
     DockSpace DockSpace::REPOSITORIES{5, "Repositories", 4, 4, ImVec4{0.8f, 0.2f, 0.2f, 1}, CB(RepositoriesPanel)};
     DockSpace DockSpace::LUA_EDITOR{6, "Lua Editor", 4, 4, ImVec4{0.2f, 0.5f, 0.8f, 1}, CB(LuaEditorPanel)};
-    DockSpace DockSpace::MCP{7, "AI Assistant", 4, 4, ImVec4{0.8f, 0.5f, 0.2f, 1}, CB(MCPPanel)};
+    DockSpace DockSpace::MCP{7, "AI Assistant", 4, 4, ImVec4{0.8f, 0.5f, 0.2f, 1}, CB(AIAssistantPanel)};
 
     const std::vector<DockSpace *> DockSpace::OPTIONS_LIST = {
         &INSPECTOR,

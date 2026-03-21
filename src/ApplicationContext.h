@@ -73,6 +73,18 @@ namespace Metal {
 
         [[nodiscard]] const std::vector<std::shared_ptr<IContextMember> > &getInstances() const { return instances; }
 
+        template<typename T>
+        std::vector<T *> getSingletons() {
+            std::vector<T *> results;
+            for (auto &instance: instances) {
+                auto *ptr = dynamic_cast<T *>(instance.get());
+                if (ptr) {
+                    results.push_back(ptr);
+                }
+            }
+            return results;
+        }
+
         void dispose() override;
     };
 }

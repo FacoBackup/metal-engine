@@ -23,6 +23,7 @@ find_package(meshoptimizer CONFIG REQUIRED)
 find_package(cereal CONFIG REQUIRED)
 find_package(OpenVDB CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
+find_package(httplib CONFIG REQUIRED)
 find_package(Lua REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
 find_package(Jolt CONFIG REQUIRED)
@@ -45,6 +46,7 @@ set(COMMON_LIBRARIES
         imguizmo::imguizmo
         nlohmann_json::nlohmann_json
         EnTT::EnTT
+        httplib::httplib
         ${LUA_LIBRARIES}
         sol2
         Jolt::Jolt

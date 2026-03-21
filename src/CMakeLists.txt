@@ -56,6 +56,8 @@ set(ENGINE_SOURCES
         editor/service/DockService.cpp
         editor/service/DockService.h
         editor/dto/DockDTO.h
+        editor/dto/Tool.h
+        editor/dto/IToolProvider.h
         editor/dto/DockSpace.h
         editor/dock-spaces/docks/DockSpacePanel.cpp
         editor/dock-spaces/docks/DockSpacePanel.h
@@ -64,6 +66,9 @@ set(ENGINE_SOURCES
         editor/service/ThemeService.h
         editor/repository/EditorRepository.h
         editor/repository/DockRepository.h
+        editor/repository/AIAssistantRepository.h
+        editor/repository/AIAssistantRepository.cpp
+        editor/dto/ChatDTO.h
         editor/enum/engine-definitions.h
         editor/dock-spaces/files/FilesPanel.cpp
         editor/dock-spaces/files/FilesPanel.h
@@ -88,8 +93,8 @@ set(ENGINE_SOURCES
         editor/dock-spaces/world/WorldPanel.h
         editor/dock-spaces/lua-editor/LuaEditorPanel.cpp
         editor/dock-spaces/lua-editor/LuaEditorPanel.h
-        editor/dock-spaces/mcp/MCPPanel.cpp
-        editor/dock-spaces/mcp/MCPPanel.h
+        editor/dock-spaces/mcp/AIAssistantPanel.cpp
+        editor/dock-spaces/mcp/AIAssistantPanel.h
         engine/resource/RuntimeResource.h
         engine/service/ShaderService.cpp
         engine/service/ShaderService.h
@@ -126,10 +131,12 @@ set(ENGINE_SOURCES
         common/FileDialogUtil.h
         editor/dock-spaces/files/FilesHeaderPanel.cpp
         editor/dock-spaces/files/FilesHeaderPanel.h
+        editor/service/HttpService.cpp
+        editor/service/HttpService.h
         editor/service/MaterialImporterService.cpp
         editor/service/MaterialImporterService.h
-        editor/service/MCPService.cpp
-        editor/service/MCPService.h
+        editor/service/AIAssistantService.cpp
+        editor/service/AIAssistantService.h
         editor/service/MeshImporterService.cpp
         editor/service/MeshImporterService.h
         editor/service/SceneImporterService.cpp
