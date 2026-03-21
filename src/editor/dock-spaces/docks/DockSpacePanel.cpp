@@ -159,7 +159,6 @@ namespace Metal {
     }
 
     void DockSpacePanel::renderCustomHeader() {
-        const float buttonWidth = 23.0f;
         const float headerPaddingY = (headerHeight - ImGui::GetFrameHeight()) * 0.5f;
 
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetStyle().FramePadding.x, headerPaddingY));
@@ -167,7 +166,7 @@ namespace Metal {
         // Tab Bar Area
         ImGui::BeginGroup();
 
-        const float availableWidth = ImGui::GetContentRegionAvail().x - buttonWidth - ImGui::GetStyle().ItemSpacing.x;
+        const float availableWidth = ImGui::GetContentRegionAvail().x - headerHeight - ImGui::GetStyle().ItemSpacing.x;
 
         if (ImGui::BeginChild((id + "tabs_scroll").c_str(), ImVec2(availableWidth, headerHeight), ImGuiChildFlags_None,
                               ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NoBackground)) {
@@ -229,7 +228,7 @@ namespace Metal {
 
         ImGui::SameLine();
 
-        if (UIUtil::ButtonSimple(Icons::add + "##addTab" + id, buttonWidth, headerHeight)) {
+        if (UIUtil::ButtonSimple(Icons::add + "##addTab" + id, headerHeight, headerHeight)) {
             ImGui::OpenPopup((id + "NewTabDropdown").c_str());
         }
         if (UIUtil::BeginPopupContext(id + "NewTabDropdown")) {

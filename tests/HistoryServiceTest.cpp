@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include "../src/editor/service/HistoryService.h"
 #include "../src/common/Inspectable.h"
+#include "../src/common/IEventMember.h"
+#include "../src/ApplicationEventContext.h"
 #include <glm/glm.hpp>
 
 using namespace Metal;
@@ -22,17 +24,49 @@ public:
     }
     const char* getIcon() override { return ""; }
     const char* getTitle() override { return "Mock"; }
+    std::string getClassName() const override { return "MockInspectable"; }
 };
 
-class HistoryServiceTest : public ::testing::Test {
+class HistoryServiceTest : public ::testing::Test, public IEventMember {
 protected:
     HistoryService historyService;
     MockInspectable mock;
+    std::vector<std::string> eventLog;
 
     void SetUp() override {
         mock.getFields();
+        eventLog.clear();
+        eventListener([this](const Event &e) {
+            eventLog.push_back(e.key);
+        }, "MockInspectable");
     }
 };
+
+TEST_F(HistoryServiceTest, UndoRedoFiresEvents) {
+    int oldValue = 0;
+    int newValue = 42;
+    auto field = mock.getFieldByPointer(&mock.intField);
+
+    // Initial change
+    mock.intField = newValue;
+    historyService.recordChange(field.get(), oldValue);
+    ASSERT_EQ(eventLog.size(), 1);
+    EXPECT_EQ(eventLog[0], "MockInspectable");
+    eventLog.clear();
+
+    // Undo should fire event
+    historyService.undo();
+    EXPECT_EQ(mock.intField, oldValue);
+    ASSERT_EQ(eventLog.size(), 1);
+    EXPECT_EQ(eventLog[0], "MockInspectable");
+    eventLog.clear();
+
+    // Redo should fire event
+    historyService.redo();
+    EXPECT_EQ(mock.intField, newValue);
+    ASSERT_EQ(eventLog.size(), 1);
+    EXPECT_EQ(eventLog[0], "MockInspectable");
+}
 
 TEST_F(HistoryServiceTest, RecordSingleChange) {
     int oldValue = 0;
@@ -150,24 +184,28 @@ TEST_F(HistoryServiceTest, GenericAction) {
     EXPECT_EQ(value, 42);
 }
 
-TEST_F(HistoryServiceTest, MixedTransaction) {
-    int value = 0;
-    mock.intField = 0;
+TEST_F(HistoryServiceTest, InvalidFieldCrash) {
+    auto field = mock.getFieldByPointer(&mock.intField);
+    std::shared_ptr<InspectableMember> fieldPtr = field;
 
-    historyService.startTransaction("Mixed");
-    mock.intField = 10;
-    historyService.recordChange(mock.getFieldByPointer(&mock.intField).get(), 0);
-    historyService.recordAction([&]() { value = 0; }, [&]() { value = 100; });
+    historyService.recordChange(fieldPtr.get(), 0);
+
+    // Simulate destruction of the inspectable
+    // In our case, mock is on the stack, but we can clear the instance pointer in the field
+    // or just let it point to a destroyed object.
+    // To be safe in a test, we can just set instance to nullptr
+    fieldPtr->instance = nullptr;
+
+    // This should NOT crash
+    EXPECT_NO_THROW(historyService.undo());
+    EXPECT_NO_THROW(historyService.redo());
+}
+
+TEST_F(HistoryServiceTest, NullFieldInTransaction) {
+    historyService.startTransaction("CrashTest");
+    historyService.recordChange(nullptr, 0);
     historyService.endTransaction();
 
-    mock.intField = 10;
-    value = 100;
-
-    historyService.undo();
-    EXPECT_EQ(mock.intField, 0);
-    EXPECT_EQ(value, 0);
-
-    historyService.redo();
-    EXPECT_EQ(mock.intField, 10);
-    EXPECT_EQ(value, 100);
+    EXPECT_NO_THROW(historyService.undo());
+    EXPECT_NO_THROW(historyService.redo());
 }

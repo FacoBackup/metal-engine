@@ -14,9 +14,8 @@
 namespace Metal {
     void TransformService::onInitialize() {
         eventListener([this](const Event &e) {
-            auto payload = std::static_pointer_cast<FieldModificationPayload>(e.payload);
-            auto transform = dynamic_cast<TransformComponent *>(payload->member.instance);
-            if (transform) {
+            const auto payload = std::static_pointer_cast<InspectableEventPayload>(e.payload);
+            if (const auto transform = dynamic_cast<TransformComponent *>(payload->inspectable)) {
                 dirtyEntities.insert(transform->getEntityId());
             }
         }, "TransformComponent");

@@ -7,6 +7,7 @@
 #include "../../editor/dto/SceneData.h"
 #include "../../common/serialization-definitions.h"
 #include "../../core/DirectoryService.h"
+#include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
     entt::entity WorldRepository::createEntity() {
@@ -130,6 +131,10 @@ namespace Metal {
     }
 
     void WorldRepository::loadScene(const std::string &sceneId) {
+        if (historyService) {
+            historyService->startTransaction("Load Scene " + sceneId);
+        }
+
         SceneData sceneData;
         const auto pathToFile = directoryService->getAssetDirectory() + FORMAT_FILE_SCENE(sceneId);
         PARSE_TEMPLATE(sceneData, pathToFile)
@@ -163,6 +168,10 @@ namespace Metal {
                 primitive.ior = entityData.primitive->ior;
             }
         }
+
+        if (historyService) {
+            historyService->endTransaction();
+        }
     }
 
     void WorldRepository::createComponent(const entt::entity entityId, ComponentType type) {
@@ -178,7 +187,8 @@ namespace Metal {
                 compDef.creator(*this, entityId);
                 if (auto *inspectable = compDef.getInspectable(*this, entityId)) {
                     std::string className = inspectable->getClassName();
-                    ApplicationEventContext::dispatch(className);
+                    ApplicationEventContext::dispatch(
+                        className, std::make_shared<InspectableEventPayload>(inspectable));
                 }
                 break;
             }
@@ -257,7 +267,8 @@ namespace Metal {
                     compDef.fromJson(*this, state.id, state.data.at(compDef.jsonKey));
                     if (auto *inspectable = compDef.getInspectable(*this, state.id)) {
                         std::string className = inspectable->getClassName();
-                        ApplicationEventContext::dispatch(className);
+                        ApplicationEventContext::dispatch(
+                            className, std::make_shared<InspectableEventPayload>(inspectable));
                     }
                 }
             }

@@ -287,6 +287,7 @@ set(ENGINE_SOURCES
         common/Util.h
         common/Util.cpp
         editor/dto/FieldModificationEvent.h
+        editor/dto/InspectableEventPayload.h
 )
 
 # Extract non-main sources for testing

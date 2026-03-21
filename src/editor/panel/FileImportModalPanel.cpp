@@ -8,6 +8,7 @@
 #include "../service/FileImporterService.h"
 #include "../service/NotificationService.h"
 #include "../service/FilesService.h"
+#include "../service/ThemeService.h"
 #include "../dto/FSEntry.h"
 
 namespace Metal {
@@ -29,13 +30,29 @@ namespace Metal {
 
         const ImGuiViewport *viewport = ImGui::GetMainViewport();
         const float maxHeight = viewport->Size.y * 0.7f;
-        const float width = 800.0f;
+
+        ImGui::SetNextWindowPos(viewport->Pos);
+        ImGui::SetNextWindowSize(viewport->Size);
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, .5));
+        ImGui::Begin("ImportModalOverlay", nullptr,
+                     ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                     ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMouseInputs |
+                     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoNav);
+        ImGui::End();
+        ImGui::PopStyleColor();
+
 
         ImGui::SetNextWindowPos(viewport->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-        ImGui::SetNextWindowSizeConstraints(ImVec2(width, 400), ImVec2(width, maxHeight));
+        ImVec2 modalSize(viewport->Size.x * .75, viewport->Size.y * .75);
+        ImGui::SetNextWindowSizeConstraints(modalSize, modalSize);
 
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, themeService->palette0);
+        ImGui::PushStyleColor(ImGuiCol_Border, themeService->palette3);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 8.0f);
         if (ImGui::Begin(("Import files?" + id + "importModal").c_str(), nullptr,
-                         ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoMove)) {
+                         ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoMove |
+                         ImGuiWindowFlags_NoCollapse)) {
             if (ImGui::BeginTable((id + "ImportLayoutTable").c_str(), 2, ImGuiTableFlags_Resizable)) {
                 ImGui::TableSetupColumn("FileList", ImGuiTableColumnFlags_WidthStretch, 0.4f);
                 ImGui::TableSetupColumn("Settings", ImGuiTableColumnFlags_WidthStretch, 0.6f);
@@ -94,7 +111,7 @@ namespace Metal {
             if (ImGui::Button(("Approve" + id + "approveImport").c_str(), ImVec2(120, 0))) {
                 for (const std::string &file: editorRepository->pendingImports) {
                     fileImporterService->importFile(editorRepository->targetImportDirectory->absolutePath, file,
-                                                       editorRepository->importSettingsMap.at(file));
+                                                    editorRepository->importSettingsMap.at(file));
                 }
                 notificationService->pushMessage("Importing files...", NotificationSeverities::WARNING);
                 filesService->GetEntries(editorRepository->targetImportDirectory);
@@ -110,5 +127,7 @@ namespace Metal {
             }
         }
         ImGui::End();
+        ImGui::PopStyleVar(2);
+        ImGui::PopStyleColor(2);
     }
 } // Metal

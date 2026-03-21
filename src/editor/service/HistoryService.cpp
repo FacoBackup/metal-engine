@@ -15,31 +15,35 @@ namespace Metal {
     }
 
     void HistoryService::endTransaction() {
-        if (currentTransaction && !currentTransaction->changes.empty()) {
-            // Pick a representative key and instance for the whole transaction
-            std::string key = currentTransaction->name;
-            Inspectable* instance = nullptr;
-            std::string propertyPath;
+        if (currentTransaction) {
+            if (!currentTransaction->changes.empty()) {
+                // Pick a representative key and instance for the whole transaction
+                std::string key = currentTransaction->name;
+                Inspectable *instance = nullptr;
+                std::string propertyPath;
 
-            for (const auto& change : currentTransaction->changes) {
-                if (std::holds_alternative<PropertyChange>(change)) {
-                    const auto& pc = std::get<PropertyChange>(change);
-                    instance = pc.field->instance;
-                    propertyPath = pc.field->path;
-                    // If we find a property change, we use its instance's title as key if it's better than the generic transaction name
-                    if (instance) key = instance->getTitle();
-                    break; 
+                for (const auto &change: currentTransaction->changes) {
+                    if (std::holds_alternative<PropertyChange>(change)) {
+                        const auto &pc = std::get<PropertyChange>(change);
+                        instance = pc.field->instance;
+                        propertyPath = pc.field->path;
+                        // If we find a property change, we use its instance's title as key if it's better than the generic transaction name
+                        if (instance) key = instance->getTitle();
+                        break;
+                    }
                 }
-            }
 
-            if (instance) {
-                ApplicationEventContext::dispatch(instance->getClassName(), std::make_shared<FieldModificationPayload>(*instance->getFieldByPath(propertyPath)));
-            }
+                if (instance) {
+                    ApplicationEventContext::dispatch(instance->getClassName(),
+                                                      std::make_shared<FieldModificationPayload>(
+                                                          *instance->getFieldByPath(propertyPath)));
+                }
 
-            undoStack.push_back(std::move(*currentTransaction));
-            redoStack.clear();
+                undoStack.push_back(std::move(*currentTransaction));
+                redoStack.clear();
+            }
+            currentTransaction = nullptr;
         }
-        currentTransaction = nullptr;
     }
 
     bool HistoryService::isTransactionActive() const {
@@ -76,17 +80,26 @@ namespace Metal {
     }
 
     void HistoryService::recordChange(InspectableMember *field, const PropertyValue &oldValue) {
+        if (!field) return;
+
         PropertyValue newValue = getValueFromMember(field);
         if (oldValue == newValue) return;
 
-        PropertyChange change{field, oldValue, newValue};
+        std::shared_ptr<InspectableMember> fieldPtr;
+        if (field->instance) {
+            fieldPtr = field->instance->getFieldByPointer(field->getGenericPointer());
+        }
+
+        if (!fieldPtr) return; // Cannot track if we can't get a shared_ptr to it
+
+        PropertyChange change{fieldPtr, oldValue, newValue};
 
         if (currentTransaction) {
             auto it = std::find_if(currentTransaction->changes.begin(), currentTransaction->changes.end(),
                                    [&](const Change &c) {
                                        if (std::holds_alternative<PropertyChange>(c)) {
                                            const auto &pc = std::get<PropertyChange>(c);
-                                           return pc.field == field;
+                                           return pc.field == fieldPtr;
                                        }
                                        return false;
                                    });
@@ -153,19 +166,21 @@ namespace Metal {
 
     void HistoryService::undo() {
         if (undoStack.empty()) {
-            if (notificationService) notificationService->pushMessage("Nothing to undo.", NotificationSeverities::WARNING);
+            if (notificationService)
+                notificationService->pushMessage("Nothing to undo.", NotificationSeverities::WARNING);
             return;
         }
 
         Transaction trans = std::move(undoStack.back());
         undoStack.pop_back();
 
-
         for (auto it = trans.changes.rbegin(); it != trans.changes.rend(); ++it) {
             if (std::holds_alternative<PropertyChange>(*it)) {
                 const auto &change = std::get<PropertyChange>(*it);
-                if (change.field) {
-                    applyChange(change.field, change.oldValue);
+                if (change.field && change.field->instance) {
+                    applyChange(change.field.get(), change.oldValue);
+                    ApplicationEventContext::dispatch(change.field->instance->getClassName(),
+                                                      std::make_shared<FieldModificationPayload>(*change.field));
                 }
             } else if (std::holds_alternative<GenericChange>(*it)) {
                 const auto &change = std::get<GenericChange>(*it);
@@ -180,7 +195,8 @@ namespace Metal {
 
     void HistoryService::redo() {
         if (redoStack.empty()) {
-            if (notificationService) notificationService->pushMessage("Nothing to redo.", NotificationSeverities::WARNING);
+            if (notificationService)
+                notificationService->pushMessage("Nothing to redo.", NotificationSeverities::WARNING);
             return;
         }
 
@@ -190,8 +206,10 @@ namespace Metal {
         for (const auto &c: trans.changes) {
             if (std::holds_alternative<PropertyChange>(c)) {
                 const auto &change = std::get<PropertyChange>(c);
-                if (change.field) {
-                    applyChange(change.field, change.newValue);
+                if (change.field && change.field->instance) {
+                    applyChange(change.field.get(), change.newValue);
+                    ApplicationEventContext::dispatch(change.field->instance->getClassName(),
+                                                      std::make_shared<FieldModificationPayload>(*change.field));
                 }
             } else if (std::holds_alternative<GenericChange>(c)) {
                 const auto &change = std::get<GenericChange>(c);

@@ -57,6 +57,9 @@ namespace Metal {
 
         if (ImGuizmo::IsUsing()) {
             gizmoStrategy->decomposeMatrix(localSelected);
+        } else {
+            // Ensure endTransaction is called even if decomposeMatrix wasn't called this frame
+            gizmoStrategy->updateUsingState(false);
         }
 
         isGizmoOver = ImGuizmo::IsOver();

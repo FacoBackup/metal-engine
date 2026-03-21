@@ -21,7 +21,7 @@ namespace Metal {
     using PropertyValue = std::variant<std::string, int, float, bool, glm::vec2, glm::vec3, glm::vec4, glm::quat>;
 
     struct PropertyChange {
-        InspectableMember *field;
+        std::shared_ptr<InspectableMember> field;
         PropertyValue oldValue;
         PropertyValue newValue;
     };
