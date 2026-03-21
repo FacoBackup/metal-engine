@@ -2,6 +2,7 @@
 #define METAL_ENGINE_EDITORHEADERPANEL_H
 
 #include <functional>
+#include "../../../core/WindowService.h"
 
 #include "../../abstract/AbstractPanel.h"
 #include <imgui.h>
@@ -26,7 +27,7 @@ namespace Metal {
 
         static void RenderMenu(const char *label, const std::function<void()> &itemsFunc);
         
-        void renderDockAdders() const;
+        void renderDockAdders(WindowService::WindowControlRects &rects) const;
 
         static void RenderWindowControl(const std::string& icon, const char* id, float xPos, float width, ImU32 hoverColor, std::function<void()> action);
 

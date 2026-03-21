@@ -28,6 +28,10 @@ namespace Metal {
             SDL_Rect minimizeButton;
             SDL_Rect maximizeButton;
             SDL_Rect closeButton;
+            SDL_Rect saveButton;
+            SDL_Rect undoButton;
+            SDL_Rect redoButton;
+            std::vector<SDL_Rect> dockAdders;
         };
 
     private:

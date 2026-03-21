@@ -80,8 +80,9 @@ namespace Metal {
             view->isWindowFocused = isHovered;
             if (view->isWindowFocused) {
                 for (const auto &shortcut: editorRepository->focusedShortcuts) {
-                    const bool triggered = (shortcut.isDown && !ImGui::IsKeyChordPressed(ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiMod_Alt | ImGuiMod_Super))
-                                               ? ImGui::IsKeyDown((ImGuiKey)shortcut.keyChord)
+                    const bool triggered = (shortcut.isDown && !ImGui::IsKeyChordPressed(
+                                                ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiMod_Alt | ImGuiMod_Super))
+                                               ? ImGui::IsKeyDown((ImGuiKey) shortcut.keyChord)
                                                : ImGui::IsKeyChordPressed(shortcut.keyChord);
 
                     if (triggered) {
@@ -180,16 +181,12 @@ namespace Metal {
 
                 const bool isSelected = (dock->selectedOption == space->index);
 
-                if (isSelected) {
-                    ImGui::PushStyleColor(ImGuiCol_Button,
-                                          isFocused ? editorRepository->accent : themeService->palette3);
-                } else {
-                    ImGui::PushStyleColor(ImGuiCol_Button, themeService->palette3);
-                }
+                const std::string icon = UIUtil::GetDockSpaceIcon(space->index);
+                const std::string label = space->name;
+                const ImVec4 accent = isFocused ? editorRepository->accent : themeService->palette3;
 
-                if (ImGui::Button(
-                    (UIUtil::GetDockSpaceIcon(space->index) + space->name + id + std::to_string(space->index)).c_str(),
-                    ImVec2(0, headerHeight))) {
+                if (UIUtil::RenderTab(id + label + std::to_string(space->index), icon, label, isSelected, space->color,
+                                      accent, headerHeight)) {
                     dock->selectedOption = space->index;
                     initializeView();
                 }
@@ -223,7 +220,6 @@ namespace Metal {
                     ImGui::PopStyleColor(2);
                 }
 
-                ImGui::PopStyleColor();
                 ImGui::SameLine();
             }
         }
@@ -239,8 +235,15 @@ namespace Metal {
             ImGui::Separator();
             for (auto *option: DockSpace::OPTIONS_LIST) {
                 const bool exists = hasDockSpace(option->index);
-                const std::string label = UIUtil::GetDockSpaceIcon(option->index) + " " + option->name;
-                if (ImGui::MenuItem(label.c_str(), nullptr, false, !exists)) {
+                const std::string icon = UIUtil::GetDockSpaceIcon(option->index);
+                const std::string label = option->name;
+
+                const bool isSelected = false;
+                ImGui::PushStyleColor(ImGuiCol_Text, option->color);
+                ImGui::Text("%s", icon.c_str());
+                ImGui::PopStyleColor();
+                ImGui::SameLine();
+                if (ImGui::Selectable(label.c_str(), isSelected, exists ? ImGuiSelectableFlags_Disabled : 0)) {
                     dock->dockSpaces.emplace_back(option);
                     dock->selectedOption = option->index;
                     initializeView();

@@ -52,6 +52,44 @@ namespace Metal::UIUtil {
         return RenderOption(label, selected, size, size, accent);
     }
 
+    bool RenderTab(const std::string &id, const std::string &icon, const std::string &label, const bool selected,
+                   const ImVec4 &iconColor, const ImVec4 &accent, const float height) {
+        ImGui::PushID(id.c_str());
+
+        const float framePadding = ImGui::GetStyle().FramePadding.x;
+        const float iconWidth = ImGui::CalcTextSize(icon.c_str()).x;
+        const float labelWidth = ImGui::CalcTextSize(label.c_str()).x;
+        const float totalWidth = iconWidth + labelWidth + framePadding * 3.0f;
+
+        if (selected) {
+            ImGui::PushStyleColor(ImGuiCol_Button, accent);
+        }
+
+        const bool clicked = ImGui::Button("##tab", ImVec2(totalWidth, height));
+
+        if (selected) {
+            ImGui::PopStyleColor();
+        }
+
+        const ImVec2 pos = ImGui::GetItemRectMin();
+        const ImVec2 size = ImGui::GetItemRectSize();
+        ImDrawList *drawList = ImGui::GetWindowDrawList();
+
+        // Icon
+        ImGui::PushStyleColor(ImGuiCol_Text, iconColor);
+        const ImVec2 iconPos = ImVec2(pos.x + framePadding, pos.y + (size.y - ImGui::GetTextLineHeight()) * 0.5f);
+        drawList->AddText(iconPos, ImGui::GetColorU32(ImGuiCol_Text), icon.c_str());
+        ImGui::PopStyleColor();
+
+        // Label
+        const ImVec2 labelPos = ImVec2(pos.x + iconWidth + framePadding * 2.0f,
+                                       pos.y + (size.y - ImGui::GetTextLineHeight()) * 0.5f);
+        drawList->AddText(labelPos, ImGui::GetColorU32(ImGuiCol_Text), label.c_str());
+
+        ImGui::PopID();
+        return clicked;
+    }
+
     void RenderTooltip(const std::string &text) {
         if (ImGui::IsItemHovered()) {
             ImGui::BeginTooltip();
