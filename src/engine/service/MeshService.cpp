@@ -20,6 +20,7 @@
 #include "../dto/TransformComponent.h"
 #include "../repository/WorldRepository.h"
 #include "editor/dto/FieldModificationEvent.h"
+#include "../dto/ResourceDisposalPayload.h"
 
 namespace Metal {
     void MeshService::onInitialize() {
@@ -37,6 +38,16 @@ namespace Metal {
                 }
             }
         }, "PrimitiveComponent");
+
+        eventListener([this](const Event &event) {
+            auto payload = std::dynamic_pointer_cast<ResourceDisposalPayload>(event.payload);
+            if (payload) {
+                MeshInstance *resource = getResource(payload->resourceId);
+                LOG_INFO("Disposing of mesh instance");
+                bufferService->dispose(resource->indexBuffer->getId());
+                bufferService->dispose(resource->dataBuffer->getId());
+            }
+        }, "RESOURCE_DISPOSAL");
     }
 
     MeshInstance *MeshService::create(const std::string &meshPath) {
@@ -94,8 +105,5 @@ namespace Metal {
     }
 
     void MeshService::disposeResource(MeshInstance *resource) {
-        LOG_INFO("Disposing of mesh instance");
-        bufferService->dispose(resource->indexBuffer->getId());
-        bufferService->dispose(resource->dataBuffer->getId());
     }
 } // Metal

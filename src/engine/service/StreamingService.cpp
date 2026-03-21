@@ -6,6 +6,8 @@
 #include "TextureService.h"
 #include "VoxelService.h"
 #include "../../ApplicationContext.h"
+#include "../../ApplicationEventContext.h"
+#include "../dto/ResourceDisposalPayload.h"
 
 #include "../resource/SVOInstance.h"
 #include "../resource/MeshInstance.h"
@@ -28,7 +30,7 @@ namespace Metal {
                         lastUse.at(it->second->getId())));
                 std::string id = it->first;
                 ++it;
-                service->dispose(id);
+                ApplicationEventContext::dispatch("RESOURCE_DISPOSAL", std::make_shared<ResourceDisposalPayload>(id));
             } else {
                 ++it;
             }

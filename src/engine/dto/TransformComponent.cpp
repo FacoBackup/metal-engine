@@ -8,7 +8,7 @@ namespace Metal {
     void TransformComponent::registerFields() {
         registerVec3(translation, "", "Translation");
         registerVec3(scale, "", "Scale", 1);
-        registerVec3(rotationEuler, "", ROTATION);
+        registerQuat(rotation, "", ROTATION);
         registerBool(isStatic, "", "Static?");
     }
 
@@ -20,7 +20,7 @@ namespace Metal {
         nlohmann::json j;
         j["entityId"] = entityId;
         j["translation"] = {translation.x, translation.y, translation.z};
-        j["rotationEuler"] = {rotationEuler.x, rotationEuler.y, rotationEuler.z};
+        j["rotation"] = {rotation.x, rotation.y, rotation.z, rotation.w};
         j["scale"] = {scale.x, scale.y, scale.z};
         j["gizmoCenter"] = {gizmoCenter.x, gizmoCenter.y, gizmoCenter.z};
         j["model"] = {
@@ -35,7 +35,12 @@ namespace Metal {
     void TransformComponent::fromJson(const nlohmann::json &j) {
         entityId = j.at("entityId").get<entt::entity>();
         translation = {j.at("translation")[0], j.at("translation")[1], j.at("translation")[2]};
-        rotationEuler = {j.at("rotationEuler")[0], j.at("rotationEuler")[1], j.at("rotationEuler")[2]};
+        if (j.contains("rotation")) {
+            rotation = {j.at("rotation")[3], j.at("rotation")[0], j.at("rotation")[1], j.at("rotation")[2]};
+        } else if (j.contains("rotationEuler")) {
+            glm::vec3 euler = {j.at("rotationEuler")[0], j.at("rotationEuler")[1], j.at("rotationEuler")[2]};
+            rotation = glm::quat(glm::radians(euler));
+        }
         scale = {j.at("scale")[0], j.at("scale")[1], j.at("scale")[2]};
         gizmoCenter = {j.at("gizmoCenter")[0], j.at("gizmoCenter")[1], j.at("gizmoCenter")[2]};
         auto &m = j.at("model");

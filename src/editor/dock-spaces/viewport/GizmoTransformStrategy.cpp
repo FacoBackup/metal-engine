@@ -48,7 +48,7 @@ namespace Metal {
 
         glm::vec3 oldTranslation = selected->translation;
         glm::vec3 oldScale = selected->scale;
-        glm::vec3 oldRotationEuler = selected->rotationEuler;
+        glm::quat oldRotation = selected->rotation;
 
         // Decompose the matrix into its components
         glm::quat auxRotQuat;
@@ -56,7 +56,7 @@ namespace Metal {
 
         selected->translation = auxTranslation;
         selected->scale = auxScale;
-        selected->rotationEuler = glm::eulerAngles(auxRotQuat) * (180.f / glm::pi<float>());
+        selected->rotation = auxRotQuat;
 
         selected->forceTransform = true;
 
@@ -66,8 +66,8 @@ namespace Metal {
         if (oldScale != selected->scale) {
             historyService->recordChange(selected->getFieldByPointer(&selected->scale).get(), oldScale);
         }
-        if (oldRotationEuler != selected->rotationEuler) {
-            historyService->recordChange(selected->getFieldByPointer(&selected->rotationEuler).get(), oldRotationEuler);
+        if (oldRotation != selected->rotation) {
+            historyService->recordChange(selected->getFieldByPointer(&selected->rotation).get(), oldRotation);
         }
     }
 

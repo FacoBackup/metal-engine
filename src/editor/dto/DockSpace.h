@@ -19,6 +19,7 @@ namespace Metal {
         static DockSpace METRICS;
         static DockSpace REPOSITORIES;
         static DockSpace LUA_EDITOR;
+        static DockSpace MCP;
 
         static const std::vector<DockSpace*> OPTIONS_LIST;
 

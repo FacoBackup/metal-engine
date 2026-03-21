@@ -4,6 +4,7 @@
 #include "../resource/MeshInstance.h"
 #include "../../editor/enum/engine-definitions.h"
 #include "../../common/IInit.h"
+#include "../../common/IEventMember.h"
 #include "ApplicationEventContext.h"
 
 namespace Metal {
@@ -14,7 +15,6 @@ namespace Metal {
     class BufferService;
     class RayTracingService;
     class DirectoryService;
-    class ApplicationEventContext;
     struct WorldRepository;
 
     class MeshService final : public AbstractResourceService<MeshInstance>, public IInit {

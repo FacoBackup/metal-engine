@@ -151,7 +151,8 @@ namespace Metal {
             JPH::EMotionType motionType = rb.isKinematic ? JPH::EMotionType::Kinematic : JPH::EMotionType::Dynamic;
             JPH::ObjectLayer layer = rb.isKinematic ? Layers::NON_MOVING : Layers::MOVING;
 
-            JPH::BodyCreationSettings settings(shape, JPH::RVec3(trans.translation.x, trans.translation.y, trans.translation.z), JPH::Quat::sIdentity(), motionType, layer);
+            JPH::Quat joltRotation(trans.rotation.x, trans.rotation.y, trans.rotation.z, trans.rotation.w);
+            JPH::BodyCreationSettings settings(shape, JPH::RVec3(trans.translation.x, trans.translation.y, trans.translation.z), joltRotation, motionType, layer);
             settings.mLinearDamping = rb.linearDamping;
             settings.mAngularDamping = rb.angularDamping;
             settings.mOverrideMassProperties = JPH::EOverrideMassProperties::CalculateInertia;
@@ -175,7 +176,7 @@ namespace Metal {
 
             if (auto *trans = worldRepository->registry.try_get<TransformComponent>(entity)) {
                 trans->translation = {position.GetX(), position.GetY(), position.GetZ()};
-                // TODO - OTHER TRANSFORMS
+                trans->rotation = {rotation.GetX(), rotation.GetY(), rotation.GetZ(), rotation.GetW()};
                 trans->forceTransform = true; // Signal that transform was updated
             }
         }

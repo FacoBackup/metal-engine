@@ -53,19 +53,34 @@ namespace Metal {
     }
 
     void EngineContext::dispose() {
+        physicsTransformThreadRunning = false;
+        if (physicsTransformThread.joinable()) {
+            physicsTransformThread.join();
+        }
+    }
+
+    void EngineContext::physicsTransformLoop() {
+        while (physicsTransformThreadRunning) {
+            if (transformService) transformService->onSync();
+            if (physicsService) physicsService->onSync();
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
     }
 
     void EngineContext::onSync() {
+        if (!physicsTransformThreadRunning) {
+            physicsTransformThreadRunning = true;
+            physicsTransformThread = std::thread(&EngineContext::physicsTransformLoop, this);
+        }
+
         updateCurrentTime();
         updateGlobalData();
 
-        transformService->onSync();
         streamingService->onSync();
         rayTracingService->onSync();
         cameraService->onSync();
         lightService->onSync();
         volumeService->onSync();
-        physicsService->onSync();
 
         for (auto *frame: registeredFrames) {
             if (frame->getShouldRender()) {

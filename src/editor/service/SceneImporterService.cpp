@@ -106,7 +106,7 @@ namespace Metal {
         node->mTransformation.Decompose(scaling, rotation, pos);
         currentNode.transform.translation = {pos.x, pos.y, pos.z};
         glm::quat q = {rotation.w, rotation.x, rotation.y, rotation.z};
-        currentNode.transform.rotationEuler = glm::eulerAngles(q) * (180.f / glm::pi<float>());
+        currentNode.transform.rotation = q;
         currentNode.transform.scale = {scaling.x, scaling.y, scaling.z};
 
         processMeshes(scene, aiScene, node, targetDir, rootDirectory, meshMap, stopToken);

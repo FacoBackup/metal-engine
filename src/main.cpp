@@ -11,6 +11,7 @@
 #include "editor/service/FilesService.h"
 #include "editor/service/HistoryService.h"
 #include "editor/service/MaterialImporterService.h"
+#include "editor/service/MCPService.h"
 #include "editor/service/MeshImporterService.h"
 #include "editor/service/NotificationService.h"
 #include "editor/service/PickingService.h"
@@ -77,6 +78,7 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::DockService>());
     context->registerSingleton(std::make_shared<Metal::MaterialService>());
     context->registerSingleton(std::make_shared<Metal::AsyncTaskService>());
+    context->registerSingleton(std::make_shared<Metal::MCPService>());
     context->registerSingleton(std::make_shared<Metal::SceneImporterService>());
 
     context->registerSingleton(std::make_shared<Metal::SelectionService>());

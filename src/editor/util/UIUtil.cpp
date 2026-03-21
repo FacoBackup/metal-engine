@@ -227,6 +227,7 @@ namespace Metal::UIUtil {
             case 4: return Icons::analytics; // METRICS
             case 5: return Icons::search; // REPOSITORIES
             case 6: return Icons::script; // REPOSITORIES
+            case 7: return Icons::chat; // MCP
             default: return "";
         }
     }

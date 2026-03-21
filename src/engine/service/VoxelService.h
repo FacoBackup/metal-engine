@@ -3,12 +3,13 @@
 
 #include "../../common/AbstractResourceService.h"
 #include "../resource/SVOInstance.h"
+#include "../../common/IInit.h"
 
 namespace Metal {
     struct SVOInstance;
     class BufferService;
 
-    class VoxelService final : public AbstractResourceService<SVOInstance> {
+    class VoxelService final : public AbstractResourceService<SVOInstance>, public IInit {
         BufferService *bufferService = nullptr;
     public:
         std::vector<Dependency> getDependencies() override {
@@ -22,6 +23,8 @@ namespace Metal {
         SVOInstance *stream(const std::string &id);
 
         void disposeResource(SVOInstance *resource) override;
+
+        void onInitialize() override;
     };
 } // Metal
 

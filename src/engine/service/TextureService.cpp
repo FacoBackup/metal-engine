@@ -6,6 +6,7 @@
 #include "../util/ImageUtils.h"
 #include "../../editor/enum/engine-definitions.h"
 #include "../../ApplicationContext.h"
+#include "../../ApplicationEventContext.h"
 
 #include <stb_image.h>
 #include <string>
@@ -20,8 +21,18 @@
 #include "DescriptorSetService.h"
 #include "../../core/DirectoryService.h"
 #include "../../common/LoggerUtil.h"
+#include "../dto/ResourceDisposalPayload.h"
 
 namespace Metal {
+
+    void TextureService::onInitialize() {
+        eventListener([this](const Event &event) {
+            auto payload = std::dynamic_pointer_cast<ResourceDisposalPayload>(event.payload);
+            if (payload) {
+                dispose(payload->resourceId);
+            }
+        }, "RESOURCE_DISPOSAL");
+    }
 
     void TextureService::copyBufferToImage(const VkBuffer &vkBuffer, const TextureInstance *image,
                                            const int layerCount) const {

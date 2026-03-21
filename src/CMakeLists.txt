@@ -88,6 +88,8 @@ set(ENGINE_SOURCES
         editor/dock-spaces/world/WorldPanel.h
         editor/dock-spaces/lua-editor/LuaEditorPanel.cpp
         editor/dock-spaces/lua-editor/LuaEditorPanel.h
+        editor/dock-spaces/mcp/MCPPanel.cpp
+        editor/dock-spaces/mcp/MCPPanel.h
         engine/resource/RuntimeResource.h
         engine/service/ShaderService.cpp
         engine/service/ShaderService.h
@@ -126,6 +128,8 @@ set(ENGINE_SOURCES
         editor/dock-spaces/files/FilesHeaderPanel.h
         editor/service/MaterialImporterService.cpp
         editor/service/MaterialImporterService.h
+        editor/service/MCPService.cpp
+        editor/service/MCPService.h
         editor/service/MeshImporterService.cpp
         editor/service/MeshImporterService.h
         editor/service/SceneImporterService.cpp

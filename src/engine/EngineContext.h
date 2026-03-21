@@ -3,6 +3,8 @@
 
 #include <chrono>
 #include <memory>
+#include <thread>
+#include <atomic>
 
 #include "dto/GlobalDataUBO.h"
 #include "../common/IService.h"
@@ -44,6 +46,10 @@ namespace Metal {
         GlobalDataUBO globalDataUBO{};
         long long start = -1;
         bool cameraUpdated = true;
+
+        std::thread physicsTransformThread;
+        std::atomic<bool> physicsTransformThreadRunning = false;
+        void physicsTransformLoop();
 
     public:
         std::vector<Dependency> getDependencies() override {

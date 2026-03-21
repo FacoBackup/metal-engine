@@ -5,8 +5,19 @@
 #include "../repository/EngineRepository.h"
 #include "BufferService.h"
 #include "../dto/SparseVoxelOctreeData.h"
+#include "../../ApplicationEventContext.h"
+#include "../dto/ResourceDisposalPayload.h"
 
 namespace Metal {
+
+    void VoxelService::onInitialize() {
+        eventListener([this](const Event &event) {
+            auto payload = std::dynamic_pointer_cast<ResourceDisposalPayload>(event.payload);
+            if (payload) {
+                dispose(payload->resourceId);
+            }
+        }, "RESOURCE_DISPOSAL");
+    }
 
     SVOInstance* VoxelService::create(const std::string &svoPath) {
         if (std::filesystem::exists(svoPath)) {
@@ -30,8 +41,5 @@ namespace Metal {
     }
 
     void VoxelService::disposeResource(SVOInstance *resource) {
-        if (resource->voxelsBuffer != nullptr) {
-            dispose(resource->voxelsBuffer->getId());
-        }
     }
 } // Metal

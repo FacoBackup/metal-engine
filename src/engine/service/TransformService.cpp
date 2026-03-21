@@ -52,9 +52,7 @@ namespace Metal {
         auxMat42 = glm::identity<glm::mat4>();
         auxMat42 = glm::translate(auxMat42, st->translation); // Translation
 
-        auxMat42 = glm::rotate(auxMat42, glm::radians(st->rotationEuler.x), {1, 0, 0});
-        auxMat42 = glm::rotate(auxMat42, glm::radians(st->rotationEuler.y), {0, 1, 0});
-        auxMat42 = glm::rotate(auxMat42, glm::radians(st->rotationEuler.z), {0, 0, 1});
+        auxMat42 = auxMat42 * glm::mat4_cast(st->rotation);
 
         auxMat42 = glm::scale(auxMat42, st->scale); // Scale
 
