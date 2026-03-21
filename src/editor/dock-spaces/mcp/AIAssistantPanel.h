@@ -3,6 +3,7 @@
 
 #include "../docks/AbstractDockPanel.h"
 #include "imgui.h"
+#include "../../enum/AIModel.h"
 
 #define MCP_INPUT_ROUNDING 6.0f
 #define MCP_PADDING 8.0f
@@ -42,6 +43,7 @@ namespace Metal {
         AIAssistantRepository *aiAssistantRepository = nullptr;
         ThemeService *themeService = nullptr;
         EditorRepository *editorRepository = nullptr;
+        AIModel currentModel = AIModel::GEMINI_3_FLASH_LITE;
         char inputBuffer[1024]{};
         std::string currentChatId;
 

@@ -52,8 +52,6 @@ namespace Metal {
         ShadingMode shadingMode = LIT;
         std::vector<std::string> bookmarks{};
         bool isPlaying = false;
-        std::string mcpModel = "http://localhost:11434/v1";
-        std::string mcpToken = "";
 
         void registerFields() override;
 

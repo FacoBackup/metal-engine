@@ -3,6 +3,7 @@
 
 #include "../../common/IService.h"
 #include "../../common/IInit.h"
+#include "../enum/AIModel.h"
 #include <string>
 
 namespace Metal {
@@ -34,7 +35,7 @@ namespace Metal {
 
         void onInitialize() override;
 
-        void sendRequest(const std::string &chatId, const std::string &message);
+        void sendRequest(const std::string &chatId, const std::string &message, AIModel model);
 
         std::string createNewChat();
 

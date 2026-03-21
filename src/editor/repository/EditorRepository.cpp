@@ -47,8 +47,6 @@ namespace Metal {
         j["shadingMode"] = shadingMode;
         j["bookmarks"] = bookmarks;
         j["isPlaying"] = isPlaying;
-        j["mcpModel"] = mcpModel;
-        j["mcpToken"] = mcpToken;
         return j;
     }
 
@@ -94,8 +92,6 @@ namespace Metal {
                 bookmarks = j.at("bookmarks").get<std::vector<std::string>>();
             }
             isPlaying = j.value("isPlaying", false);
-            mcpModel = j.value("mcpModel", "http://localhost:11434/v1");
-            mcpToken = j.value("mcpToken", "");
     }
 
     void EditorRepository::registerFields() {
@@ -109,8 +105,5 @@ namespace Metal {
         registerFloat(gridScale, "Grid", "Scale");
         registerInt(gridThreshold, "Grid", "Threshold");
         registerFloat(gridThickness, "Grid", "Thickness");
-
-        registerText(mcpModel, "MCP", "Model URL");
-        registerText(mcpToken, "MCP", "Token");
     }
 }

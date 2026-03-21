@@ -27,7 +27,7 @@ namespace Metal {
         LOG_INFO("AIAssistantService initialized");
     }
 
-    void AIAssistantService::sendRequest(const std::string &chatId, const std::string &message) {
+    void AIAssistantService::sendRequest(const std::string &chatId, const std::string &message, AIModel model) {
         if (!editorRepository || !httpService || !aiAssistantRepository) {
             LOG_ERROR("Required components not available in AIAssistantService");
             return;
@@ -36,9 +36,8 @@ namespace Metal {
         std::shared_ptr<Chat> currentChat = aiAssistantRepository->findChatById(chatId);
 
         if (!currentChat) {
-            // This should not happen if chatId is set correctly, but handle it
-            LOG_WARN("Current chat not found in repository, creating new one locally");
-            currentChat = aiAssistantRepository->createNewChat();
+            LOG_ERROR("Current chat not found in repository");
+            return;
         }
 
         auto getTimeStr = []() {
@@ -52,15 +51,11 @@ namespace Metal {
         // Add user message
         currentChat->messages.push_back({"user", message, getTimeStr()});
 
-        // Store chat after the first message if it wasn't stored before
-        if (currentChat->messages.size() == 1 && !aiAssistantRepository->findChatById(currentChat->id)) {
-            aiAssistantRepository->addChat(currentChat);
-        }
-
-        LOG_INFO("Sending MCP request to: " + editorRepository->mcpModel);
+        AIModelInfo modelInfo = getAIModelInfo(model);
+        LOG_INFO("Sending MCP request to: " + modelInfo.url + " using model " + modelInfo.modelId);
 
         nlohmann::json body;
-        body["model"] = "gpt-3.5-turbo";
+        body["model"] = modelInfo.modelId;
         body["messages"] = nlohmann::json::array();
         
         if (!systemPrompt.empty()) {
@@ -72,7 +67,7 @@ namespace Metal {
         }
 
         std::string targetChatId = currentChat->id;
-        // httpService->post(editorRepository->mcpModel + "/chat/completions", body.dump(), editorRepository->mcpToken,
+        // httpService->post(modelInfo.url + "/chat/completions", body.dump(), "",
         //     [this, targetChatId, getTimeStr](const std::string& response, bool success) {
         //         if (success) {
         //             try {
@@ -82,7 +77,7 @@ namespace Metal {
         //
         //                     auto chatOpt = aiAssistantRepository->findChatById(targetChatId);
         //                     if (chatOpt) {
-        //                         (*chatOpt)->messages.push_back({"assistant", content, getTimeStr()});
+        //                         chatOpt->messages.push_back({"assistant", content, getTimeStr()});
         //                         LOG_INFO("MCP Response added to chat " + targetChatId);
         //                     }
         //                 }

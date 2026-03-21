@@ -62,9 +62,10 @@ namespace Metal {
         auto t = std::time(nullptr);
         auto tm = *std::localtime(&t);
         std::ostringstream oss;
-        oss << std::put_time(&tm, "%d-%m-%Y %H:%M:%S");
+        oss << std::put_time(&tm, "%H:%M:%S");
         chat->date = oss.str();
 
+        addChat(chat);
         return chat;
     }
 }

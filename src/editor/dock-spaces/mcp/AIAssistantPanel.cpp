@@ -51,6 +51,21 @@ namespace Metal {
             ImGui::EndPopup();
         }
 
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(150);
+        if (ImGui::BeginCombo(("##ModelSelector" + id).c_str(), getAIModelInfo(currentModel).name.c_str())) {
+            for (auto model : getAllAIModels()) {
+                bool isSelected = (currentModel == model);
+                if (ImGui::Selectable(getAIModelInfo(model).name.c_str(), isSelected)) {
+                    currentModel = model;
+                }
+                if (isSelected) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+
         ImGui::Separator();
 
         renderMessages();
@@ -120,7 +135,7 @@ namespace Metal {
             if (ImGui::InputText(("##mcp-input" + id).c_str(), inputBuffer, sizeof(inputBuffer),
                                  ImGuiInputTextFlags_EnterReturnsTrue)) {
                 if (strlen(inputBuffer) > 0) {
-                    aiAssistantService->sendRequest(currentChatId, inputBuffer);
+                    aiAssistantService->sendRequest(currentChatId, inputBuffer, currentModel);
                     memset(inputBuffer, 0, sizeof(inputBuffer));
                 }
             }
@@ -128,7 +143,7 @@ namespace Metal {
             if (UIUtil::RenderButtonSolid("##mcp-send" + id, Icons::send, MCP_BUTTON_SIZE, editorRepository->accent,
                                           MCP_BUTTON_ROUNDING)) {
                 if (strlen(inputBuffer) > 0) {
-                    aiAssistantService->sendRequest(currentChatId, inputBuffer);
+                    aiAssistantService->sendRequest(currentChatId, inputBuffer, currentModel);
                     memset(inputBuffer, 0, sizeof(inputBuffer));
                 }
             }
