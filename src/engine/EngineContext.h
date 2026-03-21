@@ -22,6 +22,7 @@ namespace Metal {
     class CameraService;
     class LightService;
     class VolumeService;
+    class PhysicsService;
     struct WorldRepository;
     struct EditorRepository;
     struct EngineRepository;
@@ -35,6 +36,7 @@ namespace Metal {
         CameraService *cameraService = nullptr;
         LightService *lightService = nullptr;
         VolumeService *volumeService = nullptr;
+        PhysicsService *physicsService = nullptr;
         WorldRepository *worldRepository = nullptr;
         EditorRepository *editorRepository = nullptr;
         EngineRepository *engineRepository = nullptr;
@@ -52,6 +54,7 @@ namespace Metal {
                 {"CameraService", &cameraService},
                 {"LightService", &lightService},
                 {"VolumeService", &volumeService},
+                {"PhysicsService", &physicsService},
                 {"WorldRepository", &worldRepository},
                 {"EditorRepository", &editorRepository},
                 {"EngineRepository", &engineRepository}

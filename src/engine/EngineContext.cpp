@@ -7,6 +7,7 @@
 #include "service/CameraService.h"
 #include "service/LightService.h"
 #include "service/VolumeService.h"
+#include "service/PhysicsService.h"
 #include "repository/WorldRepository.h"
 #include "repository/EngineRepository.h"
 #include "../editor/repository/EditorRepository.h"
@@ -64,6 +65,7 @@ namespace Metal {
         cameraService->onSync();
         lightService->onSync();
         volumeService->onSync();
+        physicsService->onSync();
 
         for (auto *frame: registeredFrames) {
             if (frame->getShouldRender()) {

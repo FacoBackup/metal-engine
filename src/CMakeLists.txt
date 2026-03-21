@@ -275,6 +275,8 @@ set(ENGINE_SOURCES
         editor/dock-spaces/repositories/RepositoriesPanel.h
         engine/service/VolumeService.cpp
         engine/service/VolumeService.h
+        engine/service/PhysicsService.cpp
+        engine/service/PhysicsService.h
         engine/service/LuaService.cpp
         engine/service/LuaService.h
         common/IContextMember.h

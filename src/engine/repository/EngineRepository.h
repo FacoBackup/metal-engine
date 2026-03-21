@@ -26,7 +26,6 @@ namespace Metal {
         bool atmosphereEnabled = false;
 
         glm::vec3 gravity{0, -9.81f, 0};
-        bool physicsPaused = false;
 
         void registerFields() override;
 

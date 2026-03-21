@@ -34,7 +34,6 @@ namespace Metal {
         registerFloat(elapsedTime, ATMOSPHERE, "Elapsed time");
 
         registerVec3(gravity, PHYSICS, "Gravity");
-        registerBool(physicsPaused, PHYSICS, "Paused?");
     }
 
     nlohmann::json EngineRepository::toJson() const {
@@ -55,7 +54,6 @@ namespace Metal {
         j["dofAperture"] = dofAperture;
         j["dofFocalLength"] = dofFocalLength;
         j["gravity"] = {gravity.x, gravity.y, gravity.z};
-        j["physicsPaused"] = physicsPaused;
         return j;
     }
 
@@ -78,7 +76,6 @@ namespace Metal {
         if (j.contains("gravity")) {
             gravity = {j.at("gravity")[0], j.at("gravity")[1], j.at("gravity")[2]};
         }
-        physicsPaused = j.value("physicsPaused", false);
     }
 
     const char *EngineRepository::getIcon() {

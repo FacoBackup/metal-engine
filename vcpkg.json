@@ -83,6 +83,10 @@
     {
       "name": "sol2",
       "version>=": "3.3.0"
+    },
+    {
+      "name": "joltphysics",
+      "version>=": "5.0.0"
     }
   ]
 }
