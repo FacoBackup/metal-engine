@@ -51,11 +51,11 @@ namespace Metal {
 
         static PipelineBuilder OfRayTracing(const char *rayGen, const char *miss, const char *closestHit);
 
-        PipelineBuilder &setBlendEnabled();
+        PipelineBuilder &enableBlending();
 
-        PipelineBuilder &setPrepareForMesh();
+        PipelineBuilder &enablePrimitiveRendering();
 
-        PipelineBuilder &setDepthTest();
+        PipelineBuilder &enableDepthTest();
 
         PipelineBuilder &useTriangleStrip();
 

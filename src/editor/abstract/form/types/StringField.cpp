@@ -2,7 +2,9 @@
 #include <algorithm>
 #include <imgui.h>
 #include "../../../../common/Inspectable.h"
-#include "../../../service/HistoryService.h"
+#include "editor/service/HistoryService.h"
+#include "ApplicationEventContext.h"
+#include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
     StringField::StringField(InspectedField<std::string> &field) : field(field) {
@@ -15,10 +17,8 @@ namespace Metal {
             std::string oldValue = *field.field;
             if (ImGui::InputText(field.id.c_str(), buffer, sizeof(buffer))) {
                 *field.field = buffer;
-                field.instance->registerChange();
-                field.instance->onUpdate(&field);
-
-                historyService->recordChange(field.instance, field.path, oldValue, *field.field);
+                historyService->recordChange(&field, oldValue);
+                ApplicationEventContext::dispatch(field.instance->getClassName(), std::make_shared<FieldModificationPayload>(field));
             }
         } else {
             ImGui::Text("%s: %s", field.name.c_str(), field.field->c_str());

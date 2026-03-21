@@ -9,9 +9,11 @@ namespace Metal {
     class VulkanContext;
     class EngineContext;
     struct EngineRepository;
+    class ApplicationEventContext;
 
     class HWRayTracingPass final : public AbstractComputePass {
         bool isFirstRun = true;
+        bool needsUpdate = true;
         HWRayTracingPushConstant pushConstant{};
 
         RayTracingService *rayTracingService = nullptr;
@@ -34,6 +36,10 @@ namespace Metal {
         void onSync() override;
 
         void onInitialize() override;
+
+        bool requiresRayTracing() override {
+            return true;
+        }
     };
 } // Metal
 

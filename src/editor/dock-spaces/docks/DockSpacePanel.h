@@ -31,7 +31,7 @@ namespace Metal {
         std::shared_ptr<AbstractDockPanel> view = nullptr;
         std::unordered_map<int, std::shared_ptr<AbstractDockPanel>> views{};
         ImVec2 headerPadding{0, 3};
-        float headerHeight = 25.0f;
+        float headerHeight = 20.0f;
 
         EditorRepository *editorRepository = nullptr;
         ThemeService *themeService = nullptr;

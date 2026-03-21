@@ -6,7 +6,7 @@
 
 #include "../../common/IInit.h"
 #include "../resource/PipelineInstance.h"
-#include "../../core/vulkan/VulkanUtils.h"
+#include "../../common/VulkanUtils.h"
 
 namespace Metal {
     class FrameService;

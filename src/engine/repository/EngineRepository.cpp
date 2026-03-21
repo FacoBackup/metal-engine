@@ -31,20 +31,6 @@ namespace Metal {
 
         registerBool(atmosphereEnabled, ATMOSPHERE, "Enable atmosphere?");
         registerFloat(elapsedTime, ATMOSPHERE, "Elapsed time");
-        registerFloat(sunDistance, ATMOSPHERE, "Sun distance");
-        registerFloat(sunRadius, ATMOSPHERE, "Sun radius");
-        registerFloat(sunLightIntensity, ATMOSPHERE, "Sun light intensity");
-        registerColor(dawnColor, SUN, "Dawn color");
-        registerColor(nightColor, SUN, "Night color");
-        registerColor(middayColor, SUN, "Midday color");
-    }
-
-    void EngineRepository::onUpdate(InspectableMember *member) {
-        // TODO - EVENT
-        // if (member != nullptr && (member->group == PATH_TRACER || member->group == ATMOSPHERE || member->group
-                                  // == SUN || member->group == DEPTH_OF_FIELD)) {
-            // engineContext.setGISettingsUpdated(true);
-        // }
     }
 
     nlohmann::json EngineRepository::toJson() const {
@@ -54,13 +40,6 @@ namespace Metal {
         j["pathTracerBounces"] = pathTracerBounces;
         j["atmosphereEnabled"] = atmosphereEnabled;
         j["elapsedTime"] = elapsedTime;
-        j["sunRadius"] = sunRadius;
-        j["sunDistance"] = sunDistance;
-        j["sunLightIntensity"] = sunLightIntensity;
-        j["dawnColor"] = {dawnColor.x, dawnColor.y, dawnColor.z};
-        j["nightColor"] = {nightColor.x, nightColor.y, nightColor.z};
-        j["middayColor"] = {middayColor.x, middayColor.y, middayColor.z};
-        j["svoFilePaths"] = svoFilePaths;
         j["pathTracingEmissiveFactor"] = pathTracingEmissiveFactor;
         j["pathTracerMultiplier"] = pathTracerMultiplier;
         j["shadingResInvScale"] = shadingResInvScale;
@@ -80,13 +59,6 @@ namespace Metal {
         pathTracerBounces = j.at("pathTracerBounces").get<int>();
         atmosphereEnabled = j.at("atmosphereEnabled").get<bool>();
         elapsedTime = j.at("elapsedTime").get<float>();
-        sunRadius = j.at("sunRadius").get<float>();
-        sunDistance = j.at("sunDistance").get<float>();
-        sunLightIntensity = j.at("sunLightIntensity").get<float>();
-        dawnColor = {j.at("dawnColor")[0], j.at("dawnColor")[1], j.at("dawnColor")[2]};
-        nightColor = {j.at("nightColor")[0], j.at("nightColor")[1], j.at("nightColor")[2]};
-        middayColor = {j.at("middayColor")[0], j.at("middayColor")[1], j.at("middayColor")[2]};
-        svoFilePaths = j.at("svoFilePaths").get<std::vector<std::string> >();
         pathTracingEmissiveFactor = j.at("pathTracingEmissiveFactor").get<float>();
         pathTracerMultiplier = j.at("pathTracerMultiplier").get<float>();
         shadingResInvScale = j.at("shadingResInvScale").get<int>();

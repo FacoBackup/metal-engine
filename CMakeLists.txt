@@ -9,7 +9,7 @@ if (MSVC)
 endif()
 
 # ------ LIBS
-find_package(glfw3 REQUIRED)
+find_package(SDL3 REQUIRED)
 find_package(glm REQUIRED)
 find_package(imgui REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
@@ -25,7 +25,7 @@ find_package(OpenVDB CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
 
 set(COMMON_LIBRARIES
-        glfw
+        SDL3::SDL3
         nfd::nfd
         cereal::cereal
         meshoptimizer::meshoptimizer

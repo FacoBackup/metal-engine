@@ -1,10 +1,8 @@
 #include "ViewportPanel.h"
-#include "CameraPositionPanel.h"
 #include "GizmoPanel.h"
 #include "ImGuizmo.h"
 #include "ViewportHeaderPanel.h"
 #include "EngineFramePanel.h"
-#include "../../../ApplicationContext.h"
 #include "../../../engine/dto/Camera.h"
 #include "../../../engine/frame-builder/EngineFrameBuilder.h"
 #include <algorithm>
@@ -14,7 +12,6 @@
 #include "../../../engine/service/CameraService.h"
 #include "../../../engine/repository/RuntimeRepository.h"
 #include "../../../engine/EngineContext.h"
-#include "../../../core/DirectoryService.h"
 #include "../../../engine/dto/MetadataComponent.h"
 
 namespace Metal {
@@ -22,7 +19,6 @@ namespace Metal {
         headerPanel = initializePanel<ViewportHeaderPanel>();
         engineFramePanel = initializePanel<EngineFramePanel>();
         gizmoPanel = initializePanel<GizmoPanel>(true, position, size);
-        cameraPanel = initializePanel<CameraPositionPanel>();
 
         shortcuts = {
             ShortcutDTO("Change shading mode", ImGuiKey_Q, [this]() {
@@ -68,7 +64,6 @@ namespace Metal {
         engineFramePanel->onSync();
 
         gizmoPanel->onSync();
-        cameraPanel->onSync();
     }
 
     void ViewportPanel::updateCamera() {

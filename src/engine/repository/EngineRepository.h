@@ -24,21 +24,12 @@ namespace Metal {
         float pathTracerMultiplier = 1;
         float elapsedTime = .5f;
         bool atmosphereEnabled = false;
-        float sunDistance = 10000;
-        float sunRadius = 3000;
-        float sunLightIntensity = 2;
-        glm::vec3 dawnColor{1, .39f, .19f};
-        glm::vec3 nightColor{.1f, .1f, .1f};
-        glm::vec3 middayColor{.9f, .9f, .9f};
-        std::vector<std::string> svoFilePaths{};
 
         void registerFields() override;
 
         const char *getIcon() override;
 
         const char *getTitle() override;
-
-        void onUpdate(InspectableMember *member) override;
 
         nlohmann::json toJson() const override;
 

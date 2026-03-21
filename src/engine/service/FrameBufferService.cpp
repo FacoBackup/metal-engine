@@ -4,8 +4,8 @@
 #include <glm/vec3.hpp>
 
 #include "../resource/FrameBufferInstance.h"
-#include "../../core/vulkan/VulkanContext.h"
-#include "../../core/vulkan/VulkanUtils.h"
+#include "../../core/VulkanContext.h"
+#include "../../common/VulkanUtils.h"
 #include "../resource/FrameBufferAttachment.h"
 #include "../../ApplicationContext.h"
 #include "../../common/LoggerUtil.h"

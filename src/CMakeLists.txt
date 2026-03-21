@@ -1,17 +1,16 @@
 set(ENGINE_SOURCES
-        main.cpp
         editor/EditorPanel.cpp
         editor/EditorPanel.h
         engine/EngineContext.cpp
         engine/EngineContext.h
-        core/vulkan/VulkanUtils.cpp
-        core/vulkan/VulkanUtils.h
-        core/vulkan/VulkanContext.cpp
-        core/vulkan/VulkanContext.h
-        core/glfw/GLFWContext.cpp
-        core/glfw/GLFWContext.h
-        core/gui/GuiContext.cpp
-        core/gui/GuiContext.h
+        common/VulkanUtils.cpp
+        common/VulkanUtils.h
+        core/VulkanContext.cpp
+        core/VulkanContext.h
+        core/WindowService.cpp
+        core/WindowService.h
+        core/ImGuiService.cpp
+        core/ImGuiService.h
         editor/dock-spaces/viewport/ViewportPanel.cpp
         editor/dock-spaces/viewport/ViewportPanel.h
         editor/dock-spaces/viewport/EngineFramePanel.cpp
@@ -46,6 +45,7 @@ set(ENGINE_SOURCES
         editor/abstract/form/types/MethodField.cpp
         editor/abstract/form/types/MethodField.h
         editor/util/UIUtil.h
+        editor/util/UIUtil.cpp
         editor/dock-spaces/header/EditorHeaderPanel.cpp
         editor/dock-spaces/header/EditorHeaderPanel.h
         editor/dock-spaces/header/AsyncTaskPanel.cpp
@@ -132,8 +132,6 @@ set(ENGINE_SOURCES
         editor/service/FileImporterService.h
         editor/dock-spaces/files/FilesContext.cpp
         engine/dto/VertexData.h
-        editor/dock-spaces/viewport/CameraPositionPanel.cpp
-        editor/dock-spaces/viewport/CameraPositionPanel.h
         editor/passes/GridPass.cpp
         editor/passes/GridPass.h
         engine/passes/CommandBufferRecorder.cpp
@@ -174,6 +172,8 @@ set(ENGINE_SOURCES
         engine/enum/ResourceType.h
         editor/dock-spaces/viewport/GizmoPanel.cpp
         editor/dock-spaces/viewport/GizmoPanel.h
+        editor/dock-spaces/viewport/GizmoTransformStrategy.cpp
+        editor/dock-spaces/viewport/GizmoTransformStrategy.h
         editor/dock-spaces/viewport/ViewportHeaderPanel.cpp
         editor/dock-spaces/viewport/ViewportHeaderPanel.h
         editor/dock-spaces/viewport/GizmoSettingsPanel.cpp
@@ -215,6 +215,8 @@ set(ENGINE_SOURCES
         engine/dto/LightData.h
         editor/passes/SelectionIDPass.cpp
         editor/passes/SelectionIDPass.h
+        editor/passes/FallbackPass.cpp
+        editor/passes/FallbackPass.h
         editor/repository/EditorRepository.cpp
         editor/dto/GridPushConstant.h
         engine/passes/AbstractComputePass.cpp
@@ -266,6 +268,8 @@ set(ENGINE_SOURCES
         engine/service/VolumeService.cpp
         engine/service/VolumeService.h
         common/IContextMember.h
+        common/IEventMember.h
+        common/IEventMember.cpp
         common/IService.h
         common/IRepository.h
         common/IContextMember.cpp
@@ -276,11 +280,18 @@ set(ENGINE_SOURCES
         core/FrameService.h
         common/Icons.cpp
         editor/service/HistoryService.cpp
+        ApplicationEventContext.cpp
+        ApplicationEventContext.h
+        engine/dto/LightComponent.cpp
+        engine/dto/LightComponent.h
+        common/Util.h
+        common/Util.cpp
+        editor/dto/FieldModificationEvent.h
+        editor/dto/InspectableEventPayload.h
 )
 
 # Extract non-main sources for testing
 set(ENGINE_LIB_SOURCES ${ENGINE_SOURCES})
-list(REMOVE_ITEM ENGINE_LIB_SOURCES main.cpp)
 
 add_library(metal_engine_lib STATIC ${ENGINE_LIB_SOURCES})
 target_include_directories(metal_engine_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

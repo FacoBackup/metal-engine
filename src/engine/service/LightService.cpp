@@ -8,16 +8,23 @@
 #include "../dto/PrimitiveComponent.h"
 #include "../dto/MeshData.h"
 #include "MeshService.h"
+#include "common/LoggerUtil.h"
+#include "engine/dto/LightComponent.h"
 
 namespace Metal {
+    void LightService::onInitialize() {
+        eventListener([this](const Event &) {
+            needsUpdate = true;
+        }, "BVHUpdated");
+    }
+
     void LightService::registerLights() {
         unsigned int currentRenderIndex = 0;
-        for (const auto entity: worldRepository->registry.view<PrimitiveComponent>()) {
+        for (const auto entity: worldRepository->registry.view<PrimitiveComponent, LightComponent>()) {
             auto &primitive = worldRepository->registry.get<PrimitiveComponent>(entity);
             primitive.renderIndex = currentRenderIndex++;
-            if (primitive.isEmissive && !primitive.meshId.empty()) {
-                MeshData *meshData = meshService->loadMeshData(primitive.meshId);
-                if (meshData) {
+            if (!primitive.meshId.empty()) {
+                if (MeshData *meshData = meshService->loadMeshData(primitive.meshId)) {
                     for (size_t i = 0; i < meshData->indices.size(); i += 3) {
                         LightData light{};
                         light.triangleIndex = static_cast<unsigned int>(i);
@@ -30,25 +37,25 @@ namespace Metal {
         }
     }
 
-    // TODO - ADD EVENT SYSTEM THAT TRIGGERS THIS UPDATE
     void LightService::onSync() {
-        // items.clear();
-        //
-        // registerLights();
-        //
-        // if (!items.empty()) {
-        //     engineContext->currentFrame->getResourceAs<BufferInstance>(RID_LIGHT_BUFFER)->update(items.data());
-        // }
+        if (!needsUpdate) return;
+        needsUpdate = false;
+
+        LOG_INFO("Updating lights");
+
+        items.clear();
+
+        registerLights();
+
+        if (!items.empty()) {
+            engineContext->currentFrame->getResourceAs<BufferInstance>(RID_LIGHT_BUFFER)->update(items.data());
+        }
     }
 
     void LightService::computeSunInfo() {
         sunPosition = glm::vec3(0,
                                 std::cos(engineRepository->elapsedTime),
-                                std::sin(engineRepository->elapsedTime)) * engineRepository->sunDistance;
-        sunColor = LightService::CalculateSunColor(
-            sunPosition.y / engineRepository->sunDistance,
-            engineRepository->nightColor, engineRepository->dawnColor,
-            engineRepository->middayColor);
+                                std::sin(engineRepository->elapsedTime)) * 10000.f;
     }
 
     glm::vec3 LightService::CalculateSunColor(const float elevation, const glm::vec3 &nightColor,

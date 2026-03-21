@@ -5,6 +5,7 @@
 
 namespace Metal {
     class ApplicationContext;
+    struct Event;
 
     struct Dependency {
         std::string name;
@@ -12,9 +13,11 @@ namespace Metal {
     };
 
     class IContextMember {
-    public:
+    protected:
         ApplicationContext *ctx = nullptr;
 
+    public:
+        IContextMember() = default;
         virtual ~IContextMember() = default;
 
         /**

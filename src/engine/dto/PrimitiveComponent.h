@@ -18,13 +18,9 @@ namespace Metal {
         float transmissionFactor = 0;
         float thicknessFactor = 0;
         float ior = 1.45;
-        bool isEmissive = false;
-
         unsigned int renderIndex = 0;
 
         void registerFields() override;
-
-        void onUpdate(InspectableMember *member) override;
 
         ComponentType getType() override;
 

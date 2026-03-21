@@ -1,20 +1,20 @@
 #include "VulkanContext.h"
 #include "VkBootstrap.h"
-#include "VulkanUtils.h"
-#include "../../ApplicationContext.h"
-#include "../../common/LoggerUtil.h"
+#include "../common/VulkanUtils.h"
+#include "../ApplicationContext.h"
+#include "../common/LoggerUtil.h"
 
-#include "../glfw/GLFWContext.h"
-#include "../../engine/repository/EngineRepository.h"
-#include "../../engine/service/MeshService.h"
-#include "../../engine/service/TextureService.h"
-#include "../../engine/service/FrameBufferService.h"
+#include "WindowService.h"
+#include "../engine/repository/EngineRepository.h"
+#include "../engine/service/MeshService.h"
+#include "../engine/service/TextureService.h"
+#include "../engine/service/FrameBufferService.h"
 
 namespace Metal {
 
     void VulkanContext::createSwapChain() {
         int w{}, h{};
-        glfwGetFramebufferSize(window, &w, &h);
+        SDL_GetWindowSizeInPixels(window, &w, &h);
         ImGui_ImplVulkanH_CreateOrResizeWindow(instance.instance, physDevice.physical_device,
                                                device.device, &imguiVulkanWindow, queueFamily,
                                                nullptr,
@@ -22,7 +22,7 @@ namespace Metal {
         swapChain = imguiVulkanWindow.Swapchain;
 
         int wW{}, hW{};
-        glfwGetWindowSize(window, &wW, &hW);
+        SDL_GetWindowSize(window, &wW, &hW);
         this->w = static_cast<unsigned int>(wW);
         this->h = static_cast<unsigned int>(hW);
     }
@@ -51,21 +51,23 @@ namespace Metal {
     void VulkanContext::createDevice() {
         vkb::DeviceBuilder deviceBuilder{physDevice};
 
-        VkPhysicalDeviceBufferDeviceAddressFeatures bufferDeviceAddressFeatures{};
-        bufferDeviceAddressFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
-        bufferDeviceAddressFeatures.bufferDeviceAddress = VK_TRUE;
+        if (rayTracingSupported) {
+            VkPhysicalDeviceBufferDeviceAddressFeatures bufferDeviceAddressFeatures{};
+            bufferDeviceAddressFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
+            bufferDeviceAddressFeatures.bufferDeviceAddress = VK_TRUE;
 
-        VkPhysicalDeviceAccelerationStructureFeaturesKHR accelFeatures{};
-        accelFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
-        accelFeatures.accelerationStructure = VK_TRUE;
+            VkPhysicalDeviceAccelerationStructureFeaturesKHR accelFeatures{};
+            accelFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+            accelFeatures.accelerationStructure = VK_TRUE;
 
-        VkPhysicalDeviceRayTracingPipelineFeaturesKHR rtPipelineFeatures{};
-        rtPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
-        rtPipelineFeatures.rayTracingPipeline = VK_TRUE;
+            VkPhysicalDeviceRayTracingPipelineFeaturesKHR rtPipelineFeatures{};
+            rtPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
+            rtPipelineFeatures.rayTracingPipeline = VK_TRUE;
 
-        deviceBuilder.add_pNext(&bufferDeviceAddressFeatures);
-        deviceBuilder.add_pNext(&accelFeatures);
-        deviceBuilder.add_pNext(&rtPipelineFeatures);
+            deviceBuilder.add_pNext(&bufferDeviceAddressFeatures);
+            deviceBuilder.add_pNext(&accelFeatures);
+            deviceBuilder.add_pNext(&rtPipelineFeatures);
+        }
 
         auto deviceResult = deviceBuilder.build();
         if (!deviceResult) {
@@ -73,30 +75,32 @@ namespace Metal {
         }
         device = deviceResult.value();
 
-        vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(
-            vkGetDeviceProcAddr(device.device, "vkGetBufferDeviceAddressKHR"));
-        vkCreateAccelerationStructureKHR = reinterpret_cast<PFN_vkCreateAccelerationStructureKHR>(
-            vkGetDeviceProcAddr(device.device, "vkCreateAccelerationStructureKHR"));
-        vkDestroyAccelerationStructureKHR = reinterpret_cast<PFN_vkDestroyAccelerationStructureKHR>(
-            vkGetDeviceProcAddr(device.device, "vkDestroyAccelerationStructureKHR"));
-        vkGetAccelerationStructureBuildSizesKHR = reinterpret_cast<PFN_vkGetAccelerationStructureBuildSizesKHR>(
-            vkGetDeviceProcAddr(device.device, "vkGetAccelerationStructureBuildSizesKHR"));
-        vkCmdBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(
-            vkGetDeviceProcAddr(device.device, "vkCmdBuildAccelerationStructuresKHR"));
-        vkGetAccelerationStructureDeviceAddressKHR = reinterpret_cast<PFN_vkGetAccelerationStructureDeviceAddressKHR>(
-            vkGetDeviceProcAddr(device.device, "vkGetAccelerationStructureDeviceAddressKHR"));
-        vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(
-            vkGetDeviceProcAddr(device.device, "vkCreateRayTracingPipelinesKHR"));
-        vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(
-            vkGetDeviceProcAddr(device.device, "vkGetRayTracingShaderGroupHandlesKHR"));
-        vkCmdTraceRaysKHR = reinterpret_cast<PFN_vkCmdTraceRaysKHR>(
-            vkGetDeviceProcAddr(device.device, "vkCmdTraceRaysKHR"));
+        if (rayTracingSupported) {
+            vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(
+                vkGetDeviceProcAddr(device.device, "vkGetBufferDeviceAddressKHR"));
+            vkCreateAccelerationStructureKHR = reinterpret_cast<PFN_vkCreateAccelerationStructureKHR>(
+                vkGetDeviceProcAddr(device.device, "vkCreateAccelerationStructureKHR"));
+            vkDestroyAccelerationStructureKHR = reinterpret_cast<PFN_vkDestroyAccelerationStructureKHR>(
+                vkGetDeviceProcAddr(device.device, "vkDestroyAccelerationStructureKHR"));
+            vkGetAccelerationStructureBuildSizesKHR = reinterpret_cast<PFN_vkGetAccelerationStructureBuildSizesKHR>(
+                vkGetDeviceProcAddr(device.device, "vkGetAccelerationStructureBuildSizesKHR"));
+            vkCmdBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(
+                vkGetDeviceProcAddr(device.device, "vkCmdBuildAccelerationStructuresKHR"));
+            vkGetAccelerationStructureDeviceAddressKHR = reinterpret_cast<PFN_vkGetAccelerationStructureDeviceAddressKHR>(
+                vkGetDeviceProcAddr(device.device, "vkGetAccelerationStructureDeviceAddressKHR"));
+            vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(
+                vkGetDeviceProcAddr(device.device, "vkCreateRayTracingPipelinesKHR"));
+            vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(
+                vkGetDeviceProcAddr(device.device, "vkGetRayTracingShaderGroupHandlesKHR"));
+            vkCmdTraceRaysKHR = reinterpret_cast<PFN_vkCmdTraceRaysKHR>(
+                vkGetDeviceProcAddr(device.device, "vkCmdTraceRaysKHR"));
 
-        rayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
-        VkPhysicalDeviceProperties2 deviceProperties2{};
-        deviceProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-        deviceProperties2.pNext = &rayTracingPipelineProperties;
-        vkGetPhysicalDeviceProperties2(physDevice.physical_device, &deviceProperties2);
+            rayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
+            VkPhysicalDeviceProperties2 deviceProperties2{};
+            deviceProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+            deviceProperties2.pNext = &rayTracingPipelineProperties;
+            vkGetPhysicalDeviceProperties2(physDevice.physical_device, &deviceProperties2);
+        }
     }
 
     void VulkanContext::createPhysicalDevice() {
@@ -151,7 +155,7 @@ namespace Metal {
         physDevice.enable_extension_if_present(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
         // Ray tracing extensions
-        bool rayTracingSupported =
+        rayTracingSupported =
                 physDevice.enable_extension_if_present(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) &&
                 physDevice.enable_extension_if_present(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME) &&
                 physDevice.enable_extension_if_present(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME) &&
@@ -160,7 +164,7 @@ namespace Metal {
         if (rayTracingSupported) {
             LOG_INFO("Ray tracing extensions enabled");
         } else {
-            throw std::runtime_error("Ray tracing extensions NOT supported");
+            LOG_INFO("Ray tracing extensions NOT supported");
         }
     }
 
@@ -208,7 +212,7 @@ namespace Metal {
     }
 
     void VulkanContext::addExtensions(vkb::InstanceBuilder &instanceBuilder,
-                                      const ImVector<const char *> &instanceExtensions) const {
+                                      const std::vector<const char *> &instanceExtensions) const {
         if (auto sysInfoResult = vkb::SystemInfo::get_system_info(); sysInfoResult) {
             const auto &sysInfo = sysInfoResult.value();
             if (sysInfo.validation_layers_available && ctx->isDebugMode()) {
@@ -252,7 +256,7 @@ namespace Metal {
     }
 
     void VulkanContext::onInitialize() {
-        this->window = glfwContext->getWindow();
+        this->window = windowService->getWindow();
         
         imguiVulkanWindow.ClearValue.color.float32[0] = 0;
         imguiVulkanWindow.ClearValue.color.float32[1] = 0;
@@ -262,7 +266,7 @@ namespace Metal {
 
         // ------- CORE INITIALIZATION
         // ----- INSTANCE AND EXTENSIONS
-        addExtensions(instanceBuilder, glfwContext->getInstanceExtensions());
+        addExtensions(instanceBuilder, windowService->getInstanceExtensions());
         auto vkbResult = instanceBuilder
                 .set_app_name(ENGINE_NAME)
                 .set_engine_name(ENGINE_NAME)
@@ -273,8 +277,9 @@ namespace Metal {
             throw std::runtime_error("Failed to create runtime instance.");
         }
         instance = vkbResult.value();
-        VulkanUtils::CheckVKResult(
-            glfwCreateWindowSurface(instance.instance, window, nullptr, &surface));
+        if (!SDL_Vulkan_CreateSurface(window, instance.instance, nullptr, &surface)) {
+            VulkanUtils::CheckVKResult(VK_ERROR_INITIALIZATION_FAILED);
+        }
         createPhysicalDevice();
         createDevice();
         createQueue();

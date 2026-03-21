@@ -5,6 +5,7 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
+#include <glm/detail/type_quat.hpp>
 #include "InspectedField.h"
 #include "InspectedMethod.h"
 #include "../editor/util/Util.h"
@@ -40,6 +41,25 @@ namespace Metal {
         field->callback = updateCallback;
         field->type = FieldType::METHOD;
         fields.push_back(std::move(field));
+    }
+
+    std::shared_ptr<InspectableMember> Inspectable::getFieldByPointer(void *ptr) {
+        if (ptr == nullptr) return nullptr;
+        for (const auto &member: getFields()) {
+            if (member->getGenericPointer() == ptr) {
+                return member;
+            }
+        }
+        return nullptr;
+    }
+
+    std::shared_ptr<InspectableMember> Inspectable::getFieldByPath(const std::string &path) {
+        for (const auto &member: getFields()) {
+            if (member->path == path) {
+                return member;
+            }
+        }
+        return nullptr;
     }
 
     std::vector<std::shared_ptr<InspectableMember> > &Inspectable::getFields() {
@@ -104,6 +124,10 @@ namespace Metal {
                                     std::string group, std::string name, bool disabled) {
         DECLARATION(glm::vec3, COLOR)
         fields.push_back(std::move(field));
+    }
+
+    std::string Inspectable::getClassName() const {
+        return getTypeName(typeid(*this).name(), false);
     }
 
     void Inspectable::registerBool(bool &v,

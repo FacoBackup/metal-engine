@@ -7,6 +7,7 @@
 #include "../dto/SceneData.h"
 #include "MaterialImporterService.h"
 #include <iostream>
+#include <glm/gtc/quaternion.hpp>
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -104,7 +105,8 @@ namespace Metal {
         aiQuaternion rotation;
         node->mTransformation.Decompose(scaling, rotation, pos);
         currentNode.transform.translation = {pos.x, pos.y, pos.z};
-        currentNode.transform.rotation = {rotation.w, rotation.x, rotation.y, rotation.z};
+        glm::quat q = {rotation.w, rotation.x, rotation.y, rotation.z};
+        currentNode.transform.rotationEuler = glm::eulerAngles(q) * (180.f / glm::pi<float>());
         currentNode.transform.scale = {scaling.x, scaling.y, scaling.z};
 
         processMeshes(scene, aiScene, node, targetDir, rootDirectory, meshMap, stopToken);

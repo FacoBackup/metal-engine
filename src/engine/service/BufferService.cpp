@@ -1,7 +1,7 @@
 #include "BufferService.h"
 
-#include "../../core/vulkan/VulkanContext.h"
-#include "../../core/vulkan/VulkanUtils.h"
+#include "../../core/VulkanContext.h"
+#include "../../common/VulkanUtils.h"
 #include "../resource/BufferInstance.h"
 
 namespace Metal {

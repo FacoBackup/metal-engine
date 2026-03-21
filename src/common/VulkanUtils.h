@@ -7,7 +7,7 @@
 namespace Metal {
     class VulkanUtils {
     public:
-        static void GLFWErrorCallback(int error, const char *description);
+        static void SDLErrorCallback(int error, const char *description);
 
         static void CheckVKResult(VkResult err);
 

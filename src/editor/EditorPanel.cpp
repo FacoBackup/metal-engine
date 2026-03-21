@@ -3,6 +3,7 @@
 #include "../ApplicationContext.h"
 #include "service/DockService.h"
 #include "service/ThemeService.h"
+#include "repository/EditorRepository.h"
 #include "dock-spaces/header/EditorHeaderPanel.h"
 #include "dock-spaces/footer/EditorFooterPanel.h"
 #include "panel/FileImportModalPanel.h"
@@ -20,48 +21,72 @@ namespace Metal {
     const char *EditorPanel::NAME_HEADER = "##header_window";
     const char *EditorPanel::NAME_FOOTER = "##footer_window";
     ImVec2 EditorPanel::CENTER(0.0f, 0.0f);
-    float EditorPanel::HEADER_HEIGHT = 30;
+    float EditorPanel::HEADER_HEIGHT = 28;
     float EditorPanel::FOOTER_HEIGHT = 30;
 
 
     void EditorPanel::renderDockSpaces() {
         const ImGuiViewport *viewport = ImGui::GetMainViewport();
 
+        ImU32 accentColorRaw = editorRepository->accentU32;
+        ImU32 accentColor = (accentColorRaw & 0x00FFFFFF) | (0x60000000);
+        ImU32 transparentColor = accentColorRaw & 0x00FFFFFF;
+        ImVec2 gradientSize(viewport->Size.x * 0.35f, viewport->Size.y * 0.15f);
+
         // Header
         {
-            UIUtil::AUX_VEC2.x = viewport->Pos.x;
-            UIUtil::AUX_VEC2.y = viewport->Pos.y;
-            ImGui::SetNextWindowPos(UIUtil::AUX_VEC2);
+            ImGui::SetNextWindowPos(ImVec2(
+                viewport->Pos.x,
+                viewport->Pos.y));
 
-            UIUtil::AUX_VEC2.x = viewport->Size.x;
-            UIUtil::AUX_VEC2.y = HEADER_HEIGHT;
-            ImGui::SetNextWindowSize(UIUtil::AUX_VEC2);
+            ImGui::SetNextWindowSize(ImVec2(
+                viewport->Size.x,
+                HEADER_HEIGHT));
 
             SetWindowStyle(UIUtil::VEC2_ZERO);
             ImGui::Begin(NAME_HEADER, &UIUtil::OPEN, FLAGS | ImGuiWindowFlags_NoScrollbar);
             ImGui::PopStyleVar(3);
 
+            ImGui::GetWindowDrawList()->AddRectFilledMultiColor(
+                viewport->Pos,
+                ImVec2(viewport->Pos.x + gradientSize.x, viewport->Pos.y + gradientSize.y),
+                accentColor,
+                transparentColor,
+                transparentColor,
+                transparentColor
+            );
+
             headerPanel->onSync();
             ImGui::End();
         }
+        ImVec2 tempVec2{};
 
         // Main Window (DockSpace)
         {
-            UIUtil::AUX_VEC2.x = viewport->Pos.x;
-            UIUtil::AUX_VEC2.y = viewport->Pos.y + HEADER_HEIGHT;
-            ImGui::SetNextWindowPos(UIUtil::AUX_VEC2);
+            tempVec2.x = viewport->Pos.x;
+            tempVec2.y = viewport->Pos.y + HEADER_HEIGHT;
+            ImGui::SetNextWindowPos(tempVec2);
 
-            UIUtil::AUX_VEC2.x = viewport->Size.x;
-            UIUtil::AUX_VEC2.y = viewport->Size.y - HEADER_HEIGHT - FOOTER_HEIGHT;
-            ImGui::SetNextWindowSize(UIUtil::AUX_VEC2);
+            tempVec2.x = viewport->Size.x;
+            tempVec2.y = viewport->Size.y - HEADER_HEIGHT - FOOTER_HEIGHT;
+            ImGui::SetNextWindowSize(tempVec2);
             ImGui::SetNextWindowViewport(viewport->ID);
 
-            UIUtil::AUX_VEC2.x = 4.0f;
-            UIUtil::AUX_VEC2.y = .0f;
-            SetWindowStyle(UIUtil::AUX_VEC2);
+            tempVec2.x = 4.0f;
+            tempVec2.y = .0f;
+            SetWindowStyle(tempVec2);
             ImGui::Begin(NAME, &UIUtil::OPEN, FLAGS);
             windowId = ImGui::GetID(NAME);
             ImGui::PopStyleVar(3);
+
+            ImGui::GetWindowDrawList()->AddRectFilledMultiColor(
+                viewport->Pos,
+                ImVec2(viewport->Pos.x + gradientSize.x, viewport->Pos.y + gradientSize.y),
+                accentColor,
+                transparentColor,
+                transparentColor,
+                transparentColor
+            );
 
             dockService->buildViews(windowId, this);
 
@@ -75,13 +100,13 @@ namespace Metal {
 
         // Footer
         {
-            UIUtil::AUX_VEC2.x = viewport->Pos.x;
-            UIUtil::AUX_VEC2.y = viewport->Pos.y + viewport->Size.y - FOOTER_HEIGHT;
-            ImGui::SetNextWindowPos(UIUtil::AUX_VEC2);
+            tempVec2.x = viewport->Pos.x;
+            tempVec2.y = viewport->Pos.y + viewport->Size.y - FOOTER_HEIGHT;
+            ImGui::SetNextWindowPos(tempVec2);
 
-            UIUtil::AUX_VEC2.x = viewport->Size.x;
-            UIUtil::AUX_VEC2.y = FOOTER_HEIGHT;
-            ImGui::SetNextWindowSize(UIUtil::AUX_VEC2);
+            tempVec2.x = viewport->Size.x;
+            tempVec2.y = FOOTER_HEIGHT;
+            ImGui::SetNextWindowSize(tempVec2);
 
             SetWindowStyle(UIUtil::VEC2_ZERO);
             ImGui::Begin(NAME_FOOTER, &UIUtil::OPEN, FLAGS | ImGuiWindowFlags_NoScrollbar);

@@ -3,7 +3,7 @@
 #include "../dto/MeshData.h"
 #include "../../editor/dto/SceneData.h"
 
-#include "../../core/vulkan/VulkanContext.h"
+#include "../../core/VulkanContext.h"
 #include "../../common/FilesUtil.h"
 #include "../../common/LoggerUtil.h"
 #include "../../core/DirectoryService.h"
@@ -15,8 +15,29 @@
 #include "../../ApplicationContext.h"
 #include "BufferService.h"
 #include "RayTracingService.h"
+#include "../../editor/service/HistoryService.h"
+#include "../dto/PrimitiveComponent.h"
+#include "../dto/TransformComponent.h"
+#include "../repository/WorldRepository.h"
+#include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
+    void MeshService::onInitialize() {
+        eventListener([this](const Event &event) {
+            auto payload = std::dynamic_pointer_cast<FieldModificationPayload>(event.payload);
+            if (payload && payload->member.path.find("Mesh") != std::string::npos) {
+                auto *primitive = dynamic_cast<PrimitiveComponent *>(payload->member.instance);
+                if (primitive && worldRepository->registry.all_of<TransformComponent>(primitive->getEntityId())) {
+                    MeshData *data = loadMeshData(primitive->meshId);
+                    if (data != nullptr) {
+                        worldRepository->registry.get<TransformComponent>(primitive->getEntityId()).gizmoCenter = data->
+                                gizmoCenter;
+                        delete data;
+                    }
+                }
+            }
+        }, "PrimitiveComponent");
+    }
 
     MeshInstance *MeshService::create(const std::string &id) {
         MeshData *data = loadMeshData(id);
@@ -31,14 +52,16 @@ namespace Metal {
         instance->dataBuffer = bufferService->createBuffer(
             id + "_data",
             sizeof(VertexData) * data->data.size(),
-            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
+            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR |
+            VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
             data->data.data(),
             true);
 
         instance->indexBuffer = bufferService->createBuffer(
             id + "_indices",
             sizeof(unsigned int) * data->indices.size(),
-            VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
+            VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR |
+            VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
             data->indices.data(),
             true);
 
@@ -72,7 +95,6 @@ namespace Metal {
 
     void MeshService::disposeResource(MeshInstance *resource) {
         LOG_INFO("Disposing of mesh instance");
-        rayTracingService->markDirty();
         bufferService->dispose(resource->indexBuffer->getId());
         bufferService->dispose(resource->dataBuffer->getId());
     }

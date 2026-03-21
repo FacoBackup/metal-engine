@@ -26,17 +26,17 @@ namespace Metal {
         return d;
     }
 
-    PipelineBuilder &PipelineBuilder::setBlendEnabled() {
+    PipelineBuilder &PipelineBuilder::enableBlending() {
         blendEnabled = true;
         return *this;
     }
 
-    PipelineBuilder &PipelineBuilder::setPrepareForMesh() {
+    PipelineBuilder &PipelineBuilder::enablePrimitiveRendering() {
         prepareForMesh = true;
         return *this;
     }
 
-    PipelineBuilder &PipelineBuilder::setDepthTest() {
+    PipelineBuilder &PipelineBuilder::enableDepthTest() {
         depthTest = true;
         return *this;
     }

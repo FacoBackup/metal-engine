@@ -1,4 +1,6 @@
 #include "ViewportHeaderPanel.h"
+
+#include "ApplicationEventContext.h"
 #include "GizmoSettingsPanel.h"
 #include "../../../ApplicationContext.h"
 #include "../../util/UIUtil.h"
@@ -35,7 +37,7 @@ namespace Metal {
                                  UIUtil::ONLY_ICON_BUTTON_SIZE,
                                  UIUtil::ONLY_ICON_BUTTON_SIZE)) {
             worldRepository->camera.position = {0, 0, 0};
-            worldRepository->camera.registerChange();
+            ApplicationEventContext::dispatch("Camera");
         }
         UIUtil::RenderTooltip("Center camera?");
 

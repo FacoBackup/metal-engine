@@ -2,6 +2,7 @@
 #define HISTORYSERVICE_H
 
 #include <string>
+#include <utility>
 #include <vector>
 #include <memory>
 #include <variant>
@@ -15,12 +16,12 @@
 
 namespace Metal {
     class Inspectable;
+    struct InspectableMember;
 
     using PropertyValue = std::variant<std::string, int, float, bool, glm::vec2, glm::vec3, glm::vec4, glm::quat>;
 
     struct PropertyChange {
-        Inspectable *instance;
-        std::string propertyPath;
+        std::shared_ptr<InspectableMember> field;
         PropertyValue oldValue;
         PropertyValue newValue;
     };
@@ -56,8 +57,7 @@ namespace Metal {
 
         bool isTransactionActive() const;
 
-        void recordChange(Inspectable *instance, const std::string &propertyPath,
-                          const PropertyValue &oldValue, const PropertyValue &newValue);
+        void recordChange(InspectableMember *field, const PropertyValue &oldValue);
 
         void recordAction(const std::function<void()> &undoAction, const std::function<void()> &redoAction);
 

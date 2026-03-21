@@ -9,13 +9,13 @@
 namespace Metal {
     class HistoryService;
     class ThemeService;
-    class GLFWContext;
+    class WindowService;
     class EngineContext;
     struct DirectoryService;
     class DockService;
 
     class EditorHeaderPanel final : public AbstractPanel {
-        GLFWContext *glfwContext = nullptr;
+        WindowService *windowService = nullptr;
         EngineContext *engineContext = nullptr;
         DirectoryService *directoryService = nullptr;
         HistoryService *historyService = nullptr;
@@ -24,14 +24,16 @@ namespace Metal {
 
         float menuBarHeight = 0;
 
-        void renderMenu(const char *label, std::function<void()> itemsFunc);
+        static void RenderMenu(const char *label, const std::function<void()> &itemsFunc);
         
-        void renderDockAdders();
+        void renderDockAdders() const;
+
+        static void RenderWindowControl(const std::string& icon, const char* id, float xPos, float width, ImU32 hoverColor, std::function<void()> action);
 
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"GLFWContext", &glfwContext},
+                {"WindowService", &windowService},
                 {"EngineContext", &engineContext},
                 {"DirectoryService", &directoryService},
                 {"ThemeService", &themeService},

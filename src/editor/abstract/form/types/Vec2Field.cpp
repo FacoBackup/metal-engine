@@ -3,7 +3,9 @@
 #include <imgui.h>
 #include "../../../../common/Inspectable.h"
 #include "../../../util/UIUtil.h"
-#include "../../../service/HistoryService.h"
+#include "editor/service/HistoryService.h"
+#include "ApplicationEventContext.h"
+#include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
     Vec2Field::Vec2Field(InspectedField<glm::vec2> &field) : field(field) {
@@ -18,10 +20,10 @@ namespace Metal {
             if (UIUtil::DrawVec2Control(field.name, field.id, values, field.incrementF.value())) {
                 field.field->x = values[0];
                 field.field->y = values[1];
-                field.instance->registerChange();
-                field.instance->onUpdate(&field);
 
-                historyService->recordChange(field.instance, field.path, oldValue, *field.field);
+
+                historyService->recordChange(&field, oldValue);
+                ApplicationEventContext::dispatch(field.instance->getClassName(), std::make_shared<FieldModificationPayload>(field));
             }
 
             if (ImGui::IsItemActivated()) {

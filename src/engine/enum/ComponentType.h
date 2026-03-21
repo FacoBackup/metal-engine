@@ -14,11 +14,9 @@ namespace Metal {
     enum ComponentType {
         PRIMITIVE,
         TRANSFORM,
-        SPHERE_LIGHT,
-        PLANE_LIGHT,
         VOLUME,
-        ATMOSPHERE,
-        METADATA
+        METADATA,
+        LIGHT
     };
 }
 
@@ -33,6 +31,7 @@ namespace Metal::ComponentTypes {
         std::function<nlohmann::json(WorldRepository &, entt::entity)> toJson;
         std::function<void(WorldRepository &, entt::entity, const nlohmann::json &)> fromJson;
         std::function<Inspectable*(WorldRepository &, entt::entity)> getInspectable;
+        std::function<bool(const WorldRepository &, entt::entity)> hasComponent;
     };
 
     const std::vector<ComponentDefinition> &getComponents();

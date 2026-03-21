@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include "IService.h"
+#include "IEventMember.h"
 #include "../ApplicationContext.h"
 #include "../engine/resource/RuntimeResource.h"
 
@@ -12,7 +13,7 @@ namespace Metal {
     class VulkanContext;
 
     template<typename T>
-    class AbstractResourceService : public IService, public IDisposable {
+    class AbstractResourceService : public IService, public IEventMember, public IDisposable {
         static_assert(std::is_base_of_v<RuntimeResource, T>, "T must be a subclass of RuntimeResource");
 
     protected:

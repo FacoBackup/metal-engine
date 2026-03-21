@@ -10,6 +10,7 @@ namespace Metal {
     template<typename T>
     struct InspectedField final : InspectableMember {
         T *field;
+        T previousValue;
 
         std::optional<int> max;
         std::optional<int> min;
@@ -19,9 +20,14 @@ namespace Metal {
         bool disabled = false;
         EntryType::EntryType resourceType = EntryType::NONE;
 
-        explicit InspectedField(T *field) : field(field) {}
+        explicit InspectedField(T *field) : field(field), previousValue(*field) {
+        }
 
         ~InspectedField() override = default;
+
+        void *getGenericPointer() override {
+            return field;
+        }
     };
 }
 #endif

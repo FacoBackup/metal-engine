@@ -3,6 +3,7 @@
 #include "../../common/serialization-definitions.h"
 #include "../dto/MeshMetadata.h"
 #include "TextureService.h"
+#include "../repository/WorldRepository.h"
 #include "../dto/PrimitiveComponent.h"
 
 namespace Metal {
@@ -14,7 +15,7 @@ namespace Metal {
         materialData.transmission = data.transmissionFactor;
         materialData.thickness = data.thicknessFactor;
         materialData.ior = data.ior;
-        materialData.isEmissive = data.isEmissive ? 1 : 0;
+        materialData.isEmissive = worldRepository->hasComponent(data.getEntityId(), ComponentType::LIGHT) ? 1 : 0;
 
         materialData.albedoTextureId = 0;
         materialData.roughnessTextureId = 0;

@@ -9,6 +9,9 @@
 #include "../../common/IService.h"
 #include "../../common/ISync.h"
 #include "../../common/IDisposable.h"
+#include "../../common/IInit.h"
+#include "../../common/IEventMember.h"
+#include "ApplicationEventContext.h"
 
 namespace Metal {
     class DescriptorSetService;
@@ -21,7 +24,10 @@ namespace Metal {
     class BufferService;
     class EngineContext;
 
-    class RayTracingService final : public IService, public ISync, public IDisposable {
+    class ApplicationEventContext;
+
+    class RayTracingService final : public IService, public IEventMember, public ISync, public IDisposable,
+                                    public IInit {
         VulkanContext *vulkanContext = nullptr;
         PipelineService *pipelineService = nullptr;
         WorldRepository *worldRepository = nullptr;
@@ -56,11 +62,10 @@ namespace Metal {
 
         bool accelerationStructureBuilt = false;
         bool needsRebuild = true;
-        bool needsMaterialUpdate = false;
 
-        VkDeviceAddress getDeviceAddress(VkBuffer buffer);
+        VkDeviceAddress getDeviceAddress(VkBuffer buffer) const;
 
-        void updateDescriptorSets(VkAccelerationStructureKHR asHandle);
+        void updateDescriptorSets(VkAccelerationStructureKHR asHandle) const;
 
         void buildBLAS();
 
@@ -69,6 +74,8 @@ namespace Metal {
         void destroyTLAS();
 
         void updateMeshMaterials();
+
+        void markDirty() { needsRebuild = true; }
 
     public:
         RayTracingService() = default;
@@ -86,17 +93,13 @@ namespace Metal {
             };
         }
 
-        void setNeedsMaterialUpdate(bool val) {
-            needsMaterialUpdate = val;
-        }
-
         void dispose() override;
 
         void onSync() override;
 
-        [[nodiscard]] bool isReady() const;
+        void onInitialize() override;
 
-        void markDirty() { needsRebuild = true; }
+        [[nodiscard]] bool isReady() const;
 
         [[nodiscard]] VkAccelerationStructureKHR getTLAS() const { return tlas; }
     };

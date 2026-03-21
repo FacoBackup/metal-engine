@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "../../common/IContextMember.h"
+#include "../../common/IEventMember.h"
 #include "../../common/ISync.h"
 #include "../../common/IInit.h"
 #include "../../ApplicationContext.h"
@@ -14,7 +15,7 @@
 namespace Metal {
     class ApplicationContext;
 
-    class AbstractPanel : public IContextMember, public ISync, public IInit {
+    class AbstractPanel : public IContextMember, public IEventMember, public ISync, public IInit {
     protected:
         std::vector<std::shared_ptr<AbstractPanel>> children;
         const std::string id;

@@ -6,6 +6,7 @@
 #include "../AbstractPanel.h"
 
 namespace Metal {
+    class ApplicationEventContext;
     class ThemeService;
 
     class HistoryService;

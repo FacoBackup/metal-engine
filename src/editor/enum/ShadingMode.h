@@ -19,6 +19,7 @@ namespace Metal {
         POSITION,
         LIGHTING_ONLY,
         EMISSIVE,
+        DEBUG_PHONG,
     };
 
     class ShadingModes {
@@ -42,6 +43,7 @@ namespace Metal {
                 {"POSITION",              "Position",              Icons::place,            POSITION},
                 {"LIGHTING_ONLY",         "Lighting only",         Icons::highlight,        LIGHTING_ONLY},
                 {"EMISSIVE",              "Emission",              Icons::wb_incandescent,  EMISSIVE},
+                {"DEBUG_PHONG",           "Debug Phong",           Icons::bug_report,       DEBUG_PHONG},
         };
 
         static inline std::string GetNames() {

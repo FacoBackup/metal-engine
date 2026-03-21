@@ -8,6 +8,7 @@ namespace Metal {
     struct EditorRepository;
     class FileImporterService;
     class NotificationService;
+    class ThemeService;
 
     class FileImportModalPanel final : public AbstractPanel {
         std::shared_ptr<FormPanel> formPanel = nullptr;
@@ -17,6 +18,7 @@ namespace Metal {
         FileImporterService *fileImporterService = nullptr;
         NotificationService *notificationService = nullptr;
         FilesService *filesService = nullptr;
+        ThemeService *themeService = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
@@ -24,7 +26,8 @@ namespace Metal {
                 {"EditorRepository", &editorRepository},
                 {"FileImporterService", &fileImporterService},
                 {"NotificationService", &notificationService},
-                {"FilesService", &filesService}
+                {"FilesService", &filesService},
+                {"ThemeService", &themeService}
             };
         }
 

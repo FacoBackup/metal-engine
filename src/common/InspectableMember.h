@@ -2,6 +2,8 @@
 #define METAL_ENGINE_INSPECTABLEMEMBER_H
 
 #include <string>
+#include <entt/entity/entity.hpp>
+
 #include "FieldType.h"
 
 namespace Metal {
@@ -15,6 +17,10 @@ namespace Metal {
         std::string path;
         FieldType type = BOOLEAN;
         Inspectable *instance = nullptr;
+
+        virtual void *getGenericPointer() {
+            return nullptr;
+        }
 
         InspectableMember() = default;
 

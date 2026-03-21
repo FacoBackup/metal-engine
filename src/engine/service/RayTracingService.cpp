@@ -5,9 +5,9 @@
 #include "../dto/DescriptorBinding.h"
 #include "../resource/MeshInstance.h"
 #include "../dto/VertexData.h"
-#include "../../core/vulkan/VulkanUtils.h"
+#include "../../common/VulkanUtils.h"
 #include "../../editor/enum/EngineResourceIDs.h"
-#include "../../core/vulkan/VulkanContext.h"
+#include "../../core/VulkanContext.h"
 #include "../../common/LoggerUtil.h"
 #include "../dto/TransformComponent.h"
 #include "../dto/PrimitiveComponent.h"
@@ -21,14 +21,25 @@
 #include <cstddef>
 
 namespace Metal {
-    VkDeviceAddress RayTracingService::getDeviceAddress(VkBuffer buffer) {
+    void RayTracingService::onInitialize() {
+        eventListener([this](const Event &) {
+            markDirty();
+        }, "TransformComponent");
+
+        eventListener([this](const Event &) {
+            markDirty();
+            updateMeshMaterials();
+        }, "PrimitiveComponent", "BVHNeedsUpdate");
+    }
+
+    VkDeviceAddress RayTracingService::getDeviceAddress(VkBuffer buffer) const {
         VkBufferDeviceAddressInfo info{};
         info.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
         info.buffer = buffer;
         return vulkanContext->vkGetBufferDeviceAddressKHR(vulkanContext->device.device, &info);
     }
 
-    void RayTracingService::updateDescriptorSets(VkAccelerationStructureKHR asHandle) {
+    void RayTracingService::updateDescriptorSets(VkAccelerationStructureKHR asHandle) const {
         auto descriptors = pipelineService->getAllDescriptors();
         for (auto *descriptor: descriptors) {
             bool needsUpdate = false;
@@ -45,11 +56,9 @@ namespace Metal {
         }
     }
 
-    // TODO - EVENT SYSTEM BASED ON WORLD CHANGE AND ENTITY CHANGE
     void RayTracingService::onSync() {
-        if (needsMaterialUpdate) {
-            updateMeshMaterials();
-            needsMaterialUpdate = false;
+        if (!vulkanContext->rayTracingSupported) {
+            return;
         }
         if (!needsRebuild) {
             return;
@@ -85,6 +94,7 @@ namespace Metal {
         if (tlas != VK_NULL_HANDLE) {
             LOG_INFO("Updating acceleration structures");
             updateDescriptorSets(tlas);
+            ApplicationEventContext::dispatch("BVHUpdated");
             accelerationStructureBuilt = true;
         } else {
             LOG_WARN("TLAS build failed or resulted in NULL handle");
@@ -95,7 +105,7 @@ namespace Metal {
     }
 
     bool RayTracingService::isReady() const {
-        return accelerationStructureBuilt && anyMeshes && tlas != VK_NULL_HANDLE;
+        return vulkanContext->rayTracingSupported && accelerationStructureBuilt && anyMeshes && tlas != VK_NULL_HANDLE;
     }
 
     void RayTracingService::updateMeshMaterials() {
@@ -124,6 +134,9 @@ namespace Metal {
     }
 
     void RayTracingService::destroyTLAS() {
+        if (!vulkanContext->rayTracingSupported) {
+            return;
+        }
         if (vulkanContext->device.device != VK_NULL_HANDLE) {
             vkDeviceWaitIdle(vulkanContext->device.device);
         }
@@ -150,8 +163,6 @@ namespace Metal {
     }
 
     void RayTracingService::buildBLAS() {
-        auto &vulkan = vulkanContext;
-
         std::unordered_map<std::string, MeshInstance *> uniqueMeshes;
 
         auto view = worldRepository->registry.view<PrimitiveComponent, TransformComponent>();
@@ -405,6 +416,9 @@ namespace Metal {
     }
 
     void RayTracingService::dispose() {
+        if (!vulkanContext->rayTracingSupported) {
+            return;
+        }
         if (vulkanContext->device.device != VK_NULL_HANDLE) {
             vkDeviceWaitIdle(vulkanContext->device.device);
         }

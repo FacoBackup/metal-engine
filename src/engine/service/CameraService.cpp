@@ -5,18 +5,24 @@
 #include "../EngineContext.h"
 #include "../repository/WorldRepository.h"
 #include "../repository/RuntimeRepository.h"
+#include "../../editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
+    void CameraService::onInitialize() {
+        eventListener([this](const Event &e) {
+            dirty = true;
+        }, "Camera");
+    }
+
     // Per frame
-    // TODO - EVENT SYSTEM
     void CameraService::onSync() {
         camera = &worldRepository->camera;
         if (camera != nullptr) {
             updateAspectRatio();
-            if (camera->isNotFrozen()) {
+            if (dirty) {
                 updateMatrices();
                 engineContext->setCameraUpdated(true);
-                camera->freezeVersion();
+                dirty = false;
             }
         }
     }
@@ -25,7 +31,7 @@ namespace Metal {
         const float prevAspect = camera->aspectRatio;
         camera->aspectRatio = runtimeRepository->viewportW / runtimeRepository->viewportH;
         if (prevAspect != camera->aspectRatio) {
-            camera->registerChange();
+            dirty = true;
         }
     }
 
@@ -75,11 +81,11 @@ namespace Metal {
                                  engineContext->deltaTime;
         if (runtimeRepository->leftPressed) {
             camera->position += right * multiplier;
-            camera->registerChange();
+            dirty = true;
         }
         if (runtimeRepository->rightPressed) {
             camera->position -= right * multiplier;
-            camera->registerChange();
+            dirty = true;
         }
         if (runtimeRepository->backwardPressed) {
             if (camera->isOrthographic) {
@@ -87,7 +93,7 @@ namespace Metal {
             } else {
                 camera->position -= forward * multiplier;
             }
-            camera->registerChange();
+            dirty = true;
         }
         if (runtimeRepository->forwardPressed) {
             if (camera->isOrthographic) {
@@ -95,7 +101,7 @@ namespace Metal {
             } else {
                 camera->position += forward * multiplier;
             }
-            camera->registerChange();
+            dirty = true;
         }
     }
 
@@ -110,7 +116,7 @@ namespace Metal {
         camera->pitch += glm::radians(camera->deltaY);
         camera->pitch = glm::clamp(camera->pitch, -MIN_MAX_PITCH, MIN_MAX_PITCH);
 
-        camera->registerChange();
+        dirty = true;
     }
 
     void CameraService::updateDelta(const bool isFirstMovement) const {

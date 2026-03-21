@@ -5,7 +5,7 @@
 #include "../../../ApplicationContext.h"
 #include "../../../engine/resource/TextureInstance.h"
 #include "../../../engine/service/TextureService.h"
-#include "../../../core/gui/GuiContext.h"
+#include "../../../core/ImGuiService.h"
 
 namespace Metal {
     FilePreviewPanel::FilePreviewPanel(FilesContext &filesContext) : filesContext(filesContext) {

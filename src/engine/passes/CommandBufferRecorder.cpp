@@ -6,8 +6,8 @@
 #include "../resource/PipelineInstance.h"
 #include "../../ApplicationContext.h"
 #include "AbstractRenderPass.h"
-#include "../../core/vulkan/VulkanUtils.h"
-#include "../../core/vulkan/VulkanContext.h"
+#include "../../common/VulkanUtils.h"
+#include "../../core/VulkanContext.h"
 #include "../../core/FrameService.h"
 
 namespace Metal {

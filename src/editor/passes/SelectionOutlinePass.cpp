@@ -1,7 +1,7 @@
 #include "SelectionOutlinePass.h"
 #include "../../ApplicationContext.h"
 #include "../../engine/dto/TransformComponent.h"
-#include "../dto/SelectedDotPushConstant.h"
+#include "../dto/SelectionOutlinePushConstant.h"
 #include "../../engine/dto/PipelineBuilder.h"
 #include "../../engine/service/PipelineService.h"
 #include "../repository/EditorRepository.h"
@@ -14,8 +14,8 @@ namespace Metal {
                     "QUAD.vert",
                     "tools/SelectionOutline.frag"
                 )
-                .setBlendEnabled()
-                .setPushConstantsSize(sizeof(SelectedDotPushConstant))
+                .enableBlending()
+                .setPushConstantsSize(sizeof(SelectionOutlinePushConstant))
                 .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
                 .addFboBinding(getScopedResourceId(RID_SELECTION_FBO), 0);
         pipelineInstance = pipelineService->createPipeline(builder);

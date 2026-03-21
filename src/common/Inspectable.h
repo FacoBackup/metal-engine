@@ -7,6 +7,7 @@
 #include <glm/fwd.hpp>
 
 #include "InspectableMember.h"
+#include "Util.h"
 #include "../editor/util/Util.h"
 #include "../editor/enum/EntryType.h"
 
@@ -15,27 +16,12 @@ namespace Metal {
         std::string uniqueIdentifier = Util::uuidV4();
         std::vector<std::shared_ptr<InspectableMember> > fields{};
         bool fieldsRegistered = false;
-        unsigned long changes = 0;
-        unsigned long frozenVersion = 99999;
 
     public:
-        Inspectable &operator=(const Inspectable &other) {
-            if (this != &other) {
-                uniqueIdentifier = other.uniqueIdentifier;
-                fields = other.fields;
-                fieldsRegistered = other.fieldsRegistered;
-                changes = other.changes;
-                frozenVersion = other.frozenVersion;
-            }
-            return *this;
-        }
-
         Inspectable(const Inspectable &other)
             : uniqueIdentifier(other.uniqueIdentifier),
               fields(other.fields),
               fieldsRegistered(other.fieldsRegistered) {
-            changes = other.changes;
-            frozenVersion = other.frozenVersion;
         }
 
     protected:
@@ -88,21 +74,11 @@ namespace Metal {
                            std::string group, std::string name, bool disabled = false);
 
     public:
-        [[nodiscard]] unsigned long getChangeId() const {
-            return changes;
-        }
+        [[nodiscard]] virtual std::string getClassName() const;
 
-        void registerChange() {
-            changes++;
-        }
+        std::shared_ptr<InspectableMember> getFieldByPointer(void *ptr);
 
-        [[nodiscard]] bool isNotFrozen() const {
-            return frozenVersion != getChangeId();
-        }
-
-        void freezeVersion() {
-            frozenVersion = getChangeId();
-        }
+        std::shared_ptr<InspectableMember> getFieldByPath(const std::string &path);
 
         std::vector<std::shared_ptr<InspectableMember> > &getFields();
 
@@ -120,9 +96,6 @@ namespace Metal {
 
         virtual const char *getTitle() {
             throw std::logic_error("Not implemented");
-        }
-
-        virtual void onUpdate(InspectableMember *member) {
         }
     };
 }

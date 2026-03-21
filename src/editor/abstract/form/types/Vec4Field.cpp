@@ -3,7 +3,9 @@
 #include <imgui.h>
 #include "../../../../common/Inspectable.h"
 #include "../../../util/UIUtil.h"
-#include "../../../service/HistoryService.h"
+#include "editor/service/HistoryService.h"
+#include "ApplicationEventContext.h"
+#include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
     Vec4Field::Vec4Field(InspectedField<glm::vec4> &field) : field(field) {
@@ -22,10 +24,10 @@ namespace Metal {
                 field.field->y = values[1];
                 field.field->z = values[2];
                 field.field->w = values[3];
-                field.instance->registerChange();
-                field.instance->onUpdate(&field);
 
-                historyService->recordChange(field.instance, field.path, oldValue, *field.field);
+
+                historyService->recordChange(&field, oldValue);
+                ApplicationEventContext::dispatch(field.instance->getClassName(), std::make_shared<FieldModificationPayload>(field));
             }
 
             if (ImGui::IsItemActivated()) {

@@ -2,7 +2,7 @@
 #define SELECTIONIDPASS_H
 
 #include "../../engine/passes/AbstractRenderPass.h"
-#include "../dto/SelectedDotPushConstant.h"
+#include "../dto/SelectionOutlinePushConstant.h"
 
 namespace Metal {
     class PipelineService;
@@ -11,7 +11,7 @@ namespace Metal {
     class MeshService;
 
     class SelectionIDPass final : public AbstractRenderPass {
-        SelectedDotPushConstant pushConstant{};
+        SelectionOutlinePushConstant pushConstant{};
 
         PipelineService *pipelineService = nullptr;
         EditorRepository *editorRepository = nullptr;

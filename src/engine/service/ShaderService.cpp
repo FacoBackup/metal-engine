@@ -7,7 +7,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "../dto/ShaderModule.h"
-#include "../../core/vulkan/VulkanUtils.h"
+#include "../../common/VulkanUtils.h"
 #include "../../editor/util/Util.h"
 #include "../../ApplicationContext.h"
 #include "../../common/FilesUtil.h"
@@ -16,7 +16,7 @@
 #include "glslang/Include/glslang_c_interface.h"
 #include "glslang/Public/resource_limits_c.h"
 #include "../../core/DirectoryService.h"
-#include "../../core/vulkan/VulkanContext.h"
+#include "../../core/VulkanContext.h"
 #define BASE_PATH "../resources/shaders/"
 
 namespace Metal {

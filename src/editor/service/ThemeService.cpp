@@ -72,10 +72,10 @@ namespace Metal {
         textDisabled = ImVec4(palette6.x / 2.f, palette6.y / 2.f, palette6.z / 2.f, 1);
         colors[ImGuiCol_Text] = palette6;
         colors[ImGuiCol_TextDisabled] = textDisabled;
-        colors[ImGuiCol_WindowBg] = palette1;
+        colors[ImGuiCol_WindowBg] = ImVec4(0, 0, 0, 0);
         colors[ImGuiCol_ChildBg] = palette1;
         colors[ImGuiCol_PopupBg] = palette1;
-        colors[ImGuiCol_Border] = palette1;
+        colors[ImGuiCol_Border] = ImVec4(0, 0, 0, 0);
         colors[ImGuiCol_BorderShadow] = ImVec4(0.f, 0.f, 0.f, 0.f);
         colors[ImGuiCol_FrameBg] = palette2;
         colors[ImGuiCol_TitleBg] = palette1;

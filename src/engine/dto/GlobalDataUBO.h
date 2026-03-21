@@ -11,7 +11,6 @@ namespace Metal {
         alignas(16) glm::mat4x4 invProj{};
         alignas(16) glm::mat4x4 previousProjView{};
         alignas(16) glm::vec3 cameraWorldPosition{};
-        alignas(16) glm::vec3 sunColor{};
         alignas(16) glm::vec3 sunPosition{};
         alignas(4) unsigned int volumeCount{};
         alignas(4) unsigned int lightsCount{};

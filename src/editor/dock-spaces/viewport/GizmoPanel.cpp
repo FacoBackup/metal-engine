@@ -1,4 +1,5 @@
 #include "GizmoPanel.h"
+#include "GizmoTransformStrategy.h"
 #include "../../../ApplicationContext.h"
 #include "../../../engine/dto/TransformComponent.h"
 #include "../../../engine/dto/Camera.h"
@@ -11,139 +12,56 @@
 #include "../../service/HistoryService.h"
 
 namespace Metal {
-    GizmoPanel::GizmoPanel(ImVec2 *position, glm::vec2 *size): size(size), position(position) {
+    GizmoPanel::GizmoPanel(ImVec2 *position, glm::vec2 *size) : size(size), position(position) {
+    }
+
+    GizmoPanel::~GizmoPanel() {
+        delete gizmoStrategy;
     }
 
     void GizmoPanel::onInitialize() {
+        gizmoStrategy = new GizmoTransformStrategy(historyService, editorRepository, worldRepository);
     }
 
     void GizmoPanel::onSync() {
         if (editorRepository->primitiveSelected == nullptr) {
             isGizmoOver = false;
             localSelected = nullptr;
-            localChangeId = 0;
             if (editorRepository->mainSelection != EMPTY_ENTITY) {
                 selectionService->updatePrimitiveSelected();
             }
             return;
         }
 
-        if (editorRepository->primitiveSelected != localSelected || localSelected->getChangeId() != localChangeId) {
-            cacheMatrixMat4 = glm::mat4(editorRepository->primitiveSelected->model);
-            
-            if (editorRepository->primitiveSelected != nullptr) {
-                cacheMatrixMat4 = glm::translate(cacheMatrixMat4, editorRepository->primitiveSelected->gizmoCenter);
-            }
-
-            cacheMatrix = glm::value_ptr(cacheMatrixMat4);
+        if (editorRepository->primitiveSelected != localSelected) {
             localSelected = editorRepository->primitiveSelected;
-            localChangeId = localSelected->getChangeId();
+            gizmoStrategy->updateCache(localSelected);
         }
 
-        recomposeMatrix();
+        gizmoStrategy->recomposeMatrix();
         ImGuizmo::SetOrthographic(worldRepository->camera.isOrthographic);
         ImGuizmo::SetDrawlist();
         ImVec2 viewportMin = ImGui::GetItemRectMin();
         ImVec2 viewportSize = ImGui::GetItemRectSize();
         ImGuizmo::SetRect(viewportMin.x, viewportMin.y, viewportSize.x, viewportSize.y);
         Manipulate(
-            viewMatrixCache,
-            projectionMatrixCache,
+            gizmoStrategy->getViewMatrixCache(),
+            gizmoStrategy->getProjectionMatrixCache(),
             editorRepository->gizmoType,
             editorRepository->gizmoMode,
-            cacheMatrix,
+            gizmoStrategy->getCacheMatrix(),
             nullptr,
-            getSnapValues());
+            gizmoStrategy->getSnapValues());
+
+        gizmoStrategy->updateUsingState(ImGuizmo::IsUsing());
+
         if (ImGuizmo::IsUsing()) {
-            if (!wasUsing) {
-                historyService->startTransaction("Gizmo Transform");
-            }
-            decomposeMatrix();
-        } else if (wasUsing) {
-            historyService->endTransaction();
+            gizmoStrategy->decomposeMatrix(localSelected);
+        } else {
+            // Ensure endTransaction is called even if decomposeMatrix wasn't called this frame
+            gizmoStrategy->updateUsingState(false);
         }
 
-        wasUsing = ImGuizmo::IsUsing();
         isGizmoOver = ImGuizmo::IsOver();
-    }
-
-    float *GizmoPanel::getSnapValues() {
-        switch (editorRepository->gizmoType) {
-            case ImGuizmo::OPERATION::TRANSLATE: {
-                if (editorRepository->gizmoUseSnapTranslate) {
-                    translationSnap[0] = translationSnap[1] = translationSnap[2] = editorRepository->gizmoSnapTranslate;
-                    return translationSnap.data();
-                }
-            }
-            case ImGuizmo::OPERATION::ROTATE: {
-                if (editorRepository->gizmoUseSnapRotate) {
-                    return &editorRepository->gizmoSnapRotate;
-                }
-            }
-            case ImGuizmo::OPERATION::SCALE: {
-                if (editorRepository->gizmoUseSnapScale) {
-                    return &editorRepository->gizmoSnapScale;
-                }
-            }
-            default:
-                return nullptr;
-        }
-    }
-
-    void GizmoPanel::decomposeMatrix() {
-        glm::mat4 auxMat4 = glm::make_mat4(cacheMatrix);
-
-        // Remove gizmo offset using the selected TransformComponent
-        if (localSelected != nullptr) {
-            auxMat4 = glm::translate(auxMat4, -localSelected->gizmoCenter);
-        }
-
-        glm::vec3 skew;
-        glm::vec4 perspective;
-
-        glm::vec3 oldTranslation = localSelected->translation;
-        glm::vec3 oldScale = localSelected->scale;
-        glm::vec3 oldRotationEuler = localSelected->rotationEuler;
-
-        // Decompose the matrix into its components
-        glm::decompose(auxMat4, auxScale, auxRot, auxTranslation, skew, perspective);
-
-        auxTranslation = auxTranslation - localSelected->translation;
-        auxScale = auxScale - localSelected->scale;
-        auxRot = auxRot - localSelected->rotation;
-
-
-        localSelected->translation += auxTranslation;
-        localSelected->scale += auxScale;
-        localSelected->rotation += auxRot;
-        localSelected->rotationEuler = glm::eulerAngles(localSelected->rotation) * (180.f / glm::pi<float>());
-
-        localSelected->registerChange();
-        localChangeId = localSelected->getChangeId();
-        localSelected->forceTransform = true;
-        localSelected->onUpdate(nullptr);
-
-        if (oldTranslation != localSelected->translation) {
-            historyService->recordChange(localSelected, "/Translation", oldTranslation, localSelected->translation);
-        }
-        if (oldScale != localSelected->scale) {
-            historyService->recordChange(localSelected, "/Scale", oldScale, localSelected->scale);
-        }
-        if (oldRotationEuler != localSelected->rotationEuler) {
-            historyService->recordChange(localSelected, "/Rotation", oldRotationEuler, localSelected->rotationEuler);
-        }
-    }
-
-    void GizmoPanel::recomposeMatrix() {
-        viewMatrixCache = glm::value_ptr(worldRepository->camera.viewMatrix);
-        cacheProjection = worldRepository->camera.projectionMatrix;
-
-        cacheProjection[1][1] *= -1;
-
-        // Convert depth range from [0, 1] (Vulkan) to [-1, 1] (ImGuizmo/OpenGL)
-        cacheProjection[2][2] = cacheProjection[2][2] * 2.0f - cacheProjection[2][3];
-        cacheProjection[3][2] = cacheProjection[3][2] * 2.0f - cacheProjection[3][3];
-
-        projectionMatrixCache = glm::value_ptr(cacheProjection);
     }
 } // Metal
