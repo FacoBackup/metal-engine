@@ -24,6 +24,8 @@ namespace Metal::UIUtil {
     bool RenderOption(const std::string &label, bool selected, float sizeX, float sizeY,
                       const ImVec4 &accent);
 
+    bool RenderButtonSolid(const std::string &id, const std::string &icon, float size, const ImVec4 &color, float rounding);
+
     bool ButtonSimple(const std::string &label, float sizeX, float sizeY);
 
     bool RenderOption(const std::string &label, bool selected, bool fixedSize,

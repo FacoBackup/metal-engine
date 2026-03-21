@@ -79,10 +79,14 @@ namespace Metal {
         updateCamera();
         updateInputs();
 
-        headerPanel->onSync();
+        if (!editorRepository->isPlaying) {
+            headerPanel->onSync();
+        }
         engineFramePanel->onSync();
 
-        gizmoPanel->onSync();
+        if (!editorRepository->isPlaying) {
+            gizmoPanel->onSync();
+        }
     }
 
     void ViewportPanel::updateCamera() {

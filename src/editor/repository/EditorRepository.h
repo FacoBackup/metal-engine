@@ -51,6 +51,7 @@ namespace Metal {
         std::vector<ShortcutDTO> focusedShortcuts{};
         ShadingMode shadingMode = LIT;
         std::vector<std::string> bookmarks{};
+        bool isPlaying = false;
 
         void registerFields() override;
 

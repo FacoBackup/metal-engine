@@ -24,7 +24,7 @@ namespace Metal {
     }
 
     bool SelectionIDPass::shouldRun() {
-        return !editorRepository->selected.empty();
+        return !editorRepository->isPlaying && !editorRepository->selected.empty();
     }
 
     void SelectionIDPass::onSync() {

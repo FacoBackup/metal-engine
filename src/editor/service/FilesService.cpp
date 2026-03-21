@@ -67,6 +67,19 @@ namespace Metal {
         std::filesystem::create_directory(pathToDir);
     }
 
+    void FilesService::CreateFile(std::shared_ptr<FSEntry> currentDirectory, const std::string &name, const std::string &extension) {
+        int count = 0;
+        std::string fileName = name + extension;
+        while (std::filesystem::exists(currentDirectory->absolutePath + '/' + fileName)) {
+            count++;
+            fileName = name + " (" + std::to_string(count) + ")" + extension;
+        }
+
+        std::string pathToFile = currentDirectory->absolutePath + '/' + fileName;
+        std::ofstream file(pathToFile);
+        file.close();
+    }
+
     void FilesService::Move(std::shared_ptr<FSEntry> toMove, std::shared_ptr<FSEntry> targetDir) {
         if (!targetDir || !targetDir->isDirectory) {
             return;

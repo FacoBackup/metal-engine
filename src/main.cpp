@@ -20,6 +20,7 @@
 #include "editor/service/ThemeService.h"
 #include "editor/service/VoxelImporterService.h"
 #include "editor/repository/EditorRepository.h"
+#include "editor/repository/DockRepository.h"
 
 #include "engine/repository/EngineRepository.h"
 #include "engine/repository/RuntimeRepository.h"
@@ -59,6 +60,7 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::EngineContext>());
     context->registerSingleton(std::make_shared<Metal::EngineRepository>());
     context->registerSingleton(std::make_shared<Metal::EditorRepository>());
+    context->registerSingleton(std::make_shared<Metal::DockRepository>());
     context->registerSingleton(std::make_shared<Metal::RuntimeRepository>());
     context->registerSingleton(std::make_shared<Metal::WorldRepository>());
     context->registerSingleton(std::make_shared<Metal::MeshService>());

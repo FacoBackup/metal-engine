@@ -1,5 +1,6 @@
 #include "EditorHeaderPanel.h"
 #include "../../util/UIUtil.h"
+#include "../../repository/EditorRepository.h"
 #include "../../../core/DirectoryService.h"
 #include "../../../core/WindowService.h"
 #include "../../../engine/EngineContext.h"
@@ -7,6 +8,7 @@
 #include "editor/EditorPanel.h"
 #include "editor/service/HistoryService.h"
 #include "editor/service/ThemeService.h"
+#include "../../../ApplicationEventContext.h"
 
 namespace Metal {
     void EditorHeaderPanel::onSync() {
@@ -50,6 +52,26 @@ namespace Metal {
             windowService->minimize();
         });
 
+        // Play/Stop Button
+        xPos -= 30.0f;
+        ImGui::SetCursorPosX(xPos);
+        ImGui::SetCursorPosY((EditorPanel::HEADER_HEIGHT - 25.0f) * 0.5f);
+        const bool isPlaying = editorRepository->isPlaying;
+        const std::string icon = isPlaying ? Icons::stop : Icons::play_arrow;
+        const ImVec4 color = isPlaying ? ImVec4(0.957f, 0.263f, 0.212f, 1.0f) : ImVec4(0.298f, 0.686f, 0.314f, 1.0f);
+        const std::string tooltip = isPlaying ? "Stop" : "Play";
+
+        if (UIUtil::RenderButtonSolid("playstop", icon, 25.0f, color, 4.0f)) {
+            if (isPlaying) {
+                ApplicationEventContext::dispatch("Stop");
+                editorRepository->isPlaying = false;
+            } else {
+                ApplicationEventContext::dispatch("Play");
+                editorRepository->isPlaying = true;
+            }
+        }
+        UIUtil::RenderTooltip(tooltip);
+
         ImGui::PopStyleColor(1);
         ImGui::PopStyleVar();
 
@@ -66,7 +88,8 @@ namespace Metal {
         const bool canUndo = historyService->canUndo();
         if (!canUndo) ImGui::BeginDisabled();
         rects.undoButton = {
-            static_cast<int>(ImGui::GetCursorPosX()), 0, static_cast<int>(EditorPanel::HEADER_HEIGHT), static_cast<int>(EditorPanel::HEADER_HEIGHT)
+            static_cast<int>(ImGui::GetCursorPosX()), 0, static_cast<int>(EditorPanel::HEADER_HEIGHT),
+            static_cast<int>(EditorPanel::HEADER_HEIGHT)
         };
         if (UIUtil::ButtonSimple(Icons::undo + "##undo", EditorPanel::HEADER_HEIGHT, EditorPanel::HEADER_HEIGHT)) {
             historyService->undo();
@@ -77,7 +100,8 @@ namespace Metal {
         const bool canRedo = historyService->canRedo();
         if (!canRedo) ImGui::BeginDisabled();
         rects.redoButton = {
-            static_cast<int>(ImGui::GetCursorPosX()), 0, static_cast<int>(EditorPanel::HEADER_HEIGHT), static_cast<int>(EditorPanel::HEADER_HEIGHT)
+            static_cast<int>(ImGui::GetCursorPosX()), 0, static_cast<int>(EditorPanel::HEADER_HEIGHT),
+            static_cast<int>(EditorPanel::HEADER_HEIGHT)
         };
         if (UIUtil::ButtonSimple(Icons::redo + "##redo", EditorPanel::HEADER_HEIGHT, EditorPanel::HEADER_HEIGHT)) {
             historyService->redo();
@@ -92,7 +116,7 @@ namespace Metal {
             static_cast<int>(leftSideEnd), 0, static_cast<int>(xPos - leftSideEnd),
             static_cast<int>(EditorPanel::HEADER_HEIGHT)
         };
-        
+
         windowService->setWindowControlRects(rects);
 
         ImGui::PopStyleVar();
@@ -115,7 +139,8 @@ namespace Metal {
         ImGui::SetCursorPosY(0);
 
         rects.dockAdders.push_back({
-            static_cast<int>(ImGui::GetCursorPosX()), 0, static_cast<int>(EditorPanel::HEADER_HEIGHT), static_cast<int>(EditorPanel::HEADER_HEIGHT)
+            static_cast<int>(ImGui::GetCursorPosX()), 0, static_cast<int>(EditorPanel::HEADER_HEIGHT),
+            static_cast<int>(EditorPanel::HEADER_HEIGHT)
         });
         if (UIUtil::ButtonSimple(Icons::split_scene_left + "##addLeft", EditorPanel::HEADER_HEIGHT,
                                  EditorPanel::HEADER_HEIGHT)) {
@@ -125,7 +150,8 @@ namespace Metal {
         ImGui::SameLine(0, spacing);
 
         rects.dockAdders.push_back({
-            static_cast<int>(ImGui::GetCursorPosX()), 0, static_cast<int>(EditorPanel::HEADER_HEIGHT), static_cast<int>(EditorPanel::HEADER_HEIGHT)
+            static_cast<int>(ImGui::GetCursorPosX()), 0, static_cast<int>(EditorPanel::HEADER_HEIGHT),
+            static_cast<int>(EditorPanel::HEADER_HEIGHT)
         });
         if (UIUtil::ButtonSimple(Icons::split_scene_down + "##addBottom", EditorPanel::HEADER_HEIGHT,
                                  EditorPanel::HEADER_HEIGHT)) {
@@ -135,7 +161,8 @@ namespace Metal {
         ImGui::SameLine(0, spacing);
 
         rects.dockAdders.push_back({
-            static_cast<int>(ImGui::GetCursorPosX()), 0, static_cast<int>(EditorPanel::HEADER_HEIGHT), static_cast<int>(EditorPanel::HEADER_HEIGHT)
+            static_cast<int>(ImGui::GetCursorPosX()), 0, static_cast<int>(EditorPanel::HEADER_HEIGHT),
+            static_cast<int>(EditorPanel::HEADER_HEIGHT)
         });
         if (UIUtil::ButtonSimple(Icons::split_scene_right + "##addRight", EditorPanel::HEADER_HEIGHT,
                                  EditorPanel::HEADER_HEIGHT)) {

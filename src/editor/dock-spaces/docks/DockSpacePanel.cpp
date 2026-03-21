@@ -1,14 +1,11 @@
 #include "DockSpacePanel.h"
 
 #include <string>
-#include <iostream>
 
 #include "AbstractDockPanel.h"
-#include "../../../ApplicationContext.h"
 #include "../../../common/Icons.h"
 #include "../../dto/DockDTO.h"
 #include "../../util/UIUtil.h"
-#include "../../../common/LoggerUtil.h"
 #include "../../repository/EditorRepository.h"
 #include "../../service/ThemeService.h"
 #include "../../service/DockService.h"
@@ -113,7 +110,9 @@ namespace Metal {
         if (ImGui::Begin(dock->internalId.c_str(), &UIUtil::OPEN,
                          (FLAGS & ~ImGuiWindowFlags_MenuBar) | ImGuiWindowFlags_NoBackground |
                          ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
-            handleShortcut();
+            if (!editorRepository->isPlaying) {
+                handleShortcut();
+            }
             sizeInternal = ImGui::GetWindowSize();
             size.x = sizeInternal.x;
             size.y = sizeInternal.y;
@@ -144,6 +143,16 @@ namespace Metal {
                     }
                 }
                 ImGui::EndChild();
+
+                if (editorRepository->isPlaying && !dock->isCenter) {
+                    ImGui::SetCursorPos(ImVec2(0, 0));
+                    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0, 0, 0, 0.5f));
+                    ImGui::BeginChild((dock->internalId + "overlay").c_str(), ImVec2(0, 0), ImGuiChildFlags_None,
+                                      ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoMove);
+                    ImGui::EndChild();
+                    ImGui::PopStyleColor();
+                }
+
                 ImGui::PopStyleVar();
             }
             ImGui::EndChild();

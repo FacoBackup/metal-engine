@@ -46,6 +46,7 @@ namespace Metal {
         }
         j["shadingMode"] = shadingMode;
         j["bookmarks"] = bookmarks;
+        j["isPlaying"] = isPlaying;
         return j;
     }
 
@@ -90,6 +91,7 @@ namespace Metal {
             if (j.contains("bookmarks") && j.at("bookmarks").is_array()) {
                 bookmarks = j.at("bookmarks").get<std::vector<std::string>>();
             }
+            isPlaying = j.value("isPlaying", false);
     }
 
     void EditorRepository::registerFields() {

@@ -9,27 +9,31 @@
 
 namespace Metal {
     void DockService::onInitialize() {
+        if (!dockRepository->left.empty() || !dockRepository->right.empty() || !dockRepository->bottom.empty()) {
+            return;
+        }
+
         auto rightT = std::make_shared<DockDTO>(&DockSpace::WORLD);
         auto leftT = std::make_shared<DockDTO>(&DockSpace::REPOSITORIES);
         auto leftB = std::make_shared<DockDTO>(&DockSpace::INSPECTOR);
         auto rightB = std::make_shared<DockDTO>(&DockSpace::CONSOLE);
         auto b = std::make_shared<DockDTO>(&DockSpace::FILES);
 
-        center->isCenter = true;
-        center->sizeRatioForNodeAtDir = 0.5f;
+        dockRepository->center->isCenter = true;
+        dockRepository->center->sizeRatioForNodeAtDir = 0.5f;
         rightT->sizeRatioForNodeAtDir = 0.25f;
         leftT->sizeRatioForNodeAtDir = 0.2f;
         leftB->sizeRatioForNodeAtDir = 0.5f;
         rightB->sizeRatioForNodeAtDir = 0.25f;
         b->sizeRatioForNodeAtDir = 0.25f;
 
-        right.push_back(rightT);
-        right.push_back(rightB);
+        dockRepository->right.push_back(rightT);
+        dockRepository->right.push_back(rightB);
 
-        left.push_back(leftT);
-        left.push_back(leftB);
+        dockRepository->left.push_back(leftT);
+        dockRepository->left.push_back(leftB);
 
-        bottom.push_back(b);
+        dockRepository->bottom.push_back(b);
     }
 
     void DockService::buildViews(ImGuiID windowId, AbstractPanel *panel) {
@@ -40,10 +44,10 @@ namespace Metal {
             isInitialized = true;
 
             std::vector<std::shared_ptr<DockDTO>> allDocks;
-            allDocks.insert(allDocks.end(), left.begin(), left.end());
-            allDocks.insert(allDocks.end(), right.begin(), right.end());
-            allDocks.insert(allDocks.end(), bottom.begin(), bottom.end());
-            allDocks.push_back(center);
+            allDocks.insert(allDocks.end(), dockRepository->left.begin(), dockRepository->left.end());
+            allDocks.insert(allDocks.end(), dockRepository->right.begin(), dockRepository->right.end());
+            allDocks.insert(allDocks.end(), dockRepository->bottom.begin(), dockRepository->bottom.end());
+            allDocks.push_back(dockRepository->center);
 
             auto &children = panel->getChildren();
             children.erase(
@@ -59,14 +63,14 @@ namespace Metal {
             ImGui::DockBuilderAddNode(windowId, ImGuiDockNodeFlags_NoTabBar);
             ImGui::DockBuilderSetNodeSize(windowId, ImGui::GetMainViewport()->Size);
 
-            for (size_t i = 0; i < left.size(); i++) {
-                auto dockSpace = left[i];
+            for (size_t i = 0; i < dockRepository->left.size(); i++) {
+                auto dockSpace = dockRepository->left[i];
                 if (i == 0) {
                     dockSpace->origin = nullptr;
                     dockSpace->outAtOppositeDir = nullptr;
                     dockSpace->splitDir = ImGuiDir_Left;
                 } else {
-                    auto previous = left[i - 1];
+                    auto previous = dockRepository->left[i - 1];
                     dockSpace->origin = previous;
                     dockSpace->outAtOppositeDir = previous;
                     dockSpace->splitDir = ImGuiDir_Down;
@@ -75,14 +79,14 @@ namespace Metal {
                 addWindow(dockSpace, panel);
             }
 
-            for (size_t i = 0; i < right.size(); i++) {
-                auto dockSpace = right[i];
+            for (size_t i = 0; i < dockRepository->right.size(); i++) {
+                auto dockSpace = dockRepository->right[i];
                 if (i == 0) {
                     dockSpace->origin = nullptr;
                     dockSpace->outAtOppositeDir = nullptr;
                     dockSpace->splitDir = ImGuiDir_Right;
                 } else {
-                    auto previous = right[i - 1];
+                    auto previous = dockRepository->right[i - 1];
                     dockSpace->origin = previous;
                     dockSpace->outAtOppositeDir = previous;
                     dockSpace->splitDir = ImGuiDir_Down;
@@ -91,14 +95,14 @@ namespace Metal {
                 addWindow(dockSpace, panel);
             }
 
-            for (size_t i = 0, bottomSize = bottom.size(); i < bottomSize; i++) {
-                auto dockSpace = bottom[i];
+            for (size_t i = 0, bottomSize = dockRepository->bottom.size(); i < bottomSize; i++) {
+                auto dockSpace = dockRepository->bottom[i];
                 if (i == 0) {
                     dockSpace->origin = nullptr;
                     dockSpace->outAtOppositeDir = nullptr;
                     dockSpace->splitDir = ImGuiDir_Down;
                 } else {
-                    auto previous = bottom[i - 1];
+                    auto previous = dockRepository->bottom[i - 1];
                     dockSpace->origin = previous;
                     dockSpace->outAtOppositeDir = previous;
                     dockSpace->splitDir = ImGuiDir_Right;
@@ -107,10 +111,10 @@ namespace Metal {
                 addWindow(dockSpace, panel);
             }
 
-            center->nodeId = windowId;
-            addWindow(center, panel);
+            dockRepository->center->nodeId = windowId;
+            addWindow(dockRepository->center, panel);
 
-            ImGui::DockBuilderDockWindow(center->internalId.c_str(), windowId);
+            ImGui::DockBuilderDockWindow(dockRepository->center->internalId.c_str(), windowId);
             ImGui::DockBuilderFinish(windowId);
         }
     }
@@ -130,9 +134,9 @@ namespace Metal {
         };
 
         bool removed = false;
-        if (removeIt(left)) removed = true;
-        else if (removeIt(right)) removed = true;
-        else if (removeIt(bottom)) removed = true;
+        if (removeIt(dockRepository->left)) removed = true;
+        else if (removeIt(dockRepository->right)) removed = true;
+        else if (removeIt(dockRepository->bottom)) removed = true;
 
         if (removed) {
             isInitialized = false;
@@ -142,21 +146,21 @@ namespace Metal {
     void DockService::addLeftDock() {
         auto d = std::make_shared<DockDTO>(&DockSpace::CONSOLE);
         d->sizeRatioForNodeAtDir = 0.25f;
-        left.push_back(d);
+        dockRepository->left.push_back(d);
         isInitialized = false;
     }
 
     void DockService::addBottomDock() {
         auto d = std::make_shared<DockDTO>(&DockSpace::CONSOLE);
         d->sizeRatioForNodeAtDir = 0.25f;
-        bottom.push_back(d);
+        dockRepository->bottom.push_back(d);
         isInitialized = false;
     }
 
     void DockService::addRightDock() {
         auto d = std::make_shared<DockDTO>(&DockSpace::CONSOLE);
         d->sizeRatioForNodeAtDir = 0.25f;
-        right.push_back(d);
+        dockRepository->right.push_back(d);
         isInitialized = false;
     }
 

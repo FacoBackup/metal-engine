@@ -5,6 +5,7 @@
 #include "../../../common/Icons.h"
 #include "../../service/FilesService.h"
 #include "../../util/UIUtil.h"
+#include "../../../common/FileExtensions.h"
 
 #include <cstring>
 
@@ -47,17 +48,24 @@ namespace Metal {
         UIUtil::RenderTooltip("Create folder");
 
         ImGui::SameLine();
-        if (UIUtil::ButtonSimple(Icons::refresh, UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
+        if (UIUtil::ButtonSimple(Icons::refresh + id + "refresh", UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
             filesService->GetEntries(filesContext.currentDirectory);
         }
         UIUtil::RenderTooltip("Refresh");
+
+        ImGui::SameLine();
+        if (UIUtil::ButtonSimple(Icons::description + id, UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
+            filesService->CreateFile(filesContext.currentDirectory, "NewScript", EXT_LUA);
+            filesService->GetEntries(filesContext.currentDirectory);
+        }
+        UIUtil::RenderTooltip("Create Lua Script");
 
         ImGui::PopStyleVar();
         ImGui::EndGroup();
 
         ImGui::SameLine();
         ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - 220.0f);
-        if (ImGui::InputText("##AddressBar", addressBuffer, sizeof(addressBuffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
+        if (ImGui::InputText((id + "AddressBar").c_str(), addressBuffer, sizeof(addressBuffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
             std::shared_ptr<FSEntry> newDir = filesService->GetEntry(addressBuffer);
             if (newDir && newDir->isDirectory) {
                 filesContext.setCurrentDirectory(newDir);

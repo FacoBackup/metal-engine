@@ -46,6 +46,20 @@ namespace Metal::UIUtil {
         return ImGui::Button(label.c_str(), ImVec2(sizeX, sizeY));
     }
 
+    bool RenderButtonSolid(const std::string &id, const std::string &icon, const float size, const ImVec4 &color, const float rounding) {
+        ImGui::PushStyleColor(ImGuiCol_Button, color);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(color.x * 1.1f, color.y * 1.1f, color.z * 1.1f, color.w));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(color.x * 0.9f, color.y * 0.9f, color.z * 0.9f, color.w));
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, rounding);
+
+        const bool clicked = ImGui::Button((icon + "##" + id).c_str(), ImVec2(size, size));
+
+        ImGui::PopStyleVar();
+        ImGui::PopStyleColor(3);
+
+        return clicked;
+    }
+
     bool RenderOption(const std::string &label, const bool selected, const bool fixedSize,
                       const ImVec4 &accent) {
         const float size = fixedSize ? ONLY_ICON_BUTTON_SIZE : -1;
@@ -212,6 +226,7 @@ namespace Metal::UIUtil {
             case 3: return Icons::folder_open; // FILES
             case 4: return Icons::analytics; // METRICS
             case 5: return Icons::search; // REPOSITORIES
+            case 6: return Icons::script; // REPOSITORIES
             default: return "";
         }
     }

@@ -14,6 +14,7 @@ namespace Metal {
     class EngineContext;
     struct DirectoryService;
     class DockService;
+    struct EditorRepository;
 
     class EditorHeaderPanel final : public AbstractPanel {
         WindowService *windowService = nullptr;
@@ -22,6 +23,7 @@ namespace Metal {
         HistoryService *historyService = nullptr;
         ThemeService *themeService = nullptr;
         DockService *dockService = nullptr;
+        EditorRepository *editorRepository = nullptr;
 
         float menuBarHeight = 0;
 
@@ -39,7 +41,8 @@ namespace Metal {
                 {"DirectoryService", &directoryService},
                 {"ThemeService", &themeService},
                 {"historyService", &historyService},
-                {"DockService", &dockService}
+                {"DockService", &dockService},
+                {"EditorRepository", &editorRepository}
             };
         }
 

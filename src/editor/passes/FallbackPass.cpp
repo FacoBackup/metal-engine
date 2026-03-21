@@ -24,7 +24,7 @@ namespace Metal {
     }
 
     bool FallbackPass::shouldRun() {
-        return !vulkanContext->isRayTracingSupported();
+        return !editorRepository->isPlaying && !vulkanContext->isRayTracingSupported();
     }
 
     void FallbackPass::onSync() {

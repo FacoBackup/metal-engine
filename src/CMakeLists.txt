@@ -63,6 +63,7 @@ set(ENGINE_SOURCES
         editor/service/ThemeService.cpp
         editor/service/ThemeService.h
         editor/repository/EditorRepository.h
+        editor/repository/DockRepository.h
         editor/enum/engine-definitions.h
         editor/dock-spaces/files/FilesPanel.cpp
         editor/dock-spaces/files/FilesPanel.h
@@ -85,6 +86,8 @@ set(ENGINE_SOURCES
         common/LoggerUtil.h
         editor/dock-spaces/world/WorldPanel.cpp
         editor/dock-spaces/world/WorldPanel.h
+        editor/dock-spaces/lua-editor/LuaEditorPanel.cpp
+        editor/dock-spaces/lua-editor/LuaEditorPanel.h
         engine/resource/RuntimeResource.h
         engine/service/ShaderService.cpp
         engine/service/ShaderService.h
@@ -295,6 +298,20 @@ set(ENGINE_SOURCES
         common/Util.cpp
         editor/dto/FieldModificationEvent.h
         editor/dto/InspectableEventPayload.h
+        engine/dto/BoxColliderComponent.cpp
+        engine/dto/BoxColliderComponent.h
+        engine/dto/CapsuleColliderComponent.cpp
+        engine/dto/CapsuleColliderComponent.h
+        engine/dto/GlobalScriptComponent.cpp
+        engine/dto/GlobalScriptComponent.h
+        engine/dto/MeshColliderComponent.cpp
+        engine/dto/MeshColliderComponent.h
+        engine/dto/RigidBodyComponent.cpp
+        engine/dto/RigidBodyComponent.h
+        engine/dto/ScopedScriptComponent.cpp
+        engine/dto/ScopedScriptComponent.h
+        engine/dto/SphereColliderComponent.cpp
+        engine/dto/SphereColliderComponent.h
 )
 
 # Extract non-main sources for testing
@@ -308,10 +325,10 @@ add_executable(metal_engine main.cpp)
 target_link_libraries(metal_engine PRIVATE metal_engine_lib)
 if (WIN32)
     target_link_libraries(metal_engine PRIVATE dwmapi)
-endif()
+endif ()
 add_dependencies(metal_engine copy_resources)
 
 add_custom_command(TARGET metal_engine POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${CMAKE_BINARY_DIR}/resources"
-    "$<TARGET_FILE_DIR:metal_engine>/resources")
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_BINARY_DIR}/resources"
+        "$<TARGET_FILE_DIR:metal_engine>/resources")
