@@ -4,7 +4,7 @@
 #include <algorithm>
 
 namespace Metal {
-    std::string getTypeName(std::string name) {
+    std::string getTypeName(std::string name, bool toLower) {
         size_t lastSpace = name.find_last_of(' ');
         if (lastSpace != std::string::npos) {
             name = name.substr(lastSpace + 1);
@@ -13,8 +13,10 @@ namespace Metal {
         if (lastColon != std::string::npos) {
             name = name.substr(lastColon + 1);
         }
-        std::ranges::transform(name, name.begin(),
-                               [](unsigned char c) { return std::tolower(c); });
+        if (toLower) {
+            std::ranges::transform(name, name.begin(),
+                                   [](unsigned char c) { return std::tolower(c); });
+        }
         return name;
     }
 }

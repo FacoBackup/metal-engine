@@ -8,7 +8,8 @@
 #include "../dto/LightData.h"
 
 #include "../../common/IInit.h"
-#include "../../editor/service/EventService.h"
+#include "ApplicationEventContext.h"
+#include "common/IEventMember.h"
 
 namespace Metal {
     class EngineContext;
@@ -16,9 +17,9 @@ namespace Metal {
 
     class MeshService;
     struct WorldRepository;
-    class EventService;
+    class ApplicationEventContext;
 
-    class LightService final : public IService, public IInit, public ISync {
+    class LightService final : public IService, public IInit, public ISync, public IEventMember {
         EngineContext *engineContext = nullptr;
         EngineRepository *engineRepository = nullptr;
         WorldRepository *worldRepository = nullptr;

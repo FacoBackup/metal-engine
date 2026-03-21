@@ -30,17 +30,23 @@ namespace Metal {
         WorldRepository *worldRepository;
 
     public:
-        GizmoTransformStrategy(HistoryService *historyService, EditorRepository *editorRepository, WorldRepository *worldRepository);
+        GizmoTransformStrategy(HistoryService *historyService, EditorRepository *editorRepository,
+                               WorldRepository *worldRepository);
+
         ~GizmoTransformStrategy() = default;
 
-        void updateCache(TransformComponent *selected, int &localChangeId);
+        void updateCache(TransformComponent *selected);
+
         void recomposeMatrix();
-        void decomposeMatrix(TransformComponent *selected, int &localChangeId);
+
+        void decomposeMatrix(TransformComponent *selected);
+
         void updateUsingState(bool isUsing);
 
         float *getCacheMatrix() { return cacheMatrix; }
         float *getViewMatrixCache() { return viewMatrixCache; }
         float *getProjectionMatrixCache() { return projectionMatrixCache; }
+
         float *getSnapValues();
     };
 }

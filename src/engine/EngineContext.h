@@ -15,7 +15,7 @@ using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
 
 namespace Metal {
-    class EventService;
+    class ApplicationEventContext;
     class TransformService;
     class StreamingService;
     class RayTracingService;

@@ -15,7 +15,7 @@ namespace Metal {
     void LightService::onInitialize() {
         eventListener([this](const Event &) {
             needsUpdate = true;
-        }, "LightComponent");
+        }, "BVHUpdated");
     }
 
     void LightService::registerLights() {
@@ -24,8 +24,7 @@ namespace Metal {
             auto &primitive = worldRepository->registry.get<PrimitiveComponent>(entity);
             primitive.renderIndex = currentRenderIndex++;
             if (!primitive.meshId.empty()) {
-                MeshData *meshData = meshService->loadMeshData(primitive.meshId);
-                if (meshData) {
+                if (MeshData *meshData = meshService->loadMeshData(primitive.meshId)) {
                     for (size_t i = 0; i < meshData->indices.size(); i += 3) {
                         LightData light{};
                         light.triangleIndex = static_cast<unsigned int>(i);

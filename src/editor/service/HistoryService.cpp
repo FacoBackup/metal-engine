@@ -2,6 +2,8 @@
 #include <algorithm>
 #include "../../common/Inspectable.h"
 #include "../../common/InspectedField.h"
+#include "ApplicationEventContext.h"
+#include "../dto/FieldModificationEvent.h"
 
 namespace Metal {
     void HistoryService::startTransaction(const std::string &name) {
@@ -28,6 +30,10 @@ namespace Metal {
                     if (instance) key = instance->getTitle();
                     break; 
                 }
+            }
+
+            if (instance) {
+                ApplicationEventContext::dispatch(instance->getClassName(), std::make_shared<FieldModificationPayload>(*instance->getFieldByPath(propertyPath)));
             }
 
             undoStack.push_back(std::move(*currentTransaction));
@@ -95,6 +101,10 @@ namespace Metal {
             trans.changes.push_back(change);
             undoStack.push_back(std::move(trans));
             redoStack.clear();
+        }
+
+        if (field->instance) {
+            ApplicationEventContext::dispatch(field->instance->getClassName(), std::make_shared<FieldModificationPayload>(*field));
         }
     }
 

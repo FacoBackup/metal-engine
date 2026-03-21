@@ -7,19 +7,34 @@
 #include "../../ApplicationContext.h"
 #include "../dto/TransformComponent.h"
 #include "../repository/WorldRepository.h"
-#include "../dto/TransformComponent.h"
 #include "../dto/PrimitiveComponent.h"
 #include "RayTracingService.h"
+#include "../../editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
-    void TransformService::onSync() {
-        for (auto entity : worldRepository->registry.view<TransformComponent>()) {
-            TransformComponent &st = worldRepository->registry.get<TransformComponent>(entity);
-            if (st.isNotFrozen()) {
-                transform(&st, nullptr);
-                st.freezeVersion();
+    void TransformService::onInitialize() {
+        eventListener([this](const Event &e) {
+            auto payload = std::static_pointer_cast<FieldModificationPayload>(e.payload);
+            auto transform = dynamic_cast<TransformComponent *>(payload->member.instance);
+            if (transform) {
+                dirtyEntities.insert(transform->getEntityId());
             }
+        }, "TransformComponent");
+
+        for (auto entity: worldRepository->registry.view<TransformComponent>()) {
+            dirtyEntities.insert(entity);
         }
+    }
+
+    void TransformService::onSync() {
+        if (dirtyEntities.empty()) return;
+
+        for (auto entity: dirtyEntities) {
+            if (!worldRepository->registry.valid(entity)) continue;
+            TransformComponent &st = worldRepository->registry.get<TransformComponent>(entity);
+            transform(&st, nullptr);
+        }
+        dirtyEntities.clear();
     }
 
     void TransformService::transform(TransformComponent *st, const TransformComponent *parentTransform) {
@@ -29,7 +44,9 @@ namespace Metal {
             auxMat4 = glm::identity<glm::mat4>();
         }
         if (!st->forceTransform && st->isStatic) {
-            LOG_WARN("Entity will not be transformed because it is set to static " + std::to_string(entt::to_integral(st->getEntityId())));
+            LOG_WARN(
+                "Entity will not be transformed because it is set to static " + std::to_string(entt::to_integral(st->
+                    getEntityId())));
             return;
         }
 
@@ -43,10 +60,10 @@ namespace Metal {
         auxMat42 = glm::scale(auxMat42, st->scale); // Scale
 
         st->model = auxMat4 * auxMat42;
-        st->freezeVersion();
 
-        if (worldRepository->hasComponent(st->getEntityId(), PRIMITIVE) || worldRepository->hasComponent(st->getEntityId(), LIGHT)) {
-            rayTracingService->markDirty();
+        if (worldRepository->hasComponent(st->getEntityId(), PRIMITIVE) || worldRepository->hasComponent(
+                st->getEntityId(), LIGHT)) {
+            ApplicationEventContext::dispatch("BVHNeedsUpdate");
         }
     }
 } // Metal

@@ -14,20 +14,14 @@
 namespace Metal {
     class Inspectable {
         std::string uniqueIdentifier = Util::uuidV4();
-        std::string className;
         std::vector<std::shared_ptr<InspectableMember> > fields{};
         bool fieldsRegistered = false;
-        unsigned long changes = 0;
-        unsigned long frozenVersion = 99999;
 
     public:
         Inspectable(const Inspectable &other)
             : uniqueIdentifier(other.uniqueIdentifier),
               fields(other.fields),
               fieldsRegistered(other.fieldsRegistered) {
-            changes = other.changes;
-            frozenVersion = other.frozenVersion;
-            className = getTypeName(typeid(this).name());
         }
 
     protected:
@@ -80,27 +74,11 @@ namespace Metal {
                            std::string group, std::string name, bool disabled = false);
 
     public:
-        [[nodiscard]] unsigned long getChangeId() const {
-            return changes;
-        }
-
-        [[nodiscard]] std::string getClassName() const {
-            return className;
-        }
-
-        void registerChange() {
-            changes++;
-        }
-
-        [[nodiscard]] bool isNotFrozen() const {
-            return frozenVersion != getChangeId();
-        }
-
-        void freezeVersion() {
-            frozenVersion = getChangeId();
-        }
+        [[nodiscard]] virtual std::string getClassName() const;
 
         std::shared_ptr<InspectableMember> getFieldByPointer(void *ptr);
+
+        std::shared_ptr<InspectableMember> getFieldByPath(const std::string &path);
 
         std::vector<std::shared_ptr<InspectableMember> > &getFields();
 

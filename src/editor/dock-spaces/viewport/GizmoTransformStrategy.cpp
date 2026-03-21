@@ -12,7 +12,7 @@ namespace Metal {
         : historyService(historyService), editorRepository(editorRepository), worldRepository(worldRepository), translationSnap({1, 1, 1}) {
     }
 
-    void GizmoTransformStrategy::updateCache(TransformComponent *selected, int &localChangeId) {
+    void GizmoTransformStrategy::updateCache(TransformComponent *selected) {
         if (selected == nullptr) return;
 
         cacheMatrixMat4 = glm::mat4(selected->model);
@@ -20,8 +20,6 @@ namespace Metal {
         
         float* ptr = glm::value_ptr(cacheMatrixMat4);
         for(int i = 0; i < 16; i++) cacheMatrix[i] = ptr[i];
-        
-        localChangeId = selected->getChangeId();
     }
 
     void GizmoTransformStrategy::recomposeMatrix() {
@@ -37,7 +35,7 @@ namespace Metal {
         projectionMatrixCache = glm::value_ptr(cacheProjection);
     }
 
-    void GizmoTransformStrategy::decomposeMatrix(TransformComponent *selected, int &localChangeId) {
+    void GizmoTransformStrategy::decomposeMatrix(TransformComponent *selected) {
         if (selected == nullptr) return;
 
         glm::mat4 auxMat4 = glm::make_mat4(cacheMatrix);
@@ -60,8 +58,6 @@ namespace Metal {
         selected->scale = auxScale;
         selected->rotationEuler = glm::eulerAngles(auxRotQuat) * (180.f / glm::pi<float>());
 
-        selected->registerChange();
-        localChangeId = selected->getChangeId();
         selected->forceTransform = true;
 
         if (oldTranslation != selected->translation) {

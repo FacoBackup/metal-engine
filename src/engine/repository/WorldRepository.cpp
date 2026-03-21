@@ -1,6 +1,7 @@
 #include "WorldRepository.h"
 #include "../service/RayTracingService.h"
 #include "../../editor/service/HistoryService.h"
+#include "../../ApplicationEventContext.h"
 
 #include "../enum/ComponentType.h"
 #include "../../editor/dto/SceneData.h"
@@ -9,8 +10,6 @@
 
 namespace Metal {
     entt::entity WorldRepository::createEntity() {
-        registerChange();
-
         const auto entity = registry.create();
         createComponent(entity, METADATA);
 
@@ -26,12 +25,12 @@ namespace Metal {
                         registry.destroy(entity);
                         if (hiddenEntities.contains(entity)) hiddenEntities.erase(entity);
                         if (culled.contains(entity)) culled.erase(entity);
-                        rayTracingService->markDirty();
+                        ApplicationEventContext::dispatch("BVHNeedsUpdate");
                     }
                 },
                 [this, createdState]() {
                     deserializeEntityComplete(*createdState);
-                    rayTracingService->markDirty();
+                    ApplicationEventContext::dispatch("BVHNeedsUpdate");
                 }
             );
         }
@@ -62,8 +61,6 @@ namespace Metal {
     }
 
     void WorldRepository::deleteEntities(const std::vector<entt::entity> &entities) {
-        registerChange();
-
         if (historyService) {
             std::vector<EntityState> deletedStates;
             for (auto entityId: entities) {
@@ -78,7 +75,7 @@ namespace Metal {
                     for (const EntityState &state: deletedStates) {
                         deserializeEntityComplete(state);
                     }
-                    rayTracingService->markDirty();
+                    ApplicationEventContext::dispatch("BVHNeedsUpdate");
                 },
                 [this, entities]() {
                     // Redo: Delete entities
@@ -89,7 +86,7 @@ namespace Metal {
                             registry.destroy(entityId);
                         }
                     }
-                    rayTracingService->markDirty();
+                    ApplicationEventContext::dispatch("BVHNeedsUpdate");
                 }
             );
         }
@@ -106,11 +103,10 @@ namespace Metal {
 
             registry.destroy(entityId);
         }
-        rayTracingService->markDirty();
+        ApplicationEventContext::dispatch("BVHNeedsUpdate");
     }
 
     void WorldRepository::changeVisibility(entt::entity entity, bool isVisible) {
-        registerChange();
         bool wasVisible = !hiddenEntities.contains(entity);
         if (isVisible == wasVisible) return;
 
@@ -130,7 +126,7 @@ namespace Metal {
         } else {
             hiddenEntities.insert({entity, true});
         }
-        rayTracingService->markDirty();
+        ApplicationEventContext::dispatch("BVHNeedsUpdate");
     }
 
     void WorldRepository::loadScene(const std::string &sceneId) {
@@ -153,7 +149,6 @@ namespace Metal {
             transform.isStatic = entityData.transform.isStatic;
 
             if (entityData.primitive) {
-
                 createComponent(entityId, PRIMITIVE);
                 auto &primitive = registry.get<PrimitiveComponent>(entityId);
                 primitive.meshId = entityData.primitive->meshId;
@@ -176,12 +171,14 @@ namespace Metal {
         }
 
         for (const auto &compDef: ComponentTypes::getComponents()) {
-            if (compDef.type == type) {
+            if (compDef.type == type && !hasComponent(entityId, type)) {
                 for (const auto &dep: compDef.dependencies) {
                     createComponent(entityId, dep);
                 }
-                if (compDef.creator) {
-                    compDef.creator(*this, entityId);
+                compDef.creator(*this, entityId);
+                if (auto *inspectable = compDef.getInspectable(*this, entityId)) {
+                    std::string className = inspectable->getClassName();
+                    ApplicationEventContext::dispatch(className);
                 }
                 break;
             }
@@ -253,14 +250,15 @@ namespace Metal {
 
     void WorldRepository::deserializeEntityComplete(const EntityState &state) {
         if (!registry.valid(state.id)) {
-            const auto entity = registry.create(state.id);
-            if (state.data.contains("entity")) {
-                registry.emplace<MetadataComponent>(entity).fromJson(state.data.at("entity"));
-            }
+            registry.create(state.id);
             for (const auto &compDef: ComponentTypes::getComponents()) {
                 if (state.data.contains(compDef.jsonKey)) {
                     compDef.creator(*this, state.id);
                     compDef.fromJson(*this, state.id, state.data.at(compDef.jsonKey));
+                    if (auto *inspectable = compDef.getInspectable(*this, state.id)) {
+                        std::string className = inspectable->getClassName();
+                        ApplicationEventContext::dispatch(className);
+                    }
                 }
             }
         }

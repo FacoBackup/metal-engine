@@ -6,6 +6,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "../../common/IService.h"
+#include "../../common/IEventMember.h"
+#include "../../common/IInit.h"
 
 constexpr float PI_OVER_2 = glm::pi<float>() / 2.0f;
 constexpr float PI_2 = glm::pi<float>() * 2.0f;
@@ -20,7 +22,7 @@ namespace Metal {
     struct RuntimeRepository;
     struct Camera;
 
-    class CameraService final : public IService, public ISync {
+    class CameraService final : public IService, public ISync, public IEventMember, public IInit {
         EngineContext *engineContext = nullptr;
         WorldRepository *worldRepository = nullptr;
         RuntimeRepository *runtimeRepository = nullptr;
@@ -29,6 +31,8 @@ namespace Metal {
         glm::vec3 xAxis{0.0f};
         glm::vec3 yAxis{0.0f};
         glm::vec3 zAxis{0.0f};
+
+        mutable bool dirty = true;
 
         void updateMatrices();
 
@@ -56,6 +60,8 @@ namespace Metal {
                 {"RuntimeRepository", &runtimeRepository}
             };
         }
+
+        void onInitialize() override;
 
         void onSync() override;
     };

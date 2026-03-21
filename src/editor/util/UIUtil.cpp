@@ -3,6 +3,25 @@
 namespace Metal::UIUtil {
     bool OPEN = true;
 
+    bool BeginPopupContext(const std::string &id) {
+        ImGui::SetNextWindowSizeConstraints(ImVec2(POPUP_MIN_WIDTH, 0), ImVec2(FLT_MAX, FLT_MAX));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, POPUP_ROUNDING);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, POPUP_PADDING_Y));
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8.0f, POPUP_PADDING_Y));
+
+        if (ImGui::BeginPopup(id.c_str())) {
+            return true;
+        }
+
+        ImGui::PopStyleVar(3);
+        return false;
+    }
+
+    void EndPopupContext() {
+        ImGui::EndPopup();
+        ImGui::PopStyleVar(3);
+    }
+
     bool RenderOption(const std::string &label, const bool selected, const float sizeX, const float sizeY,
                       const ImVec4 &accent) {
         int popStyle = 0;

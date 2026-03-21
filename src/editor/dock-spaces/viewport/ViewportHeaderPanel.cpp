@@ -35,7 +35,6 @@ namespace Metal {
                                  UIUtil::ONLY_ICON_BUTTON_SIZE,
                                  UIUtil::ONLY_ICON_BUTTON_SIZE)) {
             worldRepository->camera.position = {0, 0, 0};
-            worldRepository->camera.registerChange();
         }
         UIUtil::RenderTooltip("Center camera?");
 

@@ -8,7 +8,7 @@
 #include "../../../engine/EngineContext.h"
 #include "../../../engine/repository/EngineRepository.h"
 #include "../../../editor/enum/EngineResourceIDs.h"
-#include "../../../editor/service/EventService.h"
+#include "ApplicationEventContext.h"
 
 namespace Metal {
     void HWRayTracingPass::onInitialize() {

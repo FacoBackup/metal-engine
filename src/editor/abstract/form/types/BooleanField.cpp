@@ -4,7 +4,7 @@
 
 #include "../../../../common/Inspectable.h"
 #include "editor/service/HistoryService.h"
-#include "editor/service/EventService.h"
+#include "ApplicationEventContext.h"
 #include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
@@ -15,9 +15,8 @@ namespace Metal {
         if (!field.disabled) {
             bool oldValue = *field.field;
             if (ImGui::Checkbox(field.nameWithId.c_str(), field.field)) {
-                field.instance->registerChange();
                 historyService->recordChange(&field, oldValue);
-                EventService::dispatch(field.instance->getClassName(),
+                ApplicationEventContext::dispatch(field.instance->getClassName(),
                                        std::make_shared<FieldModificationPayload>(field));
             }
         } else {

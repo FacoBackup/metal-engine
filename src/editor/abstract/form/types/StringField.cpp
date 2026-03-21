@@ -3,7 +3,7 @@
 #include <imgui.h>
 #include "../../../../common/Inspectable.h"
 #include "editor/service/HistoryService.h"
-#include "editor/service/EventService.h"
+#include "ApplicationEventContext.h"
 #include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
@@ -18,7 +18,7 @@ namespace Metal {
             if (ImGui::InputText(field.id.c_str(), buffer, sizeof(buffer))) {
                 *field.field = buffer;
                 historyService->recordChange(&field, oldValue);
-                EventService::dispatch(field.instance->getClassName(), std::make_shared<FieldModificationPayload>(field));
+                ApplicationEventContext::dispatch(field.instance->getClassName(), std::make_shared<FieldModificationPayload>(field));
             }
         } else {
             ImGui::Text("%s: %s", field.name.c_str(), field.field->c_str());

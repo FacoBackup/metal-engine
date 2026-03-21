@@ -16,6 +16,14 @@ namespace Metal::UIUtil {
     extern bool OPEN;
     inline constexpr ImVec2 DEFAULT_PADDING(4, 4);
 
+    inline constexpr float POPUP_MIN_WIDTH = 200.0f;
+    inline constexpr float POPUP_ROUNDING = 8.0f;
+    inline constexpr float POPUP_PADDING_Y = 6.0f;
+
+    bool BeginPopupContext(const std::string &id);
+
+    void EndPopupContext();
+
     bool RenderOption(const std::string &label, const bool selected, const float sizeX, const float sizeY,
                       const ImVec4 &accent);
 

@@ -268,6 +268,8 @@ set(ENGINE_SOURCES
         engine/service/VolumeService.cpp
         engine/service/VolumeService.h
         common/IContextMember.h
+        common/IEventMember.h
+        common/IEventMember.cpp
         common/IService.h
         common/IRepository.h
         common/IContextMember.cpp
@@ -278,8 +280,8 @@ set(ENGINE_SOURCES
         core/FrameService.h
         common/Icons.cpp
         editor/service/HistoryService.cpp
-        editor/service/EventService.cpp
-        editor/service/EventService.h
+        ApplicationEventContext.cpp
+        ApplicationEventContext.h
         engine/dto/LightComponent.cpp
         engine/dto/LightComponent.h
         common/Util.h

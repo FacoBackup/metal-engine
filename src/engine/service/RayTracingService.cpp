@@ -24,12 +24,12 @@ namespace Metal {
     void RayTracingService::onInitialize() {
         eventListener([this](const Event &) {
             markDirty();
-        }, "TransformComponent", "Action", "Undo", "Redo");
+        }, "TransformComponent");
 
         eventListener([this](const Event &) {
             markDirty();
             updateMeshMaterials();
-        }, "PrimitiveComponent");
+        }, "PrimitiveComponent", "BVHNeedsUpdate");
     }
 
     VkDeviceAddress RayTracingService::getDeviceAddress(VkBuffer buffer) const {
@@ -94,6 +94,7 @@ namespace Metal {
         if (tlas != VK_NULL_HANDLE) {
             LOG_INFO("Updating acceleration structures");
             updateDescriptorSets(tlas);
+            ApplicationEventContext::dispatch("BVHUpdated");
             accelerationStructureBuilt = true;
         } else {
             LOG_WARN("TLAS build failed or resulted in NULL handle");

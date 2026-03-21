@@ -27,7 +27,6 @@ namespace Metal {
         glm::vec2 *size = nullptr;
         ImVec2 *position = nullptr;
         TransformComponent *localSelected = nullptr;
-        int localChangeId{};
         bool isGizmoOver = false;
 
         EditorRepository *editorRepository = nullptr;

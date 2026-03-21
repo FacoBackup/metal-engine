@@ -4,15 +4,17 @@
 
 #include "../../common/IService.h"
 #include "../../common/ISync.h"
+#include "../../common/IEventMember.h"
 #include "../dto/VolumeData.h"
 #include "common/IInit.h"
+#include "ApplicationEventContext.h"
 
 namespace Metal {
-    class EventService;
+    class ApplicationEventContext;
     struct WorldRepository;
     class EngineContext;
 
-    class VolumeService final : public IService, public IInit, public ISync {
+    class VolumeService final : public IService, public IEventMember, public IInit, public ISync {
         WorldRepository *worldRepository = nullptr;
         EngineContext *engineContext = nullptr;
         bool needsUpdate = true;

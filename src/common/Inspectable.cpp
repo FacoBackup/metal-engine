@@ -53,6 +53,15 @@ namespace Metal {
         return nullptr;
     }
 
+    std::shared_ptr<InspectableMember> Inspectable::getFieldByPath(const std::string &path) {
+        for (const auto &member: getFields()) {
+            if (member->path == path) {
+                return member;
+            }
+        }
+        return nullptr;
+    }
+
     std::vector<std::shared_ptr<InspectableMember> > &Inspectable::getFields() {
         if (!fieldsRegistered) {
             fieldsRegistered = true;
@@ -115,6 +124,10 @@ namespace Metal {
                                     std::string group, std::string name, bool disabled) {
         DECLARATION(glm::vec3, COLOR)
         fields.push_back(std::move(field));
+    }
+
+    std::string Inspectable::getClassName() const {
+        return getTypeName(typeid(*this).name(), false);
     }
 
     void Inspectable::registerBool(bool &v,

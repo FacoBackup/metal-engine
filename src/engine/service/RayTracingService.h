@@ -10,7 +10,8 @@
 #include "../../common/ISync.h"
 #include "../../common/IDisposable.h"
 #include "../../common/IInit.h"
-#include "../../editor/service/EventService.h"
+#include "../../common/IEventMember.h"
+#include "ApplicationEventContext.h"
 
 namespace Metal {
     class DescriptorSetService;
@@ -23,9 +24,10 @@ namespace Metal {
     class BufferService;
     class EngineContext;
 
-    class EventService;
+    class ApplicationEventContext;
 
-    class RayTracingService final : public IService, public ISync, public IDisposable, public IInit {
+    class RayTracingService final : public IService, public IEventMember, public ISync, public IDisposable,
+                                    public IInit {
         VulkanContext *vulkanContext = nullptr;
         PipelineService *pipelineService = nullptr;
         WorldRepository *worldRepository = nullptr;
@@ -73,6 +75,8 @@ namespace Metal {
 
         void updateMeshMaterials();
 
+        void markDirty() { needsRebuild = true; }
+
     public:
         RayTracingService() = default;
 
@@ -96,8 +100,6 @@ namespace Metal {
         void onInitialize() override;
 
         [[nodiscard]] bool isReady() const;
-
-        void markDirty() { needsRebuild = true; }
 
         [[nodiscard]] VkAccelerationStructureKHR getTLAS() const { return tlas; }
     };

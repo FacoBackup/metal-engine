@@ -9,7 +9,7 @@ namespace Metal {
     class VulkanContext;
     class EngineContext;
     struct EngineRepository;
-    class EventService;
+    class ApplicationEventContext;
 
     class HWRayTracingPass final : public AbstractComputePass {
         bool isFirstRun = true;

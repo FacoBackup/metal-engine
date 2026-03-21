@@ -79,18 +79,3 @@ TEST(InspectableTest, GetFieldByPointer) {
     EXPECT_EQ(inspectable.getFieldByPointer(&dummy), nullptr);
 }
 
-TEST(InspectableTest, ChangeId) {
-    TestInspectable inspectable;
-    unsigned long initialId = inspectable.getChangeId();
-    inspectable.registerChange();
-    EXPECT_EQ(inspectable.getChangeId(), initialId + 1);
-}
-
-TEST(InspectableTest, FreezeVersion) {
-    TestInspectable inspectable;
-    EXPECT_TRUE(inspectable.isNotFrozen());
-    inspectable.freezeVersion();
-    EXPECT_FALSE(inspectable.isNotFrozen());
-    inspectable.registerChange();
-    EXPECT_TRUE(inspectable.isNotFrozen());
-}

@@ -5,7 +5,7 @@ add_executable(metal_engine_tests
         WorldRepositoryTest.cpp
         DockServiceTest.cpp
         HistoryServiceTest.cpp
-        EventServiceTest.cpp
+        ApplicationEventContextTest.cpp
         InspectableTest.cpp
 )
 

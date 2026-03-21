@@ -232,7 +232,7 @@ namespace Metal {
         if (UIUtil::ButtonSimple(Icons::add + "##addTab" + id, buttonWidth, headerHeight)) {
             ImGui::OpenPopup((id + "NewTabDropdown").c_str());
         }
-        if (ImGui::BeginPopup((id + "NewTabDropdown").c_str())) {
+        if (UIUtil::BeginPopupContext(id + "NewTabDropdown")) {
             ImGui::Text("New Tab");
             ImGui::Separator();
             for (auto *option: DockSpace::OPTIONS_LIST) {
@@ -244,7 +244,7 @@ namespace Metal {
                     initializeView();
                 }
             }
-            ImGui::EndPopup();
+            UIUtil::EndPopupContext();
         }
 
         ImGui::EndGroup();

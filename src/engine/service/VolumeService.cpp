@@ -8,7 +8,7 @@
 #include "../dto/VolumeComponent.h"
 #include "../EngineContext.h"
 #include "common/LoggerUtil.h"
-#include "editor/service/EventService.h"
+#include "ApplicationEventContext.h"
 
 namespace Metal {
     void VolumeService::registerVolumes() {

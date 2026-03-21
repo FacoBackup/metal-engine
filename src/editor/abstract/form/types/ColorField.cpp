@@ -1,9 +1,9 @@
 #include "ColorField.h"
 #include <algorithm>
 #include <imgui.h>
-#include "../../../../common/Inspectable.h"
+#include "common/Inspectable.h"
 #include "editor/service/HistoryService.h"
-#include "editor/service/EventService.h"
+#include "ApplicationEventContext.h"
 #include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
@@ -22,9 +22,8 @@ namespace Metal {
                 field.field->x = values[0];
                 field.field->y = values[1];
                 field.field->z = values[2];
-                field.instance->registerChange();
                 historyService->recordChange(&field, oldValue);
-                EventService::dispatch(field.instance->getClassName(), std::make_shared<FieldModificationPayload>(field));
+                ApplicationEventContext::dispatch(field.instance->getClassName(), std::make_shared<FieldModificationPayload>(field));
             }
 
             if (ImGui::IsItemActivated()) {

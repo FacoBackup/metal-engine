@@ -27,16 +27,15 @@ namespace Metal {
         if (editorRepository->primitiveSelected == nullptr) {
             isGizmoOver = false;
             localSelected = nullptr;
-            localChangeId = 0;
             if (editorRepository->mainSelection != EMPTY_ENTITY) {
                 selectionService->updatePrimitiveSelected();
             }
             return;
         }
 
-        if (editorRepository->primitiveSelected != localSelected || localSelected->getChangeId() != localChangeId) {
+        if (editorRepository->primitiveSelected != localSelected) {
             localSelected = editorRepository->primitiveSelected;
-            gizmoStrategy->updateCache(localSelected, localChangeId);
+            gizmoStrategy->updateCache(localSelected);
         }
 
         gizmoStrategy->recomposeMatrix();
@@ -57,7 +56,7 @@ namespace Metal {
         gizmoStrategy->updateUsingState(ImGuizmo::IsUsing());
 
         if (ImGuizmo::IsUsing()) {
-            gizmoStrategy->decomposeMatrix(localSelected, localChangeId);
+            gizmoStrategy->decomposeMatrix(localSelected);
         }
 
         isGizmoOver = ImGuizmo::IsOver();
