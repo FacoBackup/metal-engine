@@ -105,13 +105,10 @@ namespace Metal::UIUtil {
         ImGui::Text(name.c_str());
         ImGui::PushID(id.c_str());
 
-        if (ImGui::BeginTable("##table", 2, ImGuiTableFlags_NoSavedSettings)) {
-            ImGui::TableNextColumn();
-            if (DragFloatWithLabel("x", &values[0], "X", ImVec4{0.8f, 0.1f, 0.15f, 1.0f}, speed)) changed = true;
-            ImGui::TableNextColumn();
-            if (DragFloatWithLabel("y", &values[1], "Y", ImVec4{0.2f, 0.7f, 0.2f, 1.0f}, speed)) changed = true;
-            ImGui::EndTable();
-        }
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+        if (DragFloatWithLabel("x", &values[0], "X", ImVec4{0.8f, 0.1f, 0.15f, 1.0f}, speed)) changed = true;
+        if (DragFloatWithLabel("y", &values[1], "Y", ImVec4{0.2f, 0.7f, 0.2f, 1.0f}, speed)) changed = true;
+        ImGui::PopStyleVar();
 
         ImGui::PopID();
         return changed;
@@ -122,15 +119,11 @@ namespace Metal::UIUtil {
         ImGui::Text(name.c_str());
         ImGui::PushID(id.c_str());
 
-        if (ImGui::BeginTable("##table", 3, ImGuiTableFlags_NoSavedSettings)) {
-            ImGui::TableNextColumn();
-            if (DragFloatWithLabel("x", &values[0], "X", ImVec4{0.8f, 0.1f, 0.15f, 1.0f}, speed)) changed = true;
-            ImGui::TableNextColumn();
-            if (DragFloatWithLabel("y", &values[1], "Y", ImVec4{0.2f, 0.7f, 0.2f, 1.0f}, speed)) changed = true;
-            ImGui::TableNextColumn();
-            if (DragFloatWithLabel("z", &values[2], "Z", ImVec4{0.1f, 0.25f, 0.8f, 1.0f}, speed)) changed = true;
-            ImGui::EndTable();
-        }
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+        if (DragFloatWithLabel("x", &values[0], "X", ImVec4{0.8f, 0.1f, 0.15f, 1.0f}, speed)) changed = true;
+        if (DragFloatWithLabel("y", &values[1], "Y", ImVec4{0.2f, 0.7f, 0.2f, 1.0f}, speed)) changed = true;
+        if (DragFloatWithLabel("z", &values[2], "Z", ImVec4{0.1f, 0.25f, 0.8f, 1.0f}, speed)) changed = true;
+        ImGui::PopStyleVar();
 
         ImGui::PopID();
         return changed;
@@ -141,17 +134,12 @@ namespace Metal::UIUtil {
         ImGui::Text(name.c_str());
         ImGui::PushID(id.c_str());
 
-        if (ImGui::BeginTable("##table", 4, ImGuiTableFlags_NoSavedSettings)) {
-            ImGui::TableNextColumn();
-            if (DragFloatWithLabel("x", &values[0], "X", ImVec4{0.8f, 0.1f, 0.15f, 1.0f}, speed)) changed = true;
-            ImGui::TableNextColumn();
-            if (DragFloatWithLabel("y", &values[1], "Y", ImVec4{0.2f, 0.7f, 0.2f, 1.0f}, speed)) changed = true;
-            ImGui::TableNextColumn();
-            if (DragFloatWithLabel("z", &values[2], "Z", ImVec4{0.1f, 0.25f, 0.8f, 1.0f}, speed)) changed = true;
-            ImGui::TableNextColumn();
-            if (DragFloatWithLabel("w", &values[3], "W", ImVec4{0.5f, 0.5f, 0.5f, 1.0f}, speed)) changed = true;
-            ImGui::EndTable();
-        }
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+        if (DragFloatWithLabel("x", &values[0], "X", ImVec4{0.8f, 0.1f, 0.15f, 1.0f}, speed)) changed = true;
+        if (DragFloatWithLabel("y", &values[1], "Y", ImVec4{0.2f, 0.7f, 0.2f, 1.0f}, speed)) changed = true;
+        if (DragFloatWithLabel("z", &values[2], "Z", ImVec4{0.1f, 0.25f, 0.8f, 1.0f}, speed)) changed = true;
+        if (DragFloatWithLabel("w", &values[3], "W", ImVec4{0.5f, 0.5f, 0.5f, 1.0f}, speed)) changed = true;
+        ImGui::PopStyleVar();
 
         ImGui::PopID();
         return changed;
