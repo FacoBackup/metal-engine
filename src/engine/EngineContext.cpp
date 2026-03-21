@@ -56,6 +56,7 @@ namespace Metal {
 
     void EngineContext::onSync() {
         updateCurrentTime();
+        updateGlobalData();
 
         transformService->onSync();
         streamingService->onSync();
@@ -67,7 +68,6 @@ namespace Metal {
         for (auto *frame: registeredFrames) {
             if (frame->getShouldRender()) {
                 currentFrame = frame;
-                updateGlobalData();
                 currentFrame->onSync();
 
                 frame->setShouldRender(false);

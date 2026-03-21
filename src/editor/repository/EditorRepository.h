@@ -20,7 +20,7 @@ namespace Metal {
         ImVec4 accent{};
         ImU32 accentU32 = 0;
 
-        glm::vec3 accentColor{0.26f, 0.59f, 0.98f};
+        glm::vec3 accentColor{0.2f, 0.054f, 0.49f};
         glm::vec3 selectionColor{1, 1, 0};
         int selectionOutlineThickness = 3;
         std::string projectName = "New project";

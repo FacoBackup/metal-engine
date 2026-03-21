@@ -45,6 +45,7 @@ namespace Metal {
             clearTexture(accumulatedFrame->vkImage);
             engineContext->resetPathTracerAccumulationCount();
             isFirstRun = false;
+            needsUpdate = false;
         }
 
         copyTexture(gBufferPositionIndex, previousPositionIndex);

@@ -6,15 +6,15 @@
 namespace Metal {
     void PrimitiveComponent::registerFields() {
         registerResourceSelection(meshId, "", "Mesh", MESH_EXTENSIONS);
-        registerColor(albedoColor, "Material", "Albedo color");
-        registerFloat(roughnessFactor, "Material", "Roughness factor", 0, 1);
-        registerFloat(metallicFactor, "Material", "Metallic factor", 0, 1);
-        registerFloat(transmissionFactor, "Material", "Transmission factor", 0, 1);
-        registerFloat(thicknessFactor, "Material", "Thickness factor", 0, 10);
-        registerFloat(ior, "Material", "IOR", 1, 3);
-        registerResourceSelection(albedo, "Material", "Albedo", TEXTURE_EXTENSIONS);
-        registerResourceSelection(roughness, "Material", "Roughness texture", TEXTURE_EXTENSIONS);
-        registerResourceSelection(metallic, "Material", "Metallic Texture", TEXTURE_EXTENSIONS);
+        registerColor(albedoColor, "", "Albedo color");
+        registerFloat(roughnessFactor, "", "Roughness factor", 0, 1);
+        registerFloat(metallicFactor, "", "Metallic factor", 0, 1);
+        registerFloat(transmissionFactor, "", "Transmission factor", 0, 1);
+        registerFloat(thicknessFactor, "", "Thickness factor", 0, 10);
+        registerFloat(ior, "", "IOR", 1, 3);
+        registerResourceSelection(albedo, "", "Albedo", TEXTURE_EXTENSIONS);
+        registerResourceSelection(roughness, "", "Roughness texture", TEXTURE_EXTENSIONS);
+        registerResourceSelection(metallic, "", "Metallic Texture", TEXTURE_EXTENSIONS);
     }
 
     ComponentType PrimitiveComponent::getType() {
