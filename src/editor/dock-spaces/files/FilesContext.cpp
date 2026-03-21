@@ -1,17 +1,23 @@
 #include "FilesContext.h"
-
 #include "../../dto/FSEntry.h"
+#include "../../service/FilesService.h"
 #include <memory>
 
 namespace Metal {
-    void FilesContext::setCurrentDirectory(FSEntry *entry) {
+    void FilesContext::setCurrentDirectory(std::shared_ptr<FSEntry> entry) {
         currentDirectory = entry;
 
-        auto *root = currentDirectory;
-        while (root->parent != nullptr) {
-            root = root->parent;
+        if (filesService == nullptr || filesService->getRoot() == nullptr) {
+            pathToCurrentDirectory = "";
+            return;
         }
-        pathToCurrentDirectory = currentDirectory->absolutePath.substr(
-            root->absolutePath.size(), currentDirectory->absolutePath.size());
+
+        auto rootPath = filesService->getRoot()->absolutePath;
+        if (currentDirectory->absolutePath.size() >= rootPath.size()) {
+            pathToCurrentDirectory = currentDirectory->absolutePath.substr(
+                rootPath.size(), currentDirectory->absolutePath.size());
+        } else {
+            pathToCurrentDirectory = "";
+        }
     }
 }

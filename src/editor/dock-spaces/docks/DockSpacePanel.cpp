@@ -80,8 +80,11 @@ namespace Metal {
             view->isWindowFocused = isHovered;
             if (view->isWindowFocused) {
                 for (const auto &shortcut: editorRepository->focusedShortcuts) {
-                    if (ImGui::IsKeyChordPressed(shortcut.keyChord)) {
-                        LOG_INFO("Action called: " + shortcut.name);
+                    const bool triggered = (shortcut.isDown && !ImGui::IsKeyChordPressed(ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiMod_Alt | ImGuiMod_Super))
+                                               ? ImGui::IsKeyDown((ImGuiKey)shortcut.keyChord)
+                                               : ImGui::IsKeyChordPressed(shortcut.keyChord);
+
+                    if (triggered) {
                         shortcut.callback();
                     }
                 }

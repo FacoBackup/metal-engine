@@ -53,7 +53,7 @@ namespace Metal {
             };
         }
 
-        [[nodiscard]] TextureData *loadTextureData(const std::string &id) const;
+        [[nodiscard]] TextureData *loadTextureData(const std::string &pathToFile) const;
 
         TextureInstance *stream(const std::string &id);
 
@@ -61,7 +61,7 @@ namespace Metal {
                                      bool generateMipMaps = false,
                                      VkFormat imageFormat = VK_FORMAT_R8G8B8A8_SRGB);
 
-        TextureInstance *create(const std::string &id);
+        TextureInstance *create(const std::string &pathToFile);
 
         TextureInstance *createForCompute(const std::string &id, unsigned int width, unsigned int height, VkFormat format = VK_FORMAT_R16G16B16A16_SFLOAT);
 

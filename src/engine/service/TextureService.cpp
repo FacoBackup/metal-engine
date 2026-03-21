@@ -134,8 +134,7 @@ namespace Metal {
         createImageWithInfo(imageInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image);
     }
 
-    TextureData *TextureService::loadTextureData(const std::string &id) const {
-        auto pathToFile = directoryService->getAssetDirectory() + FORMAT_FILE_TEXTURE(id);
+    TextureData *TextureService::loadTextureData(const std::string &pathToFile) const {
         if (std::filesystem::exists(pathToFile)) {
             int width, height, channels;
             unsigned char *data = stbi_load(pathToFile.c_str(), &width, &height, &channels, 0);
@@ -323,12 +322,11 @@ namespace Metal {
         vulkanContext->endSingleTimeCommands(commandBuffer);
     }
 
-    TextureInstance *TextureService::create(const std::string &id) {
-        auto pathToFile = directoryService->getAssetDirectory() + FORMAT_FILE_TEXTURE(id);
+    TextureInstance *TextureService::create(const std::string &pathToFile) {
         if (std::filesystem::exists(pathToFile)) {
-            auto *instance = loadTexture(id, pathToFile, true, VK_FORMAT_R8G8B8A8_UNORM);
+            auto *instance = loadTexture(pathToFile, pathToFile, true, VK_FORMAT_R8G8B8A8_UNORM);
             if (instance != nullptr) {
-                getTextureIndex(id);
+                getTextureIndex(pathToFile);
             }
             return instance;
         }

@@ -68,4 +68,10 @@ namespace Metal {
         };
         return outStr;
     }
+
+    bool FileImporterService::isCompatible(const std::string &file) const {
+        return sceneImporterService->isCompatible(file) ||
+               textureImporterService->isCompatible(file) ||
+               voxelImporterService->isCompatible(file);
+    }
 }

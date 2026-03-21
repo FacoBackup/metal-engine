@@ -1,4 +1,6 @@
 #include "UIUtil.h"
+#include "../../common/Icons.h"
+#include "../../common/FileExtensions.h"
 
 namespace Metal::UIUtil {
     bool OPEN = true;
@@ -175,22 +177,6 @@ namespace Metal::UIUtil {
         return result;
     }
 
-    std::string GetEntryIcon(const EntryType::EntryType type) {
-        switch (type) {
-            case EntryType::MESH:
-                return Icons::view_in_ar;
-            case EntryType::TEXTURE:
-                return Icons::texture;
-            case EntryType::VOLUME:
-                return Icons::cloud;
-            case EntryType::DIRECTORY:
-                return Icons::folder;
-            case EntryType::SCENE:
-                return Icons::inventory_2;
-            default: return "";
-        }
-    }
-
     std::string GetDockSpaceIcon(const int index) {
         switch (index) {
             case -1: return Icons::i_public; // VIEWPORT
@@ -202,5 +188,58 @@ namespace Metal::UIUtil {
             case 5: return Icons::search; // REPOSITORIES
             default: return "";
         }
+    }
+
+    std::string GetExtensionIcon(const std::string &extension) {
+        if (extension == EXT_SCENE) return Icons::image;
+        if (extension == EXT_MESH) return Icons::view_in_ar;
+        if (extension == EXT_PNG || extension == EXT_JPG || extension == EXT_JPEG || extension == EXT_TGA) return Icons::texture;
+        if (extension == EXT_SVO || extension == EXT_VDB) return Icons::view_agenda;
+        if (extension == EXT_OBJ || extension == EXT_FBX || extension == EXT_GLTF || extension == EXT_GLB) return Icons::image;
+        return Icons::close;
+    }
+
+    std::string GetExtensionLabel(const std::string &extension) {
+        if (extension == EXT_SCENE) return "Scene";
+        if (extension == EXT_MESH) return "Mesh";
+        if (extension == EXT_PNG || extension == EXT_JPG || extension == EXT_JPEG || extension == EXT_TGA) return "Texture";
+        if (extension == EXT_SVO) return "Volume";
+        if (extension == EXT_VDB) return "OpenVDB";
+        if (extension == EXT_OBJ || extension == EXT_FBX || extension == EXT_GLTF || extension == EXT_GLB) return "Scene Source";
+        return "File";
+    }
+
+    bool Accordion(const std::string &id, const std::string &label, bool &open, const ImVec4 &background) {
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 3.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, open ? ImVec2(4.0f, 4.0f) : ImVec2(0, 0));
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, background);
+        if (ImGui::BeginChild(id.c_str(), ImVec2(0, 0),
+                              ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding)) {
+            ImGui::PushStyleColor(ImGuiCol_Button, background);
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
+
+            const std::string icon = open ? Icons::keyboard_arrow_down : Icons::keyboard_arrow_right;
+            if (ImGui::Button((icon + " " + label + "##" + id).c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
+                open = !open;
+            }
+
+            ImGui::PopStyleVar(3);
+            ImGui::PopStyleColor();
+
+            if (open) {
+                return true;
+            }
+        }
+
+        EndAccordion();
+        return false;
+    }
+
+    void EndAccordion() {
+        ImGui::EndChild();
+        ImGui::PopStyleColor();
+        ImGui::PopStyleVar(2);
     }
 }

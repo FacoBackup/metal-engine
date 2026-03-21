@@ -3,24 +3,32 @@
 
 #include <string>
 #include <unordered_map>
-#include "../../enum/EntryType.h"
+#include <memory>
 
 
 namespace Metal {
+    class FilesService;
     struct FSEntry;
 
-    struct FilesContext final {
-        FSEntry *currentDirectory = nullptr;
-        std::unordered_map<std::string, FSEntry *> selected{};
-        std::unordered_map<std::string, FSEntry *> toCut{};
-        std::string pathToCurrentDirectory;
-        EntryType::EntryType filterType = EntryType::NONE;
+    enum class FilesViewMode {
+        LIST,
+        CARD
+    };
 
-        explicit FilesContext(FSEntry *currentDirectory)
-            : currentDirectory(currentDirectory) {
+    struct FilesContext final {
+        FilesService *filesService = nullptr;
+        std::shared_ptr<FSEntry> currentDirectory = nullptr;
+        std::unordered_map<std::string, std::shared_ptr<FSEntry>> selected{};
+        std::unordered_map<std::string, std::shared_ptr<FSEntry>> toCut{};
+        std::string pathToCurrentDirectory;
+        char searchQuery[256] = "";
+        FilesViewMode viewMode = FilesViewMode::LIST;
+
+        explicit FilesContext(FilesService *filesService, std::shared_ptr<FSEntry> currentDirectory)
+            : filesService(filesService), currentDirectory(currentDirectory) {
         }
 
-        void setCurrentDirectory(FSEntry *entry);
+        void setCurrentDirectory(std::shared_ptr<FSEntry> entry);
     };
 }
 #endif //FILESCONTEXT_H

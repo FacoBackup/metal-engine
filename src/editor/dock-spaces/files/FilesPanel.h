@@ -5,6 +5,9 @@
 #include <map>
 
 #include "FilesContext.h"
+#include "ListDirectoryPanel.h"
+#include "CardDirectoryPanel.h"
+#include "NavigationPanel.h"
 #include "../docks/AbstractDockPanel.h"
 #include "../../dto/ImportSettingsDTO.h"
 
@@ -19,15 +22,17 @@ namespace Metal {
     class NotificationService;
     struct WorldRepository;
     class VoxelService;
-    class FilesListPanel;
+    class ListDirectoryPanel;
+    class CardDirectoryPanel;
+    class NavigationPanel;
 
     class FilesPanel : public AbstractDockPanel {
     protected:
-        FilesContext filesContext{nullptr};
-        std::shared_ptr<FilePreviewPanel> previewPanel = nullptr;
+        FilesContext filesContext{nullptr, nullptr};
         std::shared_ptr<AbstractPanel> filesHeader = nullptr;
-        std::shared_ptr<FilesListPanel> filesListPanel = nullptr;
-        float previewWidth = 200.0f;
+        std::shared_ptr<ListDirectoryPanel> listDirectoryPanel = nullptr;
+        std::shared_ptr<CardDirectoryPanel> cardDirectoryPanel = nullptr;
+        std::shared_ptr<NavigationPanel> navigationPanel = nullptr;
 
         FileImporterService *fileImporterService = nullptr;
         EditorRepository *editorRepository = nullptr;
@@ -51,16 +56,16 @@ namespace Metal {
         }
 
         virtual bool renderPreview() {
-            return true;
+            return false;
         }
-
-        virtual std::string getActionLabel();
-
-        virtual std::function<void()> onAction();
 
         void onInitialize() override;
 
         void onSync() override;
+
+        virtual std::vector<std::string> getTypeFilter() {
+            return {};
+        }
 
         static void SetIconPos(const char *text);
 
@@ -74,11 +79,7 @@ namespace Metal {
 
         void deleteSelected() const;
 
-        virtual EntryType::EntryType getTypeFilter() {
-            return EntryType::NONE;
-        }
-
-        virtual void openResource(FSEntry *root);
+        virtual void openResource(std::shared_ptr<FSEntry> root);
 
         virtual bool renderHeader() { return true; }
     };

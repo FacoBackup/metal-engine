@@ -61,6 +61,7 @@ namespace Metal {
         ImGuiStyle &style = ImGui::GetStyle();
         auto &colors = style.Colors;
 
+        style.ButtonTextAlign = ImVec2(0.5f, 0.5f);
         if (!editorRepository->isDarkMode) {
             ImGui::StyleColorsLight();
             setLightMode();
@@ -77,6 +78,7 @@ namespace Metal {
         colors[ImGuiCol_PopupBg] = palette1;
         colors[ImGuiCol_Border] = ImVec4(0, 0, 0, 0);
         colors[ImGuiCol_BorderShadow] = ImVec4(0.f, 0.f, 0.f, 0.f);
+
         colors[ImGuiCol_FrameBg] = palette2;
         colors[ImGuiCol_TitleBg] = palette1;
         colors[ImGuiCol_TitleBgActive] = palette1;

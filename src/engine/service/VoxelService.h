@@ -6,9 +6,17 @@
 
 namespace Metal {
     struct SVOInstance;
+    class BufferService;
 
     class VoxelService final : public AbstractResourceService<SVOInstance> {
+        BufferService *bufferService = nullptr;
     public:
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"BufferService", &bufferService}
+            };
+        }
+
         SVOInstance *create(const std::string &id);
 
         SVOInstance *stream(const std::string &id);

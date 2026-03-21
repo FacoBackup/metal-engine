@@ -23,6 +23,11 @@ find_package(meshoptimizer CONFIG REQUIRED)
 find_package(cereal CONFIG REQUIRED)
 find_package(OpenVDB CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
+find_package(Lua REQUIRED)
+find_package(sol2 CONFIG REQUIRED)
+message(STATUS "Lua Libraries: ${LUA_LIBRARIES}")
+message(STATUS "Lua Include Dir: ${LUA_INCLUDE_DIR}")
+include_directories(${LUA_INCLUDE_DIR})
 
 set(COMMON_LIBRARIES
         SDL3::SDL3
@@ -39,6 +44,8 @@ set(COMMON_LIBRARIES
         imguizmo::imguizmo
         nlohmann_json::nlohmann_json
         EnTT::EnTT
+        ${LUA_LIBRARIES}
+        sol2
 
         glslang::glslang
         glslang::glslang-default-resource-limits

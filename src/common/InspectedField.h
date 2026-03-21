@@ -4,7 +4,6 @@
 #include <optional>
 
 #include "InspectableMember.h"
-#include "../editor/enum/EntryType.h"
 
 namespace Metal {
     template<typename T>
@@ -18,7 +17,7 @@ namespace Metal {
         std::optional<float> minF;
         std::optional<float> incrementF;
         bool disabled = false;
-        EntryType::EntryType resourceType = EntryType::NONE;
+        std::vector<std::string> supportedFileTypes{};
 
         explicit InspectedField(T *field) : field(field), previousValue(*field) {
         }

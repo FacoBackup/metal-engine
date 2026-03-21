@@ -9,7 +9,6 @@
 #include "InspectedField.h"
 #include "InspectedMethod.h"
 #include "../editor/util/Util.h"
-#include "../editor/enum/EntryType.h"
 
 #define  DECLARATION(T, V) \
         std::shared_ptr<InspectedField<T>> field = std::make_shared<InspectedField<T>>(&v);\
@@ -137,13 +136,11 @@ namespace Metal {
     }
 
     void Inspectable::registerResourceSelection(std::string &v, std::string group, std::string name,
-                                                EntryType::EntryType type,
+                                                const std::vector<std::string> &supportedFileTypes,
                                                 bool disabled) {
-        if (type == EntryType::DIRECTORY) {
-            throw std::runtime_error("Cannot register directories on this object");
-        }
+
         DECLARATION(std::string, RESOURCE)
-        field->resourceType = type;
+        field->supportedFileTypes = supportedFileTypes;
         fields.push_back(std::move(field));
     }
 }

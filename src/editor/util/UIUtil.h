@@ -3,9 +3,6 @@
 
 #include "imgui.h"
 #include <string>
-#include "../enum/EntryType.h"
-
-#include "../../common/Icons.h"
 
 namespace Metal::UIUtil {
     inline constexpr ImVec4 DIRECTORY_COLOR{188 / 255.f, 128 / 255.f, 78 / 255.f, 1};
@@ -53,8 +50,14 @@ namespace Metal::UIUtil {
 
     std::string GetKeyChordName(ImGuiKeyChord keyChord);
 
-    std::string GetEntryIcon(const EntryType::EntryType type);
+    std::string GetDockSpaceIcon(int index);
 
-    std::string GetDockSpaceIcon(const int index);
+    std::string GetExtensionIcon(const std::string &extension);
+
+    std::string GetExtensionLabel(const std::string &extension);
+    
+    bool Accordion(const std::string &id, const std::string &label, bool &open, const ImVec4 &background);
+    
+    void EndAccordion();
 }
 #endif

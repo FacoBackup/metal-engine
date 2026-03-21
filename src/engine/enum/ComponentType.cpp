@@ -1,5 +1,6 @@
 #include "ComponentType.h"
 
+#include "../../common/Icons.h"
 #include "../EngineContext.h"
 #include "../repository/WorldRepository.h"
 #include "../service/RayTracingService.h"

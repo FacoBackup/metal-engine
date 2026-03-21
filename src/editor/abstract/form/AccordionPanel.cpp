@@ -2,6 +2,7 @@
 #include "imgui.h"
 #include "../../../ApplicationContext.h"
 #include "../../service/ThemeService.h"
+#include "../../util/UIUtil.h"
 
 namespace Metal {
     void AccordionPanel::setTitle(const std::string &t) {
@@ -15,17 +16,12 @@ namespace Metal {
             return;
         }
 
-        ImGui::PushStyleColor(ImGuiCol_Header, themeService->neutralPalette);
-        bool open = ImGui::CollapsingHeader(fixedId.c_str(), ImGuiTreeNodeFlags_None);
-        ImGui::PopStyleColor();
-
-        if (open) {
-            ImGui::Spacing();
+        ImVec4 color = backgroundColor.w == 0 ? themeService->palette3 : backgroundColor;
+        if (UIUtil::Accordion(fixedId, title, isOpen, color)) {
             ImGui::Indent(15.0f);
             onSyncChildren();
             ImGui::Unindent(15.0f);
-            ImGui::Spacing();
-            ImGui::Separator();
+            UIUtil::EndAccordion();
         }
     }
 

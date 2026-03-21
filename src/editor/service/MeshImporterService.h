@@ -31,7 +31,6 @@ namespace Metal {
                               std::unordered_map<unsigned int, MeshId> &meshMap,
                               const std::stop_token &stopToken = {}) const;
 
-    private:
         [[nodiscard]] std::string persistMesh(const std::string &targetDir, const MeshData &mesh) const;
     };
 }

@@ -31,6 +31,7 @@
 #include "engine/service/DescriptorSetService.h"
 #include "engine/service/FrameBufferService.h"
 #include "engine/service/LightService.h"
+#include "engine/service/LuaService.h"
 #include "engine/service/MaterialService.h"
 #include "engine/service/MeshService.h"
 #include "engine/service/PipelineService.h"
@@ -84,6 +85,7 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::TransformService>());
     context->registerSingleton(std::make_shared<Metal::PickingService>());
     context->registerSingleton(std::make_shared<Metal::VolumeService>());
+    context->registerSingleton(std::make_shared<Metal::LuaService>());
     context->registerSingleton(std::make_shared<Metal::VoxelImporterService>());
     context->registerSingleton(std::make_shared<Metal::LightService>());
     context->registerSingleton(std::make_shared<Metal::StreamingService>());

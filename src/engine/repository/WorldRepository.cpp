@@ -130,14 +130,13 @@ namespace Metal {
         ApplicationEventContext::dispatch("BVHNeedsUpdate");
     }
 
-    void WorldRepository::loadScene(const std::string &sceneId) {
+    void WorldRepository::loadScene(const std::string &scenePath) {
         if (historyService) {
-            historyService->startTransaction("Load Scene " + sceneId);
+            historyService->startTransaction("Load Scene " + scenePath);
         }
 
         SceneData sceneData;
-        const auto pathToFile = directoryService->getAssetDirectory() + FORMAT_FILE_SCENE(sceneId);
-        PARSE_TEMPLATE(sceneData, pathToFile)
+        PARSE_TEMPLATE(sceneData, scenePath)
 
         for (auto &entityData: sceneData.entities) {
             const auto entityId = createEntity();

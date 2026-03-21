@@ -6,6 +6,7 @@
 #include "../../../common/FieldType.h"
 #include "../../../common/Inspectable.h"
 #include "../../service/HistoryService.h"
+#include "../../service/ThemeService.h"
 #include "types/IntField.h"
 #include "types/FloatField.h"
 #include "types/BooleanField.h"
@@ -25,10 +26,12 @@ namespace Metal {
         auto rootPanel = initializePanel<AccordionPanel>();
         rootPanel->setFilter(&searchFilter);
         rootPanel->setTitle(std::string(inspection->getIcon()) + " " + inspection->getTitle());
+        rootPanel->setBackgroundColor(themeService->palette3);
         for (const auto &field: inspection->getFields()) {
             if (!groups.contains(field->group)) {
                 auto panel = rootPanel->initializePanel<AccordionPanel>();
                 panel->setFilter(&searchFilter);
+                panel->setBackgroundColor(themeService->palette4);
                 groups[field->group] = panel;
             }
             std::shared_ptr<AccordionPanel> group = groups[field->group];

@@ -66,10 +66,17 @@ set(ENGINE_SOURCES
         editor/enum/engine-definitions.h
         editor/dock-spaces/files/FilesPanel.cpp
         editor/dock-spaces/files/FilesPanel.h
-        editor/dock-spaces/files/FilesListPanel.cpp
-        editor/dock-spaces/files/FilesListPanel.h
-        editor/dock-spaces/files/FilePreviewPanel.cpp
-        editor/dock-spaces/files/FilePreviewPanel.h
+        editor/dock-spaces/files/ListDirectoryPanel.cpp
+        editor/dock-spaces/files/ListDirectoryPanel.h
+        editor/dock-spaces/files/CardDirectoryPanel.cpp
+        editor/dock-spaces/files/CardDirectoryPanel.h
+        editor/dock-spaces/files/AbstractDirectoryPanel.h
+        editor/dock-spaces/files/NavigationPanel.cpp
+        editor/dock-spaces/files/NavigationPanel.h
+        editor/dock-spaces/files/BookmarksPanel.cpp
+        editor/dock-spaces/files/BookmarksPanel.h
+        editor/dock-spaces/files/SystemDirPanel.cpp
+        editor/dock-spaces/files/SystemDirPanel.h
         editor/dock-spaces/console/ConsolePanel.cpp
         editor/dock-spaces/console/ConsolePanel.h
         editor/dock-spaces/metrics/MetricsPanel.cpp
@@ -107,8 +114,9 @@ set(ENGINE_SOURCES
         engine/dto/MeshData.h
         engine/resource/MeshInstance.h
         common/FilesUtil.h
+        common/FileExtensions.h
+        common/FilesUtil.cpp
         editor/dto/FSEntry.h
-        editor/enum/EntryType.h
         editor/dock-spaces/files/FilesContext.h
         common/FileDialogUtil.h
         editor/dock-spaces/files/FilesHeaderPanel.cpp
@@ -122,7 +130,6 @@ set(ENGINE_SOURCES
         common/AbstractImporter.h
         editor/service/TextureImporterService.cpp
         editor/service/TextureImporterService.h
-        editor/dto/EntryMetadata.h
         engine/dto/TextureData.h
         engine/service/TextureService.cpp
         engine/service/TextureService.h
@@ -241,8 +248,6 @@ set(ENGINE_SOURCES
         editor/dto/SceneImportSettingsDTO.h
         editor/panel/NotificationsPanel.cpp
         editor/panel/NotificationsPanel.h
-        editor/panel/FileImportModalPanel.cpp
-        editor/panel/FileImportModalPanel.h
         engine/frame-builder/EngineFrameBuilder.cpp
         engine/frame-builder/EngineFrameBuilder.h
         engine/frame-builder/EngineFrame.cpp
@@ -267,6 +272,8 @@ set(ENGINE_SOURCES
         editor/dock-spaces/repositories/RepositoriesPanel.h
         engine/service/VolumeService.cpp
         engine/service/VolumeService.h
+        engine/service/LuaService.cpp
+        engine/service/LuaService.h
         common/IContextMember.h
         common/IEventMember.h
         common/IEventMember.cpp

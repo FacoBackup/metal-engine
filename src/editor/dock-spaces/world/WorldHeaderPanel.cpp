@@ -3,6 +3,7 @@
 #include "../../util/UIUtil.h"
 #include "../../../engine/enum/ComponentType.h"
 #include "../../../engine/repository/WorldRepository.h"
+#include "common/Icons.h"
 
 namespace Metal {
     void WorldHeaderPanel::onSync() {

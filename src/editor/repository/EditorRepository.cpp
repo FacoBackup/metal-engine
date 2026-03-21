@@ -45,6 +45,7 @@ namespace Metal {
             j["copied"].push_back(entt::to_integral(entity));
         }
         j["shadingMode"] = shadingMode;
+        j["bookmarks"] = bookmarks;
         return j;
     }
 
@@ -86,6 +87,9 @@ namespace Metal {
                 }
             }
             shadingMode = static_cast<ShadingMode>(j.at("shadingMode").get<int>());
+            if (j.contains("bookmarks") && j.at("bookmarks").is_array()) {
+                bookmarks = j.at("bookmarks").get<std::vector<std::string>>();
+            }
     }
 
     void EditorRepository::registerFields() {

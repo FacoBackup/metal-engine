@@ -1,10 +1,9 @@
 #include "FilesService.h"
 #include "NotificationService.h"
 #include "../dto/FSEntry.h"
-#include "../enum/EntryType.h"
-#include "../enum/engine-definitions.h"
 #include "../../common/FilesUtil.h"
 #include "../../common/LoggerUtil.h"
+#include <algorithm>
 #include <chrono>
 #include <filesystem>
 #include <format>
@@ -15,39 +14,30 @@
 
 namespace fs = std::filesystem;
 
-#define DELETE_F(F, rootDir)\
-std::filesystem::remove_all(entry.second->absolutePath);\
-std::filesystem::remove_all(rootDir + "/assets/" + F(entry.second->getId()));
-
-#define DELETE_S(F, rootDir)\
-std::filesystem::remove_all(entry.second->absolutePath);\
-std::filesystem::remove_all(rootDir + "/assets/" + F(entry.second->getId()));
-
-#define DATA \
-        std::filesystem::file_time_type ftime = last_write_time(entry);
-
 namespace Metal {
     void FilesService::onInitialize() {
-        root = new FSEntry(nullptr, directoryService->getAssetRefDirectory(), "");
-        root->type = EntryType::DIRECTORY;
-        root->name = "Files";
+        root = std::make_shared<FSEntry>(directoryService->getRootDirectory(), "");
+        root->isDirectory = true;
+        root->name = "Project";
         GetEntries(root);
     }
 
-    std::unique_ptr<FSEntry> FilesService::getResource(const std::string &id) {
+    std::shared_ptr<FSEntry> FilesService::getResource(const std::string &id) {
         try {
             for (const auto &entry: fs::recursive_directory_iterator(root->absolutePath)) {
                 if (entry.is_regular_file() &&
-                    entry.path().filename().string() == id + FILE_METADATA) {
-                    DATA
+                    absolute(entry.path()).string() == id) {
+                    auto ftime = last_write_time(entry);
                     auto sys_tp = std::chrono::file_clock::to_utc(ftime);
                     std::string dateStr = std::format("{:%Y-%m-%d %H:%M}", sys_tp);
-                    auto child = std::make_unique<FSEntry>(
-                        root,
+                    auto child = std::make_shared<FSEntry>(
                         absolute(entry.path()).string(),
                         dateStr);
-                    PARSE_TEMPLATE(*child, child->absolutePath.c_str())
+
+                    child->name = entry.path().filename().string();
+                    child->size = fs::file_size(entry.path());
                     child->formattedSize = FilesUtil::FormatSize(child->size);
+                    child->extension = entry.path().extension().string();
                     return child;
                 }
             }
@@ -57,44 +47,16 @@ namespace Metal {
         return nullptr;
     }
 
-    void FilesService::deleteFiles(const std::unordered_map<std::string, FSEntry *> &selected) {
+    void FilesService::deleteFiles(const std::unordered_map<std::string, std::shared_ptr<FSEntry>> &selected) {
         for (auto &entry: selected) {
-            switch (entry.second->type) {
-                case EntryType::DIRECTORY: {
-                    GetEntries(entry.second);
-                    std::unordered_map<std::string, FSEntry *> files;
-                    for (auto *f: entry.second->children) {
-                        files.insert({f->getId(), f});
-                    }
-                    deleteFiles(files);
-                    std::filesystem::remove_all(entry.second->absolutePath);
-                    break;
-                }
-                case EntryType::MESH: {
-                    DELETE_F(FORMAT_FILE_MESH, directoryService->getRootDirectory())
-                    break;
-                }
-                case EntryType::TEXTURE: {
-                    DELETE_F(FORMAT_FILE_TEXTURE, directoryService->getRootDirectory())
-                    break;
-                }
-                case EntryType::SCENE: {
-                    DELETE_S(FORMAT_FILE_SCENE, directoryService->getRootDirectory())
-                    break;
-                }
-                case EntryType::VOLUME: {
-                    DELETE_S(FORMAT_FILE_VOLUME, directoryService->getRootDirectory())
-                    break;
-                }
-                default: break;;
-            }
+            std::filesystem::remove_all(entry.second->absolutePath);
         }
     }
 
-    void FilesService::CreateDirectory(FSEntry *currentDirectory) {
+    void FilesService::CreateDirectory(std::shared_ptr<FSEntry> currentDirectory) {
         int count = 0;
-        for (FSEntry *child: currentDirectory->children) {
-            if (child->type == EntryType::DIRECTORY && child->name == "New Directory (" + std::to_string(count) + ")") {
+        for (const auto &child: currentDirectory->children) {
+            if (child->isDirectory && child->name == "New Directory (" + std::to_string(count) + ")") {
                 count++;
             }
         }
@@ -105,8 +67,8 @@ namespace Metal {
         std::filesystem::create_directory(pathToDir);
     }
 
-    void FilesService::Move(FSEntry *toMove, FSEntry *targetDir) {
-        if (!targetDir || targetDir->type != EntryType::DIRECTORY) {
+    void FilesService::Move(std::shared_ptr<FSEntry> toMove, std::shared_ptr<FSEntry> targetDir) {
+        if (!targetDir || !targetDir->isDirectory) {
             return;
         }
 
@@ -123,45 +85,54 @@ namespace Metal {
 
         toMove->absolutePath = targetPath.string();
 
-        if (toMove->parent) {
-            auto &oldChildren = toMove->parent->children;
-            oldChildren.erase(std::remove(oldChildren.begin(), oldChildren.end(), toMove),
-                              oldChildren.end());
-        }
-
-        toMove->parent = targetDir;
         targetDir->children.push_back(toMove);
     }
 
-    void FilesService::GetEntries(FSEntry *root) {
-        if (root->type != EntryType::DIRECTORY) {
+    void FilesService::GetEntries(std::shared_ptr<FSEntry> root) {
+        if (!root->isDirectory) {
             return;
         }
         root->children.clear();
         for (const auto &entry: fs::directory_iterator(root->absolutePath)) {
-            if (!entry.is_directory()) {
-                std::string extension = entry.path().extension().string();
-                if (extension.find(FILE_METADATA) != std::string::npos) {
-                    DATA
-                    auto sys_tp = std::chrono::file_clock::to_utc(ftime);
-                    std::string dateStr = std::format("{:%Y-%m-%d %H:%M}", sys_tp);
-                    auto &child = root->children.emplace_back(new FSEntry(
-                        root,
-                        fs::absolute(entry.path()).string(),
-                        dateStr));
-                    PARSE_TEMPLATE(*child, child->absolutePath.c_str())
-                    child->formattedSize = FilesUtil::FormatSize(child->size);
-                }
-            } else {
-                auto &child = root->children.emplace_back(new FSEntry(
-                    root,
-                    fs::absolute(entry.path()).string(),
-                    ""));
+            auto ftime = last_write_time(entry);
+            auto sys_tp = std::chrono::file_clock::to_utc(ftime);
+            std::string dateStr = std::format("{:%Y-%m-%d %H:%M}", sys_tp);
+            auto child = std::make_shared<FSEntry>(
+                fs::absolute(entry.path()).string(),
+                dateStr);
 
-                child->name = entry.path().filename().string();
-                child->type = EntryType::DIRECTORY;
+            child->name = entry.path().filename().string();
+
+            if (entry.is_directory()) {
+                child->isDirectory = true;
+            } else {
+                child->size = fs::file_size(entry.path());
+                child->formattedSize = FilesUtil::FormatSize(child->size);
+                child->extension = entry.path().extension().string();
             }
+            root->children.push_back(std::move(child));
         }
+    }
+
+    std::shared_ptr<FSEntry> FilesService::GetEntry(const std::string &path) {
+        if (!fs::exists(path)) {
+            return nullptr;
+        }
+
+        auto ftime = last_write_time(fs::path(path));
+        auto sys_tp = std::chrono::file_clock::to_utc(ftime);
+        std::string dateStr = std::format("{:%Y-%m-%d %H:%M}", sys_tp);
+
+        auto entry = std::make_shared<FSEntry>(fs::absolute(path).string(), dateStr);
+        entry->name = fs::path(path).filename().string();
+        if (fs::is_directory(path)) {
+            entry->isDirectory = true;
+        } else {
+            entry->size = fs::file_size(path);
+            entry->formattedSize = FilesUtil::FormatSize(entry->size);
+            entry->extension = fs::path(path).extension().string();
+        }
+        return entry;
     }
 
 } // Metal

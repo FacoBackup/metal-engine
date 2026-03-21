@@ -37,11 +37,11 @@ namespace Metal {
 
         void onInitialize() override;
 
-        MeshInstance *create(const std::string &id);
+        MeshInstance *create(const std::string &meshPath);
 
         MeshInstance *stream(const std::string &id);
 
-        MeshData *loadMeshData(const std::string &id) const;
+        MeshData *loadMeshData(const std::string &meshPath) const;
 
         void disposeResource(MeshInstance *resource) override;
     };

@@ -3,7 +3,6 @@
 #include "../../common/LoggerUtil.h"
 #include "../../engine/dto/MeshData.h"
 #include "../../engine/dto/VertexData.h"
-#include "../dto/EntryMetadata.h"
 #include "../enum/engine-definitions.h"
 #include "../../common/FilesUtil.h"
 #include <cereal/archives/binary.hpp>
@@ -11,23 +10,20 @@
 
 namespace Metal {
     std::string MeshImporterService::persistMesh(const std::string &targetDir, const MeshData &mesh) const {
-        auto metadata = EntryMetadata{};
-        metadata.type = EntryType::MESH;
-        metadata.name = mesh.name;
-        if (metadata.name.find_last_of('.') != std::string::npos) {
-            metadata.name = metadata.name.substr(0, metadata.name.find_last_of('.'));
+        std::string meshName = mesh.name;
+        if (meshName.empty()) meshName = "mesh";
+        if (meshName.find_last_of('.') != std::string::npos) {
+            meshName = meshName.substr(0, meshName.find_last_of('.'));
         }
 
-        std::string lod0Path = directoryService->getAssetDirectory() + FORMAT_FILE_MESH(metadata.getId());
+        std::string meshPath = (fs::path(targetDir) / (meshName + ".mesh")).string();
         {
-            std::ofstream output(lod0Path, std::ios::binary);
+            std::ofstream output(meshPath, std::ios::binary);
             cereal::BinaryOutputArchive archive(output);
             archive(mesh);
         }
-        metadata.size += fs::file_size(lod0Path);
 
-        DUMP_TEMPLATE(targetDir + '/' + metadata.getId() + FILE_METADATA, metadata)
-        return metadata.getId();
+        return meshPath;
     }
 
     void MeshImporterService::persistAllMeshes(const std::string &targetDir, const aiScene *scene,
@@ -76,9 +72,9 @@ namespace Metal {
                     meshData.indices.push_back(face.mIndices[k]);
                 }
             }
-            std::string id = persistMesh(targetDir, meshData);
-            meshMap.insert({i, {id, meshData.gizmoCenter}});
-            LOG_INFO("Persisted mesh: " + meshData.name + " (" + id + ")");
+            std::string path = persistMesh(targetDir, meshData);
+            meshMap.insert({i, {path, meshData.gizmoCenter}});
+            LOG_INFO("Persisted mesh: " + meshData.name + " (" + path + ")");
         }
     }
 }

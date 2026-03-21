@@ -23,21 +23,18 @@ namespace Metal {
     }
 
     void ResourceField::onInitialize() {
-        initializePanel<ResourceFilesPanel>(true, [this](FSEntry *file) {
+        initializePanel<ResourceFilesPanel>(true, [this](const std::shared_ptr<FSEntry> &file) {
             if (file == nullptr) {
                 open = false;
                 return;
             }
-            if (file->type == field.resourceType) {
-                std::string oldValue = *field.field;
-                *field.field = file->getId();
+            std::string oldValue = *field.field;
+            *field.field = file->absolutePath;
 
-
-                historyService->recordChange(&field, oldValue);
-                ApplicationEventContext::dispatch(field.instance->getClassName(), std::make_shared<FieldModificationPayload>(field));
-                open = false;
-            }
-        }, field.resourceType);
+            historyService->recordChange(&field, oldValue);
+            ApplicationEventContext::dispatch(field.instance->getClassName(), std::make_shared<FieldModificationPayload>(field));
+            open = false;
+        }, field.supportedFileTypes);
     }
 
     void ResourceField::renderButton() {
@@ -89,7 +86,7 @@ namespace Metal {
     }
 
     void ResourceField::onSync() {
-        if (field.field->size() > 0 && (entry == nullptr || entry->getId() != *field.field)) {
+        if (field.field->size() > 0 && (entry == nullptr || entry->absolutePath != *field.field)) {
             entry = filesService->getResource(*field.field);
         }
         if (!field.disabled) {

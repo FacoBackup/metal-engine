@@ -12,6 +12,13 @@ namespace Metal {
         eventListener([this](const Event &e) {
             dirty = true;
         }, "Camera");
+
+        eventListener([this](const Event &e) { forwardPressed = true; }, "CameraMoveForward");
+        eventListener([this](const Event &e) { backwardPressed = true; }, "CameraMoveBackward");
+        eventListener([this](const Event &e) { leftPressed = true; }, "CameraMoveLeft");
+        eventListener([this](const Event &e) { rightPressed = true; }, "CameraMoveRight");
+        eventListener([this](const Event &e) { upPressed = true; }, "CameraMoveUp");
+        eventListener([this](const Event &e) { downPressed = true; }, "CameraMoveDown");
     }
 
     // Per frame
@@ -25,6 +32,12 @@ namespace Metal {
                 dirty = false;
             }
         }
+        forwardPressed = false;
+        backwardPressed = false;
+        leftPressed = false;
+        rightPressed = false;
+        upPressed = false;
+        downPressed = false;
     }
 
     void CameraService::updateAspectRatio() const {
@@ -79,15 +92,15 @@ namespace Metal {
 
         const float multiplier = 10 * camera->movementSensitivity *
                                  engineContext->deltaTime;
-        if (runtimeRepository->leftPressed) {
+        if (leftPressed) {
             camera->position += right * multiplier;
             dirty = true;
         }
-        if (runtimeRepository->rightPressed) {
+        if (rightPressed) {
             camera->position -= right * multiplier;
             dirty = true;
         }
-        if (runtimeRepository->backwardPressed) {
+        if (backwardPressed) {
             if (camera->isOrthographic) {
                 camera->orthographicProjectionSize += multiplier;
             } else {
@@ -95,12 +108,20 @@ namespace Metal {
             }
             dirty = true;
         }
-        if (runtimeRepository->forwardPressed) {
+        if (forwardPressed) {
             if (camera->isOrthographic) {
                 camera->orthographicProjectionSize -= multiplier;
             } else {
                 camera->position += forward * multiplier;
             }
+            dirty = true;
+        }
+        if (upPressed) {
+            camera->position += glm::vec3(0, 1, 0) * multiplier;
+            dirty = true;
+        }
+        if (downPressed) {
+            camera->position -= glm::vec3(0, 1, 0) * multiplier;
             dirty = true;
         }
     }

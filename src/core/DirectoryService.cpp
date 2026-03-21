@@ -26,7 +26,13 @@ namespace Metal {
         FilesUtil::ReadFile(cachePathFile.c_str(), cachedPath);
         cachedPath.erase(std::ranges::remove(cachedPath, '\n').begin(), cachedPath.cend());
         if (cachedPath.empty() || forceSelection || !fs::exists(cachedPath)) {
-            rootDirectory = FileDialogUtil::SelectDirectory();
+            char* home = getenv("USERPROFILE");
+            if (!home) home = getenv("HOME");
+            if (home && !forceSelection) {
+                rootDirectory = home;
+            } else {
+                rootDirectory = FileDialogUtil::SelectDirectory();
+            }
             rootDirectory.erase(std::ranges::remove(rootDirectory, '\n').begin(), rootDirectory.cend());
             if (rootDirectory.empty()) {
                 throw std::runtime_error("No directory selected.");
@@ -44,9 +50,9 @@ namespace Metal {
             }
         }
 
-        FilesUtil::CreateDirectory(getShadersDirectory());
-        FilesUtil::CreateDirectory(getAssetRefDirectory());
-        FilesUtil::CreateDirectory(getAssetDirectory());
+        FilesUtil::CreateDirectory(rootDirectory + "/shaders/");
+        FilesUtil::CreateDirectory(rootDirectory + "/assets-ref/");
+        FilesUtil::CreateDirectory(rootDirectory + "/assets/");
     }
 
 

@@ -9,7 +9,6 @@
 #include "InspectableMember.h"
 #include "Util.h"
 #include "../editor/util/Util.h"
-#include "../editor/enum/EntryType.h"
 
 namespace Metal {
     class Inspectable {
@@ -41,7 +40,7 @@ namespace Metal {
 
         void registerBool(bool &v, std::string group, std::string name, bool disabled = false);
 
-        void registerResourceSelection(std::string &v, std::string group, std::string name, EntryType::EntryType type,
+        void registerResourceSelection(std::string &v, std::string group, std::string name, const std::vector<std::string> &supportedFileTypes,
                                        bool disabled = false);
 
         void registerMethod(const std::function<void()> &updateCallback, std::string name, std::string group);
