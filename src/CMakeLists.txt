@@ -25,6 +25,8 @@ set(ENGINE_SOURCES
         engine/service/CameraService.h
         engine/dto/Camera.h
         editor/util/Util.h
+        editor/util/WorldToolProvider.h
+        editor/util/WorldToolProvider.cpp
         common/Inspectable.h
         common/Inspectable.cpp
         common/InspectedField.h

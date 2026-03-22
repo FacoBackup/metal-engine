@@ -47,6 +47,8 @@ namespace Metal {
         j["shadingMode"] = shadingMode;
         j["bookmarks"] = bookmarks;
         j["isPlaying"] = isPlaying;
+        j["gptMcpKey"] = gptMcpKey;
+        j["geminiMcpKey"] = geminiMcpKey;
         return j;
     }
 
@@ -92,6 +94,8 @@ namespace Metal {
                 bookmarks = j.at("bookmarks").get<std::vector<std::string>>();
             }
             isPlaying = j.value("isPlaying", false);
+            gptMcpKey = j.value("gptMcpKey", "");
+            geminiMcpKey = j.value("geminiMcpKey", "");
     }
 
     void EditorRepository::registerFields() {
@@ -105,5 +109,7 @@ namespace Metal {
         registerFloat(gridScale, "Grid", "Scale");
         registerInt(gridThreshold, "Grid", "Threshold");
         registerFloat(gridThickness, "Grid", "Thickness");
+        registerText(gptMcpKey, "MCP", "GPT Key");
+        registerText(geminiMcpKey, "MCP", "Gemini Key");
     }
 }

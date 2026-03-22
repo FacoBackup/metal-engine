@@ -4,9 +4,10 @@
 #include "Tool.h"
 #include <vector>
 #include <string>
+#include "../../common/IContextMember.h"
 
 namespace Metal {
-    class IToolProvider {
+    class IToolProvider : public IContextMember {
         std::vector<Tool> tools;
         bool toolsRegistered = false;
 
@@ -15,7 +16,7 @@ namespace Metal {
 
         void registerTool(const std::string& key, const std::string& description, 
                          const std::vector<ToolParam>& params, 
-                         const std::function<std::string(const std::map<std::string, std::variant<std::string, double, bool>>&)>& callback) {
+                         const std::function<std::string(const nlohmann::json&)>& callback) {
             tools.push_back({key, description, params, callback});
         }
 

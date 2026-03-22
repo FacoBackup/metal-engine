@@ -52,6 +52,8 @@ namespace Metal {
         ShadingMode shadingMode = LIT;
         std::vector<std::string> bookmarks{};
         bool isPlaying = false;
+        std::string gptMcpKey{};
+        std::string geminiMcpKey{};
 
         void registerFields() override;
 

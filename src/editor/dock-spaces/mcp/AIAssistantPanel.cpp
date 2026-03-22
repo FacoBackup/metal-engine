@@ -13,7 +13,7 @@ namespace Metal {
     }
 
     void AIAssistantPanel::onInitialize() {
-        currentChatId = aiAssistantService->createNewChat();
+        currentChatId = aiAssistantRepository->createNewChat()->id;
     }
 
     void AIAssistantPanel::onSync() {
@@ -23,7 +23,7 @@ namespace Metal {
         if (!hasMessages) ImGui::BeginDisabled();
         if (UIUtil::RenderButtonSolid("##mcp-new-chat" + id, Icons::add, MCP_BUTTON_SIZE, MCP_ADD_BUTTON_COLOR,
                                       MCP_BUTTON_ROUNDING)) {
-            currentChatId = aiAssistantService->createNewChat();
+            currentChatId = aiAssistantRepository->createNewChat()->id;
         }
         if (!hasMessages) ImGui::EndDisabled();
 

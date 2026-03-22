@@ -8,6 +8,7 @@ add_executable(metal_engine_tests
         ApplicationEventContextTest.cpp
         InspectableTest.cpp
         LuaServiceTest.cpp
+        AIAssistantServiceTest.cpp
 )
 
 target_link_libraries(metal_engine_tests
