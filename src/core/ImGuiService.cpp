@@ -78,6 +78,10 @@ namespace Metal {
 
         applySpacing();
         applyFonts();
+
+        markdownConfig.headingFormats[0] = { h1Font, true };
+        markdownConfig.headingFormats[1] = { h2Font, true };
+        markdownConfig.headingFormats[2] = { h3Font, true };
     }
 
     void ImGuiService::applySpacing() {
@@ -118,15 +122,29 @@ namespace Metal {
         auto *fontConfig = new ImFontConfig();
         fontConfig->PixelSnapH = true;
 
+        // Load primary font
         io.Fonts->AddFontFromFileTTF("resources/fonts/Roboto-Regular.ttf", 14, fontConfig,
                                      io.Fonts->GetGlyphRangesDefault());
+
+        // Merge icons into primary font
         fontConfig->MergeMode = true;
         fontConfig->GlyphOffset = ImVec2(-2, 4);
         constexpr auto MIN = static_cast<ImWchar16>(0xE000);
         constexpr auto MAX = static_cast<ImWchar16>(0xF8FF);
         constexpr ImWchar RANGES[] = {MIN, MAX, 0};
         io.Fonts->AddFontFromFileTTF("resources/fonts/MaterialIcons.ttf", 18, fontConfig, RANGES);
-        largeIconsFont = io.Fonts->AddFontFromFileTTF("resources/fonts/MaterialIcons.ttf", LARGE_FONT_SIZE, nullptr,
+
+        // Load secondary fonts (icons for headers too if needed, but not necessarily)
+        h1Font = io.Fonts->AddFontFromFileTTF("resources/fonts/Roboto-Regular.ttf", 20, nullptr,
+                                              io.Fonts->GetGlyphRangesDefault());
+        h2Font = io.Fonts->AddFontFromFileTTF("resources/fonts/Roboto-Regular.ttf", 18, nullptr,
+                                              io.Fonts->GetGlyphRangesDefault());
+        h3Font = io.Fonts->AddFontFromFileTTF("resources/fonts/Roboto-Regular.ttf", 16, nullptr,
+                                              io.Fonts->GetGlyphRangesDefault());
+
+        // Separate large icons font (not merged into anything)
+        ImFontConfig iconOnlyConfig;
+        largeIconsFont = io.Fonts->AddFontFromFileTTF("resources/fonts/MaterialIcons.ttf", LARGE_FONT_SIZE, &iconOnlyConfig,
                                                       RANGES);
 
         io.Fonts->Build();

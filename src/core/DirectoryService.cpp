@@ -14,6 +14,9 @@ namespace Metal {
     void DirectoryService::onInitialize() {
         NFD_Init();
         updateRootPath(false);
+        eventListener([this](const Event &) {
+            save(true);
+        }, "EditorRepository");
     }
 
     void DirectoryService::dispose() {
@@ -26,7 +29,7 @@ namespace Metal {
         FilesUtil::ReadFile(cachePathFile.c_str(), cachedPath);
         cachedPath.erase(std::ranges::remove(cachedPath, '\n').begin(), cachedPath.cend());
         if (cachedPath.empty() || forceSelection || !fs::exists(cachedPath)) {
-            char* home = getenv("USERPROFILE");
+            char *home = getenv("USERPROFILE");
             if (!home) home = getenv("HOME");
             if (home && !forceSelection) {
                 rootDirectory = home;
@@ -46,7 +49,9 @@ namespace Metal {
         for (auto &instance: ctx->getInstances()) {
             auto *repository = dynamic_cast<IRepository *>(instance.get());
             if (repository) {
-                PARSE_TEMPLATE(*repository, rootDirectory + "/" + std::to_string(std::hash<std::string>{}(typeid(*repository).name())) + ".json")
+                PARSE_TEMPLATE(*repository,
+                               rootDirectory + "/" + std::to_string(std::hash<std::string>{}(typeid(*repository).name())
+                               ) + ".json")
             }
         }
 
@@ -56,19 +61,23 @@ namespace Metal {
     }
 
 
-    void DirectoryService::save() {
+    void DirectoryService::save(bool silent) {
         try {
             for (auto &instance: ctx->getInstances()) {
                 auto *repository = dynamic_cast<IRepository *>(instance.get());
                 if (repository) {
-                    DUMP_TEMPLATE(rootDirectory + "/" + std::to_string(std::hash<std::string>{}(typeid(*repository).name())) + ".json",
-                                  *repository)
+                    DUMP_TEMPLATE(
+                        rootDirectory + "/" + std::to_string(std::hash<std::string>{}(typeid(*repository).name())) +
+                        ".json",
+                        *repository)
                 }
             }
-            notificationService->pushMessage("Project saved", NotificationSeverities::SUCCESS);
+            if (!silent)
+                notificationService->pushMessage("Project saved", NotificationSeverities::SUCCESS);
         } catch (const std::exception &e) {
             LOG_ERROR(e.what());
-            notificationService->pushMessage("Could not save project", NotificationSeverities::ERROR);
+            if (!silent)
+                notificationService->pushMessage("Could not save project", NotificationSeverities::ERROR);
         }
     }
 } // Metal

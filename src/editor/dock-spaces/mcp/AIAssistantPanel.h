@@ -18,6 +18,7 @@
 namespace Metal {
     class AIAssistantService;
     class ThemeService;
+    class ImGuiService;
     struct AIAssistantRepository;
     struct EditorRepository;
 
@@ -32,7 +33,8 @@ namespace Metal {
                 {"AIAssistantService", &aiAssistantService},
                 {"AIAssistantRepository", &aiAssistantRepository},
                 {"ThemeService", &themeService},
-                {"EditorRepository", &editorRepository}
+                {"EditorRepository", &editorRepository},
+                {"ImGuiService", &imGuiService}
             };
         }
 
@@ -43,13 +45,18 @@ namespace Metal {
         AIAssistantRepository *aiAssistantRepository = nullptr;
         ThemeService *themeService = nullptr;
         EditorRepository *editorRepository = nullptr;
+        ImGuiService *imGuiService = nullptr;
         AIModel currentModel = AIModel::GEMINI_3_FLASH_LITE;
         char inputBuffer[1024]{};
+        char editBuffer[1024]{};
+        int editingMessageIndex = -1;
         std::string currentChatId;
 
         void renderMessages();
 
         void renderInput();
+
+        void renderMessageActions(int index, bool isUser);
     };
 }
 

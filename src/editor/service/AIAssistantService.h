@@ -6,6 +6,8 @@
 #include "../enum/AIModel.h"
 #include <string>
 #include <nlohmann/json.hpp>
+#include <thread>
+#include <mutex>
 
 namespace Metal {
     struct EditorRepository;
@@ -22,8 +24,9 @@ namespace Metal {
         AIAssistantRepository *aiAssistantRepository = nullptr;
         HttpService *httpService = nullptr;
         NotificationService *notificationService = nullptr;
-        std::vector<IToolProvider*> toolProviders;
+        std::vector<IToolProvider *> toolProviders;
         std::string systemPrompt;
+        std::mutex repositoryMutex;
 
     public:
         AIAssistantService() = default;
@@ -46,19 +49,26 @@ namespace Metal {
 
         void sendFollowupRequest(const std::string &chatId, AIModel model);
 
-        std::string createNewChat();
+        void regenerateMessage(const std::string &chatId, int messageIndex, AIModel model);
+
+        void editMessage(const std::string &chatId, int messageIndex, const std::string &newContent, AIModel model);
+
+        void deleteMessagesFrom(const std::string &chatId, int messageIndex);
 
         std::string deleteCurrentChat(const std::string &chatId);
 
     private:
-        nlohmann::json buildMessages(const std::shared_ptr<Chat>& chat);
+        nlohmann::json buildMessages(const std::shared_ptr<Chat> &chat);
 
         std::string buildFullSystemPrompt();
 
-        void processAIResponse(const std::string& chatId, AIModel model, const std::string& response);
+        void processAIResponse(const std::string &chatId, AIModel model, const std::string &response);
 
-        std::string executeTool(const std::string& toolKey, const nlohmann::json& arguments);
-        
+        void processStreamData(const std::string &chatId, const std::string &chunk, std::string &accumulatedData,
+                               std::string &currentContent);
+
+        std::string executeTool(const std::string &toolKey, const nlohmann::json &arguments);
+
         std::string getApiKey(AIModel model);
 
         std::string getTimeStr();

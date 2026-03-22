@@ -192,10 +192,10 @@ namespace Metal {
 
                 const std::string icon = UIUtil::GetDockSpaceIcon(space->index);
                 const std::string label = space->name;
-                const ImVec4 accent = isFocused ? editorRepository->accent : themeService->palette3;
+                const ImVec4 tabColor = isSelected ? (isFocused ? editorRepository->accent : themeService->palette4) : themeService->palette3;
 
-                if (UIUtil::RenderTab(id + label + std::to_string(space->index), icon, label, isSelected, space->color,
-                                      accent, headerHeight)) {
+                if (UIUtil::RenderTab(id + label + std::to_string(space->index), icon, label, true, space->color,
+                                      tabColor, headerHeight)) {
                     dock->selectedOption = space->index;
                     initializeView();
                 }

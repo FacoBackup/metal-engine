@@ -17,7 +17,7 @@ namespace Metal {
     DockSpace DockSpace::INSPECTOR{0, "Inspector", 4, 4, ImVec4{0.2f, 0.8f, 0.2f, 1}, CB(InspectorPanel)};
     DockSpace DockSpace::WORLD{1, "World", 4, 4, ImVec4{0.2f, 0.2f, 0.8f, 1}, CB(WorldPanel)};
     DockSpace DockSpace::CONSOLE{2, "Console", 4, 4, ImVec4{0.8f, 0.8f, 0.2f, 1}, CB(ConsolePanel)};
-    DockSpace DockSpace::FILES{3, "Files", 4, 4, ImVec4{0.8f, 0.2f, 0.8f, 1}, CB(FilesPanel)};
+    DockSpace DockSpace::FILES{3, "Assets", 4, 4, ImVec4{0.8f, 0.2f, 0.8f, 1}, CB(FilesPanel)};
     DockSpace DockSpace::METRICS{4, "Metrics", 4, 4, ImVec4{0.2f, 0.8f, 0.8f, 1}, CB(MetricsPanel)};
     DockSpace DockSpace::REPOSITORIES{5, "Repositories", 4, 4, ImVec4{0.8f, 0.2f, 0.2f, 1}, CB(RepositoriesPanel)};
     DockSpace DockSpace::LUA_EDITOR{6, "Lua Editor", 4, 4, ImVec4{0.2f, 0.5f, 0.8f, 1}, CB(LuaEditorPanel)};

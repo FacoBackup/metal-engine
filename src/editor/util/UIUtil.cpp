@@ -79,7 +79,9 @@ namespace Metal::UIUtil {
             ImGui::PushStyleColor(ImGuiCol_Button, accent);
         }
 
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
         const bool clicked = ImGui::Button("##tab", ImVec2(totalWidth, height));
+        ImGui::PopStyleVar();
 
         if (selected) {
             ImGui::PopStyleColor();
