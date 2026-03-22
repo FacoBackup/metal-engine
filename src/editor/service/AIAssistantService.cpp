@@ -62,6 +62,7 @@ namespace Metal {
         httpService->post(modelInfo.url + "/chat/completions", jsonBody, apiKey,
             [this, targetChatId, model](const std::string& response, bool success) {
                 if (success) {
+                    std::printf(response.c_str());
                     processAIResponse(targetChatId, model, response);
                 } else {
                     LOG_ERROR("MCP Request failed: " + response);
@@ -86,13 +87,25 @@ namespace Metal {
             auto chat = aiAssistantRepository->findChatById(chatId);
             if (!chat) return;
 
-            if (!content.empty()) {
-                chat->messages.push_back({"assistant", content, getTimeStr()});
+            int promptTokens = 0;
+            int completionTokens = 0;
+            int totalTokens = 0;
+
+            if (j.contains("usage")) {
+                auto& usage = j["usage"];
+                promptTokens = usage.value("prompt_tokens", 0);
+                completionTokens = usage.value("completion_tokens", 0);
+                totalTokens = usage.value("total_tokens", 0);
+                
+                chat->totalPromptTokens += promptTokens;
+                chat->totalCompletionTokens += completionTokens;
+                chat->totalTokens += totalTokens;
             }
 
-            // Check for tool calls (simple JSON parsing in content for now as per buildFullSystemPrompt)
-            // The prompt says: "To use them, you must provide a JSON response in your output."
-            // Let's look for JSON in the content.
+            if (!content.empty()) {
+                chat->messages.push_back({"assistant", content, getTimeStr(), promptTokens, completionTokens, totalTokens});
+            }
+
             size_t firstBrace = content.find('{');
             size_t lastBrace = content.rfind('}');
 
@@ -100,19 +113,16 @@ namespace Metal {
                 std::string jsonStr = content.substr(firstBrace, lastBrace - firstBrace + 1);
                 try {
                     auto toolJson = nlohmann::json::parse(jsonStr);
-                    if (toolJson.contains("tool") && toolJson.contains("arguments")) {
+                    if (toolJson.contains("tool") && (toolJson.contains("arguments") || toolJson.contains("parameters"))) {
                         std::string toolKey = toolJson["tool"];
-                        nlohmann::json args = toolJson["arguments"];
+                        nlohmann::json args = toolJson.contains("arguments") ? toolJson["arguments"] : toolJson["parameters"];
                         
                         LOG_INFO("AI requested tool call: " + toolKey);
                         std::string toolResult = executeTool(toolKey, args);
                         
-                        // Add tool result to chat and re-request
                         chat->messages.push_back({"system", "Tool Result (" + toolKey + "): " + toolResult, getTimeStr()});
                         
-                        // Recursive call (continue the loop)
-                        // Use an empty message since we added the tool result to the history
-                        sendRequest(chatId, "Please continue based on the tool result.", model);
+                        sendFollowupRequest(chatId, model);
                         return;
                     }
                 } catch (...) {
@@ -125,6 +135,30 @@ namespace Metal {
         } catch (const std::exception& e) {
             LOG_ERROR("Failed to parse AI response: " + std::string(e.what()));
         }
+    }
+
+    void AIAssistantService::sendFollowupRequest(const std::string &chatId, AIModel model) {
+        std::shared_ptr<Chat> currentChat = aiAssistantRepository->findChatById(chatId);
+        if (!currentChat) return;
+
+        std::string apiKey = getApiKey(model);
+        if (apiKey.empty()) return;
+
+        AIModelInfo modelInfo = getAIModelInfo(model);
+        
+        nlohmann::json body;
+        body["model"] = modelInfo.modelId;
+        body["messages"] = buildMessages(currentChat);
+
+        std::string jsonBody = body.dump();
+        httpService->post(modelInfo.url + "/chat/completions", jsonBody, apiKey,
+            [this, chatId, model](const std::string& response, bool success) {
+                if (success) {
+                    processAIResponse(chatId, model, response);
+                } else {
+                    LOG_ERROR("Followup Request failed: " + response);
+                }
+            });
     }
 
     std::string AIAssistantService::executeTool(const std::string& toolKey, const nlohmann::json& arguments) {

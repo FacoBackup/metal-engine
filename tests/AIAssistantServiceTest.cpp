@@ -9,6 +9,8 @@
 #include "../src/editor/dto/IToolProvider.h"
 #include <nlohmann/json.hpp>
 
+#include "common/LoggerUtil.h"
+
 /**
  * ATTENTION AGENTS: DO NOT EXECUTE THIS TEST AUTOMATICALLY.
  * This test is designed to be executed manually on demand.
@@ -27,6 +29,7 @@ public:
             {{"arg1", "Test argument", ToolParamType::STRING}},
             [this](const nlohmann::json& args) {
                 toolExecuted = true;
+                LOG_INFO("Executing tool");
                 return "Successfully executed tool with arg: " + args.value("arg1", "none");
             });
     }
@@ -66,7 +69,7 @@ protected:
         ctx->injectDependencies(service.get());
         service->onInitialize();
 
-        editorRepo->geminiMcpKey = "YOUR_REAL_GEMINI_API_KEY_HERE";
+        editorRepo->geminiMcpKey = "KEY";
     }
 };
 
@@ -75,5 +78,5 @@ TEST_F(AIAssistantServiceIntegrationTest, TestRealToolUsageWithGeminiFlashLite) 
     std::string chatId = chat->id;
     service->sendRequest(chatId, "Please use the tool 'PLACEHOLDER_TOOL_KEY' with arg1 set to 'integration-test'", AIModel::GEMINI_3_FLASH_LITE);
     
-    ASSERT_TRUE(ctx->getSingleton<TestToolProvider>().toolExecuted);
+    ASSERT_TRUE(toolProvider->toolExecuted);
 }

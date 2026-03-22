@@ -44,6 +44,8 @@ namespace Metal {
 
         void sendRequest(const std::string &chatId, const std::string &message, AIModel model);
 
+        void sendFollowupRequest(const std::string &chatId, AIModel model);
+
         std::string createNewChat();
 
         std::string deleteCurrentChat(const std::string &chatId);
