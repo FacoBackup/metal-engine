@@ -65,7 +65,9 @@ To interact with the Metal Engine directly, you MUST use the native function cal
 1. **Identify the Need**: When a user's request can be fulfilled by an available tool (e.g., creating an entity, modifying a component, or querying scene data), call that tool.
 2. **Native Tool Calls**: Use only the provided function definitions for actions. Never output the tool call as JSON in the message body or as plain text. 
 3. **Arguments**: Provide all required arguments as specified in the function's `inputSchema`.
-4. **Follow-up**: After a tool is executed, you will receive the result. Use this result to provide a final response to the user or to perform subsequent tool calls if necessary.
+4. **Follow-up**: After a tool is executed, you will receive the result in a separate tool message.
+5. **Wait for Results**: Do not repeat the same tool call if you have already initiated it and are waiting for the result. If a tool execution fails, you can try again with corrected parameters or inform the user.
+6. **Final Response**: Once you have all necessary tool results, provide a concise final response to the user in natural language, summarizing the actions taken.
 
 Do not attempt to simulate tool results. Always wait for the actual execution output.
 

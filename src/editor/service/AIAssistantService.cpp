@@ -109,7 +109,6 @@ namespace Metal {
         }
 
         std::string jsonBody = body.dump();
-        LOG_INFO("Assistant Call " + jsonBody);
         httpService->post(modelInfo.url + "/chat/completions", jsonBody, apiKey,
                           [this, chatId, messageIndex, model](const std::string &response, bool success) {
                               auto chat = aiAssistantRepository->findChatById(chatId);
@@ -167,15 +166,41 @@ namespace Metal {
         for (const auto &msg: chat->messages) {
             nlohmann::json m = {{"role", msg.role}, {"content", msg.content}};
 
-            // Add tool calls if present
+            // Add tool calls if present (OpenAI/Gemini native format)
             if (!msg.toolCalls.empty()) {
+                nlohmann::json toolCallsJson = nlohmann::json::array();
                 for (const auto &tool: msg.toolCalls) {
-                    m["content"] = m["content"].get<std::string>() + "\n\nTool Result (" + tool.name + "):\n" + tool.
-                                   result;
+                    if (!tool.rawJson.empty()) {
+                        toolCallsJson.push_back(nlohmann::json::parse(tool.rawJson));
+                    } else {
+                        nlohmann::json tc;
+                        tc["id"] = tool.id;
+                        tc["type"] = "function";
+                        tc["function"] = {
+                            {"name", tool.name},
+                            {"arguments", tool.description}
+                        };
+                        toolCallsJson.push_back(tc);
+                    }
                 }
+                m["tool_calls"] = toolCallsJson;
             }
 
             messages.push_back(m);
+
+            // Add tool results as separate messages with role "tool"
+            if (!msg.toolCalls.empty()) {
+                for (const auto &tool: msg.toolCalls) {
+                    if (!tool.result.empty()) {
+                        nlohmann::json toolResponse;
+                        toolResponse["role"] = "tool";
+                        toolResponse["tool_call_id"] = tool.id;
+                        toolResponse["name"] = tool.name;
+                        toolResponse["content"] = tool.result;
+                        messages.push_back(toolResponse);
+                    }
+                }
+            }
         }
 
         return messages;
@@ -263,6 +288,7 @@ namespace Metal {
                         auto function = toolCall["function"];
                         std::string action = function.value("name", "");
                         std::string argumentsStr = function.value("arguments", "{}");
+                        std::string toolCallId = toolCall.value("id", "");
                         
                         try {
                             nlohmann::json arguments;
@@ -272,9 +298,9 @@ namespace Metal {
                                 arguments = nlohmann::json::parse(argumentsStr);
                             }
                             
-                            LOG_INFO("AIAssistantService: Executing native tool: " + action);
+                            LOG_INFO("AIAssistantService: Executing native tool: " + action + " (ID: " + toolCallId + ")");
                             std::string result = executeTool(action, arguments);
-                            assistantMsg.toolCalls.emplace_back(action, "Executed " + action, result);
+                            assistantMsg.toolCalls.emplace_back(toolCallId, action, argumentsStr, result, toolCall.dump());
                         } catch (const std::exception& e) {
                             LOG_ERROR("AIAssistantService: Error parsing tool arguments: " + std::string(e.what()));
                         }

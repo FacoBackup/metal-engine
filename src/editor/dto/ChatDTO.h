@@ -9,26 +9,32 @@
 
 namespace Metal {
     struct ToolCall final : ISerialize {
+        std::string id;
         std::string name;
         std::string description;
         std::string result;
+        std::string rawJson; // Stores the original tool call JSON to preserve metadata like thought_signature
 
         ToolCall() = default;
-        ToolCall(std::string n, std::string d, std::string r = "")
-            : name(std::move(n)), description(std::move(d)), result(std::move(r)) {}
+        ToolCall(std::string id, std::string n, std::string d, std::string r = "", std::string rj = "")
+            : id(std::move(id)), name(std::move(n)), description(std::move(d)), result(std::move(r)), rawJson(std::move(rj)) {}
 
         nlohmann::json toJson() const override {
             nlohmann::json j;
+            j["id"] = id;
             j["name"] = name;
             j["description"] = description;
             j["result"] = result;
+            j["rawJson"] = rawJson;
             return j;
         }
 
         void fromJson(const nlohmann::json &j) override {
+            if (j.contains("id")) id = j.at("id").get<std::string>();
             if (j.contains("name")) name = j.at("name").get<std::string>();
             if (j.contains("description")) description = j.at("description").get<std::string>();
             if (j.contains("result")) result = j.at("result").get<std::string>();
+            if (j.contains("rawJson")) rawJson = j.at("rawJson").get<std::string>();
         }
     };
 
