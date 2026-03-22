@@ -19,7 +19,7 @@ namespace Metal {
             registerFloat(scale, "Transform", "Global Scale", 0.001f, 1000.0f);
         }
 
-        const char *getTitle() override { return "Scene Import Settings"; }
+        const char *getTitle() const override { return "Scene Import Settings"; }
     };
 }
 

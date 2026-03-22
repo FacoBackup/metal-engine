@@ -14,15 +14,11 @@ namespace Metal {
         std::vector<Inspectable *> repositories{};
         std::shared_ptr<FormPanel> formPanel = nullptr;
 
-        EditorRepository *editorRepository = nullptr;
-        EngineRepository *engineRepository = nullptr;
         WorldRepository *worldRepository = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"EditorRepository", &editorRepository},
-                {"EngineRepository", &engineRepository},
                 {"WorldRepository", &worldRepository}
             };
         }

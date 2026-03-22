@@ -17,7 +17,7 @@ namespace Metal {
         registerResourceSelection(metallic, "", "Metallic Texture", TEXTURE_EXTENSIONS);
     }
 
-    ComponentType PrimitiveComponent::getType() {
+    ComponentType PrimitiveComponent::getType() const {
         return ComponentType::PRIMITIVE;
     }
 

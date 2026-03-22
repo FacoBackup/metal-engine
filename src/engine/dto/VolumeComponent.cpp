@@ -10,7 +10,7 @@ namespace Metal {
         registerInt(samples, "", "Samples", 1);
     }
 
-    ComponentType VolumeComponent::getType() {
+    ComponentType VolumeComponent::getType() const {
         return VOLUME;
     }
 } // Metal

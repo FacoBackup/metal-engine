@@ -1,7 +1,7 @@
 #include "LightComponent.h"
 
 namespace Metal {
-    ComponentType LightComponent::getType() {
+    ComponentType LightComponent::getType() const {
         return LIGHT;
     }
 

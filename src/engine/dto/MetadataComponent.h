@@ -25,7 +25,7 @@ namespace Metal {
 
         void registerFields() override;
 
-        ComponentType getType() override;
+        ComponentType getType() const override;
     };
 } // Metal
 

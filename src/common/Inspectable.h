@@ -6,6 +6,7 @@
 #include <vector>
 #include <glm/fwd.hpp>
 
+#include <nlohmann/json.hpp>
 #include "InspectableMember.h"
 #include "Util.h"
 #include "../editor/util/Util.h"
@@ -73,6 +74,8 @@ namespace Metal {
                            std::string group, std::string name, bool disabled = false);
 
     public:
+        [[nodiscard]] nlohmann::json toJSON() const;
+
         [[nodiscard]] virtual std::string getClassName() const;
 
         std::shared_ptr<InspectableMember> getFieldByPointer(void *ptr);
@@ -89,11 +92,11 @@ namespace Metal {
             return uniqueIdentifier;
         }
 
-        virtual const char *getIcon() {
+        virtual const char *getIcon() const {
             throw std::logic_error("Not implemented");
         }
 
-        virtual const char *getTitle() {
+        virtual const char *getTitle() const {
             throw std::logic_error("Not implemented");
         }
     };

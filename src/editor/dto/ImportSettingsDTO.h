@@ -8,9 +8,9 @@ namespace Metal {
     struct ImportSettingsDTO : Inspectable {
         ImportSettingsDTO() = default;
 
-        const char *getIcon() override { return ""; }
+        const char *getIcon() const override { return ""; }
 
-        const char *getTitle() override { return "Import Settings"; }
+        const char *getTitle() const override { return "Import Settings"; }
     };
 }
 

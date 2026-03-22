@@ -8,7 +8,7 @@ namespace Metal {
         registerBool(isConvex, "", "Is Convex");
     }
 
-    ComponentType MeshColliderComponent::getType() {
+    ComponentType MeshColliderComponent::getType() const {
         return ComponentType::MESH_COLLIDER;
     }
 

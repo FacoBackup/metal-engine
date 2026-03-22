@@ -148,4 +148,49 @@ namespace Metal {
         return entry;
     }
 
+    std::vector<std::string> FilesService::listScripts() {
+        std::vector<std::string> scripts;
+        if (!directoryService || directoryService->getRootDirectory().empty()) {
+            return scripts;
+        }
+
+        fs::path rootPath(directoryService->getRootDirectory());
+        try {
+            for (const auto &entry: fs::directory_iterator(rootPath)) {
+                if (entry.is_regular_file() && entry.path().extension() == ".lua") {
+                    scripts.push_back(entry.path().filename().string());
+                }
+            }
+        } catch (const std::exception &e) {
+            LOG_ERROR("Error listing scripts: " + std::string(e.what()));
+        }
+        return scripts;
+    }
+
+    std::string FilesService::writeRootFile(const std::string &name, const std::string &content) {
+        if (!directoryService || directoryService->getRootDirectory().empty()) {
+            return "";
+        }
+
+        fs::path rootPath(directoryService->getRootDirectory());
+        fs::path filePath = rootPath / name;
+
+        if (filePath.extension() != ".lua") {
+            filePath += ".lua";
+        }
+
+        try {
+            std::ofstream file(filePath);
+            if (!file.is_open()) {
+                return "";
+            }
+            file << content;
+            file.close();
+            return filePath.string();
+        } catch (const std::exception &e) {
+            LOG_ERROR("Error writing to file: " + std::string(e.what()));
+            return "";
+        }
+    }
+
 } // Metal

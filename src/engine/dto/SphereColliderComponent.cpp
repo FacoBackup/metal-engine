@@ -7,7 +7,7 @@ namespace Metal {
         registerVec3(offset, "", "Offset");
     }
 
-    ComponentType SphereColliderComponent::getType() {
+    ComponentType SphereColliderComponent::getType() const {
         return ComponentType::SPHERE_COLLIDER;
     }
 

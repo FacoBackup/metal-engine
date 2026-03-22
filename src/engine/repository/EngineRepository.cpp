@@ -78,11 +78,11 @@ namespace Metal {
         }
     }
 
-    const char *EngineRepository::getIcon() {
+    const char *EngineRepository::getIcon() const {
         return Icons::display_settings.c_str();
     }
 
-    const char *EngineRepository::getTitle() {
+    const char *EngineRepository::getTitle() const {
         return "Engine settings";
     }
 } // Metal

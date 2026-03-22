@@ -5,11 +5,11 @@
 #include <sstream>
 
 namespace Metal {
-    const char *AIAssistantRepository::getTitle() {
+    const char *AIAssistantRepository::getTitle() const {
         return "Chats";
     }
 
-    const char *AIAssistantRepository::getIcon() {
+    const char *AIAssistantRepository::getIcon() const {
         return Icons::comment.c_str();
     }
 

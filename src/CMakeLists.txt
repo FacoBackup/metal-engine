@@ -27,6 +27,10 @@ set(ENGINE_SOURCES
         editor/util/Util.h
         editor/util/WorldToolProvider.h
         editor/util/WorldToolProvider.cpp
+        editor/util/ScriptingToolProvider.h
+        editor/util/ScriptingToolProvider.cpp
+        editor/util/InspectionToolProvider.h
+        editor/util/InspectionToolProvider.cpp
         common/Inspectable.h
         common/Inspectable.cpp
         common/InspectedField.h

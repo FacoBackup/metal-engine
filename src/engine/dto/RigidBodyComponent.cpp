@@ -10,7 +10,7 @@ namespace Metal {
         registerBool(isKinematic, "", "Is Kinematic");
     }
 
-    ComponentType RigidBodyComponent::getType() {
+    ComponentType RigidBodyComponent::getType() const {
         return ComponentType::RIGID_BODY;
     }
 

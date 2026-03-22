@@ -5,7 +5,7 @@ namespace Metal {
         registerText(name, "", "Name");
     }
 
-    ComponentType MetadataComponent::getType() {
+    ComponentType MetadataComponent::getType() const {
         return METADATA;
     }
 }

@@ -2,11 +2,11 @@
 #include "../../common/Icons.h"
 
 namespace Metal {
-    const char *EditorRepository::getTitle() {
+    const char *EditorRepository::getTitle() const {
         return "Editor";
     }
 
-    const char *EditorRepository::getIcon() {
+    const char *EditorRepository::getIcon() const {
         return Icons::settings.c_str();
     }
 

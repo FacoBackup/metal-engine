@@ -77,7 +77,7 @@ namespace Metal {
                               if (success) {
                                   processAIResponse(targetChatId, assistantMessageIndex, model, response);
                                   currentChat->messages[assistantMessageIndex].isProcessing = false;
-                                  directoryService->save();
+                                  directoryService->save(true);
                               } else {
                                   LOG_ERROR("MCP Request failed: " + response);
                                   if (notificationService) {

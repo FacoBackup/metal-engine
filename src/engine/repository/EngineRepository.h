@@ -29,9 +29,9 @@ namespace Metal {
 
         void registerFields() override;
 
-        const char *getIcon() override;
+        const char *getIcon() const override;
 
-        const char *getTitle() override;
+        const char *getTitle() const override;
 
         nlohmann::json toJson() const override;
 

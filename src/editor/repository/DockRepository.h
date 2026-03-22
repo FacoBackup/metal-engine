@@ -16,11 +16,11 @@ namespace Metal {
 
         void registerFields() override {}
 
-        const char *getTitle() override {
+        const char *getTitle() const override {
             return "Docking";
         }
 
-        const char *getIcon() override {
+        const char *getIcon() const override {
             return "";
         }
 

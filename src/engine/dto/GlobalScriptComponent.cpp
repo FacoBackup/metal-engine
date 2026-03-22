@@ -6,7 +6,7 @@ namespace Metal {
         registerResourceSelection(scriptPath, "", "Script Path", SCRIPT_EXTENSIONS);
     }
 
-    ComponentType GlobalScriptComponent::getType() {
+    ComponentType GlobalScriptComponent::getType() const {
         return ComponentType::GLOBAL_SCRIPT;
     }
 

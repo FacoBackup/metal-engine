@@ -8,7 +8,7 @@ namespace Metal {
         registerResourceSelection(onDestroyPath, "", "On Destroy", SCRIPT_EXTENSIONS);
     }
 
-    ComponentType ScopedScriptComponent::getType() {
+    ComponentType ScopedScriptComponent::getType() const {
         return ComponentType::SCOPED_SCRIPT;
     }
 

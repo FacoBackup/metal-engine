@@ -8,7 +8,7 @@ namespace Metal {
         registerVec3(offset, "", "Offset");
     }
 
-    ComponentType CapsuleColliderComponent::getType() {
+    ComponentType CapsuleColliderComponent::getType() const {
         return ComponentType::CAPSULE_COLLIDER;
     }
 

@@ -12,7 +12,7 @@ namespace Metal {
         registerBool(isStatic, "", "Static?");
     }
 
-    ComponentType TransformComponent::getType() {
+    ComponentType TransformComponent::getType() const {
         return TRANSFORM;
     }
 

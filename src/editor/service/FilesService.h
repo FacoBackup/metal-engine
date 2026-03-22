@@ -42,8 +42,21 @@ namespace Metal {
         void CreateFile(std::shared_ptr<FSEntry> currentDirectory, const std::string &name, const std::string &extension);
 
         void GetEntries(std::shared_ptr<FSEntry> root);
-
         std::shared_ptr<FSEntry> GetEntry(const std::string &path);
+        
+        /**
+         * Lists all .lua files in the root directory.
+         * @return A vector of filenames.
+         */
+        std::vector<std::string> listScripts();
+
+        /**
+         * Writes content to a file in the root directory.
+         * @param name Filename.
+         * @param content Content to write.
+         * @return The absolute path of the created file, or empty string on error.
+         */
+        std::string writeRootFile(const std::string &name, const std::string &content);
     };
 } // Metal
 

@@ -7,7 +7,7 @@ namespace Metal {
         registerVec3(offset, "", "Offset");
     }
 
-    ComponentType BoxColliderComponent::getType() {
+    ComponentType BoxColliderComponent::getType() const {
         return ComponentType::BOX_COLLIDER;
     }
 

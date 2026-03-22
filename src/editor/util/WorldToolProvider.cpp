@@ -79,5 +79,17 @@ namespace Metal {
                 }
                 return result;
             });
+        // Tool: list_entities
+        registerTool("list_entities", "Lists all entities in the world with their names and IDs", {}, 
+            [this](const nlohmann::json& params) {
+                std::string result = "Entities in the world:\n";
+                bool found = false;
+                worldRepository->registry.view<MetadataComponent>().each([&](entt::entity entity, MetadataComponent& metadata) {
+                    result += "- " + metadata.name + " (ID: " + std::to_string(entt::to_integral(entity)) + ")\n";
+                    found = true;
+                });
+                if (!found) return std::string("No entities found in the world.");
+                return result;
+            });
     }
 }
