@@ -14,6 +14,9 @@ namespace Metal {
     void DirectoryService::onInitialize() {
         NFD_Init();
         updateRootPath(false);
+        eventListener([this](const Event &) {
+            save(true);
+        }, "EditorRepository");
     }
 
     void DirectoryService::dispose() {
@@ -26,7 +29,13 @@ namespace Metal {
         FilesUtil::ReadFile(cachePathFile.c_str(), cachedPath);
         cachedPath.erase(std::ranges::remove(cachedPath, '\n').begin(), cachedPath.cend());
         if (cachedPath.empty() || forceSelection || !fs::exists(cachedPath)) {
-            rootDirectory = FileDialogUtil::SelectDirectory();
+            char *home = getenv("USERPROFILE");
+            if (!home) home = getenv("HOME");
+            if (home && !forceSelection) {
+                rootDirectory = home;
+            } else {
+                rootDirectory = FileDialogUtil::SelectDirectory();
+            }
             rootDirectory.erase(std::ranges::remove(rootDirectory, '\n').begin(), rootDirectory.cend());
             if (rootDirectory.empty()) {
                 throw std::runtime_error("No directory selected.");
@@ -40,29 +49,36 @@ namespace Metal {
         for (auto &instance: ctx->getInstances()) {
             auto *repository = dynamic_cast<IRepository *>(instance.get());
             if (repository) {
-                PARSE_TEMPLATE(*repository, rootDirectory + "/" + std::to_string(std::hash<std::string>{}(typeid(*repository).name())) + ".json")
+                PARSE_TEMPLATE(*repository,
+                               rootDirectory + "/" + std::to_string(std::hash<std::string>{}(typeid(*repository).name())
+                               ) + ".json")
             }
         }
 
-        FilesUtil::CreateDirectory(getShadersDirectory());
-        FilesUtil::CreateDirectory(getAssetRefDirectory());
-        FilesUtil::CreateDirectory(getAssetDirectory());
+        FilesUtil::CreateDirectory(rootDirectory + "/shaders/");
+        FilesUtil::CreateDirectory(rootDirectory + "/assets-ref/");
+        FilesUtil::CreateDirectory(rootDirectory + "/assets/");
     }
 
 
-    void DirectoryService::save() {
+    void DirectoryService::save(bool silent) {
         try {
+            if (rootDirectory.empty()) return;
             for (auto &instance: ctx->getInstances()) {
                 auto *repository = dynamic_cast<IRepository *>(instance.get());
                 if (repository) {
-                    DUMP_TEMPLATE(rootDirectory + "/" + std::to_string(std::hash<std::string>{}(typeid(*repository).name())) + ".json",
-                                  *repository)
+                    DUMP_TEMPLATE(
+                        rootDirectory + "/" + std::to_string(std::hash<std::string>{}(typeid(*repository).name())) +
+                        ".json",
+                        *repository)
                 }
             }
-            notificationService->pushMessage("Project saved", NotificationSeverities::SUCCESS);
+            if (!silent)
+                notificationService->pushMessage("Project saved", NotificationSeverities::SUCCESS);
         } catch (const std::exception &e) {
             LOG_ERROR(e.what());
-            notificationService->pushMessage("Could not save project", NotificationSeverities::ERROR);
+            if (!silent)
+                notificationService->pushMessage("Could not save project", NotificationSeverities::ERROR);
         }
     }
 } // Metal

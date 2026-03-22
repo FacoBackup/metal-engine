@@ -13,6 +13,7 @@
 #include "../../../engine/repository/RuntimeRepository.h"
 #include "../../../engine/EngineContext.h"
 #include "../../../engine/dto/MetadataComponent.h"
+#include "../../../ApplicationEventContext.h"
 
 namespace Metal {
     void ViewportPanel::onInitialize() {
@@ -52,7 +53,25 @@ namespace Metal {
                     }
                 }
                 selectionService->addAllSelected(entities);
-            })
+            }),
+            ShortcutDTO("Move Forward", ImGuiKey_W, []() {
+                ApplicationEventContext::dispatch("CameraMoveForward");
+            }, true),
+            ShortcutDTO("Move Backward", ImGuiKey_S, []() {
+                ApplicationEventContext::dispatch("CameraMoveBackward");
+            }, true),
+            ShortcutDTO("Move Left", ImGuiKey_A, []() {
+                ApplicationEventContext::dispatch("CameraMoveLeft");
+            }, true),
+            ShortcutDTO("Move Right", ImGuiKey_D, []() {
+                ApplicationEventContext::dispatch("CameraMoveRight");
+            }, true),
+            ShortcutDTO("Move Up", ImGuiKey_Space, []() {
+                ApplicationEventContext::dispatch("CameraMoveUp");
+            }, true),
+            ShortcutDTO("Move Down", ImGuiKey_LeftCtrl, []() {
+                ApplicationEventContext::dispatch("CameraMoveDown");
+            }, true)
         };
     }
 
@@ -60,10 +79,14 @@ namespace Metal {
         updateCamera();
         updateInputs();
 
-        headerPanel->onSync();
+        if (!editorRepository->isPlaying) {
+            headerPanel->onSync();
+        }
         engineFramePanel->onSync();
 
-        gizmoPanel->onSync();
+        if (!editorRepository->isPlaying) {
+            gizmoPanel->onSync();
+        }
     }
 
     void ViewportPanel::updateCamera() {
@@ -89,12 +112,6 @@ namespace Metal {
         runtimeRepository->viewportY = windowPos.y;
 
         runtimeRepository->isFocused = ImGui::IsWindowHovered();
-        runtimeRepository->forwardPressed = ImGui::IsKeyDown(ImGuiKey_W);
-        runtimeRepository->backwardPressed = ImGui::IsKeyDown(ImGuiKey_S);
-        runtimeRepository->leftPressed = ImGui::IsKeyDown(ImGuiKey_A);
-        runtimeRepository->rightPressed = ImGui::IsKeyDown(ImGuiKey_D);
-        runtimeRepository->upPressed = ImGui::IsKeyDown(ImGuiKey_Space);
-        runtimeRepository->downPressed = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
         runtimeRepository->mousePressed = ImGui::IsWindowFocused() && ImGui::IsWindowHovered() && ImGui::IsMouseDown(
                                 ImGuiMouseButton_Left);
 

@@ -39,18 +39,18 @@ namespace Metal {
     }
 
     void ApplicationContext::dispose() {
-        try {
-            for (auto it = instances.rbegin(); it != instances.rend(); ++it) {
-                if (it->get() == this) {
-                    continue;
-                }
-                auto *disposable = dynamic_cast<IDisposable *>(it->get());
+        for (auto it = instances.rbegin(); it != instances.rend(); ++it) {
+            if (it->get() == this) {
+                continue;
+            }
+            auto *disposable = dynamic_cast<IDisposable *>(it->get());
+            try {
                 if (disposable) {
                     disposable->dispose();
                 }
+            } catch (std::exception &e) {
+                LOG_ERROR(e.what());
             }
-        } catch (std::exception &e) {
-            LOG_ERROR(e.what());
         }
     }
 }

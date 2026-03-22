@@ -26,6 +26,7 @@ namespace Metal {
         MeshService *meshService = nullptr;
 
         std::vector<LightData> items{};
+        int lightCount = 0;
         glm::vec3 sunPosition{};
         bool needsUpdate = false;
 
@@ -58,7 +59,7 @@ namespace Metal {
         }
 
         unsigned int getCount() const {
-            return items.size();
+            return lightCount;
         }
     };
 } // Metal

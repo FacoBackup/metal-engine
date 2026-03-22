@@ -10,6 +10,7 @@
 #include "MeshService.h"
 #include "common/LoggerUtil.h"
 #include "engine/dto/LightComponent.h"
+#include "../../editor/enum/engine-definitions.h"
 
 namespace Metal {
     void LightService::onInitialize() {
@@ -19,15 +20,13 @@ namespace Metal {
     }
 
     void LightService::registerLights() {
-        unsigned int currentRenderIndex = 0;
         for (const auto entity: worldRepository->registry.view<PrimitiveComponent, LightComponent>()) {
             auto &primitive = worldRepository->registry.get<PrimitiveComponent>(entity);
-            primitive.renderIndex = currentRenderIndex++;
             if (!primitive.meshId.empty()) {
                 if (MeshData *meshData = meshService->loadMeshData(primitive.meshId)) {
                     for (size_t i = 0; i < meshData->indices.size(); i += 3) {
                         LightData light{};
-                        light.triangleIndex = static_cast<unsigned int>(i);
+                        light.triangleIndex = static_cast<unsigned int>(i / 3);
                         light.meshIndex = primitive.renderIndex;
                         items.push_back(light);
                     }
@@ -47,8 +46,16 @@ namespace Metal {
 
         registerLights();
 
+        if (items.size() > MAX_LIGHTS) {
+            LOG_WARN("Too many lights! Capping to " + std::to_string(MAX_LIGHTS));
+            items.resize(MAX_LIGHTS);
+        }
+
+        lightCount = static_cast<int>(items.size());
+
         if (!items.empty()) {
-            engineContext->currentFrame->getResourceAs<BufferInstance>(RID_LIGHT_BUFFER)->update(items.data());
+            engineContext->currentFrame->getResourceAs<BufferInstance>(RID_LIGHT_BUFFER)->update(items.data(),
+                items.size() * sizeof(LightData));
         }
     }
 

@@ -4,6 +4,7 @@
 #include "../resource/MeshInstance.h"
 #include "../../editor/enum/engine-definitions.h"
 #include "../../common/IInit.h"
+#include "../../common/IEventMember.h"
 #include "ApplicationEventContext.h"
 
 namespace Metal {
@@ -14,7 +15,6 @@ namespace Metal {
     class BufferService;
     class RayTracingService;
     class DirectoryService;
-    class ApplicationEventContext;
     struct WorldRepository;
 
     class MeshService final : public AbstractResourceService<MeshInstance>, public IInit {
@@ -37,11 +37,11 @@ namespace Metal {
 
         void onInitialize() override;
 
-        MeshInstance *create(const std::string &id);
+        MeshInstance *create(const std::string &meshPath);
 
         MeshInstance *stream(const std::string &id);
 
-        MeshData *loadMeshData(const std::string &id) const;
+        MeshData *loadMeshData(const std::string &meshPath) const;
 
         void disposeResource(MeshInstance *resource) override;
     };

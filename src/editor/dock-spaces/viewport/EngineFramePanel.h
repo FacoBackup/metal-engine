@@ -9,6 +9,7 @@ namespace Metal {
     class EngineFrame;
     class VulkanContext;
     struct EngineRepository;
+    struct EditorRepository;
     class EngineContext;
     class DescriptorSetService;
     class PickingService;
@@ -17,6 +18,7 @@ namespace Metal {
     class EngineFramePanel final : public AbstractPanel {
         VulkanContext *vulkanContext = nullptr;
         EngineRepository *engineRepository = nullptr;
+        EditorRepository *editorRepository = nullptr;
         EngineContext *engineContext = nullptr;
         DescriptorSetService *descriptorSetService = nullptr;
         PickingService *pickingService = nullptr;
@@ -27,6 +29,7 @@ namespace Metal {
             return {
                 {"VulkanContext", &vulkanContext},
                 {"EngineRepository", &engineRepository},
+                {"EditorRepository", &editorRepository},
                 {"EngineContext", &engineContext},
                 {"DescriptorSetService", &descriptorSetService},
                 {"PickingService", &pickingService},

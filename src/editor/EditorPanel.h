@@ -19,7 +19,6 @@ namespace Metal {
         std::shared_ptr<AbstractPanel> headerPanel = nullptr;
         std::shared_ptr<AbstractPanel> footerPanel = nullptr;
         std::shared_ptr<AbstractPanel> notificationsPanel = nullptr;
-        std::shared_ptr<AbstractPanel> fileImportModalPanel = nullptr;
 
         DockService *dockService = nullptr;
         ThemeService *themeService = nullptr;

@@ -22,8 +22,8 @@ public:
         registerBool(boolField, "Group", "BoolField");
         registerVec3(vec3Field, "Group", "Vec3Field");
     }
-    const char* getIcon() override { return ""; }
-    const char* getTitle() override { return "Mock"; }
+    const char* getIcon() const override { return ""; }
+    const char* getTitle() const override { return "Mock"; }
     std::string getClassName() const override { return "MockInspectable"; }
 };
 

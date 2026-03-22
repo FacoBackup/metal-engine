@@ -7,6 +7,7 @@
 #include "service/CameraService.h"
 #include "service/LightService.h"
 #include "service/VolumeService.h"
+#include "service/PhysicsService.h"
 #include "repository/WorldRepository.h"
 #include "repository/EngineRepository.h"
 #include "../editor/repository/EditorRepository.h"
@@ -52,12 +53,29 @@ namespace Metal {
     }
 
     void EngineContext::dispose() {
+        physicsTransformThreadRunning = false;
+        if (physicsTransformThread.joinable()) {
+            physicsTransformThread.join();
+        }
+    }
+
+    void EngineContext::physicsTransformLoop() {
+        while (physicsTransformThreadRunning) {
+            if (transformService) transformService->onSync();
+            if (physicsService) physicsService->onSync();
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
     }
 
     void EngineContext::onSync() {
-        updateCurrentTime();
+        if (!physicsTransformThreadRunning) {
+            physicsTransformThreadRunning = true;
+            physicsTransformThread = std::thread(&EngineContext::physicsTransformLoop, this);
+        }
 
-        transformService->onSync();
+        updateCurrentTime();
+        updateGlobalData();
+
         streamingService->onSync();
         rayTracingService->onSync();
         cameraService->onSync();
@@ -67,7 +85,6 @@ namespace Metal {
         for (auto *frame: registeredFrames) {
             if (frame->getShouldRender()) {
                 currentFrame = frame;
-                updateGlobalData();
                 currentFrame->onSync();
 
                 frame->setShouldRender(false);

@@ -1,34 +1,45 @@
 #include "VoxelService.h"
-
 #include "../resource/SVOInstance.h"
+#include "../../common/LoggerUtil.h"
+#include "../../common/serialization-definitions.h"
+#include "../repository/EngineRepository.h"
+#include "BufferService.h"
+#include "../dto/SparseVoxelOctreeData.h"
+#include "../../ApplicationEventContext.h"
+#include "../dto/ResourceDisposalPayload.h"
 
 namespace Metal {
 
-    SVOInstance* VoxelService::create(const std::string &id) {
-        // if (std::string fileName = CTX.getAssetDirectory() + FORMAT_FILE_SVO(id);
-        //   std::filesystem::exists(fileName)) {
-        //     LOG_INFO("Streaming SVO " + fileName);
-        //     auto data = SparseVoxelOctreeData();
-        //     PARSE_TEMPLATE(data.load, fileName)
-        //
-        //     auto *instance = new SVOInstance(id);
-        //     registerResource(instance);
-        //     instance->voxelsBuffer = CTX.bufferService.createBuffer(
-        //         data.data.size() * sizeof(unsigned int),
-        //         VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-        //         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-        //         VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-        //     instance->voxelsBuffer->update(data.data.data());
-        //     instance->voxelBufferOffset = data.voxelBufferOffset;
-        //
-        //     return instance;
-        //   }
-         return nullptr;
+    void VoxelService::onInitialize() {
+        eventListener([this](const Event &event) {
+            auto payload = std::dynamic_pointer_cast<ResourceDisposalPayload>(event.payload);
+            if (payload) {
+                dispose(payload->resourceId);
+            }
+        }, "RESOURCE_DISPOSAL");
+    }
+
+    SVOInstance* VoxelService::create(const std::string &svoPath) {
+        if (std::filesystem::exists(svoPath)) {
+            LOG_INFO("Streaming SVO " + svoPath);
+            auto data = SparseVoxelOctreeData();
+            PARSE_TEMPLATE(data, svoPath)
+
+            auto *instance = createResourceInstance(svoPath);
+            instance->voxelsBuffer = bufferService->createBuffer(
+                instance->getId() + "_voxels",
+                data.data.size() * sizeof(unsigned int),
+                VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+            instance->voxelsBuffer->update(data.data.data());
+            instance->voxelBufferOffset = data.voxelBufferOffset;
+
+            return instance;
+        }
+        return nullptr;
     }
 
     void VoxelService::disposeResource(SVOInstance *resource) {
-        if (resource->voxelsBuffer != nullptr) {
-            dispose(resource->voxelsBuffer->getId());
-        }
     }
 } // Metal

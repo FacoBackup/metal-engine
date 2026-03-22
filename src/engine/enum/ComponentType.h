@@ -16,7 +16,14 @@ namespace Metal {
         TRANSFORM,
         VOLUME,
         METADATA,
-        LIGHT
+        LIGHT,
+        SCOPED_SCRIPT,
+        GLOBAL_SCRIPT,
+        RIGID_BODY,
+        BOX_COLLIDER,
+        SPHERE_COLLIDER,
+        CAPSULE_COLLIDER,
+        MESH_COLLIDER
     };
 }
 

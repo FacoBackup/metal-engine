@@ -1,4 +1,6 @@
 #include "UIUtil.h"
+#include "../../common/Icons.h"
+#include "../../common/FileExtensions.h"
 
 namespace Metal::UIUtil {
     bool OPEN = true;
@@ -44,10 +46,64 @@ namespace Metal::UIUtil {
         return ImGui::Button(label.c_str(), ImVec2(sizeX, sizeY));
     }
 
+    bool RenderButtonSolid(const std::string &id, const std::string &icon, const float size, const ImVec4 &color, const float rounding) {
+        ImGui::PushStyleColor(ImGuiCol_Button, color);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(color.x * 1.1f, color.y * 1.1f, color.z * 1.1f, color.w));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(color.x * 0.9f, color.y * 0.9f, color.z * 0.9f, color.w));
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, rounding);
+
+        const bool clicked = ImGui::Button((icon + "##" + id).c_str(), ImVec2(size, size));
+
+        ImGui::PopStyleVar();
+        ImGui::PopStyleColor(3);
+
+        return clicked;
+    }
+
     bool RenderOption(const std::string &label, const bool selected, const bool fixedSize,
                       const ImVec4 &accent) {
         const float size = fixedSize ? ONLY_ICON_BUTTON_SIZE : -1;
         return RenderOption(label, selected, size, size, accent);
+    }
+
+    bool RenderTab(const std::string &id, const std::string &icon, const std::string &label, const bool selected,
+                   const ImVec4 &iconColor, const ImVec4 &accent, const float height) {
+        ImGui::PushID(id.c_str());
+
+        const float framePadding = ImGui::GetStyle().FramePadding.x;
+        const float iconWidth = ImGui::CalcTextSize(icon.c_str()).x;
+        const float labelWidth = ImGui::CalcTextSize(label.c_str()).x;
+        const float totalWidth = iconWidth + labelWidth + framePadding * 3.0f;
+
+        if (selected) {
+            ImGui::PushStyleColor(ImGuiCol_Button, accent);
+        }
+
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+        const bool clicked = ImGui::Button("##tab", ImVec2(totalWidth, height));
+        ImGui::PopStyleVar();
+
+        if (selected) {
+            ImGui::PopStyleColor();
+        }
+
+        const ImVec2 pos = ImGui::GetItemRectMin();
+        const ImVec2 size = ImGui::GetItemRectSize();
+        ImDrawList *drawList = ImGui::GetWindowDrawList();
+
+        // Icon
+        ImGui::PushStyleColor(ImGuiCol_Text, iconColor);
+        const ImVec2 iconPos = ImVec2(pos.x + framePadding, pos.y + (size.y - ImGui::GetTextLineHeight()) * 0.5f);
+        drawList->AddText(iconPos, ImGui::GetColorU32(ImGuiCol_Text), icon.c_str());
+        ImGui::PopStyleColor();
+
+        // Label
+        const ImVec2 labelPos = ImVec2(pos.x + iconWidth + framePadding * 2.0f,
+                                       pos.y + (size.y - ImGui::GetTextLineHeight()) * 0.5f);
+        drawList->AddText(labelPos, ImGui::GetColorU32(ImGuiCol_Text), label.c_str());
+
+        ImGui::PopID();
+        return clicked;
     }
 
     void RenderTooltip(const std::string &text) {
@@ -103,13 +159,10 @@ namespace Metal::UIUtil {
         ImGui::Text(name.c_str());
         ImGui::PushID(id.c_str());
 
-        if (ImGui::BeginTable("##table", 2, ImGuiTableFlags_NoSavedSettings)) {
-            ImGui::TableNextColumn();
-            if (DragFloatWithLabel("x", &values[0], "X", ImVec4{0.8f, 0.1f, 0.15f, 1.0f}, speed)) changed = true;
-            ImGui::TableNextColumn();
-            if (DragFloatWithLabel("y", &values[1], "Y", ImVec4{0.2f, 0.7f, 0.2f, 1.0f}, speed)) changed = true;
-            ImGui::EndTable();
-        }
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+        if (DragFloatWithLabel("x", &values[0], "X", ImVec4{0.8f, 0.1f, 0.15f, 1.0f}, speed)) changed = true;
+        if (DragFloatWithLabel("y", &values[1], "Y", ImVec4{0.2f, 0.7f, 0.2f, 1.0f}, speed)) changed = true;
+        ImGui::PopStyleVar();
 
         ImGui::PopID();
         return changed;
@@ -120,15 +173,11 @@ namespace Metal::UIUtil {
         ImGui::Text(name.c_str());
         ImGui::PushID(id.c_str());
 
-        if (ImGui::BeginTable("##table", 3, ImGuiTableFlags_NoSavedSettings)) {
-            ImGui::TableNextColumn();
-            if (DragFloatWithLabel("x", &values[0], "X", ImVec4{0.8f, 0.1f, 0.15f, 1.0f}, speed)) changed = true;
-            ImGui::TableNextColumn();
-            if (DragFloatWithLabel("y", &values[1], "Y", ImVec4{0.2f, 0.7f, 0.2f, 1.0f}, speed)) changed = true;
-            ImGui::TableNextColumn();
-            if (DragFloatWithLabel("z", &values[2], "Z", ImVec4{0.1f, 0.25f, 0.8f, 1.0f}, speed)) changed = true;
-            ImGui::EndTable();
-        }
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+        if (DragFloatWithLabel("x", &values[0], "X", ImVec4{0.8f, 0.1f, 0.15f, 1.0f}, speed)) changed = true;
+        if (DragFloatWithLabel("y", &values[1], "Y", ImVec4{0.2f, 0.7f, 0.2f, 1.0f}, speed)) changed = true;
+        if (DragFloatWithLabel("z", &values[2], "Z", ImVec4{0.1f, 0.25f, 0.8f, 1.0f}, speed)) changed = true;
+        ImGui::PopStyleVar();
 
         ImGui::PopID();
         return changed;
@@ -139,17 +188,12 @@ namespace Metal::UIUtil {
         ImGui::Text(name.c_str());
         ImGui::PushID(id.c_str());
 
-        if (ImGui::BeginTable("##table", 4, ImGuiTableFlags_NoSavedSettings)) {
-            ImGui::TableNextColumn();
-            if (DragFloatWithLabel("x", &values[0], "X", ImVec4{0.8f, 0.1f, 0.15f, 1.0f}, speed)) changed = true;
-            ImGui::TableNextColumn();
-            if (DragFloatWithLabel("y", &values[1], "Y", ImVec4{0.2f, 0.7f, 0.2f, 1.0f}, speed)) changed = true;
-            ImGui::TableNextColumn();
-            if (DragFloatWithLabel("z", &values[2], "Z", ImVec4{0.1f, 0.25f, 0.8f, 1.0f}, speed)) changed = true;
-            ImGui::TableNextColumn();
-            if (DragFloatWithLabel("w", &values[3], "W", ImVec4{0.5f, 0.5f, 0.5f, 1.0f}, speed)) changed = true;
-            ImGui::EndTable();
-        }
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+        if (DragFloatWithLabel("x", &values[0], "X", ImVec4{0.8f, 0.1f, 0.15f, 1.0f}, speed)) changed = true;
+        if (DragFloatWithLabel("y", &values[1], "Y", ImVec4{0.2f, 0.7f, 0.2f, 1.0f}, speed)) changed = true;
+        if (DragFloatWithLabel("z", &values[2], "Z", ImVec4{0.1f, 0.25f, 0.8f, 1.0f}, speed)) changed = true;
+        if (DragFloatWithLabel("w", &values[3], "W", ImVec4{0.5f, 0.5f, 0.5f, 1.0f}, speed)) changed = true;
+        ImGui::PopStyleVar();
 
         ImGui::PopID();
         return changed;
@@ -175,22 +219,6 @@ namespace Metal::UIUtil {
         return result;
     }
 
-    std::string GetEntryIcon(const EntryType::EntryType type) {
-        switch (type) {
-            case EntryType::MESH:
-                return Icons::view_in_ar;
-            case EntryType::TEXTURE:
-                return Icons::texture;
-            case EntryType::VOLUME:
-                return Icons::cloud;
-            case EntryType::DIRECTORY:
-                return Icons::folder;
-            case EntryType::SCENE:
-                return Icons::inventory_2;
-            default: return "";
-        }
-    }
-
     std::string GetDockSpaceIcon(const int index) {
         switch (index) {
             case -1: return Icons::i_public; // VIEWPORT
@@ -200,7 +228,62 @@ namespace Metal::UIUtil {
             case 3: return Icons::folder_open; // FILES
             case 4: return Icons::analytics; // METRICS
             case 5: return Icons::search; // REPOSITORIES
+            case 6: return Icons::script; // REPOSITORIES
+            case 7: return Icons::chat; // MCP
             default: return "";
         }
+    }
+
+    std::string GetExtensionIcon(const std::string &extension) {
+        if (extension == EXT_SCENE) return Icons::image;
+        if (extension == EXT_MESH) return Icons::view_in_ar;
+        if (extension == EXT_PNG || extension == EXT_JPG || extension == EXT_JPEG || extension == EXT_TGA) return Icons::texture;
+        if (extension == EXT_SVO || extension == EXT_VDB) return Icons::view_agenda;
+        if (extension == EXT_OBJ || extension == EXT_FBX || extension == EXT_GLTF || extension == EXT_GLB) return Icons::image;
+        return Icons::close;
+    }
+
+    std::string GetExtensionLabel(const std::string &extension) {
+        if (extension == EXT_SCENE) return "Scene";
+        if (extension == EXT_MESH) return "Mesh";
+        if (extension == EXT_PNG || extension == EXT_JPG || extension == EXT_JPEG || extension == EXT_TGA) return "Texture";
+        if (extension == EXT_SVO) return "Volume";
+        if (extension == EXT_VDB) return "OpenVDB";
+        if (extension == EXT_OBJ || extension == EXT_FBX || extension == EXT_GLTF || extension == EXT_GLB) return "Scene Source";
+        return "File";
+    }
+
+    bool Accordion(const std::string &id, const std::string &label, bool &open, const ImVec4 &background) {
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 3.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, open ? ImVec2(4.0f, 4.0f) : ImVec2(0, 0));
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, background);
+        if (ImGui::BeginChild(id.c_str(), ImVec2(0, 0),
+                              ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AlwaysUseWindowPadding)) {
+            ImGui::PushStyleColor(ImGuiCol_Button, background);
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
+
+            const std::string icon = open ? Icons::keyboard_arrow_down : Icons::keyboard_arrow_right;
+            if (ImGui::Button((icon + " " + label + "##" + id).c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
+                open = !open;
+            }
+
+            ImGui::PopStyleVar(3);
+            ImGui::PopStyleColor();
+
+            if (open) {
+                return true;
+            }
+        }
+
+        EndAccordion();
+        return false;
+    }
+
+    void EndAccordion() {
+        ImGui::EndChild();
+        ImGui::PopStyleColor();
+        ImGui::PopStyleVar(2);
     }
 }

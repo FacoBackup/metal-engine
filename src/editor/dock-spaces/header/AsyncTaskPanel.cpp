@@ -1,9 +1,10 @@
 #include "AsyncTaskPanel.h"
-#include "../../../ApplicationContext.h"
+#include "ApplicationContext.h"
 #include "../../util/UIUtil.h"
 #include <cmath>
 #include "../../service/AsyncTaskService.h"
 #include "../../dto/AsyncTask.h"
+#include "common/Icons.h"
 
 namespace Metal {
     void AsyncTaskPanel::onSync() {

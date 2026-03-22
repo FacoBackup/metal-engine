@@ -6,10 +6,13 @@
 #include <glm/vec4.hpp>
 
 #include <glm/detail/type_quat.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include "InspectedField.h"
 #include "InspectedMethod.h"
 #include "../editor/util/Util.h"
-#include "../editor/enum/EntryType.h"
 
 #define  DECLARATION(T, V) \
         std::shared_ptr<InspectedField<T>> field = std::make_shared<InspectedField<T>>(&v);\
@@ -126,6 +129,54 @@ namespace Metal {
         fields.push_back(std::move(field));
     }
 
+    nlohmann::json Inspectable::toJSON() const {
+        nlohmann::json j;
+        j["className"] = getClassName();
+        
+        try {
+            j["label"] = this->getTitle();
+        } catch (...) {
+            j["label"] = j["className"];
+        }
+
+        nlohmann::json fieldsJson = nlohmann::json::array();
+        
+        auto& mutableThis = const_cast<Inspectable&>(*this);
+        for (const auto& field : mutableThis.getFields()) {
+            nlohmann::json f;
+            f["name"] = field->name;
+            f["group"] = field->group;
+            f["type"] = field->type;
+            f["path"] = field->path;
+
+            if (field->type == FieldType::BOOLEAN) {
+                f["value"] = *static_cast<InspectedField<bool>*>(field.get())->field;
+            } else if (field->type == FieldType::INT) {
+                f["value"] = *static_cast<InspectedField<int>*>(field.get())->field;
+            } else if (field->type == FieldType::FLOAT) {
+                f["value"] = *static_cast<InspectedField<float>*>(field.get())->field;
+            } else if (field->type == FieldType::STRING || field->type == FieldType::RESOURCE) {
+                f["value"] = *static_cast<InspectedField<std::string>*>(field.get())->field;
+            } else if (field->type == FieldType::VECTOR2) {
+                auto v = *static_cast<InspectedField<glm::vec2>*>(field.get())->field;
+                f["value"] = {{"x", v.x}, {"y", v.y}};
+            } else if (field->type == FieldType::VECTOR3 || field->type == FieldType::COLOR) {
+                auto v = *static_cast<InspectedField<glm::vec3>*>(field.get())->field;
+                f["value"] = {{"x", v.x}, {"y", v.y}, {"z", v.z}};
+            } else if (field->type == FieldType::VECTOR4) {
+                auto v = *static_cast<InspectedField<glm::vec4>*>(field.get())->field;
+                f["value"] = {{"x", v.x}, {"y", v.y}, {"z", v.z}, {"w", v.w}};
+            } else if (field->type == FieldType::QUAT) {
+                auto q = *static_cast<InspectedField<glm::quat>*>(field.get())->field;
+                f["value"] = {{"x", q.x}, {"y", q.y}, {"z", q.z}, {"w", q.w}};
+            }
+
+            fieldsJson.push_back(f);
+        }
+        j["fields"] = fieldsJson;
+        return j;
+    }
+
     std::string Inspectable::getClassName() const {
         return getTypeName(typeid(*this).name(), false);
     }
@@ -137,13 +188,11 @@ namespace Metal {
     }
 
     void Inspectable::registerResourceSelection(std::string &v, std::string group, std::string name,
-                                                EntryType::EntryType type,
+                                                const std::vector<std::string> &supportedFileTypes,
                                                 bool disabled) {
-        if (type == EntryType::DIRECTORY) {
-            throw std::runtime_error("Cannot register directories on this object");
-        }
+
         DECLARATION(std::string, RESOURCE)
-        field->resourceType = type;
+        field->supportedFileTypes = supportedFileTypes;
         fields.push_back(std::move(field));
     }
 }

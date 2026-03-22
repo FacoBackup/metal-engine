@@ -33,6 +33,12 @@ namespace Metal {
         glm::vec3 zAxis{0.0f};
 
         mutable bool dirty = true;
+        bool forwardPressed = false;
+        bool backwardPressed = false;
+        bool leftPressed = false;
+        bool rightPressed = false;
+        bool upPressed = false;
+        bool downPressed = false;
 
         void updateMatrices();
 

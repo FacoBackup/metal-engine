@@ -3,9 +3,6 @@
 
 #include "imgui.h"
 #include <string>
-#include "../enum/EntryType.h"
-
-#include "../../common/Icons.h"
 
 namespace Metal::UIUtil {
     inline constexpr ImVec4 DIRECTORY_COLOR{188 / 255.f, 128 / 255.f, 78 / 255.f, 1};
@@ -24,13 +21,18 @@ namespace Metal::UIUtil {
 
     void EndPopupContext();
 
-    bool RenderOption(const std::string &label, const bool selected, const float sizeX, const float sizeY,
+    bool RenderOption(const std::string &label, bool selected, float sizeX, float sizeY,
                       const ImVec4 &accent);
 
-    bool ButtonSimple(const std::string &label, const float sizeX, const float sizeY);
+    bool RenderButtonSolid(const std::string &id, const std::string &icon, float size, const ImVec4 &color, float rounding);
 
-    bool RenderOption(const std::string &label, const bool selected, const bool fixedSize,
+    bool ButtonSimple(const std::string &label, float sizeX, float sizeY);
+
+    bool RenderOption(const std::string &label, bool selected, bool fixedSize,
                       const ImVec4 &accent);
+
+    bool RenderTab(const std::string &id, const std::string &icon, const std::string &label, bool selected,
+                   const ImVec4 &iconColor, const ImVec4 &accent, float height);
 
     void RenderTooltip(const std::string &text);
 
@@ -53,8 +55,14 @@ namespace Metal::UIUtil {
 
     std::string GetKeyChordName(ImGuiKeyChord keyChord);
 
-    std::string GetEntryIcon(const EntryType::EntryType type);
+    std::string GetDockSpaceIcon(int index);
 
-    std::string GetDockSpaceIcon(const int index);
+    std::string GetExtensionIcon(const std::string &extension);
+
+    std::string GetExtensionLabel(const std::string &extension);
+
+    bool Accordion(const std::string &id, const std::string &label, bool &open, const ImVec4 &background);
+
+    void EndAccordion();
 }
 #endif

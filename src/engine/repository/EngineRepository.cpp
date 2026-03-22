@@ -8,6 +8,7 @@
 #define SUN "Sun"
 #define VOLUMES "Volumes"
 #define DEPTH_OF_FIELD "Depth of field"
+#define PHYSICS "Physics"
 
 namespace Metal {
     void EngineRepository::registerFields() {
@@ -31,6 +32,8 @@ namespace Metal {
 
         registerBool(atmosphereEnabled, ATMOSPHERE, "Enable atmosphere?");
         registerFloat(elapsedTime, ATMOSPHERE, "Elapsed time");
+
+        registerVec3(gravity, PHYSICS, "Gravity");
     }
 
     nlohmann::json EngineRepository::toJson() const {
@@ -50,6 +53,7 @@ namespace Metal {
         j["dofFocusDistance"] = dofFocusDistance;
         j["dofAperture"] = dofAperture;
         j["dofFocalLength"] = dofFocalLength;
+        j["gravity"] = {gravity.x, gravity.y, gravity.z};
         return j;
     }
 
@@ -69,13 +73,16 @@ namespace Metal {
         dofFocusDistance = j.at("dofFocusDistance").get<float>();
         dofAperture = j.at("dofAperture").get<float>();
         dofFocalLength = j.at("dofFocalLength").get<float>();
+        if (j.contains("gravity")) {
+            gravity = {j.at("gravity")[0], j.at("gravity")[1], j.at("gravity")[2]};
+        }
     }
 
-    const char *EngineRepository::getIcon() {
+    const char *EngineRepository::getIcon() const {
         return Icons::display_settings.c_str();
     }
 
-    const char *EngineRepository::getTitle() {
+    const char *EngineRepository::getTitle() const {
         return "Engine settings";
     }
 } // Metal

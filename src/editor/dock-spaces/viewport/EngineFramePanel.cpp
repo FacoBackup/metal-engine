@@ -13,6 +13,7 @@
 #include "../../../engine/dto/MeshMetadata.h"
 #include "ViewportHeaderPanel.h"
 #include "ImGuizmo.h"
+#include "../../repository/EditorRepository.h"
 #include <algorithm>
 #include "../../../engine/passes/impl/HWRayTracingPass.h"
 #include "../../../engine/passes/impl/PostProcessingPass.h"
@@ -69,6 +70,8 @@ namespace Metal {
                 .addPass(std::make_unique<FallbackPass>(), RID_POST_PROCESSING_CB)
                 .addPass(std::make_unique<SelectionOutlinePass>(), RID_POST_PROCESSING_CB)
                 .build();
+
+
     }
 
     void EngineFramePanel::onSync() {
@@ -91,7 +94,10 @@ namespace Metal {
 
             const ImVec2 imageMin = pos;
             const ImVec2 imageMax = ImVec2(pos.x + viewportSize.x, pos.y + viewportSize.y);
-            handleViewportPicking(imageMin, imageMax);
+
+            if (!editorRepository->isPlaying) {
+                handleViewportPicking(imageMin, imageMax);
+            }
         }
     }
 

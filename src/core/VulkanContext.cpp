@@ -257,11 +257,7 @@ namespace Metal {
 
     void VulkanContext::onInitialize() {
         this->window = windowService->getWindow();
-        
-        imguiVulkanWindow.ClearValue.color.float32[0] = 0;
-        imguiVulkanWindow.ClearValue.color.float32[1] = 0;
-        imguiVulkanWindow.ClearValue.color.float32[2] = 0;
-        imguiVulkanWindow.ClearValue.color.float32[3] = 1;
+
         vkb::InstanceBuilder instanceBuilder;
 
         // ------- CORE INITIALIZATION

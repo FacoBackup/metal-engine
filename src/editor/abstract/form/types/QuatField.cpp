@@ -14,32 +14,38 @@ namespace Metal {
 
     void QuatField::onSync() {
         if (!field.disabled) {
-            values[0] = field.field->x;
-            values[1] = field.field->y;
-            values[2] = field.field->z;
-            values[3] = field.field->w;
+            if (!isEditing) {
+                eulerValues = glm::degrees(glm::eulerAngles(*field.field));
+            }
+
+            values[0] = eulerValues.x;
+            values[1] = eulerValues.y;
+            values[2] = eulerValues.z;
 
             glm::quat oldValue = *field.field;
-            if (UIUtil::DrawQuatControl(field.name, field.id, values, field.incrementF.value())) {
-                field.field->x = values[0];
-                field.field->y = values[1];
-                field.field->z = values[2];
-                field.field->w = values[3];
+            if (UIUtil::DrawVec3Control(field.name, field.id, values, field.incrementF.value())) {
+                isEditing = true;
+                eulerValues.x = values[0];
+                eulerValues.y = values[1];
+                eulerValues.z = values[2];
 
+                *field.field = glm::quat(glm::radians(eulerValues));
 
                 historyService->recordChange(&field, oldValue);
                 ApplicationEventContext::dispatch(field.instance->getClassName(), std::make_shared<FieldModificationPayload>(field));
             }
 
             if (ImGui::IsItemActivated()) {
+                isEditing = true;
                 historyService->startTransaction("Change " + field.name);
             }
             if (ImGui::IsItemDeactivatedAfterEdit()) {
+                isEditing = false;
                 historyService->endTransaction();
             }
         } else {
-            ImGui::Text("%s: <%f, %f, %f, %f>", field.name.c_str(), field.field->x, field.field->y, field.field->z,
-                        field.field->w);
+            glm::vec3 euler = glm::degrees(glm::eulerAngles(*field.field));
+            ImGui::Text("%s: <%f, %f, %f>", field.name.c_str(), euler.x, euler.y, euler.z);
         }
     }
 

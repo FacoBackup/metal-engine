@@ -2,11 +2,11 @@
 #include "../../common/Icons.h"
 
 namespace Metal {
-    const char *EditorRepository::getTitle() {
+    const char *EditorRepository::getTitle() const {
         return "Editor";
     }
 
-    const char *EditorRepository::getIcon() {
+    const char *EditorRepository::getIcon() const {
         return Icons::settings.c_str();
     }
 
@@ -45,6 +45,10 @@ namespace Metal {
             j["copied"].push_back(entt::to_integral(entity));
         }
         j["shadingMode"] = shadingMode;
+        j["bookmarks"] = bookmarks;
+        j["isPlaying"] = isPlaying;
+        j["gptMcpKey"] = gptMcpKey;
+        j["geminiMcpKey"] = geminiMcpKey;
         return j;
     }
 
@@ -86,6 +90,12 @@ namespace Metal {
                 }
             }
             shadingMode = static_cast<ShadingMode>(j.at("shadingMode").get<int>());
+            if (j.contains("bookmarks") && j.at("bookmarks").is_array()) {
+                bookmarks = j.at("bookmarks").get<std::vector<std::string>>();
+            }
+            isPlaying = j.value("isPlaying", false);
+            gptMcpKey = j.value("gptMcpKey", "");
+            geminiMcpKey = j.value("geminiMcpKey", "");
     }
 
     void EditorRepository::registerFields() {
@@ -99,5 +109,7 @@ namespace Metal {
         registerFloat(gridScale, "Grid", "Scale");
         registerInt(gridThreshold, "Grid", "Threshold");
         registerFloat(gridThickness, "Grid", "Thickness");
+        registerText(gptMcpKey, "MCP", "GPT Key");
+        registerText(geminiMcpKey, "MCP", "Gemini Key");
     }
 }

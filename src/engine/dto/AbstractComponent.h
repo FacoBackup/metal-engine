@@ -15,15 +15,15 @@ namespace Metal {
             this->entityId = entityId;
         }
 
-        const char *getIcon() override {
+        const char *getIcon() const override {
             return Metal::ComponentTypes::IconOf(getType());
         }
 
-        const char *getTitle() override {
+        const char *getTitle() const override {
             return Metal::ComponentTypes::NameOf(getType());
         }
 
-        virtual ComponentType getType() {
+        virtual ComponentType getType() const {
             throw std::runtime_error("Not implemented");
         }
 

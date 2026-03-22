@@ -1,23 +1,23 @@
 #include "PrimitiveComponent.h"
 #include "../../ApplicationContext.h"
-#include "../../editor/enum/EntryType.h"
+#include "../../common/FileExtensions.h"
 #include "MeshData.h"
 
 namespace Metal {
     void PrimitiveComponent::registerFields() {
-        registerResourceSelection(meshId, "", "Mesh", EntryType::MESH);
-        registerColor(albedoColor, "Material", "Albedo color");
-        registerFloat(roughnessFactor, "Material", "Roughness factor", 0, 1);
-        registerFloat(metallicFactor, "Material", "Metallic factor", 0, 1);
-        registerFloat(transmissionFactor, "Material", "Transmission factor", 0, 1);
-        registerFloat(thicknessFactor, "Material", "Thickness factor", 0, 10);
-        registerFloat(ior, "Material", "IOR", 1, 3);
-        registerResourceSelection(albedo, "Material", "Albedo", EntryType::TEXTURE);
-        registerResourceSelection(roughness, "Material", "Roughness texture", EntryType::TEXTURE);
-        registerResourceSelection(metallic, "Material", "Metallic Texture", EntryType::TEXTURE);
+        registerResourceSelection(meshId, "", "Mesh", MESH_EXTENSIONS);
+        registerColor(albedoColor, "", "Albedo color");
+        registerFloat(roughnessFactor, "", "Roughness factor", 0, 1);
+        registerFloat(metallicFactor, "", "Metallic factor", 0, 1);
+        registerFloat(transmissionFactor, "", "Transmission factor", 0, 1);
+        registerFloat(thicknessFactor, "", "Thickness factor", 0, 10);
+        registerFloat(ior, "", "IOR", 1, 3);
+        registerResourceSelection(albedo, "", "Albedo", TEXTURE_EXTENSIONS);
+        registerResourceSelection(roughness, "", "Roughness texture", TEXTURE_EXTENSIONS);
+        registerResourceSelection(metallic, "", "Metallic Texture", TEXTURE_EXTENSIONS);
     }
 
-    ComponentType PrimitiveComponent::getType() {
+    ComponentType PrimitiveComponent::getType() const {
         return ComponentType::PRIMITIVE;
     }
 

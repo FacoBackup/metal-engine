@@ -45,11 +45,11 @@ namespace Metal {
         plane /= glm::length(glm::vec3(plane));
     }
 
-    const char *Camera::getTitle() {
+    const char *Camera::getTitle() const {
         return "Camera";
     }
 
-    const char *Camera::getIcon() {
+    const char *Camera::getIcon() const {
         return Icons::camera_alt.c_str();
     }
 

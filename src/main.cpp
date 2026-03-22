@@ -10,7 +10,12 @@
 #include "editor/service/FileImporterService.h"
 #include "editor/service/FilesService.h"
 #include "editor/service/HistoryService.h"
+#include "editor/service/HttpService.h"
 #include "editor/service/MaterialImporterService.h"
+#include "editor/service/AIAssistantService.h"
+#include "editor/util/WorldToolProvider.h"
+#include "editor/util/ScriptingToolProvider.h"
+#include "editor/util/InspectionToolProvider.h"
 #include "editor/service/MeshImporterService.h"
 #include "editor/service/NotificationService.h"
 #include "editor/service/PickingService.h"
@@ -20,6 +25,8 @@
 #include "editor/service/ThemeService.h"
 #include "editor/service/VoxelImporterService.h"
 #include "editor/repository/EditorRepository.h"
+#include "editor/repository/DockRepository.h"
+#include "editor/repository/AIAssistantRepository.h"
 
 #include "engine/repository/EngineRepository.h"
 #include "engine/repository/RuntimeRepository.h"
@@ -31,6 +38,8 @@
 #include "engine/service/DescriptorSetService.h"
 #include "engine/service/FrameBufferService.h"
 #include "engine/service/LightService.h"
+#include "engine/service/PhysicsService.h"
+#include "engine/service/LuaService.h"
 #include "engine/service/MaterialService.h"
 #include "engine/service/MeshService.h"
 #include "engine/service/PipelineService.h"
@@ -58,6 +67,8 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::EngineContext>());
     context->registerSingleton(std::make_shared<Metal::EngineRepository>());
     context->registerSingleton(std::make_shared<Metal::EditorRepository>());
+    context->registerSingleton(std::make_shared<Metal::DockRepository>());
+    context->registerSingleton(std::make_shared<Metal::AIAssistantRepository>());
     context->registerSingleton(std::make_shared<Metal::RuntimeRepository>());
     context->registerSingleton(std::make_shared<Metal::WorldRepository>());
     context->registerSingleton(std::make_shared<Metal::MeshService>());
@@ -68,11 +79,16 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::CommandBufferRecorderService>());
     context->registerSingleton(std::make_shared<Metal::NotificationService>());
     context->registerSingleton(std::make_shared<Metal::HistoryService>());
+    context->registerSingleton(std::make_shared<Metal::HttpService>());
     context->registerSingleton(std::make_shared<Metal::DescriptorSetService>());
     context->registerSingleton(std::make_shared<Metal::ThemeService>());
     context->registerSingleton(std::make_shared<Metal::DockService>());
     context->registerSingleton(std::make_shared<Metal::MaterialService>());
     context->registerSingleton(std::make_shared<Metal::AsyncTaskService>());
+    context->registerSingleton(std::make_shared<Metal::AIAssistantService>());
+    context->registerSingleton(std::make_shared<Metal::WorldToolProvider>());
+    context->registerSingleton(std::make_shared<Metal::ScriptingToolProvider>());
+    context->registerSingleton(std::make_shared<Metal::InspectionToolProvider>());
     context->registerSingleton(std::make_shared<Metal::SceneImporterService>());
 
     context->registerSingleton(std::make_shared<Metal::SelectionService>());
@@ -84,6 +100,8 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::TransformService>());
     context->registerSingleton(std::make_shared<Metal::PickingService>());
     context->registerSingleton(std::make_shared<Metal::VolumeService>());
+    context->registerSingleton(std::make_shared<Metal::PhysicsService>());
+    context->registerSingleton(std::make_shared<Metal::LuaService>());
     context->registerSingleton(std::make_shared<Metal::VoxelImporterService>());
     context->registerSingleton(std::make_shared<Metal::LightService>());
     context->registerSingleton(std::make_shared<Metal::StreamingService>());

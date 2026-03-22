@@ -22,11 +22,10 @@ namespace Metal {
     }
 
     bool SelectionOutlinePass::shouldRun() {
-        return !editorRepository->selected.empty();
+        return !editorRepository->isPlaying && !editorRepository->selected.empty();
     }
 
     void SelectionOutlinePass::onSync() {
-
         pushConstant.selectionColor.x = editorRepository->selectionColor.x;
         pushConstant.selectionColor.y = editorRepository->selectionColor.y;
         pushConstant.selectionColor.z = editorRepository->selectionColor.z;

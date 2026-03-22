@@ -53,8 +53,17 @@ namespace Metal {
         // Check window controls (buttons) first to ensure they aren't part of the drag area
         if (SDL_PointInRect(pt, &rects.closeButton) ||
             SDL_PointInRect(pt, &rects.maximizeButton) ||
-            SDL_PointInRect(pt, &rects.minimizeButton)) {
+            SDL_PointInRect(pt, &rects.minimizeButton) ||
+            SDL_PointInRect(pt, &rects.saveButton) ||
+            SDL_PointInRect(pt, &rects.undoButton) ||
+            SDL_PointInRect(pt, &rects.redoButton)) {
             return SDL_HITTEST_NORMAL;
+        }
+
+        for (const auto &dockRect : rects.dockAdders) {
+            if (SDL_PointInRect(pt, &dockRect)) {
+                return SDL_HITTEST_NORMAL;
+            }
         }
 
         // Draggable area
@@ -91,7 +100,8 @@ namespace Metal {
         }
 
         SDL_WindowFlags window_flags =
-                SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS;
+                SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS | SDL_WINDOW_MAXIMIZED;
+
         window = SDL_CreateWindow(ENGINE_NAME, 1280, 720, window_flags);
 
         if (!window) {
@@ -116,18 +126,6 @@ namespace Metal {
         if (hwnd) {
             DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_ROUND;
             DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
-
-            if (themeService) {
-                COLORREF color = RGB(
-                    static_cast<int>(themeService->palette1.x * 255),
-                    static_cast<int>(themeService->palette1.y * 255),
-                    static_cast<int>(themeService->palette1.z * 255)
-                );
-                DwmSetWindowAttribute(hwnd, DWMWA_CAPTION_COLOR, &color, sizeof(color));
-
-                COLORREF textColor = RGB(255, 255, 255);
-                DwmSetWindowAttribute(hwnd, DWMWA_TEXT_COLOR, &textColor, sizeof(textColor));
-            }
         }
     }
 

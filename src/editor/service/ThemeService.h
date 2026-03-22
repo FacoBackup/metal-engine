@@ -9,10 +9,13 @@
 #include "../../common/ISync.h"
 
 namespace Metal {
+    class VulkanContext;
     struct EditorRepository;
+    class vulkanContext;
 
     class ThemeService final : public IService, public ISync {
         EditorRepository *editorRepository = nullptr;
+        VulkanContext *vulkanContext = nullptr;
         nlohmann::json themeData;
         bool themeLoaded = false;
 
@@ -41,7 +44,10 @@ namespace Metal {
         void onSync() override;
 
         std::vector<Dependency> getDependencies() override {
-            return {{"EditorRepository", &editorRepository}};
+            return {
+                {"EditorRepository", &editorRepository},
+                {"VulkanContext", &vulkanContext}
+            };
         }
     };
 } // Metal

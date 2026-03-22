@@ -20,6 +20,7 @@
 #include "../dto/TransformComponent.h"
 #include "../repository/WorldRepository.h"
 #include "editor/dto/FieldModificationEvent.h"
+#include "../dto/ResourceDisposalPayload.h"
 
 namespace Metal {
     void MeshService::onInitialize() {
@@ -37,20 +38,30 @@ namespace Metal {
                 }
             }
         }, "PrimitiveComponent");
+
+        eventListener([this](const Event &event) {
+            auto payload = std::dynamic_pointer_cast<ResourceDisposalPayload>(event.payload);
+            if (payload) {
+                MeshInstance *resource = getResource(payload->resourceId);
+                LOG_INFO("Disposing of mesh instance");
+                bufferService->dispose(resource->indexBuffer->getId());
+                bufferService->dispose(resource->dataBuffer->getId());
+            }
+        }, "RESOURCE_DISPOSAL");
     }
 
-    MeshInstance *MeshService::create(const std::string &id) {
-        MeshData *data = loadMeshData(id);
+    MeshInstance *MeshService::create(const std::string &meshPath) {
+        MeshData *data = loadMeshData(meshPath);
         if (data == nullptr) {
             return nullptr;
         }
-        auto *instance = createResourceInstance(id);
+        auto *instance = createResourceInstance(meshPath);
 
         instance->indexCount = data->indices.size();
         instance->vertexCount = data->data.size();
 
         instance->dataBuffer = bufferService->createBuffer(
-            id + "_data",
+            meshPath + "_data",
             sizeof(VertexData) * data->data.size(),
             VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR |
             VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
@@ -58,7 +69,7 @@ namespace Metal {
             true);
 
         instance->indexBuffer = bufferService->createBuffer(
-            id + "_indices",
+            meshPath + "_indices",
             sizeof(unsigned int) * data->indices.size(),
             VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR |
             VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
@@ -81,11 +92,11 @@ namespace Metal {
         return create(id);
     }
 
-    MeshData *MeshService::loadMeshData(const std::string &id) const {
-        auto pathToFile = directoryService->getRootDirectory() + "/assets/" + FORMAT_FILE_MESH(id);
-        if (std::filesystem::exists(pathToFile)) {
+    MeshData *MeshService::loadMeshData(const std::string &meshPath) const {
+        if (std::filesystem::exists(meshPath)) {
             auto *data = new MeshData;
-            std::ifstream input(pathToFile, std::ios::binary);
+            std::ifstream input(meshPath, std::ios::binary);
+            if (!input.is_open()) return nullptr;
             cereal::BinaryInputArchive archive(input);
             archive(*data);
             return data;
@@ -94,8 +105,5 @@ namespace Metal {
     }
 
     void MeshService::disposeResource(MeshInstance *resource) {
-        LOG_INFO("Disposing of mesh instance");
-        bufferService->dispose(resource->indexBuffer->getId());
-        bufferService->dispose(resource->dataBuffer->getId());
     }
 } // Metal

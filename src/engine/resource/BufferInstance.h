@@ -24,7 +24,7 @@ namespace Metal {
 
         BufferType getBufferType();
 
-        void update(void *newData) const;
+        void update(void *newData, VkDeviceSize size = 0) const;
 
         ResourceType resourceType() override {
             return BUFFER;

@@ -53,6 +53,16 @@ namespace Metal {
             return *static_cast<T *>(it->second);
         }
 
+        template<typename T>
+        T *getSingletonPtr() {
+            auto name = getTypeName(typeid(T).name());
+            auto it = singletons.find(name);
+            if (it == singletons.end()) {
+                return nullptr;
+            }
+            return static_cast<T *>(it->second);
+        }
+
         void *getSingletonByName(const std::string &name) {
             std::string lowerName = name;
             std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(),
@@ -72,6 +82,18 @@ namespace Metal {
         [[nodiscard]] bool isDebugMode() const;
 
         [[nodiscard]] const std::vector<std::shared_ptr<IContextMember> > &getInstances() const { return instances; }
+
+        template<typename T>
+        std::vector<T *> getSingletons() {
+            std::vector<T *> results;
+            for (auto &instance: instances) {
+                auto *ptr = dynamic_cast<T *>(instance.get());
+                if (ptr) {
+                    results.push_back(ptr);
+                }
+            }
+            return results;
+        }
 
         void dispose() override;
     };

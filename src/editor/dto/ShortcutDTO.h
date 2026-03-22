@@ -11,9 +11,10 @@ namespace Metal {
         std::string name;
         ImGuiKeyChord keyChord;
         std::function<void()> callback;
+        bool isDown = false;
 
-        ShortcutDTO(std::string name, ImGuiKeyChord keyChord, std::function<void()> callback)
-            : name(std::move(name)), keyChord(keyChord), callback(std::move(callback)) {}
+        ShortcutDTO(std::string name, ImGuiKeyChord keyChord, std::function<void()> callback, const bool isDown = false)
+            : name(std::move(name)), keyChord(keyChord), callback(std::move(callback)), isDown(isDown) {}
     };
 }
 

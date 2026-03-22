@@ -12,7 +12,6 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include "../../common/FilesUtil.h"
-#include "../dto/EntryMetadata.h"
 #include "../enum/engine-definitions.h"
 #include "../../common/serialization-definitions.h"
 #include "../../core/DirectoryService.h"
@@ -46,13 +45,14 @@ namespace Metal {
             throw std::runtime_error("Error loading scene: " + std::string(importer.GetErrorString()));
         }
 
-        SceneData sceneData{};
-        auto sceneMetadata = EntryMetadata{};
-        sceneMetadata.type = EntryType::SCENE;
-        sceneMetadata.name = sceneData.name =
-                             scene->mName.length > 0 ? scene->mName.data : scene->mRootNode->mName.data;
+        fs::path sourceFilePath(pathToFile);
+        std::string extractionDirName = sourceFilePath.stem().string() + "_extracted";
+        fs::path extractionPath = fs::absolute(targetDir) / extractionDirName;
+        fs::create_directories(extractionPath);
+        std::string extractionPathStr = extractionPath.string();
 
-        std::string sceneBlobPath = directoryService->getAssetDirectory() + FORMAT_FILE_SCENE(sceneMetadata.getId());
+        SceneData sceneData{};
+        sceneData.name = scene->mName.length > 0 ? scene->mName.data : scene->mRootNode->mName.data;
 
         std::unordered_map<unsigned int, MeshId> meshMap{};
 
@@ -60,7 +60,7 @@ namespace Metal {
             throw std::runtime_error("Import cancelled");
         }
 
-        meshImporterService->persistAllMeshes(targetDir, scene, meshMap, stopToken);
+        meshImporterService->persistAllMeshes(extractionPathStr, scene, meshMap, stopToken);
 
         if (stopToken.stop_requested()) {
             throw std::runtime_error("Import cancelled");
@@ -69,7 +69,7 @@ namespace Metal {
         fs::path absolutePath = fs::absolute(pathToFile);
         std::string directoryPath = absolutePath.parent_path().string();
 
-        processNode(sceneData, scene, scene->mRootNode, targetDir, directoryPath, meshMap, stopToken);
+        processNode(sceneData, scene, scene->mRootNode, extractionPathStr, directoryPath, meshMap, stopToken);
         ProcessLights(sceneData, scene);
 
         if (stopToken.stop_requested()) {
@@ -84,11 +84,11 @@ namespace Metal {
             entities.push_back(entity);
         }
         sceneData.entities = entities;
-        DUMP_TEMPLATE(sceneBlobPath, sceneData)
-        sceneMetadata.size = fs::file_size(sceneBlobPath);
-        DUMP_TEMPLATE(targetDir + '/' + FORMAT_FILE_METADATA(sceneMetadata.getId()), sceneMetadata)
 
-        return sceneMetadata.getId();
+        std::string sceneBlobPath = (extractionPath / (sourceFilePath.stem().string() + ".scene")).string();
+        DUMP_TEMPLATE(sceneBlobPath, sceneData)
+
+        return sceneBlobPath;
     }
 
     void SceneImporterService::processNode(SceneData &scene, const aiScene *aiScene, const aiNode *node,
@@ -106,7 +106,7 @@ namespace Metal {
         node->mTransformation.Decompose(scaling, rotation, pos);
         currentNode.transform.translation = {pos.x, pos.y, pos.z};
         glm::quat q = {rotation.w, rotation.x, rotation.y, rotation.z};
-        currentNode.transform.rotationEuler = glm::eulerAngles(q) * (180.f / glm::pi<float>());
+        currentNode.transform.rotation = q;
         currentNode.transform.scale = {scaling.x, scaling.y, scaling.z};
 
         processMeshes(scene, aiScene, node, targetDir, rootDirectory, meshMap, stopToken);

@@ -6,7 +6,7 @@
 namespace Metal {
     struct LightComponent final : AbstractComponent, ISerialize {
 
-        ComponentType getType() override;
+        ComponentType getType() const override;
 
         nlohmann::json toJson() const override;
 

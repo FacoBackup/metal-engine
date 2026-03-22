@@ -20,7 +20,7 @@ namespace Metal {
         ImVec4 accent{};
         ImU32 accentU32 = 0;
 
-        glm::vec3 accentColor{0.26f, 0.59f, 0.98f};
+        glm::vec3 accentColor{0.2f, 0.054f, 0.49f};
         glm::vec3 selectionColor{1, 1, 0};
         int selectionOutlineThickness = 3;
         std::string projectName = "New project";
@@ -50,18 +50,16 @@ namespace Metal {
         std::string focusedWindowName{};
         std::vector<ShortcutDTO> focusedShortcuts{};
         ShadingMode shadingMode = LIT;
-
-
-        std::vector<std::string> pendingImports;
-        std::unordered_map<std::string, std::shared_ptr<ImportSettingsDTO> > importSettingsMap;
-        std::string selectedFileForSettings;
-        FSEntry *targetImportDirectory = nullptr;
+        std::vector<std::string> bookmarks{};
+        bool isPlaying = false;
+        std::string gptMcpKey{};
+        std::string geminiMcpKey{};
 
         void registerFields() override;
 
-        const char *getTitle() override;
+        const char *getTitle() const override;
 
-        const char *getIcon() override;
+        const char *getIcon() const override;
 
         nlohmann::json toJson() const override;
 

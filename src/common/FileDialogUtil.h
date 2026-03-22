@@ -7,6 +7,17 @@
 #include "../ApplicationContext.h"
 
 namespace Metal:: FileDialogUtil {
+    static std::string PickFile(std::vector<nfdu8filteritem_t> filtersToApply) {
+        NFD::Guard nfdGuard;
+        NFD::UniquePath outPath;
+
+        nfdresult_t result = NFD::OpenDialog(outPath, filtersToApply.data(), filtersToApply.size());
+        if (result == NFD_OKAY) {
+            return outPath.get();
+        }
+        return "";
+    }
+
     static std::vector<std::string> PickFiles(std::vector<nfdu8filteritem_t> filtersToApply) {
         std::vector<std::string> files;
         NFD::Guard nfdGuard;

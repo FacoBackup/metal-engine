@@ -40,6 +40,8 @@ namespace Metal {
         std::string runAsync(const std::string &taskName, const LoadingTask &task) const;
 
         std::string collectCompatibleFiles() const;
+
+        bool isCompatible(const std::string &file) const;
     };
 }
 

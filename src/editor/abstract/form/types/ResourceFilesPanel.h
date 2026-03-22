@@ -6,31 +6,28 @@
 
 namespace Metal {
     class ResourceFilesPanel final : public FilesPanel {
-        std::function<void (FSEntry *)> callback;
-        EntryType::EntryType typeFilter;
+        std::function<void (std::shared_ptr<FSEntry>)> callback;
+        std::vector<std::string> supportedFileTypes;
 
     public:
-        explicit ResourceFilesPanel(const std::function<void (FSEntry *)> &callback,
-                                    EntryType::EntryType type) : callback(callback), typeFilter(type) {
+        explicit ResourceFilesPanel(const std::function<void (std::shared_ptr<FSEntry>)> &callback,
+                                    std::vector<std::string> supportedFileTypes)
+            : callback(callback), supportedFileTypes(std::move(supportedFileTypes)) {
         }
 
         bool renderPreview() override {
             return false;
         }
 
-        EntryType::EntryType getTypeFilter() override {
-            return typeFilter;
+        std::vector<std::string> getTypeFilter() override {
+            return supportedFileTypes;
         }
-
-        std::function<void()> onAction() override;
-
-        std::string getActionLabel() override;
 
         bool renderHeader() override {
             return false;
         }
 
-        void openResource(FSEntry *root) override;
+        void openResource(std::shared_ptr<FSEntry> root) override;
     };
 } // Metal
 

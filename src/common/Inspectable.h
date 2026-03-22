@@ -6,10 +6,10 @@
 #include <vector>
 #include <glm/fwd.hpp>
 
+#include <nlohmann/json.hpp>
 #include "InspectableMember.h"
 #include "Util.h"
 #include "../editor/util/Util.h"
-#include "../editor/enum/EntryType.h"
 
 namespace Metal {
     class Inspectable {
@@ -41,7 +41,7 @@ namespace Metal {
 
         void registerBool(bool &v, std::string group, std::string name, bool disabled = false);
 
-        void registerResourceSelection(std::string &v, std::string group, std::string name, EntryType::EntryType type,
+        void registerResourceSelection(std::string &v, std::string group, std::string name, const std::vector<std::string> &supportedFileTypes,
                                        bool disabled = false);
 
         void registerMethod(const std::function<void()> &updateCallback, std::string name, std::string group);
@@ -74,6 +74,8 @@ namespace Metal {
                            std::string group, std::string name, bool disabled = false);
 
     public:
+        [[nodiscard]] nlohmann::json toJSON() const;
+
         [[nodiscard]] virtual std::string getClassName() const;
 
         std::shared_ptr<InspectableMember> getFieldByPointer(void *ptr);
@@ -90,11 +92,11 @@ namespace Metal {
             return uniqueIdentifier;
         }
 
-        virtual const char *getIcon() {
+        virtual const char *getIcon() const {
             throw std::logic_error("Not implemented");
         }
 
-        virtual const char *getTitle() {
+        virtual const char *getTitle() const {
             throw std::logic_error("Not implemented");
         }
     };

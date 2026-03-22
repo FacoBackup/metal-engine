@@ -3,6 +3,7 @@
 
 #include <imgui.h>
 #include <imgui_impl_vulkan.h>
+#include <imgui_markdown.h>
 #include "../common/IService.h"
 #include "../common/IDisposable.h"
 #include "../common/IInit.h"
@@ -27,8 +28,16 @@ namespace Metal {
         bool swapChainRebuild = false;
         ImDrawData *drawData = nullptr;
         ImFont *largeIconsFont = nullptr;
+        ImFont *h1Font = nullptr;
+        ImFont *h2Font = nullptr;
+        ImFont *h3Font = nullptr;
+
+        ImGui::MarkdownConfig markdownConfig;
 
     public:
+        [[nodiscard]] ImGui::MarkdownConfig &getMarkdownConfig() {
+            return markdownConfig;
+        }
         void setSwapChainRebuild(const bool val) {
             swapChainRebuild = val;
         }

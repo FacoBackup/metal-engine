@@ -14,7 +14,7 @@ namespace Metal {
     class NotificationService;
 
     class FilesService final : public IService, public IInit {
-        FSEntry *root = nullptr;
+        std::shared_ptr<FSEntry> root = nullptr;
         DirectoryService *directoryService = nullptr;
         NotificationService *notificationService = nullptr;
 
@@ -25,21 +25,38 @@ namespace Metal {
                 {"NotificationService", &notificationService}};
         }
 
-        FSEntry *getRoot() const {
+        std::shared_ptr<FSEntry> getRoot() const {
             return root;
         }
 
         void onInitialize() override;
 
-        std::unique_ptr<FSEntry> getResource(const std::string &id);
+        std::shared_ptr<FSEntry> getResource(const std::string &id);
 
-        void deleteFiles(const std::unordered_map<std::string, FSEntry *> &files_context);
+        void deleteFiles(const std::unordered_map<std::string, std::shared_ptr<FSEntry>> &files_context);
 
-        void Move(FSEntry *toMove, FSEntry *targetDir);
+        void Move(std::shared_ptr<FSEntry> toMove, std::shared_ptr<FSEntry> targetDir);
 
-        void CreateDirectory(FSEntry *currentDirectory);
+        void CreateDirectory(std::shared_ptr<FSEntry> currentDirectory);
 
-        void GetEntries(FSEntry *root);
+        void CreateFile(std::shared_ptr<FSEntry> currentDirectory, const std::string &name, const std::string &extension);
+
+        void GetEntries(std::shared_ptr<FSEntry> root);
+        std::shared_ptr<FSEntry> GetEntry(const std::string &path);
+        
+        /**
+         * Lists all .lua files in the root directory.
+         * @return A vector of filenames.
+         */
+        std::vector<std::string> listScripts();
+
+        /**
+         * Writes content to a file in the root directory.
+         * @param name Filename.
+         * @param content Content to write.
+         * @return The absolute path of the created file, or empty string on error.
+         */
+        std::string writeRootFile(const std::string &name, const std::string &content);
     };
 } // Metal
 

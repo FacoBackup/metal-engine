@@ -55,9 +55,9 @@ namespace Metal {
         float deltaX = 0;
         float deltaY = 0;
 
-        const char *getTitle() override;
+        const char *getTitle() const override;
 
-        const char *getIcon() override;
+        const char *getIcon() const override;
 
         void extractFrustumPlanes(glm::mat4x4 m);
 

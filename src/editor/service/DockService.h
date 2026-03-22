@@ -6,22 +6,27 @@
 #include "../dock-spaces/docks/DockSpacePanel.h"
 #include "../../common/IService.h"
 
+#include "../repository/DockRepository.h"
+
 namespace Metal {
     class AbstractPanel;
 
     class DockService final : public IService, public IInit {
-        std::shared_ptr<DockDTO> center = std::make_shared<DockDTO>(&DockSpace::VIEWPORT);
-        std::vector<std::shared_ptr<DockDTO> > bottom;
-        std::vector<std::shared_ptr<DockDTO> > left;
-        std::vector<std::shared_ptr<DockDTO> > right;
+        DockRepository *dockRepository = nullptr;
 
         bool isInitialized = false;
 
     public:
-        [[nodiscard]] std::shared_ptr<DockDTO> getCenter() const { return center; }
-        [[nodiscard]] const std::vector<std::shared_ptr<DockDTO> > &getBottom() const { return bottom; }
-        [[nodiscard]] const std::vector<std::shared_ptr<DockDTO> > &getLeft() const { return left; }
-        [[nodiscard]] const std::vector<std::shared_ptr<DockDTO> > &getRight() const { return right; }
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"DockRepository", &dockRepository}
+            };
+        }
+
+        [[nodiscard]] std::shared_ptr<DockDTO> getCenter() const { return dockRepository->center; }
+        [[nodiscard]] const std::vector<std::shared_ptr<DockDTO> > &getBottom() const { return dockRepository->bottom; }
+        [[nodiscard]] const std::vector<std::shared_ptr<DockDTO> > &getLeft() const { return dockRepository->left; }
+        [[nodiscard]] const std::vector<std::shared_ptr<DockDTO> > &getRight() const { return dockRepository->right; }
         [[nodiscard]] bool getIsInitialized() const { return isInitialized; }
         void setIsInitialized(bool value) { isInitialized = value; }
 

@@ -19,7 +19,7 @@ namespace Metal {
     }
 
     bool GridPass::shouldRun() {
-        return editorRepository->showGrid;
+        return !editorRepository->isPlaying && editorRepository->showGrid;
     }
 
     void GridPass::onSync() {

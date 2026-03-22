@@ -6,7 +6,6 @@
 #include "repository/EditorRepository.h"
 #include "dock-spaces/header/EditorHeaderPanel.h"
 #include "dock-spaces/footer/EditorFooterPanel.h"
-#include "panel/FileImportModalPanel.h"
 #include "panel/NotificationsPanel.h"
 
 namespace Metal {
@@ -127,13 +126,11 @@ namespace Metal {
         themeService->onSync();
         renderDockSpaces();
         notificationsPanel->onSync();
-        fileImportModalPanel->onSync();
     }
 
     void EditorPanel::onInitialize() {
         headerPanel = initializePanel<EditorHeaderPanel>(false);
         footerPanel = initializePanel<EditorFooterPanel>(false);
         notificationsPanel = initializePanel<NotificationsPanel>(false);
-        fileImportModalPanel = initializePanel<FileImportModalPanel>(false);
     }
 }

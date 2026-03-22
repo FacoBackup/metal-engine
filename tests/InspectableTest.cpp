@@ -29,13 +29,13 @@ public:
         registerColor(colorVal, "Group", "Color");
     }
 
-    const char* getIcon() override { return ""; }
-    const char* getTitle() override { return "Test"; }
+    const char *getIcon() const override { return ""; }
+    const char *getTitle() const override { return "Test"; }
 };
 
 TEST(InspectableTest, GetFieldByPointer) {
     TestInspectable inspectable;
-    auto& fields = inspectable.getFields();
+    auto &fields = inspectable.getFields();
     ASSERT_EQ(fields.size(), 9);
 
     auto fFloat = inspectable.getFieldByPointer(&inspectable.floatVal);
@@ -79,3 +79,56 @@ TEST(InspectableTest, GetFieldByPointer) {
     EXPECT_EQ(inspectable.getFieldByPointer(&dummy), nullptr);
 }
 
+TEST(InspectableTest, ToJSON) {
+    TestInspectable inspectable;
+    inspectable.floatVal = 1.5f;
+    inspectable.intVal = 42;
+    inspectable.stringVal = "Hello";
+    inspectable.boolVal = true;
+    inspectable.vec2Val = {1.0f, 2.0f};
+    inspectable.vec3Val = {3.0f, 4.0f, 5.0f};
+    inspectable.vec4Val = {6.0f, 7.0f, 8.0f, 9.0f};
+    inspectable.quatVal = {10.0f, 11.0f, 12.0f, 13.0f};
+    inspectable.colorVal = {0.1f, 0.2f, 0.3f};
+
+    nlohmann::json j = inspectable.toJSON();
+
+    EXPECT_EQ(j["label"], "Test");
+    EXPECT_EQ(j["fields"].size(), 9);
+
+    for (const auto &field: j["fields"]) {
+        std::string name = field["name"];
+        if (name == "Float") {
+            EXPECT_FLOAT_EQ(field["value"].get<float>(), 1.5f);
+        } else if (name == "Int") {
+            EXPECT_EQ(field["value"].get<int>(), 42);
+        } else if (name == "String") {
+            EXPECT_EQ(field["value"].get<std::string>(), "Hello");
+        } else if (name == "Bool") {
+            EXPECT_EQ(field["value"].get<bool>(), true);
+        } else if (name == "Vec2") {
+            EXPECT_FLOAT_EQ(field["value"]["x"], 1.0f);
+            EXPECT_FLOAT_EQ(field["value"]["y"], 2.0f);
+        } else if (name == "Vec3") {
+            EXPECT_FLOAT_EQ(field["value"]["x"], 3.0f);
+            EXPECT_FLOAT_EQ(field["value"]["y"], 4.0f);
+            EXPECT_FLOAT_EQ(field["value"]["z"], 5.0f);
+        } else if (name == "Vec4") {
+            EXPECT_FLOAT_EQ(field["value"]["x"], 6.0f);
+            EXPECT_FLOAT_EQ(field["value"]["y"], 7.0f);
+            EXPECT_FLOAT_EQ(field["value"]["z"], 8.0f);
+            EXPECT_FLOAT_EQ(field["value"]["w"], 9.0f);
+        } else if (name == "Quat") {
+            // Note: glm::quat {w, x, y, z} or {x, y, z, w} depends on constructor, 
+            // but in toJSON we mapped q.x, q.y, q.z, q.w to x, y, z, w
+            EXPECT_FLOAT_EQ(field["value"]["x"], 11.0f);
+            EXPECT_FLOAT_EQ(field["value"]["y"], 12.0f);
+            EXPECT_FLOAT_EQ(field["value"]["z"], 13.0f);
+            EXPECT_FLOAT_EQ(field["value"]["w"], 10.0f);
+        } else if (name == "Color") {
+            EXPECT_FLOAT_EQ(field["value"]["x"], 0.1f);
+            EXPECT_FLOAT_EQ(field["value"]["y"], 0.2f);
+            EXPECT_FLOAT_EQ(field["value"]["z"], 0.3f);
+        }
+    }
+}

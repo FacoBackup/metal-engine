@@ -1,12 +1,12 @@
 #ifndef TEXTURESERVICE_H
 #define TEXTURESERVICE_H
 #include <string>
-#include <sys/types.h>
 #include <vulkan/vulkan_core.h>
 
 #include "../dto/TextureData.h"
 #include "../../common/AbstractResourceService.h"
 #include "../resource/TextureInstance.h"
+#include "../../common/IInit.h"
 
 namespace Metal {
     struct TextureInstance;
@@ -16,7 +16,7 @@ namespace Metal {
     class DescriptorSetService;
     class DirectoryService;
 
-    class TextureService final : public AbstractResourceService<TextureInstance> {
+    class TextureService final : public AbstractResourceService<TextureInstance>, public IInit {
         VulkanContext *vulkanContext = nullptr;
         BufferService *bufferService = nullptr;
         PipelineService *pipelineService = nullptr;
@@ -53,7 +53,7 @@ namespace Metal {
             };
         }
 
-        [[nodiscard]] TextureData *loadTextureData(const std::string &id) const;
+        [[nodiscard]] TextureData *loadTextureData(const std::string &pathToFile) const;
 
         TextureInstance *stream(const std::string &id);
 
@@ -61,7 +61,7 @@ namespace Metal {
                                      bool generateMipMaps = false,
                                      VkFormat imageFormat = VK_FORMAT_R8G8B8A8_SRGB);
 
-        TextureInstance *create(const std::string &id);
+        TextureInstance *create(const std::string &pathToFile);
 
         TextureInstance *createForCompute(const std::string &id, unsigned int width, unsigned int height, VkFormat format = VK_FORMAT_R16G16B16A16_SFLOAT);
 
@@ -70,6 +70,8 @@ namespace Metal {
         void disposeResource(TextureInstance *resource) override;
 
         void createSampler(bool linear, VkSampler &vkImageSampler, VkSamplerAddressMode addressMode);
+
+        void onInitialize() override;
     };
 } // Metal
 

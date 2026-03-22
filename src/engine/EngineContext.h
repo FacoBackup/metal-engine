@@ -3,6 +3,8 @@
 
 #include <chrono>
 #include <memory>
+#include <thread>
+#include <atomic>
 
 #include "dto/GlobalDataUBO.h"
 #include "../common/IService.h"
@@ -22,6 +24,7 @@ namespace Metal {
     class CameraService;
     class LightService;
     class VolumeService;
+    class PhysicsService;
     struct WorldRepository;
     struct EditorRepository;
     struct EngineRepository;
@@ -35,6 +38,7 @@ namespace Metal {
         CameraService *cameraService = nullptr;
         LightService *lightService = nullptr;
         VolumeService *volumeService = nullptr;
+        PhysicsService *physicsService = nullptr;
         WorldRepository *worldRepository = nullptr;
         EditorRepository *editorRepository = nullptr;
         EngineRepository *engineRepository = nullptr;
@@ -42,6 +46,10 @@ namespace Metal {
         GlobalDataUBO globalDataUBO{};
         long long start = -1;
         bool cameraUpdated = true;
+
+        std::thread physicsTransformThread;
+        std::atomic<bool> physicsTransformThreadRunning = false;
+        void physicsTransformLoop();
 
     public:
         std::vector<Dependency> getDependencies() override {
@@ -52,6 +60,7 @@ namespace Metal {
                 {"CameraService", &cameraService},
                 {"LightService", &lightService},
                 {"VolumeService", &volumeService},
+                {"PhysicsService", &physicsService},
                 {"WorldRepository", &worldRepository},
                 {"EditorRepository", &editorRepository},
                 {"EngineRepository", &engineRepository}

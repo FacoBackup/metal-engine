@@ -1,6 +1,7 @@
 #ifndef METAL_ENGINE_DOCKSPACE_H
 #define METAL_ENGINE_DOCKSPACE_H
 
+#include <imgui.h>
 #include <memory>
 #include <vector>
 #include <functional>
@@ -17,6 +18,8 @@ namespace Metal {
         static DockSpace FILES;
         static DockSpace METRICS;
         static DockSpace REPOSITORIES;
+        static DockSpace LUA_EDITOR;
+        static DockSpace MCP;
 
         static const std::vector<DockSpace*> OPTIONS_LIST;
 
@@ -24,14 +27,17 @@ namespace Metal {
         const std::string name;
         const int paddingX;
         const int paddingY;
+        const ImVec4 color;
         const std::function<std::shared_ptr<AbstractDockPanel>()> getPanel;
 
         explicit DockSpace(const int index, std::string name,
                            const int paddingX, const int paddingY,
+                           const ImVec4 color,
                            std::function<std::shared_ptr<AbstractDockPanel> ()> getPanel) : index(index),
                                                                             name(std::move(name)),
                                                                             paddingX(paddingX),
                                                                             paddingY(paddingY),
+                                                                            color(color),
                                                                             getPanel(std::move(getPanel)) {
         }
 

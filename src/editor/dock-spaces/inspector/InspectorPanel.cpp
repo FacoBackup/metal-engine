@@ -38,6 +38,13 @@ namespace Metal {
                 }
                 ImGui::EndPopup();
             }
+        } else {
+            const char *text = "Select an entity to inspect";
+            ImVec2 windowSize = ImGui::GetWindowSize();
+            ImVec2 textSize = ImGui::CalcTextSize(text);
+
+            ImGui::SetCursorPos(ImVec2((windowSize.x - textSize.x) * 0.5f, (windowSize.y - textSize.y) * 0.5f));
+            ImGui::TextDisabled("%s", text);
         }
     }
 

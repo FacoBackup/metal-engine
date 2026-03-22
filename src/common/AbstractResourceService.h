@@ -6,6 +6,7 @@
 
 #include "IService.h"
 #include "IEventMember.h"
+#include "LoggerUtil.h"
 #include "../ApplicationContext.h"
 #include "../engine/resource/RuntimeResource.h"
 
@@ -61,10 +62,14 @@ namespace Metal {
         void dispose() override {
             std::lock_guard lock(resourceMutex);
             for (auto it = resources.begin(); it != resources.end();) {
-                auto *r = it->second;
-                disposeResource(r);
-                delete r;
-                it = resources.erase(it);
+                try {
+                    auto *r = it->second;
+                    disposeResource(r);
+                    delete r;
+                    it = resources.erase(it);
+                } catch (std::exception &e) {
+                    LOG_ERROR(e.what());
+                }
             }
         }
     };

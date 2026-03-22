@@ -25,6 +25,12 @@ set(ENGINE_SOURCES
         engine/service/CameraService.h
         engine/dto/Camera.h
         editor/util/Util.h
+        editor/util/WorldToolProvider.h
+        editor/util/WorldToolProvider.cpp
+        editor/util/ScriptingToolProvider.h
+        editor/util/ScriptingToolProvider.cpp
+        editor/util/InspectionToolProvider.h
+        editor/util/InspectionToolProvider.cpp
         common/Inspectable.h
         common/Inspectable.cpp
         common/InspectedField.h
@@ -56,6 +62,8 @@ set(ENGINE_SOURCES
         editor/service/DockService.cpp
         editor/service/DockService.h
         editor/dto/DockDTO.h
+        editor/dto/Tool.h
+        editor/dto/IToolProvider.h
         editor/dto/DockSpace.h
         editor/dock-spaces/docks/DockSpacePanel.cpp
         editor/dock-spaces/docks/DockSpacePanel.h
@@ -63,13 +71,24 @@ set(ENGINE_SOURCES
         editor/service/ThemeService.cpp
         editor/service/ThemeService.h
         editor/repository/EditorRepository.h
+        editor/repository/DockRepository.h
+        editor/repository/AIAssistantRepository.h
+        editor/repository/AIAssistantRepository.cpp
+        editor/dto/ChatDTO.h
         editor/enum/engine-definitions.h
         editor/dock-spaces/files/FilesPanel.cpp
         editor/dock-spaces/files/FilesPanel.h
-        editor/dock-spaces/files/FilesListPanel.cpp
-        editor/dock-spaces/files/FilesListPanel.h
-        editor/dock-spaces/files/FilePreviewPanel.cpp
-        editor/dock-spaces/files/FilePreviewPanel.h
+        editor/dock-spaces/files/ListDirectoryPanel.cpp
+        editor/dock-spaces/files/ListDirectoryPanel.h
+        editor/dock-spaces/files/CardDirectoryPanel.cpp
+        editor/dock-spaces/files/CardDirectoryPanel.h
+        editor/dock-spaces/files/AbstractDirectoryPanel.h
+        editor/dock-spaces/files/NavigationPanel.cpp
+        editor/dock-spaces/files/NavigationPanel.h
+        editor/dock-spaces/files/BookmarksPanel.cpp
+        editor/dock-spaces/files/BookmarksPanel.h
+        editor/dock-spaces/files/SystemDirPanel.cpp
+        editor/dock-spaces/files/SystemDirPanel.h
         editor/dock-spaces/console/ConsolePanel.cpp
         editor/dock-spaces/console/ConsolePanel.h
         editor/dock-spaces/metrics/MetricsPanel.cpp
@@ -78,6 +97,20 @@ set(ENGINE_SOURCES
         common/LoggerUtil.h
         editor/dock-spaces/world/WorldPanel.cpp
         editor/dock-spaces/world/WorldPanel.h
+        editor/dock-spaces/lua-editor/LuaEditorPanel.cpp
+        editor/dock-spaces/lua-editor/LuaEditorPanel.h
+        editor/dock-spaces/mcp/AIAssistantPanel.cpp
+        editor/dock-spaces/mcp/AIAssistantPanel.h
+        editor/dock-spaces/mcp/ChatHeaderPanel.cpp
+        editor/dock-spaces/mcp/ChatHeaderPanel.h
+        editor/dock-spaces/mcp/ChatMessagesPanel.cpp
+        editor/dock-spaces/mcp/ChatMessagesPanel.h
+        editor/dock-spaces/mcp/ChatInputPanel.cpp
+        editor/dock-spaces/mcp/ChatInputPanel.h
+        editor/dock-spaces/mcp/UserMessagePanel.cpp
+        editor/dock-spaces/mcp/UserMessagePanel.h
+        editor/dock-spaces/mcp/AssistantMessagePanel.cpp
+        editor/dock-spaces/mcp/AssistantMessagePanel.h
         engine/resource/RuntimeResource.h
         engine/service/ShaderService.cpp
         engine/service/ShaderService.h
@@ -107,14 +140,19 @@ set(ENGINE_SOURCES
         engine/dto/MeshData.h
         engine/resource/MeshInstance.h
         common/FilesUtil.h
+        common/FileExtensions.h
+        common/FilesUtil.cpp
         editor/dto/FSEntry.h
-        editor/enum/EntryType.h
         editor/dock-spaces/files/FilesContext.h
         common/FileDialogUtil.h
         editor/dock-spaces/files/FilesHeaderPanel.cpp
         editor/dock-spaces/files/FilesHeaderPanel.h
+        editor/service/HttpService.cpp
+        editor/service/HttpService.h
         editor/service/MaterialImporterService.cpp
         editor/service/MaterialImporterService.h
+        editor/service/AIAssistantService.cpp
+        editor/service/AIAssistantService.h
         editor/service/MeshImporterService.cpp
         editor/service/MeshImporterService.h
         editor/service/SceneImporterService.cpp
@@ -122,7 +160,6 @@ set(ENGINE_SOURCES
         common/AbstractImporter.h
         editor/service/TextureImporterService.cpp
         editor/service/TextureImporterService.h
-        editor/dto/EntryMetadata.h
         engine/dto/TextureData.h
         engine/service/TextureService.cpp
         engine/service/TextureService.h
@@ -241,8 +278,6 @@ set(ENGINE_SOURCES
         editor/dto/SceneImportSettingsDTO.h
         editor/panel/NotificationsPanel.cpp
         editor/panel/NotificationsPanel.h
-        editor/panel/FileImportModalPanel.cpp
-        editor/panel/FileImportModalPanel.h
         engine/frame-builder/EngineFrameBuilder.cpp
         engine/frame-builder/EngineFrameBuilder.h
         engine/frame-builder/EngineFrame.cpp
@@ -267,6 +302,12 @@ set(ENGINE_SOURCES
         editor/dock-spaces/repositories/RepositoriesPanel.h
         engine/service/VolumeService.cpp
         engine/service/VolumeService.h
+        engine/service/PhysicsService.cpp
+        engine/service/PhysicsService.h
+        engine/service/LuaService.cpp
+        engine/service/LuaService.h
+        engine/util/LuaContext.cpp
+        engine/util/LuaContext.h
         common/IContextMember.h
         common/IEventMember.h
         common/IEventMember.cpp
@@ -288,6 +329,20 @@ set(ENGINE_SOURCES
         common/Util.cpp
         editor/dto/FieldModificationEvent.h
         editor/dto/InspectableEventPayload.h
+        engine/dto/BoxColliderComponent.cpp
+        engine/dto/BoxColliderComponent.h
+        engine/dto/CapsuleColliderComponent.cpp
+        engine/dto/CapsuleColliderComponent.h
+        engine/dto/GlobalScriptComponent.cpp
+        engine/dto/GlobalScriptComponent.h
+        engine/dto/MeshColliderComponent.cpp
+        engine/dto/MeshColliderComponent.h
+        engine/dto/RigidBodyComponent.cpp
+        engine/dto/RigidBodyComponent.h
+        engine/dto/ScopedScriptComponent.cpp
+        engine/dto/ScopedScriptComponent.h
+        engine/dto/SphereColliderComponent.cpp
+        engine/dto/SphereColliderComponent.h
 )
 
 # Extract non-main sources for testing
@@ -301,10 +356,10 @@ add_executable(metal_engine main.cpp)
 target_link_libraries(metal_engine PRIVATE metal_engine_lib)
 if (WIN32)
     target_link_libraries(metal_engine PRIVATE dwmapi)
-endif()
+endif ()
 add_dependencies(metal_engine copy_resources)
 
 add_custom_command(TARGET metal_engine POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${CMAKE_BINARY_DIR}/resources"
-    "$<TARGET_FILE_DIR:metal_engine>/resources")
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_BINARY_DIR}/resources"
+        "$<TARGET_FILE_DIR:metal_engine>/resources")

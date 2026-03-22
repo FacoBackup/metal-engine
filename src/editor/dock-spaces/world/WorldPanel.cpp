@@ -58,19 +58,38 @@ namespace Metal {
         isSomethingHovered = ImGui::IsItemHovered();
         onSyncChildren();
         ImGui::Separator();
-        if (ImGui::BeginTable((id + "hierarchyTable").c_str(), 2, TABLE_FLAGS)) {
-            isSomethingHovered = isSomethingHovered || ImGui::IsItemHovered();
-            ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
-            ImGui::TableSetupColumn(Icons::visibility.c_str(), ImGuiTableColumnFlags_WidthFixed, 20.f);
-            ImGui::TableHeadersRow();
 
-            auto view = world->registry.view<MetadataComponent>();
-            for (const auto entity: view) {
-                renderNode(entity);
+        bool isEmpty = true;
+        auto view = world->registry.view<MetadataComponent>();
+        for (const auto entity: view) {
+            if (!isOnSearch || isMatched(entity)) {
+                isEmpty = false;
+                break;
             }
-
-            ImGui::EndTable();
         }
+
+        if (isEmpty) {
+            const char *text = isOnSearch ? "No entities match search" : "No entities in world";
+            ImVec2 windowSize = ImGui::GetWindowSize();
+            ImVec2 textSize = ImGui::CalcTextSize(text);
+
+            ImGui::SetCursorPos(ImVec2((windowSize.x - textSize.x) * 0.5f, (windowSize.y - textSize.y) * 0.5f));
+            ImGui::TextDisabled("%s", text);
+        } else {
+            if (ImGui::BeginTable((id + "hierarchyTable").c_str(), 2, TABLE_FLAGS)) {
+                isSomethingHovered = isSomethingHovered || ImGui::IsItemHovered();
+                ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
+                ImGui::TableSetupColumn(Icons::visibility.c_str(), ImGuiTableColumnFlags_WidthFixed, 20.f);
+                ImGui::TableHeadersRow();
+
+                for (const auto entity: view) {
+                    renderNode(entity);
+                }
+
+                ImGui::EndTable();
+            }
+        }
+
         if (!editorRepository->selected.empty()) {
             contextMenu();
         }
@@ -82,7 +101,6 @@ namespace Metal {
             return;
         }
 
-        applyRowStyle(entityId, node);
 
         if (processEntityNode(entityId, node)) {
             renderEntityChildren(entityId);
@@ -103,14 +121,6 @@ namespace Metal {
         handleDragDrop(entityId);
         renderEntityColumns(entityId);
         return open;
-    }
-
-    void WorldPanel::applyRowStyle(const entt::entity entityId, MetadataComponent *node) const {
-        ImVec4 color = ImVec4(node->color.x, node->color.y, node->color.z, 1.0f);
-        if (world->culled.contains(entityId) || world->hiddenEntities.contains(entityId)) {
-            color.w = 0.5f;
-        }
-        ImGui::PushStyleColor(ImGuiCol_Text, color);
     }
 
     std::string WorldPanel::getNodeLabel(const entt::entity entityId) const {
@@ -174,7 +184,6 @@ namespace Metal {
         }
         ImGui::PopStyleColor();
         ImGui::PopStyleVar(2);
-        ImGui::PopStyleColor(); // Pop Row Style (from applyRowStyle)
     }
 
     void WorldPanel::handleClick(const entt::entity entityId) const {
