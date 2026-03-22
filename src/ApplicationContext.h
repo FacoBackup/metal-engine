@@ -53,6 +53,16 @@ namespace Metal {
             return *static_cast<T *>(it->second);
         }
 
+        template<typename T>
+        T *getSingletonPtr() {
+            auto name = getTypeName(typeid(T).name());
+            auto it = singletons.find(name);
+            if (it == singletons.end()) {
+                return nullptr;
+            }
+            return static_cast<T *>(it->second);
+        }
+
         void *getSingletonByName(const std::string &name) {
             std::string lowerName = name;
             std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(),

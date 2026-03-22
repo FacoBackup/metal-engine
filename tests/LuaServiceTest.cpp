@@ -1,4 +1,6 @@
 #include <gtest/gtest.h>
+#include <entt/entt.hpp>
+
 #include <fstream>
 #include <filesystem>
 #include "../src/ApplicationContext.h"
@@ -6,6 +8,7 @@
 #include "../src/engine/repository/WorldRepository.h"
 #include "../src/engine/dto/ScopedScriptComponent.h"
 #include "../src/engine/dto/GlobalScriptComponent.h"
+#include "../src/engine/dto/MetadataComponent.h"
 #include "../src/ApplicationEventContext.h"
 
 using namespace Metal;
@@ -129,4 +132,33 @@ TEST_F(LuaServiceTest, OnSyncExecutesScriptsWhenPlaying) {
     luaService->onSync();
     int countAfterStop = luaService->getState()["update_count"];
     EXPECT_EQ(countAfterStop, 2); // Should not have increased
+}
+
+TEST_F(LuaServiceTest, EntityIdAndWorldBindings) {
+    auto entity = worldRepository->createEntity();
+    auto& scoped = worldRepository->registry.emplace<ScopedScriptComponent>(entity);
+    createLuaFile("test_entity_id.lua", "captured_entity = this_entity\n"
+                                        "new_ent = world:createEntity()\n"
+                                        "metadata = world:getEntity(new_ent)\n"
+                                        "metadata.name = 'From Lua'\n"
+                                        "has_metadata = world:hasComponent(new_ent, 3)"); // 3 is METADATA
+
+    scoped.onUpdatePath = "test_entity_id.lua";
+
+    ApplicationEventContext::dispatch("Play");
+    luaService->onSync();
+
+    entt::entity captured = luaService->getState()["captured_entity"];
+    EXPECT_EQ(captured, entity);
+
+    entt::entity newEnt = luaService->getState()["new_ent"];
+    // EXPECT_NE(newEnt, entt::null);
+
+    auto* metadata = worldRepository->getEntity(newEnt);
+    EXPECT_EQ(metadata->name, "From Lua");
+
+    bool hasMetadata = luaService->getState()["has_metadata"];
+    EXPECT_TRUE(hasMetadata);
+
+    if (fs::exists("test_entity_id.lua")) fs::remove("test_entity_id.lua");
 }

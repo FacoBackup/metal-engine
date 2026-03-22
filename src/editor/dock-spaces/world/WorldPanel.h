@@ -51,8 +51,6 @@ namespace Metal {
 
         bool processEntityNode(entt::entity entityId, MetadataComponent *node);
 
-        void applyRowStyle(entt::entity entityId, MetadataComponent *node) const;
-
         std::string getNodeLabel(entt::entity entityId) const;
 
         bool isMatched(entt::entity entityId) const;

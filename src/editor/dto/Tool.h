@@ -37,16 +37,30 @@ namespace Metal {
         std::function<std::string(const nlohmann::json&)> callback;
 
         std::string getSystemPrompt() const {
-            std::string prompt = "Tool: " + key + "\n";
-            prompt += "Description: " + description + "\n";
-            prompt += "Expected JSON parameters:\n{\n";
-            for (size_t i = 0; i < params.size(); ++i) {
-                prompt += "  \"" + params[i].name + "\": (" + params[i].getTypeName() + ") // " + params[i].description;
-                if (i < params.size() - 1) prompt += ",";
-                prompt += "\n";
+            nlohmann::json toolJson;
+            toolJson["name"] = key;
+            toolJson["description"] = description;
+
+            nlohmann::json properties = nlohmann::json::object();
+            std::vector<std::string> required;
+
+            for (const auto& param : params) {
+                nlohmann::json paramJson;
+                paramJson["type"] = param.getTypeName();
+                paramJson["description"] = param.description;
+                properties[param.name] = paramJson;
+                required.push_back(param.name);
             }
-            prompt += "}\n";
-            return prompt;
+
+            nlohmann::json inputSchema;
+            inputSchema["type"] = "object";
+            inputSchema["properties"] = properties;
+            if (!required.empty()) {
+                inputSchema["required"] = required;
+            }
+
+            toolJson["inputSchema"] = inputSchema;
+            return toolJson.dump(2);
         }
     };
 }

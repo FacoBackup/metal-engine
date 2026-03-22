@@ -113,6 +113,7 @@ namespace Metal {
         style.LogSliderDeadzone = 4.f;
         style.TabRounding = borderRadius;
         style.Alpha = 1;
+        style.ButtonTextAlign = ImVec2(0.5f, 0.5f);
     }
 
     void ImGuiService::applyFonts() {

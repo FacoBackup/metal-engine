@@ -15,6 +15,7 @@ namespace Metal {
     struct AIAssistantRepository;
     class HttpService;
     class IToolProvider;
+    class IAIResponseStrategy;
     class NotificationService;
     struct Chat;
 
@@ -26,7 +27,6 @@ namespace Metal {
         NotificationService *notificationService = nullptr;
         std::vector<IToolProvider *> toolProviders;
         std::string systemPrompt;
-        std::mutex repositoryMutex;
 
     public:
         AIAssistantService() = default;
@@ -47,31 +47,30 @@ namespace Metal {
 
         void sendRequest(const std::string &chatId, const std::string &message, AIModel model);
 
-        void sendFollowupRequest(const std::string &chatId, AIModel model);
+        void sendFollowupRequest(const std::string &chatId, AIModel model, int messageIndex);
 
         void regenerateMessage(const std::string &chatId, int messageIndex, AIModel model);
 
         void editMessage(const std::string &chatId, int messageIndex, const std::string &newContent, AIModel model);
 
-        void deleteMessagesFrom(const std::string &chatId, int messageIndex);
+        void deleteMessagesFrom(const std::string &chatId, int messageIndex) const;
 
         std::string deleteCurrentChat(const std::string &chatId);
+
+        std::string executeTool(const std::string &toolKey, const nlohmann::json &arguments) const;
+
+        std::string getTimeStr();
 
     private:
         nlohmann::json buildMessages(const std::shared_ptr<Chat> &chat);
 
+        nlohmann::json buildTools();
+
         std::string buildFullSystemPrompt();
 
-        void processAIResponse(const std::string &chatId, AIModel model, const std::string &response);
-
-        void processStreamData(const std::string &chatId, const std::string &chunk, std::string &accumulatedData,
-                               std::string &currentContent);
-
-        std::string executeTool(const std::string &toolKey, const nlohmann::json &arguments);
+        void processAIResponse(const std::string &chatId, int messageIndex, AIModel model, const std::string &response);
 
         std::string getApiKey(AIModel model);
-
-        std::string getTimeStr();
     };
 }
 

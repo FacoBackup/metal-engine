@@ -63,6 +63,7 @@ namespace Metal {
 
     void DirectoryService::save(bool silent) {
         try {
+            if (rootDirectory.empty()) return;
             for (auto &instance: ctx->getInstances()) {
                 auto *repository = dynamic_cast<IRepository *>(instance.get());
                 if (repository) {

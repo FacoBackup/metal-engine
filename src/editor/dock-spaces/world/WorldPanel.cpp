@@ -101,7 +101,6 @@ namespace Metal {
             return;
         }
 
-        applyRowStyle(entityId, node);
 
         if (processEntityNode(entityId, node)) {
             renderEntityChildren(entityId);
@@ -122,14 +121,6 @@ namespace Metal {
         handleDragDrop(entityId);
         renderEntityColumns(entityId);
         return open;
-    }
-
-    void WorldPanel::applyRowStyle(const entt::entity entityId, MetadataComponent *node) const {
-        ImVec4 color = ImVec4(node->color.x, node->color.y, node->color.z, 1.0f);
-        if (world->culled.contains(entityId) || world->hiddenEntities.contains(entityId)) {
-            color.w = 0.5f;
-        }
-        ImGui::PushStyleColor(ImGuiCol_Text, color);
     }
 
     std::string WorldPanel::getNodeLabel(const entt::entity entityId) const {
@@ -193,7 +184,6 @@ namespace Metal {
         }
         ImGui::PopStyleColor();
         ImGui::PopStyleVar(2);
-        ImGui::PopStyleColor(); // Pop Row Style (from applyRowStyle)
     }
 
     void WorldPanel::handleClick(const entt::entity entityId) const {

@@ -126,18 +126,6 @@ namespace Metal {
         if (hwnd) {
             DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_ROUND;
             DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
-
-            if (themeService) {
-                COLORREF color = RGB(
-                    static_cast<int>(themeService->palette1.x * 255),
-                    static_cast<int>(themeService->palette1.y * 255),
-                    static_cast<int>(themeService->palette1.z * 255)
-                );
-                DwmSetWindowAttribute(hwnd, DWMWA_CAPTION_COLOR, &color, sizeof(color));
-
-                COLORREF textColor = RGB(255, 255, 255);
-                DwmSetWindowAttribute(hwnd, DWMWA_TEXT_COLOR, &textColor, sizeof(textColor));
-            }
         }
     }
 

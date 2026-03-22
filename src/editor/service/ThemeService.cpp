@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "../repository/EditorRepository.h"
+#include "core/VulkanContext.h"
 
 namespace Metal {
     glm::vec3 ThemeService::BACKGROUND_COLOR = glm::vec3(0.f);
@@ -15,7 +16,7 @@ namespace Metal {
 
         std::string filename = "theme.json";
         if (!std::filesystem::exists(filename)) {
-            filename = "resources/theme.json";
+            filename = "../resources/theme.json";
         }
 
         if (std::filesystem::exists(filename)) {
@@ -23,7 +24,7 @@ namespace Metal {
                 std::ifstream f(filename);
                 themeData = nlohmann::json::parse(f);
                 themeLoaded = true;
-            } catch (const std::exception& e) {
+            } catch (const std::exception &e) {
                 std::cerr << "Failed to parse theme.json: " << e.what() << std::endl;
             }
         } else {
@@ -31,7 +32,7 @@ namespace Metal {
         }
     }
 
-    ImVec4 ThemeService::hexToRGBA(const std::string& hex) {
+    ImVec4 ThemeService::hexToRGBA(const std::string &hex) {
         std::string h = hex;
         if (h[0] == '#') h = h.substr(1);
 
@@ -61,14 +62,18 @@ namespace Metal {
         ImGuiStyle &style = ImGui::GetStyle();
         auto &colors = style.Colors;
 
-        style.ButtonTextAlign = ImVec2(0.5f, 0.5f);
         if (!editorRepository->isDarkMode) {
             ImGui::StyleColorsLight();
+
             setLightMode();
         } else {
             ImGui::StyleColorsDark();
             setDarkMode();
         }
+        vulkanContext->imguiVulkanWindow.ClearValue.color.float32[0] = palette1.x;
+        vulkanContext->imguiVulkanWindow.ClearValue.color.float32[1] = palette1.y;
+        vulkanContext->imguiVulkanWindow.ClearValue.color.float32[2] = palette1.z;
+        vulkanContext->imguiVulkanWindow.ClearValue.color.float32[3] = 1;
 
         textDisabled = ImVec4(palette6.x / 2.f, palette6.y / 2.f, palette6.z / 2.f, 1);
         colors[ImGuiCol_Text] = palette6;
@@ -132,7 +137,7 @@ namespace Metal {
 
     void ThemeService::setDarkMode() {
         if (themeLoaded && themeData.contains("dark")) {
-            auto& dark = themeData["dark"];
+            auto &dark = themeData["dark"];
             palette0 = hexToRGBA(dark.value("palette0", "#121212"));
             palette1 = hexToRGBA(dark.value("palette1", "#0A0A0A"));
             palette2 = hexToRGBA(dark.value("palette2", "#161616"));
@@ -146,7 +151,7 @@ namespace Metal {
 
     void ThemeService::setLightMode() {
         if (themeLoaded && themeData.contains("light")) {
-            auto& light = themeData["light"];
+            auto &light = themeData["light"];
             palette0 = hexToRGBA(light.value("palette0", "#EBEBEB"));
             palette1 = hexToRGBA(light.value("palette1", "#F5F5F5"));
             palette2 = hexToRGBA(light.value("palette2", "#E1E1E1"));

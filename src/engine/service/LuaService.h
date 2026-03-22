@@ -6,14 +6,14 @@
 #include "common/IDisposable.h"
 #include "common/IEventMember.h"
 #include "common/ISync.h"
-#include <sol/sol.hpp>
+#include "../util/LuaContext.h"
 #include <string>
 
 namespace Metal {
     struct WorldRepository;
 
     class LuaService final : public IService, public IInit, public IDisposable, public IEventMember, public ISync {
-        sol::state lua;
+        LuaContext luaContext;
         bool enabled = false;
         bool playStarted = false;
         WorldRepository *worldRepository = nullptr;
@@ -50,7 +50,7 @@ namespace Metal {
         /**
          * Access the lua state directly for bindings.
          */
-        sol::state &getState() { return lua; }
+        sol::state &getState() { return luaContext.getState(); }
     };
 } // Metal
 

@@ -35,8 +35,7 @@ namespace Metal {
         if (UIUtil::ButtonSimple((Icons::home) + id,
                                  UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
             std::string parentPath = directoryService->rootDirectory;
-            std::shared_ptr<FSEntry> parentEntry = filesService->GetEntry(parentPath);
-            if (parentEntry) {
+            if (std::shared_ptr<FSEntry> parentEntry = filesService->GetEntry(parentPath)) {
                 filesContext.setCurrentDirectory(parentEntry);
                 filesService->GetEntries(parentEntry);
             }

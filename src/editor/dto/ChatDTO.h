@@ -8,6 +8,30 @@
 #include "../../common/ISerialize.h"
 
 namespace Metal {
+    struct ToolCall final : ISerialize {
+        std::string name;
+        std::string description;
+        std::string result;
+
+        ToolCall() = default;
+        ToolCall(std::string n, std::string d, std::string r = "")
+            : name(std::move(n)), description(std::move(d)), result(std::move(r)) {}
+
+        nlohmann::json toJson() const override {
+            nlohmann::json j;
+            j["name"] = name;
+            j["description"] = description;
+            j["result"] = result;
+            return j;
+        }
+
+        void fromJson(const nlohmann::json &j) override {
+            if (j.contains("name")) name = j.at("name").get<std::string>();
+            if (j.contains("description")) description = j.at("description").get<std::string>();
+            if (j.contains("result")) result = j.at("result").get<std::string>();
+        }
+    };
+
     struct ChatMessage final : ISerialize {
         std::string role;
         std::string content;
@@ -15,11 +39,14 @@ namespace Metal {
         int promptTokens = 0;
         int completionTokens = 0;
         int totalTokens = 0;
+        float renderedHeight = 0.0f;
+        std::vector<ToolCall> toolCalls;
+        bool isProcessing = false;
 
         ChatMessage() = default;
-        ChatMessage(std::string r, std::string c, std::string t, int p = 0, int comp = 0, int tot = 0)
+        ChatMessage(std::string r, std::string c, std::string t, bool isProcessing, int p = 0, int comp = 0, int tot = 0)
             : role(std::move(r)), content(std::move(c)), timestamp(std::move(t)), 
-              promptTokens(p), completionTokens(comp), totalTokens(tot) {}
+              promptTokens(p), completionTokens(comp), totalTokens(tot), isProcessing(isProcessing), renderedHeight(0.0f) {}
 
         nlohmann::json toJson() const override {
             nlohmann::json j;
@@ -29,6 +56,14 @@ namespace Metal {
             j["promptTokens"] = promptTokens;
             j["completionTokens"] = completionTokens;
             j["totalTokens"] = totalTokens;
+            j["renderedHeight"] = renderedHeight;
+            
+            nlohmann::json toolsJson = nlohmann::json::array();
+            for (const auto& tool : toolCalls) {
+                toolsJson.push_back(tool.toJson());
+            }
+            j["toolCalls"] = toolsJson;
+            
             return j;
         }
 
@@ -39,10 +74,21 @@ namespace Metal {
             promptTokens = j.value("promptTokens", 0);
             completionTokens = j.value("completionTokens", 0);
             totalTokens = j.value("totalTokens", 0);
+            renderedHeight = j.value("renderedHeight", 0.0f);
+            
+            if (j.contains("toolCalls") && j.at("toolCalls").is_array()) {
+                toolCalls.clear();
+                for (const auto& toolJson : j.at("toolCalls")) {
+                    ToolCall tool;
+                    tool.fromJson(toolJson);
+                    toolCalls.push_back(tool);
+                }
+            }
         }
     };
 
     struct Chat final : ISerialize {
+        bool isProcessing = false;
         std::string id;
         std::string name;
         std::string date;

@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <entt/entt.hpp>
 #include "../src/editor/service/AIAssistantService.h"
 #include "../src/editor/repository/AIAssistantRepository.h"
 #include "../src/editor/repository/EditorRepository.h"
@@ -10,13 +11,6 @@
 #include <nlohmann/json.hpp>
 
 #include "common/LoggerUtil.h"
-
-/**
- * ATTENTION AGENTS: DO NOT EXECUTE THIS TEST AUTOMATICALLY.
- * This test is designed to be executed manually on demand.
- * It simulates a real interaction with the AI model (Gemini Flash Lite)
- * and requires a valid API key configured in the EditorRepository.
- */
 
 using namespace Metal;
 
@@ -78,5 +72,35 @@ TEST_F(AIAssistantServiceIntegrationTest, TestRealToolUsageWithGeminiFlashLite) 
     std::string chatId = chat->id;
     service->sendRequest(chatId, "Please use the tool 'PLACEHOLDER_TOOL_KEY' with arg1 set to 'integration-test'", AIModel::GEMINI_3_FLASH_LITE);
     
-    ASSERT_TRUE(toolProvider->toolExecuted);
+    // Wait for the AI to process (timeout after 30 seconds)
+    int waitCounter = 0;
+    while (chat->isProcessing && waitCounter < 30) {
+        _sleep(1000);
+        waitCounter++;
+    }
+    
+    ASSERT_FALSE(chat->isProcessing) << "AI timed out or failed to finish processing";
+    ASSERT_TRUE(toolProvider->toolExecuted) << "The tool was never executed by the AI strategy";
+    
+    // Check messages
+    // Message 0: User message
+    // Message 1: Assistant message (the one that should have the tool call)
+    ASSERT_GE(chat->messages.size(), 2);
+    
+    const auto& assistantMsg = chat->messages[1];
+    EXPECT_EQ(assistantMsg.role, "assistant");
+    EXPECT_FALSE(assistantMsg.toolCalls.empty()) << "Assistant message should have at least one tool call";
+    
+    if (!assistantMsg.toolCalls.empty()) {
+        EXPECT_EQ(assistantMsg.toolCalls[0].name, "PLACEHOLDER_TOOL_KEY");
+        EXPECT_FALSE(assistantMsg.toolCalls[0].result.empty()) << "Tool call result should not be empty";
+    }
+
+    // No assistant message should contain JSON parts if a tool call occurred
+    for (const auto& msg : chat->messages) {
+        if (msg.role == "assistant") {
+            EXPECT_EQ(msg.content.find("{"), std::string::npos) << "Assistant message content should not contain JSON: " << msg.content;
+            EXPECT_EQ(msg.content.find("}"), std::string::npos) << "Assistant message content should not contain JSON: " << msg.content;
+        }
+    }
 }

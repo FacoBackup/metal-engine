@@ -46,8 +46,10 @@ namespace Metal {
         for (const auto &entry: entries) {
             if (!levelFilter[(int) entry.level]) continue;
             if (!filter.PassFilter(entry.message.c_str())) continue;
-
-            ImGui::PushStyleColor(ImGuiCol_Text, LogService::getLevelColor(entry.level));
+            uint32_t levelColor = LogService::getLevelColor(entry.level);
+            if (levelColor != 0) {
+                ImGui::PushStyleColor(ImGuiCol_Text, levelColor);
+            }
             ImGui::TextUnformatted(entry.timestamp.c_str());
             ImGui::SameLine();
             ImGui::TextUnformatted("[");
@@ -57,7 +59,9 @@ namespace Metal {
             ImGui::TextUnformatted("]");
             ImGui::SameLine();
             ImGui::TextUnformatted(entry.message.c_str());
-            ImGui::PopStyleColor();
+            if (levelColor != 0) {
+                ImGui::PopStyleColor();
+            }
         }
 
         if (autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) {

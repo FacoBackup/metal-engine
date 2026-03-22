@@ -1,17 +1,18 @@
 #include "LuaService.h"
 #include <iostream>
+#include <entt/entt.hpp>
 #include "../repository/WorldRepository.h"
 #include "../dto/ScopedScriptComponent.h"
 #include "../dto/GlobalScriptComponent.h"
+#include "../dto/MetadataComponent.h"
 #include "../../ApplicationEventContext.h"
 
 namespace Metal {
     void LuaService::onInitialize() {
-        lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math, sol::lib::table, sol::lib::string,
-                           sol::lib::debug);
-        std::cout << "LuaService: Lua initialized." << std::endl;
+        luaContext.initialize(worldRepository);
+        auto &lua = luaContext.getState();
 
-        eventListener([this](const Event &) {
+        eventListener([this, &lua](const Event &) {
             enabled = true;
             playStarted = true;
 
@@ -20,6 +21,7 @@ namespace Metal {
             for (auto entity: view) {
                 auto &comp = view.get<ScopedScriptComponent>(entity);
                 if (!comp.onCreatePath.empty()) {
+                    lua["this_entity"] = entity;
                     executeFile(comp.onCreatePath);
                 }
             }
@@ -28,12 +30,13 @@ namespace Metal {
             for (auto entity: globalView) {
                 auto &comp = globalView.get<GlobalScriptComponent>(entity);
                 if (!comp.scriptPath.empty()) {
+                    lua["this_entity"] = entity;
                     executeFile(comp.scriptPath);
                 }
             }
         }, "Play");
 
-        eventListener([this](const Event &) {
+        eventListener([this, &lua](const Event &) {
             enabled = false;
 
             // Execute all onDestroy scripts
@@ -41,6 +44,7 @@ namespace Metal {
             for (auto entity: view) {
                 auto &comp = view.get<ScopedScriptComponent>(entity);
                 if (!comp.onDestroyPath.empty()) {
+                    lua["this_entity"] = entity;
                     executeFile(comp.onDestroyPath);
                 }
             }
@@ -56,11 +60,13 @@ namespace Metal {
     void LuaService::onSync() {
         if (!enabled) return;
 
+        auto &lua = luaContext.getState();
         {
             auto view = worldRepository->registry.view<ScopedScriptComponent>();
             for (auto entity: view) {
                 auto &comp = view.get<ScopedScriptComponent>(entity);
                 if (!comp.onUpdatePath.empty()) {
+                    lua["this_entity"] = entity;
                     executeFile(comp.onUpdatePath);
                 }
             }
@@ -70,6 +76,7 @@ namespace Metal {
             for (auto entity: view) {
                 auto &comp = view.get<GlobalScriptComponent>(entity);
                 if (!comp.scriptPath.empty()) {
+                    lua["this_entity"] = entity;
                     executeFile(comp.scriptPath);
                 }
             }
@@ -77,6 +84,7 @@ namespace Metal {
     }
 
     bool LuaService::executeString(const std::string &script) {
+        auto &lua = luaContext.getState();
         auto result = lua.safe_script(script, sol::script_pass_on_error);
         if (!result.valid()) {
             sol::error err = result;
@@ -87,6 +95,7 @@ namespace Metal {
     }
 
     bool LuaService::executeFile(const std::string &path) {
+        auto &lua = luaContext.getState();
         auto result = lua.safe_script_file(path, sol::script_pass_on_error);
         if (!result.valid()) {
             sol::error err = result;

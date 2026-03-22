@@ -3,7 +3,6 @@
 #include "NotificationService.h"
 #include "../repository/EditorRepository.h"
 #include "../repository/AIAssistantRepository.h"
-#include "../../core/DirectoryService.h"
 #include "../../common/LoggerUtil.h"
 #include "../../common/FilesUtil.h"
 #include "../../ApplicationContext.h"
@@ -12,6 +11,8 @@
 #include <ctime>
 #include <iomanip>
 #include <sstream>
+
+#include "core/DirectoryService.h"
 
 namespace Metal {
     void AIAssistantService::onInitialize() {
@@ -36,226 +37,264 @@ namespace Metal {
         }
 
         std::string apiKey = getApiKey(model);
-        if (apiKey.empty()) return;
+        if (apiKey.empty()) {
+            return;
+        }
 
         AIModelInfo modelInfo = getAIModelInfo(model);
 
-        // Add user message
-        {
-            std::lock_guard<std::mutex> lock(repositoryMutex);
-            currentChat->messages.push_back({"user", message, getTimeStr()});
+        currentChat->messages.push_back({"user", message, getTimeStr(), false});
+
+        currentChat->isProcessing = true;
+        if (currentChat->messages.size() == 2) {
+            std::string initialName = message.substr(0, 30);
+            if (message.length() > 30) initialName += "...";
+            currentChat->name = initialName;
         }
 
-        LOG_INFO("Sending Async MCP request to: " + modelInfo.url + " using model " + modelInfo.modelId);
+        LOG_INFO("Sending MCP request to: " + modelInfo.url + " using model " + modelInfo.modelId);
 
         nlohmann::json body;
         body["model"] = modelInfo.modelId;
         body["messages"] = buildMessages(currentChat);
-        body["stream"] = true;
+
+        nlohmann::json tools = buildTools();
+        if (!tools.empty()) {
+            body["tools"] = tools;
+        }
 
         std::string targetChatId = currentChat->id;
         std::string jsonBody = body.dump();
-        std::string url = modelInfo.url + "/chat/completions";
+        currentChat->messages.emplace_back("assistant", "", getTimeStr(), true);
 
-        std::thread([this, url, jsonBody, apiKey, targetChatId, model]() {
-            std::string accumulatedData;
-            std::string currentContent;
-            httpService->postStream(url, jsonBody, apiKey,
-                                    [this, targetChatId, &accumulatedData, &currentContent](
-                                const char *data, size_t len) {
-                                        processStreamData(targetChatId, std::string(data, len), accumulatedData,
-                                                          currentContent);
-                                        return true;
-                                    },
-                                    [this, targetChatId, model](const std::string &fullResponse, bool success) {
-                                        if (success) {
-                                            LOG_INFO("Async MCP Request finished for " + targetChatId);
-                                            // Final processing for tool calls if any
-                                            processAIResponse(targetChatId, model, fullResponse);
-                                        } else {
-                                            LOG_ERROR("Async MCP Request failed: " + fullResponse);
-                                            if (notificationService) {
-                                                notificationService->pushMessage(
-                                                    "AI Request failed: " + fullResponse,
-                                                    NotificationSeverities::ERROR);
-                                            }
-                                        }
-                                    });
-            directoryService->save(true);
-        }).detach();
+        directoryService->save(true);
+
+        LOG_INFO("AIAssistantService: Request body: " + jsonBody);
+        httpService->post(modelInfo.url + "/chat/completions", jsonBody, apiKey,
+                          [this, targetChatId,currentChat, model](const std::string &response, bool success) {
+                              int assistantMessageIndex = static_cast<int>(currentChat->messages.size() - 1);
+
+                              if (success) {
+                                  processAIResponse(targetChatId, assistantMessageIndex, model, response);
+                                  currentChat->messages[assistantMessageIndex].isProcessing = false;
+                                  directoryService->save();
+                              } else {
+                                  LOG_ERROR("MCP Request failed: " + response);
+                                  if (notificationService) {
+                                      notificationService->pushMessage("AI Request failed: " + response,
+                                                                       NotificationSeverities::ERROR);
+                                  }
+                              }
+                          });
     }
 
-    void AIAssistantService::processAIResponse(const std::string &chatId, AIModel model, const std::string &response) {
-        try {
-            auto j = nlohmann::json::parse(response);
-            if (!j.contains("choices") || j["choices"].empty()) {
-                LOG_ERROR("AI Response missing choices");
-                return;
-            }
-
-            auto &message = j["choices"][0]["message"];
-            std::string content = message.value("content", "");
-
-            std::shared_ptr<Chat> chat;
-            {
-                std::lock_guard<std::mutex> lock(repositoryMutex);
-                chat = aiAssistantRepository->findChatById(chatId);
-            }
-            if (!chat) return;
-
-            int promptTokens = 0;
-            int completionTokens = 0;
-            int totalTokens = 0;
-
-            {
-                std::lock_guard<std::mutex> lock(repositoryMutex);
-                if (j.contains("usage")) {
-                    auto &usage = j["usage"];
-                    promptTokens = usage.value("prompt_tokens", 0);
-                    completionTokens = usage.value("completion_tokens", 0);
-                    totalTokens = usage.value("total_tokens", 0);
-
-                    chat->totalPromptTokens += promptTokens;
-                    chat->totalCompletionTokens += completionTokens;
-                    chat->totalTokens += totalTokens;
-                }
-
-                // If we were streaming, the message might already be there.
-                // We should update it with final content and tokens.
-                if (!chat->messages.empty() && chat->messages.back().role == "assistant") {
-                    chat->messages.back().content = content;
-                    chat->messages.back().promptTokens = promptTokens;
-                    chat->messages.back().completionTokens = completionTokens;
-                    chat->messages.back().totalTokens = totalTokens;
-                } else if (!content.empty()) {
-                    chat->messages.push_back({
-                        "assistant", content, getTimeStr(), promptTokens, completionTokens, totalTokens
-                    });
-                }
-            }
-
-            size_t firstBrace = content.find('{');
-            size_t lastBrace = content.rfind('}');
-
-            if (firstBrace != std::string::npos && lastBrace != std::string::npos && lastBrace > firstBrace) {
-                std::string jsonStr = content.substr(firstBrace, lastBrace - firstBrace + 1);
-                try {
-                    auto toolJson = nlohmann::json::parse(jsonStr);
-                    if (toolJson.contains("tool") && (
-                            toolJson.contains("arguments") || toolJson.contains("parameters"))) {
-                        std::string toolKey = toolJson["tool"];
-                        nlohmann::json args = toolJson.contains("arguments")
-                                                  ? toolJson["arguments"]
-                                                  : toolJson["parameters"];
-
-                        LOG_INFO("AI requested tool call: " + toolKey);
-                        std::string toolResult = executeTool(toolKey, args);
-
-                        {
-                            std::lock_guard<std::mutex> lock(repositoryMutex);
-                            chat->messages.push_back({
-                                "system", "Tool Result (" + toolKey + "): " + toolResult, getTimeStr()
-                            });
-                        }
-
-                        sendFollowupRequest(chatId, model);
-                        return;
-                    }
-                } catch (...) {
-                    // Not a valid tool call JSON, just treat as regular message
-                }
-            }
-
-            LOG_INFO("AI Response processed for chat " + chatId);
-        } catch (const std::exception &e) {
-            LOG_ERROR("Failed to parse AI response: " + std::string(e.what()));
-        }
-    }
-
-    void AIAssistantService::sendFollowupRequest(const std::string &chatId, AIModel model) {
+    void AIAssistantService::sendFollowupRequest(const std::string &chatId, AIModel model, int messageIndex) {
         std::shared_ptr<Chat> currentChat = aiAssistantRepository->findChatById(chatId);
         if (!currentChat) return;
+
+        currentChat->isProcessing = true;
 
         std::string apiKey = getApiKey(model);
         if (apiKey.empty()) return;
 
         AIModelInfo modelInfo = getAIModelInfo(model);
 
-        LOG_INFO("Sending Async Followup MCP request to: " + modelInfo.url + " using model " + modelInfo.modelId);
-
         nlohmann::json body;
         body["model"] = modelInfo.modelId;
         body["messages"] = buildMessages(currentChat);
-        body["stream"] = true;
 
-        std::string targetChatId = currentChat->id;
+        nlohmann::json tools = buildTools();
+        if (!tools.empty()) {
+            body["tools"] = tools;
+        }
+
         std::string jsonBody = body.dump();
-        std::string url = modelInfo.url + "/chat/completions";
+        LOG_INFO("Assistant Call " + jsonBody);
+        httpService->post(modelInfo.url + "/chat/completions", jsonBody, apiKey,
+                          [this, chatId, messageIndex, model](const std::string &response, bool success) {
+                              auto chat = aiAssistantRepository->findChatById(chatId);
+                              if (chat) chat->isProcessing = false;
 
-        std::thread([this, url, jsonBody, apiKey, targetChatId, model]() {
-            std::string accumulatedData;
-            std::string currentContent;
-
-            httpService->postStream(url, jsonBody, apiKey,
-                                    [this, targetChatId, &accumulatedData, &currentContent](
-                                const char *data, size_t len) {
-                                        processStreamData(targetChatId, std::string(data, len), accumulatedData,
-                                                          currentContent);
-                                        return true;
-                                    },
-                                    [this, targetChatId, model](const std::string &fullResponse, bool success) {
-                                        if (success) {
-                                            LOG_INFO("Async Followup Request finished for " + targetChatId);
-                                            processAIResponse(targetChatId, model, fullResponse);
-                                        } else {
-                                            LOG_ERROR("Async Followup Request failed: " + fullResponse);
-                                        }
-                                    });
-        }).detach();
+                              if (success) {
+                                  processAIResponse(chatId, messageIndex, model, response);
+                              } else {
+                                  LOG_ERROR("Followup Request failed: " + response);
+                              }
+                          });
     }
 
-    void AIAssistantService::processStreamData(const std::string &chatId, const std::string &chunk,
-                                               std::string &accumulatedData, std::string &currentContent) {
-        accumulatedData += chunk;
+    void AIAssistantService::regenerateMessage(const std::string &chatId, int messageIndex, AIModel model) {
+        auto chat = aiAssistantRepository->findChatById(chatId);
+        if (!chat || messageIndex < 0 || (size_t) messageIndex >= chat->messages.size()) return;
 
-        size_t pos;
-        while ((pos = accumulatedData.find('\n')) != std::string::npos) {
-            std::string line = accumulatedData.substr(0, pos);
-            accumulatedData.erase(0, pos + 1);
+        chat->messages.erase(chat->messages.begin() + messageIndex - 1, chat->messages.end());
+        sendRequest(chatId, chat->messages.back().content, model);
+    }
 
-            if (line.empty()) continue;
-            if (line.find("data: ") != 0) continue;
+    void AIAssistantService::editMessage(const std::string &chatId, int messageIndex, const std::string &newContent,
+                                         const AIModel model) {
+        auto chat = aiAssistantRepository->findChatById(chatId);
+        if (!chat || messageIndex < 0 || static_cast<size_t>(messageIndex) >= chat->messages.size()) return;
 
-            std::string data = line.substr(6);
-            if (data == "[DONE]") continue;
+        chat->messages.erase(chat->messages.begin() + messageIndex, chat->messages.end());
+        sendRequest(chatId, newContent, model);
+    }
 
-            try {
-                auto j = nlohmann::json::parse(data);
-                if (j.contains("choices") && !j["choices"].empty()) {
-                    auto &choice = j["choices"][0];
-                    if (choice.contains("delta") && choice["delta"].contains("content")) {
-                        std::string delta = choice["delta"]["content"];
-                        currentContent += delta;
-
-                        // Update chat repository dynamically
-                        std::lock_guard lock(repositoryMutex);
-                        auto chat = aiAssistantRepository->findChatById(chatId);
-                        if (chat) {
-                            if (chat->messages.empty() || chat->messages.back().role != "assistant") {
-                                chat->messages.push_back({"assistant", currentContent, getTimeStr()});
-                            } else {
-                                chat->messages.back().content = currentContent;
-                            }
-                        }
-                    }
-                }
-            } catch (...) {
-                // Ignore incomplete JSON chunks
-            }
+    void AIAssistantService::deleteMessagesFrom(const std::string &chatId, int messageIndex) const {
+        auto chat = aiAssistantRepository->findChatById(chatId);
+        if (chat && messageIndex >= 0 && static_cast<size_t>(messageIndex) < chat->messages.size()) {
+            chat->messages.erase(chat->messages.begin() + messageIndex, chat->messages.end());
         }
     }
 
-    std::string AIAssistantService::executeTool(const std::string &toolKey, const nlohmann::json &arguments) {
+    std::string AIAssistantService::deleteCurrentChat(const std::string &chatId) {
+        if (!aiAssistantRepository) return "";
+        aiAssistantRepository->deleteChat(chatId);
+        if (!aiAssistantRepository->chats.empty()) {
+            return aiAssistantRepository->chats.back()->id;
+        }
+        return aiAssistantRepository->createNewChat()->id;
+    }
+
+    nlohmann::json AIAssistantService::buildMessages(const std::shared_ptr<Chat> &chat) {
+        nlohmann::json messages = nlohmann::json::array();
+
+        std::string fullSystemPrompt = buildFullSystemPrompt();
+        if (!fullSystemPrompt.empty()) {
+            messages.push_back({{"role", "system"}, {"content", fullSystemPrompt}});
+        }
+
+        for (const auto &msg: chat->messages) {
+            nlohmann::json m = {{"role", msg.role}, {"content", msg.content}};
+
+            // Add tool calls if present
+            if (!msg.toolCalls.empty()) {
+                for (const auto &tool: msg.toolCalls) {
+                    m["content"] = m["content"].get<std::string>() + "\n\nTool Result (" + tool.name + "):\n" + tool.
+                                   result;
+                }
+            }
+
+            messages.push_back(m);
+        }
+
+        return messages;
+    }
+
+    nlohmann::json AIAssistantService::buildTools() {
+        nlohmann::json toolsArray = nlohmann::json::array();
+        for (auto *provider: toolProviders) {
+            for (const auto &tool: provider->getTools()) {
+                nlohmann::json toolJson = nlohmann::json::parse(tool.getSystemPrompt());
+                nlohmann::json toolWrapper;
+                toolWrapper["type"] = "function";
+                
+                // Convert MCP-style JSON to OpenAI-style tool call if needed.
+                // MCP: { name, description, inputSchema }
+                // OpenAI: { type: "function", function: { name, description, parameters } }
+                nlohmann::json functionObj;
+                functionObj["name"] = toolJson["name"];
+                functionObj["description"] = toolJson["description"];
+                functionObj["parameters"] = toolJson["inputSchema"];
+                
+                toolWrapper["function"] = functionObj;
+                toolsArray.push_back(toolWrapper);
+            }
+        }
+        return toolsArray;
+    }
+
+    std::string AIAssistantService::buildFullSystemPrompt() {
+        return systemPrompt;
+    }
+
+    void AIAssistantService::processAIResponse(const std::string &chatId, int messageIndex, AIModel model,
+                                               const std::string &response) {
+        try {
+            auto responseJson = nlohmann::json::parse(response);
+
+            auto chat = aiAssistantRepository->findChatById(chatId);
+            if (!chat || messageIndex < 0 || static_cast<size_t>(messageIndex) >= chat->messages.size()) return;
+
+            auto &assistantMsg = chat->messages[messageIndex];
+
+            if (!responseJson.contains("choices") || responseJson["choices"].empty()) {
+                chat->isProcessing = false;
+                return;
+            }
+
+            auto firstChoice = responseJson["choices"][0];
+            if (!firstChoice.contains("message")) {
+                chat->isProcessing = false;
+                return;
+            }
+
+            LOG_INFO("AIAssistantService: Processing response... " + responseJson.dump(4));
+            auto message = firstChoice["message"];
+            std::string content = message.value("content", "");
+            LOG_INFO("AIAssistantService: Content: " + content);
+
+            int promptTokens = 0;
+            int completionTokens = 0;
+            int totalTokens = 0;
+
+            if (responseJson.contains("usage")) {
+                auto usage = responseJson["usage"];
+                promptTokens = usage.value("prompt_tokens", 0);
+                completionTokens = usage.value("completion_tokens", 0);
+                totalTokens = usage.value("total_tokens", 0);
+            }
+
+            chat->totalPromptTokens += promptTokens;
+            chat->totalCompletionTokens += completionTokens;
+            chat->totalTokens += totalTokens;
+
+            assistantMsg.promptTokens += promptTokens;
+            assistantMsg.completionTokens += completionTokens;
+            assistantMsg.totalTokens += totalTokens;
+            assistantMsg.timestamp = getTimeStr();
+            assistantMsg.content += content;
+
+            // Check for native tool_calls (as per OpenAI and Gemini MCP formats)
+            if (message.contains("tool_calls") && message["tool_calls"].is_array() && !message["tool_calls"].empty()) {
+                LOG_INFO("AIAssistantService: Found native tool_calls array");
+                for (const auto& toolCall : message["tool_calls"]) {
+                    if (toolCall.contains("function")) {
+                        auto function = toolCall["function"];
+                        std::string action = function.value("name", "");
+                        std::string argumentsStr = function.value("arguments", "{}");
+                        
+                        try {
+                            nlohmann::json arguments;
+                            if (argumentsStr.empty() || argumentsStr == "null") {
+                                arguments = nlohmann::json::object();
+                            } else {
+                                arguments = nlohmann::json::parse(argumentsStr);
+                            }
+                            
+                            LOG_INFO("AIAssistantService: Executing native tool: " + action);
+                            std::string result = executeTool(action, arguments);
+                            assistantMsg.toolCalls.emplace_back(action, "Executed " + action, result);
+                        } catch (const std::exception& e) {
+                            LOG_ERROR("AIAssistantService: Error parsing tool arguments: " + std::string(e.what()));
+                        }
+                    }
+                }
+                
+                if (!assistantMsg.toolCalls.empty()) {
+                    sendFollowupRequest(chatId, model, messageIndex);
+                    return;
+                }
+            }
+
+            assistantMsg.content = content;
+            chat->isProcessing = false;
+        } catch (const std::exception &e) {
+            LOG_ERROR("Failed to parse AI response: " + std::string(e.what()));
+        }
+    }
+
+    std::string AIAssistantService::executeTool(const std::string &toolKey, const nlohmann::json &arguments) const {
         for (auto *provider: toolProviders) {
             for (const auto &tool: provider->getTools()) {
                 if (tool.key == toolKey) {
@@ -270,7 +309,7 @@ namespace Metal {
         return "Tool not found: " + toolKey;
     }
 
-    std::string AIAssistantService::getApiKey(AIModel model) {
+    std::string AIAssistantService::getApiKey(const AIModel model) {
         if (!editorRepository) return "";
 
         AIModelInfo modelInfo = getAIModelInfo(model);
@@ -308,83 +347,5 @@ namespace Metal {
         std::ostringstream oss;
         oss << std::put_time(&tm, "%H:%M:%S");
         return oss.str();
-    }
-
-    std::string AIAssistantService::deleteCurrentChat(const std::string &chatId) {
-        if (!aiAssistantRepository) return "";
-        aiAssistantRepository->deleteChat(chatId);
-        return aiAssistantRepository->createNewChat()->id;
-    }
-
-    void AIAssistantService::deleteMessagesFrom(const std::string &chatId, int messageIndex) {
-        std::lock_guard<std::mutex> lock(repositoryMutex);
-        auto chat = aiAssistantRepository->findChatById(chatId);
-        if (chat && messageIndex >= 0 && (size_t)messageIndex < chat->messages.size()) {
-            chat->messages.erase(chat->messages.begin() + messageIndex, chat->messages.end());
-        }
-    }
-
-    void AIAssistantService::regenerateMessage(const std::string &chatId, int messageIndex, AIModel model) {
-        {
-            std::lock_guard<std::mutex> lock(repositoryMutex);
-            auto chat = aiAssistantRepository->findChatById(chatId);
-            if (!chat || messageIndex < 0 || (size_t)messageIndex >= chat->messages.size()) return;
-
-            // Remove the assistant message (it should be an assistant message, but we remove it and everything after)
-            chat->messages.erase(chat->messages.begin() + messageIndex, chat->messages.end());
-        }
-        sendFollowupRequest(chatId, model);
-    }
-
-    void AIAssistantService::editMessage(const std::string &chatId, int messageIndex, const std::string &newContent,
-                                         AIModel model) {
-        {
-            std::lock_guard<std::mutex> lock(repositoryMutex);
-            auto chat = aiAssistantRepository->findChatById(chatId);
-            if (!chat || messageIndex < 0 || (size_t)messageIndex >= chat->messages.size()) return;
-
-            // Update the message and remove everything after
-            chat->messages[messageIndex].content = newContent;
-            chat->messages[messageIndex].timestamp = getTimeStr();
-            if ((size_t)messageIndex + 1 < chat->messages.size()) {
-                chat->messages.erase(chat->messages.begin() + messageIndex + 1, chat->messages.end());
-            }
-        }
-        sendFollowupRequest(chatId, model);
-    }
-
-    nlohmann::json AIAssistantService::buildMessages(const std::shared_ptr<Chat> &chat) {
-        nlohmann::json messages = nlohmann::json::array();
-
-        std::string fullSystemPrompt = buildFullSystemPrompt();
-        if (!fullSystemPrompt.empty()) {
-            messages.push_back({{"role", "system"}, {"content", fullSystemPrompt}});
-        }
-
-        for (const auto &msg: chat->messages) {
-            messages.push_back({{"role", msg.role}, {"content", msg.content}});
-        }
-
-        return messages;
-    }
-
-    std::string AIAssistantService::buildFullSystemPrompt() {
-        std::stringstream ss;
-        if (!systemPrompt.empty()) {
-            ss << systemPrompt << "\n\n";
-        }
-
-        if (!toolProviders.empty()) {
-            ss << "AVAILABLE TOOLS:\n";
-            ss <<
-                    "You have access to the following tools. To use them, you must provide a JSON response in your output.\n\n";
-            for (auto *provider: toolProviders) {
-                for (const auto &tool: provider->getTools()) {
-                    ss << tool.getSystemPrompt() << "\n";
-                }
-            }
-        }
-
-        return ss.str();
     }
 }

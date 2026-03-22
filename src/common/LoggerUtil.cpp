@@ -49,13 +49,10 @@ namespace Metal::LogService {
 
     uint32_t getLevelColor(LogLevel level) {
         switch (level) {
-            case LogLevel::Trace: return 0xFF888888; // Grey
-            case LogLevel::Debug: return 0xFFAAAAAA; // Light Grey
-            case LogLevel::Info:  return 0xFFFFFFFF; // White
             case LogLevel::Warn:  return 0xFF00FFFF; // Yellow
             case LogLevel::Error: return 0xFF0000FF; // Red
             case LogLevel::Fatal: return 0xFF000088; // Dark Red
-            default:              return 0xFFFFFFFF;
+            default:              return 0;
         }
     }
 

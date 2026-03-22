@@ -97,6 +97,16 @@ set(ENGINE_SOURCES
         editor/dock-spaces/lua-editor/LuaEditorPanel.h
         editor/dock-spaces/mcp/AIAssistantPanel.cpp
         editor/dock-spaces/mcp/AIAssistantPanel.h
+        editor/dock-spaces/mcp/ChatHeaderPanel.cpp
+        editor/dock-spaces/mcp/ChatHeaderPanel.h
+        editor/dock-spaces/mcp/ChatMessagesPanel.cpp
+        editor/dock-spaces/mcp/ChatMessagesPanel.h
+        editor/dock-spaces/mcp/ChatInputPanel.cpp
+        editor/dock-spaces/mcp/ChatInputPanel.h
+        editor/dock-spaces/mcp/UserMessagePanel.cpp
+        editor/dock-spaces/mcp/UserMessagePanel.h
+        editor/dock-spaces/mcp/AssistantMessagePanel.cpp
+        editor/dock-spaces/mcp/AssistantMessagePanel.h
         engine/resource/RuntimeResource.h
         engine/service/ShaderService.cpp
         engine/service/ShaderService.h
@@ -292,6 +302,8 @@ set(ENGINE_SOURCES
         engine/service/PhysicsService.h
         engine/service/LuaService.cpp
         engine/service/LuaService.h
+        engine/util/LuaContext.cpp
+        engine/util/LuaContext.h
         common/IContextMember.h
         common/IEventMember.h
         common/IEventMember.cpp
