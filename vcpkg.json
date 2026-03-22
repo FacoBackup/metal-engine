@@ -63,6 +63,10 @@
     "version>=" : "5.0.0"
   }, {
     "name" : "cpp-httplib",
-    "version>=" : "0.37.1"
+    "version>=" : "0.37.1",
+    "features" : [ "openssl" ]
+  }, {
+    "name" : "openssl",
+    "version>=" : "3.3.2"
   } ]
 }

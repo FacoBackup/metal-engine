@@ -70,7 +70,7 @@ protected:
     }
 };
 
-TEST_F(AIAssistantServiceIntegrationTest, DISABLED_TestRealToolUsageWithGeminiFlashLite) {
+TEST_F(AIAssistantServiceIntegrationTest, TestRealToolUsageWithGeminiFlashLite) {
     auto chat = aiRepo->createNewChat();
     std::string chatId = chat->id;
     service->sendRequest(chatId, "Please use the tool 'PLACEHOLDER_TOOL_KEY' with arg1 set to 'integration-test'", AIModel::GEMINI_3_FLASH_LITE);

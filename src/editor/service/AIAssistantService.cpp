@@ -58,7 +58,8 @@ namespace Metal {
         body["messages"] = buildMessages(currentChat);
 
         std::string targetChatId = currentChat->id;
-        httpService->post(modelInfo.url + "/chat/completions", body.dump(), apiKey,
+        std::string jsonBody = body.dump();
+        httpService->post(modelInfo.url + "/chat/completions", jsonBody, apiKey,
             [this, targetChatId, model](const std::string& response, bool success) {
                 if (success) {
                     processAIResponse(targetChatId, model, response);
