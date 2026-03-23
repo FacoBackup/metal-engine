@@ -7,8 +7,8 @@
 
 #include <filesystem>
 #define CACHED_PATH "/metal-engine-cached.txt"
-#include "../editor/service/NotificationService.h"
-#include "../engine/repository/WorldRepository.h"
+#include "editor/service/NotificationService.h"
+#include "engine/repository/WorldRepository.h"
 
 namespace Metal {
     void DirectoryService::onInitialize() {
@@ -56,8 +56,6 @@ namespace Metal {
         }
 
         FilesUtil::CreateDirectory(rootDirectory + "/shaders/");
-        FilesUtil::CreateDirectory(rootDirectory + "/assets-ref/");
-        FilesUtil::CreateDirectory(rootDirectory + "/assets/");
     }
 
 

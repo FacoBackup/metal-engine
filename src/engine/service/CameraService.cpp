@@ -5,7 +5,7 @@
 #include "../EngineContext.h"
 #include "../repository/WorldRepository.h"
 #include "../repository/RuntimeRepository.h"
-#include "../../editor/dto/FieldModificationEvent.h"
+#include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
     void CameraService::onInitialize() {

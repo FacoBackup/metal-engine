@@ -12,7 +12,7 @@
 #include <functional>
 
 #include "NotificationService.h"
-#include "../../common/IService.h"
+#include "common/IService.h"
 
 namespace Metal {
     class Inspectable;

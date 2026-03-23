@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "../../common/ISerialize.h"
+#include "common/ISerialize.h"
 
 namespace Metal {
     struct FSEntry {
@@ -22,7 +22,7 @@ namespace Metal {
               formattedDate(std::move(formatted_date)) {
         }
 
-        std::string getId() const {
+        std::string getAbsolutePath() const {
             return absolutePath;
         }
     };

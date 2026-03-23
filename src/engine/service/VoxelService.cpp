@@ -7,9 +7,9 @@
 #include "../dto/SparseVoxelOctreeData.h"
 #include "../../ApplicationEventContext.h"
 #include "../dto/ResourceDisposalPayload.h"
+#include "common/FileExtensions.h"
 
 namespace Metal {
-
     void VoxelService::onInitialize() {
         eventListener([this](const Event &event) {
             auto payload = std::dynamic_pointer_cast<ResourceDisposalPayload>(event.payload);
@@ -19,7 +19,7 @@ namespace Metal {
         }, "RESOURCE_DISPOSAL");
     }
 
-    SVOInstance* VoxelService::create(const std::string &svoPath) {
+    void VoxelService::load(const std::string &svoPath) {
         if (std::filesystem::exists(svoPath)) {
             LOG_INFO("Streaming SVO " + svoPath);
             auto data = SparseVoxelOctreeData();
@@ -34,10 +34,11 @@ namespace Metal {
                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
             instance->voxelsBuffer->update(data.data.data());
             instance->voxelBufferOffset = data.voxelBufferOffset;
-
-            return instance;
         }
-        return nullptr;
+    }
+
+    bool VoxelService::isCompatible(const std::string &absolutePath) {
+        return absolutePath.ends_with(EXT_SVO);
     }
 
     void VoxelService::disposeResource(SVOInstance *resource) {

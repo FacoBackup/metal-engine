@@ -1,8 +1,8 @@
 #ifndef aiAssistantService_H
 #define aiAssistantService_H
 
-#include "../../common/IService.h"
-#include "../../common/IInit.h"
+#include "common/IService.h"
+#include "common/IInit.h"
 #include "../enum/AIModel.h"
 #include <string>
 #include <nlohmann/json.hpp>

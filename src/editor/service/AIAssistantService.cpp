@@ -3,9 +3,9 @@
 #include "NotificationService.h"
 #include "../repository/EditorRepository.h"
 #include "../repository/AIAssistantRepository.h"
-#include "../../common/LoggerUtil.h"
-#include "../../common/FilesUtil.h"
-#include "../../ApplicationContext.h"
+#include "common/LoggerUtil.h"
+#include "common/FilesUtil.h"
+#include "ApplicationContext.h"
 #include "../dto/IToolProvider.h"
 #include <nlohmann/json.hpp>
 #include <ctime>

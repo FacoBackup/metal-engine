@@ -1,7 +1,7 @@
 #include "HistoryService.h"
 #include <algorithm>
-#include "../../common/Inspectable.h"
-#include "../../common/InspectedField.h"
+#include "common/Inspectable.h"
+#include "common/InspectedField.h"
 #include "ApplicationEventContext.h"
 #include "../dto/FieldModificationEvent.h"
 

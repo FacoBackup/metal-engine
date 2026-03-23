@@ -1,5 +1,5 @@
 #include "AIAssistantRepository.h"
-#include "../../common/Icons.h"
+#include "common/Icons.h"
 #include <ctime>
 #include <iomanip>
 #include <sstream>

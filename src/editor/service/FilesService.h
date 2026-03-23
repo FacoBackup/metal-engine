@@ -4,8 +4,8 @@
 #include <unordered_map>
 #include <memory>
 
-#include "../../common/IInit.h"
-#include "../../common/IService.h"
+#include "common/IInit.h"
+#include "common/IService.h"
 
 namespace Metal {
     struct DirectoryService;

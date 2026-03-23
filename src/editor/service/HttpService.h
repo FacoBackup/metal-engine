@@ -1,7 +1,7 @@
 #ifndef HTTPSERVICE_H
 #define HTTPSERVICE_H
 
-#include "../../common/IService.h"
+#include "common/IService.h"
 #include <string>
 #include <functional>
 

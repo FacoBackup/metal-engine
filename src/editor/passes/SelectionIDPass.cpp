@@ -1,12 +1,12 @@
 #include "SelectionIDPass.h"
-#include "../../engine/dto/TransformComponent.h"
-#include "../../engine/dto/PrimitiveComponent.h"
+#include "engine/dto/TransformComponent.h"
+#include "engine/dto/PrimitiveComponent.h"
 #include "../dto/SelectionOutlinePushConstant.h"
-#include "../../engine/dto/PipelineBuilder.h"
-#include "../../engine/service/PipelineService.h"
+#include "engine/dto/PipelineBuilder.h"
+#include "engine/service/PipelineService.h"
 #include "../repository/EditorRepository.h"
-#include "../../engine/repository/WorldRepository.h"
-#include "../../engine/service/MeshService.h"
+#include "engine/repository/WorldRepository.h"
+#include "engine/service/MeshService.h"
 #include "../enum/EngineResourceIDs.h"
 
 namespace Metal {

@@ -12,7 +12,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include "InspectedField.h"
 #include "InspectedMethod.h"
-#include "../editor/util/Util.h"
+#include "Util.h"
 
 #define  DECLARATION(T, V) \
         std::shared_ptr<InspectedField<T>> field = std::make_shared<InspectedField<T>>(&v);\
@@ -178,7 +178,7 @@ namespace Metal {
     }
 
     std::string Inspectable::getClassName() const {
-        return getTypeName(typeid(*this).name(), false);
+        return Util::getTypeName(typeid(*this).name(), false);
     }
 
     void Inspectable::registerBool(bool &v,

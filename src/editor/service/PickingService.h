@@ -1,7 +1,7 @@
 #ifndef PICKINGSERVICE_H
 #define PICKINGSERVICE_H
 
-#include "../../common/IService.h"
+#include "common/IService.h"
 #include "../enum/engine-definitions.h"
 #include <optional>
 

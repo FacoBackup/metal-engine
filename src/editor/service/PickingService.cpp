@@ -1,13 +1,13 @@
 #include "PickingService.h"
 
-#include "../../engine/resource/BufferInstance.h"
-#include "../../engine/resource/TextureInstance.h"
-#include "../../ApplicationContext.h"
+#include "engine/resource/BufferInstance.h"
+#include "engine/resource/TextureInstance.h"
+#include "ApplicationContext.h"
 #include "../../core/VulkanContext.h"
-#include "../../engine/service/BufferService.h"
-#include "../../engine/repository/WorldRepository.h"
-#include "../../engine/dto/PrimitiveComponent.h"
-#include "../../engine/dto/TransformComponent.h"
+#include "engine/service/BufferService.h"
+#include "engine/repository/WorldRepository.h"
+#include "engine/dto/PrimitiveComponent.h"
+#include "engine/dto/TransformComponent.h"
 
 namespace Metal {
     std::optional<entt::entity> PickingService::pickEntityFromGBuffer(TextureInstance *attachment, const uint32_t pixelX,

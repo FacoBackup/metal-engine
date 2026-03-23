@@ -1,6 +1,6 @@
 #ifndef TEXTUREIMPORTER_H
 #define TEXTUREIMPORTER_H
-#include "../../common/AbstractImporter.h"
+#include "common/AbstractImporter.h"
 
 struct aiTexture;
 

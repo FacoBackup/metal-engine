@@ -7,7 +7,7 @@
 #include <memory>
 #include <nlohmann/json.hpp>
 #include "DockSpace.h"
-#include "../util/Util.h"
+#include "common/Util.h"
 
 namespace Metal {
     struct DockDTO {

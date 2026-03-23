@@ -5,13 +5,13 @@
 #include "imgui_freetype.h"
 #include "../ApplicationContext.h"
 #include "../common/VulkanUtils.h"
-#include "../engine/dto/DescriptorInstance.h"
-#include "../engine/resource/TextureInstance.h"
+#include "engine/dto/DescriptorInstance.h"
+#include "engine/resource/TextureInstance.h"
 
 #include "VulkanContext.h"
 #include "WindowService.h"
-#include "../engine/service/DescriptorSetService.h"
-#include "../editor/enum/engine-definitions.h"
+#include "engine/service/DescriptorSetService.h"
+#include "editor/enum/engine-definitions.h"
 
 namespace Metal {
     void ImGuiService::renderImage(TextureInstance *texture, const float sizeX, const float sizeY) const {

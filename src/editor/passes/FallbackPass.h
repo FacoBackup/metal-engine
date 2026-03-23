@@ -1,7 +1,7 @@
 #ifndef DEBUGPHONGPASS_H
 #define DEBUGPHONGPASS_H
 
-#include "../../engine/passes/AbstractRenderPass.h"
+#include "engine/passes/AbstractRenderPass.h"
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
 

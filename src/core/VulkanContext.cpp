@@ -5,10 +5,10 @@
 #include "../common/LoggerUtil.h"
 
 #include "WindowService.h"
-#include "../engine/repository/EngineRepository.h"
-#include "../engine/service/MeshService.h"
-#include "../engine/service/TextureService.h"
-#include "../engine/service/FrameBufferService.h"
+#include "engine/repository/EngineRepository.h"
+#include "engine/service/MeshService.h"
+#include "engine/service/TextureService.h"
+#include "engine/service/FrameBufferService.h"
 
 namespace Metal {
 

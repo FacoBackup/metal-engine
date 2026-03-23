@@ -7,6 +7,7 @@
 #include "../../common/IRepository.h"
 #include "../dto/Camera.h"
 #include "../enum/ComponentType.h"
+#include "common/ILoader.h"
 
 namespace Metal {
     struct MetadataComponent;
@@ -20,7 +21,7 @@ namespace Metal {
         nlohmann::json data;
     };
 
-    struct WorldRepository final : IRepository {
+    struct WorldRepository final : IRepository, ILoader {
         RayTracingService *rayTracingService = nullptr;
         DirectoryService *directoryService = nullptr;
         HistoryService *historyService = nullptr;
@@ -52,7 +53,9 @@ namespace Metal {
 
         void changeVisibility(entt::entity entity, bool isVisible);
 
-        void loadScene(const std::string &sceneId);
+        void load(const std::string &absolutePath) override;
+
+        bool isCompatible(const std::string &absolutePath) override;
 
         nlohmann::json toJson() const override;
 

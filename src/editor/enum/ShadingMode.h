@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "../../common/Icons.h"
+#include "common/Icons.h"
 
 namespace Metal {
     enum ShadingMode {

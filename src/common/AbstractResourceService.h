@@ -8,7 +8,7 @@
 #include "IEventMember.h"
 #include "LoggerUtil.h"
 #include "../ApplicationContext.h"
-#include "../engine/resource/RuntimeResource.h"
+#include "engine/resource/RuntimeResource.h"
 
 namespace Metal {
     class VulkanContext;

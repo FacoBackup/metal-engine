@@ -1,16 +1,16 @@
 #include "TextureImporterService.h"
 #include "../../core/DirectoryService.h"
-#include "../../common/LoggerUtil.h"
+#include "common/LoggerUtil.h"
 #include "../enum/engine-definitions.h"
 
 #include "../../../../dependencies/stb/stb_image.h"
 #include "../../../../dependencies/stb/stb_image_write.h"
 #include <assimp/texture.h>
 #include <filesystem>
-#include "../../common/serialization-definitions.h"
+#include "common/serialization-definitions.h"
 
-#include "../../common/FilesUtil.h"
-#include "../../engine/dto/TextureData.h"
+#include "common/FilesUtil.h"
+#include "engine/dto/TextureData.h"
 
 namespace fs = std::filesystem;
 

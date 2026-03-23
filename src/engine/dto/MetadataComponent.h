@@ -4,7 +4,7 @@
 #include <glm/vec3.hpp>
 
 #include "AbstractComponent.h"
-#include "../../editor/enum/engine-definitions.h"
+#include "editor/enum/engine-definitions.h"
 #include "../enum/ComponentType.h"
 #include "../../common/Inspectable.h"
 #include "../../common/ISerialize.h"

@@ -6,7 +6,7 @@
 #include "../resource/MeshInstance.h"
 #include "../dto/VertexData.h"
 #include "../../common/VulkanUtils.h"
-#include "../../editor/enum/EngineResourceIDs.h"
+#include "editor/enum/EngineResourceIDs.h"
 #include "../../core/VulkanContext.h"
 #include "../../common/LoggerUtil.h"
 #include "../dto/TransformComponent.h"

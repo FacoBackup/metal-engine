@@ -1,9 +1,9 @@
 #ifndef METAL_ENGINE_VOLUMEIMPORTERSERVICE_H
 #define METAL_ENGINE_VOLUMEIMPORTERSERVICE_H
 
-#include "../../common/AbstractImporter.h"
+#include "common/AbstractImporter.h"
 #include "../dto/SparseVoxelOctreeBuilder.h"
-#include "../../engine/dto/SparseVoxelOctreeData.h"
+#include "engine/dto/SparseVoxelOctreeData.h"
 
 namespace Metal {
     class DirectoryService;

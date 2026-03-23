@@ -1,12 +1,13 @@
 #include "WorldRepository.h"
 #include "../service/RayTracingService.h"
-#include "../../editor/service/HistoryService.h"
+#include "editor/service/HistoryService.h"
 #include "../../ApplicationEventContext.h"
 
 #include "../enum/ComponentType.h"
-#include "../../editor/dto/SceneData.h"
+#include "editor/dto/SceneData.h"
 #include "../../common/serialization-definitions.h"
 #include "../../core/DirectoryService.h"
+#include "common/FileExtensions.h"
 #include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
@@ -130,13 +131,13 @@ namespace Metal {
         ApplicationEventContext::dispatch("BVHNeedsUpdate");
     }
 
-    void WorldRepository::loadScene(const std::string &scenePath) {
+    void WorldRepository::load(const std::string &absolutePath) {
         if (historyService) {
-            historyService->startTransaction("Load Scene " + scenePath);
+            historyService->startTransaction("Load Scene " + absolutePath);
         }
 
         SceneData sceneData;
-        PARSE_TEMPLATE(sceneData, scenePath)
+        PARSE_TEMPLATE(sceneData, absolutePath)
 
         for (auto &entityData: sceneData.entities) {
             const auto entityId = createEntity();
@@ -171,6 +172,10 @@ namespace Metal {
         if (historyService) {
             historyService->endTransaction();
         }
+    }
+
+    bool WorldRepository::isCompatible(const std::string &absolutePath) {
+        return absolutePath.ends_with(EXT_SCENE);
     }
 
     void WorldRepository::createComponent(const entt::entity entityId, ComponentType type) {

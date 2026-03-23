@@ -3,7 +3,7 @@
 #include <string>
 #include <array>
 #include "../enum/NotificationSeverity.h"
-#include "../../common/IService.h"
+#include "common/IService.h"
 
 #define MAX_notifications  4
 #define  MESSAGE_DURATION  3000

@@ -8,11 +8,11 @@
 
 #include "../dto/ShaderModule.h"
 #include "../../common/VulkanUtils.h"
-#include "../../editor/util/Util.h"
+#include "../../common/Util.h"
 #include "../../ApplicationContext.h"
 #include "../../common/FilesUtil.h"
 #include "../../common/LoggerUtil.h"
-#include "../../editor/enum/ShadingMode.h"
+#include "editor/enum/ShadingMode.h"
 #include "glslang/Include/glslang_c_interface.h"
 #include "glslang/Public/resource_limits_c.h"
 #include "../../core/DirectoryService.h"

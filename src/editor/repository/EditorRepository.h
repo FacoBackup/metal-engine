@@ -9,7 +9,7 @@
 #include "../dto/ShortcutDTO.h"
 #include "../enum/engine-definitions.h"
 #include "../enum/ShadingMode.h"
-#include "../../common/IRepository.h"
+#include "common/IRepository.h"
 
 namespace Metal {
     struct TransformComponent;

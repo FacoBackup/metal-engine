@@ -6,8 +6,8 @@
 #include <mutex>
 #include <functional>
 
-#include "../../common/IDisposable.h"
-#include "../../common/IService.h"
+#include "common/IDisposable.h"
+#include "common/IService.h"
 #include "../dto/AsyncTask.h"
 
 namespace Metal {

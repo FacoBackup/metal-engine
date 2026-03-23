@@ -1,9 +1,9 @@
 #ifndef METAL_ENGINE_SCENEENTITYDATA_H
 #define METAL_ENGINE_SCENEENTITYDATA_H
 #include <optional>
-#include "../../engine/dto/PrimitiveComponent.h"
-#include "../../engine/dto/TransformComponent.h"
-#include "../../engine/dto/MetadataComponent.h"
+#include "engine/dto/PrimitiveComponent.h"
+#include "engine/dto/TransformComponent.h"
+#include "engine/dto/MetadataComponent.h"
 
 namespace Metal {
 

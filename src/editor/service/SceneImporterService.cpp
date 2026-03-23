@@ -1,9 +1,9 @@
 #include "SceneImporterService.h"
 #include "MeshImporterService.h"
 #include "MaterialImporterService.h"
-#include "../../common/LoggerUtil.h"
-#include "../dto/FSEntry.h"
-#include "../../engine/dto/MeshData.h"
+#include "common/LoggerUtil.h"
+#include "editor/dto/FSEntry.h"
+#include "engine/dto/MeshData.h"
 #include "../dto/SceneData.h"
 #include "MaterialImporterService.h"
 #include <iostream>
@@ -11,9 +11,9 @@
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
-#include "../../common/FilesUtil.h"
+#include "common/FilesUtil.h"
 #include "../enum/engine-definitions.h"
-#include "../../common/serialization-definitions.h"
+#include "common/serialization-definitions.h"
 #include "../../core/DirectoryService.h"
 #include "../dto/SceneImportSettingsDTO.h"
 
@@ -46,7 +46,7 @@ namespace Metal {
         }
 
         fs::path sourceFilePath(pathToFile);
-        std::string extractionDirName = sourceFilePath.stem().string() + "_extracted";
+        std::string extractionDirName = sourceFilePath.filename().string() + "_extracted";
         fs::path extractionPath = fs::absolute(targetDir) / extractionDirName;
         fs::create_directories(extractionPath);
         std::string extractionPathStr = extractionPath.string();

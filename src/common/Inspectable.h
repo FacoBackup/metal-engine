@@ -9,7 +9,7 @@
 #include <nlohmann/json.hpp>
 #include "InspectableMember.h"
 #include "Util.h"
-#include "../editor/util/Util.h"
+#include "Util.h"
 
 namespace Metal {
     class Inspectable {

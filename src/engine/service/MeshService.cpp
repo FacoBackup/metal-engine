@@ -1,7 +1,7 @@
 #include "MeshService.h"
 #include "../resource/MeshInstance.h"
 #include "../dto/MeshData.h"
-#include "../../editor/dto/SceneData.h"
+#include "editor/dto/SceneData.h"
 
 #include "../../core/VulkanContext.h"
 #include "../../common/FilesUtil.h"
@@ -15,7 +15,7 @@
 #include "../../ApplicationContext.h"
 #include "BufferService.h"
 #include "RayTracingService.h"
-#include "../../editor/service/HistoryService.h"
+#include "editor/service/HistoryService.h"
 #include "../dto/PrimitiveComponent.h"
 #include "../dto/TransformComponent.h"
 #include "../repository/WorldRepository.h"

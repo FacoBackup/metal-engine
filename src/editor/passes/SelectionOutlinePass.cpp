@@ -1,9 +1,9 @@
 #include "SelectionOutlinePass.h"
-#include "../../ApplicationContext.h"
-#include "../../engine/dto/TransformComponent.h"
+#include "ApplicationContext.h"
+#include "engine/dto/TransformComponent.h"
 #include "../dto/SelectionOutlinePushConstant.h"
-#include "../../engine/dto/PipelineBuilder.h"
-#include "../../engine/service/PipelineService.h"
+#include "engine/dto/PipelineBuilder.h"
+#include "engine/service/PipelineService.h"
 #include "../repository/EditorRepository.h"
 #include "../enum/EngineResourceIDs.h"
 

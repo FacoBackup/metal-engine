@@ -3,8 +3,8 @@
 
 #include "imgui.h"
 #include "../dto/DockDTO.h"
-#include "../dock-spaces/docks/DockSpacePanel.h"
-#include "../../common/IService.h"
+#include "../ui/docks/DockSpacePanel.h"
+#include "common/IService.h"
 
 #include "../repository/DockRepository.h"
 

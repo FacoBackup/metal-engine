@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 #include <nlohmann/json.hpp>
-#include "../../common/IRepository.h"
+#include "common/IRepository.h"
 #include "../dto/DockDTO.h"
 
 namespace Metal {

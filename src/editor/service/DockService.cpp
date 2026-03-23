@@ -2,10 +2,10 @@
 #include <algorithm>
 #include "DockService.h"
 #include "../dto/DockDTO.h"
-#include "../abstract/AbstractPanel.h"
-#include "../dock-spaces/docks/AbstractDockPanel.h"
-#include "../dock-spaces/docks/DockSpacePanel.h"
-#include "../../ApplicationContext.h"
+#include "editor/ui/abstract/AbstractPanel.h"
+#include "../ui/docks/AbstractDockPanel.h"
+#include "../ui/docks/DockSpacePanel.h"
+#include "ApplicationContext.h"
 
 namespace Metal {
     void DockService::onInitialize() {

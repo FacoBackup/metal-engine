@@ -10,9 +10,9 @@
 #include "service/PhysicsService.h"
 #include "repository/WorldRepository.h"
 #include "repository/EngineRepository.h"
-#include "../editor/repository/EditorRepository.h"
+#include "editor/repository/EditorRepository.h"
 
-#include "../editor/enum/EngineResourceIDs.h"
+#include "editor/enum/EngineResourceIDs.h"
 #include "resource/BufferInstance.h"
 #include "dto/TransformComponent.h"
 

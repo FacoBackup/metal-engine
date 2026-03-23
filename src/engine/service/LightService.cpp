@@ -1,7 +1,7 @@
 #include "LightService.h"
 #include "../../ApplicationContext.h"
 #include "../resource/BufferInstance.h"
-#include "../../editor/enum/EngineResourceIDs.h"
+#include "editor/enum/EngineResourceIDs.h"
 #include "../EngineContext.h"
 #include "../repository/EngineRepository.h"
 #include "../repository/WorldRepository.h"
@@ -10,7 +10,7 @@
 #include "MeshService.h"
 #include "common/LoggerUtil.h"
 #include "engine/dto/LightComponent.h"
-#include "../../editor/enum/engine-definitions.h"
+#include "editor/enum/engine-definitions.h"
 
 namespace Metal {
     void LightService::onInitialize() {

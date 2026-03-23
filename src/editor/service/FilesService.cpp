@@ -1,15 +1,15 @@
 #include "FilesService.h"
 #include "NotificationService.h"
-#include "../dto/FSEntry.h"
-#include "../../common/FilesUtil.h"
-#include "../../common/LoggerUtil.h"
+#include "editor/dto/FSEntry.h"
+#include "common/FilesUtil.h"
+#include "common/LoggerUtil.h"
 #include <algorithm>
 #include <chrono>
 #include <filesystem>
 #include <format>
 #include <fstream>
 #include <iostream>
-#include "../../common/serialization-definitions.h"
+#include "common/serialization-definitions.h"
 #include "../../core/DirectoryService.h"
 
 namespace fs = std::filesystem;

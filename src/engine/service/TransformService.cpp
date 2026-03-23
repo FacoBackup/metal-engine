@@ -9,7 +9,7 @@
 #include "../repository/WorldRepository.h"
 #include "../dto/PrimitiveComponent.h"
 #include "RayTracingService.h"
-#include "../../editor/dto/FieldModificationEvent.h"
+#include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
     void TransformService::onInitialize() {

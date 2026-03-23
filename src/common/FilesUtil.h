@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
-#include "../editor/dto/FSEntry.h"
+#include "editor/dto/FSEntry.h"
 
 namespace fs = std::filesystem;
 

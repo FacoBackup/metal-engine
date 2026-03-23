@@ -5,7 +5,7 @@
 #include "WindowService.h"
 #include "../ApplicationContext.h"
 #include "VulkanContext.h"
-#include "../editor/service/ThemeService.h"
+#include "editor/service/ThemeService.h"
 
 namespace Metal {
     SDL_Window *WindowService::getWindow() const {

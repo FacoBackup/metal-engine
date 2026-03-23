@@ -5,7 +5,7 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 
-#include "../../common/ISerialize.h"
+#include "common/ISerialize.h"
 
 namespace Metal {
     struct ToolCall final : ISerialize {

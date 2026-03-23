@@ -39,13 +39,13 @@ namespace Metal {
         void registerSingleton(std::shared_ptr<T> instance) {
             static_assert(std::is_base_of_v<IContextMember, T>, "T must derive from IContextMember");
             T *ptr = instance.get();
-            singletons[getTypeName(typeid(T).name())] = static_cast<IContextMember *>(ptr);
+            singletons[Util::getTypeName(typeid(T).name())] = static_cast<IContextMember *>(ptr);
             instances.push_back(std::move(instance));
         }
 
         template<typename T>
         T &getSingleton() {
-            auto name = getTypeName(typeid(T).name());
+            auto name = Util::getTypeName(typeid(T).name());
             auto it = singletons.find(name);
             if (it == singletons.end()) {
                 throw std::runtime_error(std::string("Singleton not registered: ") + name);
@@ -55,7 +55,7 @@ namespace Metal {
 
         template<typename T>
         T *getSingletonPtr() {
-            auto name = getTypeName(typeid(T).name());
+            auto name = Util::getTypeName(typeid(T).name());
             auto it = singletons.find(name);
             if (it == singletons.end()) {
                 return nullptr;

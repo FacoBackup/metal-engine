@@ -2,8 +2,8 @@
 #include "../../dto/PipelineBuilder.h"
 #include "../../service/PipelineService.h"
 #include "../../../core/VulkanContext.h"
-#include "../../../engine/repository/WorldRepository.h"
-#include "../../../editor/enum/EngineResourceIDs.h"
+#include "engine/repository/WorldRepository.h"
+#include "editor/enum/EngineResourceIDs.h"
 #include "../../frame-builder/EngineFrame.h"
 #include "../../resource/TextureInstance.h"
 

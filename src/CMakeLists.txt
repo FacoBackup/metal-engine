@@ -1,6 +1,6 @@
 set(ENGINE_SOURCES
-        editor/EditorPanel.cpp
-        editor/EditorPanel.h
+        editor/ui/EditorPanel.cpp
+        editor/ui/EditorPanel.h
         engine/EngineContext.cpp
         engine/EngineContext.h
         common/VulkanUtils.cpp
@@ -11,53 +11,53 @@ set(ENGINE_SOURCES
         core/WindowService.h
         core/ImGuiService.cpp
         core/ImGuiService.h
-        editor/dock-spaces/viewport/ViewportPanel.cpp
-        editor/dock-spaces/viewport/ViewportPanel.h
-        editor/dock-spaces/viewport/EngineFramePanel.cpp
-        editor/dock-spaces/viewport/EngineFramePanel.h
-        editor/dock-spaces/docks/AbstractDockPanel.h
+        editor/ui/viewport/ViewportPanel.cpp
+        editor/ui/viewport/ViewportPanel.h
+        editor/ui/viewport/EngineFramePanel.cpp
+        editor/ui/viewport/EngineFramePanel.h
+        editor/ui/docks/AbstractDockPanel.h
         ApplicationContext.cpp
         ApplicationContext.h
-        editor/abstract/AbstractPanel.h
-        editor/abstract/AbstractPanel.cpp
+        editor/ui/abstract/AbstractPanel.h
+        editor/ui/abstract/AbstractPanel.cpp
         common/ISync.h
         engine/service/CameraService.cpp
         engine/service/CameraService.h
         engine/dto/Camera.h
-        editor/util/Util.h
-        editor/util/WorldToolProvider.h
-        editor/util/WorldToolProvider.cpp
-        editor/util/ScriptingToolProvider.h
-        editor/util/ScriptingToolProvider.cpp
-        editor/util/InspectionToolProvider.h
-        editor/util/InspectionToolProvider.cpp
+        common/Util.h
+        editor/tools/WorldToolProvider.h
+        editor/tools/WorldToolProvider.cpp
+        editor/tools/ScriptingToolProvider.h
+        editor/tools/ScriptingToolProvider.cpp
+        editor/tools/InspectionToolProvider.h
+        editor/tools/InspectionToolProvider.cpp
         common/Inspectable.h
         common/Inspectable.cpp
         common/InspectedField.h
-        editor/dock-spaces/inspector/InspectorPanel.cpp
-        editor/dock-spaces/inspector/InspectorPanel.h
-        editor/abstract/form/FormPanel.cpp
-        editor/abstract/form/FormPanel.h
-        editor/abstract/form/AccordionPanel.cpp
-        editor/abstract/form/AccordionPanel.h
+        editor/ui/inspector/InspectorPanel.cpp
+        editor/ui/inspector/InspectorPanel.h
+        editor/ui/abstract/form/FormPanel.cpp
+        editor/ui/abstract/form/FormPanel.h
+        editor/ui/abstract/form/AccordionPanel.cpp
+        editor/ui/abstract/form/AccordionPanel.h
         common/FieldType.h
         common/InspectableMember.h
-        editor/abstract/form/types/BooleanField.cpp
-        editor/abstract/form/types/BooleanField.h
-        editor/abstract/form/types/IntField.cpp
-        editor/abstract/form/types/IntField.h
-        editor/abstract/form/types/FloatField.cpp
-        editor/abstract/form/types/FloatField.h
-        editor/abstract/form/types/MethodField.cpp
-        editor/abstract/form/types/MethodField.h
-        editor/util/UIUtil.h
-        editor/util/UIUtil.cpp
-        editor/dock-spaces/header/EditorHeaderPanel.cpp
-        editor/dock-spaces/header/EditorHeaderPanel.h
-        editor/dock-spaces/header/AsyncTaskPanel.cpp
-        editor/dock-spaces/header/AsyncTaskPanel.h
-        editor/dock-spaces/footer/EditorFooterPanel.cpp
-        editor/dock-spaces/footer/EditorFooterPanel.h
+        editor/ui/abstract/form/types/BooleanField.cpp
+        editor/ui/abstract/form/types/BooleanField.h
+        editor/ui/abstract/form/types/IntField.cpp
+        editor/ui/abstract/form/types/IntField.h
+        editor/ui/abstract/form/types/FloatField.cpp
+        editor/ui/abstract/form/types/FloatField.h
+        editor/ui/abstract/form/types/MethodField.cpp
+        editor/ui/abstract/form/types/MethodField.h
+        editor/ui/UIUtil.h
+        editor/ui/UIUtil.cpp
+        editor/ui/header/EditorHeaderPanel.cpp
+        editor/ui/header/EditorHeaderPanel.h
+        editor/ui/header/AsyncTaskPanel.cpp
+        editor/ui/header/AsyncTaskPanel.h
+        editor/ui/footer/EditorFooterPanel.cpp
+        editor/ui/footer/EditorFooterPanel.h
         common/Icons.h
         editor/service/DockService.cpp
         editor/service/DockService.h
@@ -65,8 +65,8 @@ set(ENGINE_SOURCES
         editor/dto/Tool.h
         editor/dto/IToolProvider.h
         editor/dto/DockSpace.h
-        editor/dock-spaces/docks/DockSpacePanel.cpp
-        editor/dock-spaces/docks/DockSpacePanel.h
+        editor/ui/docks/DockSpacePanel.cpp
+        editor/ui/docks/DockSpacePanel.h
         editor/dto/DockSpace.cpp
         editor/service/ThemeService.cpp
         editor/service/ThemeService.h
@@ -76,41 +76,41 @@ set(ENGINE_SOURCES
         editor/repository/AIAssistantRepository.cpp
         editor/dto/ChatDTO.h
         editor/enum/engine-definitions.h
-        editor/dock-spaces/files/FilesPanel.cpp
-        editor/dock-spaces/files/FilesPanel.h
-        editor/dock-spaces/files/ListDirectoryPanel.cpp
-        editor/dock-spaces/files/ListDirectoryPanel.h
-        editor/dock-spaces/files/CardDirectoryPanel.cpp
-        editor/dock-spaces/files/CardDirectoryPanel.h
-        editor/dock-spaces/files/AbstractDirectoryPanel.h
-        editor/dock-spaces/files/NavigationPanel.cpp
-        editor/dock-spaces/files/NavigationPanel.h
-        editor/dock-spaces/files/BookmarksPanel.cpp
-        editor/dock-spaces/files/BookmarksPanel.h
-        editor/dock-spaces/files/SystemDirPanel.cpp
-        editor/dock-spaces/files/SystemDirPanel.h
-        editor/dock-spaces/console/ConsolePanel.cpp
-        editor/dock-spaces/console/ConsolePanel.h
-        editor/dock-spaces/metrics/MetricsPanel.cpp
-        editor/dock-spaces/metrics/MetricsPanel.h
+        editor/ui/files/FilesPanel.cpp
+        editor/ui/files/FilesPanel.h
+        editor/ui/files/ListDirectoryPanel.cpp
+        editor/ui/files/ListDirectoryPanel.h
+        editor/ui/files/CardDirectoryPanel.cpp
+        editor/ui/files/CardDirectoryPanel.h
+        editor/ui/files/AbstractDirectoryPanel.h
+        editor/ui/files/NavigationPanel.cpp
+        editor/ui/files/NavigationPanel.h
+        editor/ui/files/BookmarksPanel.cpp
+        editor/ui/files/BookmarksPanel.h
+        editor/ui/files/SystemDirPanel.cpp
+        editor/ui/files/SystemDirPanel.h
+        editor/ui/console/ConsolePanel.cpp
+        editor/ui/console/ConsolePanel.h
+        editor/ui/metrics/MetricsPanel.cpp
+        editor/ui/metrics/MetricsPanel.h
         common/LoggerUtil.cpp
         common/LoggerUtil.h
-        editor/dock-spaces/world/WorldPanel.cpp
-        editor/dock-spaces/world/WorldPanel.h
-        editor/dock-spaces/lua-editor/LuaEditorPanel.cpp
-        editor/dock-spaces/lua-editor/LuaEditorPanel.h
-        editor/dock-spaces/mcp/AIAssistantPanel.cpp
-        editor/dock-spaces/mcp/AIAssistantPanel.h
-        editor/dock-spaces/mcp/ChatHeaderPanel.cpp
-        editor/dock-spaces/mcp/ChatHeaderPanel.h
-        editor/dock-spaces/mcp/ChatMessagesPanel.cpp
-        editor/dock-spaces/mcp/ChatMessagesPanel.h
-        editor/dock-spaces/mcp/ChatInputPanel.cpp
-        editor/dock-spaces/mcp/ChatInputPanel.h
-        editor/dock-spaces/mcp/UserMessagePanel.cpp
-        editor/dock-spaces/mcp/UserMessagePanel.h
-        editor/dock-spaces/mcp/AssistantMessagePanel.cpp
-        editor/dock-spaces/mcp/AssistantMessagePanel.h
+        editor/ui/world/WorldPanel.cpp
+        editor/ui/world/WorldPanel.h
+        editor/ui/lua-editor/LuaEditorPanel.cpp
+        editor/ui/lua-editor/LuaEditorPanel.h
+        editor/ui/mcp/AIAssistantPanel.cpp
+        editor/ui/mcp/AIAssistantPanel.h
+        editor/ui/mcp/ChatHeaderPanel.cpp
+        editor/ui/mcp/ChatHeaderPanel.h
+        editor/ui/mcp/ChatMessagesPanel.cpp
+        editor/ui/mcp/ChatMessagesPanel.h
+        editor/ui/mcp/ChatInputPanel.cpp
+        editor/ui/mcp/ChatInputPanel.h
+        editor/ui/mcp/UserMessagePanel.cpp
+        editor/ui/mcp/UserMessagePanel.h
+        editor/ui/mcp/AssistantMessagePanel.cpp
+        editor/ui/mcp/AssistantMessagePanel.h
         engine/resource/RuntimeResource.h
         engine/service/ShaderService.cpp
         engine/service/ShaderService.h
@@ -143,10 +143,10 @@ set(ENGINE_SOURCES
         common/FileExtensions.h
         common/FilesUtil.cpp
         editor/dto/FSEntry.h
-        editor/dock-spaces/files/FilesContext.h
+        editor/ui/files/FilesContext.h
         common/FileDialogUtil.h
-        editor/dock-spaces/files/FilesHeaderPanel.cpp
-        editor/dock-spaces/files/FilesHeaderPanel.h
+        editor/ui/files/FilesHeaderPanel.cpp
+        editor/ui/files/FilesHeaderPanel.h
         editor/service/HttpService.cpp
         editor/service/HttpService.h
         editor/service/MaterialImporterService.cpp
@@ -167,7 +167,7 @@ set(ENGINE_SOURCES
         editor/service/FilesService.h
         editor/service/FileImporterService.cpp
         editor/service/FileImporterService.h
-        editor/dock-spaces/files/FilesContext.cpp
+        editor/ui/files/FilesContext.cpp
         engine/dto/VertexData.h
         editor/passes/GridPass.cpp
         editor/passes/GridPass.h
@@ -183,40 +183,40 @@ set(ENGINE_SOURCES
         engine/dto/PrimitiveComponent.h
         engine/dto/TransformComponent.h
         editor/enum/ShadingMode.h
-        editor/dock-spaces/world/WorldHeaderPanel.cpp
-        editor/dock-spaces/world/WorldHeaderPanel.h
+        editor/ui/world/WorldHeaderPanel.cpp
+        editor/ui/world/WorldHeaderPanel.h
         editor/service/SelectionService.cpp
         editor/service/SelectionService.h
         engine/dto/MetadataComponent.cpp
         engine/dto/TransformComponent.cpp
         engine/dto/PrimitiveComponent.cpp
-        editor/abstract/form/types/ResourceField.cpp
-        editor/abstract/form/types/ResourceField.h
-        editor/abstract/form/types/ColorField.cpp
-        editor/abstract/form/types/ColorField.h
-        editor/abstract/form/types/Vec4Field.cpp
-        editor/abstract/form/types/Vec4Field.h
-        editor/abstract/form/types/Vec3Field.cpp
-        editor/abstract/form/types/Vec3Field.h
-        editor/abstract/form/types/Vec2Field.cpp
-        editor/abstract/form/types/Vec2Field.h
-        editor/abstract/form/types/StringField.cpp
-        editor/abstract/form/types/StringField.h
-        editor/abstract/form/types/ResourceFilesPanel.h
-        editor/abstract/form/types/ResourceFilesPanel.cpp
+        editor/ui/abstract/form/types/ResourceField.cpp
+        editor/ui/abstract/form/types/ResourceField.h
+        editor/ui/abstract/form/types/ColorField.cpp
+        editor/ui/abstract/form/types/ColorField.h
+        editor/ui/abstract/form/types/Vec4Field.cpp
+        editor/ui/abstract/form/types/Vec4Field.h
+        editor/ui/abstract/form/types/Vec3Field.cpp
+        editor/ui/abstract/form/types/Vec3Field.h
+        editor/ui/abstract/form/types/Vec2Field.cpp
+        editor/ui/abstract/form/types/Vec2Field.h
+        editor/ui/abstract/form/types/StringField.cpp
+        editor/ui/abstract/form/types/StringField.h
+        editor/ui/abstract/form/types/ResourceFilesPanel.h
+        editor/ui/abstract/form/types/ResourceFilesPanel.cpp
         engine/service/StreamingService.cpp
         engine/service/StreamingService.h
         engine/enum/ResourceType.h
-        editor/dock-spaces/viewport/GizmoPanel.cpp
-        editor/dock-spaces/viewport/GizmoPanel.h
-        editor/dock-spaces/viewport/GizmoTransformStrategy.cpp
-        editor/dock-spaces/viewport/GizmoTransformStrategy.h
-        editor/dock-spaces/viewport/ViewportHeaderPanel.cpp
-        editor/dock-spaces/viewport/ViewportHeaderPanel.h
-        editor/dock-spaces/viewport/GizmoSettingsPanel.cpp
-        editor/dock-spaces/viewport/GizmoSettingsPanel.h
-        editor/abstract/form/types/QuatField.cpp
-        editor/abstract/form/types/QuatField.h
+        editor/ui/viewport/GizmoPanel.cpp
+        editor/ui/viewport/GizmoPanel.h
+        editor/ui/viewport/GizmoTransformStrategy.cpp
+        editor/ui/viewport/GizmoTransformStrategy.h
+        editor/ui/viewport/ViewportHeaderPanel.cpp
+        editor/ui/viewport/ViewportHeaderPanel.h
+        editor/ui/viewport/GizmoSettingsPanel.cpp
+        editor/ui/viewport/GizmoSettingsPanel.h
+        editor/ui/abstract/form/types/QuatField.cpp
+        editor/ui/abstract/form/types/QuatField.h
         engine/service/TransformService.cpp
         engine/service/TransformService.h
         engine/dto/BoundingBox.h
@@ -276,8 +276,8 @@ set(ENGINE_SOURCES
         engine/service/VoxelService.h
         common/ISerialize.cpp
         editor/dto/SceneImportSettingsDTO.h
-        editor/panel/NotificationsPanel.cpp
-        editor/panel/NotificationsPanel.h
+        editor/ui/NotificationsPanel.cpp
+        editor/ui/NotificationsPanel.h
         engine/frame-builder/EngineFrameBuilder.cpp
         engine/frame-builder/EngineFrameBuilder.h
         engine/frame-builder/EngineFrame.cpp
@@ -298,8 +298,8 @@ set(ENGINE_SOURCES
         engine/passes/impl/SpatialFilterPass.h
         engine/enum/ComponentType.cpp
         editor/dto/SceneEntityData.h
-        editor/dock-spaces/repositories/RepositoriesPanel.cpp
-        editor/dock-spaces/repositories/RepositoriesPanel.h
+        editor/ui/repositories/RepositoriesPanel.cpp
+        editor/ui/repositories/RepositoriesPanel.h
         engine/service/VolumeService.cpp
         engine/service/VolumeService.h
         engine/service/PhysicsService.cpp
@@ -343,6 +343,7 @@ set(ENGINE_SOURCES
         engine/dto/ScopedScriptComponent.h
         engine/dto/SphereColliderComponent.cpp
         engine/dto/SphereColliderComponent.h
+        common/ILoader.h
 )
 
 # Extract non-main sources for testing

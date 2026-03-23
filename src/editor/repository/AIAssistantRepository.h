@@ -1,7 +1,7 @@
 #ifndef aiAssistantRepository_H
 #define aiAssistantRepository_H
 
-#include "../../common/IRepository.h"
+#include "common/IRepository.h"
 #include "../dto/ChatDTO.h"
 #include <vector>
 #include <string>

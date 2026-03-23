@@ -5,8 +5,8 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
-#include "../../common/IService.h"
-#include "../../common/ISync.h"
+#include "common/IService.h"
+#include "common/ISync.h"
 
 namespace Metal {
     class VulkanContext;

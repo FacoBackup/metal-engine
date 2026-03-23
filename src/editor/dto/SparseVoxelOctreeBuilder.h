@@ -2,7 +2,7 @@
 #define SPARSEVOXELOCTREE_H
 #include "OctreeNode.h"
 
-#include "../../engine/dto/BoundingBox.h"
+#include "engine/dto/BoundingBox.h"
 
 namespace Metal {
     class SparseVoxelOctreeBuilder;

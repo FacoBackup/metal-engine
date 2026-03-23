@@ -1,8 +1,8 @@
 #include "MaterialImporterService.h"
 #include "TextureImporterService.h"
-#include "../../common/LoggerUtil.h"
+#include "common/LoggerUtil.h"
 #include "../enum/engine-definitions.h"
-#include "../../engine/dto/PrimitiveComponent.h"
+#include "engine/dto/PrimitiveComponent.h"
 #include <assimp/material.h>
 #include <filesystem>
 

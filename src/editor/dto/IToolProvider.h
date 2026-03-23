@@ -4,7 +4,7 @@
 #include "Tool.h"
 #include <vector>
 #include <string>
-#include "../../common/IContextMember.h"
+#include "common/IContextMember.h"
 
 namespace Metal {
     class IToolProvider : public IContextMember {

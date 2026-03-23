@@ -5,7 +5,7 @@
 #include <string>
 #include <stop_token>
 
-#include "../../common/IService.h"
+#include "common/IService.h"
 
 namespace Metal {
     struct PrimitiveComponent;

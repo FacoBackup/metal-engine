@@ -1,6 +1,6 @@
 #include "GridPass.h"
-#include "../../engine/dto/PipelineBuilder.h"
-#include "../../engine/service/PipelineService.h"
+#include "engine/dto/PipelineBuilder.h"
+#include "engine/service/PipelineService.h"
 #include "../repository/EditorRepository.h"
 #include "../enum/EngineResourceIDs.h"
 

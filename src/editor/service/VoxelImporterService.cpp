@@ -1,15 +1,15 @@
 #include "VoxelImporterService.h"
 
 #include <filesystem>
-#include "../../common/serialization-definitions.h"
+#include "common/serialization-definitions.h"
 
 #include "../enum/engine-definitions.h"
-#include "../../common/LoggerUtil.h"
+#include "common/LoggerUtil.h"
 #include <openvdb/openvdb.h>
 
 #include <mutex>
 
-#include "../../engine/dto/SparseVoxelOctreeData.h"
+#include "engine/dto/SparseVoxelOctreeData.h"
 
 namespace fs = std::filesystem;
 

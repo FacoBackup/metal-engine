@@ -6,28 +6,26 @@
 #include <string>
 
 #include "../dto/ImportSettingsDTO.h"
-#include "../../common/IService.h"
+#include "common/IService.h"
 
 namespace Metal {
+    struct FSEntry;
     class SceneImporterService;
     class TextureImporterService;
+    struct DirectoryService;
     class VoxelImporterService;
     class NotificationService;
     class AsyncTaskService;
 
     class FileImporterService final : public IService {
-        SceneImporterService *sceneImporterService = nullptr;
-        TextureImporterService *textureImporterService = nullptr;
-        VoxelImporterService *voxelImporterService = nullptr;
+        DirectoryService *directoryService = nullptr;
         NotificationService *notificationService = nullptr;
         AsyncTaskService *asyncTaskService = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"SceneImporterService", &sceneImporterService},
-                {"TextureImporterService", &textureImporterService},
-                {"VoxelImporterService", &voxelImporterService},
+                {"DirectoryService", &directoryService},
                 {"NotificationService", &notificationService},
                 {"AsyncTaskService", &asyncTaskService}
             };
@@ -35,13 +33,9 @@ namespace Metal {
 
         using LoadingTask = std::function<void(const std::stop_token &)>;
 
-        void importFile(std::string targetDir, std::string file, const std::shared_ptr<ImportSettingsDTO> &settings);
+        void importFile(std::shared_ptr<FSEntry> file, const std::shared_ptr<ImportSettingsDTO> &settings);
 
         std::string runAsync(const std::string &taskName, const LoadingTask &task) const;
-
-        std::string collectCompatibleFiles() const;
-
-        bool isCompatible(const std::string &file) const;
     };
 }
 

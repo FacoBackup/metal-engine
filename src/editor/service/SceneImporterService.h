@@ -3,7 +3,7 @@
 
 #include <assimp/scene.h>
 
-#include "../../common/AbstractImporter.h"
+#include "common/AbstractImporter.h"
 #include <unordered_map>
 #include <stop_token>
 
