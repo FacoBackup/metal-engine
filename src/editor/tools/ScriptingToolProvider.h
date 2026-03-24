@@ -24,6 +24,11 @@ namespace Metal {
 
     protected:
         void registerTools() override;
+
+    private:
+        std::string createScript(const nlohmann::json &params) const;
+        std::string executeScript(const nlohmann::json &params) const;
+        std::string listScripts(const nlohmann::json &params) const;
     };
 }
 

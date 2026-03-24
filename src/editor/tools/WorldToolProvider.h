@@ -18,6 +18,19 @@ namespace Metal {
 
     protected:
         void registerTools() override;
+
+    private:
+        std::string createEntity() const;
+
+        std::string deleteEntity(const nlohmann::json &params);
+
+        static std::string listComponentTypes();
+
+        std::string addComponent(const nlohmann::json &params) const;
+
+        std::string getEntityInfo(const nlohmann::json &params) const;
+
+        std::string listEntities() const;
     };
 }
 

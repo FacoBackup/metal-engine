@@ -29,6 +29,8 @@ set(ENGINE_SOURCES
         editor/tools/WorldToolProvider.cpp
         editor/tools/ScriptingToolProvider.h
         editor/tools/ScriptingToolProvider.cpp
+        editor/tools/LayoutingToolProvider.h
+        editor/tools/LayoutingToolProvider.cpp
         editor/tools/InspectionToolProvider.h
         editor/tools/InspectionToolProvider.cpp
         common/Inspectable.h

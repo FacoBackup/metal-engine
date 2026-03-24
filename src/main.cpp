@@ -15,6 +15,7 @@
 #include "editor/service/AIAssistantService.h"
 #include "editor/tools/WorldToolProvider.h"
 #include "editor/tools/ScriptingToolProvider.h"
+#include "editor/tools/LayoutingToolProvider.h"
 #include "editor/tools/InspectionToolProvider.h"
 #include "editor/service/MeshImporterService.h"
 #include "editor/service/NotificationService.h"
@@ -88,6 +89,7 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::AIAssistantService>());
     context->registerSingleton(std::make_shared<Metal::WorldToolProvider>());
     context->registerSingleton(std::make_shared<Metal::ScriptingToolProvider>());
+    context->registerSingleton(std::make_shared<Metal::LayoutingToolProvider>());
     context->registerSingleton(std::make_shared<Metal::InspectionToolProvider>());
     context->registerSingleton(std::make_shared<Metal::SceneImporterService>());
 
