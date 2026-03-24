@@ -1,6 +1,8 @@
 #ifndef LAYOUTINGTOOLPROVIDER_H
 #define LAYOUTINGTOOLPROVIDER_H
 
+#include <glm/vec3.hpp>
+
 #include "../dto/IToolProvider.h"
 
 namespace Metal {

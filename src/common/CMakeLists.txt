@@ -1,0 +1,35 @@
+set(COMMON_SOURCES
+    VulkanUtils.cpp
+    VulkanUtils.h
+    ISync.h
+    Util.h
+    Inspectable.h
+    Inspectable.cpp
+    InspectedField.h
+    FieldType.h
+    InspectableMember.h
+    Icons.h
+    LoggerUtil.cpp
+    LoggerUtil.h
+    AbstractResourceService.h
+    FilesUtil.h
+    FileExtensions.h
+    FilesUtil.cpp
+    FileDialogUtil.h
+    AbstractImporter.h
+    serialization-definitions.h
+    ISerialize.cpp
+    IContextMember.h
+    IEventMember.h
+    IEventMember.cpp
+    IService.h
+    IRepository.h
+    IContextMember.cpp
+    IDisposable.h
+    Icons.cpp
+    Util.cpp
+    ILoader.h
+    IAsyncSync.h
+)
+
+set(COMMON_SOURCES ${COMMON_SOURCES} PARENT_SCOPE)

@@ -1,15 +1,16 @@
 #ifndef TRANSFORMSERVICE_H
 #define TRANSFORMSERVICE_H
 #include <string>
+#include <set>
+#include <vector>
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
+#include <entt/entt.hpp>
 
-#include "../../common/ISync.h"
-#include "../../common/IService.h"
-#include "../../common/IEventMember.h"
-#include "../../common/IInit.h"
-#include <set>
-#include <entt/entity/entity.hpp>
+#include <common/IAsyncSync.h>
+#include <common/IService.h>
+#include <common/IEventMember.h>
+#include <common/IInit.h>
 
 namespace Metal {
     struct TransformComponent;
@@ -17,7 +18,7 @@ namespace Metal {
     struct WorldRepository;
     class RayTracingService;
 
-    class TransformService final : public IService, public ISync, public IEventMember, public IInit {
+    class TransformService final : public IService, public IAsyncSync, public IEventMember, public IInit {
         WorldRepository *worldRepository = nullptr;
         RayTracingService *rayTracingService = nullptr;
 
@@ -38,7 +39,9 @@ namespace Metal {
 
         void onInitialize() override;
 
-        void onSync() override;
+        std::string getSyncThreadId() const override { return "physics_transform"; }
+
+        void onAsyncSync() override;
 
         void transform(TransformComponent *st, const TransformComponent *parentTransform);
     };

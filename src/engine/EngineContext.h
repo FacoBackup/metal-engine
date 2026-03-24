@@ -6,12 +6,11 @@
 #include <thread>
 #include <atomic>
 
-#include "dto/GlobalDataUBO.h"
-#include "../common/IService.h"
-#include "../common/IDisposable.h"
-#include "../common/ISync.h"
-#include "frame-builder/EngineFrame.h"
-#include "frame-builder/EngineFrameBuilder.h"
+#include <engine/dto/GlobalDataUBO.h>
+#include <common/IService.h>
+#include <common/ISync.h>
+#include <engine/frame-builder/EngineFrame.h>
+#include <engine/frame-builder/EngineFrameBuilder.h>
 
 using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
@@ -21,6 +20,9 @@ namespace Metal {
     class TransformService;
     class StreamingService;
     class RayTracingService;
+    class BLASService;
+    class TLASService;
+    class PrimitiveService;
     class CameraService;
     class LightService;
     class VolumeService;
@@ -31,10 +33,13 @@ namespace Metal {
     class EngineFrame;
     class EngineFrameBuilder;
 
-    class EngineContext final : public IService, public ISync, public IDisposable {
+    class EngineContext final : public IService, public ISync {
         TransformService *transformService = nullptr;
         StreamingService *streamingService = nullptr;
         RayTracingService *rayTracingService = nullptr;
+        BLASService *blasService = nullptr;
+        TLASService *tlasService = nullptr;
+        PrimitiveService *primitiveService = nullptr;
         CameraService *cameraService = nullptr;
         LightService *lightService = nullptr;
         VolumeService *volumeService = nullptr;
@@ -47,16 +52,15 @@ namespace Metal {
         long long start = -1;
         bool cameraUpdated = true;
 
-        std::thread physicsTransformThread;
-        std::atomic<bool> physicsTransformThreadRunning = false;
-        void physicsTransformLoop();
-
     public:
         std::vector<Dependency> getDependencies() override {
             return {
                 {"TransformService", &transformService},
                 {"StreamingService", &streamingService},
                 {"RayTracingService", &rayTracingService},
+                {"BLASService", &blasService},
+                {"TLASService", &tlasService},
+                {"PrimitiveService", &primitiveService},
                 {"CameraService", &cameraService},
                 {"LightService", &lightService},
                 {"VolumeService", &volumeService},
@@ -104,8 +108,6 @@ namespace Metal {
         }
 
         void onSync() override;
-
-        void dispose() override;
     };
 }
 #endif

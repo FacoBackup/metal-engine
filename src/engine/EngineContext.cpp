@@ -52,27 +52,7 @@ namespace Metal {
         throw std::runtime_error("Frame not found");
     }
 
-    void EngineContext::dispose() {
-        physicsTransformThreadRunning = false;
-        if (physicsTransformThread.joinable()) {
-            physicsTransformThread.join();
-        }
-    }
-
-    void EngineContext::physicsTransformLoop() {
-        while (physicsTransformThreadRunning) {
-            if (transformService) transformService->onSync();
-            if (physicsService) physicsService->onSync();
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
-    }
-
     void EngineContext::onSync() {
-        if (!physicsTransformThreadRunning) {
-            physicsTransformThreadRunning = true;
-            physicsTransformThread = std::thread(&EngineContext::physicsTransformLoop, this);
-        }
-
         updateCurrentTime();
         updateGlobalData();
 

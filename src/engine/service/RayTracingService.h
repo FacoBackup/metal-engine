@@ -1,21 +1,18 @@
 #ifndef RAYTRACINGSERVICE_H
 #define RAYTRACINGSERVICE_H
 
-#include "../dto/MeshMetadata.h"
-#include <string>
-#include <unordered_map>
-#include <vector>
+#include <engine/dto/MeshMetadata.h>
 #include <vulkan/vulkan.h>
-#include "../../common/IService.h"
-#include "../../common/ISync.h"
-#include "../../common/IDisposable.h"
-#include "../../common/IInit.h"
-#include "../../common/IEventMember.h"
-#include "ApplicationEventContext.h"
+#include <common/IService.h>
+#include <common/ISync.h>
+#include <common/IDisposable.h>
+#include <common/IInit.h>
+#include <common/IEventMember.h>
+#include <ApplicationEventContext.h>
 
 namespace Metal {
     class DescriptorSetService;
-    class BufferInstance;
+    struct BufferInstance;
     class VulkanContext;
     class PipelineService;
     struct WorldRepository;
@@ -23,6 +20,9 @@ namespace Metal {
     class MaterialService;
     class BufferService;
     class EngineContext;
+    class BLASService;
+    class TLASService;
+    class PrimitiveService;
 
     class ApplicationEventContext;
 
@@ -36,46 +36,11 @@ namespace Metal {
         BufferService *bufferService = nullptr;
         EngineContext *engineContext = nullptr;
         DescriptorSetService *descriptorSetService = nullptr;
-
-        struct BLASEntry {
-            VkAccelerationStructureKHR accelerationStructure = VK_NULL_HANDLE;
-            BufferInstance *buffer = nullptr;
-            BufferInstance *scratchBuffer = nullptr;
-            BufferInstance *vertexData = nullptr;
-            BufferInstance *indexData = nullptr;
-        };
-
-        bool anyMeshes = false;
-
-        // One BLAS per unique mesh ID
-        std::unordered_map<std::string, BLASEntry> blasEntries;
-
-        // TLAS
-        VkAccelerationStructureKHR tlas = VK_NULL_HANDLE;
-        BufferInstance *tlasBuffer = nullptr;
-        BufferInstance *instancesBuffer = nullptr;
-
-        // Scratch buffer for TLAS
-        BufferInstance *tlasScratchBuffer = nullptr;
-
-        std::vector<MeshMetadata> meshMetadata{};
+        BLASService *blasService = nullptr;
+        TLASService *tlasService = nullptr;
+        PrimitiveService *primitiveService = nullptr;
 
         bool accelerationStructureBuilt = false;
-        bool needsRebuild = true;
-
-        VkDeviceAddress getDeviceAddress(VkBuffer buffer) const;
-
-        void updateDescriptorSets(VkAccelerationStructureKHR asHandle) const;
-
-        void buildBLAS();
-
-        void buildTLAS();
-
-        void destroyTLAS();
-
-        void updateMeshMaterials();
-
-        void markDirty() { needsRebuild = true; }
 
     public:
         RayTracingService() = default;
@@ -89,7 +54,10 @@ namespace Metal {
                 {"MaterialService", &materialService},
                 {"BufferService", &bufferService},
                 {"EngineContext", &engineContext},
-                {"DescriptorSetService", &descriptorSetService}
+                {"DescriptorSetService", &descriptorSetService},
+                {"BLASService", &blasService},
+                {"TLASService", &tlasService},
+                {"PrimitiveService", &primitiveService}
             };
         }
 
@@ -101,7 +69,7 @@ namespace Metal {
 
         [[nodiscard]] bool isReady() const;
 
-        [[nodiscard]] VkAccelerationStructureKHR getTLAS() const { return tlas; }
+        [[nodiscard]] VkAccelerationStructureKHR getTLAS() const;
     };
 } // Metal
 

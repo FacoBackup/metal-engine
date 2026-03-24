@@ -1,39 +1,43 @@
-#include "TransformService.h"
+#include <engine/service/TransformService.h>
 #include <entt/entt.hpp>
 #include <iostream>
 #include <glm/gtc/quaternion.hpp>
-#include "../../common/LoggerUtil.h"
+#include <common/LoggerUtil.h>
 
-#include "../../ApplicationContext.h"
-#include "../dto/TransformComponent.h"
-#include "../repository/WorldRepository.h"
-#include "../dto/PrimitiveComponent.h"
-#include "RayTracingService.h"
-#include "editor/dto/FieldModificationEvent.h"
+#include <ApplicationContext.h>
+#include <engine/dto/TransformComponent.h>
+#include <engine/repository/WorldRepository.h>
+#include <engine/dto/PrimitiveComponent.h>
+#include <engine/service/RayTracingService.h>
+#include <editor/dto/FieldModificationEvent.h>
+#include <ApplicationEventContext.h>
 
 namespace Metal {
     void TransformService::onInitialize() {
         eventListener([this](const Event &e) {
             const auto payload = std::static_pointer_cast<InspectableEventPayload>(e.payload);
             if (const auto transform = dynamic_cast<TransformComponent *>(payload->inspectable)) {
-                dirtyEntities.insert(transform->getEntityId());
+                worldRepository->dirtyEntities.insert(transform->getEntityId());
             }
         }, "TransformComponent");
 
         for (auto entity: worldRepository->registry.view<TransformComponent>()) {
-            dirtyEntities.insert(entity);
+            worldRepository->dirtyEntities.insert(entity);
         }
     }
 
-    void TransformService::onSync() {
-        if (dirtyEntities.empty()) return;
+    void TransformService::onAsyncSync() {
+        if (worldRepository->dirtyEntities.empty()) return;
 
-        for (auto entity: dirtyEntities) {
+        for (auto entity: worldRepository->dirtyEntities) {
             if (!worldRepository->registry.valid(entity)) continue;
             TransformComponent &st = worldRepository->registry.get<TransformComponent>(entity);
             transform(&st, nullptr);
         }
-        dirtyEntities.clear();
+        // NOTE: dirtyEntities are NOT cleared here.
+        // TLASService will clear them after it's done using them.
+        // Actually, if we have multiple services needing dirty flags,
+        // we might need a better system, but for now we follow Phase 4.
     }
 
     void TransformService::transform(TransformComponent *st, const TransformComponent *parentTransform) {

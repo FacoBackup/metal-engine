@@ -1,15 +1,15 @@
 #ifndef METAL_ENGINE_VULKANCONTEXT_H
 #define METAL_ENGINE_VULKANCONTEXT_H
 
-#include "vk_mem_alloc.h"
+#include <vk_mem_alloc.h>
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 #include <imgui_impl_vulkan.h>
-#include "VkBootstrap.h"
-#include "../common/IInit.h"
-#include "../common/IService.h"
-#include "../common/IDisposable.h"
+#include <VkBootstrap.h>
+#include <common/IInit.h>
+#include <common/IService.h>
+#include <common/IDisposable.h>
 
 #define VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME "VK_KHR_portability_subset"
 
@@ -21,6 +21,9 @@ namespace Metal {
     class FrameBufferService;
     class PipelineService;
     class RayTracingService;
+    class BLASService;
+    class TLASService;
+    class PrimitiveService;
 
     class VulkanContext final : public IService, public IInit {
         WindowService *windowService = nullptr;
@@ -30,6 +33,9 @@ namespace Metal {
         FrameBufferService *framebufferService = nullptr;
         PipelineService *pipelineService = nullptr;
         RayTracingService *rayTracingService = nullptr;
+        BLASService *blasService = nullptr;
+        TLASService *tlasService = nullptr;
+        PrimitiveService *primitiveService = nullptr;
 
         static VkBool32 DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
                                       VkDebugUtilsMessageTypeFlagsEXT messageType,
@@ -76,7 +82,10 @@ namespace Metal {
                 {"TextureService", &textureService},
                 {"FrameBufferService", &framebufferService},
                 {"PipelineService", &pipelineService},
-                {"RayTracingService", &rayTracingService}
+                {"RayTracingService", &rayTracingService},
+                {"BLASService", &blasService},
+                {"TLASService", &tlasService},
+                {"PrimitiveService", &primitiveService}
             };
         }
 

@@ -10,6 +10,7 @@ add_executable(metal_engine_tests
         LuaServiceTest.cpp
         AIAssistantServiceTest.cpp
         ToolPromptTest.cpp
+        AsyncSyncServiceTest.cpp
 )
 
 target_link_libraries(metal_engine_tests

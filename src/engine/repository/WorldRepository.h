@@ -2,12 +2,16 @@
 #define WORLDREPOSITORY_H
 
 #include <vector>
+#include <set>
+#include <unordered_map>
+#include <entt/entt.hpp>
 #include <glm/ext/scalar_constants.hpp>
+#include <nlohmann/json.hpp>
 
-#include "../../common/IRepository.h"
-#include "../dto/Camera.h"
-#include "../enum/ComponentType.h"
-#include "common/ILoader.h"
+#include <common/IRepository.h>
+#include <engine/dto/Camera.h>
+#include <engine/enum/ComponentType.h>
+#include <common/ILoader.h>
 
 namespace Metal {
     struct MetadataComponent;
@@ -28,6 +32,7 @@ namespace Metal {
 
         Camera camera{-(glm::pi<float>() / 4), glm::pi<float>() / 4, {10, 10, 10}};
         entt::registry registry{};
+        std::set<entt::entity> dirtyEntities{};
         std::unordered_map<entt::entity, bool> culled{};
         std::unordered_map<entt::entity, bool> hiddenEntities{};
 

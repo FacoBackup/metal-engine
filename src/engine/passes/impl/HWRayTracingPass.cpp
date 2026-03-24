@@ -22,7 +22,7 @@ namespace Metal {
                     "rt/HWRayTracing.rchit")
                 .setPushConstantsSize(sizeof(HWRayTracingPushConstant))
                 .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
-                .addAccelerationStructureBinding(rayTracingService->getTLAS())
+                .addAccelerationStructureBinding(VK_NULL_HANDLE)
                 .addStorageImageBinding(getScopedResourceId(RID_ACCUMULATED_FRAME))
                 .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_POSITION_INDEX))
                 .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_NORMAL))

@@ -1,26 +1,24 @@
-#include "MeshService.h"
-#include "../resource/MeshInstance.h"
-#include "../dto/MeshData.h"
-#include "editor/dto/SceneData.h"
-
-#include "../../core/VulkanContext.h"
-#include "../../common/FilesUtil.h"
-#include "../../common/LoggerUtil.h"
-#include "../../core/DirectoryService.h"
+#include <engine/service/MeshService.h>
+#include <engine/resource/MeshInstance.h>
+#include <engine/dto/MeshData.h>
+#include <editor/dto/SceneData.h>
+#include <core/VulkanContext.h>
+#include <common/FilesUtil.h>
+#include <common/LoggerUtil.h>
+#include <core/DirectoryService.h>
+#include <ApplicationContext.h>
+#include <engine/service/BufferService.h>
+#include <engine/service/RayTracingService.h>
+#include <editor/service/HistoryService.h>
+#include <engine/dto/PrimitiveComponent.h>
+#include <engine/dto/TransformComponent.h>
+#include <engine/repository/WorldRepository.h>
+#include <editor/dto/FieldModificationEvent.h>
+#include <engine/dto/ResourceDisposalPayload.h>
+#include <ApplicationEventContext.h>
 #include <cereal/archives/binary.hpp>
-
 #include <fstream>
 #include <filesystem>
-
-#include "../../ApplicationContext.h"
-#include "BufferService.h"
-#include "RayTracingService.h"
-#include "editor/service/HistoryService.h"
-#include "../dto/PrimitiveComponent.h"
-#include "../dto/TransformComponent.h"
-#include "../repository/WorldRepository.h"
-#include "editor/dto/FieldModificationEvent.h"
-#include "../dto/ResourceDisposalPayload.h"
 
 namespace Metal {
     void MeshService::onInitialize() {
@@ -77,6 +75,8 @@ namespace Metal {
             true);
 
         delete data;
+
+        ApplicationEventContext::dispatch("MeshLoaded");
 
         return instance;
     }

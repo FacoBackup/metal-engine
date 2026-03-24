@@ -5,7 +5,7 @@
 #include "common/IInit.h"
 #include "common/IDisposable.h"
 #include "common/IEventMember.h"
-#include "common/ISync.h"
+#include "common/IAsyncSync.h"
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/PhysicsSystem.h>
@@ -34,7 +34,7 @@ namespace Metal {
         static constexpr uint32_t NUM_LAYERS = 2;
     }
 
-    class PhysicsService final : public IService, public IInit, public IDisposable, public IEventMember, public ISync {
+    class PhysicsService final : public IService, public IInit, public IDisposable, public IEventMember, public IAsyncSync {
         WorldRepository *worldRepository = nullptr;
         EngineRepository *engineRepository = nullptr;
 
@@ -61,7 +61,9 @@ namespace Metal {
 
         void dispose() override;
 
-        void onSync() override;
+        std::string getSyncThreadId() const override { return "physics_transform"; }
+
+        void onAsyncSync() override;
 
     private:
         void startSimulation();
