@@ -66,14 +66,13 @@ namespace Metal {
     }
 
     PipelineBuilder &PipelineBuilder::addCombinedImageSamplerBinding(VkSampler sampler, VkImageView view,
-                                                         VkImageLayout layout,
-                                                         unsigned int descriptorCount) {
+                                                         VkImageLayout layout) {
         DescriptorBindingBuilder b{};
         b.bindingPoint = currentBindingPoint++;
         b.sampler = sampler;
         b.view = view;
         b.layout = layout;
-        b.descriptorCount = descriptorCount;
+        b.descriptorCount = 0; // Use 0 to indicate dynamic query from VulkanContext
         b.type = DescriptorBindingType::COMBINED_IMAGE_SAMPLER;
         resourceBindings.push_back(b);
         return *this;

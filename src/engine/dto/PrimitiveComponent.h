@@ -12,9 +12,6 @@ namespace Metal {
         std::string albedo;
         std::string roughness;
         std::string metallic;
-        glm::vec3 albedoColor{1, 1, 1};
-        float roughnessFactor = 1;
-        float metallicFactor = 0;
         float transmissionFactor = 0;
         float thicknessFactor = 0;
         float ior = 1.45;

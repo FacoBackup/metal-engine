@@ -160,9 +160,6 @@ namespace Metal {
                 primitive.albedo = entityData.primitive->albedo;
                 primitive.roughness = entityData.primitive->roughness;
                 primitive.metallic = entityData.primitive->metallic;
-                primitive.albedoColor = entityData.primitive->albedoColor;
-                primitive.roughnessFactor = entityData.primitive->roughnessFactor;
-                primitive.metallicFactor = entityData.primitive->metallicFactor;
                 primitive.transmissionFactor = entityData.primitive->transmissionFactor;
                 primitive.thicknessFactor = entityData.primitive->thicknessFactor;
                 primitive.ior = entityData.primitive->ior;

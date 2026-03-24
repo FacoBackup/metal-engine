@@ -13,7 +13,7 @@ namespace Metal {
 
     struct DebugPhongPushConstant {
         glm::mat4 model;
-        glm::vec4 color;
+        uint32_t renderIndex;
     };
 
     class FallbackPass final : public AbstractRenderPass {

@@ -19,7 +19,10 @@ namespace Metal {
                 .enablePrimitiveRendering()
                 .enableDepthTest()
                 .setPushConstantsSize(sizeof(DebugPhongPushConstant))
-                .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA));
+                .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
+                .addBufferBinding(getScopedResourceId(RID_MESH_METADATA_BUFFER))
+                .addCombinedImageSamplerBinding(vulkanContext->vkImageSampler, VK_NULL_HANDLE,
+                                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         pipelineInstance = pipelineService->createPipeline(builder);
     }
 
@@ -43,7 +46,7 @@ namespace Metal {
                 }
 
                 pushConstant.model = transform.model;
-                pushConstant.color = glm::vec4(0.8f, 0.8f, 0.8f, 1.0f); // Default grey color for debug
+                pushConstant.renderIndex = mesh.renderIndex;
 
                 recordPushConstant(&pushConstant);
                 recordDrawMesh(meshInstance);

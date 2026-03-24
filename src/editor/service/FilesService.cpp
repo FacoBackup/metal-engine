@@ -148,21 +148,21 @@ namespace Metal {
         return entry;
     }
 
-    std::vector<std::string> FilesService::listScripts() {
+    std::vector<std::string> FilesService::listFilesWithExtension(const std::string &extension) const {
         std::vector<std::string> scripts;
-        if (!directoryService || directoryService->getRootDirectory().empty()) {
+        if (directoryService->getRootDirectory().empty()) {
             return scripts;
         }
 
         fs::path rootPath(directoryService->getRootDirectory());
         try {
             for (const auto &entry: fs::directory_iterator(rootPath)) {
-                if (entry.is_regular_file() && entry.path().extension() == ".lua") {
+                if (entry.is_regular_file() && entry.path().extension() == extension) {
                     scripts.push_back(entry.path().filename().string());
                 }
             }
         } catch (const std::exception &e) {
-            LOG_ERROR("Error listing scripts: " + std::string(e.what()));
+            LOG_ERROR("Error listing files: " + std::string(e.what()));
         }
         return scripts;
     }

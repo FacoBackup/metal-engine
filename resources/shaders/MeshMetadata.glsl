@@ -8,9 +8,6 @@ struct MeshMetadata {
     uint64_t vertexBufferAddress;
     uint64_t indexBufferAddress;
 
-    vec3 albedo;
-    float roughness;
-    float metallic;
     float transmission;
     float thickness;
     float ior;

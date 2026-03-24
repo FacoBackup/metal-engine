@@ -10,6 +10,7 @@ hitAttributeEXT vec2 attribs; // Barycentric coordinates for the hit
 
 #include "../MeshMetadata.glsl"
 #include "../MeshDataSampling.glsl"
+#include "../util/GridUtil.glsl"
 
 void main() {
     uint metadataIndex = gl_InstanceCustomIndexEXT;
@@ -44,17 +45,17 @@ void main() {
         payload.alpha = alb.a;
         baseColor = alb.rgb;
     } else {
-        baseColor = metadata.albedo;
+        baseColor = getDebugGrid(payload.hitPosition).baseColor;
     }
     if (metadata.roughnessTexture != 0u) {
         roughness = texture(textureArray[nonuniformEXT(metadata.roughnessTexture)], uv).r;
     } else {
-        roughness = metadata.roughness;
+        roughness = getDebugGrid(payload.hitPosition).roughness;
     }
     if (metadata.metallicTexture != 0u) {
         metallic = texture(textureArray[nonuniformEXT(metadata.metallicTexture)], uv).r;
     } else {
-        metallic = metadata.metallic;
+        metallic = getDebugGrid(payload.hitPosition).metallic;
     }
     transmission = metadata.transmission;
     thickness = metadata.thickness;

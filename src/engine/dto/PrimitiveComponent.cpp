@@ -6,9 +6,6 @@
 namespace Metal {
     void PrimitiveComponent::registerFields() {
         registerResourceSelection(meshId, "", "Mesh", MESH_EXTENSIONS);
-        registerColor(albedoColor, "", "Albedo color");
-        registerFloat(roughnessFactor, "", "Roughness factor", 0, 1);
-        registerFloat(metallicFactor, "", "Metallic factor", 0, 1);
         registerFloat(transmissionFactor, "", "Transmission factor", 0, 1);
         registerFloat(thicknessFactor, "", "Thickness factor", 0, 10);
         registerFloat(ior, "", "IOR", 1, 3);
@@ -28,9 +25,6 @@ namespace Metal {
         j["albedo"] = albedo;
         j["roughness"] = roughness;
         j["metallic"] = metallic;
-        j["albedoColor"] = {albedoColor.x, albedoColor.y, albedoColor.z};
-        j["roughnessFactor"] = roughnessFactor;
-        j["metallicFactor"] = metallicFactor;
         j["transmissionFactor"] = transmissionFactor;
         j["thicknessFactor"] = thicknessFactor;
         j["ior"] = ior;
@@ -44,12 +38,8 @@ namespace Metal {
         albedo = j.at("albedo").get<std::string>();
         roughness = j.at("roughness").get<std::string>();
         metallic = j.at("metallic").get<std::string>();
-        roughnessFactor = j.at("roughnessFactor").get<float>();
-        metallicFactor = j.at("metallicFactor").get<float>();
         transmissionFactor = j.value("transmissionFactor", 0.0f);
         thicknessFactor = j.value("thicknessFactor", 0.0f);
         ior = j.value("ior", 1.45f);
-
-        albedoColor = {j.at("albedoColor")[0], j.at("albedoColor")[1], j.at("albedoColor")[2]};
     }
 }

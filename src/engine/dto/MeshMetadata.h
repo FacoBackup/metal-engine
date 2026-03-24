@@ -10,10 +10,7 @@ namespace Metal {
         uint64_t vertexBufferAddress;
         uint64_t indexBufferAddress;
 
-        alignas(16) glm::vec3 albedo{};
-        alignas(4) float roughness{};
-        alignas(4) float metallic{};
-        alignas(4) float transmission{};
+        alignas(16) float transmission{};
         alignas(4) float thickness{};
         alignas(4) float ior{1.45f};
         alignas(4) unsigned int isEmissive{};

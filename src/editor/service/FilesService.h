@@ -43,12 +43,8 @@ namespace Metal {
 
         void GetEntries(std::shared_ptr<FSEntry> root);
         std::shared_ptr<FSEntry> GetEntry(const std::string &path);
-        
-        /**
-         * Lists all .lua files in the root directory.
-         * @return A vector of filenames.
-         */
-        std::vector<std::string> listScripts();
+
+        std::vector<std::string> listFilesWithExtension(const std::string &extension) const;
 
         /**
          * Writes content to a file in the root directory.

@@ -9,9 +9,6 @@
 namespace Metal {
 
     void MaterialService::load(MeshMetadata &materialData, PrimitiveComponent &data) {
-        materialData.albedo = data.albedoColor;
-        materialData.roughness = data.roughnessFactor;
-        materialData.metallic = data.metallicFactor;
         materialData.transmission = data.transmissionFactor;
         materialData.thickness = data.thicknessFactor;
         materialData.ior = data.ior;

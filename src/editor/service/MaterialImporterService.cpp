@@ -61,28 +61,5 @@ namespace Metal {
         // Metallic / Roughness
         trySetFromType(primitive.metallic, aiTextureType_METALNESS, "metallic");
         trySetFromType(primitive.roughness, aiTextureType_DIFFUSE_ROUGHNESS, "roughness");
-
-        // Factors & Colors
-        aiColor4D color;
-        if (material->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) {
-            primitive.albedoColor = {color.r, color.g, color.b};
-        }
-
-        // float factor;
-        // if (material->Get(AI_MATKEY_METALLIC_FACTOR, factor) == AI_SUCCESS) {
-        //     primitive.metallicFactor = factor;
-        // }
-        //
-        // if (material->Get(AI_MATKEY_ROUGHNESS_FACTOR, factor) == AI_SUCCESS) {
-        //     primitive.roughnessFactor = factor;
-        // }
-        //
-        // if (material->Get(AI_MATKEY_TRANSMISSION_FACTOR, factor) == AI_SUCCESS) {
-        //     primitive.transmissionFactor = factor;
-        // }
-        //
-        // if (material->Get(AI_MATKEY_REFRACTI, factor) == AI_SUCCESS) {
-        //     primitive.ior = factor;
-        // }
     }
 }

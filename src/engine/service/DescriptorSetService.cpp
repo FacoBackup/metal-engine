@@ -19,7 +19,9 @@ namespace Metal {
         for (auto &builder: pipelineBuilder.resourceBindings) {
             DescriptorBinding binding{};
             binding.bindingPoint = builder.bindingPoint;
-            binding.descriptorCount = builder.descriptorCount;
+            binding.descriptorCount = (builder.descriptorCount == 0 && builder.type == DescriptorBindingType::COMBINED_IMAGE_SAMPLER)
+                                          ? vulkanContext->getMaxCombinedImageSamplers()
+                                          : (builder.descriptorCount == 0 ? 1 : builder.descriptorCount);
             binding.descriptorType = builder.descriptorType;
             binding.sampler = builder.sampler;
             binding.view = builder.view;
