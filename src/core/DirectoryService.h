@@ -23,6 +23,8 @@ namespace Metal {
             };
         }
 
+        std::string getProjectTargetPath() const;
+
     public:
         void onInitialize() override;
 
@@ -30,11 +32,9 @@ namespace Metal {
 
         void updateRootPath(bool forceSelection);
 
-        void save(bool silent = false);
+        void save(bool silent = false) const;
 
-        [[nodiscard]] const std::string &getRootDirectory() const {
-            return rootDirectory;
-        }
+        std::string getRootDirectory() const;
 
         [[nodiscard]] const std::string &getEngineMetadataPath() const {
             return engineMetadataPath;

@@ -22,7 +22,7 @@ namespace Metal {
         GetEntries(root);
     }
 
-    std::shared_ptr<FSEntry> FilesService::getResource(const std::string &id) {
+    std::shared_ptr<FSEntry> FilesService::getResource(const std::string &id) const {
         try {
             for (const auto &entry: fs::recursive_directory_iterator(root->absolutePath)) {
                 if (entry.is_regular_file() &&
@@ -47,40 +47,13 @@ namespace Metal {
         return nullptr;
     }
 
-    void FilesService::deleteFiles(const std::unordered_map<std::string, std::shared_ptr<FSEntry>> &selected) {
+    void FilesService::deleteFiles(const std::unordered_map<std::string, std::shared_ptr<FSEntry> > &selected) {
         for (auto &entry: selected) {
             std::filesystem::remove_all(entry.second->absolutePath);
         }
     }
 
-    void FilesService::CreateDirectory(std::shared_ptr<FSEntry> currentDirectory) {
-        int count = 0;
-        for (const auto &child: currentDirectory->children) {
-            if (child->isDirectory && child->name == "New Directory (" + std::to_string(count) + ")") {
-                count++;
-            }
-        }
-        std::string pathToDir = currentDirectory->absolutePath + '/' + "New Directory (" + std::to_string(count + 1) + ")";
-        if (std::filesystem::exists(pathToDir)) {
-            return;
-        }
-        std::filesystem::create_directory(pathToDir);
-    }
-
-    void FilesService::CreateFile(std::shared_ptr<FSEntry> currentDirectory, const std::string &name, const std::string &extension) {
-        int count = 0;
-        std::string fileName = name + extension;
-        while (std::filesystem::exists(currentDirectory->absolutePath + '/' + fileName)) {
-            count++;
-            fileName = name + " (" + std::to_string(count) + ")" + extension;
-        }
-
-        std::string pathToFile = currentDirectory->absolutePath + '/' + fileName;
-        std::ofstream file(pathToFile);
-        file.close();
-    }
-
-    void FilesService::Move(std::shared_ptr<FSEntry> toMove, std::shared_ptr<FSEntry> targetDir) {
+    void FilesService::Move(const std::shared_ptr<FSEntry> &toMove, const std::shared_ptr<FSEntry> &targetDir) const {
         if (!targetDir || !targetDir->isDirectory) {
             return;
         }
@@ -101,12 +74,44 @@ namespace Metal {
         targetDir->children.push_back(toMove);
     }
 
-    void FilesService::GetEntries(std::shared_ptr<FSEntry> root) {
+    void FilesService::CreateDirectory(const std::shared_ptr<FSEntry> &currentDirectory) {
+        int count = 0;
+        for (const auto &child: currentDirectory->children) {
+            if (child->isDirectory && child->name == "New Directory (" + std::to_string(count) + ")") {
+                count++;
+            }
+        }
+        std::string pathToDir = currentDirectory->absolutePath + '/' + "New Directory (" + std::to_string(count + 1) +
+                                ")";
+        if (std::filesystem::exists(pathToDir)) {
+            return;
+        }
+        std::filesystem::create_directory(pathToDir);
+    }
+
+    void FilesService::CreateFile(const std::shared_ptr<FSEntry> &currentDirectory, const std::string &name,
+                                  const std::string &extension) {
+        int count = 0;
+        std::string fileName = name + extension;
+        while (std::filesystem::exists(currentDirectory->absolutePath + '/' + fileName)) {
+            count++;
+            fileName = name + " (" + std::to_string(count) + ")" + extension;
+        }
+
+        std::string pathToFile = currentDirectory->absolutePath + '/' + fileName;
+        std::ofstream file(pathToFile);
+        file.close();
+    }
+
+    void FilesService::GetEntries(const std::shared_ptr<FSEntry> &root) {
         if (!root->isDirectory) {
             return;
         }
         root->children.clear();
         for (const auto &entry: fs::directory_iterator(root->absolutePath)) {
+            std::string name = entry.path().filename().string();
+            if (name.starts_with(".")) { continue; }
+
             auto ftime = last_write_time(entry);
             auto sys_tp = std::chrono::file_clock::to_utc(ftime);
             std::string dateStr = std::format("{:%Y-%m-%d %H:%M}", sys_tp);
@@ -114,8 +119,7 @@ namespace Metal {
                 fs::absolute(entry.path()).string(),
                 dateStr);
 
-            child->name = entry.path().filename().string();
-
+            child->name = name;
             if (entry.is_directory()) {
                 child->isDirectory = true;
             } else {
@@ -149,26 +153,26 @@ namespace Metal {
     }
 
     std::vector<std::string> FilesService::listFilesWithExtension(const std::string &extension) const {
-        std::vector<std::string> scripts;
+        std::vector<std::string> files;
         if (directoryService->getRootDirectory().empty()) {
-            return scripts;
+            return files;
         }
 
         fs::path rootPath(directoryService->getRootDirectory());
         try {
             for (const auto &entry: fs::directory_iterator(rootPath)) {
                 if (entry.is_regular_file() && entry.path().extension() == extension) {
-                    scripts.push_back(entry.path().filename().string());
+                    files.push_back(entry.path().filename().string());
                 }
             }
         } catch (const std::exception &e) {
             LOG_ERROR("Error listing files: " + std::string(e.what()));
         }
-        return scripts;
+        return files;
     }
 
     std::string FilesService::writeRootFile(const std::string &name, const std::string &content) {
-        if (!directoryService || directoryService->getRootDirectory().empty()) {
+        if (!directoryService->getRootDirectory().empty()) {
             return "";
         }
 
@@ -192,5 +196,4 @@ namespace Metal {
             return "";
         }
     }
-
 } // Metal

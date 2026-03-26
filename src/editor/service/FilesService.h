@@ -22,7 +22,8 @@ namespace Metal {
         std::vector<Dependency> getDependencies() override {
             return {
                 {"DirectoryService", &directoryService},
-                {"NotificationService", &notificationService}};
+                {"NotificationService", &notificationService}
+            };
         }
 
         std::shared_ptr<FSEntry> getRoot() const {
@@ -31,17 +32,19 @@ namespace Metal {
 
         void onInitialize() override;
 
-        std::shared_ptr<FSEntry> getResource(const std::string &id);
+        std::shared_ptr<FSEntry> getResource(const std::string &id) const;
 
-        void deleteFiles(const std::unordered_map<std::string, std::shared_ptr<FSEntry>> &files_context);
+        void deleteFiles(const std::unordered_map<std::string, std::shared_ptr<FSEntry> > &files_context);
 
-        void Move(std::shared_ptr<FSEntry> toMove, std::shared_ptr<FSEntry> targetDir);
+        void Move(const std::shared_ptr<FSEntry> &toMove, const std::shared_ptr<FSEntry> &targetDir) const;
 
-        void CreateDirectory(std::shared_ptr<FSEntry> currentDirectory);
+        void CreateDirectory(const std::shared_ptr<FSEntry> &currentDirectory);
 
-        void CreateFile(std::shared_ptr<FSEntry> currentDirectory, const std::string &name, const std::string &extension);
+        void CreateFile(const std::shared_ptr<FSEntry> &currentDirectory, const std::string &name,
+                        const std::string &extension);
 
-        void GetEntries(std::shared_ptr<FSEntry> root);
+        void GetEntries(const std::shared_ptr<FSEntry> &root);
+
         std::shared_ptr<FSEntry> GetEntry(const std::string &path);
 
         std::vector<std::string> listFilesWithExtension(const std::string &extension) const;

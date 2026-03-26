@@ -9,6 +9,9 @@ namespace Metal {
 
     nlohmann::json DockRepository::toJson() const {
         nlohmann::json j;
+        if (center == nullptr) {
+            return j;
+        }
         j["center"] = center->toJson();
 
         nlohmann::json leftJ = nlohmann::json::array();

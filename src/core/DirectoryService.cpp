@@ -10,6 +10,10 @@
 #include "engine/repository/WorldRepository.h"
 
 namespace Metal {
+    std::string DirectoryService::getProjectTargetPath() const {
+        return rootDirectory + "/.project";
+    }
+
     void DirectoryService::onInitialize() {
         NFD_Init();
         updateRootPath(false);
@@ -48,12 +52,12 @@ namespace Metal {
         } else {
             rootDirectory = cachedPath;
         }
-
+        FilesUtil::CreateDirectory(getProjectTargetPath());
         for (auto &instance: ctx->getInstances()) {
-            auto *repository = dynamic_cast<IRepository *>(instance.get());
-            if (repository) {
+            if (auto *repository = dynamic_cast<IRepository *>(instance.get())) {
                 PARSE_TEMPLATE(*repository,
-                               rootDirectory + "/" + std::to_string(std::hash<std::string>{}(typeid(*repository).name())
+                               getProjectTargetPath() + "/" + std::to_string(std::hash<std::string>{}(typeid(*repository
+                                   ).name())
                                ) + ".json")
             }
         }
@@ -62,14 +66,16 @@ namespace Metal {
     }
 
 
-    void DirectoryService::save(bool silent) {
+    void DirectoryService::save(const bool silent) const {
         try {
             if (rootDirectory.empty()) return;
+            std::string targetPath = getProjectTargetPath();
+            FilesUtil::CreateDirectory(targetPath);
+
             for (auto &instance: ctx->getInstances()) {
-                auto *repository = dynamic_cast<IRepository *>(instance.get());
-                if (repository) {
+                if (auto *repository = dynamic_cast<IRepository *>(instance.get())) {
                     DUMP_TEMPLATE(
-                        rootDirectory + "/" + std::to_string(std::hash<std::string>{}(typeid(*repository).name())) +
+                        targetPath + "/" + std::to_string(std::hash<std::string>{}(typeid(*repository).name())) +
                         ".json",
                         *repository)
                 }
@@ -81,5 +87,9 @@ namespace Metal {
             if (!silent)
                 notificationService->pushMessage("Could not save project", NotificationSeverities::ERROR);
         }
+    }
+
+     std::string DirectoryService::getRootDirectory() const {
+        return rootDirectory;
     }
 } // Metal
