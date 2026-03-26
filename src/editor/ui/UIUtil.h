@@ -57,10 +57,6 @@ namespace Metal::UIUtil {
 
     std::string GetDockSpaceIcon(int index);
 
-    std::string GetExtensionIcon(const std::string &extension);
-
-    std::string GetExtensionLabel(const std::string &extension);
-
     bool Accordion(const std::string &id, const std::string &label, bool &open, const ImVec4 &background);
 
     void EndAccordion();

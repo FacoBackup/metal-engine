@@ -234,25 +234,6 @@ namespace Metal::UIUtil {
         }
     }
 
-    std::string GetExtensionIcon(const std::string &extension) {
-        if (extension == EXT_SCENE) return Icons::image;
-        if (extension == EXT_MESH) return Icons::view_in_ar;
-        if (extension == EXT_PNG || extension == EXT_JPG || extension == EXT_JPEG || extension == EXT_TGA) return Icons::texture;
-        if (extension == EXT_SVO || extension == EXT_VDB) return Icons::view_agenda;
-        if (extension == EXT_OBJ || extension == EXT_FBX || extension == EXT_GLTF || extension == EXT_GLB) return Icons::image;
-        return Icons::close;
-    }
-
-    std::string GetExtensionLabel(const std::string &extension) {
-        if (extension == EXT_SCENE) return "Scene";
-        if (extension == EXT_MESH) return "Mesh";
-        if (extension == EXT_PNG || extension == EXT_JPG || extension == EXT_JPEG || extension == EXT_TGA) return "Texture";
-        if (extension == EXT_SVO) return "Volume";
-        if (extension == EXT_VDB) return "OpenVDB";
-        if (extension == EXT_OBJ || extension == EXT_FBX || extension == EXT_GLTF || extension == EXT_GLB) return "Scene Source";
-        return "File";
-    }
-
     bool Accordion(const std::string &id, const std::string &label, bool &open, const ImVec4 &background) {
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 3.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, open ? ImVec2(4.0f, 4.0f) : ImVec2(0, 0));

@@ -1,8 +1,8 @@
 #include "ListDirectoryPanel.h"
 #include "editor/dto/FSEntry.h"
 #include "../../service/FilesService.h"
-#include "common/Icons.h"
 #include "editor/ui/UIUtil.h"
+#include "common/AbstractImporter.h"
 
 namespace Metal {
     void ListDirectoryPanel::onClick(const std::shared_ptr<FSEntry> &entry) {
@@ -25,24 +25,18 @@ namespace Metal {
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
 
-        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAllColumns | ImGuiTreeNodeFlags_OpenOnArrow;
-        if (isSelected) flags |= ImGuiTreeNodeFlags_Selected;
-        if (!isDirectory) flags |= ImGuiTreeNodeFlags_Leaf;
-
-        const std::string icon = isDirectory ? Icons::folder : UIUtil::GetExtensionIcon(entry->extension);
+        const std::string icon = getEntryIcon(entry);
         const std::string label = icon + " " + entry->name;
 
-        bool open = ImGui::TreeNodeEx((id + entry->getAbsolutePath()).c_str(), flags, "%s", label.c_str());
-
-        if (ImGui::IsItemClicked()) {
+        if (ImGui::Selectable(label.c_str(), isSelected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick)) {
             onClick(entry);
-        }
-
-        if (ImGui::IsItemHovered()) {
-            renderInfoTooltip(entry);
             if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
                 onDoubleClick(entry);
             }
+        }
+
+        if (ImGui::IsItemHovered()) {
+            renderInfoTooltip(entry, this);
         }
 
         ImGui::TableNextColumn();
@@ -54,24 +48,12 @@ namespace Metal {
         if (isDirectory) {
             ImGui::TextUnformatted("Directory");
         } else {
-            ImGui::TextUnformatted(UIUtil::GetExtensionLabel(entry->extension).c_str());
+            ImGui::TextUnformatted(getExtensionLabel(entry->extension).c_str());
         }
 
         ImGui::TableNextColumn();
         if (!isDirectory) {
             ImGui::TextUnformatted(entry->formattedSize.c_str());
-        }
-
-        if (open) {
-            if (isDirectory) {
-                filesService->GetEntries(entry);
-                for (const auto &child: entry->children) {
-                    renderTreeItem(child);
-                }
-            }
-            ImGui::TreePop();
-        } else if (isDirectory) {
-            entry->children.clear();
         }
     }
 

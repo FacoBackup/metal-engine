@@ -54,7 +54,7 @@ namespace Metal {
             if (!previewRendered) {
                 // Render icon
                 ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ICON_Y_OFFSET);
-                const std::string icon = entry->isDirectory ? Icons::folder : UIUtil::GetExtensionIcon(entry->extension);
+                const std::string icon = getEntryIcon(entry);
                 
                 ImGui::PushFont(guiContext->getLargeIconsFont());
                 float textWidth = ImGui::CalcTextSize(icon.c_str()).x;
@@ -93,7 +93,7 @@ namespace Metal {
         }
         
         if (ImGui::IsItemHovered()) {
-            renderInfoTooltip(entry);
+            renderInfoTooltip(entry, this);
             if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
                 onDoubleClick(entry);
             }
