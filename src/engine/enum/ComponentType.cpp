@@ -3,7 +3,6 @@
 #include "../../common/Icons.h"
 #include "../EngineContext.h"
 #include "../repository/WorldRepository.h"
-#include "../service/RayTracingService.h"
 #include "../../ApplicationContext.h"
 #include "../dto/TransformComponent.h"
 #include "../dto/PrimitiveComponent.h"

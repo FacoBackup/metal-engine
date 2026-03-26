@@ -16,9 +16,9 @@
 namespace Metal {
     struct MetadataComponent;
     class Inspectable;
-    class RayTracingService;
     class DirectoryService;
     class HistoryService;
+    class DirtyStateService;
 
     struct EntityState {
         entt::entity id;
@@ -26,21 +26,20 @@ namespace Metal {
     };
 
     struct WorldRepository final : IRepository, ILoader {
-        RayTracingService *rayTracingService = nullptr;
         DirectoryService *directoryService = nullptr;
         HistoryService *historyService = nullptr;
+        DirtyStateService *dirtyStateService = nullptr;
 
         Camera camera{-(glm::pi<float>() / 4), glm::pi<float>() / 4, {10, 10, 10}};
         entt::registry registry{};
-        std::set<entt::entity> dirtyEntities{};
         std::unordered_map<entt::entity, bool> culled{};
         std::unordered_map<entt::entity, bool> hiddenEntities{};
 
         std::vector<Dependency> getDependencies() override {
             return {
-                {"RayTracingService", &rayTracingService},
                 {"DirectoryService", &directoryService},
-                {"HistoryService", &historyService}
+                {"HistoryService", &historyService},
+                {"DirtyStateService", &dirtyStateService}
             };
         }
 

@@ -17,22 +17,24 @@ namespace Metal {
     struct WorldRepository;
     class DescriptorSetService;
     class PipelineService;
+    class DirtyStateService;
     struct BufferInstance;
 
-    class TLASService final : public IService, public IEventMember, public IInit, public ISync {
+    class TLASService final : public IService, public IEventMember, public IDisposable, public IInit, public ISync {
         VulkanContext *vulkanContext = nullptr;
         BufferService *bufferService = nullptr;
         BLASService *blasService = nullptr;
         WorldRepository *worldRepository = nullptr;
         DescriptorSetService *descriptorSetService = nullptr;
         PipelineService *pipelineService = nullptr;
+        DirtyStateService *dirtyStateService = nullptr;
 
         VkAccelerationStructureKHR tlas = VK_NULL_HANDLE;
         BufferInstance *tlasBuffer = nullptr;
         BufferInstance *instancesBuffer = nullptr;
         BufferInstance *tlasScratchBuffer = nullptr;
+        bool ready = false;
 
-        bool needsRebuild = true;
 
         VkDeviceAddress getDeviceAddress(VkBuffer buffer) const;
 
@@ -48,7 +50,8 @@ namespace Metal {
                 {"BLASService", &blasService},
                 {"WorldRepository", &worldRepository},
                 {"DescriptorSetService", &descriptorSetService},
-                {"PipelineService", &pipelineService}
+                {"PipelineService", &pipelineService},
+                {"DirtyStateService", &dirtyStateService}
             };
         }
 
@@ -56,9 +59,11 @@ namespace Metal {
 
         void onSync() override;
 
-        void dispose();
+        void dispose() override;
 
         void buildTLAS();
+
+        [[nodiscard]] bool isReady() const;
 
         [[nodiscard]] VkAccelerationStructureKHR getTLAS() const { return tlas; }
     };

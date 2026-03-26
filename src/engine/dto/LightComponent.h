@@ -2,9 +2,13 @@
 #define METAL_ENGINE_LIGHTCOMPONENT_H
 #include "AbstractComponent.h"
 #include "common/ISerialize.h"
+#include <glm/vec3.hpp>
 
 namespace Metal {
     struct LightComponent final : AbstractComponent, ISerialize {
+        glm::vec3 color = glm::vec3(1.0f);
+
+        void registerFields() override;
 
         ComponentType getType() const override;
 

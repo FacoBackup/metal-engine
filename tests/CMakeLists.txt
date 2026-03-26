@@ -11,6 +11,9 @@ add_executable(metal_engine_tests
         AIAssistantServiceTest.cpp
         ToolPromptTest.cpp
         AsyncSyncServiceTest.cpp
+        DirtyStateServiceTest.cpp
+    DirtyStateServiceConcurrencyTest.cpp
+    TransformServiceTest.cpp
 )
 
 target_link_libraries(metal_engine_tests

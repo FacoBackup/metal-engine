@@ -4,7 +4,7 @@
 #include "../../dto/HWRayTracingPushConstant.h"
 
 namespace Metal {
-    class RayTracingService;
+    class TLASService;
     class PipelineService;
     class VulkanContext;
     class EngineContext;
@@ -16,7 +16,7 @@ namespace Metal {
         bool needsUpdate = true;
         HWRayTracingPushConstant pushConstant{};
 
-        RayTracingService *rayTracingService = nullptr;
+        TLASService *tlasService = nullptr;
         PipelineService *pipelineService = nullptr;
         VulkanContext *vulkanContext = nullptr;
         EngineContext *engineContext = nullptr;
@@ -25,7 +25,7 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"RayTracingService", &rayTracingService},
+                {"TLASService", &tlasService},
                 {"PipelineService", &pipelineService},
                 {"VulkanContext", &vulkanContext},
                 {"EngineContext", &engineContext},

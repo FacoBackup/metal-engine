@@ -52,6 +52,9 @@ set(ENGINE_SOURCES_LIST
     dto/MetadataComponent.cpp
     dto/TransformComponent.cpp
     dto/PrimitiveComponent.cpp
+    enum/DirtyType.h
+    service/DirtyStateService.cpp
+    service/DirtyStateService.h
     service/StreamingService.cpp
     service/StreamingService.h
     enum/ResourceType.h
@@ -63,8 +66,6 @@ set(ENGINE_SOURCES_LIST
     passes/impl/PostProcessingPass.h
     passes/impl/HWRayTracingPass.cpp
     passes/impl/HWRayTracingPass.h
-    service/RayTracingService.cpp
-    service/RayTracingService.h
     service/BLASService.cpp
     service/BLASService.h
     service/TLASService.cpp

@@ -3,7 +3,8 @@
 #include "../ApplicationContext.h"
 #include "service/TransformService.h"
 #include "service/StreamingService.h"
-#include "service/RayTracingService.h"
+#include "service/BLASService.h"
+#include "service/TLASService.h"
 #include "service/CameraService.h"
 #include "service/LightService.h"
 #include "service/VolumeService.h"
@@ -11,10 +12,12 @@
 #include "repository/WorldRepository.h"
 #include "repository/EngineRepository.h"
 #include "editor/repository/EditorRepository.h"
+#include "core/VulkanContext.h"
 
 #include "editor/enum/EngineResourceIDs.h"
 #include "resource/BufferInstance.h"
 #include "dto/TransformComponent.h"
+#include "service/PrimitiveService.h"
 
 namespace Metal {
     void EngineContext::resetPathTracerAccumulationCount() const {
@@ -57,7 +60,11 @@ namespace Metal {
         updateGlobalData();
 
         streamingService->onSync();
-        rayTracingService->onSync();
+        if (vulkanContext->isRayTracingSupported()) {
+            blasService->onSync();
+            tlasService->onSync();
+        }
+        primitiveService->onSync();
         cameraService->onSync();
         lightService->onSync();
         volumeService->onSync();

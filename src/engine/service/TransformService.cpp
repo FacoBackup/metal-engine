@@ -8,7 +8,7 @@
 #include <engine/dto/TransformComponent.h>
 #include <engine/repository/WorldRepository.h>
 #include <engine/dto/PrimitiveComponent.h>
-#include <engine/service/RayTracingService.h>
+#include <engine/service/DirtyStateService.h>
 #include <editor/dto/FieldModificationEvent.h>
 #include <ApplicationEventContext.h>
 
@@ -17,27 +17,24 @@ namespace Metal {
         eventListener([this](const Event &e) {
             const auto payload = std::static_pointer_cast<InspectableEventPayload>(e.payload);
             if (const auto transform = dynamic_cast<TransformComponent *>(payload->inspectable)) {
-                worldRepository->dirtyEntities.insert(transform->getEntityId());
+                dirtyStateService->markEntityDirty(transform->getEntityId(), DirtyType::Transform);
             }
         }, "TransformComponent");
 
         for (auto entity: worldRepository->registry.view<TransformComponent>()) {
-            worldRepository->dirtyEntities.insert(entity);
+            dirtyStateService->markEntityDirty(entity, DirtyType::Transform);
         }
     }
 
     void TransformService::onAsyncSync() {
-        if (worldRepository->dirtyEntities.empty()) return;
+        auto dirtyEntities = dirtyStateService->getDirtyEntities(DirtyType::Transform, true);
+        if (dirtyEntities.empty()) return;
 
-        for (auto entity: worldRepository->dirtyEntities) {
+        for (auto entity: dirtyEntities) {
             if (!worldRepository->registry.valid(entity)) continue;
             TransformComponent &st = worldRepository->registry.get<TransformComponent>(entity);
             transform(&st, nullptr);
         }
-        // NOTE: dirtyEntities are NOT cleared here.
-        // TLASService will clear them after it's done using them.
-        // Actually, if we have multiple services needing dirty flags,
-        // we might need a better system, but for now we follow Phase 4.
     }
 
     void TransformService::transform(TransformComponent *st, const TransformComponent *parentTransform) {
@@ -64,7 +61,7 @@ namespace Metal {
 
         if (worldRepository->hasComponent(st->getEntityId(), PRIMITIVE) || worldRepository->hasComponent(
                 st->getEntityId(), LIGHT)) {
-            ApplicationEventContext::dispatch("BVHNeedsUpdate");
+            dirtyStateService->markDirty(DirtyType::BVH);
         }
     }
 } // Metal

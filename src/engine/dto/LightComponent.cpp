@@ -1,6 +1,10 @@
 #include "LightComponent.h"
 
 namespace Metal {
+    void LightComponent::registerFields() {
+        registerColor(color, "", "Color");
+    }
+
     ComponentType LightComponent::getType() const {
         return LIGHT;
     }

@@ -3,7 +3,6 @@
 #include "../src/ApplicationContext.h"
 #include "../src/engine/repository/WorldRepository.h"
 #include "../src/engine/dto/MetadataComponent.h"
-#include "../src/engine/service/RayTracingService.h"
 #include "../src/editor/service/HistoryService.h"
 #include "../src/core/DirectoryService.h"
 #include "../src/engine/EngineContext.h"
@@ -23,13 +22,11 @@ protected:
         context = std::make_unique<ApplicationContext>(true);
 
         auto worldRepo = std::make_shared<WorldRepository>();
-        auto rayTracingService = std::make_shared<RayTracingService>();
         auto directoryService = std::make_shared<DirectoryService>();
         auto engineContext = std::make_shared<EngineContext>();
         auto historyService = std::make_shared<HistoryService>();
 
         context->registerSingleton<WorldRepository>(worldRepo);
-        context->registerSingleton<RayTracingService>(rayTracingService);
         context->registerSingleton<DirectoryService>(directoryService);
         context->registerSingleton<EngineContext>(engineContext);
         context->registerSingleton<HistoryService>(historyService);

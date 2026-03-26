@@ -11,7 +11,7 @@ namespace Metal {
         }
         shortcuts = {
             ShortcutDTO("Clear Logs", ImGuiMod_Ctrl | ImGuiKey_L, [this]() {
-                LogService::clear();
+                LoggerUtil::clear();
             })
         };
     }
@@ -19,7 +19,7 @@ namespace Metal {
     void ConsolePanel::onSync() {
         // Header
         if (ImGui::Button((Icons::clear_all + id + "Clear_Logs").c_str())) {
-            LogService::clear();
+            LoggerUtil::clear();
         }
         ImGui::SameLine();
         filter.Draw(Icons::search.c_str(), 180);
@@ -29,7 +29,7 @@ namespace Metal {
         if (ImGui::BeginCombo((id + "LogLevel").c_str(), "Filters")) {
             for (int i = 0; i <= (int) LogLevel::Fatal; i++) {
                 LogLevel level = (LogLevel) i;
-                ImGui::Selectable(LogService::getLevelName(level), &levelFilter[i],
+                ImGui::Selectable(LoggerUtil::getLevelName(level), &levelFilter[i],
                                   ImGuiSelectableFlags_DontClosePopups);
             }
             ImGui::EndCombo();
@@ -42,11 +42,11 @@ namespace Metal {
         ImGui::BeginChild((id + "ScrollingRegion").c_str(), ImVec2(0, -footerHeightToReserve), false,
                           ImGuiWindowFlags_HorizontalScrollbar);
 
-        const auto entries = LogService::getEntriesSnapshot();
+        const auto entries = LoggerUtil::getEntriesSnapshot();
         for (const auto &entry: entries) {
             if (!levelFilter[(int) entry.level]) continue;
             if (!filter.PassFilter(entry.message.c_str())) continue;
-            uint32_t levelColor = LogService::getLevelColor(entry.level);
+            uint32_t levelColor = LoggerUtil::getLevelColor(entry.level);
             if (levelColor != 0) {
                 ImGui::PushStyleColor(ImGuiCol_Text, levelColor);
             }
@@ -54,7 +54,7 @@ namespace Metal {
             ImGui::SameLine();
             ImGui::TextUnformatted("[");
             ImGui::SameLine();
-            ImGui::TextUnformatted(LogService::getLevelName(entry.level));
+            ImGui::TextUnformatted(LoggerUtil::getLevelName(entry.level));
             ImGui::SameLine();
             ImGui::TextUnformatted("]");
             ImGui::SameLine();

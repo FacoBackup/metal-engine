@@ -72,7 +72,20 @@ namespace Metal {
         b.sampler = sampler;
         b.view = view;
         b.layout = layout;
-        b.descriptorCount = 0; // Use 0 to indicate dynamic query from VulkanContext
+        b.descriptorCount = 0; // Use 0 to indicate dynamic query from VulkanContext (DescriptorSetService::createDescriptor)
+        b.type = DescriptorBindingType::COMBINED_IMAGE_SAMPLER;
+        resourceBindings.push_back(b);
+        return *this;
+    }
+
+    PipelineBuilder &PipelineBuilder::addSingleCombinedImageSamplerBinding(VkSampler sampler, VkImageView view,
+                                                                           VkImageLayout layout) {
+        DescriptorBindingBuilder b{};
+        b.bindingPoint = currentBindingPoint++;
+        b.sampler = sampler;
+        b.view = view;
+        b.layout = layout;
+        b.descriptorCount = 1;
         b.type = DescriptorBindingType::COMBINED_IMAGE_SAMPLER;
         resourceBindings.push_back(b);
         return *this;

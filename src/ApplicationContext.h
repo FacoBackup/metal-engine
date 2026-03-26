@@ -75,7 +75,6 @@ namespace Metal {
         }
 
         void injectDependencies(IContextMember *member) {
-            std::cout << "Injecting dependencies for: " << typeid(*member).name() << std::endl;
             member->setDependencies(*this);
         }
 

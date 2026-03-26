@@ -16,7 +16,7 @@ namespace Metal {
                     "PostProcessing.frag"
                 )
                 .setPushConstantsSize(sizeof(PostProcessingPushConstant))
-                .addCombinedImageSamplerBinding(vulkanContext->vkImageSampler, frame->getResourceAs<TextureInstance>(RID_DENOISED_FRAME)->vkImageView);
+                .addSingleCombinedImageSamplerBinding(vulkanContext->vkImageSampler, frame->getResourceAs<TextureInstance>(RID_DENOISED_FRAME)->vkImageView);
         pipelineInstance = pipelineService->createPipeline(ppPipelineBuilder);
     }
 

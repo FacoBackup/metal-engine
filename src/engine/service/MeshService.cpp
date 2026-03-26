@@ -8,7 +8,6 @@
 #include <core/DirectoryService.h>
 #include <ApplicationContext.h>
 #include <engine/service/BufferService.h>
-#include <engine/service/RayTracingService.h>
 #include <editor/service/HistoryService.h>
 #include <engine/dto/PrimitiveComponent.h>
 #include <engine/dto/TransformComponent.h>

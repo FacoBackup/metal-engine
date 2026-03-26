@@ -1,5 +1,5 @@
 #include "WorldRepository.h"
-#include "../service/RayTracingService.h"
+#include "../service/DirtyStateService.h"
 #include "editor/service/HistoryService.h"
 #include "../../ApplicationEventContext.h"
 
@@ -27,12 +27,12 @@ namespace Metal {
                         registry.destroy(entity);
                         if (hiddenEntities.contains(entity)) hiddenEntities.erase(entity);
                         if (culled.contains(entity)) culled.erase(entity);
-                        ApplicationEventContext::dispatch("BVHNeedsUpdate");
+                        if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
                     }
                 },
                 [this, createdState]() {
                     deserializeEntityComplete(*createdState);
-                    ApplicationEventContext::dispatch("BVHNeedsUpdate");
+                    if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
                 }
             );
         }
@@ -77,7 +77,7 @@ namespace Metal {
                     for (const EntityState &state: deletedStates) {
                         deserializeEntityComplete(state);
                     }
-                    ApplicationEventContext::dispatch("BVHNeedsUpdate");
+                    if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
                 },
                 [this, entities]() {
                     // Redo: Delete entities
@@ -88,7 +88,7 @@ namespace Metal {
                             registry.destroy(entityId);
                         }
                     }
-                    ApplicationEventContext::dispatch("BVHNeedsUpdate");
+                    if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
                 }
             );
         }
@@ -105,7 +105,7 @@ namespace Metal {
 
             registry.destroy(entityId);
         }
-        ApplicationEventContext::dispatch("BVHNeedsUpdate");
+        if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
     }
 
     void WorldRepository::changeVisibility(entt::entity entity, bool isVisible) {
@@ -128,7 +128,7 @@ namespace Metal {
         } else {
             hiddenEntities.insert({entity, true});
         }
-        ApplicationEventContext::dispatch("BVHNeedsUpdate");
+        if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
     }
 
     void WorldRepository::load(const std::string &absolutePath) {

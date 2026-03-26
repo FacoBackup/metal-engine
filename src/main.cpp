@@ -46,7 +46,6 @@
 #include "engine/service/MaterialService.h"
 #include "engine/service/MeshService.h"
 #include "engine/service/PipelineService.h"
-#include "engine/service/RayTracingService.h"
 #include "engine/service/BLASService.h"
 #include "engine/service/TLASService.h"
 #include "engine/service/PrimitiveService.h"
@@ -57,6 +56,7 @@
 #include "engine/service/VolumeService.h"
 #include "engine/service/VoxelService.h"
 #include "engine/EngineContext.h"
+#include "engine/service/DirtyStateService.h"
 
 int main(int, char **) {
     std::shared_ptr<Metal::ApplicationContext> context = std::make_shared<Metal::ApplicationContext>(true);
@@ -71,6 +71,7 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::AsyncSyncService>());
     // --- ORDER MATTERS
 
+    context->registerSingleton(std::make_shared<Metal::DirtyStateService>());
     context->registerSingleton(std::make_shared<Metal::FilesService>());
     context->registerSingleton(std::make_shared<Metal::EngineContext>());
     context->registerSingleton(std::make_shared<Metal::EngineRepository>());
@@ -116,7 +117,6 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::StreamingService>());
 
     context->registerSingleton(std::make_shared<Metal::VoxelService>());
-    context->registerSingleton(std::make_shared<Metal::RayTracingService>());
     context->registerSingleton(std::make_shared<Metal::BLASService>());
     context->registerSingleton(std::make_shared<Metal::TLASService>());
     context->registerSingleton(std::make_shared<Metal::PrimitiveService>());

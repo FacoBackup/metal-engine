@@ -4,7 +4,7 @@
 #include <chrono>
 #include <sstream>
 
-namespace Metal::LogService {
+namespace Metal::LoggerUtil {
 
     static std::vector<LogEntry> entries;
     static std::mutex logMutex;

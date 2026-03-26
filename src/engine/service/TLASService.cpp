@@ -2,6 +2,7 @@
 #include <core/VulkanContext.h>
 #include <engine/service/BufferService.h>
 #include <engine/service/BLASService.h>
+#include <engine/service/PrimitiveService.h>
 #include <engine/repository/WorldRepository.h>
 #include <engine/service/DescriptorSetService.h>
 #include <engine/service/PipelineService.h>
@@ -13,37 +14,37 @@
 #include <editor/enum/engine-definitions.h>
 #include <engine/dto/DescriptorInstance.h>
 #include <engine/dto/DescriptorBinding.h>
+#include <engine/service/DirtyStateService.h>
 #include <ApplicationEventContext.h>
 
 namespace Metal {
     void TLASService::onInitialize() {
-        eventListener([this](const Event &) {
-            needsRebuild = true;
-        }, "TransformComponent");
-
-        eventListener([this](const Event &) {
-            needsRebuild = true;
-        }, "PrimitiveComponent", "BVHNeedsUpdate");
+        dirtyStateService->markDirty(DirtyType::BVH);
     }
 
     void TLASService::onSync() {
         if (!vulkanContext->rayTracingSupported) {
             return;
         }
-        if (worldRepository->dirtyEntities.empty() && !needsRebuild) {
+
+        bool bvhDirty = dirtyStateService->isDirty(DirtyType::BVH);
+        bool anyTransformDirty = dirtyStateService->hasAnyEntityDirty(DirtyType::Transform);
+
+        if (!anyTransformDirty && !bvhDirty && ready) {
             return;
         }
+
+        dirtyStateService->consumeDirtyFlags(DirtyType::BVH);
+        dirtyStateService->getDirtyEntities(DirtyType::Transform, true);
 
         buildTLAS();
 
         if (tlas != VK_NULL_HANDLE) {
             LOG_INFO("TLAS Updated");
             ApplicationEventContext::dispatch("BVHUpdated");
-        } else {
+        } else if (ready) {
             LOG_WARN("TLAS build failed or resulted in NULL handle");
         }
-        needsRebuild = false;
-        worldRepository->dirtyEntities.clear();
     }
 
     VkDeviceAddress TLASService::getDeviceAddress(VkBuffer buffer) const {
@@ -94,6 +95,7 @@ namespace Metal {
             bufferService->dispose(tlasScratchBuffer->getId());
             tlasScratchBuffer = nullptr;
         }
+        ready = false;
     }
 
     void TLASService::buildTLAS() {
@@ -215,5 +217,10 @@ namespace Metal {
         vulkanContext->endSingleTimeCommands(cmd);
 
         updateDescriptorSets(tlas);
+        ready = true;
+    }
+
+    bool TLASService::isReady() const {
+        return ready && getTLAS() != VK_NULL_HANDLE;
     }
 }

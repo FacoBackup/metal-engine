@@ -2,7 +2,7 @@
 #include "../../dto/PipelineBuilder.h"
 #include "../../resource/PipelineInstance.h"
 #include "../../resource/TextureInstance.h"
-#include "../../service/RayTracingService.h"
+#include "../../service/TLASService.h"
 #include "../../service/PipelineService.h"
 #include "../../../core/VulkanContext.h"
 #include "engine/EngineContext.h"
@@ -62,7 +62,7 @@ namespace Metal {
         pushConstant.pathTracerSamples = engineRepository->pathTracerSamples;
         pushConstant.pathTracerBounces = engineRepository->pathTracerBounces;
         pushConstant.pathTracingEmissiveFactor = engineRepository->pathTracingEmissiveFactor;
-        pushConstant.shouldTrace = rayTracingService->isReady();
+        pushConstant.shouldTrace = vulkanContext->rayTracingSupported && tlasService->isReady();
 
         pushConstant.dofEnabled = engineRepository->dofEnabled;
         pushConstant.dofFocusDistance = engineRepository->dofFocusDistance;

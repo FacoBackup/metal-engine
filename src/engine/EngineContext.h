@@ -19,7 +19,6 @@ namespace Metal {
     class ApplicationEventContext;
     class TransformService;
     class StreamingService;
-    class RayTracingService;
     class BLASService;
     class TLASService;
     class PrimitiveService;
@@ -27,6 +26,7 @@ namespace Metal {
     class LightService;
     class VolumeService;
     class PhysicsService;
+    class VulkanContext;
     struct WorldRepository;
     struct EditorRepository;
     struct EngineRepository;
@@ -36,7 +36,6 @@ namespace Metal {
     class EngineContext final : public IService, public ISync {
         TransformService *transformService = nullptr;
         StreamingService *streamingService = nullptr;
-        RayTracingService *rayTracingService = nullptr;
         BLASService *blasService = nullptr;
         TLASService *tlasService = nullptr;
         PrimitiveService *primitiveService = nullptr;
@@ -44,6 +43,7 @@ namespace Metal {
         LightService *lightService = nullptr;
         VolumeService *volumeService = nullptr;
         PhysicsService *physicsService = nullptr;
+        VulkanContext *vulkanContext = nullptr;
         WorldRepository *worldRepository = nullptr;
         EditorRepository *editorRepository = nullptr;
         EngineRepository *engineRepository = nullptr;
@@ -57,7 +57,6 @@ namespace Metal {
             return {
                 {"TransformService", &transformService},
                 {"StreamingService", &streamingService},
-                {"RayTracingService", &rayTracingService},
                 {"BLASService", &blasService},
                 {"TLASService", &tlasService},
                 {"PrimitiveService", &primitiveService},
@@ -65,6 +64,7 @@ namespace Metal {
                 {"LightService", &lightService},
                 {"VolumeService", &volumeService},
                 {"PhysicsService", &physicsService},
+                {"VulkanContext", &vulkanContext},
                 {"WorldRepository", &worldRepository},
                 {"EditorRepository", &editorRepository},
                 {"EngineRepository", &engineRepository}

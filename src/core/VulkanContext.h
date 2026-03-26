@@ -20,7 +20,6 @@ namespace Metal {
     class TextureService;
     class FrameBufferService;
     class PipelineService;
-    class RayTracingService;
     class BLASService;
     class TLASService;
     class PrimitiveService;
@@ -32,7 +31,6 @@ namespace Metal {
         TextureService *textureService = nullptr;
         FrameBufferService *framebufferService = nullptr;
         PipelineService *pipelineService = nullptr;
-        RayTracingService *rayTracingService = nullptr;
         BLASService *blasService = nullptr;
         TLASService *tlasService = nullptr;
         PrimitiveService *primitiveService = nullptr;
@@ -82,7 +80,6 @@ namespace Metal {
                 {"TextureService", &textureService},
                 {"FrameBufferService", &framebufferService},
                 {"PipelineService", &pipelineService},
-                {"RayTracingService", &rayTracingService},
                 {"BLASService", &blasService},
                 {"TLASService", &tlasService},
                 {"PrimitiveService", &primitiveService}

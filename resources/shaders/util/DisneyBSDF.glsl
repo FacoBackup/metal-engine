@@ -19,34 +19,34 @@ float schlickWeight(float cosTheta) {
 }
 
 float GTR1(float NdotH, float a) {
-    if (a >= 1.) return 1./PI;
-    float a2 = a*a;
-    float t = 1. + (a2-1.)*NdotH*NdotH;
-    return (a2-1.) / (PI*log(a2)*t);
+    if (a >= 1.) return 1. / PI;
+    float a2 = a * a;
+    float t = 1. + (a2 - 1.) * NdotH * NdotH;
+    return (a2 - 1.) / (PI * log(a2) * t);
 }
 
 float GTR2(float NdotH, float a) {
-    float a2 = a*a;
-    float t = 1. + (a2-1.)*NdotH*NdotH;
-    return a2 / (PI * t*t);
+    float a2 = a * a;
+    float t = 1. + (a2 - 1.) * NdotH * NdotH;
+    return a2 / (PI * t * t);
 }
 
 float GTR2_aniso(float NdotH, float HdotX, float HdotY, float ax, float ay) {
-    return 1. / (PI * ax*ay * pow2(pow2(HdotX/ax) + pow2(HdotY/ay) + NdotH*NdotH));
+    return 1. / (PI * ax * ay * pow2(pow2(HdotX / ax) + pow2(HdotY / ay) + NdotH * NdotH));
 }
 
 float smithG_GGX(float NdotV, float alphaG) {
-    float a = alphaG*alphaG;
-    float b = NdotV*NdotV;
-    return 1. / (abs(NdotV) + max(sqrt(a + b - a*b), EPSILON));
+    float a = alphaG * alphaG;
+    float b = NdotV * NdotV;
+    return 1. / (abs(NdotV) + max(sqrt(a + b - a * b), EPSILON));
 }
 
 float smithG_GGX_aniso(float NdotV, float VdotX, float VdotY, float ax, float ay) {
-    return 1. / (NdotV + sqrt(pow2(VdotX*ax) + pow2(VdotY*ay) + pow2(NdotV)));
+    return 1. / (NdotV + sqrt(pow2(VdotX * ax) + pow2(VdotY * ay) + pow2(NdotV)));
 }
 
 float pdfLambertianReflection(const in vec3 wi, const in vec3 wo, const in vec3 normal) {
-    return sameHemiSphere(wo, wi, normal) ? abs(dot(normal, wi))/PI : 0.;
+    return sameHemiSphere(wo, wi, normal) ? abs(dot(normal, wi)) / PI : 0.;
 }
 
 float pdfMicrofacet(const in vec3 wi, const in vec3 wo, const in SurfaceInteraction interaction, const in MaterialInfo material) {
@@ -60,17 +60,17 @@ float pdfMicrofacet(const in vec3 wi, const in vec3 wo, const in SurfaceInteract
     float cos2Theta = NdotH * NdotH;
     float denom = cos2Theta * (alpha2 - 1.) + 1.;
     if (denom == 0.) return 0.;
-    float pdfDistribution = alpha2 * NdotH /(PI * denom * denom);
-    return pdfDistribution/(4. * dot(wo, wh));
+    float pdfDistribution = alpha2 * NdotH / (PI * denom * denom);
+    return pdfDistribution / (4. * dot(wo, wh));
 }
 
 float pdfMicrofacetAniso(const in vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y, const in SurfaceInteraction interaction, const in MaterialInfo material) {
     if (!sameHemiSphere(wo, wi, interaction.normal)) return 0.;
     vec3 wh = normalize(wo + wi);
 
-    float aspect = sqrt(1.-material.anisotropic*.9);
-    float alphax = max(.001, pow2(material.roughness)/aspect);
-    float alphay = max(.001, pow2(material.roughness)*aspect);
+    float aspect = sqrt(1. - material.anisotropic * .9);
+    float alphax = max(.001, pow2(material.roughness) / aspect);
+    float alphay = max(.001, pow2(material.roughness) * aspect);
 
     float alphax2 = alphax * alphax;
     float alphay2 = alphay * alphay;
@@ -79,10 +79,10 @@ float pdfMicrofacetAniso(const in vec3 wi, const in vec3 wo, const in vec3 X, co
     float hDotY = dot(wh, Y);
     float NdotH = dot(interaction.normal, wh);
 
-    float denom = hDotX * hDotX/alphax2 + hDotY * hDotY/alphay2 + NdotH * NdotH;
+    float denom = hDotX * hDotX / alphax2 + hDotY * hDotY / alphay2 + NdotH * NdotH;
     if (denom == 0.) return 0.;
-    float pdfDistribution = NdotH /(PI * alphax * alphay * denom * denom);
-    return pdfDistribution/(4. * dot(wo, wh));
+    float pdfDistribution = NdotH / (PI * alphax * alphay * denom * denom);
+    return pdfDistribution / (4. * dot(wo, wh));
 }
 
 float pdfClearCoat(const in vec3 wi, const in vec3 wo, const in SurfaceInteraction interaction, const in MaterialInfo material) {
@@ -93,45 +93,45 @@ float pdfClearCoat(const in vec3 wi, const in vec3 wo, const in SurfaceInteracti
 
     float NdotH = abs(dot(wh, interaction.normal));
     float Dr = GTR1(NdotH, mix(.1, .001, material.clearcoatGloss));
-    return Dr * NdotH/ (4. * dot(wo, wh));
+    return Dr * NdotH / (4. * dot(wo, wh));
 }
 
 vec3 disneyDiffuse(const in float NdotL, const in float NdotV, const in float LdotH, const in MaterialInfo material) {
 
     float FL = schlickWeight(NdotL), FV = schlickWeight(NdotV);
 
-    float Fd90 = 0.5 + 2. * LdotH*LdotH * material.roughness;
+    float Fd90 = 0.5 + 2. * LdotH * LdotH * material.roughness;
     float Fd = mix(1.0, Fd90, FL) * mix(1.0, Fd90, FV);
 
-    return (1./PI) * Fd * material.baseColor;
+    return (1. / PI) * Fd * material.baseColor;
 }
 
 vec3 disneySubsurface(const in float NdotL, const in float NdotV, const in float LdotH, const in MaterialInfo material) {
 
     float FL = schlickWeight(NdotL), FV = schlickWeight(NdotV);
-    float Fss90 = LdotH*LdotH*material.roughness;
+    float Fss90 = LdotH * LdotH * material.roughness;
     float Fss = mix(1.0, Fss90, FL) * mix(1.0, Fss90, FV);
     float ss = 1.25 * (Fss * (1. / (NdotL + NdotV) - .5) + .5);
 
-    return (1./PI) * ss * material.baseColor;
+    return (1. / PI) * ss * material.baseColor;
 }
 
 vec3 disneyMicrofacetIsotropic(float NdotL, float NdotV, float NdotH, float LdotH, const in MaterialInfo material) {
 
-    float Cdlum = .3*material.baseColor.r + .6*material.baseColor.g + .1*material.baseColor.b;// luminance approx.
+    float Cdlum = .3 * material.baseColor.r + .6 * material.baseColor.g + .1 * material.baseColor.b;// luminance approx.
 
-    vec3 Ctint = Cdlum > 0. ? material.baseColor/Cdlum : vec3(1.);// normalize lum. to isolate hue+sat
-    vec3 Cspec0 = mix(material.specular *.08 * mix(vec3(1.), Ctint, material.specularTint), material.baseColor, material.metallic);
+    vec3 Ctint = Cdlum > 0. ? material.baseColor / Cdlum : vec3(1.);// normalize lum. to isolate hue+sat
+    vec3 Cspec0 = mix(material.specular * .08 * mix(vec3(1.), Ctint, material.specularTint), material.baseColor, material.metallic);
 
     float a = max(.001, pow2(material.roughness));
     float Ds = GTR2(NdotH, a);
     float FH = schlickWeight(LdotH);
     vec3 Fs = mix(Cspec0, vec3(1), FH);
     float Gs;
-    Gs  = smithG_GGX(NdotL, a);
+    Gs = smithG_GGX(NdotL, a);
     Gs *= smithG_GGX(NdotV, a);
 
-    return Gs*Fs*Ds;
+    return Gs * Fs * Ds;
 }
 
 vec3 disneyMicrofacetAnisotropic(float NdotL, float NdotV, float NdotH, float LdotH,
@@ -139,22 +139,22 @@ const in vec3 L, const in vec3 V,
 const in vec3 H, const in vec3 X, const in vec3 Y,
 const in MaterialInfo material) {
 
-    float Cdlum = .3*material.baseColor.r + .6*material.baseColor.g + .1*material.baseColor.b;
+    float Cdlum = .3 * material.baseColor.r + .6 * material.baseColor.g + .1 * material.baseColor.b;
 
-    vec3 Ctint = Cdlum > 0. ? material.baseColor/Cdlum : vec3(1.);
-    vec3 Cspec0 = mix(material.specular *.08 * mix(vec3(1.), Ctint, material.specularTint), material.baseColor, material.metallic);
+    vec3 Ctint = Cdlum > 0. ? material.baseColor / Cdlum : vec3(1.);
+    vec3 Cspec0 = mix(material.specular * .08 * mix(vec3(1.), Ctint, material.specularTint), material.baseColor, material.metallic);
 
-    float aspect = sqrt(1.-material.anisotropic*.9);
-    float ax = max(.001, pow2(material.roughness)/aspect);
-    float ay = max(.001, pow2(material.roughness)*aspect);
+    float aspect = sqrt(1. - material.anisotropic * .9);
+    float ax = max(.001, pow2(material.roughness) / aspect);
+    float ay = max(.001, pow2(material.roughness) * aspect);
     float Ds = GTR2_aniso(NdotH, dot(H, X), dot(H, Y), ax, ay);
     float FH = schlickWeight(LdotH);
     vec3 Fs = mix(Cspec0, vec3(1), FH);
     float Gs;
-    Gs  = smithG_GGX_aniso(NdotL, dot(L, X), dot(L, Y), ax, ay);
+    Gs = smithG_GGX_aniso(NdotL, dot(L, X), dot(L, Y), ax, ay);
     Gs *= smithG_GGX_aniso(NdotV, dot(V, X), dot(V, Y), ax, ay);
 
-    return Gs*Fs*Ds;
+    return Gs * Fs * Ds;
 }
 
 float disneyClearCoat(float NdotL, float NdotV, float NdotH, float LdotH, const in MaterialInfo material) {
@@ -168,9 +168,9 @@ float disneyClearCoat(float NdotL, float NdotV, float NdotH, float LdotH, const 
 
 vec3 disneySheen(float LdotH, const in MaterialInfo material) {
     float FH = schlickWeight(LdotH);
-    float Cdlum = .3*material.baseColor.r + .6*material.baseColor.g  + .1*material.baseColor.b;
+    float Cdlum = .3 * material.baseColor.r + .6 * material.baseColor.g + .1 * material.baseColor.b;
 
-    vec3 Ctint = Cdlum > 0. ? material.baseColor/Cdlum : vec3(1.);
+    vec3 Ctint = Cdlum > 0. ? material.baseColor / Cdlum : vec3(1.);
     vec3 Csheen = mix(vec3(1.), Ctint, material.sheenTint);
     vec3 Fsheen = FH * material.sheen * Csheen;
     return FH * material.sheen * Csheen;
@@ -209,17 +209,11 @@ vec3 lightSample(const in Light light, const in SurfaceInteraction interaction, 
         lightPdf = distSq / (cosThetaLight * area);
         lightPdf /= float(globalData.lightsCount);
 
-        vec3 albedo = meshMetadata.albedo;
-        if (meshMetadata.albedoTexture != 0) {
-            vec2 uv = (1.0 - r1) * tri.uv0 + (r1 * (1.0 - r2)) * tri.uv1 + (r1 * r2) * tri.uv2;
-            albedo *= texture(textureArray[nonuniformEXT(meshMetadata.albedoTexture)], uv).rgb;
-        }
-
-        emission = albedo * pushConstants.pathTracingEmissiveFactor;
+        emission = light.color * pushConstants.pathTracingEmissiveFactor;
         vec3 visibility = visibilityTest(dist, interaction.point, wi);
         return emission * visibility;
     }
-    
+
     lightPdf = 0.0;
     emission = vec3(0.0);
     dist = 0.0;
@@ -243,7 +237,7 @@ float lightPdf(const in Light light, const in SurfaceInteraction interaction, ve
     if (t < 0.0) return 0.0;
 
     vec3 p = interaction.point + t * wi;
-    
+
     // Barycentric coordinates for point-in-triangle test
     vec3 v2_p = p - tri.v0;
     float d00 = dot(edge1, edge1);
@@ -281,7 +275,7 @@ vec3 bsdfEvaluate(const in vec3 wi, const in vec3 wo, const in vec3 X, const in 
 
     if (NdotL < 0. || NdotV < 0.) return vec3(0.);
 
-    vec3 H = normalize(wo+wi);
+    vec3 H = normalize(wo + wi);
     float NdotH = dot(interaction.normal, H);
     float LdotH = dot(wo, H);
 
@@ -316,7 +310,7 @@ vec3 disneySubSurfaceSample(out vec3 wi, const in vec3 wo, out float pdf, const 
     if (dot(wo, normal) < 0.) wi.z *= -1.;
     //    COSINE SAMPLE
 
-    vec3 H = normalize(wo+wi);
+    vec3 H = normalize(wo + wi);
     float NdotH = dot(normal, H);
 
     pdf = pdfLambertianReflection(wi, wo, normal);
@@ -332,7 +326,7 @@ vec3 disneySheenSample(out vec3 wi, const in vec3 wo, out float pdf, const in ve
     if (dot(wo, normal) < 0.) wi.z *= -1.;
     //    COSINE SAMPLE
 
-    vec3 H = normalize(wo+wi);
+    vec3 H = normalize(wo + wi);
     float LdotH = dot(wo, H);
 
     pdf = pdfLambertianReflection(wi, wo, normal);
@@ -367,7 +361,7 @@ vec3 disneyMicrofacetSample(out vec3 wi, const in vec3 wo, out float pdf, const 
         return vec3(0.);
     }
 
-    vec3 H = normalize(wo+wi);
+    vec3 H = normalize(wo + wi);
     float NdotH = dot(interaction.normal, H);
     float LdotH = dot(wo, H);
 
@@ -378,9 +372,9 @@ vec3 disneyMicrofacetSample(out vec3 wi, const in vec3 wo, out float pdf, const 
 void disneyMicrofacetAnisoSample(out vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y, const in vec2 u, const in SurfaceInteraction interaction, const in MaterialInfo material) {
     float cosTheta = 0., phi = 0.;
 
-    float aspect = sqrt(1. - material.anisotropic*.9);
-    float alphax = max(.001, pow2(material.roughness)/aspect);
-    float alphay = max(.001, pow2(material.roughness)*aspect);
+    float aspect = sqrt(1. - material.anisotropic * .9);
+    float alphax = max(.001, pow2(material.roughness) / aspect);
+    float alphay = max(.001, pow2(material.roughness) * aspect);
 
     phi = atan(alphay / alphax * tan(2. * PI * u[1] + 0.5 * PI));
 
@@ -428,12 +422,12 @@ float bsdfPdf(const in vec3 wi, const in vec3 wo, const in vec3 X, const in vec3
     bool reflected = sameHemiSphere(wo, wi, interaction.normal);
     if (material.transmission > 0.0 && !reflected) {
         // Refraction PDF
-        return material.transmission; 
+        return material.transmission;
     }
     float pdfDiffuse = pdfLambertianReflection(wi, wo, interaction.normal);
     float pdfMicrofacet = pdfMicrofacetAniso(wi, wo, X, Y, interaction, material);
     float pdfClearCoat = pdfClearCoat(wi, wo, interaction, material);;
-    return (1.0 - material.transmission) * (pdfDiffuse + pdfMicrofacet + pdfClearCoat)/3.;
+    return (1.0 - material.transmission) * (pdfDiffuse + pdfMicrofacet + pdfClearCoat) / 3.;
 }
 
 float light_pdf(const in Light light, const in SurfaceInteraction interaction, vec3 wi) {
@@ -496,16 +490,16 @@ vec3 bsdfSample(out vec3 wi, const in vec3 wo, const in vec3 X, const in vec3 Y,
         pdf = bsdfPdf(wi, wo, X, Y, interaction, material);
     }
 
-    if (pdf < EPSILON){
+    if (pdf < EPSILON) {
         return vec3(0.);
     }
     return f;
 }
 
-float powerHeuristic(float nf, float fPdf, float ng, float gPdf){
+float powerHeuristic(float nf, float fPdf, float ng, float gPdf) {
     float f = nf * fPdf;
     float g = ng * gPdf;
-    return (f*f)/(f*f + g*g);
+    return (f * f) / (f * f + g * g);
 }
 
 vec3 calculateDirectLight(const in Light light, const in SurfaceInteraction interaction, const in MaterialInfo material, out vec3 wi, out vec3 f, out float scatteringPdf) {
