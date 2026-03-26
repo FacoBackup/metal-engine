@@ -108,13 +108,26 @@ namespace Metal {
             return;
         }
         root->children.clear();
-        for (const auto &entry: fs::directory_iterator(root->absolutePath)) {
+        std::error_code ec;
+        auto iterator = fs::directory_iterator(root->absolutePath, ec);
+        if (ec) {
+            LOG_ERROR("Error opening directory: " + root->absolutePath + " - " + ec.message());
+            notificationService->pushMessage("Error opening directory", NotificationSeverities::ERROR);
+            return;
+        }
+
+        for (const auto &entry: iterator) {
             std::string name = entry.path().filename().string();
             if (name.starts_with(".")) { continue; }
 
-            auto ftime = last_write_time(entry);
-            auto sys_tp = std::chrono::file_clock::to_utc(ftime);
-            std::string dateStr = std::format("{:%Y-%m-%d %H:%M}", sys_tp);
+            std::string dateStr = "N/A";
+            std::error_code date_ec;
+            auto ftime = last_write_time(entry, date_ec);
+            if (!date_ec) {
+                auto sys_tp = std::chrono::file_clock::to_utc(ftime);
+                dateStr = std::format("{:%Y-%m-%d %H:%M}", sys_tp);
+            }
+
             auto child = std::make_shared<FSEntry>(
                 fs::absolute(entry.path()).string(),
                 dateStr);
@@ -123,8 +136,11 @@ namespace Metal {
             if (entry.is_directory()) {
                 child->isDirectory = true;
             } else {
-                child->size = fs::file_size(entry.path());
-                child->formattedSize = FilesUtil::FormatSize(child->size);
+                std::error_code size_ec;
+                child->size = fs::file_size(entry.path(), size_ec);
+                if (!size_ec) {
+                    child->formattedSize = FilesUtil::FormatSize(child->size);
+                }
                 child->extension = entry.path().extension().string();
             }
             root->children.push_back(std::move(child));
@@ -132,21 +148,29 @@ namespace Metal {
     }
 
     std::shared_ptr<FSEntry> FilesService::GetEntry(const std::string &path) {
-        if (!fs::exists(path)) {
+        std::error_code ec;
+        if (!fs::exists(path, ec)) {
             return nullptr;
         }
 
-        auto ftime = last_write_time(fs::path(path));
-        auto sys_tp = std::chrono::file_clock::to_utc(ftime);
-        std::string dateStr = std::format("{:%Y-%m-%d %H:%M}", sys_tp);
+        std::string dateStr = "N/A";
+        std::error_code date_ec;
+        auto ftime = last_write_time(fs::path(path), date_ec);
+        if (!date_ec) {
+            auto sys_tp = std::chrono::file_clock::to_utc(ftime);
+            dateStr = std::format("{:%Y-%m-%d %H:%M}", sys_tp);
+        }
 
         auto entry = std::make_shared<FSEntry>(fs::absolute(path).string(), dateStr);
         entry->name = fs::path(path).filename().string();
-        if (fs::is_directory(path)) {
+        if (fs::is_directory(path, ec)) {
             entry->isDirectory = true;
         } else {
-            entry->size = fs::file_size(path);
-            entry->formattedSize = FilesUtil::FormatSize(entry->size);
+            std::error_code size_ec;
+            entry->size = fs::file_size(path, size_ec);
+            if (!size_ec) {
+                entry->formattedSize = FilesUtil::FormatSize(entry->size);
+            }
             entry->extension = fs::path(path).extension().string();
         }
         return entry;
