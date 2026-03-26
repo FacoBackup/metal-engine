@@ -20,9 +20,6 @@ namespace Metal {
     class TextureService;
     class FrameBufferService;
     class PipelineService;
-    class BLASService;
-    class TLASService;
-    class PrimitiveService;
 
     class VulkanContext final : public IService, public IInit {
         WindowService *windowService = nullptr;
@@ -31,9 +28,6 @@ namespace Metal {
         TextureService *textureService = nullptr;
         FrameBufferService *framebufferService = nullptr;
         PipelineService *pipelineService = nullptr;
-        BLASService *blasService = nullptr;
-        TLASService *tlasService = nullptr;
-        PrimitiveService *primitiveService = nullptr;
 
         static VkBool32 DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
                                       VkDebugUtilsMessageTypeFlagsEXT messageType,
@@ -79,10 +73,7 @@ namespace Metal {
                 {"MeshService", &meshService},
                 {"TextureService", &textureService},
                 {"FrameBufferService", &framebufferService},
-                {"PipelineService", &pipelineService},
-                {"BLASService", &blasService},
-                {"TLASService", &tlasService},
-                {"PrimitiveService", &primitiveService}
+                {"PipelineService", &pipelineService}
             };
         }
 

@@ -26,10 +26,16 @@ namespace Metal {
 
     private:
         std::string listMeshFiles(const nlohmann::json &params);
+
+        std::string getCameraPosition(const nlohmann::json &params);
+
         std::string createMeshEntity(const nlohmann::json &params);
+
         std::string setEntityTransform(const nlohmann::json &params);
 
         static glm::vec3 parseVec3(const std::string &s);
+
+        glm::vec3 getCameraForward() const;
     };
 }
 

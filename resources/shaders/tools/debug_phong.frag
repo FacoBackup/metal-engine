@@ -1,6 +1,6 @@
 #include "../GlobalDataBuffer.glsl"
-#define MESH_METADATA_SET 1
-#include "../MeshMetadata.glsl"
+#define MATERIAL_DATA_SET 1
+#include "../MaterialData.glsl"
 #include "../util/GridUtil.glsl"
 
 #extension GL_EXT_nonuniform_qualifier : enable
@@ -20,18 +20,6 @@ layout(location = 2) in vec2 inUV;
 
 layout(location = 0) out vec4 outFragColor;
 
-// Debug shading modes (aligned with ShadingMode.h)
-const uint DEBUG_MODE_LIT           = 0;
-const uint DEBUG_MODE_ALBEDO        = 1;
-const uint DEBUG_MODE_NORMAL        = 2;
-const uint DEBUG_MODE_ROUGHNESS     = 3;
-const uint DEBUG_MODE_METALLIC      = 4;
-const uint DEBUG_MODE_RANDOM        = 5;
-const uint DEBUG_MODE_DEPTH         = 6;
-const uint DEBUG_MODE_UV            = 7;
-const uint DEBUG_MODE_POSITION      = 8;
-const uint DEBUG_MODE_LIGHTING_ONLY = 9;
-const uint DEBUG_MODE_EMISSIVE      = 10;
 
 vec3 randomColor(int seed) {
     float hash = fract(sin(float(seed)) * 43758.5453);
@@ -42,45 +30,45 @@ vec3 randomColor(int seed) {
 }
 
 void main() {
-    MeshMetadata metadata = meshMetadataBuffer.items[push.renderIndex];
+    MaterialData material = materialBuffer.items[push.renderIndex];
     vec3 baseColor;
     float roughness;
     float metallic;
 
-    if (metadata.albedoTexture != 0u) {
-        baseColor = texture(textureArray[nonuniformEXT(metadata.albedoTexture)], inUV).rgb;
+    if (material.albedoTexture != 0u) {
+        baseColor = texture(textureArray[nonuniformEXT(material.albedoTexture)], inUV).rgb;
     } else {
         baseColor = getDebugGrid(inWorldPos).baseColor;
     }
-    if (metadata.roughnessTexture != 0u) {
-        roughness = texture(textureArray[nonuniformEXT(metadata.roughnessTexture)], inUV).r;
+    if (material.roughnessTexture != 0u) {
+        roughness = texture(textureArray[nonuniformEXT(material.roughnessTexture)], inUV).r;
     } else {
         roughness = getDebugGrid(inWorldPos).roughness;
     }
-    if (metadata.metallicTexture != 0u) {
-        metallic = texture(textureArray[nonuniformEXT(metadata.metallicTexture)], inUV).r;
+    if (material.metallicTexture != 0u) {
+        metallic = texture(textureArray[nonuniformEXT(material.metallicTexture)], inUV).r;
     } else {
         metallic = getDebugGrid(inWorldPos).metallic;
     }
 
     vec3 finalColor;
 
-    if (globalData.debugFlag == DEBUG_MODE_NORMAL) {
+    if (globalData.debugFlag == NORMAL) {
         finalColor = normalize(inNormal);
-    } else if (globalData.debugFlag == DEBUG_MODE_ROUGHNESS) {
+    } else if (globalData.debugFlag == ROUGHNESS) {
         finalColor = vec3(roughness);
-    } else if (globalData.debugFlag == DEBUG_MODE_METALLIC) {
+    } else if (globalData.debugFlag == METALLIC) {
         finalColor = vec3(metallic);
-    } else if (globalData.debugFlag == DEBUG_MODE_DEPTH) {
+    } else if (globalData.debugFlag == DEPTH) {
         finalColor = vec3(distance(inWorldPos, globalData.cameraWorldPosition) / 25.0);
-    } else if (globalData.debugFlag == DEBUG_MODE_UV) {
+    } else if (globalData.debugFlag == UV) {
         finalColor = vec3(inUV, 0);
-    } else if (globalData.debugFlag == DEBUG_MODE_RANDOM) {
+    } else if (globalData.debugFlag == RANDOM) {
         finalColor = randomColor(int(push.renderIndex + 1));
-    } else if (globalData.debugFlag == DEBUG_MODE_POSITION) {
+    } else if (globalData.debugFlag == POSITION) {
         finalColor = normalize(inWorldPos);
-    } else if (globalData.debugFlag == DEBUG_MODE_EMISSIVE) {
-        finalColor = metadata.isEmissive == 1u ? vec3(1) : vec3(0);
+    } else if (globalData.debugFlag == EMISSIVE) {
+        finalColor = material.isEmissive == 1u ? vec3(1) : vec3(0);
     } else {
         finalColor = baseColor;
     }

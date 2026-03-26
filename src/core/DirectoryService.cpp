@@ -6,7 +6,6 @@
 #include "../ApplicationContext.h"
 
 #include <filesystem>
-#define CACHED_PATH "/metal-engine-cached.txt"
 #include "editor/service/NotificationService.h"
 #include "engine/repository/WorldRepository.h"
 
@@ -24,18 +23,22 @@ namespace Metal {
     }
 
     void DirectoryService::updateRootPath(bool forceSelection) {
+        char *home = getenv("USERPROFILE");
+        if (!home) home = getenv("HOME");
+        if (home) {
+            engineMetadataPath = std::string(home) + "/.metal";
+            FilesUtil::CreateDirectory(engineMetadataPath);
+        } else {
+            engineMetadataPath = ".metal";
+            FilesUtil::CreateDirectory(engineMetadataPath);
+        }
+
         std::string cachedPath;
-        std::string cachePathFile = std::filesystem::current_path().string() + CACHED_PATH;
+        std::string cachePathFile = engineMetadataPath + "/metal-engine-cached.txt";
         FilesUtil::ReadFile(cachePathFile.c_str(), cachedPath);
         cachedPath.erase(std::ranges::remove(cachedPath, '\n').begin(), cachedPath.cend());
         if (cachedPath.empty() || forceSelection || !fs::exists(cachedPath)) {
-            char *home = getenv("USERPROFILE");
-            if (!home) home = getenv("HOME");
-            if (home && !forceSelection) {
-                rootDirectory = home;
-            } else {
-                rootDirectory = FileDialogUtil::SelectDirectory();
-            }
+            rootDirectory = FileDialogUtil::SelectDirectory();
             rootDirectory.erase(std::ranges::remove(rootDirectory, '\n').begin(), rootDirectory.cend());
             if (rootDirectory.empty()) {
                 throw std::runtime_error("No directory selected.");
@@ -55,7 +58,7 @@ namespace Metal {
             }
         }
 
-        FilesUtil::CreateDirectory(rootDirectory + "/shaders/");
+        FilesUtil::CreateDirectory(engineMetadataPath + "/shaders/");
     }
 
 

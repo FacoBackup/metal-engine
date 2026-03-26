@@ -1,15 +1,11 @@
-#ifndef MESHMETADATA_H
-#define MESHMETADATA_H
+#ifndef MATERIALDATA_H
+#define MATERIALDATA_H
 
 #include <cstdint>
 #include <glm/vec3.hpp>
 
 namespace Metal {
-    struct MeshMetadata {
-        unsigned int renderIndex;
-        uint64_t vertexBufferAddress;
-        uint64_t indexBufferAddress;
-
+    struct MaterialData {
         alignas(16) float transmission{};
         alignas(4) float thickness{};
         alignas(4) float ior{1.45f};
@@ -21,4 +17,4 @@ namespace Metal {
     };
 }
 
-#endif //MESHMETADATA_H
+#endif //MATERIALDATA_H

@@ -20,6 +20,8 @@ namespace Metal {
     class DirtyStateService;
     struct BufferInstance;
 
+    class EngineContext;
+
     class TLASService final : public IService, public IEventMember, public IDisposable, public IInit, public ISync {
         VulkanContext *vulkanContext = nullptr;
         BufferService *bufferService = nullptr;
@@ -28,6 +30,7 @@ namespace Metal {
         DescriptorSetService *descriptorSetService = nullptr;
         PipelineService *pipelineService = nullptr;
         DirtyStateService *dirtyStateService = nullptr;
+        EngineContext *engineContext = nullptr;
 
         VkAccelerationStructureKHR tlas = VK_NULL_HANDLE;
         BufferInstance *tlasBuffer = nullptr;
@@ -40,6 +43,8 @@ namespace Metal {
 
         void updateDescriptorSets(VkAccelerationStructureKHR asHandle) const;
 
+        void updatePrimitiveBuffer();
+
     public:
         TLASService() = default;
 
@@ -51,7 +56,8 @@ namespace Metal {
                 {"WorldRepository", &worldRepository},
                 {"DescriptorSetService", &descriptorSetService},
                 {"PipelineService", &pipelineService},
-                {"DirtyStateService", &dirtyStateService}
+                {"DirtyStateService", &dirtyStateService},
+                {"EngineContext", &engineContext}
             };
         }
 

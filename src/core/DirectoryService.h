@@ -11,10 +11,11 @@ namespace Metal {
     struct WorldRepository;
     class NotificationService;
 
-    struct DirectoryService final : IService, IInit, IDisposable, IEventMember {
+    class DirectoryService final : public IService, public IInit, public IDisposable, public IEventMember {
         NotificationService *notificationService = nullptr;
 
         std::string rootDirectory;
+        std::string engineMetadataPath;
 
         std::vector<Dependency> getDependencies() override {
             return {
@@ -22,6 +23,7 @@ namespace Metal {
             };
         }
 
+    public:
         void onInitialize() override;
 
         void dispose() override;
@@ -32,6 +34,10 @@ namespace Metal {
 
         [[nodiscard]] const std::string &getRootDirectory() const {
             return rootDirectory;
+        }
+
+        [[nodiscard]] const std::string &getEngineMetadataPath() const {
+            return engineMetadataPath;
         }
     };
 } // Metal

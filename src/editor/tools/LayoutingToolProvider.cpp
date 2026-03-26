@@ -13,8 +13,13 @@ namespace Metal {
         registerTool("list_mesh_files", "Lists all available .mesh files in the project.", {},
                      [this](const nlohmann::json &params) { return listMeshFiles(params); });
 
+        // Tool: get_camera_position
+        registerTool("get_camera_position", "Returns the current camera position and orientation.", {},
+                     [this](const nlohmann::json &params) { return getCameraPosition(params); });
+
         // Tool: create_mesh_entity
-        registerTool("create_mesh_entity", "Creates a new entity with a mesh and optional transform.",
+        registerTool("create_mesh_entity",
+                     "Creates a new entity with a mesh and optional transform. If 'position' is not provided, the entity should be created in front of the camera.",
                      {
                          {"mesh_id", "The ID/path of the mesh file", ToolParamType::STRING},
                          {"name", "Optional name for the entity (string)", ToolParamType::STRING},
@@ -67,6 +72,15 @@ namespace Metal {
         return ss.str();
     }
 
+    std::string LayoutingToolProvider::getCameraPosition(const nlohmann::json &params) {
+        auto &camera = worldRepository->camera;
+        nlohmann::json j;
+        j["position"] = {camera.position.x, camera.position.y, camera.position.z};
+        j["pitch"] = camera.pitch;
+        j["yaw"] = camera.yaw;
+        return j.dump();
+    }
+
     std::string LayoutingToolProvider::createMeshEntity(const nlohmann::json &params) {
         if (!params.contains("mesh_id")) return std::string("Error: Missing 'mesh_id' parameter");
 
@@ -85,6 +99,9 @@ namespace Metal {
 
         if (params.contains("position")) {
             transform.translation = parseVec3(params.at("position").get<std::string>());
+        } else {
+            // Instantiate in front of the camera if no position is specified
+            transform.translation = worldRepository->camera.position + getCameraForward() * 5.0f;
         }
         if (params.contains("rotation_euler")) {
             auto rot = parseVec3(params.at("rotation_euler").get<std::string>());
@@ -146,5 +163,14 @@ namespace Metal {
         } catch (...) {
         }
         return {0, 0, 0};
+    }
+
+    glm::vec3 LayoutingToolProvider::getCameraForward() const {
+        auto &camera = worldRepository->camera;
+        return glm::normalize(glm::vec3(
+            -std::sin(camera.yaw) * std::cos(camera.pitch),
+            std::sin(camera.pitch),
+            -std::cos(camera.yaw) * std::cos(camera.pitch)
+        ));
     }
 }

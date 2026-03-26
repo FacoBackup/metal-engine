@@ -4,13 +4,14 @@
 
 #include "AbstractDockPanel.h"
 #include "common/Icons.h"
-#include "../../dto/DockDTO.h"
+#include "../../dto/DockDefinition.h"
 #include "editor/ui/UIUtil.h"
 #include "../../repository/EditorRepository.h"
 #include "editor/service/ThemeService.h"
 #include "../../service/DockService.h"
 #include "editor/service/HistoryService.h"
 #include "core/DirectoryService.h"
+#include "editor/dto/DockSpace.h"
 #define BORDER_RADIUS  6.0f
 #define OUTSIDE_PADDING  2.0f
 #define INSIDE_PADDING  4.0f
@@ -128,9 +129,9 @@ namespace Metal {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(INSIDE_PADDING, INSIDE_PADDING));
             if (ImGui::BeginChild((dock->internalId + "island").c_str(),
                                   ImVec2(size.x - OUTSIDE_PADDING * 2, size.y - OUTSIDE_PADDING * 2),
-                                  dock->isCenter ? ImGuiChildFlags_None : ImGuiChildFlags_AlwaysUseWindowPadding,
+                                  dock->isCenter() ? ImGuiChildFlags_None : ImGuiChildFlags_AlwaysUseWindowPadding,
                                   ImGuiWindowFlags_None)) {
-                if (!dock->isCenter) {
+                if (!dock->isCenter()) {
                     renderCustomHeader();
                 }
 
@@ -144,7 +145,7 @@ namespace Metal {
                 }
                 ImGui::EndChild();
 
-                if (editorRepository->isPlaying && !dock->isCenter) {
+                if (editorRepository->isPlaying && !dock->isCenter()) {
                     ImGui::SetCursorPos(ImVec2(0, 0));
                     ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0, 0, 0, 0.5f));
                     ImGui::BeginChild((dock->internalId + "overlay").c_str(), ImVec2(0, 0), ImGuiChildFlags_None,
@@ -200,7 +201,7 @@ namespace Metal {
                     initializeView();
                 }
 
-                if (!dock->isCenter) {
+                if (!dock->isCenter()) {
                     ImGui::SameLine(0, 0);
                     ImGui::PushStyleColor(ImGuiCol_Button, themeService->palette0);
                     ImGui::PushStyleColor(ImGuiCol_Border, themeService->palette0);

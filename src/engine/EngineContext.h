@@ -21,7 +21,7 @@ namespace Metal {
     class StreamingService;
     class BLASService;
     class TLASService;
-    class PrimitiveService;
+    class MaterialService;
     class CameraService;
     class LightService;
     class VolumeService;
@@ -38,7 +38,7 @@ namespace Metal {
         StreamingService *streamingService = nullptr;
         BLASService *blasService = nullptr;
         TLASService *tlasService = nullptr;
-        PrimitiveService *primitiveService = nullptr;
+        MaterialService *materialService = nullptr;
         CameraService *cameraService = nullptr;
         LightService *lightService = nullptr;
         VolumeService *volumeService = nullptr;
@@ -59,7 +59,7 @@ namespace Metal {
                 {"StreamingService", &streamingService},
                 {"BLASService", &blasService},
                 {"TLASService", &tlasService},
-                {"PrimitiveService", &primitiveService},
+                {"MaterialService", &materialService},
                 {"CameraService", &cameraService},
                 {"LightService", &lightService},
                 {"VolumeService", &volumeService},

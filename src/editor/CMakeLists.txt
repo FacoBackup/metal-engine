@@ -40,7 +40,8 @@ set(EDITOR_SOURCES
     ui/footer/EditorFooterPanel.h
     service/DockService.cpp
     service/DockService.h
-    dto/DockDTO.h
+        dto/DockDefinition.cpp
+        dto/DockDefinition.h
     dto/Tool.h
     dto/IToolProvider.h
     dto/DockSpace.h
@@ -51,6 +52,7 @@ set(EDITOR_SOURCES
     service/ThemeService.h
     repository/EditorRepository.h
     repository/DockRepository.h
+    repository/DockRepository.cpp
     repository/AIAssistantRepository.h
     repository/AIAssistantRepository.cpp
     dto/ChatDTO.h

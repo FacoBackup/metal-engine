@@ -9,7 +9,7 @@
 
 namespace Metal {
     class DockService;
-    struct DockDTO;
+    struct DockDefinition;
     struct DockSpace;
     class AbstractDockPanel;
     struct EditorRepository;
@@ -27,7 +27,7 @@ namespace Metal {
         int stylePushCount = 0;
         int styleColorPushCount = 0;
         std::shared_ptr<DockSpacePanel> mainWindow = nullptr;
-        std::shared_ptr<DockDTO> dock = nullptr;
+        std::shared_ptr<DockDefinition> dock = nullptr;
         std::shared_ptr<AbstractDockPanel> view = nullptr;
         std::unordered_map<int, std::shared_ptr<AbstractDockPanel>> views{};
         ImVec2 headerPadding{0, 3};
@@ -63,10 +63,10 @@ namespace Metal {
         static const float FRAME_SIZE;
         static const ImVec2 MIN_SIZE;
 
-        explicit DockSpacePanel(std::shared_ptr<DockSpacePanel> mainWindow, std::shared_ptr<DockDTO> dock) : mainWindow(mainWindow), dock(dock) {
+        explicit DockSpacePanel(std::shared_ptr<DockSpacePanel> mainWindow, std::shared_ptr<DockDefinition> dock) : mainWindow(mainWindow), dock(dock) {
         }
 
-        [[nodiscard]] std::shared_ptr<DockDTO> getDock() const {
+        [[nodiscard]] std::shared_ptr<DockDefinition> getDock() const {
             return dock;
         }
 

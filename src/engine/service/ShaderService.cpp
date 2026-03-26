@@ -179,8 +179,8 @@ namespace Metal {
         const size_t sourceHash = std::hash<std::string>{}(source);
         const std::string part(BASE_PATH + pFilename);
         const std::string shaderName = part.substr(part.find_last_of('/') + 1, part.size());
-        const std::string binaryFilename = directoryService->getRootDirectory() + "/shaders/" + shaderName + ".spv";
-        const std::string hashFilename = directoryService->getRootDirectory() + "/shaders/" + shaderName + ".hash";
+        const std::string binaryFilename = directoryService->getEngineMetadataPath() + "/shaders/" + shaderName + ".spv";
+        const std::string hashFilename = directoryService->getEngineMetadataPath() + "/shaders/" + shaderName + ".hash";
 
         ShaderModule shader{};
 

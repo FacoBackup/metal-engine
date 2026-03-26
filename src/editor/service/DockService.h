@@ -2,7 +2,7 @@
 #define METAL_ENGINE_DOCKSERVICE_H
 
 #include "imgui.h"
-#include "../dto/DockDTO.h"
+#include "../dto/DockDefinition.h"
 #include "../ui/docks/DockSpacePanel.h"
 #include "common/IService.h"
 
@@ -23,10 +23,10 @@ namespace Metal {
             };
         }
 
-        [[nodiscard]] std::shared_ptr<DockDTO> getCenter() const { return dockRepository->center; }
-        [[nodiscard]] const std::vector<std::shared_ptr<DockDTO> > &getBottom() const { return dockRepository->bottom; }
-        [[nodiscard]] const std::vector<std::shared_ptr<DockDTO> > &getLeft() const { return dockRepository->left; }
-        [[nodiscard]] const std::vector<std::shared_ptr<DockDTO> > &getRight() const { return dockRepository->right; }
+        [[nodiscard]] std::shared_ptr<DockDefinition> getCenter() const { return dockRepository->center; }
+        [[nodiscard]] const std::vector<std::shared_ptr<DockDefinition> > &getBottom() const { return dockRepository->bottom; }
+        [[nodiscard]] const std::vector<std::shared_ptr<DockDefinition> > &getLeft() const { return dockRepository->left; }
+        [[nodiscard]] const std::vector<std::shared_ptr<DockDefinition> > &getRight() const { return dockRepository->right; }
         [[nodiscard]] bool getIsInitialized() const { return isInitialized; }
         void setIsInitialized(bool value) { isInitialized = value; }
 
@@ -34,15 +34,15 @@ namespace Metal {
 
         void buildViews(ImGuiID windowId, AbstractPanel *panel);
 
-        void removeDock(std::shared_ptr<DockDTO> dock);
+        void removeDock(std::shared_ptr<DockDefinition> dock);
         
         void addLeftDock();
         void addBottomDock();
         void addRightDock();
 
-        static void createDockSpace(std::shared_ptr<DockDTO> dockSpace, ImGuiID *dockMainId);
+        static void createDockSpace(std::shared_ptr<DockDefinition> dockSpace, ImGuiID *dockMainId);
 
-        static void addWindow(std::shared_ptr<DockDTO> d, AbstractPanel *panel);
+        static void addWindow(std::shared_ptr<DockDefinition> d, AbstractPanel *panel);
     };
 } // Metal
 

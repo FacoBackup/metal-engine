@@ -70,8 +70,6 @@ set(ENGINE_SOURCES_LIST
     service/BLASService.h
     service/TLASService.cpp
     service/TLASService.h
-    service/PrimitiveService.cpp
-    service/PrimitiveService.h
     dto/PipelineBuilder.h
     resource/FrameBufferAttachment.cpp
     repository/EngineRepository.cpp

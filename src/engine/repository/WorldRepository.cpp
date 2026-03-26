@@ -257,6 +257,10 @@ namespace Metal {
         if (j.contains("hiddenEntities")) {
             hiddenEntities = j.at("hiddenEntities").get<std::unordered_map<entt::entity, bool> >();
         }
+
+        for (auto entity: registry.view<PrimitiveComponent>()) {
+            dirtyStateService->markEntityDirty(entity, DirtyType::Material);
+        }
     }
 
     void WorldRepository::deserializeEntityComplete(const EntityState &state) {

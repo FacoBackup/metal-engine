@@ -48,7 +48,6 @@
 #include "engine/service/PipelineService.h"
 #include "engine/service/BLASService.h"
 #include "engine/service/TLASService.h"
-#include "engine/service/PrimitiveService.h"
 #include "engine/service/ShaderService.h"
 #include "engine/service/StreamingService.h"
 #include "engine/service/TextureService.h"
@@ -119,7 +118,6 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::VoxelService>());
     context->registerSingleton(std::make_shared<Metal::BLASService>());
     context->registerSingleton(std::make_shared<Metal::TLASService>());
-    context->registerSingleton(std::make_shared<Metal::PrimitiveService>());
     context->registerSingleton(std::make_shared<Metal::ShaderService>());
     context->registerSingleton(std::make_shared<Metal::FrameService>());
 

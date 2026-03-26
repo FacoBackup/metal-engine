@@ -20,7 +20,7 @@ namespace Metal {
                 .enableDepthTest()
                 .setPushConstantsSize(sizeof(DebugPhongPushConstant))
                 .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
-                .addBufferBinding(getScopedResourceId(RID_MESH_METADATA_BUFFER))
+                .addBufferBinding(getScopedResourceId(RID_MATERIAL_DATA_BUFFER))
                 .addCombinedImageSamplerBinding(vulkanContext->vkImageSampler, VK_NULL_HANDLE,
                                                 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         pipelineInstance = pipelineService->createPipeline(builder);

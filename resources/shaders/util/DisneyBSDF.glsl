@@ -185,8 +185,8 @@ vec3 perpendicular(const vec3 v) {
 
 
 vec3 lightSample(const in Light light, const in SurfaceInteraction interaction, out vec3 wi, out float lightPdf, out vec3 emission, out float dist) {
-    MeshMetadata meshMetadata = meshMetadataBuffer.items[light.meshIndex];
-    TriangleData tri = getTriangleData(meshMetadata, light.triangleIndex);
+    PrimitiveData primitive = primitiveBuffer.items[light.meshIndex];
+    TriangleData tri = getTriangleData(primitive, light.triangleIndex);
 
     // Sample triangle
     vec2 u = vec2(random(), random());
@@ -221,8 +221,8 @@ vec3 lightSample(const in Light light, const in SurfaceInteraction interaction, 
 }
 
 float lightPdf(const in Light light, const in SurfaceInteraction interaction, vec3 wi) {
-    MeshMetadata meshMetadata = meshMetadataBuffer.items[light.meshIndex];
-    TriangleData tri = getTriangleData(meshMetadata, light.triangleIndex);
+    PrimitiveData primitive = primitiveBuffer.items[light.meshIndex];
+    TriangleData tri = getTriangleData(primitive, light.triangleIndex);
 
     vec3 edge1 = tri.v1 - tri.v0;
     vec3 edge2 = tri.v2 - tri.v0;

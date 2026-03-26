@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 #include "../src/editor/service/DockService.h"
-#include "../src/editor/dto/DockDTO.h"
+#include "../src/editor/dto/DockDefinition.h"
 #include "../src/editor/dto/DockSpace.h"
 
 namespace Metal {

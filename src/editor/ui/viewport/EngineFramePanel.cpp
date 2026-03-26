@@ -10,7 +10,8 @@
 #include "engine/dto/GlobalDataUBO.h"
 #include "engine/dto/LightData.h"
 #include "engine/dto/VolumeData.h"
-#include "engine/dto/MeshMetadata.h"
+#include "engine/dto/MaterialData.h"
+#include "engine/dto/PrimitiveData.h"
 #include "ViewportHeaderPanel.h"
 #include "ImGuizmo.h"
 #include "../../repository/EditorRepository.h"
@@ -44,7 +45,9 @@ namespace Metal {
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
                 .addBuffer(RID_VOLUMES_BUFFER, MAX_VOLUMES * sizeof(VolumeData),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
-                .addBuffer(RID_MESH_METADATA_BUFFER, MAX_MESH_INSTANCES * sizeof(MeshMetadata),
+                .addBuffer(RID_MATERIAL_DATA_BUFFER, MAX_MESH_INSTANCES * sizeof(MaterialData),
+                           VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
+                .addBuffer(RID_PRIMITIVE_DATA_BUFFER, MAX_MESH_INSTANCES * sizeof(PrimitiveData),
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
                 .addTexture(RID_ACCUMULATED_FRAME, gBufferW, gBufferH)
                 .addTexture(RID_GBUFFER_POSITION_INDEX, gBufferW, gBufferH, VK_FORMAT_R32G32B32A32_SFLOAT)

@@ -28,7 +28,8 @@ namespace Metal {
                 .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_NORMAL))
                 .addBufferBinding(getScopedResourceId(RID_LIGHT_BUFFER))
                 .addBufferBinding(getScopedResourceId(RID_VOLUMES_BUFFER))
-                .addBufferBinding(getScopedResourceId(RID_MESH_METADATA_BUFFER))
+                .addBufferBinding(getScopedResourceId(RID_MATERIAL_DATA_BUFFER))
+                .addBufferBinding(getScopedResourceId(RID_PRIMITIVE_DATA_BUFFER))
                 .addCombinedImageSamplerBinding(vulkanContext->vkImageSampler, VK_NULL_HANDLE,
                                                 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         pipelineInstance = pipelineService->createPipeline(builder);

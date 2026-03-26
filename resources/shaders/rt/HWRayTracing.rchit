@@ -1,22 +1,25 @@
 #extension GL_EXT_ray_tracing: require
 
 #include "../util/HWRayTracingUtil.glsl"
-#define MESH_METADATA_SET 7
+#define MATERIAL_DATA_SET 7
+#define PRIMITIVE_DATA_SET 8
 
-layout (set = 0, binding = 8) uniform sampler2D textureArray[];
+layout (set = 0, binding = 9) uniform sampler2D textureArray[];
 
 layout (location = 0) rayPayloadInEXT RayPayload payload;
 hitAttributeEXT vec2 attribs; // Barycentric coordinates for the hit
 
-#include "../MeshMetadata.glsl"
+#include "../MaterialData.glsl"
+#include "../MeshData.glsl"
 #include "../MeshDataSampling.glsl"
 #include "../util/GridUtil.glsl"
 
 void main() {
-    uint metadataIndex = gl_InstanceCustomIndexEXT;
-    MeshMetadata metadata = meshMetadataBuffer.items[metadataIndex];
+    uint primitiveIndex = gl_InstanceCustomIndexEXT;
+    PrimitiveData primitive = primitiveBuffer.items[primitiveIndex];
+    MaterialData material = materialBuffer.items[primitive.materialIndex];
 
-    TriangleData tri = getTriangleData(metadata, gl_PrimitiveID);
+    TriangleData tri = getTriangleData(primitive, gl_PrimitiveID);
 
     const vec3 barycentrics = vec3(1.0 - attribs.x - attribs.y, attribs.x, attribs.y);
     
@@ -29,7 +32,7 @@ void main() {
     payload.hitNormal = normalize(vec3(gl_ObjectToWorldEXT * vec4(normal, 0.0)));
     payload.uv = uv;
 
-    payload.renderIndex = metadata.renderIndex;
+    payload.renderIndex = primitive.materialIndex;
 
     vec3 baseColor = vec3(1.0);
     float roughness = 1.0;
@@ -40,27 +43,27 @@ void main() {
     bool isEmissive = false;
 
     payload.alpha = 1.0;
-    if (metadata.albedoTexture != 0u) {
-        vec4 alb = texture(textureArray[nonuniformEXT(metadata.albedoTexture)], uv);
+    if (material.albedoTexture != 0u) {
+        vec4 alb = texture(textureArray[nonuniformEXT(material.albedoTexture)], uv);
         payload.alpha = alb.a;
         baseColor = alb.rgb;
     } else {
         baseColor = getDebugGrid(payload.hitPosition).baseColor;
     }
-    if (metadata.roughnessTexture != 0u) {
-        roughness = texture(textureArray[nonuniformEXT(metadata.roughnessTexture)], uv).r;
+    if (material.roughnessTexture != 0u) {
+        roughness = texture(textureArray[nonuniformEXT(material.roughnessTexture)], uv).r;
     } else {
         roughness = getDebugGrid(payload.hitPosition).roughness;
     }
-    if (metadata.metallicTexture != 0u) {
-        metallic = texture(textureArray[nonuniformEXT(metadata.metallicTexture)], uv).r;
+    if (material.metallicTexture != 0u) {
+        metallic = texture(textureArray[nonuniformEXT(material.metallicTexture)], uv).r;
     } else {
         metallic = getDebugGrid(payload.hitPosition).metallic;
     }
-    transmission = metadata.transmission;
-    thickness = metadata.thickness;
-    ior = metadata.ior;
-    isEmissive = metadata.isEmissive == 1u;
+    transmission = material.transmission;
+    thickness = material.thickness;
+    ior = material.ior;
+    isEmissive = material.isEmissive == 1u;
 
     payload.material.baseColor = baseColor;
     payload.material.roughness = max(roughness, 0.015);

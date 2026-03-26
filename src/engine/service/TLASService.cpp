@@ -2,7 +2,8 @@
 #include <core/VulkanContext.h>
 #include <engine/service/BufferService.h>
 #include <engine/service/BLASService.h>
-#include <engine/service/PrimitiveService.h>
+#include <engine/dto/PrimitiveData.h>
+#include <engine/EngineContext.h>
 #include <engine/repository/WorldRepository.h>
 #include <engine/service/DescriptorSetService.h>
 #include <engine/service/PipelineService.h>
@@ -11,6 +12,7 @@
 #include <engine/dto/TransformComponent.h>
 #include <common/VulkanUtils.h>
 #include <common/LoggerUtil.h>
+#include <editor/enum/EngineResourceIDs.h>
 #include <editor/enum/engine-definitions.h>
 #include <engine/dto/DescriptorInstance.h>
 #include <engine/dto/DescriptorBinding.h>
@@ -38,6 +40,7 @@ namespace Metal {
         dirtyStateService->getDirtyEntities(DirtyType::Transform, true);
 
         buildTLAS();
+        updatePrimitiveBuffer();
 
         if (tlas != VK_NULL_HANDLE) {
             LOG_INFO("TLAS Updated");
@@ -67,6 +70,34 @@ namespace Metal {
 
             if (needsUpdate) {
                 descriptorSetService->Write(descriptor->vkDescriptorSet, descriptor->bindings);
+            }
+        }
+    }
+
+    void TLASService::updatePrimitiveBuffer() {
+        std::vector<PrimitiveData> primitiveDatas(MAX_MESH_INSTANCES);
+        auto view = worldRepository->registry.view<PrimitiveComponent>();
+
+        for (auto entity: view) {
+            if (worldRepository->hiddenEntities.contains(entity)) continue;
+            auto &meshComp = view.get<PrimitiveComponent>(entity);
+            if (meshComp.meshId.empty() || meshComp.renderIndex == 0xFFFFFFFF) continue;
+
+            if (meshComp.renderIndex < MAX_MESH_INSTANCES) {
+                auto *blas = blasService->buildBLAS(meshComp.meshId);
+                if (blas && blas->vertexData && blas->indexData) {
+                    auto &primitiveData = primitiveDatas[meshComp.renderIndex];
+                    primitiveData.materialIndex = meshComp.renderIndex;
+                    primitiveData.vertexBufferAddress = getDeviceAddress(blas->vertexData->vkBuffer);
+                    primitiveData.indexBufferAddress = getDeviceAddress(blas->indexData->vkBuffer);
+                }
+            }
+        }
+
+        for (auto *frame: engineContext->registeredFrames) {
+            auto *buffer = frame->getResourceAs<BufferInstance>(RID_PRIMITIVE_DATA_BUFFER);
+            if (buffer) {
+                buffer->update(primitiveDatas.data(), primitiveDatas.size() * sizeof(PrimitiveData));
             }
         }
     }

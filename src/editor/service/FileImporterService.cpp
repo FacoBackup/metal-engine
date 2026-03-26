@@ -38,11 +38,12 @@ namespace Metal {
                              if (importer->isCompatible(file->absolutePath)) {
                                  notificationService->pushMessage("Importing...",
                                                                   NotificationSeverities::WARNING);
-                                 importer->importData(directoryService->rootDirectory,
+                                 importer->importData(directoryService->getRootDirectory(),
                                                       file->absolutePath, settings, token);
 
-                                 notificationService->pushMessage("Successfully imported file: " + fileName,
-                                                                  NotificationSeverities::SUCCESS);
+                                 notificationService->pushMessage(
+                                     "Imported file to the root directory",
+                                     NotificationSeverities::WARNING);
                                  return;
                              }
                          }

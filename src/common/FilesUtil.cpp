@@ -51,7 +51,7 @@ namespace Metal::FilesUtil {
         if (std::filesystem::exists(pathToDir)) {
             return;
         }
-        std::filesystem::create_directory(pathToDir);
+        std::filesystem::create_directories(pathToDir);
     }
 
     std::string FormatSize(size_t sizeInBytes) {

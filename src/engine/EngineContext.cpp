@@ -17,7 +17,7 @@
 #include "editor/enum/EngineResourceIDs.h"
 #include "resource/BufferInstance.h"
 #include "dto/TransformComponent.h"
-#include "service/PrimitiveService.h"
+#include "service/MaterialService.h"
 
 namespace Metal {
     void EngineContext::resetPathTracerAccumulationCount() const {
@@ -64,7 +64,7 @@ namespace Metal {
             blasService->onSync();
             tlasService->onSync();
         }
-        primitiveService->onSync();
+        materialService->onSync();
         cameraService->onSync();
         lightService->onSync();
         volumeService->onSync();
