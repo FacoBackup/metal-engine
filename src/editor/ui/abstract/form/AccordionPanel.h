@@ -11,12 +11,12 @@ namespace Metal {
         std::string fixedId = id;
         std::string title;
         bool isOpen = false;
-        ImVec4 backgroundColor = {0, 0, 0, 0};
+        ImVec4 *backgroundColor = nullptr;
 
     public:
         void setTitle(const std::string &title);
 
-        void setBackgroundColor(const ImVec4 &color) { this->backgroundColor = color; }
+        void setBackgroundColor(ImVec4 *color) { this->backgroundColor = color; }
 
         void onSync() override;
 

@@ -11,12 +11,12 @@ namespace Metal {
     }
 
     void AccordionPanel::onSync() {
-        if (title.empty()) {
+        if (title.empty() || backgroundColor == nullptr) {
             onSyncChildren();
             return;
         }
 
-        ImVec4 color = backgroundColor.w == 0 ? themeService->palette3 : backgroundColor;
+        ImVec4 color = backgroundColor->w == 0 ? themeService->palette3 : *backgroundColor;
         if (UIUtil::Accordion(fixedId, title, isOpen, color)) {
             ImGui::Indent(15.0f);
             onSyncChildren();
@@ -28,7 +28,7 @@ namespace Metal {
     bool AccordionPanel::isVisible() const {
         if (!filter || filter->empty()) return true;
 
-        for (const auto &panel : children) {
+        for (const auto &panel: children) {
             if (auto abstractPanel = std::dynamic_pointer_cast<AbstractFormFieldPanel>(panel)) {
                 if (abstractPanel->isVisible()) return true;
             }
