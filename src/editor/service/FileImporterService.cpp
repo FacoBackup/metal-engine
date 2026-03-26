@@ -28,18 +28,18 @@ namespace Metal {
             }
         }
 
-        std::string fileName = file->name.substr(
-            file->absolutePath.find_last_of(std::filesystem::path::preferred_separator) + 1);
+        std::string fileName = file->name;
+        std::string absolutePath = file->absolutePath;
         runAsync("Import file: " + fileName,
-                 [this, file, fileName, settings](const std::stop_token &token) {
+                 [this, absolutePath, fileName, settings](const std::stop_token &token) {
                      try {
                          auto importers = ctx->getSingletons<AbstractImporter>();
                          for (auto *importer: importers) {
-                             if (importer->isCompatible(file->absolutePath)) {
+                             if (importer->isCompatible(absolutePath)) {
                                  notificationService->pushMessage("Importing...",
                                                                   NotificationSeverities::WARNING);
                                  importer->importData(directoryService->getRootDirectory(),
-                                                      file->absolutePath, settings, token);
+                                                      absolutePath, settings, token);
 
                                  notificationService->pushMessage(
                                      "Imported file to the root directory",
