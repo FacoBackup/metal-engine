@@ -14,22 +14,24 @@ namespace Metal {
     }
 
     void AIAssistantRepository::registerFields() {
-        registerSerializableOnlyField(&chats, COMPOSITE, "chats").setTransformer(
-                [this] {
-                    nlohmann::json j = nlohmann::json::array();
-                    for (const auto &c: chats) {
-                        if (c) j.push_back(c->toJson());
-                    }
-                    return j;
-                },
-                [this](const nlohmann::json &j) {
-                    chats.clear();
-                    for (const auto &item: j) {
-                        auto c = std::make_shared<Chat>();
-                        c->fromJson(item);
-                        chats.push_back(c);
-                    }
-                });
+        auto chatsToJson = [this] {
+            nlohmann::json j = nlohmann::json::array();
+            for (const auto &c: chats) {
+                if (c) j.push_back(c->toJson());
+            }
+            return j;
+        };
+
+        auto chatsFromJson = [this](const nlohmann::json &j) {
+            chats.clear();
+            for (const auto &item: j) {
+                auto c = std::make_shared<Chat>();
+                c->fromJson(item);
+                chats.push_back(c);
+            }
+        };
+
+        registerGenericField(chatsToJson, chatsFromJson).setName("chats");
     }
 
     std::shared_ptr<Chat> AIAssistantRepository::findChatById(const std::string &id) {

@@ -11,14 +11,14 @@ namespace Metal {
             Metal::FileExtensions::jpeg.get(),
             Metal::FileExtensions::tga.get()
         };
-        registerEditableField(&meshId, RESOURCE, "Mesh", "").setSupportedFileTypes(meshExtensions);
-        registerEditableField(&transmissionFactor, FLOAT, "Transmission factor", "").setMin(0).setMax(1);
-        registerEditableField(&thicknessFactor, FLOAT, "Thickness factor", "").setMin(0).setMax(10);
-        registerEditableField(&ior, FLOAT, "IOR", "").setMin(1).setMax(3);
-        registerEditableField(&albedo, RESOURCE, "Albedo", "").setSupportedFileTypes(textureExtensions);
-        registerEditableField(&roughness, RESOURCE, "Roughness texture", "").setSupportedFileTypes(textureExtensions);
-        registerEditableField(&metallic, RESOURCE, "Metallic Texture", "").setSupportedFileTypes(textureExtensions);
-        registerSerializableOnlyField(&renderIndex, INT, "renderIndex");
+        registerEditableField<RESOURCE>(&meshId).setName("Mesh").setGroup("").setSupportedFileTypes(meshExtensions);
+        registerEditableField<FLOAT>(&transmissionFactor).setName("Transmission factor").setGroup("").setMin(0).setMax(1);
+        registerEditableField<FLOAT>(&thicknessFactor).setName("Thickness factor").setGroup("").setMin(0).setMax(10);
+        registerEditableField<FLOAT>(&ior).setName("IOR").setGroup("").setMin(1).setMax(3);
+        registerEditableField<RESOURCE>(&albedo).setName("Albedo").setGroup("").setSupportedFileTypes(textureExtensions);
+        registerEditableField<RESOURCE>(&roughness).setName("Roughness texture").setGroup("").setSupportedFileTypes(textureExtensions);
+        registerEditableField<RESOURCE>(&metallic).setName("Metallic Texture").setGroup("").setSupportedFileTypes(textureExtensions);
+        registerSerializableOnlyField<UINT>(&renderIndex).setName("renderIndex");
     }
 
     ComponentType PrimitiveComponent::getType() const {

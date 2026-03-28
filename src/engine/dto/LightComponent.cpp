@@ -2,7 +2,7 @@
 
 namespace Metal {
     void LightComponent::registerFields() {
-        registerEditableField(&color, COLOR, "Color", "");
+        registerEditableField<COLOR>(&color).setName("Color").setGroup("");
     }
 
     ComponentType LightComponent::getType() const {

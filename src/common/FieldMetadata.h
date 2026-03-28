@@ -98,6 +98,16 @@ namespace Metal {
             return *this;
         }
 
+        FieldMetadata &setName(std::string n) {
+            name = std::move(n);
+            return *this;
+        }
+
+        FieldMetadata &setGroup(std::string g) {
+            group = std::move(g);
+            return *this;
+        }
+
         FieldMetadata &setSupportedFileTypes(const std::vector<const FileExtensionInfo *> &types) {
             supportedFileTypes = types;
             return *this;

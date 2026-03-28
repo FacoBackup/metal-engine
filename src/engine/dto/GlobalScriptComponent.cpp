@@ -3,7 +3,7 @@
 
 namespace Metal {
     void GlobalScriptComponent::registerFields() {
-        registerEditableField(&scriptPath, RESOURCE, "Script Path", "").setSupportedFileTypes(Metal::FileExtensions::scripts);
+        registerEditableField<RESOURCE>(&scriptPath).setName("Script Path").setGroup("").setSupportedFileTypes(Metal::FileExtensions::scripts);
     }
 
     ComponentType GlobalScriptComponent::getType() const {

@@ -1,6 +1,7 @@
 #include "DockDefinition.h"
 
 #include "DockSpace.h"
+#include "common/FieldType.h"
 
 namespace Metal {
     bool DockDefinition::isCenter() const {
@@ -20,13 +21,13 @@ namespace Metal {
     }
 
     void DockDefinition::registerFields() {
-        registerSerializableOnlyField(&id, STRING, "id");
-        registerSerializableOnlyField(&selectedOption, INT, "selectedOption");
-        registerSerializableOnlyField(&internalId, STRING, "internalId");
-        registerSerializableOnlyField(&splitDir, INT, "splitDir");
-        registerSerializableOnlyField(&sizeX, FLOAT, "sizeX");
-        registerSerializableOnlyField(&sizeY, FLOAT, "sizeY");
-        registerSerializableOnlyField(&sizeRatioForNodeAtDir, FLOAT, "sizeRatioForNodeAtDir");
+        registerSerializableOnlyField<STRING>(&id).setName("id");
+        registerSerializableOnlyField<INT>(&selectedOption).setName("selectedOption");
+        registerSerializableOnlyField<STRING>(&internalId).setName("internalId");
+        registerSerializableOnlyField<INT>((int *) &splitDir).setName("splitDir");
+        registerSerializableOnlyField<FLOAT>(&sizeX).setName("sizeX");
+        registerSerializableOnlyField<FLOAT>(&sizeY).setName("sizeY");
+        registerSerializableOnlyField<FLOAT>(&sizeRatioForNodeAtDir).setName("sizeRatioForNodeAtDir");
 
         auto dockSpacesToJson = [this] {
             std::vector<int> spaces;
@@ -47,7 +48,6 @@ namespace Metal {
             }
         };
 
-        registerSerializableOnlyField(&dockSpaces, COMPOSITE, "dockSpaces")
-                .setTransformer(dockSpacesToJson, dockSpacesFromJson);
+        registerGenericField(dockSpacesToJson, dockSpacesFromJson).setName("dockSpaces");
     }
 }

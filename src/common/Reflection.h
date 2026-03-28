@@ -19,16 +19,57 @@ namespace Metal {
         bool fieldsRegistered = false;
 
     public:
+        Reflection() = default;
+
         Reflection(const Reflection &other)
-            : uniqueIdentifier(other.uniqueIdentifier),
-              fields(other.fields),
-              fieldsRegistered(other.fieldsRegistered) {
+            : uniqueIdentifier(other.uniqueIdentifier) {
         }
 
-    protected:
-        FieldMetadata &registerSerializableOnlyField(void *pointer, FieldType type, std::string name);
+        virtual ~Reflection() = default;
 
-        FieldMetadata &registerEditableField(void *pointer, FieldType type, std::string name, std::string group);
+    protected:
+        template<FieldType FT>
+        FieldMetadata &registerSerializableOnlyField(void *pointer) {
+            return registerFieldInternal(pointer, FT, SERIALIZABLE);
+        }
+
+        template<FieldType FT, typename T>
+        FieldMetadata &registerSerializableOnlyField(T *pointer) {
+            if constexpr (FT != COMPOSITE && FT != GENERIC) {
+                static_assert(std::is_same_v<typename TypeToCpp<FT>::Type, T>, "Field type mismatch");
+            }
+            return registerFieldInternal(static_cast<void *>(pointer), FT, SERIALIZABLE);
+        }
+
+        template<FieldType FT>
+        FieldMetadata &registerEditableField(void *pointer) {
+            return registerFieldInternal(pointer, FT, DEFAULT);
+        }
+
+        template<FieldType FT, typename T>
+        FieldMetadata &registerEditableField(T *pointer) {
+            if constexpr (FT != COMPOSITE && FT != GENERIC) {
+                static_assert(std::is_same_v<typename TypeToCpp<FT>::Type, T>, "Field type mismatch");
+            }
+            return registerFieldInternal(static_cast<void *>(pointer), FT, DEFAULT);
+        }
+
+        template<typename T>
+        FieldMetadata &registerCompositeField(T *pointer, UsageFlags flags = SERIALIZABLE) {
+            static_assert(std::is_base_of_v<Reflection, T>, "Field type must extend Reflection");
+            return registerFieldInternal(static_cast<void *>(pointer), COMPOSITE, flags);
+        }
+
+        FieldMetadata &registerGenericField(std::function<nlohmann::json()> toJson,
+                                           std::function<void(const nlohmann::json &)> fromJson,
+                                           UsageFlags flags = SERIALIZABLE) {
+            auto &field = registerFieldInternal(nullptr, GENERIC, flags);
+            field.setTransformer(std::move(toJson), std::move(fromJson));
+            return field;
+        }
+
+    private:
+        FieldMetadata &registerFieldInternal(void *pointer, FieldType type, UsageFlags flags);
 
     public:
         virtual void registerFields() {
@@ -54,9 +95,6 @@ namespace Metal {
         nlohmann::json getFieldValue(UsageFlags filter, bool isVerbose,
                                      const std::vector<std::shared_ptr<FieldMetadata> >::value_type &field) const;
 
-        Reflection() = default;
-
-        virtual ~Reflection() = default;
 
         [[nodiscard]] std::string getUniqueId() const {
             return uniqueIdentifier;

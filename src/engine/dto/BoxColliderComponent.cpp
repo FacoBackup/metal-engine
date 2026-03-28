@@ -3,8 +3,8 @@
 
 namespace Metal {
     void BoxColliderComponent::registerFields() {
-        registerEditableField(&halfExtents, VECTOR3, "Half Extents", "");
-        registerEditableField(&offset, VECTOR3, "Offset", "");
+        registerEditableField<VECTOR3>(&halfExtents).setName("Half Extents").setGroup("");
+        registerEditableField<VECTOR3>(&offset).setName("Offset").setGroup("");
     }
 
     ComponentType BoxColliderComponent::getType() const {

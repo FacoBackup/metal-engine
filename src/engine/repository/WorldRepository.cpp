@@ -224,9 +224,8 @@ namespace Metal {
             }
         };
 
-        registerSerializableOnlyField(&camera, COMPOSITE, "camera");
-        registerSerializableOnlyField(&hiddenEntities, COMPOSITE, "hiddenEntities")
-                .setTransformer(hiddenEntitiesToJson, hiddenEntitiesFromJson);
+        registerCompositeField(&camera).setName("camera");
+        registerGenericField(hiddenEntitiesToJson, hiddenEntitiesFromJson).setName("hiddenEntities");
 
         auto registryToJson = [this] {
             nlohmann::json entitiesJson;
@@ -270,8 +269,7 @@ namespace Metal {
             }
         };
 
-        registerSerializableOnlyField(nullptr, COMPOSITE, "registry")
-                .setTransformer(registryToJson, registryFromJson);
+        registerGenericField(registryToJson, registryFromJson).setName("registry");
     }
 
     void WorldRepository::deserializeEntityComplete(const EntityState &state) {

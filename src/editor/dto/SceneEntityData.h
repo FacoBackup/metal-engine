@@ -15,8 +15,8 @@ namespace Metal {
 
     protected:
         void registerFields() override {
-            registerSerializableOnlyField(&entity, COMPOSITE, "entity");
-            registerSerializableOnlyField(&transform, COMPOSITE, "transform");
+            registerCompositeField(&entity).setName("entity");
+            registerCompositeField(&transform).setName("transform");
 
             auto primitiveToJson = [this] {
                 if (primitive) return primitive->toJson();
@@ -24,7 +24,7 @@ namespace Metal {
             };
 
             auto primitiveFromJson = [this](const nlohmann::json &j) {
-                if (!j.is_null()) {
+                if (!j.is_null() && !j.empty()) {
                     primitive = PrimitiveComponent();
                     primitive->fromJson(j);
                 } else {
@@ -32,8 +32,7 @@ namespace Metal {
                 }
             };
 
-            registerSerializableOnlyField(nullptr, COMPOSITE, "primitive")
-                    .setTransformer(primitiveToJson, primitiveFromJson);
+            registerGenericField(primitiveToJson, primitiveFromJson).setName("primitive");
         }
     };
 }

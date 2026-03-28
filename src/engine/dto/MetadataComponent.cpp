@@ -2,7 +2,7 @@
 
 namespace Metal {
     void MetadataComponent::registerFields() {
-        registerEditableField(&name, STRING, "Name", "");
+        registerEditableField<STRING>(&name).setName("Name").setGroup("");
     }
 
     ComponentType MetadataComponent::getType() const {

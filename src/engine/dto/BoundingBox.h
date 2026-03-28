@@ -10,9 +10,9 @@ namespace Metal {
         glm::vec3 center = glm::vec3(0.0f);
 
         void registerFields() override {
-            registerSerializableOnlyField(&min, VECTOR3, "min");
-            registerSerializableOnlyField(&max, VECTOR3, "max");
-            registerSerializableOnlyField(&center, VECTOR3, "center");
+            registerSerializableOnlyField<VECTOR3>(&min).setName("min");
+            registerSerializableOnlyField<VECTOR3>(&max).setName("max");
+            registerSerializableOnlyField<VECTOR3>(&center).setName("center");
         }
 
         bool intersects(const BoundingBox &bb) const {

@@ -3,9 +3,9 @@
 
 namespace Metal {
     void ScopedScriptComponent::registerFields() {
-        registerEditableField(&onCreatePath, RESOURCE, "On Create", "").setSupportedFileTypes(Metal::FileExtensions::scripts);
-        registerEditableField(&onUpdatePath, RESOURCE, "On Update", "").setSupportedFileTypes(Metal::FileExtensions::scripts);
-        registerEditableField(&onDestroyPath, RESOURCE, "On Destroy", "").setSupportedFileTypes(Metal::FileExtensions::scripts);
+        registerEditableField<RESOURCE>(&onCreatePath).setName("On Create").setGroup("").setSupportedFileTypes(Metal::FileExtensions::scripts);
+        registerEditableField<RESOURCE>(&onUpdatePath).setName("On Update").setGroup("").setSupportedFileTypes(Metal::FileExtensions::scripts);
+        registerEditableField<RESOURCE>(&onDestroyPath).setName("On Destroy").setGroup("").setSupportedFileTypes(Metal::FileExtensions::scripts);
     }
 
     ComponentType ScopedScriptComponent::getType() const {

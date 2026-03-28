@@ -21,7 +21,7 @@ For building the project, use this pattern:
 
 ### **3. Specialized Engine Interfaces**
 
-* **Serialization:** For any object requiring data persistence or state saving, extend the `ISerializable` class.
+* **Serialization:** For any object requiring data persistence or state saving, extend the `Reflection` class.
 * **Asynchronous Logic:** For logic that must loop throughout the engine's lifecycle (e.g., background streaming,
   physics stepping), implement the `IAsyncSync` interface.
 

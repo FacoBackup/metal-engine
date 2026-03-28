@@ -12,18 +12,21 @@ namespace Metal {
         unsigned int voxelBufferOffset;
 
         void registerFields() override {
-            registerSerializableOnlyField(&voxelBufferOffset, INT, "voxelBufferOffset");
-            registerSerializableOnlyField(&data, COMPOSITE, "data").setTransformer(
-                [this] {
-                    nlohmann::json j = nlohmann::json::array();
-                    for (unsigned int c: data) {
-                        if (c) j.push_back(c);
-                    }
-                    return j;
-                },
-                [this](const nlohmann::json &j) {
-                    data = j.at("data").get<std::vector<unsigned int> >();
-                });
+            registerSerializableOnlyField<UINT>(&voxelBufferOffset).setName("voxelBufferOffset");
+
+            auto dataToJson = [this] {
+                nlohmann::json j = nlohmann::json::array();
+                for (unsigned int c: data) {
+                    if (c) j.push_back(c);
+                }
+                return j;
+            };
+
+            auto dataFromJson = [this](const nlohmann::json &j) {
+                data = j.get<std::vector<unsigned int>>();
+            };
+
+            registerGenericField(dataToJson, dataFromJson).setName("data");
         }
     };
 }

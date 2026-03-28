@@ -4,7 +4,7 @@
 
 namespace Metal {
     void DockRepository::registerFields() {
-        registerSerializableOnlyField(&center, COMPOSITE, "center").setTransformer(
+        registerSerializableOnlyField<GENERIC>(nullptr).setName("center").setTransformer(
             [this] {
                 if (center == nullptr) return nlohmann::json(nullptr);
                 return center->toJson();
@@ -33,13 +33,13 @@ namespace Metal {
             }
         };
 
-        registerSerializableOnlyField(&left, COMPOSITE, "left").setTransformer(
+        registerSerializableOnlyField<GENERIC>(nullptr).setName("left").setTransformer(
             [this, dockListToJson] { return dockListToJson(left); },
             [this, dockListFromJson](const nlohmann::json &j) { dockListFromJson(j, left); });
-        registerSerializableOnlyField(&right, COMPOSITE, "right").setTransformer(
+        registerSerializableOnlyField<GENERIC>(nullptr).setName("right").setTransformer(
             [this, dockListToJson] { return dockListToJson(right); },
             [this, dockListFromJson](const nlohmann::json &j) { dockListFromJson(j, right); });
-        registerSerializableOnlyField(&bottom, COMPOSITE, "bottom").setTransformer(
+        registerSerializableOnlyField<GENERIC>(nullptr).setName("bottom").setTransformer(
             [this, dockListToJson] { return dockListToJson(bottom); },
             [this, dockListFromJson](const nlohmann::json &j) { dockListFromJson(j, bottom); });
     }

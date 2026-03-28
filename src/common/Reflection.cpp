@@ -9,31 +9,13 @@
 #include "LoggerUtil.h"
 
 namespace Metal {
-    FieldMetadata &Reflection::registerSerializableOnlyField(void *pointer, FieldType type, std::string name) {
+    FieldMetadata &Reflection::registerFieldInternal(void *pointer, FieldType type, UsageFlags flags) {
         auto field = std::make_shared<FieldMetadata>();
-        field->name = std::move(name);
         field->id = "##" + Util::uuidV4();
-        field->nameWithId = field->name + field->id;
         field->type = type;
         field->instance = this;
         field->pointer = pointer;
-        field->flags = SERIALIZABLE;
-        fields.push_back(field);
-        return *field;
-    }
-
-    FieldMetadata &Reflection::registerEditableField(void *pointer, FieldType type, std::string name,
-                                                     std::string group) {
-        auto field = std::make_shared<FieldMetadata>();
-        field->name = std::move(name);
-        field->id = "##" + Util::uuidV4();
-        field->nameWithId = field->name + field->id;
-        field->group = std::move(group);
-        field->path = field->group + "/" + field->name;
-        field->type = type;
-        field->instance = this;
-        field->pointer = pointer;
-        field->flags = DEFAULT;
+        field->flags = flags;
         fields.push_back(field);
         return *field;
     }
@@ -57,18 +39,25 @@ namespace Metal {
         return nullptr;
     }
 
-    std::vector<std::shared_ptr<FieldMetadata> > Reflection::getFields(std::optional<UsageFlags> filter) {
+    std::vector<std::shared_ptr<FieldMetadata>> Reflection::getFields(std::optional<UsageFlags> filter) {
         if (!fieldsRegistered) {
             fieldsRegistered = true;
             registerFields();
+            for (auto &field: fields) {
+                field->nameWithId = field->name + field->id;
+                if (!field->group.empty()) {
+                    field->path = field->group + "/" + field->name;
+                } else {
+                    field->path = field->name;
+                }
+            }
         }
 
         if (!filter.has_value()) {
             return fields;
         }
 
-        std::vector<std::shared_ptr<FieldMetadata> > filteredFields;
-        filteredFields.clear();
+        std::vector<std::shared_ptr<FieldMetadata>> filteredFields;
         for (const auto &field: fields) {
             if (field->flags & filter.value()) {
                 filteredFields.push_back(field);
@@ -83,10 +72,15 @@ namespace Metal {
         nlohmann::json val;
         if (field->transformer) {
             val = field->transformer->toJson();
+        } else if (field->type == GENERIC) {
+            LOG_ERROR("Field " + field->name + " is GENERIC but does not have a transformer");
+            throw std::runtime_error("Field " + field->name + " is GENERIC but does not have a transformer");
         } else if (field->type == BOOLEAN) {
             val = *static_cast<bool *>(field->pointer);
         } else if (field->type == INT) {
             val = *static_cast<int *>(field->pointer);
+        } else if (field->type == UINT) {
+            val = *static_cast<unsigned int *>(field->pointer);
         } else if (field->type == FLOAT) {
             val = *static_cast<float *>(field->pointer);
         } else if (field->type == STRING || field->type == RESOURCE) {
@@ -103,6 +97,12 @@ namespace Metal {
         } else if (field->type == QUAT) {
             auto q = *static_cast<glm::quat *>(field->pointer);
             val = {{"x", q.x}, {"y", q.y}, {"z", q.z}, {"w", q.w}};
+        } else if (field->type == MAT4) {
+            auto m = *static_cast<glm::mat4 *>(field->pointer);
+            val = nlohmann::json::array();
+            for (int i = 0; i < 4; ++i)
+                for (int k = 0; k < 4; ++k)
+                    val.push_back(m[i][k]);
         } else if (field->type == COMPOSITE) {
             if (auto *reflectionInstance = dynamic_cast<Reflection *>(static_cast<Reflection *>(field->pointer))) {
                 val = reflectionInstance->toJson(filter, isVerbose);
@@ -175,10 +175,15 @@ namespace Metal {
     void Reflection::applyValueFromJson(const std::shared_ptr<FieldMetadata> &field, const nlohmann::json &val) {
         if (field->transformer) {
             field->transformer->fromJson(val);
+        } else if (field->type == GENERIC) {
+            LOG_ERROR("Field " + field->name + " is GENERIC but does not have a transformer");
+            throw std::runtime_error("Field " + field->name + " is GENERIC but does not have a transformer");
         } else if (field->type == BOOLEAN) {
             *static_cast<bool *>(field->pointer) = val.get<bool>();
         } else if (field->type == INT) {
             *static_cast<int *>(field->pointer) = val.get<int>();
+        } else if (field->type == UINT) {
+            *static_cast<unsigned int *>(field->pointer) = val.get<unsigned int>();
         } else if (field->type == FLOAT) {
             *static_cast<float *>(field->pointer) = val.get<float>();
         } else if (field->type == STRING || field->type == RESOURCE) {
@@ -204,6 +209,11 @@ namespace Metal {
             q.y = val.at("y").get<float>();
             q.z = val.at("z").get<float>();
             q.w = val.at("w").get<float>();
+        } else if (field->type == MAT4) {
+            auto &m = *static_cast<glm::mat4 *>(field->pointer);
+            for (int i = 0; i < 4; ++i)
+                for (int k = 0; k < 4; ++k)
+                    m[i][k] = val.at(i * 4 + k).get<float>();
         } else if (field->type == COMPOSITE) {
             if (auto *reflectionInstance = dynamic_cast<Reflection *>(static_cast<Reflection *>(field->pointer))) {
                 reflectionInstance->fromJson(val);

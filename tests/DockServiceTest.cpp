@@ -7,16 +7,29 @@
 namespace Metal {
     class DockServiceTest : public ::testing::Test {
     protected:
-        std::unique_ptr<DockService> dockService;
+        std::unique_ptr<ApplicationContext> context;
+        DockService *dockService = nullptr;
+        DockRepository *dockRepository = nullptr;
 
         void SetUp() override {
-            dockService = std::make_unique<DockService>();
+            context = std::make_unique<ApplicationContext>(true);
+
+            auto repo = std::make_shared<DockRepository>();
+            auto service = std::make_shared<DockService>();
+
+            context->registerSingleton<DockRepository>(repo);
+            context->registerSingleton<DockService>(service);
+
+            context->injectDependencies(repo.get());
+            context->injectDependencies(service.get());
+            context->onInitialize();
+
+            dockRepository = repo.get();
+            dockService = service.get();
         }
     };
 
     TEST_F(DockServiceTest, InitializationPopulatesVectors) {
-        dockService->onInitialize();
-
         EXPECT_NE(dockService->getCenter(), nullptr);
         EXPECT_TRUE(dockService->getCenter()->isCenter());
 
@@ -26,7 +39,6 @@ namespace Metal {
     }
 
     TEST_F(DockServiceTest, RemoveDockRemovesFromLeft) {
-        dockService->onInitialize();
         dockService->setIsInitialized(true);
 
         auto dockToRemove = dockService->getLeft()[0];
@@ -37,7 +49,6 @@ namespace Metal {
     }
 
     TEST_F(DockServiceTest, RemoveDockRemovesFromRight) {
-        dockService->onInitialize();
         dockService->setIsInitialized(true);
 
         auto dockToRemove = dockService->getRight()[0];
@@ -48,7 +59,6 @@ namespace Metal {
     }
 
     TEST_F(DockServiceTest, RemoveDockRemovesFromBottom) {
-        dockService->onInitialize();
         dockService->setIsInitialized(true);
 
         auto dockToRemove = dockService->getBottom()[0];
@@ -59,7 +69,6 @@ namespace Metal {
     }
 
     TEST_F(DockServiceTest, RemoveCenterDockDoesNothing) {
-        dockService->onInitialize();
         dockService->setIsInitialized(true);
 
         auto center = dockService->getCenter();
@@ -70,7 +79,6 @@ namespace Metal {
     }
 
     TEST_F(DockServiceTest, RemoveNullDockDoesNothing) {
-        dockService->onInitialize();
         dockService->setIsInitialized(true);
 
         dockService->removeDock(nullptr);
@@ -79,7 +87,6 @@ namespace Metal {
     }
 
     TEST_F(DockServiceTest, AddDocksIncrementsSizesAndResetsInitialization) {
-        dockService->onInitialize();
         dockService->setIsInitialized(true);
 
         dockService->addLeftDock();

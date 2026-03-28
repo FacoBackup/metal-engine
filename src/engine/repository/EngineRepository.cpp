@@ -12,27 +12,27 @@
 
 namespace Metal {
     void EngineRepository::registerFields() {
-        registerEditableField(&shadingResInvScale, INT, "Shading inverted resolution scale", "Display settings (Restart required)").setMin(1).setMax(16);
-        registerEditableField(&vsync, BOOLEAN, "VSync?", "Display settings (Restart required)");
+        registerEditableField<INT>(&shadingResInvScale).setName("Shading inverted resolution scale").setGroup("Display settings (Restart required)").setMin(1).setMax(16);
+        registerEditableField<BOOLEAN>(&vsync).setName("VSync?").setGroup("Display settings (Restart required)");
 
-        registerEditableField(&volumeShadowSteps, INT, "Shadow steps", VOLUMES).setMin(1);
+        registerEditableField<INT>(&volumeShadowSteps).setName("Shadow steps").setGroup(VOLUMES).setMin(1);
 
-        registerEditableField(&pathTracerMultiplier, FLOAT, "Strength", PATH_TRACER);
-        registerEditableField(&denoiserEnabled, BOOLEAN, "Enable denoiser?", PATH_TRACER);
-        registerEditableField(&pathTracerMaxSamples, INT, "Maximum accumulation", PATH_TRACER).setMin(1).setMax(10000);
-        registerEditableField(&pathTracerSamples, INT, "Samples per pixel", PATH_TRACER).setMin(1).setMax(32);
-        registerEditableField(&pathTracerBounces, INT, "Bounces", PATH_TRACER).setMin(0).setMax(7);
-        registerEditableField(&pathTracingEmissiveFactor, FLOAT, "Emissive surface factor", PATH_TRACER).setMin(0);
+        registerEditableField<FLOAT>(&pathTracerMultiplier).setName("Strength").setGroup(PATH_TRACER);
+        registerEditableField<BOOLEAN>(&denoiserEnabled).setName("Enable denoiser?").setGroup(PATH_TRACER);
+        registerEditableField<INT>(&pathTracerMaxSamples).setName("Maximum accumulation").setGroup(PATH_TRACER).setMin(1).setMax(10000);
+        registerEditableField<INT>(&pathTracerSamples).setName("Samples per pixel").setGroup(PATH_TRACER).setMin(1).setMax(32);
+        registerEditableField<INT>(&pathTracerBounces).setName("Bounces").setGroup(PATH_TRACER).setMin(0).setMax(7);
+        registerEditableField<FLOAT>(&pathTracingEmissiveFactor).setName("Emissive surface factor").setGroup(PATH_TRACER).setMin(0);
 
-        registerEditableField(&dofEnabled, BOOLEAN, "Enable depth of field?", DEPTH_OF_FIELD);
-        registerEditableField(&dofFocusDistance, FLOAT, "Focus distance", DEPTH_OF_FIELD);
-        registerEditableField(&dofAperture, FLOAT, "Aperture", DEPTH_OF_FIELD);
-        registerEditableField(&dofFocalLength, FLOAT, "Focal length", DEPTH_OF_FIELD);
+        registerEditableField<BOOLEAN>(&dofEnabled).setName("Enable depth of field?").setGroup(DEPTH_OF_FIELD);
+        registerEditableField<FLOAT>(&dofFocusDistance).setName("Focus distance").setGroup(DEPTH_OF_FIELD);
+        registerEditableField<FLOAT>(&dofAperture).setName("Aperture").setGroup(DEPTH_OF_FIELD);
+        registerEditableField<FLOAT>(&dofFocalLength).setName("Focal length").setGroup(DEPTH_OF_FIELD);
 
-        registerEditableField(&atmosphereEnabled, BOOLEAN, "Enable atmosphere?", ATMOSPHERE);
-        registerEditableField(&elapsedTime, FLOAT, "Elapsed time", ATMOSPHERE);
+        registerEditableField<BOOLEAN>(&atmosphereEnabled).setName("Enable atmosphere?").setGroup(ATMOSPHERE);
+        registerEditableField<FLOAT>(&elapsedTime).setName("Elapsed time").setGroup(ATMOSPHERE);
 
-        registerEditableField(&gravity, VECTOR3, "Gravity", PHYSICS);
+        registerEditableField<VECTOR3>(&gravity).setName("Gravity").setGroup(PHYSICS);
     }
 
 

@@ -24,11 +24,11 @@ namespace Metal {
 
     protected:
         void registerFields() override {
-            registerSerializableOnlyField(&id, STRING, "id");
-            registerSerializableOnlyField(&name, STRING, "name");
-            registerSerializableOnlyField(&description, STRING, "description");
-            registerSerializableOnlyField(&result, STRING, "result");
-            registerSerializableOnlyField(&rawJson, STRING, "rawJson");
+            registerSerializableOnlyField<STRING>(&id).setName("id");
+            registerSerializableOnlyField<STRING>(&name).setName("name");
+            registerSerializableOnlyField<STRING>(&description).setName("description");
+            registerSerializableOnlyField<STRING>(&result).setName("result");
+            registerSerializableOnlyField<STRING>(&rawJson).setName("rawJson");
         }
     };
 
@@ -54,14 +54,30 @@ namespace Metal {
 
     protected:
         void registerFields() override {
-            registerSerializableOnlyField(&role, STRING, "role");
-            registerSerializableOnlyField(&content, STRING, "content");
-            registerSerializableOnlyField(&timestamp, STRING, "timestamp");
-            registerSerializableOnlyField(&promptTokens, INT, "promptTokens");
-            registerSerializableOnlyField(&completionTokens, INT, "completionTokens");
-            registerSerializableOnlyField(&totalTokens, INT, "totalTokens");
-            registerSerializableOnlyField(&renderedHeight, FLOAT, "renderedHeight");
-            registerSerializableOnlyField(&toolCalls, COMPOSITE, "toolCalls");
+            registerSerializableOnlyField<STRING>(&role).setName("role");
+            registerSerializableOnlyField<STRING>(&content).setName("content");
+            registerSerializableOnlyField<STRING>(&timestamp).setName("timestamp");
+            registerSerializableOnlyField<INT>(&promptTokens).setName("promptTokens");
+            registerSerializableOnlyField<INT>(&completionTokens).setName("completionTokens");
+            registerSerializableOnlyField<INT>(&totalTokens).setName("totalTokens");
+            registerSerializableOnlyField<FLOAT>(&renderedHeight).setName("renderedHeight");
+
+            auto toolCallsToJson = [this] {
+                nlohmann::json j = nlohmann::json::array();
+                for (auto &tc: toolCalls) j.push_back(tc.toJson());
+                return j;
+            };
+
+            auto toolCallsFromJson = [this](const nlohmann::json &j) {
+                toolCalls.clear();
+                for (const auto &item: j) {
+                    ToolCall tc;
+                    tc.fromJson(item);
+                    toolCalls.push_back(tc);
+                }
+            };
+
+            registerGenericField(toolCallsToJson, toolCallsFromJson).setName("toolCalls");
         }
     };
 
@@ -77,13 +93,29 @@ namespace Metal {
 
     protected:
         void registerFields() override {
-            registerSerializableOnlyField(&id, STRING, "id");
-            registerSerializableOnlyField(&name, STRING, "name");
-            registerSerializableOnlyField(&date, STRING, "date");
-            registerSerializableOnlyField(&totalPromptTokens, INT, "totalPromptTokens");
-            registerSerializableOnlyField(&totalCompletionTokens, INT, "totalCompletionTokens");
-            registerSerializableOnlyField(&totalTokens, INT, "totalTokens");
-            registerSerializableOnlyField(&messages, COMPOSITE, "messages");
+            registerSerializableOnlyField<STRING>(&id).setName("id");
+            registerSerializableOnlyField<STRING>(&name).setName("name");
+            registerSerializableOnlyField<STRING>(&date).setName("date");
+            registerSerializableOnlyField<INT>(&totalPromptTokens).setName("totalPromptTokens");
+            registerSerializableOnlyField<INT>(&totalCompletionTokens).setName("totalCompletionTokens");
+            registerSerializableOnlyField<INT>(&totalTokens).setName("totalTokens");
+
+            auto messagesToJson = [this] {
+                nlohmann::json j = nlohmann::json::array();
+                for (auto &m: messages) j.push_back(m.toJson());
+                return j;
+            };
+
+            auto messagesFromJson = [this](const nlohmann::json &j) {
+                messages.clear();
+                for (const auto &item: j) {
+                    ChatMessage m;
+                    m.fromJson(item);
+                    messages.push_back(m);
+                }
+            };
+
+            registerGenericField(messagesToJson, messagesFromJson).setName("messages");
         }
     };
 }

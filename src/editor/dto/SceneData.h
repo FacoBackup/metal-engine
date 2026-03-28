@@ -12,8 +12,8 @@ namespace Metal {
         std::string name;
 
         void registerFields() override {
-            registerSerializableOnlyField(&name, STRING, "name");
-            registerSerializableOnlyField(&entities, COMPOSITE, "entities");
+            registerSerializableOnlyField<STRING>(&name).setName("name");
+            registerSerializableOnlyField<COMPOSITE>(&entities).setName("entities");
         }
     };
 }
