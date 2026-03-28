@@ -11,7 +11,7 @@
 
 namespace Metal {
     struct EditorRepository;
-    struct DirectoryService;
+    class DirectoryService;
     struct AIAssistantRepository;
     class HttpService;
     class IToolProvider;

@@ -1,5 +1,6 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
+#include <stb_image.h>
 #include <dwmapi.h>
 #include <algorithm>
 #include "WindowService.h"
@@ -55,8 +56,9 @@ namespace Metal {
             SDL_PointInRect(pt, &rects.maximizeButton) ||
             SDL_PointInRect(pt, &rects.minimizeButton) ||
             SDL_PointInRect(pt, &rects.saveButton) ||
-            SDL_PointInRect(pt, &rects.undoButton) ||
-            SDL_PointInRect(pt, &rects.redoButton)) {
+            SDL_PointInRect(pt, &rects.projectNameButton) ||
+            SDL_PointInRect(pt, &rects.playStopButton) ||
+            SDL_PointInRect(pt, &rects.historyButton)) {
             return SDL_HITTEST_NORMAL;
         }
 
@@ -120,12 +122,52 @@ namespace Metal {
 
         SDL_ShowWindow(window);
 
+        // Load and set window icon
+        int width, height, channels;
+        unsigned char *pixels = stbi_load("resources/logo.png", &width, &height, &channels, 4);
+        if (pixels) {
+            SDL_Surface *icon = SDL_CreateSurfaceFrom(width, height, SDL_PIXELFORMAT_RGBA32, pixels, width * 4);
+            if (icon) {
+                SDL_SetWindowIcon(window, icon);
+                SDL_DestroySurface(icon);
+            }
+        }
+
         // Enable Windows 11 rounded corners and title bar color
         HWND hwnd = (HWND) SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HWND_POINTER,
                                                   NULL);
         if (hwnd) {
             DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_ROUND;
             DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
+
+            if (pixels) {
+                // Windows icons expect BGRA. We'll swap the channels in-place.
+                for (int i = 0; i < width * height; i++) {
+                    unsigned char temp = pixels[i * 4];
+                    pixels[i * 4] = pixels[i * 4 + 2];
+                    pixels[i * 4 + 2] = temp;
+                }
+
+                HBITMAP hbmColor = CreateBitmap(width, height, 1, 32, pixels);
+                HBITMAP hbmMask = CreateCompatibleBitmap(GetDC(NULL), width, height);
+
+                ICONINFO ii = {0};
+                ii.fIcon = TRUE;
+                ii.hbmColor = hbmColor;
+                ii.hbmMask = hbmMask;
+
+                HICON hIcon = CreateIconIndirect(&ii);
+                if (hIcon) {
+                    SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM) hIcon);
+                    SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM) hIcon);
+                }
+
+                DeleteObject(hbmColor);
+                DeleteObject(hbmMask);
+            }
+        }
+        if (pixels) {
+            stbi_image_free(pixels);
         }
     }
 

@@ -26,6 +26,8 @@ namespace Metal {
         void deleteChat(const std::string &id);
 
         std::shared_ptr<Chat> createNewChat();
+
+        void clear() override;
     };
 }
 

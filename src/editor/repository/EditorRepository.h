@@ -55,6 +55,11 @@ namespace Metal {
         std::string gptMcpKey{};
         std::string geminiMcpKey{};
 
+        bool enableSnapshots = true;
+        float snapshotInterval = 5.f; // in minutes
+
+        void clear() override;
+
         void registerFields() override;
 
         const char *getTitle() const override;

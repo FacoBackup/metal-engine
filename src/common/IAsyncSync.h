@@ -10,6 +10,8 @@ namespace Metal {
 
         virtual std::string getSyncThreadId() const = 0;
 
+        virtual float getSyncInterval() const = 0;
+
         virtual void onAsyncSync() = 0;
     };
 }

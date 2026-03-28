@@ -8,7 +8,7 @@
 #include "common/IService.h"
 
 namespace Metal {
-    struct DirectoryService;
+    class DirectoryService;
     struct FSEntry;
 
     class NotificationService;

@@ -8,7 +8,7 @@
 #include <stop_token>
 
 namespace Metal {
-    struct DirectoryService;
+    class DirectoryService;
     struct MeshId;
     struct MaterialData;
     struct MeshData;

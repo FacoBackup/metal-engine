@@ -63,6 +63,8 @@ namespace Metal {
 
         std::string getSyncThreadId() const override { return "physics_transform"; }
 
+        float getSyncInterval() const override { return 16.0f; } // ~60fps
+
         void onAsyncSync() override;
 
     private:

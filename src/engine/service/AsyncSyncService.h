@@ -8,6 +8,8 @@
 #include <atomic>
 #include <unordered_map>
 #include <string>
+#include <mutex>
+#include <condition_variable>
 
 namespace Metal {
     class ThreadManager;
@@ -31,6 +33,8 @@ namespace Metal {
     private:
         ThreadManager *threadManager = nullptr;
         std::atomic<bool> running{true};
+        std::mutex shutdownMutex;
+        std::condition_variable shutdownCv;
         std::unordered_map<std::string, std::vector<IAsyncSync *> > syncGroups;
 
         void runSyncLoop(const std::string &threadId);

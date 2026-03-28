@@ -27,6 +27,7 @@ namespace Metal {
 
     void AsyncSyncService::dispose() {
         running = false;
+        shutdownCv.notify_all();
     }
 
     void AsyncSyncService::runSyncLoop(const std::string& threadId) {
@@ -36,11 +37,25 @@ namespace Metal {
         const auto& services = it->second;
 
         while (running) {
+            float totalInterval = 0.f;
             for (auto* service : services) {
                 service->onAsyncSync();
+                totalInterval += service->getSyncInterval();
             }
-            // Small sleep to prevent 100% CPU usage if no work is needed
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            
+            float averageInterval = totalInterval / static_cast<float>(services.size());
+            if (averageInterval > 0) {
+                std::unique_lock lock(shutdownMutex);
+                shutdownCv.wait_for(lock, std::chrono::milliseconds(static_cast<long long>(averageInterval)), [this] {
+                    return !running.load();
+                });
+            } else {
+                // Fallback to small sleep to prevent 100% CPU usage if no interval is provided
+                std::unique_lock lock(shutdownMutex);
+                shutdownCv.wait_for(lock, std::chrono::milliseconds(1), [this] {
+                    return !running.load();
+                });
+            }
         }
     }
 }

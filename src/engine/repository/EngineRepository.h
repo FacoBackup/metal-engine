@@ -27,6 +27,8 @@ namespace Metal {
 
         glm::vec3 gravity{0, -9.81f, 0};
 
+        void clear() override;
+
         void registerFields() override;
 
         const char *getIcon() const override;

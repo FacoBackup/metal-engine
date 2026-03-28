@@ -15,7 +15,7 @@ namespace Metal {
     struct EditorRepository;
     class ThemeService;
     class HistoryService;
-    struct DirectoryService;
+    class DirectoryService;
 
     class DockSpacePanel final : public AbstractPanel {
         ImVec2 padding{DEFAULT.x, DEFAULT.y};

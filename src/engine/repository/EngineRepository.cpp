@@ -11,6 +11,10 @@
 #define PHYSICS "Physics"
 
 namespace Metal {
+    void EngineRepository::clear() {
+        // Nothing to clear
+    }
+
     void EngineRepository::registerFields() {
         registerEditableField<INT>(&shadingResInvScale).setName("Shading inverted resolution scale").setGroup("Display settings (Restart required)").setMin(1).setMax(16);
         registerEditableField<BOOLEAN>(&vsync).setName("VSync?").setGroup("Display settings (Restart required)");

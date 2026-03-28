@@ -100,7 +100,6 @@ namespace Metal {
 
     void MaterialService::uploadMaterialData() {
         if (materialData.empty()) {
-            LOG_TRACE("No material data to upload.");
             return;
         }
 

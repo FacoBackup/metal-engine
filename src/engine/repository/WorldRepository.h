@@ -57,6 +57,8 @@ namespace Metal {
 
         void changeVisibility(entt::entity entity, bool isVisible);
 
+        void clear() override;
+
         void registerFields() override;
 
         void load(const std::string &absolutePath) override;

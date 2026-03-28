@@ -9,15 +9,9 @@ namespace Metal {
     void EditorFooterPanel::onSync() {
         ImGui::SameLine();
         renderShortcuts();
-        ImGui::SameLine(ImGui::GetWindowWidth() - 150);
+        ImGui::SameLine(ImGui::GetWindowWidth() - 100);
 
         framerate();
-        ImGui::SameLine();
-        if (UIUtil::ButtonSimple(
-            (editorRepository->isDarkMode ? Icons::light_mode : Icons::dark_mode) + id + "theme",
-            UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            editorRepository->isDarkMode = !editorRepository->isDarkMode;
-        }
         ImGui::SameLine();
         asyncTaskPanel->onSync();
     }

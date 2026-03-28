@@ -52,7 +52,7 @@ namespace Metal {
                 end()) {
                 auto *texture = textureService->stream(entry->absolutePath);
                 if (texture != nullptr) {
-                    guiContext->renderImage(texture, PREVIEW_SIZE, PREVIEW_SIZE);
+                    imguiService->renderImage(texture, PREVIEW_SIZE, PREVIEW_SIZE);
                     previewRendered = true;
                 }
             }
@@ -62,7 +62,7 @@ namespace Metal {
                 ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ICON_Y_OFFSET);
                 const std::string icon = getEntryIcon(entry);
 
-                ImGui::PushFont(guiContext->getLargeIconsFont());
+                ImGui::PushFont(imguiService->getLargeIconsFont());
                 float textWidth = ImGui::CalcTextSize(icon.c_str()).x;
                 ImGui::SetCursorPosX((CARD_WIDTH - textWidth) * 0.5f);
                 ImGui::Text("%s", icon.c_str());

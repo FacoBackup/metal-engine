@@ -5,7 +5,7 @@
 
 namespace Metal {
     class LuaService;
-    struct DirectoryService;
+    class DirectoryService;
     class FilesService;
 
     class ScriptingToolProvider final : public IToolProvider {

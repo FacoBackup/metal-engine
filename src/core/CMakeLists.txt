@@ -11,6 +11,8 @@ set(CORE_SOURCES
     FrameService.h
     service/ThreadManager.cpp
     service/ThreadManager.h
+    service/SnapshotService.cpp
+    service/SnapshotService.h
 )
 
 set(CORE_SOURCES ${CORE_SOURCES} PARENT_SCOPE)

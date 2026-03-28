@@ -2,12 +2,15 @@
 #include "editor/ui/UIUtil.h"
 #include "../../repository/EditorRepository.h"
 #include "../../../core/DirectoryService.h"
+#include "../../../core/service/SnapshotService.h"
 #include "../../../core/WindowService.h"
 #include "engine/EngineContext.h"
 #include "../../service/DockService.h"
 #include "../EditorPanel.h"
 #include "editor/service/HistoryService.h"
 #include "editor/service/ThemeService.h"
+#include "engine/service/TextureService.h"
+#include "../../../core/ImGuiService.h"
 #include "../../../ApplicationEventContext.h"
 
 namespace Metal {
@@ -52,25 +55,25 @@ namespace Metal {
             windowService->minimize();
         });
 
-        // Play/Stop Button
-        xPos -= 30.0f;
+        // Logo with Settings Icon that triggers Menu
+        xPos -= EditorPanel::HEADER_HEIGHT;
+        rects.historyButton = {
+            static_cast<int>(xPos), 0, static_cast<int>(EditorPanel::HEADER_HEIGHT), static_cast<int>(EditorPanel::HEADER_HEIGHT)
+        };
         ImGui::SetCursorPosX(xPos);
-        ImGui::SetCursorPosY((EditorPanel::HEADER_HEIGHT - 25.0f) * 0.5f);
-        const bool isPlaying = editorRepository->isPlaying;
-        const std::string icon = isPlaying ? Icons::stop : Icons::play_arrow;
-        const ImVec4 color = isPlaying ? ImVec4(0.957f, 0.263f, 0.212f, 1.0f) : ImVec4(0.298f, 0.686f, 0.314f, 1.0f);
-        const std::string tooltip = isPlaying ? "Stop" : "Play";
-
-        if (UIUtil::RenderButtonSolid("playstop", icon, 25.0f, color, 4.0f)) {
-            if (isPlaying) {
-                ApplicationEventContext::dispatch("Stop");
-                editorRepository->isPlaying = false;
-            } else {
-                ApplicationEventContext::dispatch("Play");
-                editorRepository->isPlaying = true;
-            }
+        ImGui::SetCursorPosY(0);
+        if (UIUtil::ButtonSimple(Icons::history + "##history", EditorPanel::HEADER_HEIGHT, EditorPanel::HEADER_HEIGHT)) {
+            ImGui::OpenPopup("HistoryMenu");
         }
-        UIUtil::RenderTooltip(tooltip);
+        renderHistoryPopup();
+
+        xPos -= EditorPanel::HEADER_HEIGHT;
+        ImGui::SetCursorPosX(xPos);
+        ImGui::SetCursorPosY(0);
+        if (UIUtil::ButtonSimple(Icons::settings + "##settings", EditorPanel::HEADER_HEIGHT, EditorPanel::HEADER_HEIGHT)) {
+            ImGui::OpenPopup("HeaderMenu");
+        }
+        renderHeaderMenuPopup();
 
         ImGui::PopStyleColor(1);
         ImGui::PopStyleVar();
@@ -78,36 +81,21 @@ namespace Metal {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
         ImGui::SetCursorPosX(5);
         ImGui::SetCursorPosY(0);
+
+        renderLogo();
+
         rects.saveButton = {
-            5, 0, static_cast<int>(EditorPanel::HEADER_HEIGHT), static_cast<int>(EditorPanel::HEADER_HEIGHT)
+            static_cast<int>(ImGui::GetCursorPosX()), 0, static_cast<int>(EditorPanel::HEADER_HEIGHT),
+            static_cast<int>(EditorPanel::HEADER_HEIGHT)
         };
         if (UIUtil::ButtonSimple(Icons::save + "##save", EditorPanel::HEADER_HEIGHT, EditorPanel::HEADER_HEIGHT)) {
             directoryService->save();
         }
-        ImGui::SameLine(0, 4);
-        const bool canUndo = historyService->canUndo();
-        if (!canUndo) ImGui::BeginDisabled();
-        rects.undoButton = {
-            static_cast<int>(ImGui::GetCursorPosX()), 0, static_cast<int>(EditorPanel::HEADER_HEIGHT),
-            static_cast<int>(EditorPanel::HEADER_HEIGHT)
-        };
-        if (UIUtil::ButtonSimple(Icons::undo + "##undo", EditorPanel::HEADER_HEIGHT, EditorPanel::HEADER_HEIGHT)) {
-            historyService->undo();
-        }
-        if (!canUndo) ImGui::EndDisabled();
+        ImGui::SameLine(0, 10);
 
-        ImGui::SameLine();
-        const bool canRedo = historyService->canRedo();
-        if (!canRedo) ImGui::BeginDisabled();
-        rects.redoButton = {
-            static_cast<int>(ImGui::GetCursorPosX()), 0, static_cast<int>(EditorPanel::HEADER_HEIGHT),
-            static_cast<int>(EditorPanel::HEADER_HEIGHT)
-        };
-        if (UIUtil::ButtonSimple(Icons::redo + "##redo", EditorPanel::HEADER_HEIGHT, EditorPanel::HEADER_HEIGHT)) {
-            historyService->redo();
-        }
-        if (!canRedo) ImGui::EndDisabled();
-        ImGui::SameLine(0, 4);
+        renderPlayStopButtons(rects);
+
+        renderProjectName(rects);
 
         renderDockAdders(rects);
 
@@ -123,14 +111,138 @@ namespace Metal {
         ImGui::PopStyleColor(2);
     }
 
-    void EditorHeaderPanel::RenderMenu(const char *label, const std::function<void()> &itemsFunc) {
-        if (ImGui::Button(label, ImVec2(0, EditorPanel::HEADER_HEIGHT))) {
-            ImGui::OpenPopup(label);
+    void EditorHeaderPanel::renderLogo() {
+        auto *logoTexture = textureService->stream("resources/logo.png");
+        if (logoTexture) {
+            ImGui::SetCursorPosY((EditorPanel::HEADER_HEIGHT - 20.0f) * 0.5f);
+            imguiService->renderImage(logoTexture, 20, 20);
+            ImGui::SameLine(0, 10);
         }
-        if (ImGui::BeginPopup(label)) {
-            itemsFunc();
+    }
+
+    void EditorHeaderPanel::renderProjectName(WindowService::WindowControlRects &rects) {
+        const float buttonWidth = 100.0f;
+        const float containerHeight = 25.0f;
+        
+        rects.projectNameButton = {
+            static_cast<int>(ImGui::GetCursorPosX()), 
+            3,
+            static_cast<int>(buttonWidth), 
+            static_cast<int>(EditorPanel::HEADER_HEIGHT)
+        };
+
+
+        ImGui::SetCursorPosY(3);
+
+        std::string name = editorRepository->projectName;
+        if (UIUtil::RenderButtonSolid("projectNameBtn", name, ImVec2(buttonWidth, containerHeight), themeService->palette3, 4.0f)) {
+            ImGui::OpenPopup("ProjectNamePopup");
+        }
+        UIUtil::RenderTooltip("Project: " + (name.empty() ? "[Untitled]" : name));
+
+        if (ImGui::BeginPopup("ProjectNamePopup")) {
+            char buffer[256];
+            strncpy(buffer, editorRepository->projectName.c_str(), sizeof(buffer) - 1);
+            buffer[sizeof(buffer) - 1] = '\0';
+            if (ImGui::InputText("Name", buffer, sizeof(buffer))) {
+                editorRepository->projectName = buffer;
+            }
             ImGui::EndPopup();
         }
+        ImGui::SameLine(0, 4);
+    }
+
+    void EditorHeaderPanel::renderPlayStopButtons(WindowService::WindowControlRects &rects) {
+        const bool isPlaying = editorRepository->isPlaying;
+        const float containerWidth = 53.0f;
+        const float containerHeight = 25.0f;
+        const float buttonSize = 18.0f;
+        
+        rects.playStopButton = {
+            static_cast<int>(ImGui::GetCursorPosX()), 
+            3,
+            static_cast<int>(containerWidth), 
+            static_cast<int>(containerHeight)
+        };
+
+        ImGui::SetCursorPosY(3);
+
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, themeService->palette3);
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 4.0f);
+        if (ImGui::BeginChild("playStopContainer", ImVec2(containerWidth, containerHeight), false, ImGuiWindowFlags_NoScrollbar)) {
+            float innerPadding = (containerHeight - buttonSize) * 0.5f;
+            float spacing = (containerWidth - (buttonSize * 2)) / 3.0f;
+            
+            // Play Button
+            ImGui::SetCursorPos(ImVec2(spacing, innerPadding));
+            if (isPlaying) ImGui::BeginDisabled();
+            ImVec4 playColor = isPlaying ? themeService->palette4 : ImVec4(0.298f, 0.686f, 0.314f, 1.0f);
+            if (UIUtil::RenderButtonSolid("play", Icons::play_arrow, buttonSize, playColor, 4.0f)) {
+                ApplicationEventContext::dispatch("Play");
+            }
+            if (isPlaying) ImGui::EndDisabled();
+            UIUtil::RenderTooltip("Play");
+            
+            // Stop Button
+            ImGui::SetCursorPos(ImVec2(spacing * 2 + buttonSize, innerPadding));
+            if (!isPlaying) ImGui::BeginDisabled();
+            ImVec4 stopColor = !isPlaying ? themeService->palette4 : ImVec4(0.957f, 0.263f, 0.212f, 1.0f);
+            if (UIUtil::RenderButtonSolid("stop", Icons::stop, buttonSize, stopColor, 4.0f)) {
+                ApplicationEventContext::dispatch("Stop");
+            }
+            if (!isPlaying) ImGui::EndDisabled();
+            UIUtil::RenderTooltip("Stop");
+            
+            ImGui::EndChild();
+        }
+        ImGui::PopStyleVar();
+        ImGui::PopStyleColor();
+        ImGui::SameLine(0, 10);
+    }
+
+    void EditorHeaderPanel::renderHistoryPopup() {
+        if (ImGui::BeginPopup("HistoryMenu")) {
+            std::string snapshotsPath = directoryService->getEngineMetadataPath() + "/snapshots/" + directoryService->getProjectId();
+            if (fs::exists(snapshotsPath)) {
+                for (const auto &entry : fs::directory_iterator(snapshotsPath)) {
+                    if (entry.is_directory()) {
+                        if (ImGui::MenuItem(entry.path().filename().string().c_str())) {
+                            snapshotService->restoreSnapshot(entry.path().filename().string());
+                        }
+                    }
+                }
+            } else {
+                ImGui::TextDisabled("No snapshots available");
+            }
+            ImGui::EndPopup();
+        }
+    }
+
+    void EditorHeaderPanel::renderHeaderMenuPopup() {
+        if (ImGui::BeginPopup("HeaderMenu")) {
+            if (ImGui::MenuItem("Save")) {
+                directoryService->save();
+            }
+            if (ImGui::MenuItem("Open project")) {
+                // TODO - Clear engine state and then load
+                directoryService->updateRootPath(true);
+            }
+            if (ImGui::MenuItem("Reload shaders")) {
+                // TODO - RECREATE ENGINE FRAMES ALL OF THEM
+            }
+            if (ImGui::MenuItem(editorRepository->isDarkMode ? "Light mode" : "Dark mode")) {
+                editorRepository->isDarkMode = !editorRepository->isDarkMode;
+            }
+            if (ImGui::MenuItem("Clear caches")) {
+                directoryService->clearCaches();
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Close")) {
+                windowService->close();
+            }
+            ImGui::EndPopup();
+        }
+        ImGui::SameLine(0, 5);
     }
 
     void EditorHeaderPanel::renderDockAdders(WindowService::WindowControlRects &rects) const {

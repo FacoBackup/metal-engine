@@ -10,7 +10,7 @@ namespace Metal {
     struct WorldRepository;
     struct RuntimeRepository;
     class EngineContext;
-    struct DirectoryService;
+    class DirectoryService;
 
     class ViewportPanel final : public AbstractDockPanel {
         bool isFirstMovement = false;

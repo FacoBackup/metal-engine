@@ -131,6 +131,12 @@ namespace Metal {
         if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
     }
 
+    void WorldRepository::clear() {
+        registry.clear();
+        hiddenEntities.clear();
+        culled.clear();
+    }
+
     void WorldRepository::load(const std::string &absolutePath) {
         if (historyService) {
             historyService->startTransaction("Load Scene " + absolutePath);

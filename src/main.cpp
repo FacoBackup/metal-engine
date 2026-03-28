@@ -1,5 +1,6 @@
 #include "ApplicationContext.h"
 #include "core/DirectoryService.h"
+#include "core/service/SnapshotService.h"
 #include "core/FrameService.h"
 #include "core/WindowService.h"
 #include "core/ImGuiService.h"
@@ -66,6 +67,7 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::VulkanContext>());
     context->registerSingleton(std::make_shared<Metal::ImGuiService>());
     context->registerSingleton(std::make_shared<Metal::DirectoryService>());
+    context->registerSingleton(std::make_shared<Metal::SnapshotService>());
     context->registerSingleton(std::make_shared<Metal::ThreadManager>());
     context->registerSingleton(std::make_shared<Metal::AsyncSyncService>());
     // --- ORDER MATTERS

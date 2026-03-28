@@ -10,6 +10,13 @@ namespace Metal {
         return Icons::settings.c_str();
     }
 
+    void EditorRepository::clear() {
+        selected.clear();
+        copied.clear();
+        bookmarks.clear();
+        mainSelection = EMPTY_ENTITY;
+    }
+
     void EditorRepository::registerFields() {
         registerEditableField<COLOR>(&accentColor).setName("accentColor").setGroup("Editor");
         registerEditableField<COLOR>(&selectionColor).setName("selectionColor").setGroup("Selection outline");
@@ -78,5 +85,7 @@ namespace Metal {
         registerSerializableOnlyField<BOOLEAN>(&isPlaying).setName("isPlaying");
         registerEditableField<STRING>(&gptMcpKey).setName("gptMcpKey").setGroup("MCP");
         registerEditableField<STRING>(&geminiMcpKey).setName("geminiMcpKey").setGroup("MCP");
+        registerEditableField<BOOLEAN>(&enableSnapshots).setName("enableSnapshots").setGroup("Snapshots");
+        registerEditableField<FLOAT>(&snapshotInterval).setName("snapshotInterval").setGroup("Snapshots");
     }
 }

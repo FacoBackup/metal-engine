@@ -9,7 +9,7 @@ namespace Metal {
 
     class CardDirectoryPanel final : public AbstractDirectoryPanel {
         TextureService *textureService = nullptr;
-        ImGuiService *guiContext = nullptr;
+        ImGuiService *imguiService = nullptr;
 
         void renderCard(std::shared_ptr<FSEntry> entry);
 
@@ -17,7 +17,7 @@ namespace Metal {
         std::vector<Dependency> getDependencies() override {
             auto deps = AbstractDirectoryPanel::getDependencies();
             deps.push_back({"TextureService", &textureService});
-            deps.push_back({"ImguiService", &guiContext});
+            deps.push_back({"ImguiService", &imguiService});
             return deps;
         }
 
