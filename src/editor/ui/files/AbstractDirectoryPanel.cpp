@@ -28,13 +28,13 @@ namespace Metal {
         return false;
     }
 
-    std::string AbstractDirectoryPanel::getEntryIcon(std::shared_ptr<FSEntry> entry) const {
+    const std::string &AbstractDirectoryPanel::getEntryIcon(std::shared_ptr<FSEntry> entry) const {
         if (entry->isDirectory) return Icons::folder;
         if (!canInteract(entry)) return Icons::close;
 
         const std::string &extension = entry->extension;
         for (const auto *info: Metal::FileExtensions::all) {
-            if (info->extension == extension) return info->icon;
+            if (info->typeLabel == extension) return info->icon;
         }
 
         return Icons::insert_drive_file;

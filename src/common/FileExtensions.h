@@ -11,7 +11,7 @@ namespace Metal {
         std::string extension; // with "."
         std::string name; // without "."
         std::string typeLabel;
-        std::string icon;
+        const std::string &icon;
     };
 
     struct FileExtensions {

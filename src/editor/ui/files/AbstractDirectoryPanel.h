@@ -20,7 +20,7 @@ namespace Metal {
 
         bool canInteract(std::shared_ptr<FSEntry> entry) const;
 
-        std::string getEntryIcon(std::shared_ptr<FSEntry> entry) const;
+        const std::string &getEntryIcon(std::shared_ptr<FSEntry> entry) const;
 
         bool matchesSearch(std::shared_ptr<FSEntry> entry) const;
 

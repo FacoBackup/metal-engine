@@ -6,7 +6,6 @@ namespace Metal {
         COMPOSITE,
         RESOURCE,
         COLOR,
-        OPTIONS,
         STRING,
         INT,
         FLOAT,

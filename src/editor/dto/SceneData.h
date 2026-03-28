@@ -12,7 +12,7 @@ namespace Metal {
         std::string name;
 
         void registerFields() override {
-            registerEditableField(&name, STRING, "name", "Scene");
+            registerSerializableOnlyField(&name, STRING, "name");
             registerSerializableOnlyField(&entities, COMPOSITE, "entities");
         }
     };
