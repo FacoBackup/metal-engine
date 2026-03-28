@@ -37,7 +37,7 @@ namespace Metal {
                 if (ImGui::Selectable((dir.icon + " " + dir.name).c_str(), isSelected)) {
                     std::shared_ptr<FSEntry> entry = filesService->GetEntry(dir.path);
                     if (entry) {
-                        filesContext.setCurrentDirectory(entry);
+                        filesContext.currentDirectory = entry;
                         filesService->GetEntries(entry);
                         filesContext.selected.clear();
                     }

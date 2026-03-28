@@ -11,7 +11,7 @@ namespace Metal {
         TextureService *textureService = nullptr;
         ImGuiService *guiContext = nullptr;
 
-        void renderCard(const std::shared_ptr<FSEntry> &entry);
+        void renderCard(std::shared_ptr<FSEntry> entry);
 
     public:
         std::vector<Dependency> getDependencies() override {

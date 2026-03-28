@@ -15,7 +15,6 @@ namespace Metal {
     class ResourceField final : public AbstractFormFieldPanel {
         InspectedField<std::string> &field;
         std::shared_ptr<FSEntry> entry = nullptr;
-        mutable bool open = false;
         FilesService *filesService = nullptr;
 
     public:
@@ -26,10 +25,6 @@ namespace Metal {
         void onInitialize() override;
 
         void renderButton();
-
-        void renderModal() const;
-
-        void onSyncChildren() const override;
 
         explicit ResourceField(InspectedField<std::string> &field);
 

@@ -61,7 +61,7 @@ namespace Metal {
     }
 
     std::string ScriptingToolProvider::listScripts(const nlohmann::json &) const {
-        std::vector<std::string> scripts = filesService->listFilesWithExtension(EXT_LUA);
+        std::vector<std::string> scripts = filesService->listFilesWithExtension(Metal::FileExtensions::lua->extension);
 
         if (scripts.empty()) {
             return "No lua scripts found or root directory not set.";

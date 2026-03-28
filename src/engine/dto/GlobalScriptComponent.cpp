@@ -3,7 +3,7 @@
 
 namespace Metal {
     void GlobalScriptComponent::registerFields() {
-        registerResourceSelection(scriptPath, "", "Script Path", SCRIPT_EXTENSIONS);
+        registerResourceSelection(scriptPath, "", "Script Path", Metal::FileExtensions::scripts);
     }
 
     ComponentType GlobalScriptComponent::getType() const {

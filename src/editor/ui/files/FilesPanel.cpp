@@ -24,17 +24,15 @@
 namespace Metal {
     void FilesPanel::onInitialize() {
         filesContext.filesService = filesService;
-        filesContext.setCurrentDirectory(filesService->getRoot());
+        filesContext.currentDirectory = filesService->getRoot();
         filesHeader = initializePanel<FilesHeaderPanel>(true, filesContext);
         listDirectoryPanel = initializePanel<ListDirectoryPanel>(
             false,
-            filesContext,
-            [this](const std::shared_ptr<FSEntry> &entry) { openResource(entry); }
+            filesContext
         );
         cardDirectoryPanel = initializePanel<CardDirectoryPanel>(
             false,
-            filesContext,
-            [this](const std::shared_ptr<FSEntry> &entry) { openResource(entry); }
+            filesContext
         );
         navigationPanel = initializePanel<NavigationPanel>(false, filesContext);
 
@@ -64,9 +62,7 @@ namespace Metal {
             navigationPanel->onSync();
 
             ImGui::TableNextColumn();
-            if (renderHeader()) {
-                filesHeader->onSync();
-            }
+            filesHeader->onSync();
             ImGui::Separator();
 
             if (filesContext.viewMode == FilesViewMode::LIST) {
@@ -86,18 +82,6 @@ namespace Metal {
         ImGui::SetCursorPosY((windowHeight - LARGE_FONT_SIZE * 2) * 0.5f);
     }
 
-    void FilesPanel::openResource(std::shared_ptr<FSEntry> root) {
-        if (root->isDirectory) {
-            filesContext.setCurrentDirectory(root);
-            filesService->GetEntries(root);
-            filesContext.selected.clear();
-            return;
-        }
-
-        fileImporterService->importFile(root,
-                                           std::make_shared<ImportSettingsDTO>());
-
-    }
 
     void FilesPanel::pasteSelected() {
         for (auto &entry: filesContext.toCut) {
@@ -108,8 +92,17 @@ namespace Metal {
     }
 
     void FilesPanel::openSelected() {
+        std::vector<std::shared_ptr<FSEntry> > toOpen;
         for (auto &id: filesContext.selected) {
-            openResource(id.second);
+            toOpen.push_back(id.second);
+        }
+
+        for (auto &entry: toOpen) {
+            if (filesContext.viewMode == FilesViewMode::LIST) {
+                listDirectoryPanel->openResource(entry);
+            } else {
+                cardDirectoryPanel->openResource(entry);
+            }
         }
     }
 
@@ -120,13 +113,15 @@ namespace Metal {
     }
 
     void FilesPanel::selectAll() {
-        for (const auto &entry: filesContext.currentDirectory->children) {
+        auto currentDir = filesContext.currentDirectory;
+        for (const auto &entry: currentDir->children) {
             filesContext.selected.insert({entry->getAbsolutePath(), entry});
         }
     }
 
     void FilesPanel::deleteSelected() const {
-        filesService->deleteFiles(filesContext.selected);
+        auto selectedCopy = filesContext.selected;
+        filesService->deleteFiles(selectedCopy);
         filesService->GetEntries(filesContext.currentDirectory);
     }
 }

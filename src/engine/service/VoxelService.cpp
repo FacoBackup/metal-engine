@@ -38,7 +38,7 @@ namespace Metal {
     }
 
     bool VoxelService::isCompatible(const std::string &absolutePath) {
-        return absolutePath.ends_with(EXT_SVO);
+        return absolutePath.ends_with(Metal::FileExtensions::svo->extension);
     }
 
     void VoxelService::disposeResource(SVOInstance *resource) {

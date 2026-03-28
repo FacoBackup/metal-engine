@@ -5,13 +5,19 @@
 
 namespace Metal {
     void PrimitiveComponent::registerFields() {
-        registerResourceSelection(meshId, "", "Mesh", MESH_EXTENSIONS);
+        static const std::vector<const FileExtensionInfo *> meshExtensions = {Metal::FileExtensions::mesh.get()};
+        static const std::vector<const FileExtensionInfo *> textureExtensions = {
+            Metal::FileExtensions::png.get(), Metal::FileExtensions::jpg.get(),
+            Metal::FileExtensions::jpeg.get(),
+            Metal::FileExtensions::tga.get()
+        };
+        registerResourceSelection(meshId, "", "Mesh", meshExtensions);
         registerFloat(transmissionFactor, "", "Transmission factor", 0, 1);
         registerFloat(thicknessFactor, "", "Thickness factor", 0, 10);
         registerFloat(ior, "", "IOR", 1, 3);
-        registerResourceSelection(albedo, "", "Albedo", TEXTURE_EXTENSIONS);
-        registerResourceSelection(roughness, "", "Roughness texture", TEXTURE_EXTENSIONS);
-        registerResourceSelection(metallic, "", "Metallic Texture", TEXTURE_EXTENSIONS);
+        registerResourceSelection(albedo, "", "Albedo", textureExtensions);
+        registerResourceSelection(roughness, "", "Roughness texture", textureExtensions);
+        registerResourceSelection(metallic, "", "Metallic Texture", textureExtensions);
     }
 
     ComponentType PrimitiveComponent::getType() const {

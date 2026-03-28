@@ -4,8 +4,8 @@
 
 namespace Metal {
     void MeshColliderComponent::registerFields() {
-        registerResourceSelection(meshId, "", "Mesh", MESH_EXTENSIONS);
-        registerBool(isConvex, "", "Is Convex");
+        static const std::vector<const FileExtensionInfo*> meshExtensions = {Metal::FileExtensions::mesh.get()};
+        registerResourceSelection(meshId, "", "Mesh", meshExtensions);
     }
 
     ComponentType MeshColliderComponent::getType() const {

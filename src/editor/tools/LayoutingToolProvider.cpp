@@ -61,7 +61,7 @@ namespace Metal {
     }
 
     std::string LayoutingToolProvider::listMeshFiles(const nlohmann::json &params) {
-        auto meshes = filesService->listFilesWithExtension(EXT_MESH);
+        auto meshes = filesService->listFilesWithExtension(Metal::FileExtensions::mesh->extension);
         if (meshes.empty()) return std::string("No .mesh files found.");
 
         std::stringstream ss;

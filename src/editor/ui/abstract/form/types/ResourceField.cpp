@@ -3,7 +3,7 @@
 #include <imgui.h>
 #include <iostream>
 
-#include "ResourceFilesPanel.h"
+#include "common/FileDialogUtil.h"
 #include <memory>
 #include "common/Icons.h"
 #include "editor/ui/UIUtil.h"
@@ -13,6 +13,7 @@
 #include "editor/service/FilesService.h"
 #include "editor/service/HistoryService.h"
 #include "ApplicationEventContext.h"
+#include "common/FileExtensions.h"
 #include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
@@ -23,18 +24,6 @@ namespace Metal {
     }
 
     void ResourceField::onInitialize() {
-        initializePanel<ResourceFilesPanel>(true, [this](const std::shared_ptr<FSEntry> &file) {
-            if (file == nullptr) {
-                open = false;
-                return;
-            }
-            std::string oldValue = *field.field;
-            *field.field = file->absolutePath;
-
-            historyService->recordChange(&field, oldValue);
-            ApplicationEventContext::dispatch(field.instance->getClassName(), std::make_shared<FieldModificationPayload>(field));
-            open = false;
-        }, field.supportedFileTypes);
     }
 
     void ResourceField::renderButton() {
@@ -42,7 +31,18 @@ namespace Metal {
         ImGui::BeginChild(id.c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 32),
                           ImGuiChildFlags_Border);
         if (UIUtil::ButtonSimple(Icons::file_open + id, UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            open = true;
+            std::vector<nfdu8filteritem_t> filters;
+            for (const auto &type: field.supportedFileTypes) {
+                filters.push_back({type->name.c_str(), type->typeLabel.c_str()});
+            }
+            std::string selected = FileDialogUtil::PickFile(filters);
+            if (!selected.empty()) {
+                std::string oldValue = *field.field;
+                *field.field = selected;
+                historyService->recordChange(&field, oldValue);
+                ApplicationEventContext::dispatch(field.instance->getClassName(),
+                                                  std::make_shared<FieldModificationPayload>(field));
+            }
         }
         ImGui::SameLine();
         if (entry != nullptr && UIUtil::ButtonSimple(
@@ -55,7 +55,8 @@ namespace Metal {
 
 
             historyService->recordChange(&field, oldValue);
-            ApplicationEventContext::dispatch(field.instance->getClassName(), std::make_shared<FieldModificationPayload>(field));
+            ApplicationEventContext::dispatch(field.instance->getClassName(),
+                                              std::make_shared<FieldModificationPayload>(field));
         }
         ImGui::SameLine();
         if (entry != nullptr) {
@@ -66,32 +67,12 @@ namespace Metal {
         ImGui::EndChild();
     }
 
-    void ResourceField::renderModal() const {
-        if (!open) {
-            return;
-        }
-        ImVec2 size = ImVec2(ImGui::GetMainViewport()->Size.x / 2,
-                             ImGui::GetMainViewport()->Size.y / 2);
-        ImGui::SetNextWindowSize(size, ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x - size.x,
-                                       ImGui::GetWindowPos().y), ImGuiCond_FirstUseEver);
-        if (ImGui::Begin(field.nameWithId.c_str(), &open, flags)) {
-            onSyncChildren();
-        }
-        ImGui::End();
-    }
-
-    void ResourceField::onSyncChildren() const {
-        AbstractPanel::onSyncChildren();
-    }
-
     void ResourceField::onSync() {
         if (field.field->size() > 0 && (entry == nullptr || entry->absolutePath != *field.field)) {
             entry = filesService->getResource(*field.field);
         }
         if (!field.disabled) {
             renderButton();
-            renderModal();
         } else {
             ImGui::Text("%s: %s", field.name.c_str(), (entry != nullptr ? entry->name.c_str() : "(None)"));
         }

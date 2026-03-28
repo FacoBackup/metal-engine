@@ -172,7 +172,7 @@ namespace Metal {
     }
 
     bool WorldRepository::isCompatible(const std::string &absolutePath) {
-        return absolutePath.ends_with(EXT_SCENE);
+        return absolutePath.ends_with(Metal::FileExtensions::scene->extension);
     }
 
     void WorldRepository::createComponent(const entt::entity entityId, ComponentType type) {

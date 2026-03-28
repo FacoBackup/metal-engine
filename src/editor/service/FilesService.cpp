@@ -16,6 +16,9 @@ namespace fs = std::filesystem;
 
 namespace Metal {
     void FilesService::onInitialize() {
+        if (directoryService->getRootDirectory().empty()) {
+            directoryService->updateRootPath(false);
+        }
         root = std::make_shared<FSEntry>(directoryService->getRootDirectory(), "");
         root->isDirectory = true;
         root->name = "Project";
@@ -103,11 +106,11 @@ namespace Metal {
         file.close();
     }
 
-    void FilesService::GetEntries(const std::shared_ptr<FSEntry> &root) {
-        if (!root->isDirectory) {
+    void FilesService::GetEntries(std::shared_ptr<FSEntry> root) {
+        if (root == nullptr || !root->isDirectory) {
             return;
         }
-        root->children.clear();
+        root->children = {};
         std::error_code ec;
         auto iterator = fs::directory_iterator(root->absolutePath, ec);
         if (ec) {

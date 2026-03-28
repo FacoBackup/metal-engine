@@ -16,13 +16,16 @@ namespace Metal {
                 if (filesContext.selected.empty()) {
                     if (filesContext.currentDirectory) {
                         const std::string path = filesContext.currentDirectory->absolutePath;
-                        if (std::find(editorRepository->bookmarks.begin(), editorRepository->bookmarks.end(), path) == editorRepository->bookmarks.end()) {
+                        if (std::find(editorRepository->bookmarks.begin(), editorRepository->bookmarks.end(), path) ==
+                            editorRepository->bookmarks.end()) {
                             editorRepository->bookmarks.push_back(path);
                         }
                     }
                 } else {
-                    for (auto const& [selectionId, entry] : filesContext.selected) {
-                        if (std::find(editorRepository->bookmarks.begin(), editorRepository->bookmarks.end(), entry->absolutePath) == editorRepository->bookmarks.end()) {
+                    auto selectedCopy = filesContext.selected;
+                    for (auto const &[selectionId, entry]: selectedCopy) {
+                        if (std::find(editorRepository->bookmarks.begin(), editorRepository->bookmarks.end(),
+                                      entry->absolutePath) == editorRepository->bookmarks.end()) {
                             editorRepository->bookmarks.push_back(entry->absolutePath);
                         }
                     }
@@ -32,17 +35,18 @@ namespace Metal {
             ImGui::Separator();
 
             for (size_t i = 0; i < editorRepository->bookmarks.size(); ++i) {
-                const auto& path = editorRepository->bookmarks[i];
+                const auto &path = editorRepository->bookmarks[i];
                 std::filesystem::path p(path);
                 std::string name = p.filename().string();
                 if (name.empty()) name = path; // Fallback for root
 
-                bool isSelected = (filesContext.currentDirectory && filesContext.currentDirectory->absolutePath == path);
+                bool isSelected = (filesContext.currentDirectory && filesContext.currentDirectory->absolutePath ==
+                                   path);
 
                 if (ImGui::Selectable((Icons::folder + " " + name + "##" + std::to_string(i)).c_str(), isSelected)) {
                     std::shared_ptr<FSEntry> entry = filesService->GetEntry(path);
                     if (entry) {
-                        filesContext.setCurrentDirectory(entry);
+                        filesContext.currentDirectory = entry;
                         filesService->GetEntries(entry);
                         filesContext.selected.clear();
                     }

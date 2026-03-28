@@ -43,7 +43,7 @@ namespace Metal {
         void CreateFile(const std::shared_ptr<FSEntry> &currentDirectory, const std::string &name,
                         const std::string &extension);
 
-        void GetEntries(const std::shared_ptr<FSEntry> &root);
+        void GetEntries(std::shared_ptr<FSEntry> root);
 
         std::shared_ptr<FSEntry> GetEntry(const std::string &path);
 

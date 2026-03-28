@@ -12,6 +12,8 @@
 #include "Util.h"
 
 namespace Metal {
+    struct FileExtensionInfo;
+
     class Inspectable {
         std::string uniqueIdentifier = Util::uuidV4();
         std::vector<std::shared_ptr<InspectableMember> > fields{};
@@ -41,7 +43,8 @@ namespace Metal {
 
         void registerBool(bool &v, std::string group, std::string name, bool disabled = false);
 
-        void registerResourceSelection(std::string &v, std::string group, std::string name, const std::vector<std::string> &supportedFileTypes,
+        void registerResourceSelection(std::string &v, std::string group, std::string name,
+                                       const std::vector<const FileExtensionInfo *> &supportedFileTypes,
                                        bool disabled = false);
 
         void registerMethod(const std::function<void()> &updateCallback, std::string name, std::string group);

@@ -1,11 +1,14 @@
 #ifndef INSPECTEDFIELD_H
 #define INSPECTEDFIELD_H
 
+#include <memory>
+#include <vector>
 #include <optional>
-
 #include "InspectableMember.h"
 
 namespace Metal {
+    struct FileExtensionInfo;
+
     template<typename T>
     struct InspectedField final : InspectableMember {
         T *field;
@@ -17,7 +20,7 @@ namespace Metal {
         std::optional<float> minF;
         std::optional<float> incrementF;
         bool disabled = false;
-        std::vector<std::string> supportedFileTypes{};
+        std::vector<const FileExtensionInfo *> supportedFileTypes{};
 
         explicit InspectedField(T *field) : field(field), previousValue(*field) {
         }

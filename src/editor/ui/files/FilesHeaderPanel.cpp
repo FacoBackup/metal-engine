@@ -24,7 +24,7 @@ namespace Metal {
                 std::string parentPath = currentPath.parent_path().string();
                 std::shared_ptr<FSEntry> parentEntry = filesService->GetEntry(parentPath);
                 if (parentEntry) {
-                    filesContext.setCurrentDirectory(parentEntry);
+                    filesContext.currentDirectory = parentEntry;
                     filesService->GetEntries(parentEntry);
                 }
             }
@@ -36,7 +36,7 @@ namespace Metal {
                                  UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
             std::string parentPath = directoryService->getRootDirectory();
             if (std::shared_ptr<FSEntry> parentEntry = filesService->GetEntry(parentPath)) {
-                filesContext.setCurrentDirectory(parentEntry);
+                filesContext.currentDirectory = parentEntry;
                 filesService->GetEntries(parentEntry);
             }
         }
@@ -72,7 +72,7 @@ namespace Metal {
         ImGui::SameLine();
         if (UIUtil::ButtonSimple(Icons::description + id, UIUtil::ONLY_ICON_BUTTON_SIZE,
                                  UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            filesService->CreateFile(filesContext.currentDirectory, "NewScript", EXT_LUA);
+            filesService->CreateFile(filesContext.currentDirectory, "NewScript", Metal::FileExtensions::lua->extension);
             filesService->GetEntries(filesContext.currentDirectory);
         }
         UIUtil::RenderTooltip("Create Lua Script");
@@ -86,7 +86,7 @@ namespace Metal {
                              ImGuiInputTextFlags_EnterReturnsTrue)) {
             std::shared_ptr<FSEntry> newDir = filesService->GetEntry(addressBuffer);
             if (newDir && newDir->isDirectory) {
-                filesContext.setCurrentDirectory(newDir);
+                filesContext.currentDirectory = newDir;
                 filesService->GetEntries(newDir);
             } else {
                 std::strncpy(addressBuffer, filesContext.currentDirectory->absolutePath.c_str(), sizeof(addressBuffer));

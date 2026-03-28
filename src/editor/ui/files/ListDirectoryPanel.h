@@ -6,11 +6,13 @@
 
 namespace Metal {
     class ListDirectoryPanel final : public AbstractDirectoryPanel {
-        void onClick(const std::shared_ptr<FSEntry> &entry);
-        void renderTreeItem(const std::shared_ptr<FSEntry> &entry);
+        void onClick(std::shared_ptr<FSEntry> entry);
+
+        void renderTreeItem(std::shared_ptr<FSEntry> entry);
 
     public:
         using AbstractDirectoryPanel::AbstractDirectoryPanel;
+
         void onSync() override;
     };
 }

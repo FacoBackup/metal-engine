@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <memory>
+#include <utility>
 
 
 namespace Metal {
@@ -18,17 +19,14 @@ namespace Metal {
     struct FilesContext final {
         FilesService *filesService = nullptr;
         std::shared_ptr<FSEntry> currentDirectory = nullptr;
-        std::unordered_map<std::string, std::shared_ptr<FSEntry>> selected{};
-        std::unordered_map<std::string, std::shared_ptr<FSEntry>> toCut{};
-        std::string pathToCurrentDirectory;
+        std::unordered_map<std::string, std::shared_ptr<FSEntry> > selected{};
+        std::unordered_map<std::string, std::shared_ptr<FSEntry> > toCut{};
         char searchQuery[256] = "";
         FilesViewMode viewMode = FilesViewMode::LIST;
 
         explicit FilesContext(FilesService *filesService, std::shared_ptr<FSEntry> currentDirectory)
-            : filesService(filesService), currentDirectory(currentDirectory) {
+            : filesService(filesService), currentDirectory(std::move(currentDirectory)) {
         }
-
-        void setCurrentDirectory(std::shared_ptr<FSEntry> entry);
     };
 }
 #endif //FILESCONTEXT_H

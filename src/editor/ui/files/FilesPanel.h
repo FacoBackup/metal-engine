@@ -26,7 +26,7 @@ namespace Metal {
     class CardDirectoryPanel;
     class NavigationPanel;
 
-    class FilesPanel : public AbstractDockPanel {
+    class FilesPanel final : public AbstractDockPanel {
     protected:
         FilesContext filesContext{nullptr, nullptr};
         std::shared_ptr<AbstractPanel> filesHeader = nullptr;
@@ -55,17 +55,9 @@ namespace Metal {
             };
         }
 
-        virtual bool renderPreview() {
-            return false;
-        }
-
         void onInitialize() override;
 
         void onSync() override;
-
-        virtual std::vector<std::string> getTypeFilter() {
-            return {};
-        }
 
         static void SetIconPos(const char *text);
 
@@ -76,12 +68,8 @@ namespace Metal {
         void cutSelected();
 
         void selectAll();
-
+        
         void deleteSelected() const;
-
-        virtual void openResource(std::shared_ptr<FSEntry> root);
-
-        virtual bool renderHeader() { return true; }
     };
 } // Metal
 

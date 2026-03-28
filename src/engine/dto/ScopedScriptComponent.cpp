@@ -3,9 +3,9 @@
 
 namespace Metal {
     void ScopedScriptComponent::registerFields() {
-        registerResourceSelection(onCreatePath, "", "On Create", SCRIPT_EXTENSIONS);
-        registerResourceSelection(onUpdatePath, "", "On Update", SCRIPT_EXTENSIONS);
-        registerResourceSelection(onDestroyPath, "", "On Destroy", SCRIPT_EXTENSIONS);
+        registerResourceSelection(onCreatePath, "", "On Create", Metal::FileExtensions::scripts);
+        registerResourceSelection(onUpdatePath, "", "On Update", Metal::FileExtensions::scripts);
+        registerResourceSelection(onDestroyPath, "", "On Destroy", Metal::FileExtensions::scripts);
     }
 
     ComponentType ScopedScriptComponent::getType() const {

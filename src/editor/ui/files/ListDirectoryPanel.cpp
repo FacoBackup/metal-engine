@@ -5,7 +5,7 @@
 #include "common/AbstractImporter.h"
 
 namespace Metal {
-    void ListDirectoryPanel::onClick(const std::shared_ptr<FSEntry> &entry) {
+    void ListDirectoryPanel::onClick(std::shared_ptr<FSEntry> entry) {
         if (ImGui::IsKeyDown(ImGuiMod_Ctrl)) {
             if (filesContext.selected.contains(entry->getAbsolutePath())) {
                 filesContext.selected.erase(entry->getAbsolutePath());
@@ -18,7 +18,7 @@ namespace Metal {
         }
     }
 
-    void ListDirectoryPanel::renderTreeItem(const std::shared_ptr<FSEntry> &entry) {
+    void ListDirectoryPanel::renderTreeItem(std::shared_ptr<FSEntry> entry) {
         const bool isDirectory = entry->isDirectory;
         const bool isSelected = filesContext.selected.contains(entry->getAbsolutePath());
 
@@ -28,15 +28,16 @@ namespace Metal {
         const std::string icon = getEntryIcon(entry);
         const std::string label = icon + " " + entry->name;
 
-        if (ImGui::Selectable(label.c_str(), isSelected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick)) {
+        if (ImGui::Selectable(label.c_str(), isSelected,
+                              ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick)) {
             onClick(entry);
             if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-                onDoubleClick(entry);
+                openResource(entry);
             }
         }
 
         if (ImGui::IsItemHovered()) {
-            renderInfoTooltip(entry, this);
+            renderInfoTooltip(entry);
         }
 
         ImGui::TableNextColumn();
@@ -60,9 +61,9 @@ namespace Metal {
     void ListDirectoryPanel::onSync() {
         if (ImGui::BeginChild((id + "list_view").c_str(), ImVec2(0, 0))) {
             if (ImGui::IsWindowFocused() && !ImGui::IsAnyItemHovered()) {
-                 if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-                     filesContext.selected.clear();
-                 }
+                if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+                    filesContext.selected.clear();
+                }
             }
 
             constexpr ImGuiTableFlags tableFlags = ImGuiTableFlags_RowBg |
@@ -78,7 +79,8 @@ namespace Metal {
                 ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed);
                 ImGui::TableHeadersRow();
 
-                for (const auto &child: filesContext.currentDirectory->children) {
+                auto currentDir = filesContext.currentDirectory;
+                for (const auto &child: currentDir->children) {
                     if (matchesSearch(child)) {
                         renderTreeItem(child);
                     }

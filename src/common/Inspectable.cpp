@@ -10,6 +10,7 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include "FileExtensions.h"
 #include "InspectedField.h"
 #include "InspectedMethod.h"
 #include "Util.h"
@@ -132,7 +133,7 @@ namespace Metal {
     nlohmann::json Inspectable::toJSON() const {
         nlohmann::json j;
         j["className"] = getClassName();
-        
+
         try {
             j["label"] = this->getTitle();
         } catch (...) {
@@ -140,9 +141,9 @@ namespace Metal {
         }
 
         nlohmann::json fieldsJson = nlohmann::json::array();
-        
-        auto& mutableThis = const_cast<Inspectable&>(*this);
-        for (const auto& field : mutableThis.getFields()) {
+
+        auto &mutableThis = const_cast<Inspectable &>(*this);
+        for (const auto &field: mutableThis.getFields()) {
             nlohmann::json f;
             f["name"] = field->name;
             f["group"] = field->group;
@@ -150,24 +151,37 @@ namespace Metal {
             f["path"] = field->path;
 
             if (field->type == FieldType::BOOLEAN) {
-                f["value"] = *static_cast<InspectedField<bool>*>(field.get())->field;
+                f["value"] = *static_cast<InspectedField<bool> *>(field.get())->field;
             } else if (field->type == FieldType::INT) {
-                f["value"] = *static_cast<InspectedField<int>*>(field.get())->field;
+                f["value"] = *static_cast<InspectedField<int> *>(field.get())->field;
             } else if (field->type == FieldType::FLOAT) {
-                f["value"] = *static_cast<InspectedField<float>*>(field.get())->field;
+                f["value"] = *static_cast<InspectedField<float> *>(field.get())->field;
             } else if (field->type == FieldType::STRING || field->type == FieldType::RESOURCE) {
-                f["value"] = *static_cast<InspectedField<std::string>*>(field.get())->field;
+                f["value"] = *static_cast<InspectedField<std::string> *>(field.get())->field;
+                if (field->type == FieldType::RESOURCE) {
+                    nlohmann::json supportedFileTypes = nlohmann::json::array();
+                    auto *resourceField = static_cast<InspectedField<std::string> *>(field.get());
+                    for (const auto *info: resourceField->supportedFileTypes) {
+                        nlohmann::json i;
+                        i["extension"] = info->extension;
+                        i["name"] = info->name;
+                        i["typeLabel"] = info->typeLabel;
+                        i["icon"] = info->icon;
+                        supportedFileTypes.push_back(i);
+                    }
+                    f["supportedFileTypes"] = supportedFileTypes;
+                }
             } else if (field->type == FieldType::VECTOR2) {
-                auto v = *static_cast<InspectedField<glm::vec2>*>(field.get())->field;
+                auto v = *static_cast<InspectedField<glm::vec2> *>(field.get())->field;
                 f["value"] = {{"x", v.x}, {"y", v.y}};
             } else if (field->type == FieldType::VECTOR3 || field->type == FieldType::COLOR) {
-                auto v = *static_cast<InspectedField<glm::vec3>*>(field.get())->field;
+                auto v = *static_cast<InspectedField<glm::vec3> *>(field.get())->field;
                 f["value"] = {{"x", v.x}, {"y", v.y}, {"z", v.z}};
             } else if (field->type == FieldType::VECTOR4) {
-                auto v = *static_cast<InspectedField<glm::vec4>*>(field.get())->field;
+                auto v = *static_cast<InspectedField<glm::vec4> *>(field.get())->field;
                 f["value"] = {{"x", v.x}, {"y", v.y}, {"z", v.z}, {"w", v.w}};
             } else if (field->type == FieldType::QUAT) {
-                auto q = *static_cast<InspectedField<glm::quat>*>(field.get())->field;
+                auto q = *static_cast<InspectedField<glm::quat> *>(field.get())->field;
                 f["value"] = {{"x", q.x}, {"y", q.y}, {"z", q.z}, {"w", q.w}};
             }
 
@@ -188,9 +202,8 @@ namespace Metal {
     }
 
     void Inspectable::registerResourceSelection(std::string &v, std::string group, std::string name,
-                                                const std::vector<std::string> &supportedFileTypes,
+                                                const std::vector<const FileExtensionInfo *> &supportedFileTypes,
                                                 bool disabled) {
-
         DECLARATION(std::string, RESOURCE)
         field->supportedFileTypes = supportedFileTypes;
         fields.push_back(std::move(field));
