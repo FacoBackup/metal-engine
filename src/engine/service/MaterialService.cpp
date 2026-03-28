@@ -26,13 +26,7 @@ namespace Metal {
     }
 
     void MaterialService::onSync() {
-        bool changed = false;
-
-        if (fullRebuildNeeded) {
-            changed |= rebuildMaterialData();
-        }
-
-        changed |= processDirtyMaterials();
+        bool changed = processDirtyMaterials();
 
         if (changed) {
             uploadMaterialData();
@@ -43,35 +37,18 @@ namespace Metal {
         LOG_INFO("Rebuilding material data...");
         fullRebuildNeeded = false;
         materialData.clear();
+        materialCache.clear();
 
         auto view = worldRepository->registry.view<PrimitiveComponent>();
-        uint32_t maxIndex = 0;
-        for (auto entity: view) {
-            if (worldRepository->hiddenEntities.contains(entity)) continue;
-            auto &meshComp = view.get<PrimitiveComponent>(entity);
-            if (meshComp.renderIndex != 0xFFFFFFFF && meshComp.renderIndex >= maxIndex) {
-                maxIndex = meshComp.renderIndex + 1;
-            }
-        }
 
-        if (maxIndex == 0) {
-            LOG_DEBUG("No meshes found for material data rebuild.");
-            return false;
-        }
-
-        LOG_DEBUG("Resizing material data to " + std::to_string(maxIndex));
-        materialData.resize(maxIndex);
         bool changed = false;
-
         for (auto entity: view) {
             if (worldRepository->hiddenEntities.contains(entity)) continue;
             auto &meshComp = view.get<PrimitiveComponent>(entity);
-            if (meshComp.meshId.empty() || meshComp.renderIndex == 0xFFFFFFFF) continue;
+            if (meshComp.meshId.empty()) continue;
 
-            if (meshComp.renderIndex < materialData.size()) {
-                load(materialData[meshComp.renderIndex], meshComp);
-                changed = true;
-            }
+            getMaterialIndex(meshComp);
+            changed = true;
         }
         return changed;
     }
@@ -88,15 +65,16 @@ namespace Metal {
             if (!worldRepository->registry.valid(entity)) continue;
             if (worldRepository->hiddenEntities.contains(entity)) continue;
             auto &meshComp = worldRepository->registry.get<PrimitiveComponent>(entity);
-            if (meshComp.meshId.empty() || meshComp.renderIndex == 0xFFFFFFFF) continue;
+            if (meshComp.meshId.empty()) continue;
 
-            if (meshComp.renderIndex < materialData.size()) {
-                load(materialData[meshComp.renderIndex], meshComp);
+            std::string key = getMaterialKey(meshComp);
+            if (materialCache.contains(key)) {
+                uint32_t index = materialCache[key];
+                load(materialData[index], meshComp);
                 changed = true;
             } else {
-                LOG_WARN("Dirty entity " + std::to_string(static_cast<uint32_t>(entity)) +
-                         " has renderIndex out of bounds (" + std::to_string(meshComp.renderIndex) +
-                         " >= " + std::to_string(materialData.size()) + ")");
+                getMaterialIndex(meshComp);
+                changed = true;
             }
         }
         return changed;
@@ -111,10 +89,8 @@ namespace Metal {
             auto &meshComp = view.get<PrimitiveComponent>(entity);
             if (meshComp.meshId.empty()) continue;
 
-            if (meshComp.renderIndex < materialData.size()) {
-                load(materialData[meshComp.renderIndex], meshComp);
-                changed = true;
-            }
+            getMaterialIndex(meshComp);
+            changed = true;
         }
 
         if (changed) {
@@ -137,33 +113,61 @@ namespace Metal {
         }
     }
 
-    void MaterialService::load(MaterialData &materialData, PrimitiveComponent &data) {
-        materialData.transmission = data.transmissionFactor;
-        materialData.thickness = data.thicknessFactor;
-        materialData.ior = data.ior;
-        materialData.isEmissive = worldRepository->hasComponent(data.getEntityId(), LIGHT) ? 1 : 0;
+    void MaterialService::clear() {
+        materialData.clear();
+        materialCache.clear();
+        fullRebuildNeeded = false;
+    }
 
-        materialData.albedoTextureId = 0;
-        materialData.roughnessTextureId = 0;
-        materialData.metallicTextureId = 0;
+    void MaterialService::load(MaterialData &dest, const PrimitiveComponent &data) {
+        dest.transmission = data.transmissionFactor;
+        dest.thickness = data.thicknessFactor;
+        dest.ior = data.ior;
+        dest.isEmissive = worldRepository->hasComponent(data.getEntityId(), LIGHT) ? 1 : 0;
+
+        dest.albedoTextureId = 0;
+        dest.roughnessTextureId = 0;
+        dest.metallicTextureId = 0;
 
         if (!data.albedo.empty()) {
             auto *tex = textureService->stream(data.albedo);
             if (tex != nullptr) {
-                materialData.albedoTextureId = textureService->getTextureIndex(data.albedo);
+                dest.albedoTextureId = textureService->getTextureIndex(data.albedo);
             }
         }
         if (!data.roughness.empty()) {
             auto *tex = textureService->stream(data.roughness);
             if (tex != nullptr) {
-                materialData.roughnessTextureId = textureService->getTextureIndex(data.roughness);
+                dest.roughnessTextureId = textureService->getTextureIndex(data.roughness);
             }
         }
         if (!data.metallic.empty()) {
             auto *tex = textureService->stream(data.metallic);
             if (tex != nullptr) {
-                materialData.metallicTextureId = textureService->getTextureIndex(data.metallic);
+                dest.metallicTextureId = textureService->getTextureIndex(data.metallic);
             }
         }
+    }
+
+    std::string MaterialService::getMaterialKey(const PrimitiveComponent &component) const {
+        return component.albedo + "|" + component.roughness + "|" + component.metallic + "|" +
+               std::to_string(component.transmissionFactor) + "|" +
+               std::to_string(component.thicknessFactor) + "|" +
+               std::to_string(component.ior) + "|" +
+               std::to_string(worldRepository->hasComponent(component.getEntityId(), LIGHT));
+    }
+
+    uint32_t MaterialService::getMaterialIndex(const PrimitiveComponent &component) {
+        std::string key = getMaterialKey(component);
+        if (materialCache.contains(key)) {
+            return materialCache[key];
+        }
+
+        uint32_t index = static_cast<uint32_t>(materialData.size());
+        materialData.emplace_back();
+        load(materialData.back(), component);
+        materialCache[key] = index;
+
+        return index;
     }
 } // Metal

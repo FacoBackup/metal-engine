@@ -6,6 +6,9 @@
 #include "../../common/IEventMember.h"
 #include "../dto/MaterialData.h"
 
+#include "../dto/PrimitiveComponent.h"
+#include <map>
+
 namespace Metal {
     struct MaterialData;
     struct PrimitiveComponent;
@@ -23,6 +26,7 @@ namespace Metal {
         DirtyStateService *dirtyStateService = nullptr;
 
         std::vector<MaterialData> materialData{};
+        std::map<std::string, uint32_t> materialCache{};
         bool fullRebuildNeeded = false;
 
         /**
@@ -36,6 +40,8 @@ namespace Metal {
          * @return True if any material data was changed.
          */
         bool processDirtyMaterials();
+
+        [[nodiscard]] std::string getMaterialKey(const PrimitiveComponent &component) const;
 
     public:
         std::vector<Dependency> getDependencies() override {
@@ -52,11 +58,15 @@ namespace Metal {
 
         void onSync() override;
 
-        void load(MaterialData &data, PrimitiveComponent &component);
+        void load(MaterialData &dest, const PrimitiveComponent &component);
 
         void uploadMaterialData();
 
         void updateMeshMaterials();
+
+        void clear();
+
+        uint32_t getMaterialIndex(const PrimitiveComponent &component);
     };
 } // Metal
 

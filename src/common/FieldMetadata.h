@@ -60,9 +60,9 @@ namespace Metal {
         std::function<void()> callback;
 
         // Metadata
-        std::optional<float> min;
-        std::optional<float> max;
-        std::optional<float> increment;
+        std::optional<float> min = std::numeric_limits<float>::min();
+        std::optional<float> max = std::numeric_limits<float>::max();
+        std::optional<float> increment = 1;
         bool disabled = false;
         std::vector<const FileExtensionInfo *> supportedFileTypes{};
 

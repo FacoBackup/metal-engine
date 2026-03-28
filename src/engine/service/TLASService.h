@@ -20,6 +20,8 @@ namespace Metal {
     class DirtyStateService;
     struct BufferInstance;
 
+    class MaterialService;
+
     class EngineContext;
 
     class TLASService final : public IService, public IEventMember, public IDisposable, public IInit, public ISync {
@@ -31,6 +33,7 @@ namespace Metal {
         PipelineService *pipelineService = nullptr;
         DirtyStateService *dirtyStateService = nullptr;
         EngineContext *engineContext = nullptr;
+        MaterialService *materialService = nullptr;
 
         VkAccelerationStructureKHR tlas = VK_NULL_HANDLE;
         BufferInstance *tlasBuffer = nullptr;
@@ -57,7 +60,8 @@ namespace Metal {
                 {"DescriptorSetService", &descriptorSetService},
                 {"PipelineService", &pipelineService},
                 {"DirtyStateService", &dirtyStateService},
-                {"EngineContext", &engineContext}
+                {"EngineContext", &engineContext},
+                {"MaterialService", &materialService}
             };
         }
 

@@ -5,6 +5,7 @@
 
 struct PrimitiveData {
     uint materialIndex;
+    uint renderIndex;
     uint64_t vertexBufferAddress;
     uint64_t indexBufferAddress;
 };

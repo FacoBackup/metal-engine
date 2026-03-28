@@ -23,9 +23,6 @@ namespace Metal {
     ResourceField::ResourceField(FieldMetadata &field) : field(field) {
     }
 
-    void ResourceField::onInitialize() {
-    }
-
     void ResourceField::renderButton() {
         std::string *ptr = static_cast<std::string *>(field.pointer);
         ImGui::Text(field.name.c_str());
@@ -34,7 +31,7 @@ namespace Metal {
         if (UIUtil::ButtonSimple(Icons::file_open + id, UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
             std::vector<nfdu8filteritem_t> filters;
             for (const auto &type: field.supportedFileTypes) {
-                filters.push_back({type->name.c_str(), type->typeLabel.c_str()});
+                filters.push_back({type->typeLabel.c_str(), type->name.c_str()});
             }
             std::string selected = FileDialogUtil::PickFile(filters);
             if (!selected.empty()) {

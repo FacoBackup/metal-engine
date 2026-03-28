@@ -19,10 +19,12 @@ namespace Metal {
 
     public:
         std::vector<Dependency> getDependencies() override {
-            return {{"FilesService", &filesService}};
+            return {
+                {"FilesService", &filesService},
+                {"ThemeService", &themeService},
+                {"HistoryService", &historyService}
+            };
         }
-
-        void onInitialize() override;
 
         void renderButton();
 

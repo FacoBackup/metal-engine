@@ -8,7 +8,7 @@
 
 namespace Metal {
     void FloatField::onSync() {
-        float *ptr = static_cast<float *>(field.pointer);
+        auto *ptr = static_cast<float *>(field.pointer);
         if (field.disabled) {
             ImGui::Text("%s:", field.name.c_str());
             ImGui::TextDisabled("%f", *ptr);

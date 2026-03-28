@@ -13,18 +13,19 @@ namespace Metal {
 
     class AbstractFormFieldPanel : public AbstractPanel {
     protected:
-        const std::string* filter = nullptr;
+        const std::string *filter = nullptr;
 
         ThemeService *themeService = nullptr;
         HistoryService *historyService = nullptr;
-    public:
 
+    public:
         std::vector<Dependency> getDependencies() override {
             return {
-                    {"ThemeService", &themeService},
-                    {"HistoryService", &historyService}
+                {"ThemeService", &themeService},
+                {"HistoryService", &historyService}
             };
         }
+
         [[nodiscard]] virtual bool isVisible() const = 0;
 
         void onSyncChildren() const override {
@@ -34,7 +35,8 @@ namespace Metal {
                 }
             }
         }
-        void setFilter(const std::string* f) {
+
+        void setFilter(const std::string *f) {
             filter = f;
         }
     };

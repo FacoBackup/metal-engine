@@ -2,6 +2,7 @@
 #include <core/VulkanContext.h>
 #include <engine/service/BufferService.h>
 #include <engine/service/BLASService.h>
+#include <engine/service/MaterialService.h>
 #include <engine/dto/PrimitiveData.h>
 #include <engine/EngineContext.h>
 #include <engine/repository/WorldRepository.h>
@@ -75,6 +76,7 @@ namespace Metal {
     }
 
     void TLASService::updatePrimitiveBuffer() {
+        materialService->clear();
         std::vector<PrimitiveData> primitiveDatas(MAX_MESH_INSTANCES);
         auto view = worldRepository->registry.view<PrimitiveComponent>();
 
@@ -87,7 +89,8 @@ namespace Metal {
                 auto *blas = blasService->buildBLAS(meshComp.meshId);
                 if (blas && blas->vertexData && blas->indexData) {
                     auto &primitiveData = primitiveDatas[meshComp.renderIndex];
-                    primitiveData.materialIndex = meshComp.renderIndex;
+                    primitiveData.materialIndex = materialService->getMaterialIndex(meshComp);
+                    primitiveData.renderIndex = meshComp.renderIndex;
                     primitiveData.vertexBufferAddress = getDeviceAddress(blas->vertexData->vkBuffer);
                     primitiveData.indexBufferAddress = getDeviceAddress(blas->indexData->vkBuffer);
                 }
@@ -100,6 +103,7 @@ namespace Metal {
                 buffer->update(primitiveDatas.data(), primitiveDatas.size() * sizeof(PrimitiveData));
             }
         }
+        materialService->uploadMaterialData();
     }
 
     void TLASService::dispose() {

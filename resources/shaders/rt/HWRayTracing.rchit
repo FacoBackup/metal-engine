@@ -17,12 +17,11 @@ hitAttributeEXT vec2 attribs; // Barycentric coordinates for the hit
 void main() {
     uint primitiveIndex = gl_InstanceCustomIndexEXT;
     PrimitiveData primitive = primitiveBuffer.items[primitiveIndex];
-    MaterialData material = materialBuffer.items[primitive.materialIndex];
 
     TriangleData tri = getTriangleData(primitive, gl_PrimitiveID);
 
     const vec3 barycentrics = vec3(1.0 - attribs.x - attribs.y, attribs.x, attribs.y);
-    
+
     vec3 normal = tri.n0 * barycentrics.x + tri.n1 * barycentrics.y + tri.n2 * barycentrics.z;
     vec2 uv = tri.uv0 * barycentrics.x + tri.uv1 * barycentrics.y + tri.uv2 * barycentrics.z;
 
@@ -32,7 +31,7 @@ void main() {
     payload.hitNormal = normalize(vec3(gl_ObjectToWorldEXT * vec4(normal, 0.0)));
     payload.uv = uv;
 
-    payload.renderIndex = primitive.materialIndex;
+    payload.renderIndex = primitive.renderIndex;
 
     vec3 baseColor = vec3(1.0);
     float roughness = 1.0;
@@ -43,6 +42,7 @@ void main() {
     bool isEmissive = false;
 
     payload.alpha = 1.0;
+    MaterialData material = materialBuffer.items[primitive.materialIndex];
     if (material.albedoTexture != 0u) {
         vec4 alb = texture(textureArray[nonuniformEXT(material.albedoTexture)], uv);
         payload.alpha = alb.a;
