@@ -4,7 +4,8 @@
 namespace Metal {
     inline constexpr const char* RID_GLOBAL_DATA = "globalData";
     inline constexpr const char* RID_LIGHT_BUFFER = "lightBuffer";
-    inline constexpr const char* RID_MESH_METADATA_BUFFER = "meshMetadataBuffer";
+    inline constexpr const char* RID_MATERIAL_DATA_BUFFER = "materialDataBuffer";
+    inline constexpr const char* RID_PRIMITIVE_DATA_BUFFER = "primitiveDataBuffer";
     inline constexpr const char* RID_GBUFFER_POSITION_INDEX = "gBufferPositionIndex";
     inline constexpr const char* RID_GBUFFER_NORMAL = "gBufferNormal";
     inline constexpr const char* RID_PREVIOUS_POSITION_INDEX = "previousPositionIndex";

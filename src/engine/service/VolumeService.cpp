@@ -2,7 +2,7 @@
 #include "../../ApplicationContext.h"
 #include "../dto/VolumeComponent.h"
 #include "../resource/BufferInstance.h"
-#include "../../editor/enum/EngineResourceIDs.h"
+#include "editor/enum/EngineResourceIDs.h"
 #include "../repository/WorldRepository.h"
 #include "../dto/TransformComponent.h"
 #include "../dto/VolumeComponent.h"

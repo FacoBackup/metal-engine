@@ -4,7 +4,7 @@
 #include <filesystem>
 
 #include "../util/ImageUtils.h"
-#include "../../editor/enum/engine-definitions.h"
+#include "editor/enum/engine-definitions.h"
 #include "../../ApplicationContext.h"
 #include "../../ApplicationEventContext.h"
 

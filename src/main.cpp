@@ -4,7 +4,9 @@
 #include "core/WindowService.h"
 #include "core/ImGuiService.h"
 #include "core/VulkanContext.h"
-#include "editor/EditorPanel.h"
+#include "core/service/ThreadManager.h"
+#include "engine/service/AsyncSyncService.h"
+#include "editor/ui/EditorPanel.h"
 #include "editor/service/AsyncTaskService.h"
 #include "editor/service/DockService.h"
 #include "editor/service/FileImporterService.h"
@@ -13,9 +15,10 @@
 #include "editor/service/HttpService.h"
 #include "editor/service/MaterialImporterService.h"
 #include "editor/service/AIAssistantService.h"
-#include "editor/util/WorldToolProvider.h"
-#include "editor/util/ScriptingToolProvider.h"
-#include "editor/util/InspectionToolProvider.h"
+#include "editor/tools/WorldToolProvider.h"
+#include "editor/tools/ScriptingToolProvider.h"
+#include "editor/tools/LayoutingToolProvider.h"
+#include "editor/tools/InspectionToolProvider.h"
 #include "editor/service/MeshImporterService.h"
 #include "editor/service/NotificationService.h"
 #include "editor/service/PickingService.h"
@@ -43,7 +46,8 @@
 #include "engine/service/MaterialService.h"
 #include "engine/service/MeshService.h"
 #include "engine/service/PipelineService.h"
-#include "engine/service/RayTracingService.h"
+#include "engine/service/BLASService.h"
+#include "engine/service/TLASService.h"
 #include "engine/service/ShaderService.h"
 #include "engine/service/StreamingService.h"
 #include "engine/service/TextureService.h"
@@ -51,6 +55,7 @@
 #include "engine/service/VolumeService.h"
 #include "engine/service/VoxelService.h"
 #include "engine/EngineContext.h"
+#include "engine/service/DirtyStateService.h"
 
 int main(int, char **) {
     std::shared_ptr<Metal::ApplicationContext> context = std::make_shared<Metal::ApplicationContext>(true);
@@ -61,8 +66,11 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::VulkanContext>());
     context->registerSingleton(std::make_shared<Metal::ImGuiService>());
     context->registerSingleton(std::make_shared<Metal::DirectoryService>());
+    context->registerSingleton(std::make_shared<Metal::ThreadManager>());
+    context->registerSingleton(std::make_shared<Metal::AsyncSyncService>());
     // --- ORDER MATTERS
 
+    context->registerSingleton(std::make_shared<Metal::DirtyStateService>());
     context->registerSingleton(std::make_shared<Metal::FilesService>());
     context->registerSingleton(std::make_shared<Metal::EngineContext>());
     context->registerSingleton(std::make_shared<Metal::EngineRepository>());
@@ -88,6 +96,7 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::AIAssistantService>());
     context->registerSingleton(std::make_shared<Metal::WorldToolProvider>());
     context->registerSingleton(std::make_shared<Metal::ScriptingToolProvider>());
+    context->registerSingleton(std::make_shared<Metal::LayoutingToolProvider>());
     context->registerSingleton(std::make_shared<Metal::InspectionToolProvider>());
     context->registerSingleton(std::make_shared<Metal::SceneImporterService>());
 
@@ -107,7 +116,8 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::StreamingService>());
 
     context->registerSingleton(std::make_shared<Metal::VoxelService>());
-    context->registerSingleton(std::make_shared<Metal::RayTracingService>());
+    context->registerSingleton(std::make_shared<Metal::BLASService>());
+    context->registerSingleton(std::make_shared<Metal::TLASService>());
     context->registerSingleton(std::make_shared<Metal::ShaderService>());
     context->registerSingleton(std::make_shared<Metal::FrameService>());
 

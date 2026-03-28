@@ -11,10 +11,13 @@ namespace Metal {
 
         static void CheckVKResult(VkResult err);
 
+        static const char *GetVkResultString(VkResult err);
+
         static VkFormat GetValidDepthFormat(VkPhysicalDevice physicalDevice);
 
-        static unsigned int GetMemTypeIndex(const VkPhysicalDeviceMemoryProperties &deviceMemProps, unsigned int typeBits,
-                                        VkFlags properties);
+        static unsigned int GetMemTypeIndex(const VkPhysicalDeviceMemoryProperties &deviceMemProps,
+                                            unsigned int typeBits,
+                                            VkFlags properties);
     };
 }
 

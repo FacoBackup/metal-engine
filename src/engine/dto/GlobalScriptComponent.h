@@ -2,19 +2,17 @@
 #define GLOBAL_SCRIPT_COMPONENT_H
 
 #include "AbstractComponent.h"
-#include "../../common/ISerialize.h"
+
 
 namespace Metal {
-    struct GlobalScriptComponent final : AbstractComponent, ISerialize {
+    struct GlobalScriptComponent final : AbstractComponent {
         std::string scriptPath;
 
+    protected:
         void registerFields() override;
 
+    public:
         ComponentType getType() const override;
-
-        nlohmann::json toJson() const override;
-
-        void fromJson(const nlohmann::json& j) override;
     };
 }
 #endif //GLOBAL_SCRIPT_COMPONENT_H

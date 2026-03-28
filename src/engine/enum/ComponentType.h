@@ -8,7 +8,7 @@
 
 namespace Metal {
     class ApplicationContext;
-    class Inspectable;
+    class Reflection;
     struct WorldRepository;
 
     enum ComponentType {
@@ -37,7 +37,7 @@ namespace Metal::ComponentTypes {
         std::function<void(WorldRepository &, entt::entity)> creator;
         std::function<nlohmann::json(WorldRepository &, entt::entity)> toJson;
         std::function<void(WorldRepository &, entt::entity, const nlohmann::json &)> fromJson;
-        std::function<Inspectable*(WorldRepository &, entt::entity)> getInspectable;
+        std::function<Reflection*(WorldRepository &, entt::entity)> getInspectable;
         std::function<bool(const WorldRepository &, entt::entity)> hasComponent;
     };
 

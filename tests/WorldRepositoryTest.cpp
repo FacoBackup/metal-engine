@@ -3,38 +3,42 @@
 #include "../src/ApplicationContext.h"
 #include "../src/engine/repository/WorldRepository.h"
 #include "../src/engine/dto/MetadataComponent.h"
-#include "../src/engine/service/RayTracingService.h"
 #include "../src/editor/service/HistoryService.h"
 #include "../src/core/DirectoryService.h"
 #include "../src/engine/EngineContext.h"
 #include "../src/ApplicationEventContext.h"
+#include "../src/engine/service/DirtyStateService.h"
 #include <iostream>
 
 using namespace Metal;
 
 class WorldRepositoryTest : public ::testing::Test, public IEventMember {
 protected:
-    std::unique_ptr<ApplicationContext> context;
+    std::shared_ptr<ApplicationContext> context;
     WorldRepository *repo;
     std::vector<std::string> eventLog;
 
     void SetUp() override {
         eventLog.clear();
-        context = std::make_unique<ApplicationContext>(true);
+        context = std::make_shared<ApplicationContext>(true);
+        context->registerSingleton(context);
 
         auto worldRepo = std::make_shared<WorldRepository>();
-        auto rayTracingService = std::make_shared<RayTracingService>();
         auto directoryService = std::make_shared<DirectoryService>();
-        auto engineContext = std::make_shared<EngineContext>();
         auto historyService = std::make_shared<HistoryService>();
+        auto dirtyStateService = std::make_shared<DirtyStateService>();
 
         context->registerSingleton<WorldRepository>(worldRepo);
-        context->registerSingleton<RayTracingService>(rayTracingService);
         context->registerSingleton<DirectoryService>(directoryService);
-        context->registerSingleton<EngineContext>(engineContext);
         context->registerSingleton<HistoryService>(historyService);
+        context->registerSingleton<DirtyStateService>(dirtyStateService);
 
         context->injectDependencies(worldRepo.get());
+        context->injectDependencies(historyService.get());
+        context->injectDependencies(directoryService.get());
+        context->injectDependencies(dirtyStateService.get());
+
+        context->onInitialize();
 
         repo = worldRepo.get();
 

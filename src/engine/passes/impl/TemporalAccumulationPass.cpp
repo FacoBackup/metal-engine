@@ -3,7 +3,7 @@
 #include "../../resource/TextureInstance.h"
 #include "../../service/PipelineService.h"
 #include "../../frame-builder/EngineFrame.h"
-#include "../../../editor/enum/EngineResourceIDs.h"
+#include "editor/enum/EngineResourceIDs.h"
 
 namespace Metal {
     void TemporalAccumulationPass::onInitialize() {

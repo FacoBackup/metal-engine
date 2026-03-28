@@ -1,7 +1,7 @@
 #include "SelectionService.h"
-#include "../../editor/repository/EditorRepository.h"
-#include "../../engine/repository/WorldRepository.h"
-#include "../../engine/dto/TransformComponent.h"
+#include "editor/repository/EditorRepository.h"
+#include "engine/repository/WorldRepository.h"
+#include "engine/dto/TransformComponent.h"
 
 namespace Metal {
     void SelectionService::addSelected(entt::entity entity) const {

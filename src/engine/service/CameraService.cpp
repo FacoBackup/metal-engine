@@ -5,20 +5,22 @@
 #include "../EngineContext.h"
 #include "../repository/WorldRepository.h"
 #include "../repository/RuntimeRepository.h"
-#include "../../editor/dto/FieldModificationEvent.h"
+#include "../service/DirtyStateService.h"
+#include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
     void CameraService::onInitialize() {
-        eventListener([this](const Event &e) {
-            dirty = true;
+        dirtyStateService->markDirty(DirtyType::Camera);
+        eventListener([this](const Event &) {
+            dirtyStateService->markDirty(DirtyType::Camera);
         }, "Camera");
 
-        eventListener([this](const Event &e) { forwardPressed = true; }, "CameraMoveForward");
-        eventListener([this](const Event &e) { backwardPressed = true; }, "CameraMoveBackward");
-        eventListener([this](const Event &e) { leftPressed = true; }, "CameraMoveLeft");
-        eventListener([this](const Event &e) { rightPressed = true; }, "CameraMoveRight");
-        eventListener([this](const Event &e) { upPressed = true; }, "CameraMoveUp");
-        eventListener([this](const Event &e) { downPressed = true; }, "CameraMoveDown");
+        eventListener([this](const Event &) { forwardPressed = true; }, "CameraMoveForward");
+        eventListener([this](const Event &) { backwardPressed = true; }, "CameraMoveBackward");
+        eventListener([this](const Event &) { leftPressed = true; }, "CameraMoveLeft");
+        eventListener([this](const Event &) { rightPressed = true; }, "CameraMoveRight");
+        eventListener([this](const Event &) { upPressed = true; }, "CameraMoveUp");
+        eventListener([this](const Event &) { downPressed = true; }, "CameraMoveDown");
     }
 
     // Per frame
@@ -26,10 +28,10 @@ namespace Metal {
         camera = &worldRepository->camera;
         if (camera != nullptr) {
             updateAspectRatio();
-            if (dirty) {
+            if (dirtyStateService->isDirty(DirtyType::Camera)) {
                 updateMatrices();
                 engineContext->setCameraUpdated(true);
-                dirty = false;
+                dirtyStateService->consumeDirtyFlags(DirtyType::Camera);
             }
         }
         forwardPressed = false;
@@ -44,7 +46,7 @@ namespace Metal {
         const float prevAspect = camera->aspectRatio;
         camera->aspectRatio = runtimeRepository->viewportW / runtimeRepository->viewportH;
         if (prevAspect != camera->aspectRatio) {
-            dirty = true;
+            dirtyStateService->markDirty(DirtyType::Camera);
         }
     }
 
@@ -94,11 +96,11 @@ namespace Metal {
                                  engineContext->deltaTime;
         if (leftPressed) {
             camera->position += right * multiplier;
-            dirty = true;
+            dirtyStateService->markDirty(DirtyType::Camera);
         }
         if (rightPressed) {
             camera->position -= right * multiplier;
-            dirty = true;
+            dirtyStateService->markDirty(DirtyType::Camera);
         }
         if (backwardPressed) {
             if (camera->isOrthographic) {
@@ -106,7 +108,7 @@ namespace Metal {
             } else {
                 camera->position -= forward * multiplier;
             }
-            dirty = true;
+            dirtyStateService->markDirty(DirtyType::Camera);
         }
         if (forwardPressed) {
             if (camera->isOrthographic) {
@@ -114,15 +116,15 @@ namespace Metal {
             } else {
                 camera->position += forward * multiplier;
             }
-            dirty = true;
+            dirtyStateService->markDirty(DirtyType::Camera);
         }
         if (upPressed) {
             camera->position += glm::vec3(0, 1, 0) * multiplier;
-            dirty = true;
+            dirtyStateService->markDirty(DirtyType::Camera);
         }
         if (downPressed) {
             camera->position -= glm::vec3(0, 1, 0) * multiplier;
-            dirty = true;
+            dirtyStateService->markDirty(DirtyType::Camera);
         }
     }
 
@@ -137,7 +139,7 @@ namespace Metal {
         camera->pitch += glm::radians(camera->deltaY);
         camera->pitch = glm::clamp(camera->pitch, -MIN_MAX_PITCH, MIN_MAX_PITCH);
 
-        dirty = true;
+        dirtyStateService->markDirty(DirtyType::Camera);
     }
 
     void CameraService::updateDelta(const bool isFirstMovement) const {

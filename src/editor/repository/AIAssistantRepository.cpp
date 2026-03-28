@@ -1,5 +1,5 @@
 #include "AIAssistantRepository.h"
-#include "../../common/Icons.h"
+#include "common/Icons.h"
 #include <ctime>
 #include <iomanip>
 #include <sstream>
@@ -13,27 +13,25 @@ namespace Metal {
         return Icons::comment.c_str();
     }
 
-    nlohmann::json AIAssistantRepository::toJson() const {
-        nlohmann::json j;
-        nlohmann::json chatsJson = nlohmann::json::array();
-        for (const auto& chat : chats) {
-            if (chat) {
-                chatsJson.push_back(chat->toJson());
+    void AIAssistantRepository::registerFields() {
+        auto chatsToJson = [this] {
+            nlohmann::json j = nlohmann::json::array();
+            for (const auto &c: chats) {
+                if (c) j.push_back(c->toJson());
             }
-        }
-        j["chats"] = chatsJson;
-        return j;
-    }
+            return j;
+        };
 
-    void AIAssistantRepository::fromJson(const nlohmann::json &j) {
-        if (j.contains("chats") && j.at("chats").is_array()) {
+        auto chatsFromJson = [this](const nlohmann::json &j) {
             chats.clear();
-            for (const auto& chatJson : j.at("chats")) {
-                auto chat = std::make_shared<Chat>();
-                chat->fromJson(chatJson);
-                chats.push_back(chat);
+            for (const auto &item: j) {
+                auto c = std::make_shared<Chat>();
+                c->fromJson(item);
+                chats.push_back(c);
             }
-        }
+        };
+
+        registerGenericField(chatsToJson, chatsFromJson).setName("chats");
     }
 
     std::shared_ptr<Chat> AIAssistantRepository::findChatById(const std::string &id) {

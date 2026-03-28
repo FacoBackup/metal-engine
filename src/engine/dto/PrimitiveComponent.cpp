@@ -5,51 +5,23 @@
 
 namespace Metal {
     void PrimitiveComponent::registerFields() {
-        registerResourceSelection(meshId, "", "Mesh", MESH_EXTENSIONS);
-        registerColor(albedoColor, "", "Albedo color");
-        registerFloat(roughnessFactor, "", "Roughness factor", 0, 1);
-        registerFloat(metallicFactor, "", "Metallic factor", 0, 1);
-        registerFloat(transmissionFactor, "", "Transmission factor", 0, 1);
-        registerFloat(thicknessFactor, "", "Thickness factor", 0, 10);
-        registerFloat(ior, "", "IOR", 1, 3);
-        registerResourceSelection(albedo, "", "Albedo", TEXTURE_EXTENSIONS);
-        registerResourceSelection(roughness, "", "Roughness texture", TEXTURE_EXTENSIONS);
-        registerResourceSelection(metallic, "", "Metallic Texture", TEXTURE_EXTENSIONS);
+        static const std::vector<const FileExtensionInfo *> meshExtensions = {Metal::FileExtensions::mesh.get()};
+        static const std::vector<const FileExtensionInfo *> textureExtensions = {
+            Metal::FileExtensions::png.get(), Metal::FileExtensions::jpg.get(),
+            Metal::FileExtensions::jpeg.get(),
+            Metal::FileExtensions::tga.get()
+        };
+        registerEditableField<RESOURCE>(&meshId).setName("Mesh").setGroup("").setSupportedFileTypes(meshExtensions);
+        registerEditableField<FLOAT>(&transmissionFactor).setName("Transmission factor").setGroup("").setMin(0).setMax(1);
+        registerEditableField<FLOAT>(&thicknessFactor).setName("Thickness factor").setGroup("").setMin(0).setMax(10);
+        registerEditableField<FLOAT>(&ior).setName("IOR").setGroup("").setMin(1).setMax(3);
+        registerEditableField<RESOURCE>(&albedo).setName("Albedo").setGroup("").setSupportedFileTypes(textureExtensions);
+        registerEditableField<RESOURCE>(&roughness).setName("Roughness texture").setGroup("").setSupportedFileTypes(textureExtensions);
+        registerEditableField<RESOURCE>(&metallic).setName("Metallic Texture").setGroup("").setSupportedFileTypes(textureExtensions);
+        registerSerializableOnlyField<UINT>(&renderIndex).setName("renderIndex");
     }
 
     ComponentType PrimitiveComponent::getType() const {
-        return ComponentType::PRIMITIVE;
-    }
-
-    nlohmann::json PrimitiveComponent::toJson() const {
-        nlohmann::json j;
-        j["entityId"] = entityId;
-        j["meshId"] = meshId;
-        j["albedo"] = albedo;
-        j["roughness"] = roughness;
-        j["metallic"] = metallic;
-        j["albedoColor"] = {albedoColor.x, albedoColor.y, albedoColor.z};
-        j["roughnessFactor"] = roughnessFactor;
-        j["metallicFactor"] = metallicFactor;
-        j["transmissionFactor"] = transmissionFactor;
-        j["thicknessFactor"] = thicknessFactor;
-        j["ior"] = ior;
-        return j;
-    }
-
-    void PrimitiveComponent::fromJson(const nlohmann::json &j) {
-        entityId = j.at("entityId").get<entt::entity>();
-        meshId = j.at("meshId").get<std::string>();
-
-        albedo = j.at("albedo").get<std::string>();
-        roughness = j.at("roughness").get<std::string>();
-        metallic = j.at("metallic").get<std::string>();
-        roughnessFactor = j.at("roughnessFactor").get<float>();
-        metallicFactor = j.at("metallicFactor").get<float>();
-        transmissionFactor = j.value("transmissionFactor", 0.0f);
-        thicknessFactor = j.value("thicknessFactor", 0.0f);
-        ior = j.value("ior", 1.45f);
-
-        albedoColor = {j.at("albedoColor")[0], j.at("albedoColor")[1], j.at("albedoColor")[2]};
+        return PRIMITIVE;
     }
 }

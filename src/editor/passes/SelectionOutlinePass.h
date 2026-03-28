@@ -1,7 +1,7 @@
 #ifndef SELECTEDDOTPASS_H
 #define SELECTEDDOTPASS_H
 
-#include "../../engine/passes/AbstractRenderPass.h"
+#include "engine/passes/AbstractRenderPass.h"
 #include "../dto/SelectionOutlinePushConstant.h"
 
 namespace Metal {

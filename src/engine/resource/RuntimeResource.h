@@ -1,7 +1,7 @@
 #ifndef IGPURESOURCE_H
 #define IGPURESOURCE_H
 #include "../enum/ResourceType.h"
-#include "../../editor/util/Util.h"
+#include "../../common/Util.h"
 #include <chrono>
 
 #include "../../common/IContextMember.h"

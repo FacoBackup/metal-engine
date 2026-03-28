@@ -1,10 +1,10 @@
 #ifndef ABSTRACTCOMPONENT_H
 #define ABSTRACTCOMPONENT_H
-#include "../../common/Inspectable.h"
+#include "../../common/Reflection.h"
 #include "../enum/ComponentType.h"
 
 namespace Metal {
-    struct AbstractComponent : Inspectable {
+    struct AbstractComponent : Reflection {
         AbstractComponent() = default;
 
         [[nodiscard]] entt::entity getEntityId() const {

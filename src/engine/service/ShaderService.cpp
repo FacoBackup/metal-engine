@@ -8,11 +8,11 @@
 
 #include "../dto/ShaderModule.h"
 #include "../../common/VulkanUtils.h"
-#include "../../editor/util/Util.h"
+#include "../../common/Util.h"
 #include "../../ApplicationContext.h"
 #include "../../common/FilesUtil.h"
 #include "../../common/LoggerUtil.h"
-#include "../../editor/enum/ShadingMode.h"
+#include "editor/enum/ShadingMode.h"
 #include "glslang/Include/glslang_c_interface.h"
 #include "glslang/Public/resource_limits_c.h"
 #include "../../core/DirectoryService.h"
@@ -179,8 +179,8 @@ namespace Metal {
         const size_t sourceHash = std::hash<std::string>{}(source);
         const std::string part(BASE_PATH + pFilename);
         const std::string shaderName = part.substr(part.find_last_of('/') + 1, part.size());
-        const std::string binaryFilename = directoryService->getRootDirectory() + "/shaders/" + shaderName + ".spv";
-        const std::string hashFilename = directoryService->getRootDirectory() + "/shaders/" + shaderName + ".hash";
+        const std::string binaryFilename = directoryService->getEngineMetadataPath() + "/shaders/" + shaderName + ".spv";
+        const std::string hashFilename = directoryService->getEngineMetadataPath() + "/shaders/" + shaderName + ".hash";
 
         ShaderModule shader{};
 

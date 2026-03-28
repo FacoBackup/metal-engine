@@ -5,11 +5,10 @@
 #include <glm/ext/matrix_transform.hpp>
 
 #include "AbstractComponent.h"
-#include "../../common/ISerialize.h"
 
 
 namespace Metal {
-    struct TransformComponent final : AbstractComponent, ISerialize {
+    struct TransformComponent final : AbstractComponent {
         glm::mat4x4 model = glm::identity<glm::mat4x4>();
         glm::vec3 translation{};
         glm::quat rotation = glm::identity<glm::quat>();
@@ -18,13 +17,11 @@ namespace Metal {
         bool forceTransform = false;
         bool isStatic = true;
 
+    protected:
         void registerFields() override;
 
+    public:
         ComponentType getType() const override;
-
-        nlohmann::json toJson() const override;
-
-        void fromJson(const nlohmann::json &j) override;
     };
 }
 

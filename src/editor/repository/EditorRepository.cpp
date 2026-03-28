@@ -1,5 +1,5 @@
 #include "EditorRepository.h"
-#include "../../common/Icons.h"
+#include "common/Icons.h"
 
 namespace Metal {
     const char *EditorRepository::getTitle() const {
@@ -10,106 +10,73 @@ namespace Metal {
         return Icons::settings.c_str();
     }
 
-    nlohmann::json EditorRepository::toJson() const {
-        nlohmann::json j;
-        j["accentColor"] = {accentColor.x, accentColor.y, accentColor.z};
-        j["selectionColor"] = {selectionColor.x, selectionColor.y, selectionColor.z};
-        j["selectionOutlineThickness"] = selectionOutlineThickness;
-        j["projectName"] = projectName;
-        j["showIcons"] = showIcons;
-        j["isDarkMode"] = isDarkMode;
-        j["showGrid"] = showGrid;
-        j["gridOverlayObjects"] = gridOverlayObjects;
-        j["gridScale"] = gridScale;
-        j["gridThreshold"] = gridThreshold;
-        j["gridThickness"] = gridThickness;
-        j["gizmoType"] = gizmoType;
-        j["gizmoMode"] = gizmoMode;
-        j["gizmoSnapRotate"] = gizmoSnapRotate;
-        j["gizmoSnapScale"] = gizmoSnapScale;
-        j["gizmoSnapTranslate"] = gizmoSnapTranslate;
-        j["gizmoSnapTranslateOption"] = gizmoSnapTranslateOption;
-        j["gizmoSnapRotateOption"] = gizmoSnapRotateOption;
-        j["gizmoSnapScaleOption"] = gizmoSnapScaleOption;
-        j["gizmoUseSnapTranslate"] = gizmoUseSnapTranslate;
-        j["gizmoUseSnapRotate"] = gizmoUseSnapRotate;
-        j["gizmoUseSnapScale"] = gizmoUseSnapScale;
-        j["showOnlyEntitiesHierarchy"] = showOnlyEntitiesHierarchy;
-        j["mainSelection"] = entt::to_integral(mainSelection);
-        j["selected"] = nlohmann::json::array();
-        for (auto const& [key, val] : selected) {
-            j["selected"].push_back(entt::to_integral(key));
-        }
-        j["copied"] = nlohmann::json::array();
-        for (auto const& entity : copied) {
-            j["copied"].push_back(entt::to_integral(entity));
-        }
-        j["shadingMode"] = shadingMode;
-        j["bookmarks"] = bookmarks;
-        j["isPlaying"] = isPlaying;
-        j["gptMcpKey"] = gptMcpKey;
-        j["geminiMcpKey"] = geminiMcpKey;
-        return j;
-    }
-
-    void EditorRepository::fromJson(const nlohmann::json &j) {
-         accentColor = {j.at("accentColor")[0], j.at("accentColor")[1], j.at("accentColor")[2]};
-            selectionColor = {j.at("selectionColor")[0], j.at("selectionColor")[1], j.at("selectionColor")[2]};
-            selectionOutlineThickness = j.at("selectionOutlineThickness").get<int>();
-            projectName = j.at("projectName").get<std::string>();
-            showIcons = j.at("showIcons").get<bool>();
-            isDarkMode = j.at("isDarkMode").get<bool>();
-            showGrid = j.at("showGrid").get<bool>();
-            gridOverlayObjects = j.at("gridOverlayObjects").get<bool>();
-            gridScale = j.at("gridScale").get<float>();
-            gridThreshold = j.at("gridThreshold").get<int>();
-            gridThickness = j.at("gridThickness").get<float>();
-            gizmoType = static_cast<ImGuizmo::OPERATION>(j.at("gizmoType").get<int>());
-            gizmoMode = static_cast<ImGuizmo::MODE>(j.at("gizmoMode").get<int>());
-            gizmoSnapRotate = j.at("gizmoSnapRotate").get<float>();
-            gizmoSnapScale = j.at("gizmoSnapScale").get<float>();
-            gizmoSnapTranslate = j.at("gizmoSnapTranslate").get<float>();
-            gizmoSnapTranslateOption = j.at("gizmoSnapTranslateOption").get<int>();
-            gizmoSnapRotateOption = j.at("gizmoSnapRotateOption").get<int>();
-            gizmoSnapScaleOption = j.at("gizmoSnapScaleOption").get<int>();
-            gizmoUseSnapTranslate = j.at("gizmoUseSnapTranslate").get<bool>();
-            gizmoUseSnapRotate = j.at("gizmoUseSnapRotate").get<bool>();
-            gizmoUseSnapScale = j.at("gizmoUseSnapScale").get<bool>();
-            showOnlyEntitiesHierarchy = j.at("showOnlyEntitiesHierarchy").get<bool>();
-            mainSelection = static_cast<entt::entity>(j.at("mainSelection").get<uint32_t>());
-            selected.clear();
-            if (j.contains("selected") && j.at("selected").is_array()) {
-                for (auto const& item : j.at("selected")) {
-                    selected[static_cast<entt::entity>(item.get<uint32_t>())] = true;
-                }
-            }
-            copied.clear();
-            if (j.contains("copied") && j.at("copied").is_array()) {
-                for (auto const& item : j.at("copied")) {
-                    copied.push_back(static_cast<entt::entity>(item.get<uint32_t>()));
-                }
-            }
-            shadingMode = static_cast<ShadingMode>(j.at("shadingMode").get<int>());
-            if (j.contains("bookmarks") && j.at("bookmarks").is_array()) {
-                bookmarks = j.at("bookmarks").get<std::vector<std::string>>();
-            }
-            isPlaying = j.value("isPlaying", false);
-            gptMcpKey = j.value("gptMcpKey", "");
-            geminiMcpKey = j.value("geminiMcpKey", "");
-    }
-
     void EditorRepository::registerFields() {
-        registerColor(accentColor, "Editor", "Accent color");
-        registerColor(selectionColor, "Selection outline", "Color");
-        registerInt(selectionOutlineThickness, "Selection outline", "thickness");
-
-        registerBool(showIcons, "Icons", "Show icons?");
-        registerBool(showGrid, "Grid", "Enabled?");
-        registerBool(gridOverlayObjects, "Grid", "Overlay objects?");
-        registerFloat(gridScale, "Grid", "Scale");
-        registerInt(gridThreshold, "Grid", "Threshold");
-        registerFloat(gridThickness, "Grid", "Thickness");
-        registerText(gptMcpKey, "MCP", "GPT Key");
-        registerText(geminiMcpKey, "MCP", "Gemini Key");
+        registerEditableField<COLOR>(&accentColor).setName("accentColor").setGroup("Editor");
+        registerEditableField<COLOR>(&selectionColor).setName("selectionColor").setGroup("Selection outline");
+        registerEditableField<INT>(&selectionOutlineThickness).setName("selectionOutlineThickness").setGroup("Selection outline");
+        registerEditableField<STRING>(&projectName).setName("projectName").setGroup("Project");
+        registerEditableField<BOOLEAN>(&showIcons).setName("showIcons").setGroup("Icons");
+        registerEditableField<BOOLEAN>(&isDarkMode).setName("isDarkMode").setGroup("Editor");
+        registerEditableField<BOOLEAN>(&showGrid).setName("showGrid").setGroup("Grid");
+        registerEditableField<BOOLEAN>(&gridOverlayObjects).setName("gridOverlayObjects").setGroup("Grid");
+        registerEditableField<FLOAT>(&gridScale).setName("gridScale").setGroup("Grid");
+        registerEditableField<INT>(&gridThreshold).setName("gridThreshold").setGroup("Grid");
+        registerEditableField<FLOAT>(&gridThickness).setName("gridThickness").setGroup("Grid");
+        auto gizmoTypeToJson = [this] { return static_cast<int>(gizmoType); };
+        auto gizmoTypeFromJson = [this](const nlohmann::json &j) { gizmoType = static_cast<ImGuizmo::OPERATION>(j.get<int>()); };
+        registerGenericField(gizmoTypeToJson, gizmoTypeFromJson).setName("gizmoType");
+        auto gizmoModeToJson = [this] { return static_cast<int>(gizmoMode); };
+        auto gizmoModeFromJson = [this](const nlohmann::json &j) { gizmoMode = static_cast<ImGuizmo::MODE>(j.get<int>()); };
+        registerGenericField(gizmoModeToJson, gizmoModeFromJson).setName("gizmoMode");
+        registerSerializableOnlyField<FLOAT>(&gizmoSnapRotate).setName("gizmoSnapRotate");
+        registerSerializableOnlyField<FLOAT>(&gizmoSnapScale).setName("gizmoSnapScale");
+        registerSerializableOnlyField<FLOAT>(&gizmoSnapTranslate).setName("gizmoSnapTranslate");
+        registerSerializableOnlyField<INT>(&gizmoSnapTranslateOption).setName("gizmoSnapTranslateOption");
+        registerSerializableOnlyField<INT>(&gizmoSnapRotateOption).setName("gizmoSnapRotateOption");
+        registerSerializableOnlyField<INT>(&gizmoSnapScaleOption).setName("gizmoSnapScaleOption");
+        registerSerializableOnlyField<BOOLEAN>(&gizmoUseSnapTranslate).setName("gizmoUseSnapTranslate");
+        registerSerializableOnlyField<BOOLEAN>(&gizmoUseSnapRotate).setName("gizmoUseSnapRotate");
+        registerSerializableOnlyField<BOOLEAN>(&gizmoUseSnapScale).setName("gizmoUseSnapScale");
+        registerSerializableOnlyField<BOOLEAN>(&showOnlyEntitiesHierarchy).setName("showOnlyEntitiesHierarchy");
+        auto mainSelectionToJson = [this] { return static_cast<uint32_t>(mainSelection); };
+        auto mainSelectionFromJson = [this](const nlohmann::json &j) { mainSelection = static_cast<entt::entity>(j.get<uint32_t>()); };
+        registerGenericField(mainSelectionToJson, mainSelectionFromJson).setName("mainSelection");
+        auto selectedToJson = [this] {
+            nlohmann::json j = nlohmann::json::array();
+            for (auto const &[key, val]: selected) {
+                j.push_back(static_cast<uint32_t>(key));
+            }
+            return j;
+        };
+        auto selectedFromJson = [this](const nlohmann::json &j) {
+            selected.clear();
+            for (auto const &item: j) {
+                selected[static_cast<entt::entity>(item.get<uint32_t>())] = true;
+            }
+        };
+        registerGenericField(selectedToJson, selectedFromJson).setName("selected");
+        auto copiedToJson = [this] {
+            nlohmann::json j = nlohmann::json::array();
+            for (auto const &entity: copied) {
+                j.push_back(static_cast<uint32_t>(entity));
+            }
+            return j;
+        };
+        auto copiedFromJson = [this](const nlohmann::json &j) {
+            copied.clear();
+            for (auto const &item: j) {
+                copied.push_back(static_cast<entt::entity>(item.get<uint32_t>()));
+            }
+        };
+        registerGenericField(copiedToJson, copiedFromJson).setName("copied");
+        auto shadingModeToJson = [this] { return static_cast<int>(shadingMode); };
+        auto shadingModeFromJson = [this](const nlohmann::json &j) { shadingMode = static_cast<ShadingMode>(j.get<int>()); };
+        registerGenericField(shadingModeToJson, shadingModeFromJson).setName("shadingMode");
+        auto bookmarksToJson = [this] { return bookmarks; };
+        auto bookmarksFromJson = [this](const nlohmann::json &j) { bookmarks = j.get<std::vector<std::string>>(); };
+        registerGenericField(bookmarksToJson, bookmarksFromJson).setName("bookmarks");
+        registerSerializableOnlyField<BOOLEAN>(&isPlaying).setName("isPlaying");
+        registerEditableField<STRING>(&gptMcpKey).setName("gptMcpKey").setGroup("MCP");
+        registerEditableField<STRING>(&geminiMcpKey).setName("geminiMcpKey").setGroup("MCP");
     }
 }

@@ -2,7 +2,7 @@
 #define SELECTIONSERVICE_H
 #include <vector>
 
-#include "../../common/IService.h"
+#include "common/IService.h"
 #include "../enum/engine-definitions.h"
 
 namespace Metal {

@@ -19,10 +19,12 @@ layout (location = 0) rayPayloadEXT RayPayload payload;
 #define VOLUME_SET 6
 #include "../VolumeBuffer.glsl"
 
-#define MESH_METADATA_SET 7
-#include "../MeshMetadata.glsl"
+#define MATERIAL_DATA_SET 7
+#define PRIMITIVE_DATA_SET 8
+#include "../MaterialData.glsl"
+#include "../MeshData.glsl"
 
-layout (set = 0, binding = 8) uniform sampler2D textureArray[];
+layout (set = 0, binding = 9) uniform sampler2D textureArray[];
 
 #include "../MeshDataSampling.glsl"
 

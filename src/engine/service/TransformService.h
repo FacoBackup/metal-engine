@@ -1,44 +1,45 @@
 #ifndef TRANSFORMSERVICE_H
 #define TRANSFORMSERVICE_H
 #include <string>
+#include <set>
+#include <vector>
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
+#include <entt/entt.hpp>
 
-#include "../../common/ISync.h"
-#include "../../common/IService.h"
-#include "../../common/IEventMember.h"
-#include "../../common/IInit.h"
-#include <set>
-#include <entt/entity/entity.hpp>
+#include <common/IAsyncSync.h>
+#include <common/IService.h>
+#include <common/IEventMember.h>
+#include <common/IInit.h>
 
 namespace Metal {
     struct TransformComponent;
 
     struct WorldRepository;
-    class RayTracingService;
+    class DirtyStateService;
 
-    class TransformService final : public IService, public ISync, public IEventMember, public IInit {
+    class TransformService final : public IService, public IAsyncSync, public IEventMember, public IInit {
         WorldRepository *worldRepository = nullptr;
-        RayTracingService *rayTracingService = nullptr;
+        DirtyStateService *dirtyStateService = nullptr;
 
         glm::vec3 distanceAux{};
         glm::mat4x4 auxMat4{};
         glm::vec3 translation{};
         glm::mat4x4 auxMat42{};
 
-        std::set<entt::entity> dirtyEntities;
-
     public:
         std::vector<Dependency> getDependencies() override {
             return {
                 {"WorldRepository", &worldRepository},
-                {"RayTracingService", &rayTracingService}
+                {"DirtyStateService", &dirtyStateService}
             };
         }
 
         void onInitialize() override;
 
-        void onSync() override;
+        [[nodiscard]] std::string getSyncThreadId() const override { return "physics_transform"; }
+
+        void onAsyncSync() override;
 
         void transform(TransformComponent *st, const TransformComponent *parentTransform);
     };

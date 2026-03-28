@@ -9,7 +9,7 @@
 #include "../dto/ShortcutDTO.h"
 #include "../enum/engine-definitions.h"
 #include "../enum/ShadingMode.h"
-#include "../../common/IRepository.h"
+#include "common/IRepository.h"
 
 namespace Metal {
     struct TransformComponent;
@@ -60,10 +60,6 @@ namespace Metal {
         const char *getTitle() const override;
 
         const char *getIcon() const override;
-
-        nlohmann::json toJson() const override;
-
-        void fromJson(const nlohmann::json &j) override;
     };
 } // Metal
 

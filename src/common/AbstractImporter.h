@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "../editor/dto/ImportSettingsDTO.h"
+#include "editor/dto/ImportSettingsDTO.h"
 #include "IService.h"
 
 namespace Metal {

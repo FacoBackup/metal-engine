@@ -4,13 +4,15 @@
 #include "../../common/AbstractResourceService.h"
 #include "../resource/SVOInstance.h"
 #include "../../common/IInit.h"
+#include "common/ILoader.h"
 
 namespace Metal {
     struct SVOInstance;
     class BufferService;
 
-    class VoxelService final : public AbstractResourceService<SVOInstance>, public IInit {
+    class VoxelService final : public AbstractResourceService<SVOInstance>, public IInit, public ILoader {
         BufferService *bufferService = nullptr;
+
     public:
         std::vector<Dependency> getDependencies() override {
             return {
@@ -18,9 +20,9 @@ namespace Metal {
             };
         }
 
-        SVOInstance *create(const std::string &id);
+        bool isCompatible(const std::string &absolutePath) override;
 
-        SVOInstance *stream(const std::string &id);
+        void load(const std::string &absolutePath) override;
 
         void disposeResource(SVOInstance *resource) override;
 

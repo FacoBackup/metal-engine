@@ -3,7 +3,7 @@
 #include <array>
 #include <unordered_map>
 
-#include "../../engine/dto/VoxelData.h"
+#include "engine/dto/VoxelData.h"
 
 namespace Metal {
     struct OctreeNode final {

@@ -22,7 +22,7 @@ namespace Metal {
         std::string timestamp;
     };
 
-    namespace LogService {
+    namespace LoggerUtil {
         void log(LogLevel level, const std::string &message);
 
         [[nodiscard]] std::vector<LogEntry> getEntriesSnapshot();
@@ -34,11 +34,11 @@ namespace Metal {
 
 }
 
-#define LOG_TRACE(msg) Metal::LogService::log(Metal::LogLevel::Trace, msg)
-#define LOG_DEBUG(msg) Metal::LogService::log(Metal::LogLevel::Debug, msg)
-#define LOG_INFO(msg)  Metal::LogService::log(Metal::LogLevel::Info, msg)
-#define LOG_WARN(msg)  Metal::LogService::log(Metal::LogLevel::Warn, msg)
-#define LOG_ERROR(msg) Metal::LogService::log(Metal::LogLevel::Error, msg)
-#define LOG_FATAL(msg) Metal::LogService::log(Metal::LogLevel::Fatal, msg)
+#define LOG_TRACE(msg) Metal::LoggerUtil::log(Metal::LogLevel::Trace, msg)
+#define LOG_DEBUG(msg) Metal::LoggerUtil::log(Metal::LogLevel::Debug, msg)
+#define LOG_INFO(msg)  Metal::LoggerUtil::log(Metal::LogLevel::Info, msg)
+#define LOG_WARN(msg)  Metal::LoggerUtil::log(Metal::LogLevel::Warn, msg)
+#define LOG_ERROR(msg) Metal::LoggerUtil::log(Metal::LogLevel::Error, msg)
+#define LOG_FATAL(msg) Metal::LoggerUtil::log(Metal::LogLevel::Fatal, msg)
 
 #endif

@@ -4,23 +4,29 @@
 #include <glm/vec4.hpp>
 #include <vector>
 
-#include "../../common/ISerialize.h"
+#include "../../common/Reflection.h"
 
 namespace Metal {
-    struct SparseVoxelOctreeData final : ISerialize {
+    struct SparseVoxelOctreeData final : Reflection {
         std::vector<unsigned int> data{};
         unsigned int voxelBufferOffset;
 
-        nlohmann::json toJson() const override {
-            nlohmann::json j;
-            j["data"] = data;
-            j["voxelBufferOffset"] = voxelBufferOffset;
-            return j;
-        }
+        void registerFields() override {
+            registerSerializableOnlyField<UINT>(&voxelBufferOffset).setName("voxelBufferOffset");
 
-        void fromJson(const nlohmann::json& j) override {
-            data = j.at("data").get<std::vector<unsigned int>>();
-            voxelBufferOffset = j.at("voxelBufferOffset").get<unsigned int>();
+            auto dataToJson = [this] {
+                nlohmann::json j = nlohmann::json::array();
+                for (unsigned int c: data) {
+                    if (c) j.push_back(c);
+                }
+                return j;
+            };
+
+            auto dataFromJson = [this](const nlohmann::json &j) {
+                data = j.get<std::vector<unsigned int>>();
+            };
+
+            registerGenericField(dataToJson, dataFromJson).setName("data");
         }
     };
 }

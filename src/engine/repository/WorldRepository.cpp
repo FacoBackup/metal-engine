@@ -1,12 +1,13 @@
 #include "WorldRepository.h"
-#include "../service/RayTracingService.h"
-#include "../../editor/service/HistoryService.h"
+#include "../service/DirtyStateService.h"
+#include "editor/service/HistoryService.h"
 #include "../../ApplicationEventContext.h"
 
 #include "../enum/ComponentType.h"
-#include "../../editor/dto/SceneData.h"
+#include "editor/dto/SceneData.h"
 #include "../../common/serialization-definitions.h"
 #include "../../core/DirectoryService.h"
+#include "common/FileExtensions.h"
 #include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
@@ -26,12 +27,12 @@ namespace Metal {
                         registry.destroy(entity);
                         if (hiddenEntities.contains(entity)) hiddenEntities.erase(entity);
                         if (culled.contains(entity)) culled.erase(entity);
-                        ApplicationEventContext::dispatch("BVHNeedsUpdate");
+                        if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
                     }
                 },
                 [this, createdState]() {
                     deserializeEntityComplete(*createdState);
-                    ApplicationEventContext::dispatch("BVHNeedsUpdate");
+                    if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
                 }
             );
         }
@@ -76,7 +77,7 @@ namespace Metal {
                     for (const EntityState &state: deletedStates) {
                         deserializeEntityComplete(state);
                     }
-                    ApplicationEventContext::dispatch("BVHNeedsUpdate");
+                    if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
                 },
                 [this, entities]() {
                     // Redo: Delete entities
@@ -87,7 +88,7 @@ namespace Metal {
                             registry.destroy(entityId);
                         }
                     }
-                    ApplicationEventContext::dispatch("BVHNeedsUpdate");
+                    if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
                 }
             );
         }
@@ -104,7 +105,7 @@ namespace Metal {
 
             registry.destroy(entityId);
         }
-        ApplicationEventContext::dispatch("BVHNeedsUpdate");
+        if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
     }
 
     void WorldRepository::changeVisibility(entt::entity entity, bool isVisible) {
@@ -127,16 +128,16 @@ namespace Metal {
         } else {
             hiddenEntities.insert({entity, true});
         }
-        ApplicationEventContext::dispatch("BVHNeedsUpdate");
+        if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
     }
 
-    void WorldRepository::loadScene(const std::string &scenePath) {
+    void WorldRepository::load(const std::string &absolutePath) {
         if (historyService) {
-            historyService->startTransaction("Load Scene " + scenePath);
+            historyService->startTransaction("Load Scene " + absolutePath);
         }
 
         SceneData sceneData;
-        PARSE_TEMPLATE(sceneData, scenePath)
+        PARSE_TEMPLATE(sceneData, absolutePath)
 
         for (auto &entityData: sceneData.entities) {
             const auto entityId = createEntity();
@@ -159,9 +160,6 @@ namespace Metal {
                 primitive.albedo = entityData.primitive->albedo;
                 primitive.roughness = entityData.primitive->roughness;
                 primitive.metallic = entityData.primitive->metallic;
-                primitive.albedoColor = entityData.primitive->albedoColor;
-                primitive.roughnessFactor = entityData.primitive->roughnessFactor;
-                primitive.metallicFactor = entityData.primitive->metallicFactor;
                 primitive.transmissionFactor = entityData.primitive->transmissionFactor;
                 primitive.thicknessFactor = entityData.primitive->thicknessFactor;
                 primitive.ior = entityData.primitive->ior;
@@ -171,6 +169,10 @@ namespace Metal {
         if (historyService) {
             historyService->endTransaction();
         }
+    }
+
+    bool WorldRepository::isCompatible(const std::string &absolutePath) {
+        return absolutePath.ends_with(Metal::FileExtensions::scene->extension);
     }
 
     void WorldRepository::createComponent(const entt::entity entityId, ComponentType type) {
@@ -184,10 +186,10 @@ namespace Metal {
                     createComponent(entityId, dep);
                 }
                 compDef.creator(*this, entityId);
-                if (auto *inspectable = compDef.getInspectable(*this, entityId)) {
-                    std::string className = inspectable->getClassName();
+                if (auto *reflectionInstance = compDef.getInspectable(*this, entityId)) {
+                    std::string className = reflectionInstance->getClassName();
                     ApplicationEventContext::dispatch(
-                        className, std::make_shared<InspectableEventPayload>(inspectable));
+                        className, std::make_shared<InspectableEventPayload>(reflectionInstance));
                 }
                 break;
             }
@@ -205,37 +207,49 @@ namespace Metal {
         return false;
     }
 
-    nlohmann::json WorldRepository::toJson() const {
-        nlohmann::json j;
-        j["camera"] = camera.toJson();
-
-        nlohmann::json entitiesJson;
-        for (auto entity: registry.view<entt::entity>()) {
-            nlohmann::json ej;
-
-            if (registry.all_of<MetadataComponent>(entity)) {
-                ej["entity"] = registry.get<MetadataComponent>(entity).toJson();
+    void WorldRepository::registerFields() {
+        auto hiddenEntitiesToJson = [this] {
+            nlohmann::json j;
+            for (auto const &[entity, isHidden]: hiddenEntities) {
+                j[std::to_string(entt::to_integral(entity))] = isHidden;
             }
+            return j;
+        };
 
-            for (const auto &compDef: ComponentTypes::getComponents()) {
-                auto cj = compDef.toJson(const_cast<WorldRepository &>(*this), entity);
-                if (!cj.is_null()) {
-                    ej[compDef.jsonKey] = std::move(cj);
+        auto hiddenEntitiesFromJson = [this](const nlohmann::json &j) {
+            hiddenEntities.clear();
+            for (auto const &[key, val]: j.items()) {
+                const auto entity = static_cast<entt::entity>(static_cast<uint32_t>(std::stoul(key)));
+                hiddenEntities[entity] = val.get<bool>();
+            }
+        };
+
+        registerCompositeField(&camera).setName("camera");
+        registerGenericField(hiddenEntitiesToJson, hiddenEntitiesFromJson).setName("hiddenEntities");
+
+        auto registryToJson = [this] {
+            nlohmann::json entitiesJson;
+            for (auto entity: registry.view<entt::entity>()) {
+                nlohmann::json ej;
+
+                if (registry.all_of<MetadataComponent>(entity)) {
+                    ej["entity"] = registry.get<MetadataComponent>(entity).toJson();
                 }
+
+                for (const auto &compDef: ComponentTypes::getComponents()) {
+                    auto cj = compDef.toJson(*this, entity);
+                    if (!cj.is_null()) {
+                        ej[compDef.jsonKey] = std::move(cj);
+                    }
+                }
+                entitiesJson[std::to_string(entt::to_integral(entity))] = ej;
             }
-            entitiesJson[std::to_string(entt::to_integral(entity))] = ej;
-        }
-        j["registry"] = entitiesJson;
-        j["hiddenEntities"] = hiddenEntities;
-        return j;
-    }
+            return entitiesJson;
+        };
 
-    void WorldRepository::fromJson(const nlohmann::json &j) {
-        if (j.contains("camera")) camera.fromJson(j.at("camera"));
-
-        registry.clear();
-        if (j.contains("registry")) {
-            for (auto const &[key, val]: j.at("registry").items()) {
+        auto registryFromJson = [this](const nlohmann::json &j) {
+            registry.clear();
+            for (auto const &[key, val]: j.items()) {
                 const auto id = static_cast<entt::entity>(static_cast<uint32_t>(std::stoul(key)));
                 const auto entity = registry.create(id);
 
@@ -250,11 +264,12 @@ namespace Metal {
                     }
                 }
             }
-        }
+            for (auto entity: registry.view<PrimitiveComponent>()) {
+                if (dirtyStateService) dirtyStateService->markEntityDirty(entity, DirtyType::Material);
+            }
+        };
 
-        if (j.contains("hiddenEntities")) {
-            hiddenEntities = j.at("hiddenEntities").get<std::unordered_map<entt::entity, bool> >();
-        }
+        registerGenericField(registryToJson, registryFromJson).setName("registry");
     }
 
     void WorldRepository::deserializeEntityComplete(const EntityState &state) {
@@ -264,10 +279,12 @@ namespace Metal {
                 if (state.data.contains(compDef.jsonKey)) {
                     compDef.creator(*this, state.id);
                     compDef.fromJson(*this, state.id, state.data.at(compDef.jsonKey));
-                    if (auto *inspectable = compDef.getInspectable(*this, state.id)) {
-                        std::string className = inspectable->getClassName();
+                    if (auto *reflectionInstance = compDef.getInspectable(*this, state.id)) {
+                        auto component = dynamic_cast<AbstractComponent *>(reflectionInstance);
+                        component->setEntityId(state.id);
+                        std::string className = reflectionInstance->getClassName();
                         ApplicationEventContext::dispatch(
-                            className, std::make_shared<InspectableEventPayload>(inspectable));
+                            className, std::make_shared<InspectableEventPayload>(reflectionInstance));
                     }
                 }
             }

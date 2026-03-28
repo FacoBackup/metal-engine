@@ -1,7 +1,7 @@
 #include "LightService.h"
 #include "../../ApplicationContext.h"
 #include "../resource/BufferInstance.h"
-#include "../../editor/enum/EngineResourceIDs.h"
+#include "editor/enum/EngineResourceIDs.h"
 #include "../EngineContext.h"
 #include "../repository/EngineRepository.h"
 #include "../repository/WorldRepository.h"
@@ -10,7 +10,7 @@
 #include "MeshService.h"
 #include "common/LoggerUtil.h"
 #include "engine/dto/LightComponent.h"
-#include "../../editor/enum/engine-definitions.h"
+#include "editor/enum/engine-definitions.h"
 
 namespace Metal {
     void LightService::onInitialize() {
@@ -22,16 +22,19 @@ namespace Metal {
     void LightService::registerLights() {
         for (const auto entity: worldRepository->registry.view<PrimitiveComponent, LightComponent>()) {
             auto &primitive = worldRepository->registry.get<PrimitiveComponent>(entity);
-            if (!primitive.meshId.empty()) {
-                if (MeshData *meshData = meshService->loadMeshData(primitive.meshId)) {
-                    for (size_t i = 0; i < meshData->indices.size(); i += 3) {
-                        LightData light{};
-                        light.triangleIndex = static_cast<unsigned int>(i / 3);
-                        light.meshIndex = primitive.renderIndex;
-                        items.push_back(light);
-                    }
-                    delete meshData;
+            if (primitive.meshId.empty()) {
+                continue;
+            }
+            auto &lightComponent = worldRepository->registry.get<LightComponent>(entity);
+            if (MeshData *meshData = meshService->loadMeshData(primitive.meshId)) {
+                for (size_t i = 0; i < meshData->indices.size(); i += 3) {
+                    LightData light{};
+                    light.color = lightComponent.color;
+                    light.triangleIndex = static_cast<unsigned int>(i / 3);
+                    light.meshIndex = primitive.renderIndex;
+                    items.push_back(light);
                 }
+                delete meshData;
             }
         }
     }

@@ -1,7 +1,6 @@
 #include "HistoryService.h"
 #include <algorithm>
-#include "../../common/Inspectable.h"
-#include "../../common/InspectedField.h"
+#include "common/Reflection.h"
 #include "ApplicationEventContext.h"
 #include "../dto/FieldModificationEvent.h"
 
@@ -19,7 +18,7 @@ namespace Metal {
             if (!currentTransaction->changes.empty()) {
                 // Pick a representative key and instance for the whole transaction
                 std::string key = currentTransaction->name;
-                Inspectable *instance = nullptr;
+                Reflection *instance = nullptr;
                 std::string propertyPath;
 
                 for (const auto &change: currentTransaction->changes) {
@@ -50,44 +49,36 @@ namespace Metal {
         return currentTransaction != nullptr;
     }
 
-    static PropertyValue getValueFromMember(InspectableMember *field) {
+    static PropertyValue getValueFromMember(FieldMetadata *field) {
         if (field->type == FLOAT) {
-            auto f = dynamic_cast<InspectedField<float> *>(field);
-            if (f) return *f->field;
+            return *static_cast<float *>(field->pointer);
         } else if (field->type == INT) {
-            auto f = dynamic_cast<InspectedField<int> *>(field);
-            if (f) return *f->field;
+            return *static_cast<int *>(field->pointer);
         } else if (field->type == BOOLEAN) {
-            auto f = dynamic_cast<InspectedField<bool> *>(field);
-            if (f) return *f->field;
+            return *static_cast<bool *>(field->pointer);
         } else if (field->type == STRING || field->type == RESOURCE) {
-            auto f = dynamic_cast<InspectedField<std::string> *>(field);
-            if (f) return *f->field;
+            return *static_cast<std::string *>(field->pointer);
         } else if (field->type == VECTOR2) {
-            auto f = dynamic_cast<InspectedField<glm::vec2> *>(field);
-            if (f) return *f->field;
+            return *static_cast<glm::vec2 *>(field->pointer);
         } else if (field->type == VECTOR3 || field->type == COLOR) {
-            auto f = dynamic_cast<InspectedField<glm::vec3> *>(field);
-            if (f) return *f->field;
+            return *static_cast<glm::vec3 *>(field->pointer);
         } else if (field->type == VECTOR4) {
-            auto f = dynamic_cast<InspectedField<glm::vec4> *>(field);
-            if (f) return *f->field;
+            return *static_cast<glm::vec4 *>(field->pointer);
         } else if (field->type == QUAT) {
-            auto f = dynamic_cast<InspectedField<glm::quat> *>(field);
-            if (f) return *f->field;
+            return *static_cast<glm::quat *>(field->pointer);
         }
         return 0;
     }
 
-    void HistoryService::recordChange(InspectableMember *field, const PropertyValue &oldValue) {
+    void HistoryService::recordChange(FieldMetadata *field, const PropertyValue &oldValue) {
         if (!field) return;
 
         PropertyValue newValue = getValueFromMember(field);
         if (oldValue == newValue) return;
 
-        std::shared_ptr<InspectableMember> fieldPtr;
+        std::shared_ptr<FieldMetadata> fieldPtr;
         if (field->instance) {
-            fieldPtr = field->instance->getFieldByPointer(field->getGenericPointer());
+            fieldPtr = field->instance->getFieldByPointer(field->pointer);
         }
 
         if (!fieldPtr) return; // Cannot track if we can't get a shared_ptr to it
@@ -136,31 +127,23 @@ namespace Metal {
         }
     }
 
-    static void applyChange(InspectableMember *field, const PropertyValue &value) {
+    static void applyChange(FieldMetadata *field, const PropertyValue &value) {
         if (field->type == FLOAT) {
-            auto f = dynamic_cast<InspectedField<float> *>(field);
-            if (f) *f->field = std::get<float>(value);
+            *static_cast<float *>(field->pointer) = std::get<float>(value);
         } else if (field->type == INT) {
-            auto f = dynamic_cast<InspectedField<int> *>(field);
-            if (f) *f->field = std::get<int>(value);
+            *static_cast<int *>(field->pointer) = std::get<int>(value);
         } else if (field->type == BOOLEAN) {
-            auto f = dynamic_cast<InspectedField<bool> *>(field);
-            if (f) *f->field = std::get<bool>(value);
+            *static_cast<bool *>(field->pointer) = std::get<bool>(value);
         } else if (field->type == STRING || field->type == RESOURCE) {
-            auto f = dynamic_cast<InspectedField<std::string> *>(field);
-            if (f) *f->field = std::get<std::string>(value);
+            *static_cast<std::string *>(field->pointer) = std::get<std::string>(value);
         } else if (field->type == VECTOR2) {
-            auto f = dynamic_cast<InspectedField<glm::vec2> *>(field);
-            if (f) *f->field = std::get<glm::vec2>(value);
+            *static_cast<glm::vec2 *>(field->pointer) = std::get<glm::vec2>(value);
         } else if (field->type == VECTOR3 || field->type == COLOR) {
-            auto f = dynamic_cast<InspectedField<glm::vec3> *>(field);
-            if (f) *f->field = std::get<glm::vec3>(value);
+            *static_cast<glm::vec3 *>(field->pointer) = std::get<glm::vec3>(value);
         } else if (field->type == VECTOR4) {
-            auto f = dynamic_cast<InspectedField<glm::vec4> *>(field);
-            if (f) *f->field = std::get<glm::vec4>(value);
+            *static_cast<glm::vec4 *>(field->pointer) = std::get<glm::vec4>(value);
         } else if (field->type == QUAT) {
-            auto f = dynamic_cast<InspectedField<glm::quat> *>(field);
-            if (f) *f->field = std::get<glm::quat>(value);
+            *static_cast<glm::quat *>(field->pointer) = std::get<glm::quat>(value);
         }
     }
 

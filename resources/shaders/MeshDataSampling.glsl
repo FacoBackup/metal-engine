@@ -25,7 +25,7 @@ struct TriangleData {
     vec2 uv0, uv1, uv2;
 };
 
-TriangleData getTriangleData(inout MeshMetadata metadata, uint triangleId) {
+TriangleData getTriangleData(inout PrimitiveData metadata, uint triangleId) {
 
     Vertices vBuffer = Vertices(metadata.vertexBufferAddress);
     Indices iBuffer = Indices(metadata.indexBufferAddress);

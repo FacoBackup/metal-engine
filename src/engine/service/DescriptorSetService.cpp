@@ -19,7 +19,9 @@ namespace Metal {
         for (auto &builder: pipelineBuilder.resourceBindings) {
             DescriptorBinding binding{};
             binding.bindingPoint = builder.bindingPoint;
-            binding.descriptorCount = builder.descriptorCount;
+            binding.descriptorCount = (builder.descriptorCount == 0)
+                                          ? vulkanContext->getMaxCombinedImageSamplers()
+                                          : builder.descriptorCount;
             binding.descriptorType = builder.descriptorType;
             binding.sampler = builder.sampler;
             binding.view = builder.view;
@@ -156,7 +158,16 @@ namespace Metal {
         layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         layoutInfo.bindingCount = descriptorSetLayoutBindings.size();
         layoutInfo.pBindings = descriptorSetLayoutBindings.data();
-        if (descriptor->bindings.size() == 1 && descriptor->bindings[0].descriptorCount > 1) {
+
+        bool useUpdateAfterBind = false;
+        for (auto &binding: descriptor->bindings) {
+            if (binding.descriptorCount > 1) {
+                useUpdateAfterBind = true;
+                break;
+            }
+        }
+
+        if (useUpdateAfterBind) {
             layoutInfo.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT_EXT;
             layoutInfo.pNext = &flagsInfo;
         }

@@ -1,7 +1,7 @@
 #ifndef SELECTIONIDPASS_H
 #define SELECTIONIDPASS_H
 
-#include "../../engine/passes/AbstractRenderPass.h"
+#include "engine/passes/AbstractRenderPass.h"
 #include "../dto/SelectionOutlinePushConstant.h"
 
 namespace Metal {

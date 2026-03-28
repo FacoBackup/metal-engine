@@ -3,18 +3,21 @@
 #include "../ApplicationContext.h"
 #include "service/TransformService.h"
 #include "service/StreamingService.h"
-#include "service/RayTracingService.h"
+#include "service/BLASService.h"
+#include "service/TLASService.h"
 #include "service/CameraService.h"
 #include "service/LightService.h"
 #include "service/VolumeService.h"
 #include "service/PhysicsService.h"
 #include "repository/WorldRepository.h"
 #include "repository/EngineRepository.h"
-#include "../editor/repository/EditorRepository.h"
+#include "editor/repository/EditorRepository.h"
+#include "core/VulkanContext.h"
 
-#include "../editor/enum/EngineResourceIDs.h"
+#include "editor/enum/EngineResourceIDs.h"
 #include "resource/BufferInstance.h"
 #include "dto/TransformComponent.h"
+#include "service/MaterialService.h"
 
 namespace Metal {
     void EngineContext::resetPathTracerAccumulationCount() const {
@@ -52,32 +55,15 @@ namespace Metal {
         throw std::runtime_error("Frame not found");
     }
 
-    void EngineContext::dispose() {
-        physicsTransformThreadRunning = false;
-        if (physicsTransformThread.joinable()) {
-            physicsTransformThread.join();
-        }
-    }
-
-    void EngineContext::physicsTransformLoop() {
-        while (physicsTransformThreadRunning) {
-            if (transformService) transformService->onSync();
-            if (physicsService) physicsService->onSync();
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
-    }
-
     void EngineContext::onSync() {
-        if (!physicsTransformThreadRunning) {
-            physicsTransformThreadRunning = true;
-            physicsTransformThread = std::thread(&EngineContext::physicsTransformLoop, this);
-        }
-
         updateCurrentTime();
         updateGlobalData();
 
         streamingService->onSync();
-        rayTracingService->onSync();
+        if (vulkanContext->isRayTracingSupported()) {
+            tlasService->onSync();
+        }
+        materialService->onSync();
         cameraService->onSync();
         lightService->onSync();
         volumeService->onSync();

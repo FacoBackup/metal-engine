@@ -2,12 +2,12 @@
 #include "../../dto/PipelineBuilder.h"
 #include "../../resource/PipelineInstance.h"
 #include "../../resource/TextureInstance.h"
-#include "../../service/RayTracingService.h"
+#include "../../service/TLASService.h"
 #include "../../service/PipelineService.h"
 #include "../../../core/VulkanContext.h"
-#include "../../../engine/EngineContext.h"
-#include "../../../engine/repository/EngineRepository.h"
-#include "../../../editor/enum/EngineResourceIDs.h"
+#include "engine/EngineContext.h"
+#include "engine/repository/EngineRepository.h"
+#include "editor/enum/EngineResourceIDs.h"
 #include "ApplicationEventContext.h"
 
 namespace Metal {
@@ -22,15 +22,16 @@ namespace Metal {
                     "rt/HWRayTracing.rchit")
                 .setPushConstantsSize(sizeof(HWRayTracingPushConstant))
                 .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
-                .addAccelerationStructureBinding(rayTracingService->getTLAS())
+                .addAccelerationStructureBinding(VK_NULL_HANDLE)
                 .addStorageImageBinding(getScopedResourceId(RID_ACCUMULATED_FRAME))
                 .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_POSITION_INDEX))
                 .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_NORMAL))
                 .addBufferBinding(getScopedResourceId(RID_LIGHT_BUFFER))
                 .addBufferBinding(getScopedResourceId(RID_VOLUMES_BUFFER))
-                .addBufferBinding(getScopedResourceId(RID_MESH_METADATA_BUFFER))
+                .addBufferBinding(getScopedResourceId(RID_MATERIAL_DATA_BUFFER))
+                .addBufferBinding(getScopedResourceId(RID_PRIMITIVE_DATA_BUFFER))
                 .addCombinedImageSamplerBinding(vulkanContext->vkImageSampler, VK_NULL_HANDLE,
-                                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1000);
+                                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         pipelineInstance = pipelineService->createPipeline(builder);
     }
 
@@ -62,7 +63,7 @@ namespace Metal {
         pushConstant.pathTracerSamples = engineRepository->pathTracerSamples;
         pushConstant.pathTracerBounces = engineRepository->pathTracerBounces;
         pushConstant.pathTracingEmissiveFactor = engineRepository->pathTracingEmissiveFactor;
-        pushConstant.shouldTrace = rayTracingService->isReady();
+        pushConstant.shouldTrace = vulkanContext->rayTracingSupported && tlasService->isReady();
 
         pushConstant.dofEnabled = engineRepository->dofEnabled;
         pushConstant.dofFocusDistance = engineRepository->dofFocusDistance;

@@ -1,26 +1,23 @@
-#include "MeshService.h"
-#include "../resource/MeshInstance.h"
-#include "../dto/MeshData.h"
-#include "../../editor/dto/SceneData.h"
-
-#include "../../core/VulkanContext.h"
-#include "../../common/FilesUtil.h"
-#include "../../common/LoggerUtil.h"
-#include "../../core/DirectoryService.h"
+#include <engine/service/MeshService.h>
+#include <engine/resource/MeshInstance.h>
+#include <engine/dto/MeshData.h>
+#include <editor/dto/SceneData.h>
+#include <core/VulkanContext.h>
+#include <common/FilesUtil.h>
+#include <common/LoggerUtil.h>
+#include <core/DirectoryService.h>
+#include <ApplicationContext.h>
+#include <engine/service/BufferService.h>
+#include <editor/service/HistoryService.h>
+#include <engine/dto/PrimitiveComponent.h>
+#include <engine/dto/TransformComponent.h>
+#include <engine/repository/WorldRepository.h>
+#include <editor/dto/FieldModificationEvent.h>
+#include <engine/dto/ResourceDisposalPayload.h>
+#include <ApplicationEventContext.h>
 #include <cereal/archives/binary.hpp>
-
 #include <fstream>
 #include <filesystem>
-
-#include "../../ApplicationContext.h"
-#include "BufferService.h"
-#include "RayTracingService.h"
-#include "../../editor/service/HistoryService.h"
-#include "../dto/PrimitiveComponent.h"
-#include "../dto/TransformComponent.h"
-#include "../repository/WorldRepository.h"
-#include "editor/dto/FieldModificationEvent.h"
-#include "../dto/ResourceDisposalPayload.h"
 
 namespace Metal {
     void MeshService::onInitialize() {
@@ -40,12 +37,12 @@ namespace Metal {
         }, "PrimitiveComponent");
 
         eventListener([this](const Event &event) {
-            auto payload = std::dynamic_pointer_cast<ResourceDisposalPayload>(event.payload);
-            if (payload) {
-                MeshInstance *resource = getResource(payload->resourceId);
-                LOG_INFO("Disposing of mesh instance");
-                bufferService->dispose(resource->indexBuffer->getId());
-                bufferService->dispose(resource->dataBuffer->getId());
+            if (const auto payload = std::dynamic_pointer_cast<ResourceDisposalPayload>(event.payload)) {
+                if (const MeshInstance *resource = getResource(payload->resourceId); resource != nullptr) {
+                    LOG_INFO("Disposing of mesh instance");
+                    bufferService->dispose(resource->indexBuffer->getId());
+                    bufferService->dispose(resource->dataBuffer->getId());
+                }
             }
         }, "RESOURCE_DISPOSAL");
     }
@@ -77,6 +74,8 @@ namespace Metal {
             true);
 
         delete data;
+
+        ApplicationEventContext::dispatch("MeshLoaded");
 
         return instance;
     }

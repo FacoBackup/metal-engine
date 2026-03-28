@@ -1,15 +1,15 @@
 #ifndef METAL_ENGINE_VULKANCONTEXT_H
 #define METAL_ENGINE_VULKANCONTEXT_H
 
-#include "vk_mem_alloc.h"
+#include <vk_mem_alloc.h>
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 #include <imgui_impl_vulkan.h>
-#include "VkBootstrap.h"
-#include "../common/IInit.h"
-#include "../common/IService.h"
-#include "../common/IDisposable.h"
+#include <VkBootstrap.h>
+#include <common/IInit.h>
+#include <common/IService.h>
+#include <common/IDisposable.h>
 
 #define VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME "VK_KHR_portability_subset"
 
@@ -20,7 +20,6 @@ namespace Metal {
     class TextureService;
     class FrameBufferService;
     class PipelineService;
-    class RayTracingService;
 
     class VulkanContext final : public IService, public IInit {
         WindowService *windowService = nullptr;
@@ -29,7 +28,6 @@ namespace Metal {
         TextureService *textureService = nullptr;
         FrameBufferService *framebufferService = nullptr;
         PipelineService *pipelineService = nullptr;
-        RayTracingService *rayTracingService = nullptr;
 
         static VkBool32 DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
                                       VkDebugUtilsMessageTypeFlagsEXT messageType,
@@ -75,8 +73,7 @@ namespace Metal {
                 {"MeshService", &meshService},
                 {"TextureService", &textureService},
                 {"FrameBufferService", &framebufferService},
-                {"PipelineService", &pipelineService},
-                {"RayTracingService", &rayTracingService}
+                {"PipelineService", &pipelineService}
             };
         }
 
@@ -123,6 +120,10 @@ namespace Metal {
 
         [[nodiscard]] bool isRayTracingSupported() const {
             return rayTracingSupported;
+        }
+
+        [[nodiscard]] uint32_t getMaxCombinedImageSamplers() const {
+            return physicalDeviceProperties.limits.maxDescriptorSetSamplers;
         }
 
         [[nodiscard]] VkCommandBuffer beginSingleTimeCommands() const;

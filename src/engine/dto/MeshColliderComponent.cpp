@@ -4,25 +4,12 @@
 
 namespace Metal {
     void MeshColliderComponent::registerFields() {
-        registerResourceSelection(meshId, "", "Mesh", MESH_EXTENSIONS);
-        registerBool(isConvex, "", "Is Convex");
+        static const std::vector<const FileExtensionInfo*> meshExtensions = {Metal::FileExtensions::mesh.get()};
+        registerEditableField<RESOURCE>(&meshId).setName("Mesh").setGroup("").setSupportedFileTypes(meshExtensions);
+        registerSerializableOnlyField<BOOLEAN>(&isConvex).setName("isConvex");
     }
 
     ComponentType MeshColliderComponent::getType() const {
-        return ComponentType::MESH_COLLIDER;
-    }
-
-    nlohmann::json MeshColliderComponent::toJson() const {
-        nlohmann::json j;
-        j["entityId"] = entityId;
-        j["meshId"] = meshId;
-        j["isConvex"] = isConvex;
-        return j;
-    }
-
-    void MeshColliderComponent::fromJson(const nlohmann::json &j) {
-        entityId = j.at("entityId").get<entt::entity>();
-        meshId = j.value("meshId", "");
-        isConvex = j.value("isConvex", false);
+        return MESH_COLLIDER;
     }
 }

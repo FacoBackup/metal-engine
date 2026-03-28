@@ -3,28 +3,12 @@
 
 namespace Metal {
     void ScopedScriptComponent::registerFields() {
-        registerResourceSelection(onCreatePath, "", "On Create", SCRIPT_EXTENSIONS);
-        registerResourceSelection(onUpdatePath, "", "On Update", SCRIPT_EXTENSIONS);
-        registerResourceSelection(onDestroyPath, "", "On Destroy", SCRIPT_EXTENSIONS);
+        registerEditableField<RESOURCE>(&onCreatePath).setName("On Create").setGroup("").setSupportedFileTypes(Metal::FileExtensions::scripts);
+        registerEditableField<RESOURCE>(&onUpdatePath).setName("On Update").setGroup("").setSupportedFileTypes(Metal::FileExtensions::scripts);
+        registerEditableField<RESOURCE>(&onDestroyPath).setName("On Destroy").setGroup("").setSupportedFileTypes(Metal::FileExtensions::scripts);
     }
 
     ComponentType ScopedScriptComponent::getType() const {
-        return ComponentType::SCOPED_SCRIPT;
-    }
-
-    nlohmann::json ScopedScriptComponent::toJson() const {
-        nlohmann::json j;
-        j["entityId"] = entityId;
-        j["onCreatePath"] = onCreatePath;
-        j["onUpdatePath"] = onUpdatePath;
-        j["onDestroyPath"] = onDestroyPath;
-        return j;
-    }
-
-    void ScopedScriptComponent::fromJson(const nlohmann::json &j) {
-        entityId = j.at("entityId").get<entt::entity>();
-        onCreatePath = j.value("onCreatePath", "");
-        onUpdatePath = j.value("onUpdatePath", "");
-        onDestroyPath = j.value("onDestroyPath", "");
+        return SCOPED_SCRIPT;
     }
 }

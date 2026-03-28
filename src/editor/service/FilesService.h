@@ -4,14 +4,16 @@
 #include <unordered_map>
 #include <memory>
 
-#include "../../common/IInit.h"
-#include "../../common/IService.h"
+#include "common/IInit.h"
+#include "common/IService.h"
 
 namespace Metal {
     struct DirectoryService;
     struct FSEntry;
 
     class NotificationService;
+    class ILoader;
+    class AbstractImporter;
 
     class FilesService final : public IService, public IInit {
         std::shared_ptr<FSEntry> root = nullptr;
@@ -22,7 +24,8 @@ namespace Metal {
         std::vector<Dependency> getDependencies() override {
             return {
                 {"DirectoryService", &directoryService},
-                {"NotificationService", &notificationService}};
+                {"NotificationService", &notificationService}
+            };
         }
 
         std::shared_ptr<FSEntry> getRoot() const {
@@ -31,24 +34,24 @@ namespace Metal {
 
         void onInitialize() override;
 
-        std::shared_ptr<FSEntry> getResource(const std::string &id);
+        std::shared_ptr<FSEntry> GetEntryByAbsolutePath(const std::string &absolutePath) const;
 
-        void deleteFiles(const std::unordered_map<std::string, std::shared_ptr<FSEntry>> &files_context);
+        void deleteFiles(const std::unordered_map<std::string, std::shared_ptr<FSEntry> > &files_context);
 
-        void Move(std::shared_ptr<FSEntry> toMove, std::shared_ptr<FSEntry> targetDir);
+        void Move(const std::shared_ptr<FSEntry> &toMove, const std::shared_ptr<FSEntry> &targetDir) const;
 
-        void CreateDirectory(std::shared_ptr<FSEntry> currentDirectory);
+        void CreateDirectory(const std::shared_ptr<FSEntry> &currentDirectory);
 
-        void CreateFile(std::shared_ptr<FSEntry> currentDirectory, const std::string &name, const std::string &extension);
+        void CreateFile(const std::shared_ptr<FSEntry> &currentDirectory, const std::string &name,
+                        const std::string &extension);
 
         void GetEntries(std::shared_ptr<FSEntry> root);
+
+        bool canInteract(const std::shared_ptr<FSEntry> &entry) const;
+
         std::shared_ptr<FSEntry> GetEntry(const std::string &path);
-        
-        /**
-         * Lists all .lua files in the root directory.
-         * @return A vector of filenames.
-         */
-        std::vector<std::string> listScripts();
+
+        std::vector<std::string> listFilesWithExtension(const std::string &extension) const;
 
         /**
          * Writes content to a file in the root directory.

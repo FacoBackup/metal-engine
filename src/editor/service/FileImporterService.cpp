@@ -4,31 +4,51 @@
 #include "VoxelImporterService.h"
 #include "NotificationService.h"
 #include "AsyncTaskService.h"
-#include "../../common/LoggerUtil.h"
+#include "common/LoggerUtil.h"
 
 #include <exception>
 #include <thread>
 
-namespace Metal {
-    void FileImporterService::importFile(std::string targetDir, std::string file,
-                                         const std::shared_ptr<ImportSettingsDTO> &settings) {
-        std::string fileName = file.substr(file.find_last_of(std::filesystem::path::preferred_separator) + 1);
-        runAsync("Import file: " + fileName,
-                 [this, targetDir, file, fileName, settings](const std::stop_token &token) {
-                     try {
-                         LOG_INFO("Starting file processing: " + fileName);
-                         if (sceneImporterService->isCompatible(file)) {
-                             sceneImporterService->importData(targetDir,
-                                                                 file, settings, token);
-                         } else if (textureImporterService->isCompatible(file)) {
-                             textureImporterService->importData(targetDir, file, settings, token);
-                         } else if (voxelImporterService->isCompatible(file)) {
-                             voxelImporterService->importData(targetDir, file, settings, token);
-                         }
+#include "ApplicationContext.h"
+#include "common/FileExtensions.h"
+#include "common/ILoader.h"
+#include "core/DirectoryService.h"
+#include "editor/dto/FSEntry.h"
 
-                         LOG_INFO("Successfully imported file: " + fileName);
-                         notificationService->pushMessage("Successfully imported file: " + fileName,
-                                                             NotificationSeverities::SUCCESS);
+namespace Metal {
+    void FileImporterService::importFile(std::shared_ptr<FSEntry> file,
+                                         const std::shared_ptr<ImportSettingsDTO> &settings) {
+        const std::string ext = file->extension;
+        auto loaders = ctx->getSingletons<ILoader>();
+        for (auto loader: loaders) {
+            if (loader->isCompatible(ext)) {
+                notificationService->pushMessage("Loading...", NotificationSeverities::WARNING);
+                loader->load(file->getAbsolutePath());
+                return;
+            }
+        }
+
+        std::string fileName = file->name;
+        std::string absolutePath = file->absolutePath;
+        runAsync("Import file: " + fileName,
+                 [this, absolutePath, fileName, settings](const std::stop_token &token) {
+                     try {
+                         auto importers = ctx->getSingletons<AbstractImporter>();
+                         for (auto *importer: importers) {
+                             if (importer->isCompatible(absolutePath)) {
+                                 notificationService->pushMessage("Importing...",
+                                                                  NotificationSeverities::WARNING);
+                                 importer->importData(directoryService->getRootDirectory(),
+                                                      absolutePath, settings, token);
+
+                                 notificationService->pushMessage(
+                                     "Imported file to the root directory",
+                                     NotificationSeverities::WARNING);
+                                 return;
+                             }
+                         }
+                         notificationService->pushMessage("Could not find importer for file type: " + fileName,
+                                                          NotificationSeverities::ERROR);
                      } catch (std::exception &e) {
                          notificationService->pushMessage(e.what(), NotificationSeverities::ERROR);
                      }
@@ -53,25 +73,5 @@ namespace Metal {
         }).detach();
 
         return taskId;
-    }
-
-    std::string FileImporterService::collectCompatibleFiles() const {
-        std::string outStr = "";
-        for (std::string type: sceneImporterService->getSupportedTypes()) {
-            outStr += type + ",";
-        };
-        for (std::string type: textureImporterService->getSupportedTypes()) {
-            outStr += type + ",";
-        };
-        for (std::string type: voxelImporterService->getSupportedTypes()) {
-            outStr += type + ",";
-        };
-        return outStr;
-    }
-
-    bool FileImporterService::isCompatible(const std::string &file) const {
-        return sceneImporterService->isCompatible(file) ||
-               textureImporterService->isCompatible(file) ||
-               voxelImporterService->isCompatible(file);
     }
 }

@@ -1,11 +1,10 @@
 #ifndef METAL_ENGINE_IREPOSITORY_H
 #define METAL_ENGINE_IREPOSITORY_H
 #include "IContextMember.h"
-#include "Inspectable.h"
-#include "ISerialize.h"
+#include "Reflection.h"
 
 namespace Metal {
-    class IRepository : public IContextMember, public Inspectable, public ISerialize {
+    class IRepository : public IContextMember, public Reflection {
     public:
         virtual ~IRepository() = default;
     };

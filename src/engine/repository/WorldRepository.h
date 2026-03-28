@@ -2,28 +2,33 @@
 #define WORLDREPOSITORY_H
 
 #include <vector>
+#include <set>
+#include <unordered_map>
+#include <entt/entt.hpp>
 #include <glm/ext/scalar_constants.hpp>
+#include <nlohmann/json.hpp>
 
-#include "../../common/IRepository.h"
-#include "../dto/Camera.h"
-#include "../enum/ComponentType.h"
+#include <common/IRepository.h>
+#include <engine/dto/Camera.h>
+#include <engine/enum/ComponentType.h>
+#include <common/ILoader.h>
 
 namespace Metal {
     struct MetadataComponent;
-    class Inspectable;
-    class RayTracingService;
+    class Reflection;
     class DirectoryService;
     class HistoryService;
+    class DirtyStateService;
 
     struct EntityState {
         entt::entity id;
         nlohmann::json data;
     };
 
-    struct WorldRepository final : IRepository {
-        RayTracingService *rayTracingService = nullptr;
+    struct WorldRepository final : IRepository, ILoader {
         DirectoryService *directoryService = nullptr;
         HistoryService *historyService = nullptr;
+        DirtyStateService *dirtyStateService = nullptr;
 
         Camera camera{-(glm::pi<float>() / 4), glm::pi<float>() / 4, {10, 10, 10}};
         entt::registry registry{};
@@ -32,9 +37,9 @@ namespace Metal {
 
         std::vector<Dependency> getDependencies() override {
             return {
-                {"RayTracingService", &rayTracingService},
                 {"DirectoryService", &directoryService},
-                {"HistoryService", &historyService}
+                {"HistoryService", &historyService},
+                {"DirtyStateService", &dirtyStateService}
             };
         }
 
@@ -52,11 +57,11 @@ namespace Metal {
 
         void changeVisibility(entt::entity entity, bool isVisible);
 
-        void loadScene(const std::string &sceneId);
+        void registerFields() override;
 
-        nlohmann::json toJson() const override;
+        void load(const std::string &absolutePath) override;
 
-        void fromJson(const nlohmann::json &j) override;
+        bool isCompatible(const std::string &absolutePath) override;
 
         void deserializeEntityComplete(const EntityState &state);
     };

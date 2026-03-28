@@ -6,12 +6,11 @@
 #include <thread>
 #include <atomic>
 
-#include "dto/GlobalDataUBO.h"
-#include "../common/IService.h"
-#include "../common/IDisposable.h"
-#include "../common/ISync.h"
-#include "frame-builder/EngineFrame.h"
-#include "frame-builder/EngineFrameBuilder.h"
+#include <engine/dto/GlobalDataUBO.h>
+#include <common/IService.h>
+#include <common/ISync.h>
+#include <engine/frame-builder/EngineFrame.h>
+#include <engine/frame-builder/EngineFrameBuilder.h>
 
 using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::time_point<Clock>;
@@ -20,25 +19,31 @@ namespace Metal {
     class ApplicationEventContext;
     class TransformService;
     class StreamingService;
-    class RayTracingService;
+    class BLASService;
+    class TLASService;
+    class MaterialService;
     class CameraService;
     class LightService;
     class VolumeService;
     class PhysicsService;
+    class VulkanContext;
     struct WorldRepository;
     struct EditorRepository;
     struct EngineRepository;
     class EngineFrame;
     class EngineFrameBuilder;
 
-    class EngineContext final : public IService, public ISync, public IDisposable {
+    class EngineContext final : public IService, public ISync {
         TransformService *transformService = nullptr;
         StreamingService *streamingService = nullptr;
-        RayTracingService *rayTracingService = nullptr;
+        BLASService *blasService = nullptr;
+        TLASService *tlasService = nullptr;
+        MaterialService *materialService = nullptr;
         CameraService *cameraService = nullptr;
         LightService *lightService = nullptr;
         VolumeService *volumeService = nullptr;
         PhysicsService *physicsService = nullptr;
+        VulkanContext *vulkanContext = nullptr;
         WorldRepository *worldRepository = nullptr;
         EditorRepository *editorRepository = nullptr;
         EngineRepository *engineRepository = nullptr;
@@ -47,20 +52,19 @@ namespace Metal {
         long long start = -1;
         bool cameraUpdated = true;
 
-        std::thread physicsTransformThread;
-        std::atomic<bool> physicsTransformThreadRunning = false;
-        void physicsTransformLoop();
-
     public:
         std::vector<Dependency> getDependencies() override {
             return {
                 {"TransformService", &transformService},
                 {"StreamingService", &streamingService},
-                {"RayTracingService", &rayTracingService},
+                {"BLASService", &blasService},
+                {"TLASService", &tlasService},
+                {"MaterialService", &materialService},
                 {"CameraService", &cameraService},
                 {"LightService", &lightService},
                 {"VolumeService", &volumeService},
                 {"PhysicsService", &physicsService},
+                {"VulkanContext", &vulkanContext},
                 {"WorldRepository", &worldRepository},
                 {"EditorRepository", &editorRepository},
                 {"EngineRepository", &engineRepository}
@@ -104,8 +108,6 @@ namespace Metal {
         }
 
         void onSync() override;
-
-        void dispose() override;
     };
 }
 #endif

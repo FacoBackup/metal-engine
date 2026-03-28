@@ -1,6 +1,6 @@
 #ifndef GRIDRENDERPASS_H
 #define GRIDRENDERPASS_H
-#include "../../engine/passes/AbstractRenderPass.h"
+#include "engine/passes/AbstractRenderPass.h"
 #include "../dto/GridPushConstant.h"
 
 namespace Metal {

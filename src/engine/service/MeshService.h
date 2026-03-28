@@ -2,7 +2,7 @@
 #define MESHSERVICE_H
 #include "../../common/AbstractResourceService.h"
 #include "../resource/MeshInstance.h"
-#include "../../editor/enum/engine-definitions.h"
+#include "editor/enum/engine-definitions.h"
 #include "../../common/IInit.h"
 #include "../../common/IEventMember.h"
 #include "ApplicationEventContext.h"
@@ -13,13 +13,11 @@ namespace Metal {
     struct EntityAssetData;
 
     class BufferService;
-    class RayTracingService;
     class DirectoryService;
     struct WorldRepository;
 
     class MeshService final : public AbstractResourceService<MeshInstance>, public IInit {
         BufferService *bufferService = nullptr;
-        RayTracingService *rayTracingService = nullptr;
         DirectoryService *directoryService = nullptr;
         WorldRepository *worldRepository = nullptr;
 
@@ -29,7 +27,6 @@ namespace Metal {
         std::vector<Dependency> getDependencies() override {
             return {
                 {"BufferService", &bufferService},
-                {"RayTracingService", &rayTracingService},
                 {"DirectoryService", &directoryService},
                 {"WorldRepository", &worldRepository}
             };

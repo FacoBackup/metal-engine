@@ -1,7 +1,7 @@
 #ifndef MESHIMPORTERSERVICE_H
 #define MESHIMPORTERSERVICE_H
 
-#include "../../common/IService.h"
+#include "common/IService.h"
 #include <assimp/scene.h>
 #include <unordered_map>
 #include <string>

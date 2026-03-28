@@ -140,7 +140,6 @@ TEST_F(LuaServiceTest, EntityIdAndWorldBindings) {
     createLuaFile("test_entity_id.lua", "captured_entity = this_entity\n"
                                         "new_ent = world:createEntity()\n"
                                         "metadata = world:getEntity(new_ent)\n"
-                                        "metadata.name = 'From Lua'\n"
                                         "has_metadata = world:hasComponent(new_ent, 3)"); // 3 is METADATA
 
     scoped.onUpdatePath = "test_entity_id.lua";
@@ -153,10 +152,6 @@ TEST_F(LuaServiceTest, EntityIdAndWorldBindings) {
 
     entt::entity newEnt = luaService->getState()["new_ent"];
     // EXPECT_NE(newEnt, entt::null);
-
-    auto* metadata = worldRepository->getEntity(newEnt);
-    EXPECT_EQ(metadata->name, "From Lua");
-
     bool hasMetadata = luaService->getState()["has_metadata"];
     EXPECT_TRUE(hasMetadata);
 

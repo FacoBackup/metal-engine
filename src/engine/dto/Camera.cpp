@@ -54,63 +54,42 @@ namespace Metal {
     }
 
     void Camera::registerFields() {
-        registerFloat(fov, "View", "FOV", 60, 120, false);
-        registerFloat(zNear, "View", "Z-Near", 0, 1, false);
-        registerFloat(zFar, "View", "Z-Far", 1, MAX_INT, false);
+        registerEditableField<FLOAT>(&fov).setName("FOV").setGroup("View").setMin(60).setMax(120);
+        registerEditableField<FLOAT>(&zNear).setName("Z-Near").setGroup("View").setMin(0).setMax(1);
+        registerEditableField<FLOAT>(&zFar).setName("Z-Far").setGroup("View").setMin(1).setMax(MAX_INT);
 
-        registerFloat(rotationSensitivity, "Controls", "Camera rotation sensitivity", 0, 10, false);
+        registerEditableField<FLOAT>(&rotationSensitivity).setName("Camera rotation sensitivity").setGroup("Controls").setMin(0).setMax(10);
+        registerEditableField<FLOAT>(&movementSensitivity).setName("Camera Movement speed").setGroup("Controls").setMin(0).setMax(10);
+        registerEditableField<FLOAT>(&zoomSensitivity).setName("Orbit camera zoom sensitivity").setGroup("Controls").setMin(0).setMax(10);
 
-        registerFloat(movementSensitivity, "Controls", "Camera Movement speed", 0, 10, false);
+        registerEditableField<BOOLEAN>(&motionBlurEnabled).setName("Motion Blur Enabled").setGroup("Motion blur");
+        registerEditableField<FLOAT>(&motionBlurVelocityScale).setName("Motion Blur Velocity Scale").setGroup("Motion blur").setMin(0).setMax(500);
+        registerEditableField<INT>(&motionBlurMaxSamples).setName("Motion Blur Max Samples").setGroup("Motion blur").setMin(1).setMax(100);
+        registerEditableField<BOOLEAN>(&cameraMotionBlur).setName("Camera Motion Blur").setGroup("Motion blur");
 
-        registerFloat(zoomSensitivity, "Controls", "Orbit camera zoom sensitivity", 0, 10, false);
+        registerEditableField<BOOLEAN>(&bloomEnabled).setName("Bloom").setGroup("Post processing");
+        registerEditableField<BOOLEAN>(&filmGrain).setName("Film Grain").setGroup("Post processing");
+        registerEditableField<BOOLEAN>(&vignetteEnabled).setName("Vignette Enabled").setGroup("Post processing");
+        registerEditableField<BOOLEAN>(&chromaticAberrationEnabled).setName("Chromatic Aberration").setGroup("Post processing");
+        registerEditableField<BOOLEAN>(&distortionEnabled).setName("Distortion").setGroup("Post processing");
+        registerEditableField<FLOAT>(&filmGrainStrength).setName("Film Grain Strength").setGroup("Post processing").setMin(-MAX_FLOAT).setMax(MAX_FLOAT);
+        registerEditableField<FLOAT>(&vignetteStrength).setName("Vignette Strength").setGroup("Post processing").setMin(0).setMax(MAX_FLOAT);
+        registerEditableField<FLOAT>(&bloomThreshold).setName("Bloom Threshold").setGroup("Post processing").setMin(0).setMax(MAX_FLOAT);
+        registerEditableField<INT>(&bloomQuality).setName("Bloom Quality").setGroup("Post processing").setMin(0).setMax(MAX_INT);
+        registerEditableField<INT>(&bloomOffset).setName("Bloom Offset").setGroup("Post processing").setMin(0).setMax(MAX_INT);
+        registerEditableField<FLOAT>(&chromaticAberrationIntensity).setName("Chromatic Aberration Strength").setGroup("Post processing").setMin(0).setMax(MAX_FLOAT);
+        registerEditableField<FLOAT>(&distortionIntensity).setName("Distortion Strength").setGroup("Post processing").setMin(0).setMax(MAX_FLOAT);
 
-        registerBool(motionBlurEnabled,
-                     "Motion blur", "Motion Blur Enabled", false);
-
-        registerFloat(motionBlurVelocityScale,
-                      "Motion blur", "Motion Blur Velocity Scale", 0, 500, false);
-
-        registerInt(motionBlurMaxSamples,
-                    "Motion blur", "Motion Blur Max Samples", 1, 100, false);
-
-        registerBool(cameraMotionBlur,
-                     "Motion blur", "Camera Motion Blur", false);
-
-        registerBool(bloomEnabled,
-                     "Post processing", "Bloom", false);
-
-        registerBool(filmGrain,
-                     "Post processing", "Film Grain", false);
-
-        registerBool(vignetteEnabled,
-                     "Post processing", "Vignette Enabled", false);
-
-        registerBool(chromaticAberrationEnabled,
-                     "Post processing", "Chromatic Aberration", false);
-
-        registerBool(distortionEnabled,
-                     "Post processing", "Distortion", false);
-
-        registerFloat(filmGrainStrength,
-                      "Post processing", "Film Grain Strength", -MAX_FLOAT, MAX_FLOAT, false);
-
-        registerFloat(vignetteStrength,
-                      "Post processing", "Vignette Strength", 0, MAX_FLOAT, false);
-
-        registerFloat(bloomThreshold,
-                      "Post processing", "Bloom Threshold", 0, MAX_FLOAT, false);
-
-        registerInt(bloomQuality,
-                    "Post processing", "Bloom Quality", 0, MAX_INT, false);
-
-        registerInt(bloomOffset,
-                    "Post processing",
-                    "Bloom Offset", 0, MAX_INT, false);
-
-        registerFloat(chromaticAberrationIntensity, "Post processing", "Chromatic Aberration Strength", 0,
-                      MAX_FLOAT, false);
-
-        registerFloat(distortionIntensity, "Post processing", "Distortion Strength", 0, MAX_FLOAT, false);
+        registerSerializableOnlyField<VECTOR3>(&position).setName("position");
+        registerSerializableOnlyField<BOOLEAN>(&isOrthographic).setName("isOrthographic");
+        registerSerializableOnlyField<FLOAT>(&aspectRatio).setName("aspectRatio");
+        registerSerializableOnlyField<FLOAT>(&orthographicProjectionSize).setName("orthographicProjectionSize");
+        registerSerializableOnlyField<FLOAT>(&pitch).setName("pitch");
+        registerSerializableOnlyField<FLOAT>(&yaw).setName("yaw");
+        registerSerializableOnlyField<FLOAT>(&lastMouseX).setName("lastMouseX");
+        registerSerializableOnlyField<FLOAT>(&lastMouseY).setName("lastMouseY");
+        registerSerializableOnlyField<FLOAT>(&deltaX).setName("deltaX");
+        registerSerializableOnlyField<FLOAT>(&deltaY).setName("deltaY");
     }
 
     Camera::Camera(const float pitch, const float yaw, const glm::vec3 position) {

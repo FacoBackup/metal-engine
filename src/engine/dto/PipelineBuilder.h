@@ -66,8 +66,10 @@ namespace Metal {
         PipelineBuilder &addBufferBinding(std::string bufferId);
 
         PipelineBuilder &addCombinedImageSamplerBinding(VkSampler sampler, VkImageView view,
-                                            VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                                            unsigned int descriptorCount = 1);
+                                            VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+        PipelineBuilder &addSingleCombinedImageSamplerBinding(VkSampler sampler, VkImageView view,
+                                                        VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
         PipelineBuilder &addFboBinding(std::string frameBufferId, uint32_t attachmentIndex,
                                             VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);

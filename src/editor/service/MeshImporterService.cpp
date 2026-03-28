@@ -1,12 +1,12 @@
 #include "MeshImporterService.h"
 #include "../../core/DirectoryService.h"
-#include "../../common/LoggerUtil.h"
-#include "../../engine/dto/MeshData.h"
-#include "../../engine/dto/VertexData.h"
+#include "common/LoggerUtil.h"
+#include "engine/dto/MeshData.h"
+#include "engine/dto/VertexData.h"
 #include "../enum/engine-definitions.h"
-#include "../../common/FilesUtil.h"
+#include "common/FilesUtil.h"
 #include <cereal/archives/binary.hpp>
-#include "../../common/serialization-definitions.h"
+#include "common/serialization-definitions.h"
 
 namespace Metal {
     std::string MeshImporterService::persistMesh(const std::string &targetDir, const MeshData &mesh) const {

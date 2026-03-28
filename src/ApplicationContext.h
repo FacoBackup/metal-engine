@@ -17,6 +17,7 @@
 #include "common/IInit.h"
 #include "common/IContextMember.h"
 #include "common/IDisposable.h"
+#include "common/LoggerUtil.h"
 #include "common/Util.h"
 
 #define ENGINE_NAME "Metal Engine"
@@ -39,13 +40,13 @@ namespace Metal {
         void registerSingleton(std::shared_ptr<T> instance) {
             static_assert(std::is_base_of_v<IContextMember, T>, "T must derive from IContextMember");
             T *ptr = instance.get();
-            singletons[getTypeName(typeid(T).name())] = static_cast<IContextMember *>(ptr);
+            singletons[Util::getTypeName(typeid(T).name())] = static_cast<IContextMember *>(ptr);
             instances.push_back(std::move(instance));
         }
 
         template<typename T>
         T &getSingleton() {
-            auto name = getTypeName(typeid(T).name());
+            auto name = Util::getTypeName(typeid(T).name());
             auto it = singletons.find(name);
             if (it == singletons.end()) {
                 throw std::runtime_error(std::string("Singleton not registered: ") + name);
@@ -55,7 +56,7 @@ namespace Metal {
 
         template<typename T>
         T *getSingletonPtr() {
-            auto name = getTypeName(typeid(T).name());
+            auto name = Util::getTypeName(typeid(T).name());
             auto it = singletons.find(name);
             if (it == singletons.end()) {
                 return nullptr;
@@ -63,19 +64,18 @@ namespace Metal {
             return static_cast<T *>(it->second);
         }
 
-        void *getSingletonByName(const std::string &name) {
+        void *getSingletonByName(const std::string &name) const {
             std::string lowerName = name;
-            std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(),
-                           [](unsigned char c) { return std::tolower(c); });
-            auto it = singletons.find(lowerName);
-            if (it == singletons.end()) {
-                throw std::runtime_error(std::string("Singleton not registered: ") + lowerName);
+            std::ranges::transform(lowerName, lowerName.begin(),
+                                   [](unsigned char c) { return std::tolower(c); });
+            if (!singletons.contains(lowerName)) {
+                LOG_WARN("Could not find dependency " + name);
+                return nullptr;
             }
-            return it->second;
+            return singletons.at(lowerName);
         }
 
         void injectDependencies(IContextMember *member) {
-            std::cout << "Injecting dependencies for: " << typeid(*member).name() << std::endl;
             member->setDependencies(*this);
         }
 

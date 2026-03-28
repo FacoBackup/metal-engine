@@ -1,31 +1,33 @@
-#include "TransformService.h"
+#include <engine/service/TransformService.h>
 #include <entt/entt.hpp>
 #include <iostream>
 #include <glm/gtc/quaternion.hpp>
-#include "../../common/LoggerUtil.h"
+#include <common/LoggerUtil.h>
 
-#include "../../ApplicationContext.h"
-#include "../dto/TransformComponent.h"
-#include "../repository/WorldRepository.h"
-#include "../dto/PrimitiveComponent.h"
-#include "RayTracingService.h"
-#include "../../editor/dto/FieldModificationEvent.h"
+#include <ApplicationContext.h>
+#include <engine/dto/TransformComponent.h>
+#include <engine/repository/WorldRepository.h>
+#include <engine/dto/PrimitiveComponent.h>
+#include <engine/service/DirtyStateService.h>
+#include <editor/dto/FieldModificationEvent.h>
+#include <ApplicationEventContext.h>
 
 namespace Metal {
     void TransformService::onInitialize() {
         eventListener([this](const Event &e) {
             const auto payload = std::static_pointer_cast<InspectableEventPayload>(e.payload);
-            if (const auto transform = dynamic_cast<TransformComponent *>(payload->inspectable)) {
-                dirtyEntities.insert(transform->getEntityId());
+            if (const auto transform = dynamic_cast<TransformComponent *>(payload->reflectionInstance)) {
+                dirtyStateService->markEntityDirty(transform->getEntityId(), DirtyType::Transform);
             }
         }, "TransformComponent");
 
         for (auto entity: worldRepository->registry.view<TransformComponent>()) {
-            dirtyEntities.insert(entity);
+            dirtyStateService->markEntityDirty(entity, DirtyType::Transform);
         }
     }
 
-    void TransformService::onSync() {
+    void TransformService::onAsyncSync() {
+        auto dirtyEntities = dirtyStateService->getDirtyEntities(DirtyType::Transform, true);
         if (dirtyEntities.empty()) return;
 
         for (auto entity: dirtyEntities) {
@@ -33,7 +35,6 @@ namespace Metal {
             TransformComponent &st = worldRepository->registry.get<TransformComponent>(entity);
             transform(&st, nullptr);
         }
-        dirtyEntities.clear();
     }
 
     void TransformService::transform(TransformComponent *st, const TransformComponent *parentTransform) {
@@ -60,7 +61,7 @@ namespace Metal {
 
         if (worldRepository->hasComponent(st->getEntityId(), PRIMITIVE) || worldRepository->hasComponent(
                 st->getEntityId(), LIGHT)) {
-            ApplicationEventContext::dispatch("BVHNeedsUpdate");
+            dirtyStateService->markDirty(DirtyType::BVH);
         }
     }
 } // Metal

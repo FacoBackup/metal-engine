@@ -1,32 +1,38 @@
 #ifndef METAL_ENGINE_SCENEENTITYDATA_H
 #define METAL_ENGINE_SCENEENTITYDATA_H
 #include <optional>
-#include "../../engine/dto/PrimitiveComponent.h"
-#include "../../engine/dto/TransformComponent.h"
-#include "../../engine/dto/MetadataComponent.h"
+#include "engine/dto/PrimitiveComponent.h"
+#include "engine/dto/TransformComponent.h"
+#include "engine/dto/MetadataComponent.h"
+
+#include "common/Reflection.h"
 
 namespace Metal {
-
-    struct SceneEntityData final : ISerialize {
+    struct SceneEntityData final : Reflection {
         MetadataComponent entity;
         TransformComponent transform;
         std::optional<PrimitiveComponent> primitive;
 
-        nlohmann::json toJson() const override {
-            nlohmann::json j;
-            j["entity"] = entity.toJson();
-            j["transform"] = transform.toJson();
-            if (primitive) j["primitive"] = primitive->toJson();
-            return j;
-        }
+    protected:
+        void registerFields() override {
+            registerCompositeField(&entity).setName("entity");
+            registerCompositeField(&transform).setName("transform");
 
-        void fromJson(const nlohmann::json &j) override {
-            entity.fromJson(j.at("entity"));
-            transform.fromJson(j.at("transform"));
-            if (j.contains("primitive")) {
-                primitive = PrimitiveComponent();
-                primitive->fromJson(j.at("primitive"));
-            }
+            auto primitiveToJson = [this] {
+                if (primitive) return primitive->toJson();
+                return nlohmann::json();
+            };
+
+            auto primitiveFromJson = [this](const nlohmann::json &j) {
+                if (!j.is_null() && !j.empty()) {
+                    primitive = PrimitiveComponent();
+                    primitive->fromJson(j);
+                } else {
+                    primitive = std::nullopt;
+                }
+            };
+
+            registerGenericField(primitiveToJson, primitiveFromJson).setName("primitive");
         }
     };
 }

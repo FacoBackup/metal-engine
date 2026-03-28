@@ -20,19 +20,20 @@ namespace Metal {
     class EngineContext;
     struct WorldRepository;
     struct RuntimeRepository;
+    class DirtyStateService;
     struct Camera;
 
     class CameraService final : public IService, public ISync, public IEventMember, public IInit {
         EngineContext *engineContext = nullptr;
         WorldRepository *worldRepository = nullptr;
         RuntimeRepository *runtimeRepository = nullptr;
+        DirtyStateService *dirtyStateService = nullptr;
 
         Camera *camera = nullptr;
         glm::vec3 xAxis{0.0f};
         glm::vec3 yAxis{0.0f};
         glm::vec3 zAxis{0.0f};
 
-        mutable bool dirty = true;
         bool forwardPressed = false;
         bool backwardPressed = false;
         bool leftPressed = false;
@@ -63,7 +64,8 @@ namespace Metal {
             return {
                 {"EngineContext", &engineContext},
                 {"WorldRepository", &worldRepository},
-                {"RuntimeRepository", &runtimeRepository}
+                {"RuntimeRepository", &runtimeRepository},
+                {"DirtyStateService", &dirtyStateService}
             };
         }
 

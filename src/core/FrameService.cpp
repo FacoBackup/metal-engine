@@ -7,8 +7,8 @@
 #include "ImGuiService.h"
 #include "VulkanContext.h"
 #include "WindowService.h"
-#include "../editor/abstract/AbstractPanel.h"
-#include "../engine/EngineContext.h"
+#include "editor/ui/abstract/AbstractPanel.h"
+#include "engine/EngineContext.h"
 #include "../common/VulkanUtils.h"
 
 namespace Metal {

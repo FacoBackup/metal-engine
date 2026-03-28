@@ -104,7 +104,7 @@ namespace Metal {
         delete JPH::Factory::sInstance;
     }
 
-    void PhysicsService::onSync() {
+    void PhysicsService::onAsyncSync() {
         if (!enabled) return;
 
         physicsSystem->Update(1.0f / 60.0f, 1, tempAllocator, jobSystem);

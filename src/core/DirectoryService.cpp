@@ -6,11 +6,14 @@
 #include "../ApplicationContext.h"
 
 #include <filesystem>
-#define CACHED_PATH "/metal-engine-cached.txt"
-#include "../editor/service/NotificationService.h"
-#include "../engine/repository/WorldRepository.h"
+#include "editor/service/NotificationService.h"
+#include "engine/repository/WorldRepository.h"
 
 namespace Metal {
+    std::string DirectoryService::getProjectTargetPath() const {
+        return rootDirectory + "/.project";
+    }
+
     void DirectoryService::onInitialize() {
         NFD_Init();
         updateRootPath(false);
@@ -24,18 +27,22 @@ namespace Metal {
     }
 
     void DirectoryService::updateRootPath(bool forceSelection) {
+        char *home = getenv("USERPROFILE");
+        if (!home) home = getenv("HOME");
+        if (home) {
+            engineMetadataPath = std::string(home) + "/.metal";
+            FilesUtil::CreateDirectory(engineMetadataPath);
+        } else {
+            engineMetadataPath = ".metal";
+            FilesUtil::CreateDirectory(engineMetadataPath);
+        }
+
         std::string cachedPath;
-        std::string cachePathFile = std::filesystem::current_path().string() + CACHED_PATH;
+        std::string cachePathFile = engineMetadataPath + "/metal-engine-cached.txt";
         FilesUtil::ReadFile(cachePathFile.c_str(), cachedPath);
         cachedPath.erase(std::ranges::remove(cachedPath, '\n').begin(), cachedPath.cend());
         if (cachedPath.empty() || forceSelection || !fs::exists(cachedPath)) {
-            char *home = getenv("USERPROFILE");
-            if (!home) home = getenv("HOME");
-            if (home && !forceSelection) {
-                rootDirectory = home;
-            } else {
-                rootDirectory = FileDialogUtil::SelectDirectory();
-            }
+            rootDirectory = FileDialogUtil::SelectDirectory();
             rootDirectory.erase(std::ranges::remove(rootDirectory, '\n').begin(), rootDirectory.cend());
             if (rootDirectory.empty()) {
                 throw std::runtime_error("No directory selected.");
@@ -45,32 +52,36 @@ namespace Metal {
         } else {
             rootDirectory = cachedPath;
         }
+        FilesUtil::CreateDirectory(getProjectTargetPath());
 
-        for (auto &instance: ctx->getInstances()) {
-            auto *repository = dynamic_cast<IRepository *>(instance.get());
-            if (repository) {
-                PARSE_TEMPLATE(*repository,
-                               rootDirectory + "/" + std::to_string(std::hash<std::string>{}(typeid(*repository).name())
-                               ) + ".json")
+        for (auto *instance: ctx->getSingletons<IRepository>()) {
+            std::string path = getProjectTargetPath() + "/" + instance->getClassName() + ".json";
+            if (std::filesystem::exists(path)) {
+                std::cout << "Loading " << path << std::endl;
+                std::ifstream is(path);
+                if (is.is_open()) {
+                    nlohmann::json j;
+                    is >> j;
+                    instance->fromJson(j);
+                }
             }
         }
 
-        FilesUtil::CreateDirectory(rootDirectory + "/shaders/");
-        FilesUtil::CreateDirectory(rootDirectory + "/assets-ref/");
-        FilesUtil::CreateDirectory(rootDirectory + "/assets/");
+        FilesUtil::CreateDirectory(engineMetadataPath + "/shaders/");
     }
 
 
-    void DirectoryService::save(bool silent) {
+    void DirectoryService::save(const bool silent) const {
         try {
             if (rootDirectory.empty()) return;
-            for (auto &instance: ctx->getInstances()) {
-                auto *repository = dynamic_cast<IRepository *>(instance.get());
-                if (repository) {
-                    DUMP_TEMPLATE(
-                        rootDirectory + "/" + std::to_string(std::hash<std::string>{}(typeid(*repository).name())) +
-                        ".json",
-                        *repository)
+            std::string targetPath = getProjectTargetPath();
+            FilesUtil::CreateDirectory(targetPath);
+
+            for (auto *instance: ctx->getSingletons<IRepository>()) {
+                std::ofstream os(targetPath + "/" + instance->getClassName() + ".json");
+                if (os.is_open()) {
+                    std::string data = instance->toJson().dump(4);
+                    os << data;
                 }
             }
             if (!silent)
@@ -80,5 +91,9 @@ namespace Metal {
             if (!silent)
                 notificationService->pushMessage("Could not save project", NotificationSeverities::ERROR);
         }
+    }
+
+    std::string DirectoryService::getRootDirectory() const {
+        return rootDirectory;
     }
 } // Metal
