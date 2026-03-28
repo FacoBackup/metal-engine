@@ -9,7 +9,7 @@
 #include "editor/ui/UIUtil.h"
 #include "editor/dto/FSEntry.h"
 #include "ApplicationContext.h"
-#include "common/Inspectable.h"
+#include "common/Reflection.h"
 #include "editor/service/FilesService.h"
 #include "editor/service/HistoryService.h"
 #include "ApplicationEventContext.h"
@@ -20,13 +20,14 @@ namespace Metal {
     constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoDocking |
                                        ImGuiWindowFlags_NoSavedSettings;
 
-    ResourceField::ResourceField(InspectedField<std::string> &field) : field(field) {
+    ResourceField::ResourceField(FieldMetadata &field) : field(field) {
     }
 
     void ResourceField::onInitialize() {
     }
 
     void ResourceField::renderButton() {
+        std::string *ptr = static_cast<std::string *>(field.pointer);
         ImGui::Text(field.name.c_str());
         ImGui::BeginChild(id.c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 32),
                           ImGuiChildFlags_Border);
@@ -37,8 +38,8 @@ namespace Metal {
             }
             std::string selected = FileDialogUtil::PickFile(filters);
             if (!selected.empty()) {
-                std::string oldValue = *field.field;
-                *field.field = selected;
+                std::string oldValue = *ptr;
+                *ptr = selected;
                 historyService->recordChange(&field, oldValue);
                 ApplicationEventContext::dispatch(field.instance->getClassName(),
                                                   std::make_shared<FieldModificationPayload>(field));
@@ -49,9 +50,9 @@ namespace Metal {
                 Icons::close + id,
                 UIUtil::ONLY_ICON_BUTTON_SIZE,
                 UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            std::string oldValue = *field.field;
+            std::string oldValue = *ptr;
             entry = nullptr;
-            *field.field = "";
+            *ptr = "";
 
 
             historyService->recordChange(&field, oldValue);
@@ -68,8 +69,9 @@ namespace Metal {
     }
 
     void ResourceField::onSync() {
-        if (field.field->size() > 0 && (entry == nullptr || entry->absolutePath != *field.field)) {
-            entry = filesService->getResource(*field.field);
+        std::string *ptr = static_cast<std::string *>(field.pointer);
+        if (ptr->size() > 0 && (entry == nullptr || entry->absolutePath != *ptr)) {
+            entry = filesService->getResource(*ptr);
         }
         if (!field.disabled) {
             renderButton();

@@ -186,10 +186,10 @@ namespace Metal {
                     createComponent(entityId, dep);
                 }
                 compDef.creator(*this, entityId);
-                if (auto *inspectable = compDef.getInspectable(*this, entityId)) {
-                    std::string className = inspectable->getClassName();
+                if (auto *reflectionInstance = compDef.getInspectable(*this, entityId)) {
+                    std::string className = reflectionInstance->getClassName();
                     ApplicationEventContext::dispatch(
-                        className, std::make_shared<InspectableEventPayload>(inspectable));
+                        className, std::make_shared<InspectableEventPayload>(reflectionInstance));
                 }
                 break;
             }
@@ -207,37 +207,50 @@ namespace Metal {
         return false;
     }
 
-    nlohmann::json WorldRepository::toJson() const {
-        nlohmann::json j;
-        j["camera"] = camera.toJson();
-
-        nlohmann::json entitiesJson;
-        for (auto entity: registry.view<entt::entity>()) {
-            nlohmann::json ej;
-
-            if (registry.all_of<MetadataComponent>(entity)) {
-                ej["entity"] = registry.get<MetadataComponent>(entity).toJson();
+    void WorldRepository::registerFields() {
+        auto hiddenEntitiesToJson = [this] {
+            nlohmann::json j;
+            for (auto const &[entity, isHidden]: hiddenEntities) {
+                j[std::to_string(entt::to_integral(entity))] = isHidden;
             }
+            return j;
+        };
 
-            for (const auto &compDef: ComponentTypes::getComponents()) {
-                auto cj = compDef.toJson(const_cast<WorldRepository &>(*this), entity);
-                if (!cj.is_null()) {
-                    ej[compDef.jsonKey] = std::move(cj);
+        auto hiddenEntitiesFromJson = [this](const nlohmann::json &j) {
+            hiddenEntities.clear();
+            for (auto const &[key, val]: j.items()) {
+                const auto entity = static_cast<entt::entity>(static_cast<uint32_t>(std::stoul(key)));
+                hiddenEntities[entity] = val.get<bool>();
+            }
+        };
+
+        registerSerializableOnlyField(&camera, COMPOSITE, "camera");
+        registerSerializableOnlyField(&hiddenEntities, COMPOSITE, "hiddenEntities")
+                .setTransformer(hiddenEntitiesToJson, hiddenEntitiesFromJson);
+
+        auto registryToJson = [this] {
+            nlohmann::json entitiesJson;
+            for (auto entity: registry.view<entt::entity>()) {
+                nlohmann::json ej;
+
+                if (registry.all_of<MetadataComponent>(entity)) {
+                    ej["entity"] = registry.get<MetadataComponent>(entity).toJson();
                 }
+
+                for (const auto &compDef: ComponentTypes::getComponents()) {
+                    auto cj = compDef.toJson(*this, entity);
+                    if (!cj.is_null()) {
+                        ej[compDef.jsonKey] = std::move(cj);
+                    }
+                }
+                entitiesJson[std::to_string(entt::to_integral(entity))] = ej;
             }
-            entitiesJson[std::to_string(entt::to_integral(entity))] = ej;
-        }
-        j["registry"] = entitiesJson;
-        j["hiddenEntities"] = hiddenEntities;
-        return j;
-    }
+            return entitiesJson;
+        };
 
-    void WorldRepository::fromJson(const nlohmann::json &j) {
-        if (j.contains("camera")) camera.fromJson(j.at("camera"));
-
-        registry.clear();
-        if (j.contains("registry")) {
-            for (auto const &[key, val]: j.at("registry").items()) {
+        auto registryFromJson = [this](const nlohmann::json &j) {
+            registry.clear();
+            for (auto const &[key, val]: j.items()) {
                 const auto id = static_cast<entt::entity>(static_cast<uint32_t>(std::stoul(key)));
                 const auto entity = registry.create(id);
 
@@ -252,15 +265,13 @@ namespace Metal {
                     }
                 }
             }
-        }
+            for (auto entity: registry.view<PrimitiveComponent>()) {
+                if (dirtyStateService) dirtyStateService->markEntityDirty(entity, DirtyType::Material);
+            }
+        };
 
-        if (j.contains("hiddenEntities")) {
-            hiddenEntities = j.at("hiddenEntities").get<std::unordered_map<entt::entity, bool> >();
-        }
-
-        for (auto entity: registry.view<PrimitiveComponent>()) {
-            dirtyStateService->markEntityDirty(entity, DirtyType::Material);
-        }
+        registerSerializableOnlyField(nullptr, COMPOSITE, "registry")
+                .setTransformer(registryToJson, registryFromJson);
     }
 
     void WorldRepository::deserializeEntityComplete(const EntityState &state) {
@@ -270,10 +281,12 @@ namespace Metal {
                 if (state.data.contains(compDef.jsonKey)) {
                     compDef.creator(*this, state.id);
                     compDef.fromJson(*this, state.id, state.data.at(compDef.jsonKey));
-                    if (auto *inspectable = compDef.getInspectable(*this, state.id)) {
-                        std::string className = inspectable->getClassName();
+                    if (auto *reflectionInstance = compDef.getInspectable(*this, state.id)) {
+                        auto component = dynamic_cast<AbstractComponent *>(reflectionInstance);
+                        component->setEntityId(state.id);
+                        std::string className = reflectionInstance->getClassName();
                         ApplicationEventContext::dispatch(
-                            className, std::make_shared<InspectableEventPayload>(inspectable));
+                            className, std::make_shared<InspectableEventPayload>(reflectionInstance));
                     }
                 }
             }

@@ -2,23 +2,21 @@
 #define RIGID_BODY_COMPONENT_H
 
 #include "AbstractComponent.h"
-#include "../../common/ISerialize.h"
+
 
 namespace Metal {
-    struct RigidBodyComponent final : AbstractComponent, ISerialize {
+    struct RigidBodyComponent final : AbstractComponent {
         float mass = 1.0f;
         float linearDamping = 0.0f;
         float angularDamping = 0.05f;
         bool useGravity = true;
         bool isKinematic = false;
 
+    protected:
         void registerFields() override;
 
+    public:
         ComponentType getType() const override;
-
-        nlohmann::json toJson() const override;
-
-        void fromJson(const nlohmann::json& j) override;
     };
 }
 #endif //RIGID_BODY_COMPONENT_H

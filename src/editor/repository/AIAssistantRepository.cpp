@@ -13,27 +13,23 @@ namespace Metal {
         return Icons::comment.c_str();
     }
 
-    nlohmann::json AIAssistantRepository::toJson() const {
-        nlohmann::json j;
-        nlohmann::json chatsJson = nlohmann::json::array();
-        for (const auto& chat : chats) {
-            if (chat) {
-                chatsJson.push_back(chat->toJson());
-            }
-        }
-        j["chats"] = chatsJson;
-        return j;
-    }
-
-    void AIAssistantRepository::fromJson(const nlohmann::json &j) {
-        if (j.contains("chats") && j.at("chats").is_array()) {
-            chats.clear();
-            for (const auto& chatJson : j.at("chats")) {
-                auto chat = std::make_shared<Chat>();
-                chat->fromJson(chatJson);
-                chats.push_back(chat);
-            }
-        }
+    void AIAssistantRepository::registerFields() {
+        registerSerializableOnlyField(&chats, COMPOSITE, "chats").setTransformer(
+                [this] {
+                    nlohmann::json j = nlohmann::json::array();
+                    for (const auto &c: chats) {
+                        if (c) j.push_back(c->toJson());
+                    }
+                    return j;
+                },
+                [this](const nlohmann::json &j) {
+                    chats.clear();
+                    for (const auto &item: j) {
+                        auto c = std::make_shared<Chat>();
+                        c->fromJson(item);
+                        chats.push_back(c);
+                    }
+                });
     }
 
     std::shared_ptr<Chat> AIAssistantRepository::findChatById(const std::string &id) {

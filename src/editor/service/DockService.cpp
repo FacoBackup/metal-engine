@@ -10,7 +10,8 @@
 
 namespace Metal {
     void DockService::onInitialize() {
-        if (!dockRepository->left.empty() || !dockRepository->right.empty() || !dockRepository->bottom.empty()) {
+        if (!dockRepository->getLeft().empty() || !dockRepository->getRight().empty() || !dockRepository->getBottom().
+            empty()) {
             return;
         }
 
@@ -20,20 +21,20 @@ namespace Metal {
         auto rightB = std::make_shared<DockDefinition>(&DockSpace::CONSOLE);
         auto b = std::make_shared<DockDefinition>(&DockSpace::FILES);
 
-        dockRepository->center->sizeRatioForNodeAtDir = 0.5f;
+        dockRepository->getCenter()->sizeRatioForNodeAtDir = 0.5f;
         rightT->sizeRatioForNodeAtDir = 0.25f;
         leftT->sizeRatioForNodeAtDir = 0.2f;
         leftB->sizeRatioForNodeAtDir = 0.5f;
         rightB->sizeRatioForNodeAtDir = 0.25f;
         b->sizeRatioForNodeAtDir = 0.25f;
 
-        dockRepository->right.push_back(rightT);
-        dockRepository->right.push_back(rightB);
+        dockRepository->getRight().push_back(rightT);
+        dockRepository->getRight().push_back(rightB);
 
-        dockRepository->left.push_back(leftT);
-        dockRepository->left.push_back(leftB);
+        dockRepository->getLeft().push_back(leftT);
+        dockRepository->getLeft().push_back(leftB);
 
-        dockRepository->bottom.push_back(b);
+        dockRepository->getBottom().push_back(b);
     }
 
     void DockService::buildViews(ImGuiID windowId, AbstractPanel *panel) {
@@ -43,11 +44,11 @@ namespace Metal {
             }
             isInitialized = true;
 
-            std::vector<std::shared_ptr<DockDefinition>> allDocks;
-            allDocks.insert(allDocks.end(), dockRepository->left.begin(), dockRepository->left.end());
-            allDocks.insert(allDocks.end(), dockRepository->right.begin(), dockRepository->right.end());
-            allDocks.insert(allDocks.end(), dockRepository->bottom.begin(), dockRepository->bottom.end());
-            allDocks.push_back(dockRepository->center);
+            std::vector<std::shared_ptr<DockDefinition> > allDocks;
+            allDocks.insert(allDocks.end(), dockRepository->getLeft().begin(), dockRepository->getLeft().end());
+            allDocks.insert(allDocks.end(), dockRepository->getRight().begin(), dockRepository->getRight().end());
+            allDocks.insert(allDocks.end(), dockRepository->getBottom().begin(), dockRepository->getBottom().end());
+            allDocks.push_back(dockRepository->getCenter());
 
             auto &children = panel->getChildren();
             children.erase(
@@ -63,14 +64,14 @@ namespace Metal {
             ImGui::DockBuilderAddNode(windowId, ImGuiDockNodeFlags_NoTabBar);
             ImGui::DockBuilderSetNodeSize(windowId, ImGui::GetMainViewport()->Size);
 
-            for (size_t i = 0; i < dockRepository->left.size(); i++) {
-                auto dockSpace = dockRepository->left[i];
+            for (size_t i = 0; i < dockRepository->getLeft().size(); i++) {
+                auto dockSpace = dockRepository->getLeft()[i];
                 if (i == 0) {
                     dockSpace->origin = nullptr;
                     dockSpace->outAtOppositeDir = nullptr;
                     dockSpace->splitDir = ImGuiDir_Left;
                 } else {
-                    auto previous = dockRepository->left[i - 1];
+                    auto previous = dockRepository->getLeft()[i - 1];
                     dockSpace->origin = previous;
                     dockSpace->outAtOppositeDir = previous;
                     dockSpace->splitDir = ImGuiDir_Down;
@@ -79,14 +80,14 @@ namespace Metal {
                 addWindow(dockSpace, panel);
             }
 
-            for (size_t i = 0; i < dockRepository->right.size(); i++) {
-                auto dockSpace = dockRepository->right[i];
+            for (size_t i = 0; i < dockRepository->getRight().size(); i++) {
+                auto dockSpace = dockRepository->getRight()[i];
                 if (i == 0) {
                     dockSpace->origin = nullptr;
                     dockSpace->outAtOppositeDir = nullptr;
                     dockSpace->splitDir = ImGuiDir_Right;
                 } else {
-                    auto previous = dockRepository->right[i - 1];
+                    auto previous = dockRepository->getRight()[i - 1];
                     dockSpace->origin = previous;
                     dockSpace->outAtOppositeDir = previous;
                     dockSpace->splitDir = ImGuiDir_Down;
@@ -95,14 +96,14 @@ namespace Metal {
                 addWindow(dockSpace, panel);
             }
 
-            for (size_t i = 0, bottomSize = dockRepository->bottom.size(); i < bottomSize; i++) {
-                auto dockSpace = dockRepository->bottom[i];
+            for (size_t i = 0, bottomSize = dockRepository->getBottom().size(); i < bottomSize; i++) {
+                auto dockSpace = dockRepository->getBottom()[i];
                 if (i == 0) {
                     dockSpace->origin = nullptr;
                     dockSpace->outAtOppositeDir = nullptr;
                     dockSpace->splitDir = ImGuiDir_Down;
                 } else {
-                    auto previous = dockRepository->bottom[i - 1];
+                    auto previous = dockRepository->getBottom()[i - 1];
                     dockSpace->origin = previous;
                     dockSpace->outAtOppositeDir = previous;
                     dockSpace->splitDir = ImGuiDir_Right;
@@ -111,10 +112,10 @@ namespace Metal {
                 addWindow(dockSpace, panel);
             }
 
-            dockRepository->center->nodeId = windowId;
-            addWindow(dockRepository->center, panel);
+            dockRepository->getCenter()->nodeId = windowId;
+            addWindow(dockRepository->getCenter(), panel);
 
-            ImGui::DockBuilderDockWindow(dockRepository->center->internalId.c_str(), windowId);
+            ImGui::DockBuilderDockWindow(dockRepository->getCenter()->internalId.c_str(), windowId);
             ImGui::DockBuilderFinish(windowId);
         }
     }
@@ -124,7 +125,7 @@ namespace Metal {
             return;
         }
 
-        auto removeIt = [&](std::vector<std::shared_ptr<DockDefinition>> &vec) {
+        auto removeIt = [&](std::vector<std::shared_ptr<DockDefinition> > &vec) {
             auto it = std::find(vec.begin(), vec.end(), dock);
             if (it != vec.end()) {
                 vec.erase(it);
@@ -134,9 +135,9 @@ namespace Metal {
         };
 
         bool removed = false;
-        if (removeIt(dockRepository->left)) removed = true;
-        else if (removeIt(dockRepository->right)) removed = true;
-        else if (removeIt(dockRepository->bottom)) removed = true;
+        if (removeIt(dockRepository->getLeft())) removed = true;
+        else if (removeIt(dockRepository->getRight())) removed = true;
+        else if (removeIt(dockRepository->getBottom())) removed = true;
 
         if (removed) {
             isInitialized = false;
@@ -146,21 +147,21 @@ namespace Metal {
     void DockService::addLeftDock() {
         auto d = std::make_shared<DockDefinition>(&DockSpace::CONSOLE);
         d->sizeRatioForNodeAtDir = 0.25f;
-        dockRepository->left.push_back(d);
+        dockRepository->getLeft().push_back(d);
         isInitialized = false;
     }
 
     void DockService::addBottomDock() {
         auto d = std::make_shared<DockDefinition>(&DockSpace::CONSOLE);
         d->sizeRatioForNodeAtDir = 0.25f;
-        dockRepository->bottom.push_back(d);
+        dockRepository->getBottom().push_back(d);
         isInitialized = false;
     }
 
     void DockService::addRightDock() {
         auto d = std::make_shared<DockDefinition>(&DockSpace::CONSOLE);
         d->sizeRatioForNodeAtDir = 0.25f;
-        dockRepository->right.push_back(d);
+        dockRepository->getRight().push_back(d);
         isInitialized = false;
     }
 
@@ -189,7 +190,7 @@ namespace Metal {
                 return;
             }
         }
-        
+
         for (auto &l: panel->getChildren()) {
             auto dsPanel = std::dynamic_pointer_cast<DockSpacePanel>(l);
             if (dsPanel != nullptr) {

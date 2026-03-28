@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "../AbstractFormFieldPanel.h"
-#include "common/InspectedField.h"
+#include "common/FieldMetadata.h"
 #include "editor/dto/FSEntry.h"
 #include "imgui.h"
 
@@ -13,7 +13,7 @@ namespace Metal {
     struct FSEntry;
 
     class ResourceField final : public AbstractFormFieldPanel {
-        InspectedField<std::string> &field;
+        FieldMetadata &field;
         std::shared_ptr<FSEntry> entry = nullptr;
         FilesService *filesService = nullptr;
 
@@ -26,7 +26,7 @@ namespace Metal {
 
         void renderButton();
 
-        explicit ResourceField(InspectedField<std::string> &field);
+        explicit ResourceField(FieldMetadata &field);
 
         void onSync() override;
 

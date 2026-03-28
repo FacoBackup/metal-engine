@@ -2,13 +2,13 @@
 #define METAL_ENGINE_BOOLEANFIELD_H
 
 #include "../AbstractFormFieldPanel.h"
-#include "common/InspectedField.h"
+#include "common/FieldMetadata.h"
 
 namespace Metal {
     class BooleanField final : public AbstractFormFieldPanel {
-        InspectedField<bool> &field;
+        FieldMetadata &field;
     public:
-        explicit BooleanField(InspectedField<bool> &field);
+        explicit BooleanField(FieldMetadata &field);
 
         void onSync() override;
 

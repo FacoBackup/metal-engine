@@ -6,24 +6,24 @@
 #include <string>
 
 namespace Metal {
-    class Inspectable;
+    class Reflection;
 
     class HistoryService;
 
     class ThemeService;
 
     class FormPanel final : public AbstractPanel {
-        std::unordered_map<std::string, Inspectable *> inspectionMap{};
+        std::unordered_map<std::string, Reflection *> inspectionMap{};
         std::string searchFilter;
         char searchBuffer[256] = "";
 
         HistoryService *historyService = nullptr;
         ThemeService *themeService = nullptr;
 
-        void processFields(Inspectable *inspection);
+        void processFields(Reflection *inspection);
 
     public:
-        void setInspection(Inspectable *inspection);
+        void setInspection(Reflection *inspection);
 
         void onSync() override;
 

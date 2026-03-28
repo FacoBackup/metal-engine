@@ -3,9 +3,7 @@
 
 namespace Metal {
     enum FieldType {
-        LIST,
         COMPOSITE,
-        CUSTOM,
         RESOURCE,
         COLOR,
         OPTIONS,
@@ -16,8 +14,7 @@ namespace Metal {
         VECTOR2,
         VECTOR3,
         VECTOR4,
-        QUAT,
-        METHOD
+        QUAT
     };
 }
 #endif

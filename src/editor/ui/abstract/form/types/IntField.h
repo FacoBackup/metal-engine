@@ -2,14 +2,14 @@
 #define METAL_ENGINE_INTFIELD_H
 
 #include "../AbstractFormFieldPanel.h"
-#include "common/InspectedField.h"
+#include "common/FieldMetadata.h"
 
 namespace Metal {
     class IntField final : public AbstractFormFieldPanel {
-        InspectedField<int> &field;
+        FieldMetadata &field;
 
     public:
-        explicit IntField(InspectedField<int> &field);
+        explicit IntField(FieldMetadata &field);
 
         void onSync() override;
 

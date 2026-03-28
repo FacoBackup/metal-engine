@@ -5,13 +5,13 @@
 
 namespace Metal {
     class FormPanel;
-    class Inspectable;
+    class Reflection;
     struct EditorRepository;
     struct EngineRepository;
     struct WorldRepository;
 
     class RepositoriesPanel final : public AbstractDockPanel {
-        std::vector<Inspectable *> repositories{};
+        std::vector<Reflection *> repositories{};
         std::shared_ptr<FormPanel> formPanel = nullptr;
 
         WorldRepository *worldRepository = nullptr;

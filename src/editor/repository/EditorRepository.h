@@ -60,10 +60,6 @@ namespace Metal {
         const char *getTitle() const override;
 
         const char *getIcon() const override;
-
-        nlohmann::json toJson() const override;
-
-        void fromJson(const nlohmann::json &j) override;
     };
 } // Metal
 

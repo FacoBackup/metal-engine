@@ -6,12 +6,9 @@
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 
-#include "../../common/Inspectable.h"
-#include "../../common/ISerialize.h"
-
-
+#include "../../common/Reflection.h"
 namespace Metal {
-    struct Camera final : Inspectable, ISerialize {
+    struct Camera final : Reflection {
         float rotationSensitivity = 1;
         float movementSensitivity = 1.0f;
         float zoomSensitivity = 1.0f;
@@ -67,77 +64,6 @@ namespace Metal {
 
         explicit Camera(float pitch, float yaw, glm::vec3 position);
 
-        nlohmann::json toJson() const override {
-            nlohmann::json j;
-            j["rotationSensitivity"] = rotationSensitivity;
-            j["movementSensitivity"] = movementSensitivity;
-            j["zoomSensitivity"] = zoomSensitivity;
-            j["motionBlurEnabled"] = motionBlurEnabled;
-            j["motionBlurVelocityScale"] = motionBlurVelocityScale;
-            j["motionBlurMaxSamples"] = motionBlurMaxSamples;
-            j["cameraMotionBlur"] = cameraMotionBlur;
-            j["bloomEnabled"] = bloomEnabled;
-            j["filmGrain"] = filmGrain;
-            j["vignetteEnabled"] = vignetteEnabled;
-            j["chromaticAberrationEnabled"] = chromaticAberrationEnabled;
-            j["distortionEnabled"] = distortionEnabled;
-            j["filmGrainStrength"] = filmGrainStrength;
-            j["vignetteStrength"] = vignetteStrength;
-            j["bloomThreshold"] = bloomThreshold;
-            j["bloomQuality"] = bloomQuality;
-            j["bloomOffset"] = bloomOffset;
-            j["chromaticAberrationIntensity"] = chromaticAberrationIntensity;
-            j["distortionIntensity"] = distortionIntensity;
-            j["position"] = {position.x, position.y, position.z};
-            j["isOrthographic"] = isOrthographic;
-            j["zFar"] = zFar;
-            j["zNear"] = zNear;
-            j["fov"] = fov;
-            j["aspectRatio"] = aspectRatio;
-            j["orthographicProjectionSize"] = orthographicProjectionSize;
-            j["pitch"] = pitch;
-            j["yaw"] = yaw;
-            j["lastMouseX"] = lastMouseX;
-            j["lastMouseY"] = lastMouseY;
-            j["deltaX"] = deltaX;
-            j["deltaY"] = deltaY;
-            return j;
-        }
-
-        void fromJson(const nlohmann::json& j) override {
-            rotationSensitivity = j.at("rotationSensitivity").get<float>();
-            movementSensitivity = j.at("movementSensitivity").get<float>();
-            zoomSensitivity = j.at("zoomSensitivity").get<float>();
-            motionBlurEnabled = j.at("motionBlurEnabled").get<bool>();
-            motionBlurVelocityScale = j.at("motionBlurVelocityScale").get<float>();
-            motionBlurMaxSamples = j.at("motionBlurMaxSamples").get<int>();
-            cameraMotionBlur = j.at("cameraMotionBlur").get<bool>();
-            bloomEnabled = j.at("bloomEnabled").get<bool>();
-            filmGrain = j.at("filmGrain").get<bool>();
-            vignetteEnabled = j.at("vignetteEnabled").get<bool>();
-            chromaticAberrationEnabled = j.at("chromaticAberrationEnabled").get<bool>();
-            distortionEnabled = j.at("distortionEnabled").get<bool>();
-            filmGrainStrength = j.at("filmGrainStrength").get<float>();
-            vignetteStrength = j.at("vignetteStrength").get<float>();
-            bloomThreshold = j.at("bloomThreshold").get<float>();
-            bloomQuality = j.at("bloomQuality").get<int>();
-            bloomOffset = j.at("bloomOffset").get<int>();
-            chromaticAberrationIntensity = j.at("chromaticAberrationIntensity").get<float>();
-            distortionIntensity = j.at("distortionIntensity").get<float>();
-            position = {j.at("position")[0], j.at("position")[1], j.at("position")[2]};
-            isOrthographic = j.at("isOrthographic").get<bool>();
-            zFar = j.at("zFar").get<float>();
-            zNear = j.at("zNear").get<float>();
-            fov = j.at("fov").get<float>();
-            aspectRatio = j.at("aspectRatio").get<float>();
-            orthographicProjectionSize = j.at("orthographicProjectionSize").get<float>();
-            pitch = j.at("pitch").get<float>();
-            yaw = j.at("yaw").get<float>();
-            lastMouseX = j.at("lastMouseX").get<float>();
-            lastMouseY = j.at("lastMouseY").get<float>();
-            deltaX = j.at("deltaX").get<float>();
-            deltaY = j.at("deltaY").get<float>();
-        }
 
     private:
         static void extractPlane(const glm::mat4 &matrix, int index, glm::vec4 &plane);

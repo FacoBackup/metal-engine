@@ -9,17 +9,31 @@
 #include "common/IInit.h"
 
 namespace Metal {
-    struct DockRepository final : IRepository, IInit {
-        std::shared_ptr<DockDefinition> center;
-        std::vector<std::shared_ptr<DockDefinition>> bottom;
-        std::vector<std::shared_ptr<DockDefinition>> left;
-        std::vector<std::shared_ptr<DockDefinition>> right;
+    class DockRepository final : public IRepository, public IInit {
+    public:
+        void registerFields() override;
 
         void onInitialize() override;
 
-        [[nodiscard]] nlohmann::json toJson() const override;
+        [[nodiscard]] std::shared_ptr<DockDefinition> getCenter() const { return center; }
 
-        void fromJson(const nlohmann::json &j) override;
+        [[nodiscard]] std::vector<std::shared_ptr<DockDefinition> > &getBottom() { return bottom; }
+
+        [[nodiscard]] const std::vector<std::shared_ptr<DockDefinition> > &getBottom() const { return bottom; }
+
+        [[nodiscard]] std::vector<std::shared_ptr<DockDefinition> > &getLeft() { return left; }
+
+        [[nodiscard]] const std::vector<std::shared_ptr<DockDefinition> > &getLeft() const { return left; }
+
+        [[nodiscard]] std::vector<std::shared_ptr<DockDefinition> > &getRight() { return right; }
+
+        [[nodiscard]] const std::vector<std::shared_ptr<DockDefinition> > &getRight() const { return right; }
+
+    private:
+        std::shared_ptr<DockDefinition> center;
+        std::vector<std::shared_ptr<DockDefinition> > bottom;
+        std::vector<std::shared_ptr<DockDefinition> > left;
+        std::vector<std::shared_ptr<DockDefinition> > right;
     };
 }
 

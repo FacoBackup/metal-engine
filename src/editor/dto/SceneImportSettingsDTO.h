@@ -12,11 +12,11 @@ namespace Metal {
         float scale = 1.0f;
 
         void registerFields() override {
-            registerBool(triangulate, "Mesh", "Triangulate");
-            registerBool(flipUVs, "Texture", "Flip UVs");
-            registerBool(genSmoothNormals, "Mesh", "Gen Smooth Normals");
-            registerBool(generateUVs, "Mesh", "Generate UVs");
-            registerFloat(scale, "Transform", "Global Scale", 0.001f, 1000.0f);
+            registerEditableField(&triangulate, BOOLEAN, "Triangulate", "Mesh");
+            registerEditableField(&flipUVs, BOOLEAN, "Flip UVs", "Texture");
+            registerEditableField(&genSmoothNormals, BOOLEAN, "Gen Smooth Normals", "Mesh");
+            registerEditableField(&generateUVs, BOOLEAN, "Generate UVs", "Mesh");
+            registerEditableField(&scale, FLOAT, "Global Scale", "Transform").setMin(0.001f).setMax(1000.0f);
         }
 
         const char *getTitle() const override { return "Scene Import Settings"; }

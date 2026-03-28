@@ -1,15 +1,15 @@
 #ifndef METAL_ENGINE_FIELDMODIFICATIONEVENT_H
 #define METAL_ENGINE_FIELDMODIFICATIONEVENT_H
 #include "InspectableEventPayload.h"
-#include "common/InspectableMember.h"
+#include "common/FieldMetadata.h"
 
 namespace Metal {
     struct FieldModificationPayload : InspectableEventPayload {
-        explicit FieldModificationPayload(InspectableMember &member)
+        explicit FieldModificationPayload(FieldMetadata &member)
             : InspectableEventPayload(member.instance), member(member) {
         }
 
-        InspectableMember &member;
+        FieldMetadata &member;
     };
 } // Metal
 

@@ -2,25 +2,26 @@
 #include <algorithm>
 #include <imgui.h>
 
-#include "common/Inspectable.h"
+#include "common/Reflection.h"
 #include "editor/service/HistoryService.h"
 #include "ApplicationEventContext.h"
 #include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
-    BooleanField::BooleanField(InspectedField<bool> &field) : field(field) {
+    BooleanField::BooleanField(FieldMetadata &field) : field(field) {
     }
 
     void BooleanField::onSync() {
         if (!field.disabled) {
-            bool oldValue = *field.field;
-            if (ImGui::Checkbox(field.nameWithId.c_str(), field.field)) {
+            bool *ptr = static_cast<bool *>(field.pointer);
+            bool oldValue = *ptr;
+            if (ImGui::Checkbox(field.nameWithId.c_str(), ptr)) {
                 historyService->recordChange(&field, oldValue);
                 ApplicationEventContext::dispatch(field.instance->getClassName(),
-                                       std::make_shared<FieldModificationPayload>(field));
+                                                  std::make_shared<FieldModificationPayload>(field));
             }
         } else {
-            ImGui::Text("%s: %b", field.name.c_str(), *field.field);
+            ImGui::Text("%s: %b", field.name.c_str(), *static_cast<bool *>(field.pointer));
         }
     }
 

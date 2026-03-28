@@ -94,7 +94,7 @@ namespace Metal {
         }
 
         // Add and configure TransformComponent
-        worldRepository->createComponent(entity, ComponentType::TRANSFORM);
+        worldRepository->createComponent(entity, TRANSFORM);
         auto &transform = worldRepository->registry.get<TransformComponent>(entity);
 
         if (params.contains("position")) {
@@ -113,7 +113,7 @@ namespace Metal {
         }
 
         // Add and configure PrimitiveComponent
-        worldRepository->createComponent(entity, ComponentType::PRIMITIVE);
+        worldRepository->createComponent(entity, PRIMITIVE);
         auto &primitive = worldRepository->registry.get<PrimitiveComponent>(entity);
         primitive.meshId = params.at("mesh_id").get<std::string>();
 
@@ -133,7 +133,7 @@ namespace Metal {
         if (!worldRepository->registry.valid(entity)) return std::string("Error: Invalid entity ID");
 
         if (!worldRepository->registry.all_of<TransformComponent>(entity)) {
-            worldRepository->createComponent(entity, ComponentType::TRANSFORM);
+            worldRepository->createComponent(entity, TRANSFORM);
         }
 
         auto &transform = worldRepository->registry.get<TransformComponent>(entity);

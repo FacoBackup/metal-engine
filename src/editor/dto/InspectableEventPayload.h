@@ -3,14 +3,14 @@
 #include "ApplicationEventContext.h"
 
 namespace Metal {
-    class Inspectable;
+    class Reflection;
 
     struct InspectableEventPayload : EventPayload {
-        explicit InspectableEventPayload(Inspectable *inspectable)
-            : inspectable(inspectable) {
+        explicit InspectableEventPayload(Reflection *reflectionInstance)
+            : reflectionInstance(reflectionInstance) {
         }
 
-        Inspectable *inspectable;
+        Reflection *reflectionInstance;
     };
 }
 #endif //METAL_ENGINE_INSPECTABLEEVENTPAYLOAD_H

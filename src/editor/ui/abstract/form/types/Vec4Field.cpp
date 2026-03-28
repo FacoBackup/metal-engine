@@ -1,29 +1,30 @@
 #include "Vec4Field.h"
 #include <algorithm>
 #include <imgui.h>
-#include "common/Inspectable.h"
+#include "common/Reflection.h"
 #include "editor/ui/UIUtil.h"
 #include "editor/service/HistoryService.h"
 #include "ApplicationEventContext.h"
 #include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
-    Vec4Field::Vec4Field(InspectedField<glm::vec4> &field) : field(field) {
+    Vec4Field::Vec4Field(FieldMetadata &field) : field(field) {
     }
 
     void Vec4Field::onSync() {
+        glm::vec4 *ptr = static_cast<glm::vec4 *>(field.pointer);
         if (!field.disabled) {
-            values[0] = field.field->x;
-            values[1] = field.field->y;
-            values[2] = field.field->z;
-            values[3] = field.field->w;
+            values[0] = ptr->x;
+            values[1] = ptr->y;
+            values[2] = ptr->z;
+            values[3] = ptr->w;
 
-            glm::vec4 oldValue = *field.field;
-            if (UIUtil::DrawVec4Control(field.name, field.id, values, field.incrementF.value())) {
-                field.field->x = values[0];
-                field.field->y = values[1];
-                field.field->z = values[2];
-                field.field->w = values[3];
+            glm::vec4 oldValue = *ptr;
+            if (UIUtil::DrawVec4Control(field.name, field.id, values, field.increment.value_or(0.01f))) {
+                ptr->x = values[0];
+                ptr->y = values[1];
+                ptr->z = values[2];
+                ptr->w = values[3];
 
 
                 historyService->recordChange(&field, oldValue);
@@ -37,8 +38,8 @@ namespace Metal {
                 historyService->endTransaction();
             }
         } else {
-            ImGui::Text("%s: <%f, %f, %f, %f>", field.name.c_str(), field.field->x, field.field->y, field.field->z,
-                        field.field->w);
+            ImGui::Text("%s: <%f, %f, %f, %f>", field.name.c_str(), ptr->x, ptr->y, ptr->z,
+                        ptr->w);
         }
     }
 

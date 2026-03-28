@@ -23,10 +23,20 @@ namespace Metal {
             };
         }
 
-        [[nodiscard]] std::shared_ptr<DockDefinition> getCenter() const { return dockRepository->center; }
-        [[nodiscard]] const std::vector<std::shared_ptr<DockDefinition> > &getBottom() const { return dockRepository->bottom; }
-        [[nodiscard]] const std::vector<std::shared_ptr<DockDefinition> > &getLeft() const { return dockRepository->left; }
-        [[nodiscard]] const std::vector<std::shared_ptr<DockDefinition> > &getRight() const { return dockRepository->right; }
+        [[nodiscard]] std::shared_ptr<DockDefinition> getCenter() const { return dockRepository->getCenter(); }
+
+        [[nodiscard]] const std::vector<std::shared_ptr<DockDefinition> > &getBottom() const {
+            return dockRepository->getBottom();
+        }
+
+        [[nodiscard]] const std::vector<std::shared_ptr<DockDefinition> > &getLeft() const {
+            return dockRepository->getLeft();
+        }
+
+        [[nodiscard]] const std::vector<std::shared_ptr<DockDefinition> > &getRight() const {
+            return dockRepository->getRight();
+        }
+
         [[nodiscard]] bool getIsInitialized() const { return isInitialized; }
         void setIsInitialized(bool value) { isInitialized = value; }
 
@@ -35,9 +45,11 @@ namespace Metal {
         void buildViews(ImGuiID windowId, AbstractPanel *panel);
 
         void removeDock(std::shared_ptr<DockDefinition> dock);
-        
+
         void addLeftDock();
+
         void addBottomDock();
+
         void addRightDock();
 
         static void createDockSpace(std::shared_ptr<DockDefinition> dockSpace, ImGuiID *dockMainId);

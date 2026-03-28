@@ -6,25 +6,17 @@
 #include "AbstractComponent.h"
 #include "editor/enum/engine-definitions.h"
 #include "../enum/ComponentType.h"
-#include "../../common/Inspectable.h"
-#include "../../common/ISerialize.h"
+#include "../../common/Reflection.h"
+
 
 namespace Metal {
-    struct MetadataComponent final : AbstractComponent, ISerialize {
+    struct MetadataComponent final : AbstractComponent {
         std::string name = "New entity";
 
-        nlohmann::json toJson() const override {
-            nlohmann::json j;
-            j["name"] = name;
-            return j;
-        }
-
-        void fromJson(const nlohmann::json &j) override {
-            name = j.at("name").get<std::string>();
-        }
-
+    protected:
         void registerFields() override;
 
+    public:
         ComponentType getType() const override;
     };
 } // Metal

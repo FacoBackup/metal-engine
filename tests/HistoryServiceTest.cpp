@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
 #include "../src/editor/service/HistoryService.h"
-#include "../src/common/Inspectable.h"
+#include "../src/common/Reflection.h"
 #include "../src/common/IEventMember.h"
 #include "../src/ApplicationEventContext.h"
 #include <glm/glm.hpp>
 
 using namespace Metal;
 
-class MockInspectable : public Inspectable {
+class MockInspectable : public Reflection {
 public:
     int intField = 0;
     float floatField = 0.0f;
@@ -16,11 +16,11 @@ public:
     glm::vec3 vec3Field = {0, 0, 0};
 
     void registerFields() override {
-        registerInt(intField, "Group", "IntField");
-        registerFloat(floatField, "Group", "FloatField");
-        registerText(stringField, "Group", "StringField");
-        registerBool(boolField, "Group", "BoolField");
-        registerVec3(vec3Field, "Group", "Vec3Field");
+        registerEditableField(&intField, INT, "IntField", "Group");
+        registerEditableField(&floatField, FLOAT, "FloatField", "Group");
+        registerEditableField(&stringField, STRING, "StringField", "Group");
+        registerEditableField(&boolField, BOOLEAN, "BoolField", "Group");
+        registerEditableField(&vec3Field, VECTOR3, "Vec3Field", "Group");
     }
     const char* getIcon() const override { return ""; }
     const char* getTitle() const override { return "Mock"; }
@@ -186,11 +186,11 @@ TEST_F(HistoryServiceTest, GenericAction) {
 
 TEST_F(HistoryServiceTest, InvalidFieldCrash) {
     auto field = mock.getFieldByPointer(&mock.intField);
-    std::shared_ptr<InspectableMember> fieldPtr = field;
+    std::shared_ptr<FieldMetadata> fieldPtr = field;
 
     historyService.recordChange(fieldPtr.get(), 0);
 
-    // Simulate destruction of the inspectable
+    // Simulate destruction of the reflectionInstance
     // In our case, mock is on the stack, but we can clear the instance pointer in the field
     // or just let it point to a destroyed object.
     // To be safe in a test, we can just set instance to nullptr

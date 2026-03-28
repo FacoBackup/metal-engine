@@ -54,63 +54,42 @@ namespace Metal {
     }
 
     void Camera::registerFields() {
-        registerFloat(fov, "View", "FOV", 60, 120, false);
-        registerFloat(zNear, "View", "Z-Near", 0, 1, false);
-        registerFloat(zFar, "View", "Z-Far", 1, MAX_INT, false);
+        registerEditableField(&fov, FLOAT, "FOV", "View").setMin(60).setMax(120);
+        registerEditableField(&zNear, FLOAT, "Z-Near", "View").setMin(0).setMax(1);
+        registerEditableField(&zFar, FLOAT, "Z-Far", "View").setMin(1).setMax(MAX_INT);
 
-        registerFloat(rotationSensitivity, "Controls", "Camera rotation sensitivity", 0, 10, false);
+        registerEditableField(&rotationSensitivity, FLOAT, "Camera rotation sensitivity", "Controls").setMin(0).setMax(10);
+        registerEditableField(&movementSensitivity, FLOAT, "Camera Movement speed", "Controls").setMin(0).setMax(10);
+        registerEditableField(&zoomSensitivity, FLOAT, "Orbit camera zoom sensitivity", "Controls").setMin(0).setMax(10);
 
-        registerFloat(movementSensitivity, "Controls", "Camera Movement speed", 0, 10, false);
+        registerEditableField(&motionBlurEnabled, BOOLEAN, "Motion Blur Enabled", "Motion blur");
+        registerEditableField(&motionBlurVelocityScale, FLOAT, "Motion Blur Velocity Scale", "Motion blur").setMin(0).setMax(500);
+        registerEditableField(&motionBlurMaxSamples, INT, "Motion Blur Max Samples", "Motion blur").setMin(1).setMax(100);
+        registerEditableField(&cameraMotionBlur, BOOLEAN, "Camera Motion Blur", "Motion blur");
 
-        registerFloat(zoomSensitivity, "Controls", "Orbit camera zoom sensitivity", 0, 10, false);
+        registerEditableField(&bloomEnabled, BOOLEAN, "Bloom", "Post processing");
+        registerEditableField(&filmGrain, BOOLEAN, "Film Grain", "Post processing");
+        registerEditableField(&vignetteEnabled, BOOLEAN, "Vignette Enabled", "Post processing");
+        registerEditableField(&chromaticAberrationEnabled, BOOLEAN, "Chromatic Aberration", "Post processing");
+        registerEditableField(&distortionEnabled, BOOLEAN, "Distortion", "Post processing");
+        registerEditableField(&filmGrainStrength, FLOAT, "Film Grain Strength", "Post processing").setMin(-MAX_FLOAT).setMax(MAX_FLOAT);
+        registerEditableField(&vignetteStrength, FLOAT, "Vignette Strength", "Post processing").setMin(0).setMax(MAX_FLOAT);
+        registerEditableField(&bloomThreshold, FLOAT, "Bloom Threshold", "Post processing").setMin(0).setMax(MAX_FLOAT);
+        registerEditableField(&bloomQuality, INT, "Bloom Quality", "Post processing").setMin(0).setMax(MAX_INT);
+        registerEditableField(&bloomOffset, INT, "Bloom Offset", "Post processing").setMin(0).setMax(MAX_INT);
+        registerEditableField(&chromaticAberrationIntensity, FLOAT, "Chromatic Aberration Strength", "Post processing").setMin(0).setMax(MAX_FLOAT);
+        registerEditableField(&distortionIntensity, FLOAT, "Distortion Strength", "Post processing").setMin(0).setMax(MAX_FLOAT);
 
-        registerBool(motionBlurEnabled,
-                     "Motion blur", "Motion Blur Enabled", false);
-
-        registerFloat(motionBlurVelocityScale,
-                      "Motion blur", "Motion Blur Velocity Scale", 0, 500, false);
-
-        registerInt(motionBlurMaxSamples,
-                    "Motion blur", "Motion Blur Max Samples", 1, 100, false);
-
-        registerBool(cameraMotionBlur,
-                     "Motion blur", "Camera Motion Blur", false);
-
-        registerBool(bloomEnabled,
-                     "Post processing", "Bloom", false);
-
-        registerBool(filmGrain,
-                     "Post processing", "Film Grain", false);
-
-        registerBool(vignetteEnabled,
-                     "Post processing", "Vignette Enabled", false);
-
-        registerBool(chromaticAberrationEnabled,
-                     "Post processing", "Chromatic Aberration", false);
-
-        registerBool(distortionEnabled,
-                     "Post processing", "Distortion", false);
-
-        registerFloat(filmGrainStrength,
-                      "Post processing", "Film Grain Strength", -MAX_FLOAT, MAX_FLOAT, false);
-
-        registerFloat(vignetteStrength,
-                      "Post processing", "Vignette Strength", 0, MAX_FLOAT, false);
-
-        registerFloat(bloomThreshold,
-                      "Post processing", "Bloom Threshold", 0, MAX_FLOAT, false);
-
-        registerInt(bloomQuality,
-                    "Post processing", "Bloom Quality", 0, MAX_INT, false);
-
-        registerInt(bloomOffset,
-                    "Post processing",
-                    "Bloom Offset", 0, MAX_INT, false);
-
-        registerFloat(chromaticAberrationIntensity, "Post processing", "Chromatic Aberration Strength", 0,
-                      MAX_FLOAT, false);
-
-        registerFloat(distortionIntensity, "Post processing", "Distortion Strength", 0, MAX_FLOAT, false);
+        registerSerializableOnlyField(&position, VECTOR3, "position");
+        registerSerializableOnlyField(&isOrthographic, BOOLEAN, "isOrthographic");
+        registerSerializableOnlyField(&aspectRatio, FLOAT, "aspectRatio");
+        registerSerializableOnlyField(&orthographicProjectionSize, FLOAT, "orthographicProjectionSize");
+        registerSerializableOnlyField(&pitch, FLOAT, "pitch");
+        registerSerializableOnlyField(&yaw, FLOAT, "yaw");
+        registerSerializableOnlyField(&lastMouseX, FLOAT, "lastMouseX");
+        registerSerializableOnlyField(&lastMouseY, FLOAT, "lastMouseY");
+        registerSerializableOnlyField(&deltaX, FLOAT, "deltaX");
+        registerSerializableOnlyField(&deltaY, FLOAT, "deltaY");
     }
 
     Camera::Camera(const float pitch, const float yaw, const glm::vec3 position) {

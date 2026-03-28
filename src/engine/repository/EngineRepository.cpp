@@ -12,71 +12,29 @@
 
 namespace Metal {
     void EngineRepository::registerFields() {
-        registerInt(shadingResInvScale, "Display settings (Restart required)", "Shading inverted resolution scale", 1,
-                    16);
-        registerBool(vsync, "Display settings (Restart required)", "VSync?");
+        registerEditableField(&shadingResInvScale, INT, "Shading inverted resolution scale", "Display settings (Restart required)").setMin(1).setMax(16);
+        registerEditableField(&vsync, BOOLEAN, "VSync?", "Display settings (Restart required)");
 
-        registerInt(volumeShadowSteps, VOLUMES, "Shadow steps", 1);
+        registerEditableField(&volumeShadowSteps, INT, "Shadow steps", VOLUMES).setMin(1);
 
-        registerFloat(pathTracerMultiplier, PATH_TRACER, "Strength");
-        registerBool(denoiserEnabled, PATH_TRACER, "Enable denoiser?");
-        registerInt(pathTracerMaxSamples, PATH_TRACER, "Maximum accumulation", 1, 10000);
-        registerInt(pathTracerSamples, PATH_TRACER, "Samples per pixel", 1, 32);
-        registerInt(pathTracerBounces, PATH_TRACER, "Bounces", 0, 7);
-        registerFloat(pathTracingEmissiveFactor, PATH_TRACER, "Emissive surface factor", 0);
+        registerEditableField(&pathTracerMultiplier, FLOAT, "Strength", PATH_TRACER);
+        registerEditableField(&denoiserEnabled, BOOLEAN, "Enable denoiser?", PATH_TRACER);
+        registerEditableField(&pathTracerMaxSamples, INT, "Maximum accumulation", PATH_TRACER).setMin(1).setMax(10000);
+        registerEditableField(&pathTracerSamples, INT, "Samples per pixel", PATH_TRACER).setMin(1).setMax(32);
+        registerEditableField(&pathTracerBounces, INT, "Bounces", PATH_TRACER).setMin(0).setMax(7);
+        registerEditableField(&pathTracingEmissiveFactor, FLOAT, "Emissive surface factor", PATH_TRACER).setMin(0);
 
-        registerBool(dofEnabled, DEPTH_OF_FIELD, "Enable depth of field?");
-        registerFloat(dofFocusDistance, DEPTH_OF_FIELD, "Focus distance");
-        registerFloat(dofAperture, DEPTH_OF_FIELD, "Aperture");
-        registerFloat(dofFocalLength, DEPTH_OF_FIELD, "Focal length");
+        registerEditableField(&dofEnabled, BOOLEAN, "Enable depth of field?", DEPTH_OF_FIELD);
+        registerEditableField(&dofFocusDistance, FLOAT, "Focus distance", DEPTH_OF_FIELD);
+        registerEditableField(&dofAperture, FLOAT, "Aperture", DEPTH_OF_FIELD);
+        registerEditableField(&dofFocalLength, FLOAT, "Focal length", DEPTH_OF_FIELD);
 
-        registerBool(atmosphereEnabled, ATMOSPHERE, "Enable atmosphere?");
-        registerFloat(elapsedTime, ATMOSPHERE, "Elapsed time");
+        registerEditableField(&atmosphereEnabled, BOOLEAN, "Enable atmosphere?", ATMOSPHERE);
+        registerEditableField(&elapsedTime, FLOAT, "Elapsed time", ATMOSPHERE);
 
-        registerVec3(gravity, PHYSICS, "Gravity");
+        registerEditableField(&gravity, VECTOR3, "Gravity", PHYSICS);
     }
 
-    nlohmann::json EngineRepository::toJson() const {
-        nlohmann::json j;
-        j["vsync"] = vsync;
-        j["pathTracerSamples"] = pathTracerSamples;
-        j["pathTracerBounces"] = pathTracerBounces;
-        j["atmosphereEnabled"] = atmosphereEnabled;
-        j["elapsedTime"] = elapsedTime;
-        j["pathTracingEmissiveFactor"] = pathTracingEmissiveFactor;
-        j["pathTracerMultiplier"] = pathTracerMultiplier;
-        j["shadingResInvScale"] = shadingResInvScale;
-        j["pathTracerMaxSamples"] = pathTracerMaxSamples;
-        j["volumeShadowSteps"] = volumeShadowSteps;
-        j["denoiserEnabled"] = denoiserEnabled;
-        j["dofEnabled"] = dofEnabled;
-        j["dofFocusDistance"] = dofFocusDistance;
-        j["dofAperture"] = dofAperture;
-        j["dofFocalLength"] = dofFocalLength;
-        j["gravity"] = {gravity.x, gravity.y, gravity.z};
-        return j;
-    }
-
-    void EngineRepository::fromJson(const nlohmann::json &j) {
-        vsync = j.at("vsync").get<bool>();
-        pathTracerSamples = j.at("pathTracerSamples").get<int>();
-        pathTracerBounces = j.at("pathTracerBounces").get<int>();
-        atmosphereEnabled = j.at("atmosphereEnabled").get<bool>();
-        elapsedTime = j.at("elapsedTime").get<float>();
-        pathTracingEmissiveFactor = j.at("pathTracingEmissiveFactor").get<float>();
-        pathTracerMultiplier = j.at("pathTracerMultiplier").get<float>();
-        shadingResInvScale = j.at("shadingResInvScale").get<int>();
-        pathTracerMaxSamples = j.at("pathTracerMaxSamples").get<int>();
-        denoiserEnabled = j.at("denoiserEnabled").get<bool>();
-        volumeShadowSteps = j.at("volumeShadowSteps").get<int>();
-        dofEnabled = j.at("dofEnabled").get<bool>();
-        dofFocusDistance = j.at("dofFocusDistance").get<float>();
-        dofAperture = j.at("dofAperture").get<float>();
-        dofFocalLength = j.at("dofFocalLength").get<float>();
-        if (j.contains("gravity")) {
-            gravity = {j.at("gravity")[0], j.at("gravity")[1], j.at("gravity")[2]};
-        }
-    }
 
     const char *EngineRepository::getIcon() const {
         return Icons::display_settings.c_str();

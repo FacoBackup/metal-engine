@@ -1,7 +1,7 @@
 #include "ComponentType.h"
 
 #include "../../common/Icons.h"
-#include "../EngineContext.h"
+#include "common/Reflection.h"
 #include "../repository/WorldRepository.h"
 #include "../../ApplicationContext.h"
 #include "../dto/TransformComponent.h"
@@ -17,6 +17,7 @@
 #include "../dto/CapsuleColliderComponent.h"
 #include "../dto/MeshColliderComponent.h"
 
+
 #define DEFINE_COMPONENT(TYPE, NAME, JSON_KEY, ICON, DEPS, CLASS, CREATOR) \
 { \
 TYPE, NAME, JSON_KEY, ICON, DEPS, \
@@ -30,9 +31,9 @@ return nlohmann::json(); \
 [](WorldRepository &repo, entt::entity entityId, const nlohmann::json &j) { \
 repo.registry.get<CLASS>(entityId).fromJson(j); \
 }, \
-[](WorldRepository &repo, entt::entity entityId) -> Inspectable* { \
+[](WorldRepository &repo, entt::entity entityId) -> Reflection* { \
 if (auto *comp = repo.registry.try_get<CLASS>(entityId)) { \
-return static_cast<Inspectable *>(comp); \
+return static_cast<Reflection *>(comp); \
 } \
 return nullptr; \
 }, \
@@ -97,28 +98,32 @@ namespace Metal::ComponentTypes {
                 }
             ),
             DEFINE_COMPONENT(
-                RIGID_BODY, "Rigid Body", "rigid_body", Icons::settings_input_component, {TRANSFORM}, RigidBodyComponent,
+                RIGID_BODY, "Rigid Body", "rigid_body", Icons::settings_input_component, {TRANSFORM},
+                RigidBodyComponent,
                 [](WorldRepository &repo, entt::entity entityId) {
                 auto &comp = repo.registry.emplace_or_replace<RigidBodyComponent>(entityId);
                 comp.setEntityId(entityId);
                 }
             ),
             DEFINE_COMPONENT(
-                BOX_COLLIDER, "Box Collider", "box_collider", Icons::check_box_outline_blank, {TRANSFORM}, BoxColliderComponent,
+                BOX_COLLIDER, "Box Collider", "box_collider", Icons::check_box_outline_blank, {TRANSFORM},
+                BoxColliderComponent,
                 [](WorldRepository &repo, entt::entity entityId) {
                 auto &comp = repo.registry.emplace_or_replace<BoxColliderComponent>(entityId);
                 comp.setEntityId(entityId);
                 }
             ),
             DEFINE_COMPONENT(
-                SPHERE_COLLIDER, "Sphere Collider", "sphere_collider", Icons::panorama_fish_eye, {TRANSFORM}, SphereColliderComponent,
+                SPHERE_COLLIDER, "Sphere Collider", "sphere_collider", Icons::panorama_fish_eye, {TRANSFORM},
+                SphereColliderComponent,
                 [](WorldRepository &repo, entt::entity entityId) {
                 auto &comp = repo.registry.emplace_or_replace<SphereColliderComponent>(entityId);
                 comp.setEntityId(entityId);
                 }
             ),
             DEFINE_COMPONENT(
-                CAPSULE_COLLIDER, "Capsule Collider", "capsule_collider", Icons::reorder, {TRANSFORM}, CapsuleColliderComponent,
+                CAPSULE_COLLIDER, "Capsule Collider", "capsule_collider", Icons::reorder, {TRANSFORM},
+                CapsuleColliderComponent,
                 [](WorldRepository &repo, entt::entity entityId) {
                 auto &comp = repo.registry.emplace_or_replace<CapsuleColliderComponent>(entityId);
                 comp.setEntityId(entityId);

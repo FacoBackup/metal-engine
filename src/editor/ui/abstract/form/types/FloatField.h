@@ -2,16 +2,15 @@
 #define METAL_ENGINE_FLOATFIELD_H
 
 #include "../AbstractFormFieldPanel.h"
-#include "common/InspectedField.h"
-
+#include "common/FieldMetadata.h"
 
 namespace Metal {
 
     class FloatField final : public AbstractFormFieldPanel {
-        InspectedField<float> &field;
+        FieldMetadata &field;
     public:
 
-        explicit FloatField(InspectedField<float> &field);
+        explicit FloatField(FieldMetadata &field);
 
         void onSync() override;
 

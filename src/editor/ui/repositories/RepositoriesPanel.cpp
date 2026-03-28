@@ -1,7 +1,7 @@
 #include "RepositoriesPanel.h"
 #include "editor/ui/abstract/form/FormPanel.h"
 #include "ApplicationContext.h"
-#include "common/Inspectable.h"
+#include "common/Reflection.h"
 #include "common/IRepository.h"
 #include "engine/repository/WorldRepository.h"
 #include "engine/dto/Camera.h"

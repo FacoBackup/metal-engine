@@ -3,15 +3,15 @@
 #include <glm/vec4.hpp>
 
 #include "../AbstractFormFieldPanel.h"
-#include "common/InspectedField.h"
+#include "common/FieldMetadata.h"
 
 namespace Metal {
     class Vec4Field final : public AbstractFormFieldPanel {
-        InspectedField<glm::vec4> &field;
+        FieldMetadata &field;
         float values[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 
     public:
-        explicit Vec4Field(InspectedField<glm::vec4> &field);
+        explicit Vec4Field(FieldMetadata &field);
 
         void onSync() override;
 

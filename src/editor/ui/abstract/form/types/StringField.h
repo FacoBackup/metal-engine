@@ -2,16 +2,15 @@
 #define STRINGFIELD_H
 
 #include "../AbstractFormFieldPanel.h"
-#include "common/InspectedField.h"
-
+#include "common/FieldMetadata.h"
 
 namespace Metal {
     class StringField final : public AbstractFormFieldPanel {
         char buffer[512];
-        InspectedField<std::string> &field;
+        FieldMetadata &field;
 
     public:
-        explicit StringField(InspectedField<std::string> &field);
+        explicit StringField(FieldMetadata &field);
 
         void onSync() override;
 

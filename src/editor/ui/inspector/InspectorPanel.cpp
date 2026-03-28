@@ -1,7 +1,7 @@
 #include "InspectorPanel.h"
 #include "editor/ui/abstract/form/FormPanel.h"
 #include "editor/ui/UIUtil.h"
-#include "common/Inspectable.h"
+#include "common/Reflection.h"
 #include "ApplicationContext.h"
 #include "engine/dto/MetadataComponent.h"
 #include <imgui.h>
@@ -59,8 +59,8 @@ namespace Metal {
                     additionalInspection.push_back(selectedEntity);
 
                     for (const auto &compDef: ComponentTypes::getComponents()) {
-                        if (Inspectable *inspectable = compDef.getInspectable(*worldRepository, selectedId)) {
-                            additionalInspection.push_back(inspectable);
+                        if (Reflection *reflectionInstance = compDef.getInspectable(*worldRepository, selectedId)) {
+                            additionalInspection.push_back(reflectionInstance);
                         }
                     }
                 }

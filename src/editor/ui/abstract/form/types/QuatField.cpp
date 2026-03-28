@@ -2,34 +2,35 @@
 #include <algorithm>
 #include <imgui.h>
 #include <glm/detail/type_quat.hpp>
-#include "common/Inspectable.h"
+#include "common/Reflection.h"
 #include "editor/ui/UIUtil.h"
 #include "editor/service/HistoryService.h"
 #include "ApplicationEventContext.h"
 #include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
-    QuatField::QuatField(InspectedField<glm::quat> &field) : field(field) {
+    QuatField::QuatField(FieldMetadata &field) : field(field) {
     }
 
     void QuatField::onSync() {
+        glm::quat *ptr = static_cast<glm::quat *>(field.pointer);
         if (!field.disabled) {
             if (!isEditing) {
-                eulerValues = glm::degrees(glm::eulerAngles(*field.field));
+                eulerValues = glm::degrees(glm::eulerAngles(*ptr));
             }
 
             values[0] = eulerValues.x;
             values[1] = eulerValues.y;
             values[2] = eulerValues.z;
 
-            glm::quat oldValue = *field.field;
-            if (UIUtil::DrawVec3Control(field.name, field.id, values, field.incrementF.value())) {
+            glm::quat oldValue = *ptr;
+            if (UIUtil::DrawVec3Control(field.name, field.id, values, field.increment.value_or(0.01f))) {
                 isEditing = true;
                 eulerValues.x = values[0];
                 eulerValues.y = values[1];
                 eulerValues.z = values[2];
 
-                *field.field = glm::quat(glm::radians(eulerValues));
+                *ptr = glm::quat(glm::radians(eulerValues));
 
                 historyService->recordChange(&field, oldValue);
                 ApplicationEventContext::dispatch(field.instance->getClassName(), std::make_shared<FieldModificationPayload>(field));
@@ -44,7 +45,7 @@ namespace Metal {
                 historyService->endTransaction();
             }
         } else {
-            glm::vec3 euler = glm::degrees(glm::eulerAngles(*field.field));
+            glm::vec3 euler = glm::degrees(glm::eulerAngles(*ptr));
             ImGui::Text("%s: <%f, %f, %f>", field.name.c_str(), euler.x, euler.y, euler.z);
         }
     }

@@ -141,7 +141,7 @@ namespace Metal {
         materialData.transmission = data.transmissionFactor;
         materialData.thickness = data.thicknessFactor;
         materialData.ior = data.ior;
-        materialData.isEmissive = worldRepository->hasComponent(data.getEntityId(), ComponentType::LIGHT) ? 1 : 0;
+        materialData.isEmissive = worldRepository->hasComponent(data.getEntityId(), LIGHT) ? 1 : 0;
 
         materialData.albedoTextureId = 0;
         materialData.roughnessTextureId = 0;

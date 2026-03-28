@@ -16,7 +16,7 @@ namespace Metal {
     void TransformService::onInitialize() {
         eventListener([this](const Event &e) {
             const auto payload = std::static_pointer_cast<InspectableEventPayload>(e.payload);
-            if (const auto transform = dynamic_cast<TransformComponent *>(payload->inspectable)) {
+            if (const auto transform = dynamic_cast<TransformComponent *>(payload->reflectionInstance)) {
                 dirtyStateService->markEntityDirty(transform->getEntityId(), DirtyType::Transform);
             }
         }, "TransformComponent");

@@ -6,13 +6,13 @@
 
 namespace Metal {
     class FormPanel;
-    class Inspectable;
+    class Reflection;
     struct EditorRepository;
     struct WorldRepository;
 
     class InspectorPanel final : public AbstractDockPanel {
-        std::vector<Inspectable *> additionalInspection{};
-        Inspectable *selectedEntity = nullptr;
+        std::vector<Reflection *> additionalInspection{};
+        Reflection *selectedEntity = nullptr;
 
         std::shared_ptr<FormPanel> formPanel = nullptr;
         entt::entity selectedId = EMPTY_ENTITY;

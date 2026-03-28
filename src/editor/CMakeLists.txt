@@ -28,8 +28,6 @@ set(EDITOR_SOURCES
         ui/abstract/form/types/IntField.h
         ui/abstract/form/types/FloatField.cpp
         ui/abstract/form/types/FloatField.h
-        ui/abstract/form/types/MethodField.cpp
-        ui/abstract/form/types/MethodField.h
         ui/UIUtil.h
         ui/UIUtil.cpp
         ui/header/EditorHeaderPanel.cpp

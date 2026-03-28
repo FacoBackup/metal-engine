@@ -13,18 +13,18 @@ namespace Metal {
 
         // Bindings
         lua.new_enum("ComponentType",
-                     "PRIMITIVE", ComponentType::PRIMITIVE,
-                     "TRANSFORM", ComponentType::TRANSFORM,
-                     "VOLUME", ComponentType::VOLUME,
-                     "METADATA", ComponentType::METADATA,
-                     "LIGHT", ComponentType::LIGHT,
-                     "SCOPED_SCRIPT", ComponentType::SCOPED_SCRIPT,
-                     "GLOBAL_SCRIPT", ComponentType::GLOBAL_SCRIPT,
-                     "RIGID_BODY", ComponentType::RIGID_BODY,
-                     "BOX_COLLIDER", ComponentType::BOX_COLLIDER,
-                     "SPHERE_COLLIDER", ComponentType::SPHERE_COLLIDER,
-                     "CAPSULE_COLLIDER", ComponentType::CAPSULE_COLLIDER,
-                     "MESH_COLLIDER", ComponentType::MESH_COLLIDER
+                     "PRIMITIVE", PRIMITIVE,
+                     "TRANSFORM", TRANSFORM,
+                     "VOLUME", VOLUME,
+                     "METADATA", METADATA,
+                     "LIGHT", LIGHT,
+                     "SCOPED_SCRIPT", SCOPED_SCRIPT,
+                     "GLOBAL_SCRIPT", GLOBAL_SCRIPT,
+                     "RIGID_BODY", RIGID_BODY,
+                     "BOX_COLLIDER", BOX_COLLIDER,
+                     "SPHERE_COLLIDER", SPHERE_COLLIDER,
+                     "CAPSULE_COLLIDER", CAPSULE_COLLIDER,
+                     "MESH_COLLIDER", MESH_COLLIDER
         );
 
         // Treat entt::entity as its underlying type (usually uint32_t) for Lua

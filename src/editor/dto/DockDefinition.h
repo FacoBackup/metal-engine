@@ -7,13 +7,13 @@
 #include <memory>
 #include <nlohmann/json.hpp>
 
-#include "common/ISerialize.h"
+#include "common/Reflection.h"
 #include "common/Util.h"
 
 namespace Metal {
     class DockSpace;
 
-    struct DockDefinition : ISerialize {
+    struct DockDefinition : Reflection {
         std::string id = Util::uuidV4();
         ImGuiID nodeId{};
         int selectedOption;
@@ -26,7 +26,6 @@ namespace Metal {
         std::shared_ptr<DockDefinition> origin = nullptr;
         std::vector<DockSpace *> dockSpaces{};
 
-
         explicit DockDefinition(DockSpace *description);
 
         explicit DockDefinition() : selectedOption(0) {
@@ -34,11 +33,9 @@ namespace Metal {
 
         explicit DockDefinition(DockSpace *description, float sizeRatioForNodeAtDir);
 
-        [[nodiscard]] nlohmann::json toJson() const override;
+        void registerFields() override;
 
         [[nodiscard]] bool isCenter() const;
-
-        void fromJson(const nlohmann::json &j) override;
     };
 } // Metal
 

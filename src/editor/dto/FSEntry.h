@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "common/ISerialize.h"
+#include <memory>
 
 namespace Metal {
     struct FSEntry {

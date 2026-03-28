@@ -2,11 +2,11 @@
 #define PRIMITIVE_COMPONENT_H
 
 #include "AbstractComponent.h"
-#include "../../common/ISerialize.h"
+
 #include <glm/glm.hpp>
 
 namespace Metal {
-    struct PrimitiveComponent final : AbstractComponent, ISerialize {
+    struct PrimitiveComponent final : AbstractComponent {
         std::string meshId;
 
         std::string albedo;
@@ -20,10 +20,6 @@ namespace Metal {
         void registerFields() override;
 
         ComponentType getType() const override;
-
-        nlohmann::json toJson() const override;
-
-        void fromJson(const nlohmann::json& j) override;
     };
 }
 #endif //MESHCOMPONENT_H

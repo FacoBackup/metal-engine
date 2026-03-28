@@ -2,8 +2,7 @@
 #include "ApplicationContext.h"
 #include "common/IRepository.h"
 #include "engine/enum/ComponentType.h"
-#include "common/Inspectable.h"
-#include "common/InspectedField.h"
+#include "common/Reflection.h"
 #include <nlohmann/json.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -49,8 +48,8 @@ namespace Metal {
 
         auto repositories = ctx->getSingletons<IRepository>();
         for (auto *repo: repositories) {
-            if (!repo->getFields().empty()) {
-                result.push_back(repo->toJSON());
+            if (!repo->getFields().empty() && repo->getTitle() != nullptr) {
+                result.push_back(repo->toJson(UI_VISIBLE, true));
             }
         }
         return result.dump();
@@ -69,22 +68,22 @@ namespace Metal {
         for (const auto &def: ComponentTypes::getComponents()) {
             if (def.type == type) {
                 if (def.hasComponent(*worldRepository, entity)) {
-                    if (const Inspectable *inspectable = def.getInspectable(*worldRepository, entity)) {
-                        return inspectable->toJSON().dump();
+                    if (Reflection *reflectionInstance = def.getInspectable(*worldRepository, entity)) {
+                        return reflectionInstance->toJson(UI_VISIBLE, true).dump();
                     }
-                    return std::string("Error: Component found but it's not inspectable.");
+                    return "Error: Component found but it's not reflectionInstance.";
                 }
-                return std::string("Error: Entity does not have this component type.");
+                return "Error: Entity does not have this component type.";
             }
         }
 
-        return std::string("Error: Component type not found.");
+        return "Error: Component type not found.";
     }
 
     std::string InspectionToolProvider::changeComponentField(const nlohmann::json &params) const {
         if (!params.contains("entity_id") || !params.contains("component_type_id") || !params.contains("field_path") ||
             !params.contains("value"))
-            return std::string("Error: Missing parameters.");
+            return "Error: Missing parameters.";
 
         auto entityId = params.at("entity_id").get<uint32_t>();
         auto componentTypeId = params.at("component_type_id").get<int>();
@@ -97,16 +96,16 @@ namespace Metal {
         for (const auto &def: ComponentTypes::getComponents()) {
             if (def.type == type) {
                 if (def.hasComponent(*worldRepository, entity)) {
-                    if (Inspectable *inspectable = def.getInspectable(*worldRepository, entity)) {
-                        const auto member = inspectable->getFieldByPath(fieldPath);
+                    if (Reflection *reflectionInstance = def.getInspectable(*worldRepository, entity)) {
+                        const auto member = reflectionInstance->getFieldByPath(fieldPath);
                         if (member) {
                             return updateField(member.get(), value);
                         }
-                        return std::string("Error: Field not found.");
+                        return "Error: Field not found.";
                     }
-                    return std::string("Error: Component is not inspectable.");
+                    return "Error: Component is not reflectionInstance.";
                 }
-                return std::string("Error: Entity does not have this component.");
+                return "Error: Entity does not have this component.";
             }
         }
         return "Error: Component type not found.";
@@ -136,32 +135,32 @@ namespace Metal {
         return "Error: Repository not found.";
     }
 
-    std::string InspectionToolProvider::updateField(InspectableMember *member, const nlohmann::json &value) {
+    std::string InspectionToolProvider::updateField(FieldMetadata *member, const nlohmann::json &value) {
         if (member->type == BOOLEAN) {
-            *dynamic_cast<InspectedField<bool> *>(member)->field = value.get<bool>();
+            *static_cast<bool *>(member->pointer) = value.get<bool>();
         } else if (member->type == INT) {
-            *dynamic_cast<InspectedField<int> *>(member)->field = value.get<int>();
+            *static_cast<int *>(member->pointer) = value.get<int>();
         } else if (member->type == FLOAT) {
-            *dynamic_cast<InspectedField<float> *>(member)->field = value.get<float>();
+            *static_cast<float *>(member->pointer) = value.get<float>();
         } else if (member->type == STRING || member->type == RESOURCE) {
-            *dynamic_cast<InspectedField<std::string> *>(member)->field = value.get<std::string>();
+            *static_cast<std::string *>(member->pointer) = value.get<std::string>();
         } else if (member->type == VECTOR2) {
-            auto &v = *dynamic_cast<InspectedField<glm::vec2> *>(member)->field;
+            auto &v = *static_cast<glm::vec2 *>(member->pointer);
             v.x = value["x"].get<float>();
             v.y = value["y"].get<float>();
         } else if (member->type == VECTOR3 || member->type == COLOR) {
-            auto &v = *dynamic_cast<InspectedField<glm::vec3> *>(member)->field;
+            auto &v = *static_cast<glm::vec3 *>(member->pointer);
             v.x = value["x"].get<float>();
             v.y = value["y"].get<float>();
             v.z = value["z"].get<float>();
         } else if (member->type == VECTOR4) {
-            auto &v = *dynamic_cast<InspectedField<glm::vec4> *>(member)->field;
+            auto &v = *static_cast<glm::vec4 *>(member->pointer);
             v.x = value["x"].get<float>();
             v.y = value["y"].get<float>();
             v.z = value["z"].get<float>();
             v.w = value["w"].get<float>();
         } else if (member->type == QUAT) {
-            auto &q = *dynamic_cast<InspectedField<glm::quat> *>(member)->field;
+            auto &q = *static_cast<glm::quat *>(member->pointer);
             q.x = value["x"].get<float>();
             q.y = value["y"].get<float>();
             q.z = value["z"].get<float>();

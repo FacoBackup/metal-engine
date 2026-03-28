@@ -5,7 +5,7 @@
 
 namespace Metal {
     struct WorldRepository;
-    struct InspectableMember;
+    struct FieldMetadata;
 
     class InspectionToolProvider final : public IToolProvider {
         WorldRepository *worldRepository = nullptr;
@@ -29,7 +29,7 @@ namespace Metal {
 
         std::string changeRepositoryField(const nlohmann::json &params) const;
 
-        static std::string updateField(InspectableMember *member, const nlohmann::json &value);
+        static std::string updateField(FieldMetadata *member, const nlohmann::json &value);
     };
 }
 

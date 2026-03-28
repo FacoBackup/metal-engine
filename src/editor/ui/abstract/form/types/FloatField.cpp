@@ -1,22 +1,23 @@
 #include "FloatField.h"
 #include <algorithm>
 #include <imgui.h>
-#include "common/Inspectable.h"
+#include "common/Reflection.h"
 #include "editor/service/HistoryService.h"
 #include "ApplicationEventContext.h"
 #include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
     void FloatField::onSync() {
+        float *ptr = static_cast<float *>(field.pointer);
         if (field.disabled) {
             ImGui::Text("%s:", field.name.c_str());
-            ImGui::TextDisabled("%f", field.field);
+            ImGui::TextDisabled("%f", *ptr);
         } else {
             ImGui::Text("%s", field.name.c_str());
 
-            float oldValue = *field.field;
-            if (ImGui::DragFloat(id.c_str(), field.field, field.incrementF.value(), field.minF.value(),
-                                 field.maxF.value())) {
+            float oldValue = *ptr;
+            if (ImGui::DragFloat(id.c_str(), ptr, field.increment.value(), field.min.value(),
+                                 field.max.value())) {
                 historyService->recordChange(&field, oldValue);
                 ApplicationEventContext::dispatch(field.instance->getClassName(), std::make_shared<FieldModificationPayload>(field));
             }
@@ -30,7 +31,7 @@ namespace Metal {
         }
     }
 
-    FloatField::FloatField(InspectedField<float> &field) : field(field) {
+    FloatField::FloatField(FieldMetadata &field) : field(field) {
     }
 
     bool FloatField::isVisible() const {

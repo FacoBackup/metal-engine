@@ -53,12 +53,17 @@ namespace Metal {
             rootDirectory = cachedPath;
         }
         FilesUtil::CreateDirectory(getProjectTargetPath());
-        for (auto &instance: ctx->getInstances()) {
-            if (auto *repository = dynamic_cast<IRepository *>(instance.get())) {
-                PARSE_TEMPLATE(*repository,
-                               getProjectTargetPath() + "/" + std::to_string(std::hash<std::string>{}(typeid(*repository
-                                   ).name())
-                               ) + ".json")
+
+        for (auto *instance: ctx->getSingletons<IRepository>()) {
+            std::string path = getProjectTargetPath() + "/" + instance->getClassName() + ".json";
+            if (std::filesystem::exists(path)) {
+                std::cout << "Loading " << path << std::endl;
+                std::ifstream is(path);
+                if (is.is_open()) {
+                    nlohmann::json j;
+                    is >> j;
+                    instance->fromJson(j);
+                }
             }
         }
 
@@ -72,12 +77,11 @@ namespace Metal {
             std::string targetPath = getProjectTargetPath();
             FilesUtil::CreateDirectory(targetPath);
 
-            for (auto &instance: ctx->getInstances()) {
-                if (auto *repository = dynamic_cast<IRepository *>(instance.get())) {
-                    DUMP_TEMPLATE(
-                        targetPath + "/" + std::to_string(std::hash<std::string>{}(typeid(*repository).name())) +
-                        ".json",
-                        *repository)
+            for (auto *instance: ctx->getSingletons<IRepository>()) {
+                std::ofstream os(targetPath + "/" + instance->getClassName() + ".json");
+                if (os.is_open()) {
+                    std::string data = instance->toJson().dump(4);
+                    os << data;
                 }
             }
             if (!silent)
@@ -89,7 +93,7 @@ namespace Metal {
         }
     }
 
-     std::string DirectoryService::getRootDirectory() const {
+    std::string DirectoryService::getRootDirectory() const {
         return rootDirectory;
     }
 } // Metal

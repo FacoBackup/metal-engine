@@ -15,7 +15,7 @@
 
 namespace Metal {
     struct MetadataComponent;
-    class Inspectable;
+    class Reflection;
     class DirectoryService;
     class HistoryService;
     class DirtyStateService;
@@ -57,13 +57,11 @@ namespace Metal {
 
         void changeVisibility(entt::entity entity, bool isVisible);
 
+        void registerFields() override;
+
         void load(const std::string &absolutePath) override;
 
         bool isCompatible(const std::string &absolutePath) override;
-
-        nlohmann::json toJson() const override;
-
-        void fromJson(const nlohmann::json &j) override;
 
         void deserializeEntityComplete(const EntityState &state);
     };

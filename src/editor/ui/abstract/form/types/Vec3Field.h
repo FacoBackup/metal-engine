@@ -4,16 +4,16 @@
 #include <glm/vec3.hpp>
 
 #include "../AbstractFormFieldPanel.h"
-#include "common/InspectedField.h"
+#include "common/FieldMetadata.h"
 
 
 namespace Metal {
     class Vec3Field final : public AbstractFormFieldPanel {
-        InspectedField<glm::vec3> &field;
+        FieldMetadata &field;
         float values[3] = {0.0f, 0.0f, 0.0f};
 
     public:
-        explicit Vec3Field(InspectedField<glm::vec3> &field);
+        explicit Vec3Field(FieldMetadata &field);
 
         void onSync() override;
 

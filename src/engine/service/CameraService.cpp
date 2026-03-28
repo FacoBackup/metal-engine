@@ -11,16 +11,16 @@
 namespace Metal {
     void CameraService::onInitialize() {
         dirtyStateService->markDirty(DirtyType::Camera);
-        eventListener([this](const Event &e) {
+        eventListener([this](const Event &) {
             dirtyStateService->markDirty(DirtyType::Camera);
         }, "Camera");
 
-        eventListener([this](const Event &e) { forwardPressed = true; }, "CameraMoveForward");
-        eventListener([this](const Event &e) { backwardPressed = true; }, "CameraMoveBackward");
-        eventListener([this](const Event &e) { leftPressed = true; }, "CameraMoveLeft");
-        eventListener([this](const Event &e) { rightPressed = true; }, "CameraMoveRight");
-        eventListener([this](const Event &e) { upPressed = true; }, "CameraMoveUp");
-        eventListener([this](const Event &e) { downPressed = true; }, "CameraMoveDown");
+        eventListener([this](const Event &) { forwardPressed = true; }, "CameraMoveForward");
+        eventListener([this](const Event &) { backwardPressed = true; }, "CameraMoveBackward");
+        eventListener([this](const Event &) { leftPressed = true; }, "CameraMoveLeft");
+        eventListener([this](const Event &) { rightPressed = true; }, "CameraMoveRight");
+        eventListener([this](const Event &) { upPressed = true; }, "CameraMoveUp");
+        eventListener([this](const Event &) { downPressed = true; }, "CameraMoveDown");
     }
 
     // Per frame

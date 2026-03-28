@@ -3,20 +3,18 @@
 
 #include <string>
 #include "AbstractComponent.h"
-#include "../../common/ISerialize.h"
+
 
 namespace Metal {
-    struct MeshColliderComponent final : AbstractComponent, ISerialize {
+    struct MeshColliderComponent final : AbstractComponent {
         std::string meshId;
         bool isConvex = false;
 
+    protected:
         void registerFields() override;
 
+    public:
         ComponentType getType() const override;
-
-        nlohmann::json toJson() const override;
-
-        void fromJson(const nlohmann::json& j) override;
     };
 }
 #endif //MESH_COLLIDER_COMPONENT_H

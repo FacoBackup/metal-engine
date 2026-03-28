@@ -3,7 +3,6 @@
 
 #include <fstream>
 #include <iostream>
-#include "ISerialize.h"
 #include <cereal/types/vector.hpp>
 #include <cereal/types/array.hpp>
 #include <cereal/types/atomic.hpp>
@@ -49,13 +48,21 @@ ar(__VA_ARGS__);\
 }
 
 #define DUMP_TEMPLATE(PATH, DATA){\
-    (DATA).saveToJson(PATH);\
+    std::ofstream os(PATH);\
+    if (os.is_open()) {\
+        os << (DATA).toJson().dump(4);\
+    }\
 }
 
 #define PARSE_TEMPLATE(D, P) { \
     if (std::filesystem::exists(P)) {\
         std::cout << "Loading " << P << std::endl;\
-        (D).loadFromJson(P);\
+        std::ifstream is(P);\
+        if (is.is_open()) {\
+            nlohmann::json j;\
+            is >> j;\
+            (D).fromJson(j);\
+        }\
     }\
 }
 

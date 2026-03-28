@@ -3,20 +3,18 @@
 
 #include <glm/glm.hpp>
 #include "AbstractComponent.h"
-#include "../../common/ISerialize.h"
+
 
 namespace Metal {
-    struct SphereColliderComponent final : AbstractComponent, ISerialize {
+    struct SphereColliderComponent final : AbstractComponent {
         float radius = 0.5f;
         glm::vec3 offset{0.0f, 0.0f, 0.0f};
 
+    protected:
         void registerFields() override;
 
+    public:
         ComponentType getType() const override;
-
-        nlohmann::json toJson() const override;
-
-        void fromJson(const nlohmann::json& j) override;
     };
 }
 #endif //SPHERE_COLLIDER_COMPONENT_H

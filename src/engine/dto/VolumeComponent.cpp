@@ -3,11 +3,11 @@
 
 namespace Metal {
     void VolumeComponent::registerFields() {
-        registerColor(albedo, "", "Albedo");
-        registerFloat(density, "", "Density", .1, 10);
-        registerFloat(g, "", "Phase function asymmetry (0.0 for isotropic)", 0);
-        registerFloat(scatteringAlbedo, "", "Scattering albedo", 0);
-        registerInt(samples, "", "Samples", 1);
+        registerEditableField(&albedo, COLOR, "Albedo", "");
+        registerEditableField(&density, FLOAT, "Density", "").setMin(.1).setMax(10);
+        registerEditableField(&g, FLOAT, "Phase function asymmetry (0.0 for isotropic)", "").setMin(0);
+        registerEditableField(&scatteringAlbedo, FLOAT, "Scattering albedo", "").setMin(0);
+        registerEditableField(&samples, INT, "Samples", "").setMin(1);
     }
 
     ComponentType VolumeComponent::getType() const {
