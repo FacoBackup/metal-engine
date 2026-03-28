@@ -16,7 +16,7 @@ namespace Metal {
 
     struct FileExtensions {
         inline static const std::unique_ptr<FileExtensionInfo> scene = std::make_unique<FileExtensionInfo>(
-            ".scene", "scene", "Scene", Icons::image);
+            ".scene", "scene", "Scene", Icons::inventory_2);
         inline static const std::unique_ptr<FileExtensionInfo> svo = std::make_unique<FileExtensionInfo>(
             ".svo", "svo", "Volume", Icons::view_agenda);
         inline static const std::unique_ptr<FileExtensionInfo> mesh = std::make_unique<FileExtensionInfo>(
@@ -35,13 +35,13 @@ namespace Metal {
             ".vdb", "vdb", "OpenVDB", Icons::view_agenda);
 
         inline static const std::unique_ptr<FileExtensionInfo> glb = std::make_unique<FileExtensionInfo>(
-            ".glb", "glb", "Scene Source", Icons::image);
+            ".glb", "glb", "Scene Source", Icons::category);
         inline static const std::unique_ptr<FileExtensionInfo> gltf = std::make_unique<FileExtensionInfo>(
-            ".gltf", "gltf", "Scene Source", Icons::image);
+            ".gltf", "gltf", "Scene Source", Icons::category);
         inline static const std::unique_ptr<FileExtensionInfo> fbx = std::make_unique<FileExtensionInfo>(
-            ".fbx", "fbx", "Scene Source", Icons::image);
+            ".fbx", "fbx", "Scene Source", Icons::category);
         inline static const std::unique_ptr<FileExtensionInfo> obj = std::make_unique<FileExtensionInfo>(
-            ".obj", "obj", "Scene Source", Icons::image);
+            ".obj", "obj", "Scene Source", Icons::category);
 
         inline static const std::unique_ptr<FileExtensionInfo> lua = std::make_unique<FileExtensionInfo>(
             ".lua", "lua", "Script", Icons::insert_drive_file);

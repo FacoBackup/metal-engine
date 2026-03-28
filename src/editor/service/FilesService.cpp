@@ -11,6 +11,9 @@
 #include <iostream>
 #include "common/serialization-definitions.h"
 #include "../../core/DirectoryService.h"
+#include "ApplicationContext.h"
+#include "common/ILoader.h"
+#include "common/AbstractImporter.h"
 
 namespace fs = std::filesystem;
 
@@ -146,8 +149,22 @@ namespace Metal {
                 }
                 child->extension = entry.path().extension().string();
             }
-            root->children.push_back(std::move(child));
+            if (canInteract(child)) {
+                root->children.push_back(std::move(child));
+            }
         }
+    }
+
+    bool FilesService::canInteract(const std::shared_ptr<FSEntry> &entry) const {
+        if (entry->isDirectory) return true;
+        const std::string &ext = entry->extension;
+        for (auto *loader: ctx->getSingletons<ILoader>()) {
+            if (loader->isCompatible(ext)) return true;
+        }
+        for (auto *importer: ctx->getSingletons<AbstractImporter>()) {
+            if (importer->isCompatible(entry->absolutePath)) return true;
+        }
+        return false;
     }
 
     std::shared_ptr<FSEntry> FilesService::GetEntry(const std::string &path) {

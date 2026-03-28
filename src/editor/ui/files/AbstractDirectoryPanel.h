@@ -18,8 +18,6 @@ namespace Metal {
         FilesService *filesService = nullptr;
         FileImporterService *fileImporterService = nullptr;
 
-        bool canInteract(std::shared_ptr<FSEntry> entry) const;
-
         const std::string &getEntryIcon(std::shared_ptr<FSEntry> entry) const;
 
         bool matchesSearch(std::shared_ptr<FSEntry> entry) const;

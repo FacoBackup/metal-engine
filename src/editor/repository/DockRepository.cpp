@@ -4,7 +4,7 @@
 
 namespace Metal {
     void DockRepository::registerFields() {
-        registerSerializableOnlyField<GENERIC>(nullptr).setName("center").setTransformer(
+        registerGenericField(
             [this] {
                 if (center == nullptr) return nlohmann::json(nullptr);
                 return center->toJson();
@@ -16,7 +16,7 @@ namespace Metal {
                 }
                 if (center == nullptr) center = std::make_shared<DockDefinition>();
                 center->fromJson(j);
-            });
+            }).setName("center");
 
         auto dockListToJson = [](std::vector<std::shared_ptr<DockDefinition> > &list) {
             nlohmann::json j = nlohmann::json::array();
@@ -33,15 +33,15 @@ namespace Metal {
             }
         };
 
-        registerSerializableOnlyField<GENERIC>(nullptr).setName("left").setTransformer(
+        registerGenericField(
             [this, dockListToJson] { return dockListToJson(left); },
-            [this, dockListFromJson](const nlohmann::json &j) { dockListFromJson(j, left); });
-        registerSerializableOnlyField<GENERIC>(nullptr).setName("right").setTransformer(
+            [this, dockListFromJson](const nlohmann::json &j) { dockListFromJson(j, left); }).setName("left");
+        registerGenericField(
             [this, dockListToJson] { return dockListToJson(right); },
-            [this, dockListFromJson](const nlohmann::json &j) { dockListFromJson(j, right); });
-        registerSerializableOnlyField<GENERIC>(nullptr).setName("bottom").setTransformer(
+            [this, dockListFromJson](const nlohmann::json &j) { dockListFromJson(j, right); }).setName("right");
+        registerGenericField(
             [this, dockListToJson] { return dockListToJson(bottom); },
-            [this, dockListFromJson](const nlohmann::json &j) { dockListFromJson(j, bottom); });
+            [this, dockListFromJson](const nlohmann::json &j) { dockListFromJson(j, bottom); }).setName("bottom");
     }
 
     void DockRepository::onInitialize() {

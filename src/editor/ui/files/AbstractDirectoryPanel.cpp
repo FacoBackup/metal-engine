@@ -16,25 +16,12 @@ namespace Metal {
         : filesContext(filesContext) {
     }
 
-    bool AbstractDirectoryPanel::canInteract(std::shared_ptr<FSEntry> entry) const {
-        if (entry->isDirectory) return true;
-        const std::string &ext = entry->extension;
-        for (auto *loader: ctx->getSingletons<ILoader>()) {
-            if (loader->isCompatible(ext)) return true;
-        }
-        for (auto *importer: ctx->getSingletons<AbstractImporter>()) {
-            if (importer->isCompatible(entry->absolutePath)) return true;
-        }
-        return false;
-    }
-
     const std::string &AbstractDirectoryPanel::getEntryIcon(std::shared_ptr<FSEntry> entry) const {
         if (entry->isDirectory) return Icons::folder;
-        if (!canInteract(entry)) return Icons::close;
 
         const std::string &extension = entry->extension;
         for (const auto *info: Metal::FileExtensions::all) {
-            if (info->typeLabel == extension) return info->icon;
+            if (info->extension == extension) return info->icon;
         }
 
         return Icons::insert_drive_file;

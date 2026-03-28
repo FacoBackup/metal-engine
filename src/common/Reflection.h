@@ -30,11 +30,17 @@ namespace Metal {
     protected:
         template<FieldType FT>
         FieldMetadata &registerSerializableOnlyField(void *pointer) {
+            static_assert(FT != COMPOSITE && FT != GENERIC,
+                          "registerSerializableOnlyField does not support COMPOSITE or GENERIC. "
+                          "Use registerCompositeField or registerGenericField instead.");
             return registerFieldInternal(pointer, FT, SERIALIZABLE);
         }
 
         template<FieldType FT, typename T>
         FieldMetadata &registerSerializableOnlyField(T *pointer) {
+            static_assert(FT != COMPOSITE && FT != GENERIC,
+                          "registerSerializableOnlyField does not support COMPOSITE or GENERIC. "
+                          "Use registerCompositeField or registerGenericField instead.");
             if constexpr (FT != COMPOSITE && FT != GENERIC) {
                 static_assert(std::is_same_v<typename TypeToCpp<FT>::Type, T>, "Field type mismatch");
             }
@@ -43,11 +49,17 @@ namespace Metal {
 
         template<FieldType FT>
         FieldMetadata &registerEditableField(void *pointer) {
+            static_assert(FT != COMPOSITE && FT != GENERIC,
+                          "registerEditableField does not support COMPOSITE or GENERIC. "
+                          "Use registerCompositeField or registerGenericField instead.");
             return registerFieldInternal(pointer, FT, DEFAULT);
         }
 
         template<FieldType FT, typename T>
         FieldMetadata &registerEditableField(T *pointer) {
+            static_assert(FT != COMPOSITE && FT != GENERIC,
+                          "registerEditableField does not support COMPOSITE or GENERIC. "
+                          "Use registerCompositeField or registerGenericField instead.");
             if constexpr (FT != COMPOSITE && FT != GENERIC) {
                 static_assert(std::is_same_v<typename TypeToCpp<FT>::Type, T>, "Field type mismatch");
             }

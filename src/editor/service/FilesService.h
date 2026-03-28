@@ -12,6 +12,8 @@ namespace Metal {
     struct FSEntry;
 
     class NotificationService;
+    class ILoader;
+    class AbstractImporter;
 
     class FilesService final : public IService, public IInit {
         std::shared_ptr<FSEntry> root = nullptr;
@@ -44,6 +46,8 @@ namespace Metal {
                         const std::string &extension);
 
         void GetEntries(std::shared_ptr<FSEntry> root);
+
+        bool canInteract(const std::shared_ptr<FSEntry> &entry) const;
 
         std::shared_ptr<FSEntry> GetEntry(const std::string &path);
 

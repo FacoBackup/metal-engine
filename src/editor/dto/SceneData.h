@@ -13,7 +13,18 @@ namespace Metal {
 
         void registerFields() override {
             registerSerializableOnlyField<STRING>(&name).setName("name");
-            registerSerializableOnlyField<COMPOSITE>(&entities).setName("entities");
+            registerGenericField([this] {
+                nlohmann::json j = nlohmann::json::array();
+                for (auto &entity: entities) j.push_back(entity.toJson());
+                return j;
+            }, [this](const nlohmann::json &j) {
+                entities.clear();
+                for (const auto &item: j) {
+                    SceneEntityData entity;
+                    entity.fromJson(item);
+                    entities.push_back(entity);
+                }
+            }).setName("entities");
         }
     };
 }
