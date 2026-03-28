@@ -61,7 +61,6 @@ namespace Metal {
 
         streamingService->onSync();
         if (vulkanContext->isRayTracingSupported()) {
-            blasService->onSync();
             tlasService->onSync();
         }
         materialService->onSync();

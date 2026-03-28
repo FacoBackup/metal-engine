@@ -68,7 +68,7 @@ namespace Metal {
     void ResourceField::onSync() {
         std::string *ptr = static_cast<std::string *>(field.pointer);
         if (ptr->size() > 0 && (entry == nullptr || entry->absolutePath != *ptr)) {
-            entry = filesService->getResource(*ptr);
+            entry = filesService->GetEntryByAbsolutePath(*ptr);
         }
         if (!field.disabled) {
             renderButton();

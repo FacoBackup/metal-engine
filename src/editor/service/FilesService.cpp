@@ -28,27 +28,31 @@ namespace Metal {
         GetEntries(root);
     }
 
-    std::shared_ptr<FSEntry> FilesService::getResource(const std::string &id) const {
+    std::shared_ptr<FSEntry> FilesService::GetEntryByAbsolutePath(const std::string &absolutePath) const {
         try {
-            for (const auto &entry: fs::recursive_directory_iterator(root->absolutePath)) {
-                if (entry.is_regular_file() &&
-                    absolute(entry.path()).string() == id) {
-                    auto ftime = last_write_time(entry);
-                    auto sys_tp = std::chrono::file_clock::to_utc(ftime);
-                    std::string dateStr = std::format("{:%Y-%m-%d %H:%M}", sys_tp);
-                    auto child = std::make_shared<FSEntry>(
-                        absolute(entry.path()).string(),
-                        dateStr);
-
-                    child->name = entry.path().filename().string();
-                    child->size = fs::file_size(entry.path());
-                    child->formattedSize = FilesUtil::FormatSize(child->size);
-                    child->extension = entry.path().extension().string();
-                    return child;
-                }
+            fs::path path(absolutePath);
+            if (!fs::exists(path)) {
+                return nullptr;
             }
+
+            auto ftime = fs::last_write_time(path);
+            auto sys_tp = std::chrono::file_clock::to_utc(ftime);
+            std::string dateStr = std::format("{:%Y-%m-%d %H:%M}", sys_tp);
+
+            auto entry = std::make_shared<FSEntry>(
+                fs::absolute(path).string(),
+                dateStr);
+
+            entry->name = path.filename().string();
+            entry->isDirectory = fs::is_directory(path);
+            if (!entry->isDirectory) {
+                entry->size = fs::file_size(path);
+                entry->formattedSize = FilesUtil::FormatSize(entry->size);
+                entry->extension = path.extension().string();
+            }
+            return entry;
         } catch (const fs::filesystem_error &e) {
-            std::cerr << "Error while accessing directory: " << e.what() << '\n';
+            std::cerr << "Error while accessing file: " << e.what() << '\n';
         }
         return nullptr;
     }

@@ -37,12 +37,12 @@ namespace Metal {
         }, "PrimitiveComponent");
 
         eventListener([this](const Event &event) {
-            auto payload = std::dynamic_pointer_cast<ResourceDisposalPayload>(event.payload);
-            if (payload) {
-                MeshInstance *resource = getResource(payload->resourceId);
-                LOG_INFO("Disposing of mesh instance");
-                bufferService->dispose(resource->indexBuffer->getId());
-                bufferService->dispose(resource->dataBuffer->getId());
+            if (const auto payload = std::dynamic_pointer_cast<ResourceDisposalPayload>(event.payload)) {
+                if (const MeshInstance *resource = getResource(payload->resourceId); resource != nullptr) {
+                    LOG_INFO("Disposing of mesh instance");
+                    bufferService->dispose(resource->indexBuffer->getId());
+                    bufferService->dispose(resource->dataBuffer->getId());
+                }
             }
         }, "RESOURCE_DISPOSAL");
     }

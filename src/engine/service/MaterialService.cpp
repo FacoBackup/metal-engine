@@ -1,5 +1,6 @@
 #include "MaterialService.h"
 
+#include "ApplicationEventContext.h"
 #include "../../common/serialization-definitions.h"
 #include "../../common/LoggerUtil.h"
 #include "../dto/MaterialData.h"
@@ -12,17 +13,16 @@
 #include "DirtyStateService.h"
 #include "../resource/BufferInstance.h"
 #include "../../editor/enum/EngineResourceIDs.h"
+#include "editor/dto/FieldModificationEvent.h"
 
 namespace Metal {
-
     void MaterialService::onInitialize() {
-        eventListener([this](const Event &) {
-            fullRebuildNeeded = true;
+        eventListener([this](const Event &event) {
+            const auto payload = std::static_pointer_cast<InspectableEventPayload>(event.payload);
+            if (const auto primitive = dynamic_cast<PrimitiveComponent *>(payload->reflectionInstance)) {
+                dirtyStateService->markEntityDirty(primitive->getEntityId(), DirtyType::Material);
+            }
         }, "PrimitiveComponent");
-
-        eventListener([this](const Event &) {
-            fullRebuildNeeded = true;
-        }, "BVHUpdated");
     }
 
     void MaterialService::onSync() {

@@ -123,7 +123,7 @@ namespace Metal {
         }
 
         [[nodiscard]] uint32_t getMaxCombinedImageSamplers() const {
-            return physicalDeviceProperties.limits.maxDescriptorSetSamplers / 2;
+            return physicalDeviceProperties.limits.maxDescriptorSetSamplers;
         }
 
         [[nodiscard]] VkCommandBuffer beginSingleTimeCommands() const;

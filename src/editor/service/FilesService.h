@@ -34,7 +34,7 @@ namespace Metal {
 
         void onInitialize() override;
 
-        std::shared_ptr<FSEntry> getResource(const std::string &id) const;
+        std::shared_ptr<FSEntry> GetEntryByAbsolutePath(const std::string &absolutePath) const;
 
         void deleteFiles(const std::unordered_map<std::string, std::shared_ptr<FSEntry> > &files_context);
 

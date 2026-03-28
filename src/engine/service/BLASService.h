@@ -12,7 +12,7 @@ namespace Metal {
     class BufferService;
     class MeshService;
 
-    class BLASService final : public AbstractResourceService<BLASInstance>, public IInit, public ISync {
+    class BLASService final : public AbstractResourceService<BLASInstance>, public IInit {
         VulkanContext *vulkanContext = nullptr;
         BufferService *bufferService = nullptr;
         MeshService *meshService = nullptr;
@@ -22,7 +22,7 @@ namespace Metal {
         VkDeviceAddress getDeviceAddress(VkBuffer buffer) const;
 
     public:
-        BLASService() = default;
+        void onInitialize() override;
 
         std::vector<Dependency> getDependencies() override {
             return {
@@ -31,10 +31,6 @@ namespace Metal {
                 {"MeshService", &meshService}
             };
         }
-
-        void onInitialize() override;
-
-        void onSync();
 
         void disposeResource(BLASInstance *resource) override;
 

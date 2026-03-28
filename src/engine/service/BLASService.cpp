@@ -8,25 +8,9 @@
 #include <common/VulkanUtils.h>
 #include <editor/dto/FieldModificationEvent.h>
 
+#include "engine/dto/ResourceDisposalPayload.h"
+
 namespace Metal {
-    void BLASService::onInitialize() {
-        eventListener([this](const Event &) {
-            needsRebuild = true;
-        }, "MeshLoaded");
-
-        eventListener([this](const Event &event) {
-            auto payload = std::dynamic_pointer_cast<FieldModificationPayload>(event.payload);
-            if (payload && payload->member.path.find("Mesh") != std::string::npos) {
-                needsRebuild = true;
-            }
-        }, "PrimitiveComponent");
-    }
-
-    void BLASService::onSync() {
-        // BLAS rebuild detection is also handled per-mesh in buildBLAS,
-        // but here we can handle general structure changes if needed.
-    }
-
     VkDeviceAddress BLASService::getDeviceAddress(VkBuffer buffer) const {
         VkBufferDeviceAddressInfo info{};
         info.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
@@ -34,15 +18,27 @@ namespace Metal {
         return vulkanContext->vkGetBufferDeviceAddressKHR(vulkanContext->device.device, &info);
     }
 
+    void BLASService::onInitialize() {
+        eventListener([this](const Event &event) {
+            if (const auto payload = std::dynamic_pointer_cast<ResourceDisposalPayload>(event.payload)) {
+                if (const BLASInstance *resource = getResource(payload->resourceId); resource != nullptr) {
+                    LOG_INFO("Disposing of mesh instance");
+                    dispose(payload->resourceId);
+                }
+            }
+        }, "RESOURCE_DISPOSAL");
+    }
+
     void BLASService::disposeResource(BLASInstance *resource) {
-        if (!vulkanContext || !vulkanContext->rayTracingSupported) return;
+        if (!vulkanContext->rayTracingSupported) return;
 
         if (vulkanContext->device.device != VK_NULL_HANDLE) {
             vkDeviceWaitIdle(vulkanContext->device.device);
         }
 
         if (resource->accelerationStructure != VK_NULL_HANDLE) {
-            vulkanContext->vkDestroyAccelerationStructureKHR(vulkanContext->device.device, resource->accelerationStructure, nullptr);
+            vulkanContext->vkDestroyAccelerationStructureKHR(vulkanContext->device.device,
+                                                             resource->accelerationStructure, nullptr);
             resource->accelerationStructure = VK_NULL_HANDLE;
         }
 
