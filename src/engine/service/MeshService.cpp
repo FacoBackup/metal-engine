@@ -23,7 +23,7 @@ namespace Metal {
     void MeshService::onInitialize() {
         eventListener([this](const Event &event) {
             auto payload = std::dynamic_pointer_cast<FieldModificationPayload>(event.payload);
-            if (payload && payload->member.path.find("Mesh") != std::string::npos) {
+            if (payload && payload->member.name.find("Mesh") != std::string::npos) {
                 auto *primitive = dynamic_cast<PrimitiveComponent *>(payload->member.instance);
                 if (primitive && worldRepository->registry.all_of<TransformComponent>(primitive->getEntityId())) {
                     MeshData *data = loadMeshData(primitive->meshId);

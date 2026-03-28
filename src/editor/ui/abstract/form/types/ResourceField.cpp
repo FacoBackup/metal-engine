@@ -25,7 +25,7 @@ namespace Metal {
 
     void ResourceField::renderButton() {
         std::string *ptr = static_cast<std::string *>(field.pointer);
-        ImGui::Text(field.name.c_str());
+        ImGui::Text(field.label.c_str());
         ImGui::BeginChild(id.c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 32),
                           ImGuiChildFlags_Border);
         if (UIUtil::ButtonSimple(Icons::file_open + id, UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
@@ -73,13 +73,13 @@ namespace Metal {
         if (!field.disabled) {
             renderButton();
         } else {
-            ImGui::Text("%s: %s", field.name.c_str(), (entry != nullptr ? entry->name.c_str() : "(None)"));
+            ImGui::Text("%s: %s", field.label.c_str(), (entry != nullptr ? entry->name.c_str() : "(None)"));
         }
     }
 
     bool ResourceField::isVisible() const {
         if (!filter || filter->empty()) return true;
-        std::string lowerName = field.name;
+        std::string lowerName = field.label;
         std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
         return lowerName.find(*filter) != std::string::npos;
     }

@@ -202,15 +202,16 @@ namespace Metal {
 
     std::vector<std::string> FilesService::listFilesWithExtension(const std::string &extension) const {
         std::vector<std::string> files;
-        if (directoryService->getRootDirectory().empty()) {
+        const std::string &root = directoryService->getRootDirectory();
+        if (root.empty()) {
             return files;
         }
 
-        fs::path rootPath(directoryService->getRootDirectory());
+        fs::path rootPath(root);
         try {
-            for (const auto &entry: fs::directory_iterator(rootPath)) {
+            for (const auto &entry: fs::recursive_directory_iterator(rootPath)) {
                 if (entry.is_regular_file() && entry.path().extension() == extension) {
-                    files.push_back(entry.path().filename().string());
+                    files.push_back(entry.path().string());
                 }
             }
         } catch (const std::exception &e) {

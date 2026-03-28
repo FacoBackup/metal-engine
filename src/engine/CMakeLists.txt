@@ -123,14 +123,12 @@ set(ENGINE_SOURCES_LIST
     dto/BoxColliderComponent.h
     dto/CapsuleColliderComponent.cpp
     dto/CapsuleColliderComponent.h
-    dto/GlobalScriptComponent.cpp
-    dto/GlobalScriptComponent.h
+    dto/ScriptComponent.cpp
+    dto/ScriptComponent.h
     dto/MeshColliderComponent.cpp
     dto/MeshColliderComponent.h
     dto/RigidBodyComponent.cpp
     dto/RigidBodyComponent.h
-    dto/ScopedScriptComponent.cpp
-    dto/ScopedScriptComponent.h
     dto/SphereColliderComponent.cpp
     dto/SphereColliderComponent.h
 )

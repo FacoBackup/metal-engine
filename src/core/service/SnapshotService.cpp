@@ -57,8 +57,6 @@ namespace Metal {
     std::string SnapshotService::saveSnapshot() {
         if (engineMetadataPath.empty() || projectId.empty()) return "";
         try {
-            saveProject();
-            
             auto now = std::chrono::system_clock::now();
             auto in_time_t = std::chrono::system_clock::to_time_t(now);
 
@@ -108,6 +106,10 @@ namespace Metal {
                 std::string data = instance->toJson().dump(4);
                 os << data;
             }
+        }
+
+        if (!isSnapshot) {
+            saveSnapshot();
         }
     }
 

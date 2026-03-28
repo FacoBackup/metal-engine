@@ -7,9 +7,13 @@
 namespace Metal {
     struct WorldRepository;
 
+    class EngineContext;
+    class TransformService;
+    struct ScriptComponent;
+
     class LuaContext {
     public:
-        void initialize(WorldRepository* worldRepository);
+        void initialize(WorldRepository* worldRepository, EngineContext* engineContext, TransformService* transformService);
         
         sol::state& getState() { return lua; }
 

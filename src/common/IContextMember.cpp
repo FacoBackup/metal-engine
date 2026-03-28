@@ -4,6 +4,7 @@
 namespace Metal {
     void IContextMember::setDependencies(ApplicationContext &ctx) {
         this->ctx = &ctx;
+        LOG_DEBUG("Setting dependencies for " + std::string(typeid(*this).name())) ;
         for (auto &dep : getDependencies()) {
             void* singleton = ctx.getSingletonByName(dep.name);
             if (dep.ptr != nullptr) {

@@ -8,8 +8,7 @@
 #include "../dto/PrimitiveComponent.h"
 #include "../dto/VolumeComponent.h"
 #include "../dto/MetadataComponent.h"
-#include "../dto/ScopedScriptComponent.h"
-#include "../dto/GlobalScriptComponent.h"
+#include "../dto/ScriptComponent.h"
 #include "engine/dto/LightComponent.h"
 #include "../dto/RigidBodyComponent.h"
 #include "../dto/BoxColliderComponent.h"
@@ -84,16 +83,9 @@ namespace Metal::ComponentTypes {
                 }
             ),
             DEFINE_COMPONENT(
-                SCOPED_SCRIPT, "Scoped Script", "scoped_script", Icons::description, {}, ScopedScriptComponent,
+                SCRIPT, "Script Component", "script", Icons::description, {}, ScriptComponent,
                 [](WorldRepository &repo, entt::entity entityId) {
-                auto &comp = repo.registry.emplace_or_replace<ScopedScriptComponent>(entityId);
-                comp.setEntityId(entityId);
-                }
-            ),
-            DEFINE_COMPONENT(
-                GLOBAL_SCRIPT, "Global Script", "global_script", Icons::i_public, {}, GlobalScriptComponent,
-                [](WorldRepository &repo, entt::entity entityId) {
-                auto &comp = repo.registry.emplace_or_replace<GlobalScriptComponent>(entityId);
+                auto &comp = repo.registry.emplace_or_replace<ScriptComponent>(entityId);
                 comp.setEntityId(entityId);
                 }
             ),

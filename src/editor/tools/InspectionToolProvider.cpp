@@ -97,7 +97,7 @@ namespace Metal {
             if (def.type == type) {
                 if (def.hasComponent(*worldRepository, entity)) {
                     if (Reflection *reflectionInstance = def.getInspectable(*worldRepository, entity)) {
-                        const auto member = reflectionInstance->getFieldByPath(fieldPath);
+                        const auto member = reflectionInstance->getFieldByName(fieldPath);
                         if (member) {
                             return updateField(member.get(), value);
                         }
@@ -122,7 +122,7 @@ namespace Metal {
         try {
             void *repoPtr = ctx->getSingletonByName(repoName);
             if (auto *repo = static_cast<IRepository *>(repoPtr)) {
-                const auto member = repo->getFieldByPath(fieldPath);
+                const auto member = repo->getFieldByName(fieldPath);
                 if (member) {
                     return updateField(member.get(), value);
                 }

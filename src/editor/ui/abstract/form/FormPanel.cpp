@@ -22,20 +22,12 @@
 namespace Metal {
     void FormPanel::processFields(Reflection *inspection) {
         if (inspection->getTitle() == nullptr) return;
-        std::unordered_map<std::string, std::shared_ptr<AccordionPanel> > groups{};
         auto rootPanel = initializePanel<AccordionPanel>();
         rootPanel->setFilter(&searchFilter);
         rootPanel->setTitle(std::string(inspection->getIcon()) + " " + inspection->getTitle());
         rootPanel->setBackgroundColor(&themeService->palette3);
         for (const auto &field: inspection->getFields(UI_VISIBLE)) {
-            if (!groups.contains(field->group)) {
-                auto panel = rootPanel->initializePanel<AccordionPanel>();
-                panel->setFilter(&searchFilter);
-                panel->setBackgroundColor(&themeService->palette4);
-                groups[field->group] = panel;
-            }
-            std::shared_ptr<AccordionPanel> group = groups[field->group];
-            group->setTitle(field->group);
+
             std::shared_ptr<AbstractFormFieldPanel> fieldPanel = nullptr;
             switch (field->type) {
                 case STRING:
@@ -73,7 +65,7 @@ namespace Metal {
             }
             if (fieldPanel) {
                 fieldPanel->setFilter(&searchFilter);
-                group->initializePanel(fieldPanel);
+                rootPanel->initializePanel(fieldPanel);
             }
         }
     }

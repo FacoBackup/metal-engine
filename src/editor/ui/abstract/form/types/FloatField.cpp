@@ -10,10 +10,10 @@ namespace Metal {
     void FloatField::onSync() {
         auto *ptr = static_cast<float *>(field.pointer);
         if (field.disabled) {
-            ImGui::Text("%s:", field.name.c_str());
+            ImGui::Text("%s:", field.label.c_str());
             ImGui::TextDisabled("%f", *ptr);
         } else {
-            ImGui::Text("%s", field.name.c_str());
+            ImGui::Text("%s", field.label.c_str());
 
             float oldValue = *ptr;
             if (ImGui::DragFloat(id.c_str(), ptr, field.increment.value(), field.min.value(),
@@ -23,7 +23,7 @@ namespace Metal {
             }
 
             if (ImGui::IsItemActivated()) {
-                historyService->startTransaction("Change " + field.name);
+                historyService->startTransaction("Change " + field.label);
             }
             if (ImGui::IsItemDeactivatedAfterEdit()) {
                 historyService->endTransaction();
@@ -36,7 +36,7 @@ namespace Metal {
 
     bool FloatField::isVisible() const {
         if (!filter || filter->empty()) return true;
-        std::string lowerName = field.name;
+        std::string lowerName = field.label;
         std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
         return lowerName.find(*filter) != std::string::npos;
     }

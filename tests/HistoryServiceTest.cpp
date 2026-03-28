@@ -16,11 +16,11 @@ public:
     glm::vec3 vec3Field = {0, 0, 0};
 
     void registerFields() override {
-        registerEditableField<INT>(&intField).setName("IntField").setGroup("Group");
-        registerEditableField<FLOAT>(&floatField).setName("FloatField").setGroup("Group");
-        registerEditableField<STRING>(&stringField).setName("StringField").setGroup("Group");
-        registerEditableField<BOOLEAN>(&boolField).setName("BoolField").setGroup("Group");
-        registerEditableField<VECTOR3>(&vec3Field).setName("Vec3Field").setGroup("Group");
+        registerEditableField<INT>(&intField).setName("IntField").setLabel("Group");
+        registerEditableField<FLOAT>(&floatField).setName("FloatField").setLabel("Group");
+        registerEditableField<STRING>(&stringField).setName("StringField").setLabel("Group");
+        registerEditableField<BOOLEAN>(&boolField).setName("BoolField").setLabel("Group");
+        registerEditableField<VECTOR3>(&vec3Field).setName("Vec3Field").setLabel("Group");
     }
     const char* getIcon() const override { return ""; }
     const char* getTitle() const override { return "Mock"; }

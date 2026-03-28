@@ -54,6 +54,7 @@ set(EDITOR_SOURCES
         repository/AIAssistantRepository.h
         repository/AIAssistantRepository.cpp
         dto/ChatDTO.h
+        dto/Skill.h
         enum/engine-definitions.h
         ui/files/FilesPanel.cpp
         ui/files/FilesPanel.h

@@ -100,7 +100,7 @@ namespace Metal {
 
         std::shared_ptr<FieldMetadata> getFieldByPointer(void *ptr);
 
-        std::shared_ptr<FieldMetadata> getFieldByPath(const std::string &path);
+        std::shared_ptr<FieldMetadata> getFieldByName(const std::string &path);
 
         std::vector<std::shared_ptr<FieldMetadata> > getFields(std::optional<UsageFlags> filter = std::nullopt);
 

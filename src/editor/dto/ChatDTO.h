@@ -6,6 +6,7 @@
 #include <nlohmann/json.hpp>
 
 #include "common/Reflection.h"
+#include "Skill.h"
 
 namespace Metal {
     struct ToolCall final : Reflection {
@@ -90,6 +91,11 @@ namespace Metal {
         int totalPromptTokens = 0;
         int totalCompletionTokens = 0;
         int totalTokens = 0;
+        const Skill* selectedSkill = nullptr;
+
+        void setSelectedSkill(const Skill* skill) {
+            selectedSkill = skill;
+        }
 
     protected:
         void registerFields() override {

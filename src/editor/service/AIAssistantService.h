@@ -66,7 +66,7 @@ namespace Metal {
 
         nlohmann::json buildTools();
 
-        std::string buildFullSystemPrompt();
+        std::string buildFullSystemPrompt(const std::shared_ptr<Chat> &chat);
 
         void processAIResponse(const std::string &chatId, int messageIndex, AIModel model, const std::string &response);
 

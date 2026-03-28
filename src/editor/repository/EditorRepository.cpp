@@ -18,17 +18,17 @@ namespace Metal {
     }
 
     void EditorRepository::registerFields() {
-        registerEditableField<COLOR>(&accentColor).setName("accentColor").setGroup("Editor");
-        registerEditableField<COLOR>(&selectionColor).setName("selectionColor").setGroup("Selection outline");
-        registerEditableField<INT>(&selectionOutlineThickness).setName("selectionOutlineThickness").setGroup("Selection outline");
-        registerEditableField<STRING>(&projectName).setName("projectName").setGroup("Project");
-        registerEditableField<BOOLEAN>(&showIcons).setName("showIcons").setGroup("Icons");
-        registerEditableField<BOOLEAN>(&isDarkMode).setName("isDarkMode").setGroup("Editor");
-        registerEditableField<BOOLEAN>(&showGrid).setName("showGrid").setGroup("Grid");
-        registerEditableField<BOOLEAN>(&gridOverlayObjects).setName("gridOverlayObjects").setGroup("Grid");
-        registerEditableField<FLOAT>(&gridScale).setName("gridScale").setGroup("Grid");
-        registerEditableField<INT>(&gridThreshold).setName("gridThreshold").setGroup("Grid");
-        registerEditableField<FLOAT>(&gridThickness).setName("gridThickness").setGroup("Grid");
+        registerEditableField<COLOR>(&accentColor).setName("accentColor").setLabel("Accent color");
+        registerEditableField<COLOR>(&selectionColor).setName("selectionColor").setLabel("Selection outline color");
+        registerEditableField<INT>(&selectionOutlineThickness).setName("selectionOutlineThickness").setLabel("Selection outline thickness");
+        registerEditableField<STRING>(&projectName).setName("projectName").setLabel("Project name");
+        registerEditableField<BOOLEAN>(&showIcons).setName("showIcons").setLabel("Show icons");
+        registerEditableField<BOOLEAN>(&isDarkMode).setName("isDarkMode").setLabel("Dark mode");
+        registerEditableField<BOOLEAN>(&showGrid).setName("showGrid").setLabel("Show grid");
+        registerEditableField<BOOLEAN>(&gridOverlayObjects).setName("gridOverlayObjects").setLabel("Grid overlay objects");
+        registerEditableField<FLOAT>(&gridScale).setName("gridScale").setLabel("Grid scale");
+        registerEditableField<INT>(&gridThreshold).setName("gridThreshold").setLabel("Grid threshold");
+        registerEditableField<FLOAT>(&gridThickness).setName("gridThickness").setLabel("Grid thickness");
         auto gizmoTypeToJson = [this] { return static_cast<int>(gizmoType); };
         auto gizmoTypeFromJson = [this](const nlohmann::json &j) { gizmoType = static_cast<ImGuizmo::OPERATION>(j.get<int>()); };
         registerGenericField(gizmoTypeToJson, gizmoTypeFromJson).setName("gizmoType");
@@ -83,9 +83,9 @@ namespace Metal {
         auto bookmarksFromJson = [this](const nlohmann::json &j) { bookmarks = j.get<std::vector<std::string>>(); };
         registerGenericField(bookmarksToJson, bookmarksFromJson).setName("bookmarks");
         registerSerializableOnlyField<BOOLEAN>(&isPlaying).setName("isPlaying");
-        registerEditableField<STRING>(&gptMcpKey).setName("gptMcpKey").setGroup("MCP");
-        registerEditableField<STRING>(&geminiMcpKey).setName("geminiMcpKey").setGroup("MCP");
-        registerEditableField<BOOLEAN>(&enableSnapshots).setName("enableSnapshots").setGroup("Snapshots");
-        registerEditableField<FLOAT>(&snapshotInterval).setName("snapshotInterval").setGroup("Snapshots");
+        registerEditableField<STRING>(&gptMcpKey).setName("gptMcpKey").setLabel("GPT API Key");
+        registerEditableField<STRING>(&geminiMcpKey).setName("geminiMcpKey").setLabel("Gemini API Key");
+        registerEditableField<BOOLEAN>(&enableSnapshots).setName("enableSnapshots").setLabel("Enable snapshots");
+        registerEditableField<FLOAT>(&snapshotInterval).setName("snapshotInterval").setLabel("Snapshot interval");
     }
 }

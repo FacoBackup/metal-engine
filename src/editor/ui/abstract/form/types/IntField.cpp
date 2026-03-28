@@ -10,10 +10,10 @@ namespace Metal {
     void IntField::onSync() {
         int *ptr = static_cast<int *>(field.pointer);
         if (field.disabled) {
-            ImGui::Text("%s:", field.name.c_str());
+            ImGui::Text("%s:", field.label.c_str());
             ImGui::TextDisabled("%i", *ptr);
         } else {
-            ImGui::Text("%s", field.name.c_str());
+            ImGui::Text("%s", field.label.c_str());
             int oldValue = *ptr;
             if (ImGui::DragInt(id.c_str(), ptr, .01f, (int)field.min.value(), (int)field.max.value())) {
                 historyService->recordChange(&field, oldValue);
@@ -21,7 +21,7 @@ namespace Metal {
             }
 
             if (ImGui::IsItemActivated()) {
-                historyService->startTransaction("Change " + field.name);
+                historyService->startTransaction("Change " + field.label);
             }
             if (ImGui::IsItemDeactivatedAfterEdit()) {
                 historyService->endTransaction();
@@ -34,7 +34,7 @@ namespace Metal {
 
     bool IntField::isVisible() const {
         if (!filter || filter->empty()) return true;
-        std::string lowerName = field.name;
+        std::string lowerName = field.label;
         std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
         return lowerName.find(*filter) != std::string::npos;
     }
