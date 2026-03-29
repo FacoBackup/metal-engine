@@ -13,6 +13,8 @@ namespace Metal {
     struct StaticGeometryPushConstant {
         glm::mat4 model;
         uint32_t renderIndex;
+        float parallaxHeightScale;
+        int32_t parallaxLayers;
     };
 
     class StaticGBufferPass final : public AbstractRenderPass {

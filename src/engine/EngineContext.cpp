@@ -95,7 +95,7 @@ namespace Metal {
         globalDataUBO.pathTracerAccumulationCount = engineRepository->pathTracerAccumulationCount;
         globalDataUBO.globalFrameCount++;
         globalDataUBO.pathTracerMaxSamples = engineRepository->pathTracerMaxSamples;
-        globalDataUBO.denoiserEnabled = engineRepository->denoiserEnabled && globalDataUBO.debugFlag == LIT;
+        globalDataUBO.denoiserEnabled = engineRepository->denoiserEnabled && (globalDataUBO.debugFlag == LIT || globalDataUBO.debugFlag == GRID);
         globalDataUBO.isOrthographic = camera.isOrthographic;
 
         currentFrame->getResourceAs<BufferInstance>(RID_GLOBAL_DATA)->update(&globalDataUBO);

@@ -9,7 +9,6 @@ void main() {
     payload.t = -1.0;
     payload.hitPosition = vec3(0.0);
     payload.hitNormal = vec3(0.0, 1.0, 0.0);
-    payload.uv = vec2(0.0);
 
     payload.material.baseColor = vec3(1.0, 0.0, 1.0);
     payload.material.roughness = 1.0;

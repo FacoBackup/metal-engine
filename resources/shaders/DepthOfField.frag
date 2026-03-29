@@ -7,13 +7,16 @@ layout(push_constant) uniform Push {
     uint enabled;
 } dof;
 
-layout(set = 0, binding = 0) uniform sampler2D sceneColor;
+layout(set = 0, binding = 0, rgba32f) uniform readonly image2D sceneColor;
 layout(set = 0, binding = 1) uniform sampler2D gBufferRenderIndexDepth;
 
 layout(location = 0) out vec4 finalColor;
 
 void main() {
-    vec4 color = texture(sceneColor, texCoords);
+    ivec2 size = imageSize(sceneColor);
+    ivec2 iTexCoords = ivec2(texCoords * vec2(size));
+
+    vec4 color = imageLoad(sceneColor, iTexCoords);
     if (dof.enabled == 0) {
         finalColor = color;
         return;
@@ -46,8 +49,11 @@ void main() {
     for (int i = -samples; i <= samples; i++) {
         for (int j = -samples; j <= samples; j++) {
             vec2 offset = vec2(i, j) * coc / float(samples);
+            ivec2 sampleCoords = ivec2((texCoords + offset) * vec2(size));
+            sampleCoords = clamp(sampleCoords, ivec2(0), size - ivec2(1));
+
             float weight = exp(-(float(i*i + j*j)) / (2.0 * float(samples * samples)));
-            blurColor += texture(sceneColor, texCoords + offset).rgb * weight;
+            blurColor += imageLoad(sceneColor, sampleCoords).rgb * weight;
             totalWeight += weight;
         }
     }

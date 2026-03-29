@@ -28,7 +28,6 @@ void main() {
     payload.t = gl_HitTEXT;
     payload.hitPosition = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
     payload.hitNormal = normalize(vec3(gl_ObjectToWorldEXT * vec4(normal, 0.0)));
-    payload.uv = uv;
 
     payload.renderIndex = primitive.renderIndex;
 

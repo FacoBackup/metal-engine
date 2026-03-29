@@ -39,27 +39,21 @@ void main() {
 
     vec3 finalColor = vec3(0);
 
-    payload.hit = false;
-    payload.renderIndex = 0;
-
     vec2 gBufferRenderIdxDepth = imageLoad(gBufferRenderIndexDepth, launchId).rg;
 
     if (gBufferRenderIdxDepth.r > 0.0) {
-        payload.hit = true;
         float depth = gBufferRenderIdxDepth.g;
-        payload.renderIndex = uint(gBufferRenderIdxDepth.r - 1.0);
 
         // Reconstruct position from depth
         vec4 clipPos;
         clipPos.xy = texCoords * 2.0 - 1.0;
         clipPos.z = depth;
-        clipPos.y *= -1.0; // Invert Y for Vulkan NDC
         clipPos.w = 1.0;
         vec4 worldPos = globalData.invProjView * clipPos;
-        payload.hitPosition = worldPos.xyz / worldPos.w;
+        vec3 worldHitPos = worldPos.xyz / worldPos.w;
 
         vec4 gBufferNorm = imageLoad(gBufferNormal, launchId);
-        payload.hitNormal = gBufferNorm.rgb;
+        vec3 worldNormal = gBufferNorm.rgb;
 
         vec4 albedoEmissive = imageLoad(gBufferAlbedoEmissive, launchId);
         float packedRoughnessMetallic = imageLoad(gBufferRoughnessMetallic, launchId).r;
@@ -67,41 +61,55 @@ void main() {
         float roughness, metallic;
         decompressRoughnessMetallic(packedRoughnessMetallic, metallic, roughness);
 
-        payload.material.baseColor = albedoEmissive.rgb;
-        payload.material.roughness = max(roughness, 0.015);
-        payload.material.metallic = metallic;
-        payload.material.isEmissive = albedoEmissive.a < 0.0;
-    }
-
-
-    if (!payload.hit) {
-        if (pushConstants.isAtmosphereEnabled != 0) {
-            vec3 rayOrigin;
-            vec3 rayDirection = createRay(texCoords, globalData.invProj, globalData.invView, rayOrigin);
-            finalColor = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), rayDirection, 2.0f) * 0.05f;
-        }
-    } else {
         state = uint(uint(launchId.x) * uint(1973) + uint(launchId.y) * uint(9277) + uint(globalData.globalFrameCount) * uint(26699)) | uint(1);
 
-        MaterialInfo material = payload.material;
-        SurfaceInteraction interaction;
-        interaction.normal = payload.hitNormal;
-        interaction.point = payload.hitPosition;
-        interaction.anyHit = true;
-
-        if (material.isEmissive) {
-            finalColor = material.baseColor;
+        if (albedoEmissive.a < 0.0) {
+            finalColor = albedoEmissive.rgb;
         } else {
+            MaterialInfo material;
+            material.baseColor = albedoEmissive.rgb;
+            material.roughness = max(roughness, 0.015);
+            material.metallic = metallic;
+            material.isEmissive = false;
+            // Initialize other material properties
+            material.subsurface = 0.0;
+            material.specular = 0.0;
+            material.specularTint = 0.0;
+            material.clearcoat = 0.0;
+            material.clearcoatGloss = 1.0;
+            material.anisotropic = 0.0;
+            material.sheen = 0.0;
+            material.sheenTint = 0.0;
+
+            SurfaceInteraction interaction;
+            interaction.normal = worldNormal;
+            interaction.point = worldHitPos;
+            interaction.anyHit = true;
+
             vec2 jitterTexCoords = (vec2(launchId) + vec2(random(), random())) / vec2(launchSize);
             vec3 rayOrigin;
             vec3 rayDirection = createRay(jitterTexCoords, globalData.invProj, globalData.invView, rayOrigin);
+
             finalColor = calculatePixelColor(rayDirection, texCoords, material, interaction);
+        }
+    } else {
+        if (pushConstants.isAtmosphereEnabled != 0) {
+            vec3 rayOrigin;
+            vec3 rayDirection = createRay(texCoords, globalData.invProj, globalData.invView, rayOrigin);
+            finalColor = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), rayDirection, 2.0f) * 0.05f * pushConstants.pathTracingEmissiveFactor;
         }
     }
 
-    vec4 prev = imageLoad(outputImage, launchId);
-    float count = min(float(globalData.pathTracerMaxSamples), max(float(globalData.pathTracerAccumulationCount), 1.0));
-    vec3 color = prev.rgb * (1.0 - 1.0 / count) + finalColor.rgb * (1.0 / count);
+    vec3 color = finalColor.rgb;
+    #ifdef DEBUG
+    if (globalData.debugFlag == LIT || globalData.debugFlag == GRID) {
+        #endif
 
+        vec4 prev = imageLoad(outputImage, launchId);
+        float count = min(float(globalData.pathTracerMaxSamples), max(float(globalData.pathTracerAccumulationCount), 1.0));
+        color = prev.rgb * (1.0 - 1.0 / count) + finalColor.rgb * (1.0 / count);
+        #ifdef DEBUG
+        }
+    #endif
     imageStore(outputImage, launchId, vec4(color, 1));
 }

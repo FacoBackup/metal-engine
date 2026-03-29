@@ -45,6 +45,8 @@ namespace Metal {
 
                 pushConstant.model = transform.model;
                 pushConstant.renderIndex = mesh.renderIndex;
+                pushConstant.parallaxHeightScale = mesh.parallaxScale;
+                pushConstant.parallaxLayers = 32;
 
                 recordPushConstant(&pushConstant);
                 recordDrawMesh(meshInstance);

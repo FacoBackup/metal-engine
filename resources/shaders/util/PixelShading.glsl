@@ -68,7 +68,7 @@ vec3 tracePath(vec3 rayDirection, MaterialInfo material, SurfaceInteraction inte
 
         if (!payload.hit) {
             if (pushConstants.isAtmosphereEnabled != 0) {
-                vec3 skyLuminance = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), wi, 2.0f) * 0.05f;
+                vec3 skyLuminance = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), wi, 2.0f) * 0.05f * pushConstants.pathTracingEmissiveFactor;
                 pathInfo.radiance += pathInfo.throughput * skyLuminance;
             }
             break;

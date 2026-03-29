@@ -17,7 +17,8 @@ namespace Metal {
         DEPTH,
         UV,
         POSITION,
-        EMISSIVE
+        EMISSIVE,
+        GRID
     };
 
     class ShadingModes {
@@ -40,6 +41,7 @@ namespace Metal {
                 {"UV",                    "UV",                    Icons::grid_on,          UV},
                 {"POSITION",              "Position",              Icons::place,            POSITION},
                 {"EMISSIVE",              "Emission",              Icons::wb_incandescent,  EMISSIVE},
+                {"GRID",                  "Grid",                  Icons::grid_4x4,         GRID},
         };
 
         static inline std::string GetNames() {

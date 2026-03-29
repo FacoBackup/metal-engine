@@ -6,6 +6,7 @@
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inNormal;
 layout(location = 2) in vec2 inUV;
+layout(location = 3) in vec3 inLocalPosition;
 
 #define MATERIAL_DATA_SET 1
 #include "../MaterialData.glsl"
@@ -38,6 +39,7 @@ vec2 parallaxOcclusionMapping(vec2 initialUV, vec3 worldSpacePosition, float hei
     if (distanceFromCamera > PARALLAX_THRESHOLD || heightTextureId == 0) return initialUV;
     mat3 transposed = transpose(TBN);
     vec3 viewDirection = normalize(transposed * (globalData.cameraWorldPosition.xyz - worldSpacePosition.xyz));
+    
     float fLayers = float(max(layers, 1));
     float layerDepth = 1.0 / fLayers;
     float currentLayerDepth = 0.0;
@@ -85,24 +87,26 @@ float sharpGrid(vec3 pos, float lineWeight) {
     return max(grid3.x, max(grid3.y, grid3.z));
 }
 
-GridData getDebugGrid(vec3 worldPos) {
-    vec3 checkerPos = floor(worldPos * 0.5);
+GridData getDebugGrid(vec3 localPos) {
+    vec3 checkerPos = floor(localPos * 0.5);
     float checker = mod(checkerPos.x + checkerPos.y + checkerPos.z, 2.0);
 
-    vec3 colorA = vec3(0.4);
-    vec3 colorB = vec3(0.5);
+    vec3 colorA = vec3(0.5);
+    vec3 colorB = vec3(0.6);
     vec3 base = mix(colorA, colorB, checker);
 
-    float mainGrid = sharpGrid(worldPos, 0.01);
-    float subGrid = sharpGrid(worldPos * 10.0, 0.005);
+    float mainGrid = sharpGrid(localPos, 0.01);
+    float subGrid = sharpGrid(localPos * 10.0, 0.005);
 
-    vec3 finalColor = mix(base, vec3(0.3), subGrid * 0.5);
-    finalColor = mix(finalColor, vec3(0.1), mainGrid);
+    vec3 finalColor = mix(base, vec3(0.4), subGrid * 0.5);
+    finalColor = mix(finalColor, vec3(0.25), mainGrid);
+
+    float lineStrength = max(mainGrid, subGrid * 0.5);
 
     GridData data;
     data.baseColor = finalColor;
-    data.roughness = 0.8;
-    data.metallic = 0.0;
+    data.roughness = mix(1.0, 0.1, lineStrength);
+    data.metallic = mix(0.0, 1.0, lineStrength);
     return data;
 }
 
@@ -116,10 +120,10 @@ void main () {
     if (material.heightTextureId != 0){
         vec3 V = globalData.cameraWorldPosition.xyz - inPosition;
         float distanceFromCamera = length(V);
-        localUV = parallaxOcclusionMapping(localUV, inPosition, material.parallaxScale, 32, distanceFromCamera, TBN, material.heightTextureId);
+        localUV = parallaxOcclusionMapping(localUV, inPosition, push.parallaxHeightScale, push.parallaxLayers, distanceFromCamera, TBN, material.heightTextureId);
     }
 
-    GridData grid = getDebugGrid(inPosition);
+    GridData grid = getDebugGrid(inLocalPosition);
     vec3 albedo = grid.baseColor;
     if (material.albedoTextureId != 0){
         albedo = texture(textureArray[nonuniformEXT(material.albedoTextureId)], localUV).rgb;
@@ -160,13 +164,17 @@ void main () {
         } else if (globalData.debugFlag == EMISSIVE) {
             albedo = vec3(material.isEmissive == 1u ? 1.0 : 0.0);
         }
+    } else if (globalData.debugFlag == GRID) {
+        albedo = grid.baseColor;
+        roughness = grid.roughness;
+        metallic = grid.metallic;
     }
     #endif
 
     gBufferAlbedoEmissive = vec4(albedo, material.isEmissive == 1u ? 1.0 : 0.0);
 
     #ifdef DEBUG
-    if (globalData.debugFlag != LIT) {
+    if (globalData.debugFlag != LIT && globalData.debugFlag != GRID) {
         gBufferAlbedoEmissive.a = -1.0;
     }
     #endif
