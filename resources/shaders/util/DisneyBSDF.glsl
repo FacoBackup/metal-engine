@@ -210,7 +210,7 @@ vec3 lightSample(const in Light light, const in SurfaceInteraction interaction, 
         lightPdf /= float(globalData.lightsCount);
 
         emission = light.color * pushConstants.pathTracingEmissiveFactor;
-        vec3 visibility = visibilityTest(dist, interaction.point, wi);
+        float visibility = visibilityTest(dist, interaction.point, wi);
         return emission * visibility;
     }
 

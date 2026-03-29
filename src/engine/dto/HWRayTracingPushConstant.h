@@ -9,6 +9,8 @@ namespace Metal {
         alignas(4) unsigned int pathTracerSamples{};
         alignas(4) unsigned int pathTracerBounces{};
         alignas(4) float pathTracingEmissiveFactor{};
+        alignas(4) unsigned int restirFrameIndex{};
+        alignas(4) unsigned int restirEnabled{};
     };
 }
 

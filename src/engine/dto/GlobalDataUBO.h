@@ -5,6 +5,7 @@
 namespace Metal {
     struct GlobalDataUBO {
         alignas(16) glm::mat4x4 projView{};
+        alignas(16) glm::mat4x4 previousProjView{};
         alignas(16) glm::mat4x4 invView{};
         alignas(16) glm::mat4x4 invProj{};
         alignas(16) glm::mat4x4 invProjView{};

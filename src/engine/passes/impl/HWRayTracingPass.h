@@ -8,6 +8,7 @@ namespace Metal {
     class PipelineService;
     class VulkanContext;
     class EngineContext;
+    class DescriptorSetService;
     struct EngineRepository;
     class ApplicationEventContext;
 
@@ -20,7 +21,9 @@ namespace Metal {
         PipelineService *pipelineService = nullptr;
         VulkanContext *vulkanContext = nullptr;
         EngineContext *engineContext = nullptr;
+        DescriptorSetService *descriptorSetService = nullptr;
         EngineRepository *engineRepository = nullptr;
+        uint32_t frameIndex = 0;
 
     public:
         std::vector<Dependency> getDependencies() override {
@@ -29,6 +32,7 @@ namespace Metal {
                 {"PipelineService", &pipelineService},
                 {"VulkanContext", &vulkanContext},
                 {"EngineContext", &engineContext},
+                {"DescriptorSetService", &descriptorSetService},
                 {"EngineRepository", &engineRepository}
             };
         }

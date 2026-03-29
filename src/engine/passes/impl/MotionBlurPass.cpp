@@ -1,4 +1,4 @@
-#include "DepthOfFieldPass.h"
+#include "MotionBlurPass.h"
 #include "../../dto/PipelineBuilder.h"
 #include "../../service/PipelineService.h"
 #include "../../../core/VulkanContext.h"
@@ -6,30 +6,30 @@
 #include "editor/enum/EngineResourceIDs.h"
 #include "../../frame-builder/EngineFrame.h"
 #include "../../resource/TextureInstance.h"
+#include "engine/resource/RenderTargetInstance.h"
 
 namespace Metal {
-    void DepthOfFieldPass::onInitialize() {
+    void MotionBlurPass::onInitialize() {
         PipelineBuilder builder = PipelineBuilder::Of(
-                    getScopedResourceId(RID_POST_PROCESSING_RT),
+                    getScopedResourceId(RID_MOTION_BLUR_RT),
                     "QUAD.vert",
-                    "DepthOfField.frag"
+                    "MotionBlur.frag"
                 )
-                .setPushConstantsSize(sizeof(DepthOfFieldPushConstant))
-                .addStorageImageBinding(getScopedResourceId(RID_ACCUMULATED_FRAME))
+                .setPushConstantsSize(sizeof(MotionBlurPushConstant))
+                .addRenderTargetBinding(getScopedResourceId(RID_DOF_RT), 0)
                 .addRenderTargetBinding(getScopedResourceId(RID_GBUFFER_RT), RID_GBUFFER_RENDER_INDEX_DEPTH)
-                .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA));
-        
+                .addRenderTargetBinding(getScopedResourceId(RID_GBUFFER_RT), RID_GBUFFER_MOTION_VECTOR);
+
         pipelineInstance = pipelineService->createPipeline(builder);
     }
 
-    void DepthOfFieldPass::onSync() {
+    void MotionBlurPass::onSync() {
         auto &camera = worldRepository->camera;
-        pushConstant.focusDistance = camera.dofFocusDistance;
-        pushConstant.aperture = camera.dofAperture;
-        pushConstant.focalLength = camera.dofFocalLength;
-        pushConstant.enabled = camera.dofEnabled;
+        pushConstant.motionBlurEnabled = camera.motionBlurEnabled;
+        pushConstant.motionBlurVelocityScale = camera.motionBlurVelocityScale;
+        pushConstant.motionBlurMaxSamples = camera.motionBlurMaxSamples;
 
         recordPushConstant(&pushConstant);
         recordDrawSimpleInstanced(3, 1);
     }
-}
+} // Metal

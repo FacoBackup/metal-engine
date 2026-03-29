@@ -15,17 +15,10 @@ namespace Metal {
     GizmoPanel::GizmoPanel(ImVec2 *position, glm::vec2 *size) : size(size), position(position) {
     }
 
-    GizmoPanel::~GizmoPanel() {
-        delete gizmoStrategy;
-    }
-
-    void GizmoPanel::onInitialize() {
-        gizmoStrategy = new GizmoTransformStrategy(historyService, editorRepository, worldRepository);
-    }
-
     void GizmoPanel::onSync() {
         if (editorRepository->primitiveSelected == nullptr) {
-            isGizmoOver = false;
+            editorRepository->isGizmoOver = false;
+            editorRepository->isGizmoUsing = false;
             localSelected = nullptr;
             if (editorRepository->mainSelection != EMPTY_ENTITY) {
                 selectionService->updatePrimitiveSelected();
@@ -53,15 +46,16 @@ namespace Metal {
             nullptr,
             gizmoStrategy->getSnapValues());
 
-        gizmoStrategy->updateUsingState(ImGuizmo::IsUsing());
+        editorRepository->isGizmoUsing = ImGuizmo::IsUsing();
+        gizmoStrategy->updateUsingState(editorRepository->isGizmoUsing);
 
-        if (ImGuizmo::IsUsing()) {
+        if (editorRepository->isGizmoUsing) {
             gizmoStrategy->decomposeMatrix(localSelected);
         } else {
             // Ensure endTransaction is called even if decomposeMatrix wasn't called this frame
             gizmoStrategy->updateUsingState(false);
         }
 
-        isGizmoOver = ImGuizmo::IsOver();
+        editorRepository->isGizmoOver = ImGuizmo::IsOver();
     }
 } // Metal

@@ -16,6 +16,7 @@ namespace Metal {
         std::string height;
         float parallaxScale = 0.05f;
         unsigned int renderIndex = 0;
+        unsigned int materialIndex = 0;
 
         void registerFields() override;
 

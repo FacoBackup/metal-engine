@@ -10,6 +10,10 @@
 #include "editor/enum/EngineResourceIDs.h"
 #include "ApplicationEventContext.h"
 #include "engine/resource/RenderTargetInstance.h"
+#include "engine/resource/BufferInstance.h"
+#include "engine/dto/DescriptorInstance.h"
+#include "engine/service/DescriptorSetService.h"
+#include "engine/frame-builder/EngineFrame.h"
 
 namespace Metal {
     void HWRayTracingPass::onInitialize() {
@@ -35,7 +39,9 @@ namespace Metal {
                 .addBufferBinding(getScopedResourceId(RID_MATERIAL_DATA_BUFFER)) // 8
                 .addBufferBinding(getScopedResourceId(RID_PRIMITIVE_DATA_BUFFER)) // 9
                 .addCombinedImageSamplerBinding(vulkanContext->vkTextureSampler, VK_NULL_HANDLE, // 10
-                                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+                                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+                .addBufferBinding(getScopedResourceId(RID_RESTIR_RESERVOIR_0)) // 11
+                .addBufferBinding(getScopedResourceId(RID_RESTIR_RESERVOIR_1)); // 12
         pipelineInstance = pipelineService->createPipeline(builder);
     }
 
@@ -58,7 +64,26 @@ namespace Metal {
         pushConstant.pathTracerBounces = engineRepository->pathTracerBounces;
         pushConstant.pathTracingEmissiveFactor = engineRepository->pathTracingEmissiveFactor;
 
+        // ReSTIR GI
+        pushConstant.restirFrameIndex = frameIndex;
+        pushConstant.restirEnabled = engineRepository->restirEnabled;
+        frameIndex++;
+
         recordPushConstant(&pushConstant);
+
+        auto *reservoir0 = frame->getResourceAs<BufferInstance>(RID_RESTIR_RESERVOIR_0);
+        auto *reservoir1 = frame->getResourceAs<BufferInstance>(RID_RESTIR_RESERVOIR_1);
+
+        auto *descriptor = pipelineInstance->descriptor;
+        for (auto &binding: descriptor->bindings) {
+            if (binding.bindingPoint == 11) {
+                binding.bufferId = reservoir0->getId();
+            } else if (binding.bindingPoint == 12) {
+                binding.bufferId = reservoir1->getId();
+            }
+        }
+        descriptorSetService->write(descriptor);
+
         startWriting(accumulatedFrame->vkImage);
 
         vulkanContext->vkCmdTraceRaysKHR(

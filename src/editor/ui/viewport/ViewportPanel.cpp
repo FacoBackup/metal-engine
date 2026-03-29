@@ -68,12 +68,6 @@ namespace Metal {
             ShortcutDTO("Move Right", ImGuiKey_D, []() {
                 ApplicationEventContext::dispatch("CameraMoveRight");
             }, true),
-            ShortcutDTO("Move Up", ImGuiKey_Space, []() {
-                ApplicationEventContext::dispatch("CameraMoveUp");
-            }, true),
-            ShortcutDTO("Move Down", ImGuiKey_LeftCtrl, []() {
-                ApplicationEventContext::dispatch("CameraMoveDown");
-            }, true)
         };
     }
 
@@ -94,7 +88,18 @@ namespace Metal {
 
     void ViewportPanel::updateCamera() {
         if (ImGui::IsWindowHovered() && !ImGuizmo::IsUsing() && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-            cameraService->handleInput(isFirstMovement);
+            const float mouseX = ImGui::GetIO().MousePos.x;
+            const float mouseY = ImGui::GetIO().MousePos.y;
+
+            if (!isFirstMovement) {
+                const float deltaX = mouseX - lastMouseX;
+                const float deltaY = lastMouseY - mouseY;
+                ApplicationEventContext::dispatch("CameraRotate", std::make_shared<MouseEventPayload>(deltaX, deltaY));
+            }
+
+            lastMouseX = mouseX;
+            lastMouseY = mouseY;
+
             if (const auto &io = ImGui::GetIO(); io.MouseWheel != 0) {
                 worldRepository->camera.movementSensitivity += io.MouseWheel * 100 * engineContext->deltaTime;
                 worldRepository->camera.movementSensitivity =

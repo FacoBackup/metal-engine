@@ -7,6 +7,8 @@ layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inNormal;
 layout(location = 2) in vec2 inUV;
 layout(location = 3) in vec3 inLocalPosition;
+layout(location = 4) in vec4 inCurrPos;
+layout(location = 5) in vec4 inPrevPos;
 
 #define MATERIAL_DATA_SET 1
 #include "../MaterialData.glsl"
@@ -16,6 +18,7 @@ layout (location = 0) out vec4 gBufferAlbedoEmissive;
 layout (location = 1) out vec2 gBufferRoughnessMetallic;
 layout (location = 2) out vec2 gBufferRenderIndexDepth;
 layout (location = 3) out vec4 gBufferNormal;
+layout (location = 4) out vec2 gBufferMotionVector;
 
 
 
@@ -75,19 +78,13 @@ vec3 randomColor(int seed) {
 }
 #endif
 
-struct GridData {
-    vec3 baseColor;
-    float roughness;
-    float metallic;
-};
-
 float sharpGrid(vec3 pos, float lineWeight) {
     vec3 aaf = fwidth(pos);
     vec3 grid3 = smoothstep(0.5 - lineWeight - aaf, 0.5 - lineWeight + aaf, abs(fract(pos) - 0.5));
     return max(grid3.x, max(grid3.y, grid3.z));
 }
 
-GridData getDebugGrid(vec3 localPos) {
+vec3 getDebugGrid(vec3 localPos) {
     vec3 checkerPos = floor(localPos * 0.5);
     float checker = mod(checkerPos.x + checkerPos.y + checkerPos.z, 2.0);
 
@@ -101,13 +98,7 @@ GridData getDebugGrid(vec3 localPos) {
     vec3 finalColor = mix(base, vec3(0.4), subGrid * 0.5);
     finalColor = mix(finalColor, vec3(0.25), mainGrid);
 
-    float lineStrength = max(mainGrid, subGrid * 0.5);
-
-    GridData data;
-    data.baseColor = finalColor;
-    data.roughness = mix(1.0, 0.1, lineStrength);
-    data.metallic = mix(0.0, 1.0, lineStrength);
-    return data;
+    return finalColor;
 }
 
 void main () {
@@ -115,7 +106,7 @@ void main () {
     vec3 N = normalize(inNormal);
     mat3 TBN = computeTBN(inPosition, localUV, N, false);
 
-    MaterialData material = materialBuffer.items[push.renderIndex];
+    MaterialData material = materialBuffer.items[push.materialIndex];
 
     if (material.heightTextureId != 0){
         vec3 V = globalData.cameraWorldPosition.xyz - inPosition;
@@ -123,8 +114,8 @@ void main () {
         localUV = parallaxOcclusionMapping(localUV, inPosition, push.parallaxHeightScale, push.parallaxLayers, distanceFromCamera, TBN, material.heightTextureId);
     }
 
-    GridData grid = getDebugGrid(inLocalPosition);
-    vec3 albedo = grid.baseColor;
+    vec3 grid = getDebugGrid(inLocalPosition);
+    vec3 albedo = grid;
     if (material.albedoTextureId != 0){
         albedo = texture(textureArray[nonuniformEXT(material.albedoTextureId)], localUV).rgb;
     }
@@ -133,12 +124,12 @@ void main () {
         N = normalize(TBN * (texture(textureArray[nonuniformEXT(material.normalTextureId)], localUV).rgb * 2 - 1));
     }
 
-    float roughness = grid.roughness;
+    float roughness = 1;
     if (material.roughnessTextureId != 0){
         roughness = texture(textureArray[nonuniformEXT(material.roughnessTextureId)], localUV).r;
     }
 
-    float metallic = grid.metallic;
+    float metallic = .5;
     if (material.metallicTextureId != 0){
         metallic = texture(textureArray[nonuniformEXT(material.metallicTextureId)], localUV).r;
     }
@@ -165,9 +156,7 @@ void main () {
             albedo = vec3(material.isEmissive == 1u ? 1.0 : 0.0);
         }
     } else if (globalData.debugFlag == GRID) {
-        albedo = grid.baseColor;
-        roughness = grid.roughness;
-        metallic = grid.metallic;
+        albedo = grid;
     }
     #endif
 
@@ -182,4 +171,8 @@ void main () {
     gBufferRoughnessMetallic = vec2(roughness, metallic);
     gBufferRenderIndexDepth = vec2(float(push.renderIndex + 1), gl_FragCoord.z);
     gBufferNormal = vec4(N, 1.0);
+
+    vec2 curr = (inCurrPos.xy / inCurrPos.w) * 0.5 + 0.5;
+    vec2 prev = (inPrevPos.xy / inPrevPos.w) * 0.5 + 0.5;
+    gBufferMotionVector = curr - prev;
 }

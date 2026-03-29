@@ -9,6 +9,8 @@ layout(location = 0) out vec3 outPosition;
 layout(location = 1) out vec3 outNormal;
 layout(location = 2) out vec2 outUV;
 layout(location = 3) out vec3 outLocalPosition;
+layout(location = 4) out vec4 outCurrPos;
+layout(location = 5) out vec4 outPrevPos;
 
 
 void main(){
@@ -17,6 +19,7 @@ void main(){
     vec4 worldPos = push.model * vec4(inPosition, 1.0);
     outPosition = worldPos.rgb;
     outLocalPosition = inPosition;
-    gl_Position =  globalData.projView * worldPos;
-
+    outCurrPos = globalData.projView * worldPos;
+    outPrevPos = globalData.previousProjView * push.previousModel * vec4(inPosition, 1.0);
+    gl_Position =  outCurrPos;
 }

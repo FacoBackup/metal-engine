@@ -12,7 +12,9 @@ namespace Metal {
 
     struct StaticGeometryPushConstant {
         glm::mat4 model;
+        glm::mat4 previousModel;
         uint32_t renderIndex;
+        uint32_t materialIndex;
         float parallaxHeightScale;
         int32_t parallaxLayers;
     };

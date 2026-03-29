@@ -57,6 +57,7 @@ namespace Metal {
 
         auxMat42 = glm::scale(auxMat42, st->scale); // Scale
 
+        st->previousModel = st->model;
         st->model = auxMat4 * auxMat42;
 
         if (worldRepository->hasComponent(st->getEntityId(), STATIC_GEOMETRY) || worldRepository->hasComponent(

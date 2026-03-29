@@ -3,6 +3,7 @@
 #include <entt/entt.hpp>
 #include "../repository/WorldRepository.h"
 #include "../dto/MetadataComponent.h"
+#include "../dto/CameraComponent.h"
 #include "../enum/ComponentType.h"
 
 #include <glm/glm.hpp>
@@ -103,6 +104,14 @@ namespace Metal {
             "name", &MetadataComponent::name
         );
 
+        lua.new_usertype<CameraComponent>("CameraComponent",
+            "fov", &CameraComponent::fov,
+            "zNear", &CameraComponent::zNear,
+            "zFar", &CameraComponent::zFar,
+            "motionBlurEnabled", &CameraComponent::motionBlurEnabled,
+            "mainCamera", &CameraComponent::mainCamera
+        );
+
         // Bindings
         lua.new_enum("ComponentType",
                      "STATIC_GEOMETRY", STATIC_GEOMETRY,
@@ -136,6 +145,12 @@ namespace Metal {
                                           },
                                           "getMetadata", [](WorldRepository& world, entt::entity entity) -> MetadataComponent* {
                                               return world.registry.try_get<MetadataComponent>(entity);
+                                          },
+                                          "getCamera", [](WorldRepository& world, entt::entity entity) -> CameraComponent* {
+                                              return world.registry.try_get<CameraComponent>(entity);
+                                          },
+                                          "updateCameraData", [](WorldRepository& world, entt::entity entity) {
+                                              world.updateCameraData(entity);
                                           }
         );
 

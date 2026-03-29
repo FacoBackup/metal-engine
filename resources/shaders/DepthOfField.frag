@@ -10,7 +10,24 @@ layout(push_constant) uniform Push {
 layout(set = 0, binding = 0, rgba32f) uniform readonly image2D sceneColor;
 layout(set = 0, binding = 1) uniform sampler2D gBufferRenderIndexDepth;
 
+// Assuming standard GlobalDataBlock for projection matrix access if needed
+layout (set = 0, binding = 2, std140) uniform GlobalDataBlock {
+    mat4 projView;
+    mat4 previousProjView;
+    mat4 invView;
+    mat4 invProj;
+    mat4 invProjView;
+} globalData;
+
 layout(location = 0) out vec4 finalColor;
+
+float linearizeDepth(float d) {
+    // d is in [0, 1] (standard Vulkan depth)
+    // We use the inverse projection matrix to get view-space depth
+    vec4 clip = vec4(texCoords.x * 2.0 - 1.0, texCoords.y * 2.0 - 1.0, d, 1.0);
+    vec4 view = globalData.invProj * clip;
+    return abs(view.z / view.w);
+}
 
 void main() {
     ivec2 size = imageSize(sceneColor);
@@ -22,21 +39,26 @@ void main() {
         return;
     }
 
-    float depth = texture(gBufferRenderIndexDepth, texCoords).y;
+    float rawDepth = texture(gBufferRenderIndexDepth, texCoords).y;
+    if (rawDepth == 0.0) {
+        finalColor = color;
+        return;
+    }
 
+    float d = linearizeDepth(rawDepth);
+    
     // Circle of Confusion (CoC) calculation
-    // CoC = |A * (f * (D - d)) / (D * (d - f))|
-    // where A is aperture, f is focal length, D is focus distance, d is depth
-
+    // CoC = |A * (f * (D - d)) / (d * (D - f))|
+    // A: aperture, f: focal length, D: focus distance, d: linear depth
+    
     float f = dof.focalLength;
     float D = dof.focusDistance;
-    float d = depth;
     float A = dof.aperture;
 
-    float coc = abs(A * (f * (D - d)) / (D * (d - f)));
-    coc = clamp(coc, 0.0, 0.05); // Limit max blur
+    float coc = abs(A * (f * (D - d)) / (d * (D - f)));
+    coc = clamp(coc, 0.0, 0.02); // Limit max blur
 
-    if (coc < 0.0001) {
+    if (coc < 0.001) {
         finalColor = color;
         return;
     }
@@ -52,7 +74,9 @@ void main() {
             ivec2 sampleCoords = ivec2((texCoords + offset) * vec2(size));
             sampleCoords = clamp(sampleCoords, ivec2(0), size - ivec2(1));
 
-            float weight = exp(-(float(i*i + j*j)) / (2.0 * float(samples * samples)));
+            float distSq = float(i*i + j*j);
+            float weight = exp(-distSq / (2.0 * float(samples * samples)));
+            
             blurColor += imageLoad(sceneColor, sampleCoords).rgb * weight;
             totalWeight += weight;
         }

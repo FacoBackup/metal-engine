@@ -22,7 +22,10 @@
 
 namespace Metal {
     void TLASService::onInitialize() {
-        dirtyStateService->markDirty(DirtyType::BVH);
+        eventListener([this](const Event&) {
+            dirtyStateService->markDirty(DirtyType::BVH);
+        }, "BVH");
+        ApplicationEventContext::dispatch("BVH");
     }
 
     void TLASService::onSync() {

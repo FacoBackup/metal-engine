@@ -18,7 +18,8 @@
     X(BOX_COLLIDER, "Box Collider", "box_collider", Icons::check_box_outline_blank, {TRANSFORM}, BoxColliderComponent) \
     X(SPHERE_COLLIDER, "Sphere Collider", "sphere_collider", Icons::panorama_fish_eye, {TRANSFORM}, SphereColliderComponent) \
     X(CAPSULE_COLLIDER, "Capsule Collider", "capsule_collider", Icons::reorder, {TRANSFORM}, CapsuleColliderComponent) \
-    X(MESH_COLLIDER, "Mesh Collider", "mesh_collider", Icons::filter_none, {TRANSFORM}, MeshColliderComponent)
+    X(MESH_COLLIDER, "Mesh Collider", "mesh_collider", Icons::filter_none, {TRANSFORM}, MeshColliderComponent) \
+    X(CAMERA, "Camera", "camera", Icons::camera_alt, {TRANSFORM}, CameraComponent)
 
 namespace Metal {
     class ApplicationContext;

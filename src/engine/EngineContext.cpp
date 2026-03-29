@@ -58,14 +58,15 @@ namespace Metal {
         updateCurrentTime();
         updateGlobalData();
 
+        transformService->onSync();
         streamingService->onSync();
         if (vulkanContext->isRayTracingSupported()) {
             tlasService->onSync();
         }
         materialService->onSync();
+        cameraUpdateCallback();
         cameraService->onSync();
         lightService->onSync();
-        transformService->onSync();
         for (auto *frame: registeredFrames) {
             if (frame->getShouldRender()) {
                 currentFrame = frame;
@@ -80,6 +81,7 @@ namespace Metal {
 
     void EngineContext::updateGlobalData() {
         auto &camera = worldRepository->camera;
+        globalDataUBO.previousProjView = globalDataUBO.projView;
         globalDataUBO.projView = camera.projViewMatrix;
         globalDataUBO.invProj = camera.invProjectionMatrix;
         globalDataUBO.invView = camera.invViewMatrix;
@@ -87,7 +89,7 @@ namespace Metal {
         globalDataUBO.cameraWorldPosition = camera.position;
         globalDataUBO.lightsCount = lightService->getCount();
         globalDataUBO.debugFlag = ShadingModes::IndexOfValue(editorRepository->shadingMode);
-        
+
         lightService->computeSunInfo();
         globalDataUBO.sunPosition = lightService->getSunPosition();
 
@@ -95,7 +97,8 @@ namespace Metal {
         globalDataUBO.pathTracerAccumulationCount = engineRepository->pathTracerAccumulationCount;
         globalDataUBO.globalFrameCount++;
         globalDataUBO.pathTracerMaxSamples = engineRepository->pathTracerMaxSamples;
-        globalDataUBO.denoiserEnabled = engineRepository->denoiserEnabled && (globalDataUBO.debugFlag == LIT || globalDataUBO.debugFlag == GRID);
+        globalDataUBO.denoiserEnabled = engineRepository->denoiserEnabled && (
+                                            globalDataUBO.debugFlag == LIT || globalDataUBO.debugFlag == GRID);
         globalDataUBO.isOrthographic = camera.isOrthographic;
 
         currentFrame->getResourceAs<BufferInstance>(RID_GLOBAL_DATA)->update(&globalDataUBO);

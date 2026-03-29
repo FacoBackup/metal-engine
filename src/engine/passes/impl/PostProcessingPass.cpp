@@ -17,7 +17,7 @@ namespace Metal {
                     "PostProcessing.frag"
                 )
                 .setPushConstantsSize(sizeof(PostProcessingPushConstant))
-                .addRenderTargetBinding(getScopedResourceId(RID_DOF_RT), 0);
+                .addRenderTargetBinding(getScopedResourceId(RID_MOTION_BLUR_RT), 0);
         pipelineInstance = pipelineService->createPipeline(ppPipelineBuilder);
     }
 

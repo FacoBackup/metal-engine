@@ -1,6 +1,7 @@
 #ifndef METAL_ENGINE_ENGINECONTEXT_H
 #define METAL_ENGINE_ENGINECONTEXT_H
 
+#include <functional>
 #include <chrono>
 #include <memory>
 #include <thread>
@@ -93,6 +94,12 @@ namespace Metal {
 
         std::vector<EngineFrame *> registeredFrames;
         EngineFrame *currentFrame = nullptr;
+
+        std::function<void()> cameraUpdateCallback;
+
+        void setCameraUpdateCallback(std::function<void()> callback) {
+            cameraUpdateCallback = std::move(callback);
+        }
 
         void updateGlobalData();
 

@@ -48,12 +48,12 @@ namespace Metal {
             ApplicationEventContext::dispatch("Camera");
         }
 
-        ImGui::SetCursorPos(ImVec2(viewportSize.x - GIZMO_SIZE / 2.0f - 25, GIZMO_SIZE + headerOffset + 15));
-        const std::string icon = camera.isOrthographic ? Icons::videocam_off : Icons::videocam;
-        if (UIUtil::ButtonSimple(icon + id + "projectionMode", 30, 30)) {
-            camera.isOrthographic = !camera.isOrthographic;
-            ApplicationEventContext::dispatch("Camera");
-        }
-        UIUtil::RenderTooltip(camera.isOrthographic ? "Switch to Perspective" : "Switch to Orthographic");
+        // ImGui::SetCursorPos(ImVec2(viewportSize.x - GIZMO_SIZE / 2.0f - 25, GIZMO_SIZE + headerOffset + 15));
+        // const std::string icon = camera.isOrthographic ? Icons::videocam_off : Icons::videocam;
+        // if (UIUtil::ButtonSimple(icon + id + "projectionMode", 30, 30)) {
+        //     camera.isOrthographic = !camera.isOrthographic;
+        //     ApplicationEventContext::dispatch("Camera");
+        // }
+        // UIUtil::RenderTooltip(camera.isOrthographic ? "Switch to Perspective" : "Switch to Orthographic");
     }
 } // Metal

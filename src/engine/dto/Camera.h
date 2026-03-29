@@ -9,13 +9,24 @@
 #include "../../common/Reflection.h"
 namespace Metal {
     struct Camera final : Reflection {
+        float fov = 90;
+        float zNear = .1f;
+        float zFar = 10000;
+
         float rotationSensitivity = 1;
         float movementSensitivity = 1.0f;
         float zoomSensitivity = 1.0f;
+
         bool motionBlurEnabled = false;
         float motionBlurVelocityScale = 1.f;
         int motionBlurMaxSamples = 50;
         bool cameraMotionBlur = false;
+
+        bool dofEnabled = false;
+        float dofFocusDistance = 10;
+        float dofAperture = 1.2f;
+        float dofFocalLength = 5;
+
         bool bloomEnabled = false;
         bool filmGrain = false;
         bool vignetteEnabled = false;
@@ -39,9 +50,6 @@ namespace Metal {
         glm::vec3 position{};
 
         bool isOrthographic = false;
-        float zFar = 10000;
-        float zNear = .1f;
-        float fov = 90;
         float aspectRatio = 1;
         float orthographicProjectionSize = 50;
 

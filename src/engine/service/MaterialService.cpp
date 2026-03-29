@@ -266,7 +266,7 @@ namespace Metal {
                std::to_string(worldRepository->hasComponent(component.getEntityId(), LIGHT));
     }
 
-    uint32_t MaterialService::getMaterialIndex(const StaticGeometryComponent &component) {
+    uint32_t MaterialService::getMaterialIndex(StaticGeometryComponent &component) {
         std::string key = getMaterialKey(component);
         if (materialCache.contains(key)) {
             return materialCache[key];
@@ -276,11 +276,26 @@ namespace Metal {
         materialData.emplace_back();
         load(materialData.back(), component);
         materialCache[key] = index;
+        component.materialIndex = index;
+        return index;
+    }
+
+    uint32_t MaterialService::getMaterialIndex(InstancedGeometryComponent &component) {
+        std::string key = getMaterialKey(component);
+        if (materialCache.contains(key)) {
+            return materialCache[key];
+        }
+
+        uint32_t index = static_cast<uint32_t>(materialData.size());
+        materialData.emplace_back();
+        load(materialData.back(), component);
+        materialCache[key] = index;
+        component.materialIndex = index;
 
         return index;
     }
 
-    uint32_t MaterialService::getMaterialIndex(const InstancedGeometryComponent &component) {
+    uint32_t MaterialService::getMaterialIndex(AnimatedGeometryComponent &component) {
         std::string key = getMaterialKey(component);
         if (materialCache.contains(key)) {
             return materialCache[key];
@@ -290,20 +305,7 @@ namespace Metal {
         materialData.emplace_back();
         load(materialData.back(), component);
         materialCache[key] = index;
-
-        return index;
-    }
-
-    uint32_t MaterialService::getMaterialIndex(const AnimatedGeometryComponent &component) {
-        std::string key = getMaterialKey(component);
-        if (materialCache.contains(key)) {
-            return materialCache[key];
-        }
-
-        uint32_t index = static_cast<uint32_t>(materialData.size());
-        materialData.emplace_back();
-        load(materialData.back(), component);
-        materialCache[key] = index;
+        component.materialIndex = index;
 
         return index;
     }

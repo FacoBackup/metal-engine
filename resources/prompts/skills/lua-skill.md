@@ -33,7 +33,7 @@ return MyScript
 #### Global Bindings
 - `world`: The `WorldRepository` instance.
 - `deltaTime`: The time elapsed since the last frame (seconds).
-- `ComponentType`: Enum for component IDs (e.g., `ComponentType.TRANSFORM`, `ComponentType.SCRIPT`).
+- `ComponentType`: Enum for component IDs (e.g., `ComponentType.TRANSFORM`, `ComponentType.SCRIPT`, `ComponentType.CAMERA`).
 
 #### WorldRepository API
 - `world:createEntity()`: Creates and returns a new `entt::entity`.
@@ -42,6 +42,14 @@ return MyScript
 - `world:getTransform(entity)`: Returns the `TransformComponent` for the entity.
 - `world:getMetadata(entity)`: Returns the `MetadataComponent` (name, tags).
 - `world:getScript(entity)`: Returns the `ScriptComponent`.
+- `world:getCamera(entity)`: Returns the `CameraComponent` for the entity.
+- `world:updateCameraData(entity)`: Synchronizes the specified entity's camera data to the engine's active camera.
+
+#### Component Types
+- `TransformComponent`: `translation` (vec3), `rotation` (quat), `scale` (vec3), `isStatic` (bool).
+- `MetadataComponent`: `name` (string).
+- `ScriptComponent`: `scriptPath` (string).
+- `CameraComponent`: `fov` (float), `zNear` (float), `zFar` (float), `motionBlurEnabled` (bool), `mainCamera` (bool).
 
 #### Math Library (GLM)
 - `vec3(x, y, z)`, `quat(w, x, y, z)`, `mat4(1.0)`

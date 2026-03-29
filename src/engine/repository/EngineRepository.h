@@ -9,10 +9,6 @@ namespace Metal {
         bool vsync = true;
 
         bool denoiserEnabled = false;
-        bool dofEnabled = false;
-        float dofFocusDistance = 10;
-        float dofAperture = 1.2f;
-        float dofFocalLength = 5;
 
         int shadingResInvScale = 2;
         int pathTracerMaxSamples = 200;
@@ -23,6 +19,7 @@ namespace Metal {
         float pathTracerMultiplier = 1;
         float elapsedTime = .5f;
         bool atmosphereEnabled = false;
+        bool restirEnabled = true;
 
         glm::vec3 gravity{0, -9.81f, 0};
 

@@ -8,6 +8,8 @@ layout(push_constant) uniform PushConstants {
     uint pathTracerSamples;
     uint pathTracerBounces;
     float pathTracingEmissiveFactor;
+    uint restirFrameIndex;
+    uint restirEnabled;
 } pushConstants;
 
 #endif

@@ -9,6 +9,9 @@
 #include "../../core/DirectoryService.h"
 #include "common/FileExtensions.h"
 #include "editor/dto/FieldModificationEvent.h"
+#include "engine/dto/CameraComponent.h"
+#include "engine/dto/TransformComponent.h"
+#include "engine/EngineContext.h"
 
 namespace Metal {
     entt::entity WorldRepository::createEntity() {
@@ -27,12 +30,12 @@ namespace Metal {
                         registry.destroy(entity);
                         if (hiddenEntities.contains(entity)) hiddenEntities.erase(entity);
                         if (culled.contains(entity)) culled.erase(entity);
-                        if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
+                        ApplicationEventContext::dispatch("BVH");
                     }
                 },
                 [this, createdState]() {
                     deserializeEntityComplete(*createdState);
-                    if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
+                    ApplicationEventContext::dispatch("BVH");
                 }
             );
         }
@@ -77,7 +80,7 @@ namespace Metal {
                     for (const EntityState &state: deletedStates) {
                         deserializeEntityComplete(state);
                     }
-                    if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
+                    ApplicationEventContext::dispatch("BVH");
                 },
                 [this, entities]() {
                     // Redo: Delete entities
@@ -88,7 +91,7 @@ namespace Metal {
                             registry.destroy(entityId);
                         }
                     }
-                    if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
+                    ApplicationEventContext::dispatch("BVH");
                 }
             );
         }
@@ -105,7 +108,7 @@ namespace Metal {
 
             registry.destroy(entityId);
         }
-        if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
+        ApplicationEventContext::dispatch("BVH");
     }
 
     void WorldRepository::changeVisibility(entt::entity entity, bool isVisible) {
@@ -128,7 +131,7 @@ namespace Metal {
         } else {
             hiddenEntities.insert({entity, true});
         }
-        if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
+        ApplicationEventContext::dispatch("BVH");
     }
 
     void WorldRepository::clear() {
@@ -294,5 +297,48 @@ namespace Metal {
                 }
             }
         }
+    }
+
+    void WorldRepository::updateCameraData(entt::entity entity) {
+        if (entity == entt::null) return;
+        auto *component = registry.try_get<CameraComponent>(entity);
+        auto *transform = registry.try_get<TransformComponent>(entity);
+        if (!component || !transform) return;
+
+        camera.fov = component->fov;
+        camera.zNear = component->zNear;
+        camera.zFar = component->zFar;
+        camera.rotationSensitivity = component->rotationSensitivity;
+        camera.movementSensitivity = component->movementSensitivity;
+        camera.zoomSensitivity = component->zoomSensitivity;
+        camera.motionBlurEnabled = component->motionBlurEnabled;
+        camera.motionBlurVelocityScale = component->motionBlurVelocityScale;
+        camera.motionBlurMaxSamples = component->motionBlurMaxSamples;
+        camera.cameraMotionBlur = component->cameraMotionBlur;
+        camera.dofEnabled = component->dofEnabled;
+        camera.dofFocusDistance = component->dofFocusDistance;
+        camera.dofAperture = component->dofAperture;
+        camera.dofFocalLength = component->dofFocalLength;
+        camera.bloomEnabled = component->bloomEnabled;
+        camera.filmGrain = component->filmGrain;
+        camera.vignetteEnabled = component->vignetteEnabled;
+        camera.chromaticAberrationEnabled = component->chromaticAberrationEnabled;
+        camera.distortionEnabled = component->distortionEnabled;
+        camera.filmGrainStrength = component->filmGrainStrength;
+        camera.vignetteStrength = component->vignetteStrength;
+        camera.bloomThreshold = component->bloomThreshold;
+        camera.bloomQuality = component->bloomQuality;
+        camera.bloomOffset = component->bloomOffset;
+        camera.chromaticAberrationIntensity = component->chromaticAberrationIntensity;
+        camera.distortionIntensity = component->distortionIntensity;
+        camera.isOrthographic = component->isOrthographic;
+        camera.aspectRatio = component->aspectRatio;
+        camera.orthographicProjectionSize = component->orthographicProjectionSize;
+
+        camera.position = transform->translation;
+        camera.yaw = component->yaw;
+        camera.pitch = component->pitch;
+
+        ApplicationEventContext::dispatch("Camera");
     }
 } // Metal

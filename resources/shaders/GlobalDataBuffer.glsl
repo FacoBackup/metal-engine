@@ -2,6 +2,7 @@
 #define GLOBAL_DATA_V
 layout (set = 0, binding = 0, std140) uniform GlobalDataBlock {
     mat4 projView;
+    mat4 previousProjView;
     mat4 invView;
     mat4 invProj;
     mat4 invProjView;

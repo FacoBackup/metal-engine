@@ -11,6 +11,7 @@ namespace Metal {
     inline constexpr int RID_GBUFFER_ROUGHNESS_METALLIC = 1;
     inline constexpr int RID_GBUFFER_RENDER_INDEX_DEPTH = 2;
     inline constexpr int RID_GBUFFER_NORMAL = 3;
+    inline constexpr int RID_GBUFFER_MOTION_VECTOR = 4;
 
     inline constexpr const char *RID_ACCUMULATED_FRAME = "accumulatedFrame";
     inline constexpr const char *RID_POST_PROCESSING_RT = "postProcessingRT";
@@ -22,6 +23,14 @@ namespace Metal {
     inline constexpr const char *RID_GBUFFER_RT = "gBufferRT";
     inline constexpr const char *RID_DOF_RT = "dofRT";
     inline constexpr const char *RID_DOF_CB = "dofCB";
+    inline constexpr const char *RID_MOTION_BLUR_RT = "motionBlurRT";
+    inline constexpr const char *RID_MOTION_BLUR_CB = "motionBlurCB";
+
+    inline constexpr const char *RID_MOTION_VECTORS_RT = "motionVectorsRT";
+    inline constexpr const char *RID_MOTION_VECTORS_CB = "motionVectorsCB";
+
+    inline constexpr const char *RID_RESTIR_RESERVOIR_0 = "restirReservoir0";
+    inline constexpr const char *RID_RESTIR_RESERVOIR_1 = "restirReservoir1";
 }
 
 #endif //ENGINE_RESOURCE_IDS_H

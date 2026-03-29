@@ -14,6 +14,8 @@
 #include <common/ILoader.h>
 
 namespace Metal {
+    struct TransformComponent;
+    struct CameraComponent;
     struct MetadataComponent;
     class Reflection;
     class DirectoryService;
@@ -66,6 +68,7 @@ namespace Metal {
         bool isCompatible(const std::string &absolutePath) override;
 
         void deserializeEntityComplete(const EntityState &state);
+        void updateCameraData(entt::entity entity);
     };
 } // Metal
 

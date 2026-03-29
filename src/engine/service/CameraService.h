@@ -34,13 +34,6 @@ namespace Metal {
         glm::vec3 yAxis{0.0f};
         glm::vec3 zAxis{0.0f};
 
-        bool forwardPressed = false;
-        bool backwardPressed = false;
-        bool leftPressed = false;
-        bool rightPressed = false;
-        bool upPressed = false;
-        bool downPressed = false;
-
         void updateMatrices();
 
         void updateView();
@@ -49,17 +42,9 @@ namespace Metal {
 
         void updateAspectRatio() const;
 
-        void handleInputInternal() const;
-
-        void handleMouse(bool isFirstMovement) const;
-
-        void updateDelta(bool isFirstMovement) const;
-
         void createViewMatrix();
 
     public:
-        void handleInput(bool isFirstMovement) const;
-
         std::vector<Dependency> getDependencies() override {
             return {
                 {"EngineContext", &engineContext},

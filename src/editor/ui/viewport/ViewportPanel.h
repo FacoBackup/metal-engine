@@ -14,6 +14,8 @@ namespace Metal {
 
     class ViewportPanel final : public AbstractDockPanel {
         bool isFirstMovement = false;
+        float lastMouseX = 0;
+        float lastMouseY = 0;
         std::shared_ptr<AbstractPanel> headerPanel = nullptr;
         std::shared_ptr<AbstractPanel> gizmoPanel = nullptr;
         std::shared_ptr<AbstractPanel> cameraGizmoPanel = nullptr;

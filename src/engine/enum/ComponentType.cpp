@@ -16,6 +16,7 @@
 #include "../dto/SphereColliderComponent.h"
 #include "../dto/CapsuleColliderComponent.h"
 #include "../dto/MeshColliderComponent.h"
+#include "../dto/CameraComponent.h"
 
 
 #define DEFINE_COMPONENT(TYPE, NAME, JSON_KEY, ICON, DEPS, CLASS) \

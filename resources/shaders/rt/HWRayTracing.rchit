@@ -10,7 +10,7 @@ layout (location = 0) rayPayloadInEXT RayPayload payload;
 hitAttributeEXT vec2 attribs; // Barycentric coordinates for the hit
 
 #include "../MaterialData.glsl"
-#include "../MeshData.glsl"
+#include "../PrimitiveData.glsl"
 #include "../MeshDataSampling.glsl"
 
 void main() {

@@ -76,11 +76,11 @@ namespace Metal {
 
         void clear();
 
-        uint32_t getMaterialIndex(const StaticGeometryComponent &component);
+        uint32_t getMaterialIndex(StaticGeometryComponent &component);
 
-        uint32_t getMaterialIndex(const InstancedGeometryComponent &component);
+        uint32_t getMaterialIndex(InstancedGeometryComponent &component);
 
-        uint32_t getMaterialIndex(const AnimatedGeometryComponent &component);
+        uint32_t getMaterialIndex(AnimatedGeometryComponent &component);
     };
 } // Metal
 

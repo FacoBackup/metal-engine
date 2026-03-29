@@ -10,6 +10,10 @@ layout (set = 0, binding = 3, rgba16f) uniform readonly image2D gBufferAlbedoEmi
 layout (set = 0, binding = 4, rg16f) uniform readonly image2D gBufferRoughnessMetallic;
 layout (set = 0, binding = 5, rg32f) uniform readonly image2D gBufferRenderIndexDepth;
 layout (set = 0, binding = 6, rgba16f) uniform readonly image2D gBufferNormal;
+#include "../rt/Reservoir.glsl"
+
+layout (set = 0, binding = 11) buffer Reservoirs0 { PackedReservoir items[]; } reservoirs0;
+layout (set = 0, binding = 12) buffer Reservoirs1 { PackedReservoir items[]; } reservoirs1;
 
 #include "../util/HWRayTracingUtil.glsl"
 
@@ -21,7 +25,7 @@ layout (location = 0) rayPayloadEXT RayPayload payload;
 #define MATERIAL_DATA_SET 8
 #define PRIMITIVE_DATA_SET 9
 #include "../MaterialData.glsl"
-#include "../MeshData.glsl"
+#include "../PrimitiveData.glsl"
 
 #include "../MeshDataSampling.glsl"
 
@@ -70,7 +74,7 @@ void main() {
             material.baseColor = albedoEmissive.rgb;
             material.roughness = max(roughness, 0.015);
             material.metallic = metallic;
-            material.isEmissive = false;
+            material.isEmissive = albedoEmissive.a > 0.5;
             // Initialize other material properties
             material.subsurface = 0.0;
             material.specular = 0.0;

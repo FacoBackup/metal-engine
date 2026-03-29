@@ -51,6 +51,8 @@ set(EDITOR_SOURCES
         service/ThemeService.cpp
         service/ThemeService.h
         repository/EditorRepository.h
+        repository/EditorCameraRepository.h
+        repository/EditorCameraRepository.cpp
         repository/DockRepository.h
         repository/DockRepository.cpp
         repository/AIAssistantRepository.h
@@ -112,6 +114,8 @@ set(EDITOR_SOURCES
         service/FilesService.h
         service/FileImporterService.cpp
         service/FileImporterService.h
+        service/EditorCameraService.cpp
+        service/EditorCameraService.h
         passes/GridPass.cpp
         passes/GridPass.h
         enum/ShadingMode.h
@@ -150,6 +154,8 @@ set(EDITOR_SOURCES
         enum/NotificationSeverity.h
         passes/SelectionOutlinePass.cpp
         passes/SelectionOutlinePass.h
+        passes/CameraVisualizationPass.cpp
+        passes/CameraVisualizationPass.h
         service/PickingService.cpp
         service/PickingService.h
         passes/SelectionIDPass.cpp

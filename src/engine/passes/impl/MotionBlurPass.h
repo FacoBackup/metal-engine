@@ -1,16 +1,16 @@
-#ifndef DEPTHOFFIELDPASS_H
-#define DEPTHOFFIELDPASS_H
+#ifndef MOTIONBLURPASS_H
+#define MOTIONBLURPASS_H
 
 #include "../AbstractRenderPass.h"
-#include "../../dto/DepthOfFieldPushConstant.h"
+#include "../../dto/MotionBlurPushConstant.h"
 
 namespace Metal {
     class VulkanContext;
     class PipelineService;
     struct WorldRepository;
 
-    class DepthOfFieldPass final : public AbstractRenderPass {
-        DepthOfFieldPushConstant pushConstant{};
+    class MotionBlurPass final : public AbstractRenderPass {
+        MotionBlurPushConstant pushConstant{};
 
         VulkanContext *vulkanContext = nullptr;
         PipelineService *pipelineService = nullptr;
@@ -31,4 +31,4 @@ namespace Metal {
     };
 }
 
-#endif //DEPTHOFFIELDPASS_H
+#endif //MOTIONBLURPASS_H

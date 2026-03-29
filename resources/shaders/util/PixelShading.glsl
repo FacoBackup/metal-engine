@@ -80,8 +80,8 @@ vec3 tracePath(vec3 rayDirection, MaterialInfo material, SurfaceInteraction inte
         pathInfo.interaction.incomingRayDir = wi;
 
         if (pathInfo.material.isEmissive) {
-//            pathInfo.radiance += pathInfo.throughput * pathInfo.material.baseColor * pushConstants.pathTracingEmissiveFactor;
-            break; // Stop at emissive for now, or continue if you want multiple emissive hits
+            pathInfo.radiance += pathInfo.throughput * pathInfo.material.baseColor * pushConstants.pathTracingEmissiveFactor;
+            break; // Stop at emissive
         }
     }
     return pathInfo.radiance;

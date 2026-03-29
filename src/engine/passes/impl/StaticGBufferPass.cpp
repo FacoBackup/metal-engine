@@ -44,7 +44,9 @@ namespace Metal {
                 }
 
                 pushConstant.model = transform.model;
+                pushConstant.previousModel = transform.previousModel;
                 pushConstant.renderIndex = mesh.renderIndex;
+                pushConstant.materialIndex = mesh.materialIndex;
                 pushConstant.parallaxHeightScale = mesh.parallaxScale;
                 pushConstant.parallaxLayers = 32;
 

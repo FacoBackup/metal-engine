@@ -54,6 +54,8 @@ namespace Metal {
         bool isPlaying = false;
         std::string gptMcpKey{};
         std::string geminiMcpKey{};
+        bool isGizmoOver = false;
+        bool isGizmoUsing = false;
 
         bool enableSnapshots = true;
         float snapshotInterval = 5.f; // in minutes

@@ -14,6 +14,9 @@ namespace Metal {
     class DescriptorSetService;
     class PickingService;
     class SelectionService;
+    struct WorldRepository;
+    struct EditorCameraRepository;
+    class EditorCameraService;
 
     class EngineFramePanel final : public AbstractPanel {
         VulkanContext *vulkanContext = nullptr;
@@ -23,6 +26,9 @@ namespace Metal {
         DescriptorSetService *descriptorSetService = nullptr;
         PickingService *pickingService = nullptr;
         SelectionService *selectionService = nullptr;
+        WorldRepository *worldRepository = nullptr;
+        EditorCameraRepository *editorCameraRepository = nullptr;
+        EditorCameraService *editorCameraService = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
@@ -33,7 +39,10 @@ namespace Metal {
                 {"EngineContext", &engineContext},
                 {"DescriptorSetService", &descriptorSetService},
                 {"PickingService", &pickingService},
-                {"SelectionService", &selectionService}
+                {"SelectionService", &selectionService},
+                {"WorldRepository", &worldRepository},
+                {"EditorCameraRepository", &editorCameraRepository},
+                {"EditorCameraService", &editorCameraService}
             };
         }
 

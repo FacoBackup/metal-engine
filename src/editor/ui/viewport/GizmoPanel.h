@@ -22,13 +22,12 @@ namespace Metal {
     class GizmoTransformStrategy;
 
     class GizmoPanel final : public AbstractPanel {
-        GizmoTransformStrategy *gizmoStrategy = nullptr;
 
         glm::vec2 *size = nullptr;
         ImVec2 *position = nullptr;
         TransformComponent *localSelected = nullptr;
-        bool isGizmoOver = false;
 
+        GizmoTransformStrategy *gizmoStrategy = nullptr;
         EditorRepository *editorRepository = nullptr;
         WorldRepository *worldRepository = nullptr;
         SelectionService *selectionService = nullptr;
@@ -40,14 +39,12 @@ namespace Metal {
                 {"EditorRepository", &editorRepository},
                 {"WorldRepository", &worldRepository},
                 {"SelectionService", &selectionService},
-                {"HistoryService", &historyService}
+                {"HistoryService", &historyService},
+                {"GizmoTransformStrategy", &gizmoStrategy}
             };
         }
 
         explicit GizmoPanel(ImVec2 *position, glm::vec2 *size);
-        ~GizmoPanel() override;
-
-        void onInitialize() override;
 
         void onSync() override;
     };
