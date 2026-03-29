@@ -9,7 +9,7 @@
 #include "engine/repository/EngineRepository.h"
 #include "editor/enum/EngineResourceIDs.h"
 #include "ApplicationEventContext.h"
-#include "engine/resource/FrameBufferInstance.h"
+#include "engine/resource/RenderTargetInstance.h"
 
 namespace Metal {
     void HWRayTracingPass::onInitialize() {
@@ -26,10 +26,10 @@ namespace Metal {
                 .addAccelerationStructureBinding(VK_NULL_HANDLE)
                 .addStorageImageBinding(getScopedResourceId(RID_ACCUMULATED_FRAME))
 
-                .addStorageFboBinding(getScopedResourceId(RID_GBUFFER_FBO), RID_GBUFFER_ALBEDO_EMISSIVE)
-                .addStorageFboBinding(getScopedResourceId(RID_GBUFFER_FBO), RID_GBUFFER_ROUGHNESS_METALLIC)
-                .addStorageFboBinding(getScopedResourceId(RID_GBUFFER_FBO), RID_GBUFFER_RENDER_INDEX_DEPTH)
-                .addStorageFboBinding(getScopedResourceId(RID_GBUFFER_FBO), RID_GBUFFER_NORMAL)
+                .addStorageRenderTargetBinding(getScopedResourceId(RID_GBUFFER_RT), RID_GBUFFER_ALBEDO_EMISSIVE)
+                .addStorageRenderTargetBinding(getScopedResourceId(RID_GBUFFER_RT), RID_GBUFFER_ROUGHNESS_METALLIC)
+                .addStorageRenderTargetBinding(getScopedResourceId(RID_GBUFFER_RT), RID_GBUFFER_RENDER_INDEX_DEPTH)
+                .addStorageRenderTargetBinding(getScopedResourceId(RID_GBUFFER_RT), RID_GBUFFER_NORMAL)
 
                 .addBufferBinding(getScopedResourceId(RID_LIGHT_BUFFER))
                 .addBufferBinding(getScopedResourceId(RID_MATERIAL_DATA_BUFFER))
@@ -41,7 +41,7 @@ namespace Metal {
 
     void HWRayTracingPass::onSync() {
         auto *accumulatedFrame = frame->getResourceAs<TextureInstance>(RID_ACCUMULATED_FRAME);
-        auto *gBuffer = frame->getResourceAs<FrameBufferInstance>(RID_GBUFFER_FBO);
+        auto *gBuffer = frame->getResourceAs<RenderTargetInstance>(RID_GBUFFER_RT);
 
         if (isFirstRun || engineContext->isCameraUpdated() || needsUpdate) {
             clearTexture(accumulatedFrame->vkImage);

@@ -12,8 +12,8 @@ namespace Metal {
         COMBINED_IMAGE_SAMPLER,
         STORAGE_IMAGE,
         ACCELERATION_STRUCTURE,
-        FBO_ATTACHMENT,
-        STORAGE_FBO_ATTACHMENT
+        RENDERTARGET_ATTACHMENT,
+        STORAGE_RENDERTARGET_ATTACHMENT
     };
 
     struct DescriptorBinding {
@@ -27,7 +27,7 @@ namespace Metal {
         VkImageView view = VK_NULL_HANDLE;
         VkImageLayout layout = VK_IMAGE_LAYOUT_GENERAL;
         VkAccelerationStructureKHR accelerationStructure = VK_NULL_HANDLE;
-        std::string frameBufferId = "";
+        std::string renderTargetId = "";
         int attachmentIndex = -1;
 
         DescriptorBinding() = default;

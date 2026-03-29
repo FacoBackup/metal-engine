@@ -14,7 +14,7 @@ namespace Metal {
     class EngineContext;
     class AbstractPass;
     class CommandBufferRecorder;
-    struct FrameBufferInstance;
+    struct RenderTargetInstance;
     struct DescriptorBinding;
     class ResourceBuilder;
     class VulkanContext;
@@ -58,22 +58,22 @@ namespace Metal {
         explicit EngineFrameBuilder(std::string frameId = Util::uuidV4());
 
         /**
-         * @brief Adds a new framebuffer resource to the frame.
+         * @brief Adds a new rendertarget resource to the frame.
          */
-        EngineFrameBuilder &addFramebuffer(std::string id, unsigned w, unsigned h, glm::vec4 clearColor);
+        EngineFrameBuilder &addRenderTarget(std::string id, unsigned w, unsigned h, glm::vec4 clearColor);
 
         /**
-         * @brief References an existing framebuffer by ID.
+         * @brief References an existing rendertarget by ID.
          */
-        EngineFrameBuilder &addFramebuffer(const std::string &id);
+        EngineFrameBuilder &addRenderTarget(const std::string &id);
 
         /**
-         * @brief Adds a color attachment to the current framebuffer being built.
+         * @brief Adds a color attachment to the current rendertarget being built.
          */
         EngineFrameBuilder &addColor(VkFormat format, VkImageUsageFlags usage);
 
         /**
-         * @brief Adds a depth attachment to the current framebuffer being built.
+         * @brief Adds a depth attachment to the current rendertarget being built.
          */
         EngineFrameBuilder &addDepth();
 
@@ -100,9 +100,9 @@ namespace Metal {
         EngineFrameBuilder &addBuffer(const std::string &id);
 
         /**
-         * @brief Adds a graphics command buffer associated with a framebuffer.
+         * @brief Adds a graphics command buffer associated with a rendertarget.
          */
-        EngineFrameBuilder &addCommandBuffer(const std::string &id, const std::string &framebufferId,
+        EngineFrameBuilder &addCommandBuffer(const std::string &id, const std::string &renderTargetId,
                                              bool clearBuffer = true);
 
         /**

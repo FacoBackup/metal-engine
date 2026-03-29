@@ -8,10 +8,10 @@
 #include "engine/repository/WorldRepository.h"
 #include "engine/dto/StaticGeometryComponent.h"
 #include "engine/dto/TransformComponent.h"
-#include "engine/resource/FrameBufferInstance.h"
+#include "engine/resource/RenderTargetInstance.h"
 
 namespace Metal {
-    std::optional<entt::entity> PickingService::pickEntityFromGBuffer(std::shared_ptr<FrameBufferAttachment> &attachment, const uint32_t pixelX,
+    std::optional<entt::entity> PickingService::pickEntityFromGBuffer(std::shared_ptr<RenderTargetAttachment> &attachment, const uint32_t pixelX,
                                                                   const uint32_t pixelY) const {
 
         constexpr VkDeviceSize imageSize = 2 * sizeof(float);

@@ -1,11 +1,11 @@
-#ifndef FRAMEBUFFERATTACHMENT_H
-#define FRAMEBUFFERATTACHMENT_H
+#ifndef RENDERTARGETATTACHMENT_H
+#define RENDERTARGETATTACHMENT_H
 #include "../dto/DescriptorInstance.h"
 
 namespace Metal {
     class DescriptorSetService;
 
-    struct FrameBufferAttachment final : IContextMember {
+    struct RenderTargetAttachment final : IContextMember {
         VkImage vkImage = VK_NULL_HANDLE;
         VkDeviceMemory vkImageMemory = VK_NULL_HANDLE;
         VkImageView vkImageView = VK_NULL_HANDLE;

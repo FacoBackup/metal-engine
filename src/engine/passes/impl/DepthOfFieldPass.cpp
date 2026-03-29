@@ -10,13 +10,13 @@
 namespace Metal {
     void DepthOfFieldPass::onInitialize() {
         PipelineBuilder builder = PipelineBuilder::Of(
-                    getScopedResourceId(RID_POST_PROCESSING_FBO),
+                    getScopedResourceId(RID_POST_PROCESSING_RT),
                     "QUAD.vert",
                     "DepthOfField.frag"
                 )
                 .setPushConstantsSize(sizeof(DepthOfFieldPushConstant))
                 .addStorageImageBinding(getScopedResourceId(RID_ACCUMULATED_FRAME))
-                .addFboBinding(getScopedResourceId(RID_GBUFFER_FBO), RID_GBUFFER_RENDER_INDEX_DEPTH);
+                .addRenderTargetBinding(getScopedResourceId(RID_GBUFFER_RT), RID_GBUFFER_RENDER_INDEX_DEPTH);
         
         pipelineInstance = pipelineService->createPipeline(builder);
     }

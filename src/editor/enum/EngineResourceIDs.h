@@ -13,14 +13,14 @@ namespace Metal {
     inline constexpr int RID_GBUFFER_NORMAL = 3;
 
     inline constexpr const char *RID_ACCUMULATED_FRAME = "accumulatedFrame";
-    inline constexpr const char *RID_POST_PROCESSING_FBO = "postProcessingFBO";
+    inline constexpr const char *RID_POST_PROCESSING_RT = "postProcessingRT";
     inline constexpr const char *RID_RT_COMPUTE_CB = "ComputeCB";
     inline constexpr const char *RID_POST_PROCESSING_CB = "PostProcessingCB";
-    inline constexpr const char *RID_SELECTION_FBO = "selectionFBO";
+    inline constexpr const char *RID_SELECTION_RT = "selectionRT";
     inline constexpr const char *RID_SELECTION_CB = "selectionCB";
     inline constexpr const char *RID_GBUFFER_CB = "gBufferCB";
-    inline constexpr const char *RID_GBUFFER_FBO = "gBufferFBO";
-    inline constexpr const char *RID_DOF_FBO = "dofFBO";
+    inline constexpr const char *RID_GBUFFER_RT = "gBufferFBO";
+    inline constexpr const char *RID_DOF_RT = "dofRT";
     inline constexpr const char *RID_DOF_CB = "dofCB";
 }
 

@@ -14,10 +14,10 @@ set(ENGINE_SOURCES_LIST
     dto/ShaderModule.h
     passes/AbstractRenderPass.cpp
     passes/AbstractRenderPass.h
-    resource/FrameBufferAttachment.h
-    service/FrameBufferService.cpp
-    service/FrameBufferService.h
-    resource/FrameBufferInstance.h
+    resource/RenderTargetAttachment.h
+    service/RenderTargetService.cpp
+    service/RenderTargetService.h
+    resource/RenderTargetInstance.h
     service/PipelineService.cpp
     service/PipelineService.h
     resource/PipelineInstance.h
@@ -76,7 +76,7 @@ set(ENGINE_SOURCES_LIST
     service/TLASService.cpp
     service/TLASService.h
     dto/PipelineBuilder.h
-    resource/FrameBufferAttachment.cpp
+    resource/RenderTargetAttachment.cpp
     repository/EngineRepository.cpp
     repository/EngineRepository.h
         dto/LightData.h
@@ -94,8 +94,8 @@ set(ENGINE_SOURCES_LIST
     frame-builder/EngineFrameBuilder.h
     frame-builder/EngineFrame.cpp
     frame-builder/EngineFrame.h
-    frame-builder/structures/FramebufferBuilder.cpp
-    frame-builder/structures/FramebufferBuilder.h
+    frame-builder/structures/RenderTargetBuilder.cpp
+    frame-builder/structures/RenderTargetBuilder.h
     frame-builder/structures/TextureBuilder.cpp
     frame-builder/structures/TextureBuilder.h
     frame-builder/structures/BufferBuilder.cpp

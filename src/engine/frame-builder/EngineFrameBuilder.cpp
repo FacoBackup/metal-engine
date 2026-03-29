@@ -1,7 +1,7 @@
 #include "EngineFrameBuilder.h"
 
 #include "../../core/VulkanContext.h"
-#include "structures/FramebufferBuilder.h"
+#include "structures/RenderTargetBuilder.h"
 #include "structures/TextureBuilder.h"
 #include "structures/BufferBuilder.h"
 #include "structures/CommandBufferRecorderBuilder.h"
@@ -14,27 +14,27 @@ namespace Metal {
     EngineFrameBuilder::EngineFrameBuilder(std::string frameId) : frameId(std::move(frameId)) {
     }
 
-    EngineFrameBuilder &EngineFrameBuilder::addFramebuffer(std::string id, const unsigned w, const unsigned h,
+    EngineFrameBuilder &EngineFrameBuilder::addRenderTarget(std::string id, const unsigned w, const unsigned h,
                                                            glm::vec4 clearColor) {
-        currentBuilder = std::make_shared<FramebufferBuilder>(frameId + "_" + id, w, h, clearColor);
+        currentBuilder = std::make_shared<RenderTargetBuilder>(frameId + "_" + id, w, h, clearColor);
         storeBuilder();
         return *this;
     }
 
-    EngineFrameBuilder &EngineFrameBuilder::addFramebuffer(const std::string &id) {
-        if (!tryMatch(frameId + "_" + id, ResourceType::FRAMEBUFFER)) {
-            throw std::runtime_error("Framebuffer not found");
+    EngineFrameBuilder &EngineFrameBuilder::addRenderTarget(const std::string &id) {
+        if (!tryMatch(frameId + "_" + id, ResourceType::RENDER_TARGET)) {
+            throw std::runtime_error("RenderTarget not found");
         }
         return *this;
     }
 
     EngineFrameBuilder &EngineFrameBuilder::addColor(VkFormat format, VkImageUsageFlags usage) {
-        dynamic_cast<FramebufferBuilder *>(currentBuilder.get())->addColor(format, usage, nullptr);
+        dynamic_cast<RenderTargetBuilder *>(currentBuilder.get())->addColor(format, usage, nullptr);
         return *this;
     }
 
     EngineFrameBuilder &EngineFrameBuilder::addDepth() {
-        dynamic_cast<FramebufferBuilder *>(currentBuilder.get())->addDepth();
+        dynamic_cast<RenderTargetBuilder *>(currentBuilder.get())->addDepth();
         return *this;
     }
 
@@ -69,10 +69,10 @@ namespace Metal {
         return *this;
     }
 
-    EngineFrameBuilder &EngineFrameBuilder::addCommandBuffer(const std::string &id, const std::string &framebufferId,
+    EngineFrameBuilder &EngineFrameBuilder::addCommandBuffer(const std::string &id, const std::string &renderTargetId,
                                                              const bool clearBuffer) {
         currentBuilder = std::make_shared<CommandBufferRecorderBuilder>(
-            frameId + "_" + id, frameId + "_" + framebufferId, clearBuffer);
+            frameId + "_" + id, frameId + "_" + renderTargetId, clearBuffer);
         storeBuilder();
         return *this;
     }

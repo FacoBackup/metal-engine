@@ -9,17 +9,17 @@
 namespace Metal {
     class ShaderService;
     struct PipelineBuilder;
-    struct FrameBufferInstance;
+    struct RenderTargetInstance;
     struct PipelineInstance;
     struct DescriptorInstance;
 
     class VulkanContext;
-    class FrameBufferService;
+    class RenderTargetService;
     class BufferService;
 
     class PipelineService final : public AbstractResourceService<PipelineInstance> {
         VulkanContext *vulkanContext = nullptr;
-        FrameBufferService *framebufferService = nullptr;
+        RenderTargetService *RenderTargetService = nullptr;
         BufferService *bufferService = nullptr;
         DescriptorSetService *descriptorSetService = nullptr;
         ShaderService *shaderService = nullptr;
@@ -30,7 +30,7 @@ namespace Metal {
         std::vector<Dependency> getDependencies() override {
             return {
                 {"VulkanContext", &vulkanContext},
-                {"FramebufferService", &framebufferService},
+                {"RenderTargetService", &RenderTargetService},
                 {"BufferService", &bufferService},
                 {"DescriptorSetService", &descriptorSetService},
                 {"ShaderService", &shaderService}

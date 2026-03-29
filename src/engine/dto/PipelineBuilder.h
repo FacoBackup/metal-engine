@@ -7,7 +7,7 @@
 
 namespace Metal {
     struct DescriptorInstance;
-    struct FrameBufferInstance;
+    struct RenderTargetInstance;
     struct TextureInstance;
 
     /**
@@ -24,7 +24,7 @@ namespace Metal {
         VkImageView view = VK_NULL_HANDLE;
         VkImageLayout layout = VK_IMAGE_LAYOUT_GENERAL;
         VkAccelerationStructureKHR accelerationStructure = VK_NULL_HANDLE;
-        std::string frameBufferId;
+        std::string renderTargetId;
         int attachmentIndex = -1;
         unsigned int descriptorCount = 1;
         unsigned int bindingPoint = 0;
@@ -41,7 +41,7 @@ namespace Metal {
      */
     struct PipelineBuilder final {
         const char *id = nullptr;
-        std::string frameBufferId;
+        std::string renderTargetId;
         VkCullModeFlagBits cullMode = VK_CULL_MODE_NONE;
         const char *vertexShader = nullptr;
         const char *fragmentShader = nullptr;
@@ -61,7 +61,7 @@ namespace Metal {
         /**
          * @brief Creates a builder for a graphics pipeline.
          */
-        static PipelineBuilder Of(std::string frameBufferId, const char *vertexShader,
+        static PipelineBuilder Of(std::string renderTargetId, const char *vertexShader,
                                   const char *fragmentShader);
 
         /**
@@ -122,15 +122,15 @@ namespace Metal {
                                                         VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
         /**
-         * @brief Adds a binding for a specific framebuffer attachment. Attachments are not persisted as textures
+         * @brief Adds a binding for a specific rendertarget attachment. Attachments are not persisted as textures
          */
-        PipelineBuilder &addFboBinding(std::string frameBufferId, uint32_t attachmentIndex,
+        PipelineBuilder &addRenderTargetBinding(std::string renderTargetId, uint32_t attachmentIndex,
                                             VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
         /**
-         * @brief Adds a binding for a specific framebuffer attachment as a storage image.
+         * @brief Adds a binding for a specific rendertarget attachment as a storage image.
          */
-        PipelineBuilder &addStorageFboBinding(std::string frameBufferId, uint32_t attachmentIndex);
+        PipelineBuilder &addStorageRenderTargetBinding(std::string renderTargetId, uint32_t attachmentIndex);
 
         /**
          * @brief Adds a binding for an existing texture instance.

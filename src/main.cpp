@@ -39,7 +39,7 @@
 #include "engine/service/CameraService.h"
 #include "engine/service/CommandBufferRecorderService.h"
 #include "engine/service/DescriptorSetService.h"
-#include "engine/service/FrameBufferService.h"
+#include "engine/service/RenderTargetService.h"
 #include "engine/service/LightService.h"
 #include "engine/service/PhysicsService.h"
 #include "engine/service/LuaService.h"
@@ -80,7 +80,7 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::WorldRepository>());
     context->registerSingleton(std::make_shared<Metal::MeshService>());
     context->registerSingleton(std::make_shared<Metal::TextureService>());
-    context->registerSingleton(std::make_shared<Metal::FrameBufferService>());
+    context->registerSingleton(std::make_shared<Metal::RenderTargetService>());
     context->registerSingleton(std::make_shared<Metal::PipelineService>());
     context->registerSingleton(std::make_shared<Metal::BufferService>());
     context->registerSingleton(std::make_shared<Metal::CommandBufferRecorderService>());

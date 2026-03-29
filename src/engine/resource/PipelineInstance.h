@@ -7,7 +7,7 @@
 #include <memory>
 
 namespace Metal {
-    struct FrameBufferInstance;
+    struct RenderTargetInstance;
     struct ShaderModule;
     struct MeshInstance;
     struct DescriptorInstance;

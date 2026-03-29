@@ -5,30 +5,30 @@
 
 namespace Metal {
     class CommandBufferRecorderService;
-    class FrameBufferService;
+    class RenderTargetService;
 
     class CommandBufferRecorderBuilder final : public ResourceBuilder {
-        std::string framebufferId;
+        std::string renderTargetId;
         bool clearBuffer;
         bool computeMode;
-        FrameBufferService *framebufferService = nullptr;
+        RenderTargetService *RenderTargetService = nullptr;
         CommandBufferRecorderService *commandBufferRecorderService = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"FrameBufferService", &framebufferService},
+                {"RenderTargetService", &RenderTargetService},
                 {"CommandBufferRecorderService", &commandBufferRecorderService}
             };
         }
 
-        explicit CommandBufferRecorderBuilder(const std::string &id, std::string framebufferId, bool clearBuffer = true)
-            : ResourceBuilder(id), framebufferId(std::move(framebufferId)), clearBuffer(clearBuffer),
+        explicit CommandBufferRecorderBuilder(const std::string &id, std::string renderTargetId, bool clearBuffer = true)
+            : ResourceBuilder(id), renderTargetId(std::move(renderTargetId)), clearBuffer(clearBuffer),
               computeMode(false) {
         }
 
         explicit CommandBufferRecorderBuilder(const std::string &id)
-            : ResourceBuilder(id), framebufferId(""), clearBuffer(false), computeMode(true) {
+            : ResourceBuilder(id), renderTargetId(""), clearBuffer(false), computeMode(true) {
         }
 
         ResourceType getType() override {
@@ -38,7 +38,7 @@ namespace Metal {
         RuntimeResource *build() override;
 
         bool isComputeMode() const { return computeMode; }
-        const std::string &getFramebufferId() const { return framebufferId; }
+        const std::string &getrenderTargetId() const { return renderTargetId; }
         bool shouldClearBuffer() const { return clearBuffer; }
     };
 }

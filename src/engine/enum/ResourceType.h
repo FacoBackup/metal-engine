@@ -3,7 +3,7 @@
 
 namespace Metal {
     enum ResourceType {
-        FRAMEBUFFER,
+        RENDER_TARGET,
         TEXTURE,
         PIPELINE,
         BUFFER,

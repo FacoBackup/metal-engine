@@ -18,7 +18,7 @@ namespace Metal {
     struct EngineRepository;
     class MeshService;
     class TextureService;
-    class FrameBufferService;
+    class RenderTargetService;
     class PipelineService;
 
     class VulkanContext final : public IService, public IInit {
@@ -26,7 +26,7 @@ namespace Metal {
         EngineRepository *engineRepository = nullptr;
         MeshService *meshService = nullptr;
         TextureService *textureService = nullptr;
-        FrameBufferService *framebufferService = nullptr;
+        RenderTargetService *RenderTargetService = nullptr;
         PipelineService *pipelineService = nullptr;
 
         static VkBool32 DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -72,7 +72,7 @@ namespace Metal {
                 {"EngineRepository", &engineRepository},
                 {"MeshService", &meshService},
                 {"TextureService", &textureService},
-                {"FrameBufferService", &framebufferService},
+                {"RenderTargetService", &RenderTargetService},
                 {"PipelineService", &pipelineService}
             };
         }
@@ -105,6 +105,8 @@ namespace Metal {
         PFN_vkCreateRayTracingPipelinesKHR vkCreateRayTracingPipelinesKHR = nullptr;
         PFN_vkGetRayTracingShaderGroupHandlesKHR vkGetRayTracingShaderGroupHandlesKHR = nullptr;
         PFN_vkCmdTraceRaysKHR vkCmdTraceRaysKHR = nullptr;
+        PFN_vkCmdBeginRenderingKHR vkCmdBeginRendering = nullptr;
+        PFN_vkCmdEndRenderingKHR vkCmdEndRendering = nullptr;
 
         void disposeManually();
 

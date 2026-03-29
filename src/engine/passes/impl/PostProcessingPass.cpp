@@ -6,18 +6,18 @@
 #include "editor/enum/EngineResourceIDs.h"
 #include "../../frame-builder/EngineFrame.h"
 #include "../../resource/TextureInstance.h"
-#include "engine/resource/FrameBufferInstance.h"
+#include "engine/resource/RenderTargetInstance.h"
 
 
 namespace Metal {
     void PostProcessingPass::onInitialize() {
         PipelineBuilder ppPipelineBuilder = PipelineBuilder::Of(
-                    getScopedResourceId(RID_POST_PROCESSING_FBO),
+                    getScopedResourceId(RID_POST_PROCESSING_RT),
                     "QUAD.vert",
                     "PostProcessing.frag"
                 )
                 .setPushConstantsSize(sizeof(PostProcessingPushConstant))
-                .addFboBinding(getScopedResourceId(RID_DOF_FBO), 0);
+                .addRenderTargetBinding(getScopedResourceId(RID_DOF_RT), 0);
         pipelineInstance = pipelineService->createPipeline(ppPipelineBuilder);
     }
 

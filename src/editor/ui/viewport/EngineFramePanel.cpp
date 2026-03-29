@@ -3,7 +3,7 @@
 #include "engine/frame-builder/EngineFrameBuilder.h"
 #include "engine/frame-builder/EngineFrame.h"
 #include "engine/dto/DescriptorInstance.h"
-#include "engine/resource/FrameBufferInstance.h"
+#include "engine/resource/RenderTargetInstance.h"
 #include "../../service/PickingService.h"
 #include "../../enum/engine-definitions.h"
 #include "../../enum/EngineResourceIDs.h"
@@ -50,35 +50,35 @@ namespace Metal {
                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, STORAGE_BUFFER)
                 .addTexture(RID_ACCUMULATED_FRAME, gBufferW, gBufferH, VK_FORMAT_R32G32B32A32_SFLOAT)
 
-                .addFramebuffer(RID_GBUFFER_FBO, gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
+                .addRenderTarget(RID_GBUFFER_RT, gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
                 .addColor(VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT)
                 .addColor(VK_FORMAT_R16G16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT)
                 .addColor(VK_FORMAT_R32G32_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT)
                 .addColor(VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT)
                 .addDepth()
 
-                .addFramebuffer(RID_SELECTION_FBO, gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
+                .addRenderTarget(RID_SELECTION_RT, gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
                 .addColor(VK_FORMAT_R16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
 
-                .addFramebuffer(RID_POST_PROCESSING_FBO, gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
+                .addRenderTarget(RID_POST_PROCESSING_RT, gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
                 .addColor(VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
 
-                .addFramebuffer(RID_DOF_FBO, gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
+                .addRenderTarget(RID_DOF_RT, gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
                 .addColor(VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
 
-                .addCommandBuffer(RID_GBUFFER_CB, RID_GBUFFER_FBO)
+                .addCommandBuffer(RID_GBUFFER_CB, RID_GBUFFER_RT)
                 .addPass(std::make_unique<StaticGBufferPass>(), RID_GBUFFER_CB)
 
                 .addComputeCommandBuffer(RID_RT_COMPUTE_CB, true)
                 .addPass(std::make_unique<HWRayTracingPass>(), RID_RT_COMPUTE_CB)
 
-                .addCommandBuffer(RID_DOF_CB, RID_DOF_FBO)
+                .addCommandBuffer(RID_DOF_CB, RID_DOF_RT)
                 .addPass(std::make_unique<DepthOfFieldPass>(), RID_DOF_CB)
 
-                .addCommandBuffer(RID_SELECTION_CB, RID_SELECTION_FBO)
+                .addCommandBuffer(RID_SELECTION_CB, RID_SELECTION_RT)
                 .addPass(std::make_unique<SelectionIDPass>(), RID_SELECTION_CB)
 
-                .addCommandBuffer(RID_POST_PROCESSING_CB, RID_POST_PROCESSING_FBO)
+                .addCommandBuffer(RID_POST_PROCESSING_CB, RID_POST_PROCESSING_RT)
                 .addPass(std::make_unique<PostProcessingPass>(), RID_POST_PROCESSING_CB)
                 .addPass(std::make_unique<GridPass>(), RID_POST_PROCESSING_CB)
                 .addPass(std::make_unique<SelectionOutlinePass>(), RID_POST_PROCESSING_CB)
@@ -89,7 +89,7 @@ namespace Metal {
         engineContext->setCurrentFrame(id);
         const ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 
-        auto *framebuffer = engineContext->currentFrame->getResourceAs<FrameBufferInstance>(RID_POST_PROCESSING_FBO);
+        auto *framebuffer = engineContext->currentFrame->getResourceAs<RenderTargetInstance>(RID_POST_PROCESSING_RT);
         if (framebuffer) {
             descriptorSetService->setImageDescriptor(framebuffer, 0);
 
@@ -133,8 +133,8 @@ namespace Metal {
             return;
         }
 
-        FrameBufferInstance *gBuffer = engineContext->currentFrame->getResourceAs<FrameBufferInstance>(
-            RID_GBUFFER_FBO);
+        RenderTargetInstance *gBuffer = engineContext->currentFrame->getResourceAs<RenderTargetInstance>(
+            RID_GBUFFER_RT);
 
         const auto width = gBuffer->bufferWidth;
         const auto height = gBuffer->bufferHeight;

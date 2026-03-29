@@ -3,14 +3,14 @@
 #include "ShaderService.h"
 #include "../../core/VulkanContext.h"
 #include "../../common/VulkanUtils.h"
-#include "FrameBufferService.h"
+#include "RenderTargetService.h"
 #include "BufferService.h"
-#include "../resource/FrameBufferInstance.h"
+#include "../resource/RenderTargetInstance.h"
 #include "../resource/PipelineInstance.h"
 #include "../dto/MeshData.h"
 #include "../dto/VertexData.h"
 #include "../dto/DescriptorInstance.h"
-#include "../resource/FrameBufferAttachment.h"
+#include "../resource/RenderTargetAttachment.h"
 #include "../resource/BufferInstance.h"
 #include "../../ApplicationContext.h"
 #include "../../common/LoggerUtil.h"
@@ -158,9 +158,9 @@ namespace Metal {
         multisampling.sampleShadingEnable = VK_FALSE;
         multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
 
-        auto *frameBuffer = framebufferService->getResource(pipelineBuilder.frameBufferId);
+        auto *frameBuffer = RenderTargetService->getResource(pipelineBuilder.renderTargetId);
         if (!frameBuffer) {
-            throw std::runtime_error("Framebuffer not found: " + pipelineBuilder.frameBufferId);
+            throw std::runtime_error("Framebuffer not found: " + pipelineBuilder.renderTargetId);
         }
 
         std::vector<VkPipelineColorBlendAttachmentState> colorBlendAttachments{};
@@ -203,8 +203,26 @@ namespace Metal {
         dynamicState.dynamicStateCount = dynamicStates.size();
         dynamicState.pDynamicStates = dynamicStates.data();
 
+        std::vector<VkFormat> colorFormats{};
+        VkFormat depthFormat = VK_FORMAT_UNDEFINED;
+        for (const auto &attachment: frameBuffer->attachments) {
+            if (attachment->depth) {
+                depthFormat = attachment->format;
+            } else {
+                colorFormats.push_back(attachment->format);
+            }
+        }
+
+        VkPipelineRenderingCreateInfo pipelineRenderingCreateInfo{};
+        pipelineRenderingCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
+        pipelineRenderingCreateInfo.colorAttachmentCount = colorFormats.size();
+        pipelineRenderingCreateInfo.pColorAttachmentFormats = colorFormats.data();
+        pipelineRenderingCreateInfo.depthAttachmentFormat = depthFormat;
+        pipelineRenderingCreateInfo.stencilAttachmentFormat = VK_FORMAT_UNDEFINED;
+
         VkGraphicsPipelineCreateInfo pipelineInfo{};
         pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+        pipelineInfo.pNext = &pipelineRenderingCreateInfo;
         pipelineInfo.stageCount = shaderStages.size();
         pipelineInfo.pStages = shaderStages.data();
         pipelineInfo.pVertexInputState = &vertexInputInfo;
@@ -225,7 +243,7 @@ namespace Metal {
         pipelineInfo.pColorBlendState = &colorBlending;
         pipelineInfo.pDynamicState = &dynamicState;
         pipelineInfo.layout = pipeline->vkPipelineLayout;
-        pipelineInfo.renderPass = frameBuffer->vkRenderPass;
+        pipelineInfo.renderPass = VK_NULL_HANDLE;
         pipelineInfo.subpass = 0;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 

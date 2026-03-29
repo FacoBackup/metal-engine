@@ -11,7 +11,7 @@
 namespace Metal {
     void StaticGBufferPass::onInitialize() {
         PipelineBuilder builder = PipelineBuilder::Of(
-                    getScopedResourceId(RID_GBUFFER_FBO),
+                    getScopedResourceId(RID_GBUFFER_RT),
                     "gbuffer/GBufferGen.vert",
                     "gbuffer/GBufferGen.frag"
                 )

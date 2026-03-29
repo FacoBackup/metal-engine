@@ -8,7 +8,7 @@
 #include "engine/repository/EngineRepository.h"
 #include "engine/service/MeshService.h"
 #include "engine/service/TextureService.h"
-#include "engine/service/FrameBufferService.h"
+#include "engine/service/RenderTargetService.h"
 
 namespace Metal {
 
@@ -50,6 +50,12 @@ namespace Metal {
 
     void VulkanContext::createDevice() {
         vkb::DeviceBuilder deviceBuilder{physDevice};
+
+        VkPhysicalDeviceDynamicRenderingFeatures dynamicRenderingFeatures{
+            .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES,
+            .dynamicRendering = VK_TRUE
+        };
+        deviceBuilder.add_pNext(&dynamicRenderingFeatures);
 
         if (rayTracingSupported) {
             VkPhysicalDeviceBufferDeviceAddressFeatures bufferDeviceAddressFeatures{};
@@ -100,6 +106,18 @@ namespace Metal {
             deviceProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
             deviceProperties2.pNext = &rayTracingPipelineProperties;
             vkGetPhysicalDeviceProperties2(physDevice.physical_device, &deviceProperties2);
+        }
+
+        vkCmdBeginRendering = reinterpret_cast<PFN_vkCmdBeginRenderingKHR>(
+            vkGetDeviceProcAddr(device.device, "vkCmdBeginRendering"));
+        vkCmdEndRendering = reinterpret_cast<PFN_vkCmdEndRenderingKHR>(
+            vkGetDeviceProcAddr(device.device, "vkCmdEndRendering"));
+
+        if (!vkCmdBeginRendering || !vkCmdEndRendering) {
+            vkCmdBeginRendering = reinterpret_cast<PFN_vkCmdBeginRenderingKHR>(
+                vkGetDeviceProcAddr(device.device, "vkCmdBeginRenderingKHR"));
+            vkCmdEndRendering = reinterpret_cast<PFN_vkCmdEndRenderingKHR>(
+                vkGetDeviceProcAddr(device.device, "vkCmdEndRenderingKHR"));
         }
     }
 
@@ -153,6 +171,7 @@ namespace Metal {
         }
         physDevice.enable_extension_if_present(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME);
         physDevice.enable_extension_if_present(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+        physDevice.enable_extension_if_present(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
 
         // Ray tracing extensions
         rayTracingSupported =

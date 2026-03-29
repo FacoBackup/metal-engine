@@ -7,15 +7,15 @@
 namespace Metal {
     struct PipelineBuilder;
     struct TextureInstance;
-    struct FrameBufferInstance;
+    struct RenderTargetInstance;
     class VulkanContext;
-    class FrameBufferService;
+    class RenderTargetService;
     class BufferService;
     class TextureService;
 
     class DescriptorSetService final : public AbstractResourceService<DescriptorInstance> {
         VulkanContext *vulkanContext = nullptr;
-        FrameBufferService *framebufferService = nullptr;
+        RenderTargetService *RenderTargetService = nullptr;
         BufferService *bufferService = nullptr;
         TextureService *textureService = nullptr;
 
@@ -23,7 +23,7 @@ namespace Metal {
         std::vector<Dependency> getDependencies() override {
             return {
                 {"VulkanContext", &vulkanContext},
-                {"FrameBufferService", &framebufferService},
+                {"RenderTargetService", &RenderTargetService},
                 {"BufferService", &bufferService},
                 {"TextureService", &textureService}
             };
@@ -36,7 +36,7 @@ namespace Metal {
 
         std::vector<DescriptorInstance *> getAllDescriptors() const;
 
-        void setImageDescriptor(const FrameBufferInstance *framebuffer, unsigned int attachmentIndex);
+        void setImageDescriptor(const RenderTargetInstance *framebuffer, unsigned int attachmentIndex);
 
         void setImageDescriptor(TextureInstance *texture);
 

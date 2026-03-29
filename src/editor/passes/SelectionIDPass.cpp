@@ -14,7 +14,7 @@
 namespace Metal {
     void SelectionIDPass::onInitialize() {
         PipelineBuilder builder = PipelineBuilder::Of(
-                   getScopedResourceId(RID_SELECTION_FBO),
+                   getScopedResourceId(RID_SELECTION_RT),
                     "tools/SelectionID.vert",
                     "tools/SelectionID.frag"
                 )

@@ -2,7 +2,8 @@
 #include <mutex>
 
 
-#include "../resource/FrameBufferInstance.h"
+#include "../resource/RenderTargetAttachment.h"
+#include "../resource/RenderTargetInstance.h"
 #include "../resource/PipelineInstance.h"
 #include "../../ApplicationContext.h"
 #include "AbstractRenderPass.h"
@@ -22,9 +23,10 @@ namespace Metal {
                                      _commandBuffers.data()));
     }
 
-    CommandBufferRecorder::CommandBufferRecorder(std::string id, FrameBufferInstance *frameBuffer,
+    CommandBufferRecorder::CommandBufferRecorder(std::string id, RenderTargetInstance *frameBuffer,
                                                  const bool clearBuffer) : RuntimeResource(std::move(id)) {
-        createRenderPassInfo(frameBuffer, clearBuffer);
+        attachments = frameBuffer->attachments;
+        createRenderingInfo(frameBuffer, clearBuffer);
 
         viewport.width = static_cast<float>(frameBuffer->bufferWidth);
         viewport.height = static_cast<float>(frameBuffer->bufferHeight);
@@ -43,34 +45,45 @@ namespace Metal {
         computePassMode = true;
     }
 
-    void CommandBufferRecorder::createRenderPassInfo(const FrameBufferInstance *frameBuffer, const bool clearBuffer) {
-        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = frameBuffer->vkRenderPass;
-        renderPassInfo.framebuffer = frameBuffer->vkFramebuffer;
-        renderPassInfo.renderArea.offset = {0, 0};
-        renderPassInfo.renderArea.extent = {
-            frameBuffer->bufferWidth, frameBuffer->bufferHeight
-        };
-        if (clearBuffer) {
-            for (const auto &attachment: frameBuffer->attachments) {
-                VkClearValue &clearValue = clearColors.emplace_back();
-                if (attachment->depth) {
-                    clearValue.depthStencil.depth = 1.0f;
-                    clearValue.depthStencil.stencil = 0;
-                } else {
-                    clearValue.color = {
-                        frameBuffer->clearColor.r, frameBuffer->clearColor.g, frameBuffer->clearColor.b,
-                        frameBuffer->clearColor.a
-                    };
-                }
+    void CommandBufferRecorder::createRenderingInfo(const RenderTargetInstance *frameBuffer, const bool clearBuffer) {
+        colorAttachments.clear();
+        hasDepth = false;
+
+        for (const auto &attachment: frameBuffer->attachments) {
+            VkRenderingAttachmentInfo attachmentInfo{};
+            attachmentInfo.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
+            attachmentInfo.imageView = attachment->vkImageView;
+            attachmentInfo.imageLayout = attachment->depth
+                                             ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+                                             : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+            attachmentInfo.loadOp = clearBuffer ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD;
+            attachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+
+            if (attachment->depth) {
+                attachmentInfo.clearValue.depthStencil = {1.0f, 0};
+                depthAttachment = attachmentInfo;
+                hasDepth = true;
+            } else {
+                attachmentInfo.clearValue.color = {
+                    frameBuffer->clearColor.r, frameBuffer->clearColor.g, frameBuffer->clearColor.b,
+                    frameBuffer->clearColor.a
+                };
+                colorAttachments.push_back(attachmentInfo);
             }
         }
-        renderPassInfo.clearValueCount = clearColors.size();
-        renderPassInfo.pClearValues = clearColors.data();
+
+        renderingInfo.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
+        renderingInfo.renderArea.offset = {0, 0};
+        renderingInfo.renderArea.extent = {frameBuffer->bufferWidth, frameBuffer->bufferHeight};
+        renderingInfo.layerCount = 1;
+        renderingInfo.colorAttachmentCount = colorAttachments.size();
+        renderingInfo.pColorAttachments = colorAttachments.data();
+        renderingInfo.pDepthAttachment = hasDepth ? &depthAttachment : nullptr;
+        renderingInfo.pStencilAttachment = nullptr;
     }
 
     void CommandBufferRecorder::recordCommands(
-        const std::vector<std::unique_ptr<AbstractPass>> &passes) const {
+        const std::vector<std::unique_ptr<AbstractPass>> &passes) {
         auto vkCommandBuffer = _commandBuffers[frameService->getFrameIndex()];
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -79,11 +92,83 @@ namespace Metal {
         if (computePassMode) {
             RecordCommandsInternal(passes, vkCommandBuffer);
         } else {
-            vkCmdBeginRenderPass(vkCommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+            for (const auto &attachment: attachments) {
+                VkImageMemoryBarrier barrier{};
+                barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+                barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+                barrier.newLayout = attachment->depth
+                                        ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+                                        : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+                barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+                barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+                barrier.image = attachment->vkImage;
+                barrier.subresourceRange.aspectMask = attachment->depth
+                                                          ? VK_IMAGE_ASPECT_DEPTH_BIT
+                                                          : VK_IMAGE_ASPECT_COLOR_BIT;
+                barrier.subresourceRange.baseMipLevel = 0;
+                barrier.subresourceRange.levelCount = 1;
+                barrier.subresourceRange.baseArrayLayer = 0;
+                barrier.subresourceRange.layerCount = 1;
+                barrier.srcAccessMask = 0;
+                barrier.dstAccessMask = attachment->depth
+                                            ? VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT
+                                            : VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+                vkCmdPipelineBarrier(
+                    vkCommandBuffer,
+                    VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                    attachment->depth
+                        ? VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT
+                        : VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                    0,
+                    0, nullptr,
+                    0, nullptr,
+                    1, &barrier
+                );
+            }
+            renderingInfo.pColorAttachments = colorAttachments.data();
+            renderingInfo.pDepthAttachment = hasDepth ? &depthAttachment : nullptr;
+
+            vulkanContext->vkCmdBeginRendering(vkCommandBuffer, &renderingInfo);
             vkCmdSetViewport(vkCommandBuffer, 0, 1, &viewport);
             vkCmdSetScissor(vkCommandBuffer, 0, 1, &scissor);
             RecordCommandsInternal(passes, vkCommandBuffer);
-            vkCmdEndRenderPass(vkCommandBuffer);
+            vulkanContext->vkCmdEndRendering(vkCommandBuffer);
+
+            for (const auto &attachment: attachments) {
+                VkImageMemoryBarrier barrier{};
+                barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+                barrier.oldLayout = attachment->depth
+                                        ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+                                        : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+                barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+                barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+                barrier.image = attachment->vkImage;
+                barrier.subresourceRange.aspectMask = attachment->depth
+                                                          ? VK_IMAGE_ASPECT_DEPTH_BIT
+                                                          : VK_IMAGE_ASPECT_COLOR_BIT;
+                barrier.subresourceRange.baseMipLevel = 0;
+                barrier.subresourceRange.levelCount = 1;
+                barrier.subresourceRange.baseArrayLayer = 0;
+                barrier.subresourceRange.layerCount = 1;
+                barrier.srcAccessMask = attachment->depth
+                                            ? VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT
+                                            : VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+                barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+                vkCmdPipelineBarrier(
+                    vkCommandBuffer,
+                    attachment->depth
+                        ? VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT
+                        : VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                    VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                    0,
+                    0, nullptr,
+                    0, nullptr,
+                    1, &barrier
+                );
+            }
         }
 
         vkEndCommandBuffer(vkCommandBuffer);
