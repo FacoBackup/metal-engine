@@ -83,14 +83,15 @@ namespace Metal {
     }
 
     void CommandBufferRecorder::recordCommands(
-        const std::vector<std::unique_ptr<AbstractPass>> &passes) {
+        const std::vector<std::unique_ptr<AbstractPass>> &passes,
+        const RGResourceManager& resources) {
         auto vkCommandBuffer = _commandBuffers[frameService->getFrameIndex()];
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         vkBeginCommandBuffer(vkCommandBuffer, &beginInfo);
 
         if (computePassMode) {
-            RecordCommandsInternal(passes, vkCommandBuffer);
+            RecordCommandsInternal(passes, vkCommandBuffer, resources);
         } else {
             for (const auto &attachment: attachments) {
                 VkImageMemoryBarrier barrier{};
@@ -132,7 +133,7 @@ namespace Metal {
             vulkanContext->vkCmdBeginRendering(vkCommandBuffer, &renderingInfo);
             vkCmdSetViewport(vkCommandBuffer, 0, 1, &viewport);
             vkCmdSetScissor(vkCommandBuffer, 0, 1, &scissor);
-            RecordCommandsInternal(passes, vkCommandBuffer);
+            RecordCommandsInternal(passes, vkCommandBuffer, resources);
             vulkanContext->vkCmdEndRendering(vkCommandBuffer);
 
             for (const auto &attachment: attachments) {
@@ -177,17 +178,22 @@ namespace Metal {
 
     void CommandBufferRecorder::RecordCommandsInternal(
         const std::vector<std::unique_ptr<AbstractPass>> &passes,
-        VkCommandBuffer vkCommandBuffer) {
+        VkCommandBuffer vkCommandBuffer,
+        const RGResourceManager& resources) {
         for (auto &pass: passes) {
             pass->setCommandBuffer(vkCommandBuffer);
             if (!pass->shouldRun()) {
                 continue;
             }
+            
+            pass->getBarrierBatch().execute(vkCommandBuffer);
+
             if (pass->getPipeline() != nullptr) {
                 vkCmdBindPipeline(vkCommandBuffer, pass->getBindingPoint(), pass->getPipeline()->vkPipeline);
             }
             pass->bindStaticDescriptorSets();
             pass->onSync();
+            pass->execute(vkCommandBuffer, resources);
         }
     }
 } // Metal

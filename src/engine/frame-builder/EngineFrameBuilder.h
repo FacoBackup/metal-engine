@@ -9,6 +9,8 @@
 #include "../../common/IContextMember.h"
 #include "structures/ResourceBuilder.h"
 #include "../resource/BufferInstance.h"
+#include "../render-graph/RGResourceHandle.h"
+#include "../render-graph/RGResourceDescription.h"
 
 namespace Metal {
     class EngineContext;
@@ -60,12 +62,12 @@ namespace Metal {
         /**
          * @brief Adds a new rendertarget resource to the frame.
          */
-        EngineFrameBuilder &addRenderTarget(std::string id, unsigned w, unsigned h, glm::vec4 clearColor);
+        EngineFrameBuilder& addRenderTarget(std::string id, unsigned w, unsigned h, glm::vec4 clearColor, RGResourceHandle* outHandle = nullptr);
 
         /**
          * @brief References an existing rendertarget by ID.
          */
-        EngineFrameBuilder &addRenderTarget(const std::string &id);
+        EngineFrameBuilder& addRenderTarget(const std::string &id, RGResourceHandle* outHandle = nullptr);
 
         /**
          * @brief Adds a color attachment to the current rendertarget being built.
@@ -80,24 +82,24 @@ namespace Metal {
         /**
          * @brief Adds a standalone texture resource to the frame.
          */
-        EngineFrameBuilder &addTexture(const std::string &id, unsigned w, unsigned h,
-                                       VkFormat format = VK_FORMAT_R16G16B16A16_SFLOAT);
+        EngineFrameBuilder& addTexture(const std::string &id, unsigned w, unsigned h,
+                                       VkFormat format = VK_FORMAT_R16G16B16A16_SFLOAT, RGResourceHandle* outHandle = nullptr);
 
         /**
          * @brief References an existing texture by ID.
          */
-        EngineFrameBuilder &addTexture(const std::string &id);
+        EngineFrameBuilder& addTexture(const std::string &id, RGResourceHandle* outHandle = nullptr);
 
         /**
          * @brief Adds a buffer resource (Uniform, Storage, etc.) to the frame.
          */
-        EngineFrameBuilder &addBuffer(const std::string &id, VkDeviceSize size,
-                                      VkMemoryPropertyFlags properties, BufferType type);
+        EngineFrameBuilder& addBuffer(const std::string &id, VkDeviceSize size,
+                                      VkMemoryPropertyFlags properties, BufferType type, RGResourceHandle* outHandle = nullptr);
 
         /**
          * @brief References an existing buffer by ID.
          */
-        EngineFrameBuilder &addBuffer(const std::string &id);
+        EngineFrameBuilder& addBuffer(const std::string &id, RGResourceHandle* outHandle = nullptr);
 
         /**
          * @brief Adds a graphics command buffer associated with a rendertarget.

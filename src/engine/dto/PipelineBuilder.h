@@ -4,6 +4,7 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 #include "DescriptorBinding.h"
+#include "../render-graph/RGResourceHandle.h"
 
 namespace Metal {
     struct DescriptorInstance;
@@ -61,6 +62,12 @@ namespace Metal {
         /**
          * @brief Creates a builder for a graphics pipeline.
          */
+        static PipelineBuilder Of(RGResourceHandle renderTargetHandle, const char *vertexShader,
+                                  const char *fragmentShader);
+
+        /**
+         * @brief Creates a builder for a graphics pipeline (legacy).
+         */
         static PipelineBuilder Of(std::string renderTargetId, const char *vertexShader,
                                   const char *fragmentShader);
 
@@ -106,6 +113,11 @@ namespace Metal {
 
         /**
          * @brief Adds a uniform/storage buffer binding.
+         */
+        PipelineBuilder &addBufferBinding(RGResourceHandle bufferHandle);
+
+        /**
+         * @brief Adds a uniform/storage buffer binding (legacy).
          */
         PipelineBuilder &addBufferBinding(std::string bufferId);
 

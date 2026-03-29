@@ -84,6 +84,12 @@ set(ENGINE_SOURCES_LIST
     passes/AbstractComputePass.h
     passes/AbstractPass.cpp
     passes/AbstractPass.h
+    render-graph/RGResourceHandle.h
+    render-graph/RGResourceDescription.h
+    render-graph/RGPassBuilder.h
+    render-graph/RGResourceState.h
+    render-graph/RGBarrierBatch.h
+    render-graph/RGResourceManager.h
     util/ImageUtils.h
     service/MaterialService.cpp
     service/MaterialService.h

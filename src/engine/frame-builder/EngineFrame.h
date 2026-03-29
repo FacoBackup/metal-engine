@@ -8,6 +8,8 @@
 #include "../passes/CommandBufferRecorder.h"
 #include "../passes/AbstractPass.h"
 
+#include "../render-graph/RGResourceHandle.h"
+
 namespace Metal {
     class CommandBufferRecorder;
     class AbstractPass;
@@ -16,6 +18,7 @@ namespace Metal {
         std::string id;
         bool shouldRender = false;
         std::unordered_map<std::string, RuntimeResource *> resources;
+        std::vector<RuntimeResource *> indexedResources;
         std::vector<std::pair<CommandBufferRecorder *, std::vector<std::unique_ptr<AbstractPass> > > > passes;
 
     public:
@@ -27,8 +30,6 @@ namespace Metal {
 
         [[nodiscard]] bool getShouldRender() const { return shouldRender; }
 
-        void addResource(RuntimeResource *resource);
-
         template<typename T>
         T *getResourceAs(const std::string &resourceId) {
             auto it = resources.find(getScopedResourceId(resourceId));
@@ -37,6 +38,18 @@ namespace Metal {
             }
             return nullptr;
         }
+
+        template<typename T>
+        T *getResourceAs(RGResourceHandle handle) {
+            if (handle.isValid() && handle.getIndex() < indexedResources.size()) {
+                return dynamic_cast<T *>(indexedResources[handle.getIndex()]);
+            }
+            return nullptr;
+        }
+
+        void addResource(RuntimeResource *resource);
+
+        void addResource(RGResourceHandle handle, RuntimeResource *resource);
 
         void addPass(CommandBufferRecorder *recorder, std::vector<std::unique_ptr<AbstractPass>> p);
 

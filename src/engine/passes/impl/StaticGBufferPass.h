@@ -23,6 +23,11 @@ namespace Metal {
         MeshService *meshService = nullptr;
         VulkanContext *vulkanContext = nullptr;
 
+        RGResourceHandle globalDataHandle;
+        RGResourceHandle materialDataHandle;
+        RGResourceHandle primitiveDataHandle;
+        RGResourceHandle gBufferHandle;
+
     public:
         std::vector<Dependency> getDependencies() override {
             return {
@@ -34,6 +39,8 @@ namespace Metal {
         }
 
         void onInitialize() override;
+
+        void setup(RGPassBuilder& builder) override;
 
         void onSync() override;
     };

@@ -3,6 +3,7 @@
 #include <string>
 #include "../../enum/ResourceType.h"
 #include "../../../common/IContextMember.h"
+#include "../../render-graph/RGResourceHandle.h"
 
 namespace Metal {
     class RuntimeResource;
@@ -10,6 +11,7 @@ namespace Metal {
     class ResourceBuilder : public IContextMember {
     protected:
         std::string id;
+        RGResourceHandle handle;
 
     public:
         explicit ResourceBuilder(const std::string &id) : id(id) {
@@ -17,6 +19,14 @@ namespace Metal {
 
         [[nodiscard]] std::string getId() const {
             return id;
+        }
+
+        void setHandle(RGResourceHandle h) {
+            handle = h;
+        }
+
+        [[nodiscard]] RGResourceHandle getHandle() const {
+            return handle;
         }
 
         virtual ~ResourceBuilder() = default;

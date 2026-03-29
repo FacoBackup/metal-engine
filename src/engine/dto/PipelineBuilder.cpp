@@ -2,6 +2,15 @@
 #include "../resource/TextureInstance.h"
 
 namespace Metal {
+    PipelineBuilder PipelineBuilder::Of(RGResourceHandle renderTargetHandle, const char *vertexShader,
+                                        const char *fragmentShader) {
+        PipelineBuilder d{};
+        d.renderTargetId = static_cast<std::string>(renderTargetHandle);
+        d.vertexShader = vertexShader;
+        d.fragmentShader = fragmentShader;
+        return d;
+    }
+
     PipelineBuilder PipelineBuilder::Of(std::string renderTargetId, const char *vertexShader,
                                         const char *fragmentShader) {
         PipelineBuilder d{};
@@ -54,6 +63,10 @@ namespace Metal {
     PipelineBuilder &PipelineBuilder::setPushConstantsSize(unsigned int size) {
         pushConstantsSize = size;
         return *this;
+    }
+
+    PipelineBuilder &PipelineBuilder::addBufferBinding(RGResourceHandle bufferHandle) {
+        return addBufferBinding(static_cast<std::string>(bufferHandle));
     }
 
     PipelineBuilder &PipelineBuilder::addBufferBinding(std::string bufferId) {

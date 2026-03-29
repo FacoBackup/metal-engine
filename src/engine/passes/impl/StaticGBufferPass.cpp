@@ -9,9 +9,25 @@
 #include "core/VulkanContext.h"
 
 namespace Metal {
+    void StaticGBufferPass::setup(RGPassBuilder &builder) {
+        gBufferHandle = builder.getResourceHandle(RID_GBUFFER_RT);
+        globalDataHandle = builder.getResourceHandle(RID_GLOBAL_DATA);
+        materialDataHandle = builder.getResourceHandle(RID_MATERIAL_DATA_BUFFER);
+        primitiveDataHandle = builder.getResourceHandle(RID_PRIMITIVE_DATA_BUFFER);
+
+        builder.write(gBufferHandle, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                      VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
+        builder.read(globalDataHandle, VK_IMAGE_LAYOUT_UNDEFINED,
+                     VK_ACCESS_UNIFORM_READ_BIT, VK_PIPELINE_STAGE_VERTEX_SHADER_BIT);
+        builder.read(materialDataHandle, VK_IMAGE_LAYOUT_UNDEFINED,
+                     VK_ACCESS_SHADER_READ_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);
+        builder.read(primitiveDataHandle, VK_IMAGE_LAYOUT_UNDEFINED,
+                     VK_ACCESS_SHADER_READ_BIT, VK_PIPELINE_STAGE_VERTEX_SHADER_BIT);
+    }
+
     void StaticGBufferPass::onInitialize() {
         PipelineBuilder builder = PipelineBuilder::Of(
-                    getScopedResourceId(RID_GBUFFER_RT),
+                    gBufferHandle,
                     "gbuffer/GBufferGen.vert",
                     "gbuffer/GBufferGen.frag"
                 )
@@ -19,9 +35,9 @@ namespace Metal {
                 .setCullMode(VK_CULL_MODE_BACK_BIT)
                 .enableDepthTest()
                 .setPushConstantsSize(sizeof(StaticGeometryPushConstant))
-                .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
-                .addBufferBinding(getScopedResourceId(RID_MATERIAL_DATA_BUFFER))
-                .addBufferBinding(getScopedResourceId(RID_PRIMITIVE_DATA_BUFFER))
+                .addBufferBinding(globalDataHandle)
+                .addBufferBinding(materialDataHandle)
+                .addBufferBinding(primitiveDataHandle)
                 .addCombinedImageSamplerBinding(vulkanContext->vkImageSampler, VK_NULL_HANDLE,
                                                 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 

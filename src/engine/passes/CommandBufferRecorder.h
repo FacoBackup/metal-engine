@@ -8,6 +8,8 @@
 #include "../resource/PipelineInstance.h"
 #include "../../common/VulkanUtils.h"
 
+#include "../render-graph/RGResourceManager.h"
+
 namespace Metal {
     class FrameService;
     class AbstractPass;
@@ -29,7 +31,8 @@ namespace Metal {
 
         static void RecordCommandsInternal(
             const std::vector<std::unique_ptr<AbstractPass> > &passes,
-            VkCommandBuffer vkCommandBuffer);
+            VkCommandBuffer vkCommandBuffer,
+            const RGResourceManager& resources);
 
         void createRenderingInfo(const RenderTargetInstance *frameBuffer, bool clearBuffer);
 
@@ -50,7 +53,7 @@ namespace Metal {
 
         void createCommandBuffer();
 
-        void recordCommands(const std::vector<std::unique_ptr<AbstractPass> > &passes);
+        void recordCommands(const std::vector<std::unique_ptr<AbstractPass> > &passes, const RGResourceManager& resources);
     };
 } // Metal
 
