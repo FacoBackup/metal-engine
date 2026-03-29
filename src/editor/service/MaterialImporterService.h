@@ -8,7 +8,7 @@
 #include "common/IService.h"
 
 namespace Metal {
-    struct PrimitiveComponent;
+    struct StaticGeometryComponent;
 
     class TextureImporterService;
 
@@ -23,7 +23,7 @@ namespace Metal {
         }
 
         void importMaterial(const std::string &targetDir, const aiMaterial *material, const aiScene *scene,
-                            const std::string &rootDirectory, PrimitiveComponent &primitive,
+                            const std::string &rootDirectory, StaticGeometryComponent &primitive,
                             const std::stop_token &stopToken = {}) const;
     };
 }

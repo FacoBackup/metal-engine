@@ -33,6 +33,11 @@ namespace Metal {
     }
 
     void DirectoryService::updateRootPath(bool forceSelection) {
+        if (forceSelection) {
+            for (auto *instance: ctx->getSingletons<IRepository>()) {
+                instance->clear();
+            }
+        }
         char *home = getenv("USERPROFILE");
         if (!home) home = getenv("HOME");
         engineMetadataPath = (home) ? std::string(home) + "/.metal" : ".metal";
@@ -82,7 +87,7 @@ namespace Metal {
     void DirectoryService::save(const bool silent) const {
         try {
             if (rootDirectory.empty()) return;
-            
+
             snapshotService->saveProject();
 
             if (!silent)

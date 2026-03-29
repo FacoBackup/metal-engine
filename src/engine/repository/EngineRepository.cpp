@@ -12,8 +12,6 @@ namespace Metal {
         registerEditableField<INT>(&shadingResInvScale).setName("shadingResInvScale").setLabel("Shading inverted resolution scale").setMin(1).setMax(16);
         registerEditableField<BOOLEAN>(&vsync).setName("vsync").setLabel("VSync enabled");
 
-        registerEditableField<INT>(&volumeShadowSteps).setName("volumeShadowSteps").setLabel("Volume shadow steps").setMin(1);
-
         registerEditableField<FLOAT>(&pathTracerMultiplier).setName("pathTracerMultiplier").setLabel("Path tracer multiplier");
         registerEditableField<BOOLEAN>(&denoiserEnabled).setName("denoiserEnabled").setLabel("Denoiser enabled");
         registerEditableField<INT>(&pathTracerMaxSamples).setName("pathTracerMaxSamples").setLabel("Path tracer max accumulation").setMin(1).setMax(10000);

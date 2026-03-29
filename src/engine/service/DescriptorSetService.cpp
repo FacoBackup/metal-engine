@@ -37,6 +37,9 @@ namespace Metal {
                 if (fbo == nullptr) {
                     throw std::runtime_error("Framebuffer not found: " + binding.frameBufferId);
                 }
+                if (binding.attachmentIndex < 0 || binding.attachmentIndex >= fbo->attachments.size()) {
+                    throw std::runtime_error("FBO attachment index out of bounds: " + std::to_string(binding.attachmentIndex));
+                }
                 binding.view = fbo->attachments[binding.attachmentIndex]->vkImageView;
                 if (binding.sampler == VK_NULL_HANDLE) {
                     binding.sampler = vulkanContext->vkImageSampler;
@@ -73,7 +76,7 @@ namespace Metal {
                     break;
                 }
             }
-            binding.stageFlags = static_cast<VkShaderStageFlagBits>(stageFlags);
+            binding.stageFlags = stageFlags;
             descriptorInstance->bindings.push_back(binding);
         }
 
@@ -101,7 +104,7 @@ namespace Metal {
         if (attachment->imageDescriptor == nullptr) {
             attachment->imageDescriptor =
                     createResourceInstance(framebuffer->getId() + std::to_string(attachmentIndex));
-            attachment->imageDescriptor->bindings.push_back(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
+            attachment->imageDescriptor->bindings.push_back(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
                 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
                 vulkanContext->vkImageSampler,
                 attachment->vkImageView,
@@ -113,7 +116,7 @@ namespace Metal {
     void DescriptorSetService::setImageDescriptor(TextureInstance *texture) {
         if (texture->imageDescriptor == nullptr) {
             texture->imageDescriptor = createResourceInstance(texture->getId() + "_descriptor");
-            texture->imageDescriptor->bindings.push_back(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
+            texture->imageDescriptor->bindings.push_back(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
                                                                                VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                                                0,
                                                                                texture->vkSampler,

@@ -7,7 +7,6 @@
 #include "service/TLASService.h"
 #include "service/CameraService.h"
 #include "service/LightService.h"
-#include "service/VolumeService.h"
 #include "service/PhysicsService.h"
 #include "repository/WorldRepository.h"
 #include "repository/EngineRepository.h"
@@ -66,8 +65,7 @@ namespace Metal {
         materialService->onSync();
         cameraService->onSync();
         lightService->onSync();
-        volumeService->onSync();
-
+        transformService->onSync();
         for (auto *frame: registeredFrames) {
             if (frame->getShouldRender()) {
                 currentFrame = frame;
@@ -82,27 +80,24 @@ namespace Metal {
 
     void EngineContext::updateGlobalData() {
         auto &camera = worldRepository->camera;
-        globalDataUBO.previousProjView = globalDataUBO.projView;
-        globalDataUBO.viewMatrix = camera.viewMatrix;
-        globalDataUBO.projectionMatrix = camera.projectionMatrix;
         globalDataUBO.projView = camera.projViewMatrix;
         globalDataUBO.invProj = camera.invProjectionMatrix;
         globalDataUBO.invView = camera.invViewMatrix;
+        globalDataUBO.invProjView = camera.invProjView;
         globalDataUBO.cameraWorldPosition = camera.position;
-        globalDataUBO.volumeCount = volumeService->getCount();
         globalDataUBO.lightsCount = lightService->getCount();
         globalDataUBO.debugFlag = ShadingModes::IndexOfValue(editorRepository->shadingMode);
+        
+        lightService->computeSunInfo();
+        globalDataUBO.sunPosition = lightService->getSunPosition();
+
         engineRepository->pathTracerAccumulationCount++;
         globalDataUBO.pathTracerAccumulationCount = engineRepository->pathTracerAccumulationCount;
         globalDataUBO.globalFrameCount++;
         globalDataUBO.pathTracerMaxSamples = engineRepository->pathTracerMaxSamples;
-        globalDataUBO.denoiserEnabled = engineRepository->denoiserEnabled && (
-                                            globalDataUBO.debugFlag == LIT || globalDataUBO.debugFlag == LIGHTING_ONLY)
-                                            ? 1
-                                            : 0;
+        globalDataUBO.denoiserEnabled = engineRepository->denoiserEnabled && globalDataUBO.debugFlag == LIT;
+        globalDataUBO.isOrthographic = camera.isOrthographic;
 
-        lightService->computeSunInfo();
-        globalDataUBO.sunPosition = lightService->getSunPosition();
         currentFrame->getResourceAs<BufferInstance>(RID_GLOBAL_DATA)->update(&globalDataUBO);
     }
 }

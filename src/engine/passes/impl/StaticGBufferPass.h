@@ -1,26 +1,24 @@
-#ifndef DEBUGPHONGPASS_H
-#define DEBUGPHONGPASS_H
+#ifndef STATICGEOMETRYPASS_H
+#define STATICGEOMETRYPASS_H
 
 #include "engine/passes/AbstractRenderPass.h"
 #include <glm/mat4x4.hpp>
-#include <glm/vec4.hpp>
 
 namespace Metal {
     class PipelineService;
-    struct EditorRepository;
     struct WorldRepository;
     class MeshService;
+    class VulkanContext;
 
-    struct DebugPhongPushConstant {
+    struct StaticGeometryPushConstant {
         glm::mat4 model;
         uint32_t renderIndex;
     };
 
-    class FallbackPass final : public AbstractRenderPass {
-        DebugPhongPushConstant pushConstant{};
+    class StaticGBufferPass final : public AbstractRenderPass {
+        StaticGeometryPushConstant pushConstant{};
 
         PipelineService *pipelineService = nullptr;
-        EditorRepository *editorRepository = nullptr;
         WorldRepository *worldRepository = nullptr;
         MeshService *meshService = nullptr;
         VulkanContext *vulkanContext = nullptr;
@@ -29,7 +27,6 @@ namespace Metal {
         std::vector<Dependency> getDependencies() override {
             return {
                 {"PipelineService", &pipelineService},
-                {"EditorRepository", &editorRepository},
                 {"WorldRepository", &worldRepository},
                 {"VulkanContext", &vulkanContext},
                 {"MeshService", &meshService}
@@ -38,10 +35,8 @@ namespace Metal {
 
         void onInitialize() override;
 
-        bool shouldRun() override;
-
         void onSync() override;
     };
 } // Metal
 
-#endif // DEBUGPHONGPASS_H
+#endif // STATICGEOMETRYPASS_H

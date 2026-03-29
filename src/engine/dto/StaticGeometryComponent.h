@@ -6,15 +6,15 @@
 #include <glm/glm.hpp>
 
 namespace Metal {
-    struct PrimitiveComponent final : AbstractComponent {
+    struct StaticGeometryComponent final : AbstractComponent {
         std::string meshId;
 
         std::string albedo;
         std::string roughness;
         std::string metallic;
-        float transmissionFactor = 0;
-        float thicknessFactor = 0;
-        float ior = 1.45;
+        std::string normal;
+        std::string height;
+        float parallaxScale = 0.05f;
         unsigned int renderIndex = 0;
 
         void registerFields() override;

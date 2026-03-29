@@ -2,8 +2,10 @@
 #include "engine/repository/WorldRepository.h"
 #include "editor/service/FilesService.h"
 #include "engine/dto/TransformComponent.h"
-#include "engine/dto/PrimitiveComponent.h"
+#include "engine/dto/StaticGeometryComponent.h"
 #include "engine/dto/MetadataComponent.h"
+#include "engine/service/DirtyStateService.h"
+#include "engine/enum/DirtyType.h"
 #include "common/FileExtensions.h"
 #include <sstream>
 
@@ -111,11 +113,13 @@ namespace Metal {
         if (params.contains("scale")) {
             transform.scale = parseVec3(params.at("scale").get<std::string>());
         }
-
-        // Add and configure PrimitiveComponent
-        worldRepository->createComponent(entity, PRIMITIVE);
-        auto &primitive = worldRepository->registry.get<PrimitiveComponent>(entity);
+        
+        // Add and configure StaticGeometryComponent
+        worldRepository->createComponent(entity, STATIC_GEOMETRY);
+        auto &primitive = worldRepository->registry.get<StaticGeometryComponent>(entity);
         primitive.meshId = params.at("mesh_id").get<std::string>();
+        
+        dirtyStateService->markEntityDirty(entity, DirtyType::Transform | DirtyType::Material | DirtyType::Mesh);
 
         std::stringstream ss;
         ss << "Created entity '" << (params.contains("name")
@@ -149,6 +153,8 @@ namespace Metal {
         if (params.contains("scale")) {
             transform.scale = parseVec3(params.at("scale").get<std::string>());
         }
+
+        dirtyStateService->markEntityDirty(entity, DirtyType::Transform);
 
         return std::string("Transform updated successfully for entity ") + std::to_string(
                    entt::to_integral(entity));

@@ -5,7 +5,7 @@
 #include "../src/engine/service/DirtyStateService.h"
 #include "../src/engine/service/TransformService.h"
 #include "../src/engine/dto/TransformComponent.h"
-#include "../src/engine/dto/PrimitiveComponent.h"
+#include "../src/engine/dto/StaticGeometryComponent.h"
 #include "../src/editor/dto/InspectableEventPayload.h"
 #include "../src/ApplicationEventContext.h"
 #include "../src/core/DirectoryService.h"
@@ -95,7 +95,7 @@ TEST_F(TransformServiceTest, ConsumptionOfDirtyFlagsAndTransformation) {
 TEST_F(TransformServiceTest, BVHFlagBehavior) {
     entt::entity entity = worldRepo->createEntity();
     worldRepo->createComponent(entity, TRANSFORM);
-    worldRepo->createComponent(entity, PRIMITIVE);
+    worldRepo->createComponent(entity, STATIC_GEOMETRY);
     
     auto& transform = worldRepo->registry.get<TransformComponent>(entity);
     transform.isStatic = false;
@@ -110,7 +110,7 @@ TEST_F(TransformServiceTest, BVHFlagBehavior) {
     // Run service
     transformService->onAsyncSync();
 
-    // BVH should now be dirty because entity has PRIMITIVE
+    // BVH should now be dirty because entity has STATIC_GEOMETRY
     EXPECT_TRUE(dirtyStateService->isDirty(DirtyType::BVH));
 
     // Consume and check again

@@ -17,8 +17,6 @@ namespace Metal {
     struct FileExtensions {
         inline static const std::unique_ptr<FileExtensionInfo> scene = std::make_unique<FileExtensionInfo>(
             ".scene", "scene", "Scene", Icons::inventory_2);
-        inline static const std::unique_ptr<FileExtensionInfo> svo = std::make_unique<FileExtensionInfo>(
-            ".svo", "svo", "Volume", Icons::view_agenda);
         inline static const std::unique_ptr<FileExtensionInfo> mesh = std::make_unique<FileExtensionInfo>(
             ".mesh", "mesh", "Mesh", Icons::view_in_ar);
 
@@ -30,9 +28,6 @@ namespace Metal {
             ".jpeg", "jpeg", "Texture", Icons::texture);
         inline static const std::unique_ptr<FileExtensionInfo> tga = std::make_unique<FileExtensionInfo>(
             ".tga", "tga", "Texture", Icons::texture);
-
-        inline static const std::unique_ptr<FileExtensionInfo> vdb = std::make_unique<FileExtensionInfo>(
-            ".vdb", "vdb", "OpenVDB", Icons::view_agenda);
 
         inline static const std::unique_ptr<FileExtensionInfo> glb = std::make_unique<FileExtensionInfo>(
             ".glb", "glb", "Scene Source", Icons::category);
@@ -47,7 +42,7 @@ namespace Metal {
             ".lua", "lua", "Script", Icons::insert_drive_file);
 
         inline static const std::vector<const FileExtensionInfo *> all = {
-            scene.get(), svo.get(), mesh.get(), png.get(), jpg.get(), jpeg.get(), tga.get(), vdb.get(), glb.get(),
+            scene.get(),  mesh.get(), png.get(), jpg.get(), jpeg.get(), tga.get(), glb.get(),
             gltf.get(), fbx.get(), obj.get(), lua.get()
         };
 

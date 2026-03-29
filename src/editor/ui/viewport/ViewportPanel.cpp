@@ -1,5 +1,6 @@
 #include "ViewportPanel.h"
 #include "GizmoPanel.h"
+#include "CameraGizmoPanel.h"
 #include "ImGuizmo.h"
 #include "ViewportHeaderPanel.h"
 #include "EngineFramePanel.h"
@@ -19,6 +20,7 @@ namespace Metal {
     void ViewportPanel::onInitialize() {
         headerPanel = initializePanel<ViewportHeaderPanel>();
         engineFramePanel = initializePanel<EngineFramePanel>();
+        cameraGizmoPanel = initializePanel<CameraGizmoPanel>();
         gizmoPanel = initializePanel<GizmoPanel>(true, position, size);
 
         shortcuts = {
@@ -86,6 +88,7 @@ namespace Metal {
 
         if (!editorRepository->isPlaying) {
             gizmoPanel->onSync();
+            cameraGizmoPanel->onSync();
         }
     }
 

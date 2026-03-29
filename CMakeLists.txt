@@ -21,7 +21,6 @@ find_package(nfd CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(meshoptimizer CONFIG REQUIRED)
 find_package(cereal CONFIG REQUIRED)
-find_package(OpenVDB CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
 find_package(httplib CONFIG REQUIRED)
 find_package(Lua REQUIRED)
@@ -55,7 +54,6 @@ set(COMMON_LIBRARIES
         glslang::glslang
         glslang::glslang-default-resource-limits
         glslang::SPVRemapper
-        OpenVDB::openvdb
 )
 
 add_subdirectory(dependencies/vk-bootstrap)

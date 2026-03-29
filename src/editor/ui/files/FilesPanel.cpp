@@ -3,23 +3,14 @@
 #include "ListDirectoryPanel.h"
 #include "CardDirectoryPanel.h"
 #include "NavigationPanel.h"
-#include "common/Icons.h"
 #include "editor/ui/UIUtil.h"
 #include "editor/dto/FSEntry.h"
-#include "../../dto/SceneImportSettingsDTO.h"
 #include "FilesContext.h"
-#include "common/FileDialogUtil.h"
-#include "common/FileExtensions.h"
 #include <string>
-#include <filesystem>
 #include "common/FilesUtil.h"
-#include "../../service/FileImporterService.h"
 #include "../../repository/EditorRepository.h"
 #include "../../service/SceneImporterService.h"
 #include "../../service/FilesService.h"
-#include "../../service/NotificationService.h"
-#include "engine/repository/WorldRepository.h"
-#include "engine/service/VoxelService.h"
 
 namespace Metal {
     void FilesPanel::onInitialize() {

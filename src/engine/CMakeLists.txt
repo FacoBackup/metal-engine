@@ -47,11 +47,15 @@ set(ENGINE_SOURCES_LIST
     enum/ComponentType.cpp
     enum/ComponentType.h
     dto/AbstractComponent.h
-    dto/PrimitiveComponent.h
+        dto/StaticGeometryComponent.h
     dto/TransformComponent.h
+    dto/AnimatedGeometryComponent.cpp
+    dto/AnimatedGeometryComponent.h
+    dto/InstancedGeometryComponent.cpp
+    dto/InstancedGeometryComponent.h
     dto/MetadataComponent.cpp
     dto/TransformComponent.cpp
-    dto/PrimitiveComponent.cpp
+        dto/StaticGeometryComponent.cpp
     enum/DirtyType.h
     service/DirtyStateService.cpp
     service/DirtyStateService.h
@@ -61,9 +65,10 @@ set(ENGINE_SOURCES_LIST
     service/TransformService.cpp
     service/TransformService.h
     dto/BoundingBox.h
-    dto/VoxelData.h
     passes/impl/PostProcessingPass.cpp
     passes/impl/PostProcessingPass.h
+    passes/impl/DepthOfFieldPass.cpp
+    passes/impl/DepthOfFieldPass.h
     passes/impl/HWRayTracingPass.cpp
     passes/impl/HWRayTracingPass.h
     service/BLASService.cpp
@@ -74,9 +79,7 @@ set(ENGINE_SOURCES_LIST
     resource/FrameBufferAttachment.cpp
     repository/EngineRepository.cpp
     repository/EngineRepository.h
-    dto/SparseVoxelOctreeData.h
-    resource/SVOInstance.h
-    dto/LightData.h
+        dto/LightData.h
     passes/AbstractComputePass.cpp
     passes/AbstractComputePass.h
     passes/AbstractPass.cpp
@@ -86,12 +89,7 @@ set(ENGINE_SOURCES_LIST
     service/MaterialService.h
     service/LightService.cpp
     service/LightService.h
-    dto/VolumeComponent.cpp
-    dto/VolumeComponent.h
     dto/DescriptorBinding.h
-    dto/VolumeData.h
-    service/VoxelService.cpp
-    service/VoxelService.h
     frame-builder/EngineFrameBuilder.cpp
     frame-builder/EngineFrameBuilder.h
     frame-builder/EngineFrame.cpp
@@ -105,12 +103,8 @@ set(ENGINE_SOURCES_LIST
     frame-builder/structures/ResourceBuilder.h
     dto/PipelineBuilder.cpp
     frame-builder/structures/CommandBufferRecorderBuilder.cpp
-    passes/impl/TemporalAccumulationPass.cpp
-    passes/impl/TemporalAccumulationPass.h
-    passes/impl/SpatialFilterPass.cpp
-    passes/impl/SpatialFilterPass.h
-    service/VolumeService.cpp
-    service/VolumeService.h
+    passes/impl/StaticGBufferPass.cpp
+    passes/impl/StaticGBufferPass.h
     service/PhysicsService.cpp
     service/PhysicsService.h
     service/LuaService.cpp

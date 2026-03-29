@@ -14,7 +14,7 @@ namespace Metal {
                 .enableBlending()
                 .setPushConstantsSize(sizeof(GridPushConstant))
                 .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
-                .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_POSITION_INDEX));
+                .addFboBinding(getScopedResourceId(RID_GBUFFER_FBO), RID_GBUFFER_RENDER_INDEX_DEPTH);
         pipelineInstance = pipelineService->createPipeline(gridPipelineBuilder);
     }
 

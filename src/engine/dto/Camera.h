@@ -32,6 +32,7 @@ namespace Metal {
         glm::mat4x4 viewMatrix{};
         glm::mat4x4 projectionMatrix{};
         glm::mat4x4 invViewMatrix{};
+        glm::mat4x4 invProjView{};
         glm::mat4x4 invProjectionMatrix{};
         glm::mat4x4 projViewMatrix{};
 

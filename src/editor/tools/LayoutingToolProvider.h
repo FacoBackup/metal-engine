@@ -8,16 +8,19 @@
 namespace Metal {
     class WorldRepository;
     class FilesService;
+    class DirtyStateService;
 
     class LayoutingToolProvider final : public IToolProvider {
         WorldRepository *worldRepository = nullptr;
         FilesService *filesService = nullptr;
+        DirtyStateService *dirtyStateService = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
             return {
                 {"WorldRepository", &worldRepository},
-                {"FilesService", &filesService}
+                {"FilesService", &filesService},
+                {"DirtyStateService", &dirtyStateService}
             };
         }
 

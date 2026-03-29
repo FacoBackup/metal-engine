@@ -160,15 +160,14 @@ namespace Metal {
             transform.isStatic = entityData.transform.isStatic;
 
             if (entityData.primitive) {
-                createComponent(entityId, PRIMITIVE);
-                auto &primitive = registry.get<PrimitiveComponent>(entityId);
+                createComponent(entityId, STATIC_GEOMETRY);
+                auto &primitive = registry.get<StaticGeometryComponent>(entityId);
                 primitive.meshId = entityData.primitive->meshId;
                 primitive.albedo = entityData.primitive->albedo;
                 primitive.roughness = entityData.primitive->roughness;
                 primitive.metallic = entityData.primitive->metallic;
-                primitive.transmissionFactor = entityData.primitive->transmissionFactor;
-                primitive.thicknessFactor = entityData.primitive->thicknessFactor;
-                primitive.ior = entityData.primitive->ior;
+                primitive.height = entityData.primitive->height;
+                primitive.normal = entityData.primitive->normal;
             }
         }
 
@@ -270,7 +269,7 @@ namespace Metal {
                     }
                 }
             }
-            for (auto entity: registry.view<PrimitiveComponent>()) {
+            for (auto entity: registry.view<StaticGeometryComponent>()) {
                 if (dirtyStateService) dirtyStateService->markEntityDirty(entity, DirtyType::Material);
             }
         };

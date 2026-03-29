@@ -5,8 +5,9 @@
 #include "../repository/WorldRepository.h"
 #include "../../ApplicationContext.h"
 #include "../dto/TransformComponent.h"
-#include "../dto/PrimitiveComponent.h"
-#include "../dto/VolumeComponent.h"
+#include "../dto/StaticGeometryComponent.h"
+#include "../dto/InstancedGeometryComponent.h"
+#include "../dto/AnimatedGeometryComponent.h"
 #include "../dto/MetadataComponent.h"
 #include "../dto/ScriptComponent.h"
 #include "engine/dto/LightComponent.h"
@@ -17,10 +18,13 @@
 #include "../dto/MeshColliderComponent.h"
 
 
-#define DEFINE_COMPONENT(TYPE, NAME, JSON_KEY, ICON, DEPS, CLASS, CREATOR) \
+#define DEFINE_COMPONENT(TYPE, NAME, JSON_KEY, ICON, DEPS, CLASS) \
 { \
 TYPE, NAME, JSON_KEY, ICON, DEPS, \
-CREATOR, \
+[](WorldRepository &repo, entt::entity entityId) { \
+auto &comp = repo.registry.emplace_or_replace<CLASS>(entityId); \
+comp.setEntityId(entityId); \
+}, \
 [](WorldRepository &repo, entt::entity entityId) { \
 if (auto *comp = repo.registry.try_get<CLASS>(entityId)) { \
 return comp->toJson(); \
@@ -44,90 +48,9 @@ return repo.registry.all_of<CLASS>(entityId); \
 namespace Metal::ComponentTypes {
     const std::vector<ComponentDefinition> &getComponents() {
         static const std::vector<ComponentDefinition> COMPONENTS = {
-            DEFINE_COMPONENT(
-                PRIMITIVE, "Primitive", "mesh", Icons::view_in_ar, {TRANSFORM}, PrimitiveComponent,
-                [](WorldRepository &repo, entt::entity entityId) {
-                auto &mesh = repo.registry.emplace_or_replace<PrimitiveComponent>(entityId);
-                mesh.setEntityId(entityId);
-                }
-            ),
-            DEFINE_COMPONENT(
-                TRANSFORM, "Transformation", "transform", Icons::transform, {}, TransformComponent,
-                [](WorldRepository &repo, entt::entity entityId) {
-                if (!repo.registry.all_of<TransformComponent>(entityId)) {
-                auto &trans = repo.registry.emplace<TransformComponent>(entityId);
-                trans.setEntityId(entityId);
-                }
-                }
-            ),
-            DEFINE_COMPONENT(
-                VOLUME, "Volume Component", "volume", Icons::blur_on, {TRANSFORM}, VolumeComponent,
-                [](WorldRepository &repo, entt::entity entityId) {
-                auto &vol = repo.registry.emplace_or_replace<VolumeComponent>(entityId);
-                vol.setEntityId(entityId);
-                }
-            ),
-            DEFINE_COMPONENT(
-                LIGHT, "Light Component", "light", Icons::lightbulb, std::vector({TRANSFORM, PRIMITIVE}),
-                LightComponent,
-                [](WorldRepository &repo, entt::entity entityId) {
-                auto &vol = repo.registry.emplace_or_replace<LightComponent>(entityId);
-                vol.setEntityId(entityId);
-                }
-            ),
-            DEFINE_COMPONENT(
-                METADATA, "Metadata", "metadata", Icons::data_array, {}, MetadataComponent,
-                [](WorldRepository &repo, entt::entity entityId) {
-                auto &atmo = repo.registry.emplace_or_replace<MetadataComponent>(entityId);
-                atmo.setEntityId(entityId);
-                }
-            ),
-            DEFINE_COMPONENT(
-                SCRIPT, "Script Component", "script", Icons::description, {}, ScriptComponent,
-                [](WorldRepository &repo, entt::entity entityId) {
-                auto &comp = repo.registry.emplace_or_replace<ScriptComponent>(entityId);
-                comp.setEntityId(entityId);
-                }
-            ),
-            DEFINE_COMPONENT(
-                RIGID_BODY, "Rigid Body", "rigid_body", Icons::settings_input_component, {TRANSFORM},
-                RigidBodyComponent,
-                [](WorldRepository &repo, entt::entity entityId) {
-                auto &comp = repo.registry.emplace_or_replace<RigidBodyComponent>(entityId);
-                comp.setEntityId(entityId);
-                }
-            ),
-            DEFINE_COMPONENT(
-                BOX_COLLIDER, "Box Collider", "box_collider", Icons::check_box_outline_blank, {TRANSFORM},
-                BoxColliderComponent,
-                [](WorldRepository &repo, entt::entity entityId) {
-                auto &comp = repo.registry.emplace_or_replace<BoxColliderComponent>(entityId);
-                comp.setEntityId(entityId);
-                }
-            ),
-            DEFINE_COMPONENT(
-                SPHERE_COLLIDER, "Sphere Collider", "sphere_collider", Icons::panorama_fish_eye, {TRANSFORM},
-                SphereColliderComponent,
-                [](WorldRepository &repo, entt::entity entityId) {
-                auto &comp = repo.registry.emplace_or_replace<SphereColliderComponent>(entityId);
-                comp.setEntityId(entityId);
-                }
-            ),
-            DEFINE_COMPONENT(
-                CAPSULE_COLLIDER, "Capsule Collider", "capsule_collider", Icons::reorder, {TRANSFORM},
-                CapsuleColliderComponent,
-                [](WorldRepository &repo, entt::entity entityId) {
-                auto &comp = repo.registry.emplace_or_replace<CapsuleColliderComponent>(entityId);
-                comp.setEntityId(entityId);
-                }
-            ),
-            DEFINE_COMPONENT(
-                MESH_COLLIDER, "Mesh Collider", "mesh_collider", Icons::filter_none, {TRANSFORM}, MeshColliderComponent,
-                [](WorldRepository &repo, entt::entity entityId) {
-                auto &comp = repo.registry.emplace_or_replace<MeshColliderComponent>(entityId);
-                comp.setEntityId(entityId);
-                }
-            )
+#define X(TYPE, NAME, JSON_KEY, ICON, DEPS, CLASS) DEFINE_COMPONENT(TYPE, NAME, JSON_KEY, ICON, DEPS, CLASS),
+            COMPONENTS_LIST
+#undef X
         };
         return COMPONENTS;
     }

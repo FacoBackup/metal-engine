@@ -24,7 +24,6 @@ namespace Metal {
     class MaterialService;
     class CameraService;
     class LightService;
-    class VolumeService;
     class PhysicsService;
     class VulkanContext;
     struct WorldRepository;
@@ -41,7 +40,6 @@ namespace Metal {
         MaterialService *materialService = nullptr;
         CameraService *cameraService = nullptr;
         LightService *lightService = nullptr;
-        VolumeService *volumeService = nullptr;
         PhysicsService *physicsService = nullptr;
         VulkanContext *vulkanContext = nullptr;
         WorldRepository *worldRepository = nullptr;
@@ -62,7 +60,6 @@ namespace Metal {
                 {"MaterialService", &materialService},
                 {"CameraService", &cameraService},
                 {"LightService", &lightService},
-                {"VolumeService", &volumeService},
                 {"PhysicsService", &physicsService},
                 {"VulkanContext", &vulkanContext},
                 {"WorldRepository", &worldRepository},

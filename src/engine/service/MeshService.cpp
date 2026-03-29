@@ -9,7 +9,7 @@
 #include <ApplicationContext.h>
 #include <engine/service/BufferService.h>
 #include <editor/service/HistoryService.h>
-#include <engine/dto/PrimitiveComponent.h>
+#include <engine/dto/StaticGeometryComponent.h>
 #include <engine/dto/TransformComponent.h>
 #include <engine/repository/WorldRepository.h>
 #include <editor/dto/FieldModificationEvent.h>
@@ -24,7 +24,7 @@ namespace Metal {
         eventListener([this](const Event &event) {
             auto payload = std::dynamic_pointer_cast<FieldModificationPayload>(event.payload);
             if (payload && payload->member.name.find("Mesh") != std::string::npos) {
-                auto *primitive = dynamic_cast<PrimitiveComponent *>(payload->member.instance);
+                auto *primitive = dynamic_cast<StaticGeometryComponent *>(payload->member.instance);
                 if (primitive && worldRepository->registry.all_of<TransformComponent>(primitive->getEntityId())) {
                     MeshData *data = loadMeshData(primitive->meshId);
                     if (data != nullptr) {
@@ -34,7 +34,7 @@ namespace Metal {
                     }
                 }
             }
-        }, "PrimitiveComponent");
+        }, "StaticGeometryComponent");
 
         eventListener([this](const Event &event) {
             if (const auto payload = std::dynamic_pointer_cast<ResourceDisposalPayload>(event.payload)) {

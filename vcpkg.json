@@ -43,10 +43,7 @@
   }, {
     "name" : "cereal",
     "version>=" : "1.3.2#1"
-  }, {
-    "name" : "openvdb",
-    "version>=" : "12.0.1"
-  }, {
+  },  {
     "name" : "entt",
     "version>=" : "3.16.0"
   }, {

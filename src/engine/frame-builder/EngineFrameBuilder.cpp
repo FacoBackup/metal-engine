@@ -83,6 +83,9 @@ namespace Metal {
     }
 
     EngineFrameBuilder &EngineFrameBuilder::addComputeCommandBuffer(const std::string &id, bool requiresRayTracing) {
+        if (requiresRayTracing && !vulkanContext->isRayTracingSupported()) {
+            return *this;
+        }
         currentBuilder = std::make_shared<CommandBufferRecorderBuilder>(frameId + "_" + id);
         storeBuilder();
         return *this;

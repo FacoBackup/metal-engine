@@ -54,6 +54,7 @@ namespace Metal {
         updateProjection();
         updateView();
         camera->projViewMatrix = camera->projectionMatrix * camera->viewMatrix;
+        camera->invProjView = glm::inverse(camera->projViewMatrix);
         camera->extractFrustumPlanes(camera->projViewMatrix);
     }
 
@@ -68,7 +69,7 @@ namespace Metal {
                                                   camera->orthographicProjectionSize,
                                                   -camera->orthographicProjectionSize / camera->aspectRatio,
                                                   camera->orthographicProjectionSize / camera->aspectRatio,
-                                                  -camera->zFar, camera->zFar);
+                                                  camera->zNear, camera->zFar);
         } else {
             camera->projectionMatrix = glm::perspective(camera->fov * Util::TO_RADIANS, camera->aspectRatio,
                                                         camera->zNear,

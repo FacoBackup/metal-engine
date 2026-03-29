@@ -5,6 +5,8 @@ set(EDITOR_SOURCES
         ui/viewport/ViewportPanel.h
         ui/viewport/EngineFramePanel.cpp
         ui/viewport/EngineFramePanel.h
+        ui/viewport/CameraGizmoPanel.cpp
+        ui/viewport/CameraGizmoPanel.h
         ui/docks/AbstractDockPanel.h
         ui/abstract/AbstractPanel.h
         ui/abstract/AbstractPanel.cpp
@@ -139,10 +141,6 @@ set(EDITOR_SOURCES
         ui/viewport/GizmoSettingsPanel.h
         ui/abstract/form/types/QuatField.cpp
         ui/abstract/form/types/QuatField.h
-        dto/SparseVoxelOctreeBuilder.cpp
-        dto/SparseVoxelOctreeBuilder.h
-        dto/OctreeNode.cpp
-        dto/OctreeNode.h
         dto/SceneData.h
         service/NotificationService.cpp
         service/NotificationService.h
@@ -156,13 +154,9 @@ set(EDITOR_SOURCES
         service/PickingService.h
         passes/SelectionIDPass.cpp
         passes/SelectionIDPass.h
-        passes/FallbackPass.cpp
-        passes/FallbackPass.h
         repository/EditorRepository.cpp
         dto/GridPushConstant.h
         dto/AsyncTask.h
-        service/VoxelImporterService.cpp
-        service/VoxelImporterService.h
         dto/SceneImportSettingsDTO.h
         ui/NotificationsPanel.cpp
         ui/NotificationsPanel.h

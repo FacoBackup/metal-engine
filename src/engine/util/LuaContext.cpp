@@ -105,9 +105,10 @@ namespace Metal {
 
         // Bindings
         lua.new_enum("ComponentType",
-                     "PRIMITIVE", PRIMITIVE,
+                     "STATIC_GEOMETRY", STATIC_GEOMETRY,
+                     "INSTANCED_GEOMETRY", INSTANCED_GEOMETRY,
+                     "ANIMATED_GEOMETRY", ANIMATED_GEOMETRY,
                      "TRANSFORM", TRANSFORM,
-                     "VOLUME", VOLUME,
                      "METADATA", METADATA,
                      "LIGHT", LIGHT,
                      "SCRIPT", SCRIPT,

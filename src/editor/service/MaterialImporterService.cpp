@@ -2,14 +2,14 @@
 #include "TextureImporterService.h"
 #include "common/LoggerUtil.h"
 #include "../enum/engine-definitions.h"
-#include "engine/dto/PrimitiveComponent.h"
+#include "engine/dto/StaticGeometryComponent.h"
 #include <assimp/material.h>
 #include <filesystem>
 
 namespace Metal {
     void MaterialImporterService::importMaterial(const std::string &targetDir, const aiMaterial *material,
                                                          const aiScene *scene, const std::string &rootDirectory,
-                                                         PrimitiveComponent &primitive,
+                                                         StaticGeometryComponent &primitive,
                                                          const std::stop_token &stopToken) const {
         namespace fs = std::filesystem;
 

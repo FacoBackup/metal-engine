@@ -1,5 +1,4 @@
 #include "TransformComponent.h"
-#include "VolumeComponent.h"
 #include "../../ApplicationContext.h"
 
 #define ROTATION "Rotation"

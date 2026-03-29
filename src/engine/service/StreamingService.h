@@ -13,12 +13,10 @@ using TimePoint = std::chrono::time_point<Clock>;
 namespace Metal {
     struct MeshInstance;
     struct TextureInstance;
-    struct SVOInstance;
     class EngineContext;
     struct WorldRepository;
     class MeshService;
     class TextureService;
-    class VoxelService;
 
     class StreamingService final : public IService, public ISync {
         std::unordered_map<std::string, long long> lastUse{};
@@ -28,7 +26,6 @@ namespace Metal {
         WorldRepository *worldRepository = nullptr;
         MeshService *meshService = nullptr;
         TextureService *textureService = nullptr;
-        VoxelService *voxelService = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
@@ -36,8 +33,7 @@ namespace Metal {
                 {"EngineContext", &engineContext},
                 {"WorldRepository", &worldRepository},
                 {"MeshService", &meshService},
-                {"TextureService", &textureService},
-                {"VoxelService", &voxelService}
+                {"TextureService", &textureService}
             };
         }
 

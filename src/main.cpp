@@ -27,7 +27,6 @@
 #include "editor/service/SelectionService.h"
 #include "editor/service/TextureImporterService.h"
 #include "editor/service/ThemeService.h"
-#include "editor/service/VoxelImporterService.h"
 #include "editor/repository/EditorRepository.h"
 #include "editor/repository/DockRepository.h"
 #include "editor/repository/AIAssistantRepository.h"
@@ -53,8 +52,6 @@
 #include "engine/service/StreamingService.h"
 #include "engine/service/TextureService.h"
 #include "engine/service/TransformService.h"
-#include "engine/service/VolumeService.h"
-#include "engine/service/VoxelService.h"
 #include "engine/EngineContext.h"
 #include "engine/service/DirtyStateService.h"
 
@@ -110,14 +107,11 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::CameraService>());
     context->registerSingleton(std::make_shared<Metal::TransformService>());
     context->registerSingleton(std::make_shared<Metal::PickingService>());
-    context->registerSingleton(std::make_shared<Metal::VolumeService>());
     context->registerSingleton(std::make_shared<Metal::PhysicsService>());
     context->registerSingleton(std::make_shared<Metal::LuaService>());
-    context->registerSingleton(std::make_shared<Metal::VoxelImporterService>());
     context->registerSingleton(std::make_shared<Metal::LightService>());
     context->registerSingleton(std::make_shared<Metal::StreamingService>());
 
-    context->registerSingleton(std::make_shared<Metal::VoxelService>());
     context->registerSingleton(std::make_shared<Metal::BLASService>());
     context->registerSingleton(std::make_shared<Metal::TLASService>());
     context->registerSingleton(std::make_shared<Metal::ShaderService>());

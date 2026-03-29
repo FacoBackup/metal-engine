@@ -6,7 +6,9 @@
 #include "../dto/MaterialData.h"
 #include "TextureService.h"
 #include "../repository/WorldRepository.h"
-#include "../dto/PrimitiveComponent.h"
+#include "../dto/StaticGeometryComponent.h"
+#include "../dto/InstancedGeometryComponent.h"
+#include "../dto/AnimatedGeometryComponent.h"
 #include "../dto/TransformComponent.h"
 #include "../EngineContext.h"
 #include "BufferService.h"
@@ -19,10 +21,28 @@ namespace Metal {
     void MaterialService::onInitialize() {
         eventListener([this](const Event &event) {
             const auto payload = std::static_pointer_cast<InspectableEventPayload>(event.payload);
-            if (const auto primitive = dynamic_cast<PrimitiveComponent *>(payload->reflectionInstance)) {
+            if (const auto primitive = dynamic_cast<StaticGeometryComponent *>(payload->reflectionInstance)) {
+                dirtyStateService->markEntityDirty(primitive->getEntityId(), DirtyType::Material);
+            } else if (const auto instanced = dynamic_cast<InstancedGeometryComponent *>(payload->reflectionInstance)) {
+                dirtyStateService->markEntityDirty(instanced->getEntityId(), DirtyType::Material);
+            } else if (const auto animated = dynamic_cast<AnimatedGeometryComponent *>(payload->reflectionInstance)) {
+                dirtyStateService->markEntityDirty(animated->getEntityId(), DirtyType::Material);
+            }
+        }, "StaticGeometryComponent");
+
+        eventListener([this](const Event &event) {
+            const auto payload = std::static_pointer_cast<InspectableEventPayload>(event.payload);
+            if (const auto primitive = dynamic_cast<InstancedGeometryComponent *>(payload->reflectionInstance)) {
                 dirtyStateService->markEntityDirty(primitive->getEntityId(), DirtyType::Material);
             }
-        }, "PrimitiveComponent");
+        }, "InstancedGeometryComponent");
+
+        eventListener([this](const Event &event) {
+            const auto payload = std::static_pointer_cast<InspectableEventPayload>(event.payload);
+            if (const auto primitive = dynamic_cast<AnimatedGeometryComponent *>(payload->reflectionInstance)) {
+                dirtyStateService->markEntityDirty(primitive->getEntityId(), DirtyType::Material);
+            }
+        }, "AnimatedGeometryComponent");
     }
 
     void MaterialService::onSync() {
@@ -39,12 +59,12 @@ namespace Metal {
         materialData.clear();
         materialCache.clear();
 
-        auto view = worldRepository->registry.view<PrimitiveComponent>();
+        auto view = worldRepository->registry.view<StaticGeometryComponent>();
 
         bool changed = false;
         for (auto entity: view) {
             if (worldRepository->hiddenEntities.contains(entity)) continue;
-            auto &meshComp = view.get<PrimitiveComponent>(entity);
+            auto &meshComp = view.get<StaticGeometryComponent>(entity);
             if (meshComp.meshId.empty()) continue;
 
             getMaterialIndex(meshComp);
@@ -64,17 +84,46 @@ namespace Metal {
         for (auto entity: dirtyEntities) {
             if (!worldRepository->registry.valid(entity)) continue;
             if (worldRepository->hiddenEntities.contains(entity)) continue;
-            auto &meshComp = worldRepository->registry.get<PrimitiveComponent>(entity);
-            if (meshComp.meshId.empty()) continue;
 
-            std::string key = getMaterialKey(meshComp);
-            if (materialCache.contains(key)) {
-                uint32_t index = materialCache[key];
-                load(materialData[index], meshComp);
-                changed = true;
-            } else {
-                getMaterialIndex(meshComp);
-                changed = true;
+            if (worldRepository->registry.all_of<StaticGeometryComponent>(entity)) {
+                auto &meshComp = worldRepository->registry.get<StaticGeometryComponent>(entity);
+                if (meshComp.meshId.empty()) continue;
+
+                std::string key = getMaterialKey(meshComp);
+                if (materialCache.contains(key)) {
+                    uint32_t index = materialCache[key];
+                    load(materialData[index], meshComp);
+                    changed = true;
+                } else {
+                    getMaterialIndex(meshComp);
+                    changed = true;
+                }
+            } else if (worldRepository->registry.all_of<InstancedGeometryComponent>(entity)) {
+                auto &meshComp = worldRepository->registry.get<InstancedGeometryComponent>(entity);
+                if (meshComp.meshId.empty()) continue;
+
+                std::string key = getMaterialKey(meshComp);
+                if (materialCache.contains(key)) {
+                    uint32_t index = materialCache[key];
+                    load(materialData[index], meshComp);
+                    changed = true;
+                } else {
+                    getMaterialIndex(meshComp);
+                    changed = true;
+                }
+            } else if (worldRepository->registry.all_of<AnimatedGeometryComponent>(entity)) {
+                auto &meshComp = worldRepository->registry.get<AnimatedGeometryComponent>(entity);
+                if (meshComp.meshId.empty()) continue;
+
+                std::string key = getMaterialKey(meshComp);
+                if (materialCache.contains(key)) {
+                    uint32_t index = materialCache[key];
+                    load(materialData[index], meshComp);
+                    changed = true;
+                } else {
+                    getMaterialIndex(meshComp);
+                    changed = true;
+                }
             }
         }
         return changed;
@@ -82,11 +131,11 @@ namespace Metal {
 
     void MaterialService::updateMeshMaterials() {
         bool changed = false;
-        auto view = worldRepository->registry.view<PrimitiveComponent>();
+        auto view = worldRepository->registry.view<StaticGeometryComponent>();
 
         for (auto entity: view) {
             if (worldRepository->hiddenEntities.contains(entity)) continue;
-            auto &meshComp = view.get<PrimitiveComponent>(entity);
+            auto &meshComp = view.get<StaticGeometryComponent>(entity);
             if (meshComp.meshId.empty()) continue;
 
             getMaterialIndex(meshComp);
@@ -118,45 +167,134 @@ namespace Metal {
         fullRebuildNeeded = false;
     }
 
-    void MaterialService::load(MaterialData &dest, const PrimitiveComponent &data) {
-        dest.transmission = data.transmissionFactor;
-        dest.thickness = data.thicknessFactor;
-        dest.ior = data.ior;
+    void MaterialService::load(MaterialData &dest, const StaticGeometryComponent &data) {
         dest.isEmissive = worldRepository->hasComponent(data.getEntityId(), LIGHT) ? 1 : 0;
 
         dest.albedoTextureId = 0;
         dest.roughnessTextureId = 0;
         dest.metallicTextureId = 0;
+        dest.normalTextureId = 0;
+        dest.heightTextureId = 0;
+        dest.parallaxScale = data.parallaxScale;
 
         if (!data.albedo.empty()) {
-            auto *tex = textureService->stream(data.albedo);
-            if (tex != nullptr) {
-                dest.albedoTextureId = textureService->getTextureIndex(data.albedo);
-            }
+            dest.albedoTextureId = textureService->getTextureIndex(data.albedo);
         }
         if (!data.roughness.empty()) {
-            auto *tex = textureService->stream(data.roughness);
-            if (tex != nullptr) {
-                dest.roughnessTextureId = textureService->getTextureIndex(data.roughness);
-            }
+            dest.roughnessTextureId = textureService->getTextureIndex(data.roughness);
         }
         if (!data.metallic.empty()) {
-            auto *tex = textureService->stream(data.metallic);
-            if (tex != nullptr) {
-                dest.metallicTextureId = textureService->getTextureIndex(data.metallic);
-            }
+            dest.metallicTextureId = textureService->getTextureIndex(data.metallic);
+        }
+        if (!data.normal.empty()) {
+            dest.normalTextureId = textureService->getTextureIndex(data.normal);
+        }
+        if (!data.height.empty()) {
+            dest.heightTextureId = textureService->getTextureIndex(data.height);
         }
     }
 
-    std::string MaterialService::getMaterialKey(const PrimitiveComponent &component) const {
+    void MaterialService::load(MaterialData &dest, const InstancedGeometryComponent &data) {
+        dest.isEmissive = worldRepository->hasComponent(data.getEntityId(), LIGHT) ? 1 : 0;
+
+        dest.albedoTextureId = 0;
+        dest.roughnessTextureId = 0;
+        dest.metallicTextureId = 0;
+        dest.normalTextureId = 0;
+        dest.heightTextureId = 0;
+        dest.parallaxScale = data.parallaxScale;
+
+        if (!data.albedo.empty()) {
+            dest.albedoTextureId = textureService->getTextureIndex(data.albedo);
+        }
+        if (!data.roughness.empty()) {
+            dest.roughnessTextureId = textureService->getTextureIndex(data.roughness);
+        }
+        if (!data.metallic.empty()) {
+            dest.metallicTextureId = textureService->getTextureIndex(data.metallic);
+        }
+        if (!data.normal.empty()) {
+            dest.normalTextureId = textureService->getTextureIndex(data.normal);
+        }
+        if (!data.height.empty()) {
+            dest.heightTextureId = textureService->getTextureIndex(data.height);
+        }
+    }
+
+    void MaterialService::load(MaterialData &dest, const AnimatedGeometryComponent &data) {
+        dest.isEmissive = worldRepository->hasComponent(data.getEntityId(), LIGHT) ? 1 : 0;
+
+        dest.albedoTextureId = 0;
+        dest.roughnessTextureId = 0;
+        dest.metallicTextureId = 0;
+        dest.normalTextureId = 0;
+        dest.heightTextureId = 0;
+        dest.parallaxScale = data.parallaxScale;
+
+        if (!data.albedo.empty()) {
+            dest.albedoTextureId = textureService->getTextureIndex(data.albedo);
+        }
+        if (!data.roughness.empty()) {
+            dest.roughnessTextureId = textureService->getTextureIndex(data.roughness);
+        }
+        if (!data.metallic.empty()) {
+            dest.metallicTextureId = textureService->getTextureIndex(data.metallic);
+        }
+        if (!data.normal.empty()) {
+            dest.normalTextureId = textureService->getTextureIndex(data.normal);
+        }
+        if (!data.height.empty()) {
+            dest.heightTextureId = textureService->getTextureIndex(data.height);
+        }
+    }
+
+    std::string MaterialService::getMaterialKey(const StaticGeometryComponent &component) const {
         return component.albedo + "|" + component.roughness + "|" + component.metallic + "|" +
-               std::to_string(component.transmissionFactor) + "|" +
-               std::to_string(component.thicknessFactor) + "|" +
-               std::to_string(component.ior) + "|" +
+               component.normal + "|" + component.height + "|" + std::to_string(component.parallaxScale) + "|" +
                std::to_string(worldRepository->hasComponent(component.getEntityId(), LIGHT));
     }
 
-    uint32_t MaterialService::getMaterialIndex(const PrimitiveComponent &component) {
+    std::string MaterialService::getMaterialKey(const InstancedGeometryComponent &component) const {
+        return component.albedo + "|" + component.roughness + "|" + component.metallic + "|" +
+               component.normal + "|" + component.height + "|" + std::to_string(component.parallaxScale) + "|" +
+               std::to_string(worldRepository->hasComponent(component.getEntityId(), LIGHT));
+    }
+
+    std::string MaterialService::getMaterialKey(const AnimatedGeometryComponent &component) const {
+        return component.albedo + "|" + component.roughness + "|" + component.metallic + "|" +
+               component.normal + "|" + component.height + "|" + std::to_string(component.parallaxScale) + "|" +
+               std::to_string(worldRepository->hasComponent(component.getEntityId(), LIGHT));
+    }
+
+    uint32_t MaterialService::getMaterialIndex(const StaticGeometryComponent &component) {
+        std::string key = getMaterialKey(component);
+        if (materialCache.contains(key)) {
+            return materialCache[key];
+        }
+
+        uint32_t index = static_cast<uint32_t>(materialData.size());
+        materialData.emplace_back();
+        load(materialData.back(), component);
+        materialCache[key] = index;
+
+        return index;
+    }
+
+    uint32_t MaterialService::getMaterialIndex(const InstancedGeometryComponent &component) {
+        std::string key = getMaterialKey(component);
+        if (materialCache.contains(key)) {
+            return materialCache[key];
+        }
+
+        uint32_t index = static_cast<uint32_t>(materialData.size());
+        materialData.emplace_back();
+        load(materialData.back(), component);
+        materialCache[key] = index;
+
+        return index;
+    }
+
+    uint32_t MaterialService::getMaterialIndex(const AnimatedGeometryComponent &component) {
         std::string key = getMaterialKey(component);
         if (materialCache.contains(key)) {
             return materialCache[key];

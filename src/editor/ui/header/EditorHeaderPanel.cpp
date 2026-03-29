@@ -224,7 +224,6 @@ namespace Metal {
                 directoryService->save();
             }
             if (ImGui::MenuItem("Open project")) {
-                // TODO - Clear engine state and then load
                 directoryService->updateRootPath(true);
             }
             if (ImGui::MenuItem("Reload shaders")) {

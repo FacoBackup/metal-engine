@@ -12,13 +12,15 @@
 #include <common/IEventMember.h>
 #include <common/IInit.h>
 
+#include "common/ISync.h"
+
 namespace Metal {
     struct TransformComponent;
 
     struct WorldRepository;
     class DirtyStateService;
 
-    class TransformService final : public IService, public IAsyncSync, public IEventMember, public IInit {
+    class TransformService final : public IService, public ISync, public IEventMember, public IInit {
         WorldRepository *worldRepository = nullptr;
         DirtyStateService *dirtyStateService = nullptr;
 
@@ -37,11 +39,7 @@ namespace Metal {
 
         void onInitialize() override;
 
-        [[nodiscard]] std::string getSyncThreadId() const override { return "physics_transform"; }
-
-        float getSyncInterval() const override { return 16.0f; } // ~60fps
-
-        void onAsyncSync() override;
+        void onSync() override;
 
         void transform(TransformComponent *st, const TransformComponent *parentTransform);
     };

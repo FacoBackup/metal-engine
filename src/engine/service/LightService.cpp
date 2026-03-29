@@ -5,7 +5,7 @@
 #include "../EngineContext.h"
 #include "../repository/EngineRepository.h"
 #include "../repository/WorldRepository.h"
-#include "../dto/PrimitiveComponent.h"
+#include "../dto/StaticGeometryComponent.h"
 #include "../dto/MeshData.h"
 #include "MeshService.h"
 #include "common/LoggerUtil.h"
@@ -20,8 +20,8 @@ namespace Metal {
     }
 
     void LightService::registerLights() {
-        for (const auto entity: worldRepository->registry.view<PrimitiveComponent, LightComponent>()) {
-            auto &primitive = worldRepository->registry.get<PrimitiveComponent>(entity);
+        for (const auto entity: worldRepository->registry.view<StaticGeometryComponent, LightComponent>()) {
+            auto &primitive = worldRepository->registry.get<StaticGeometryComponent>(entity);
             if (primitive.meshId.empty()) {
                 continue;
             }

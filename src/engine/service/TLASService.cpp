@@ -9,7 +9,7 @@
 #include <engine/service/DescriptorSetService.h>
 #include <engine/service/PipelineService.h>
 #include <engine/resource/BufferInstance.h>
-#include <engine/dto/PrimitiveComponent.h>
+#include <engine/dto/StaticGeometryComponent.h>
 #include <engine/dto/TransformComponent.h>
 #include <common/VulkanUtils.h>
 #include <common/LoggerUtil.h>
@@ -78,11 +78,11 @@ namespace Metal {
     void TLASService::updatePrimitiveBuffer() {
         materialService->clear();
         std::vector<PrimitiveData> primitiveDatas(MAX_MESH_INSTANCES);
-        auto view = worldRepository->registry.view<PrimitiveComponent>();
+        auto view = worldRepository->registry.view<StaticGeometryComponent>();
 
         for (auto entity: view) {
             if (worldRepository->hiddenEntities.contains(entity)) continue;
-            auto &meshComp = view.get<PrimitiveComponent>(entity);
+            auto &meshComp = view.get<StaticGeometryComponent>(entity);
             if (meshComp.meshId.empty() || meshComp.renderIndex == 0xFFFFFFFF) continue;
 
             if (meshComp.renderIndex < MAX_MESH_INSTANCES) {
@@ -139,7 +139,7 @@ namespace Metal {
         dispose();
 
         std::vector<VkAccelerationStructureInstanceKHR> instances;
-        auto view = worldRepository->registry.view<PrimitiveComponent, TransformComponent>();
+        auto view = worldRepository->registry.view<StaticGeometryComponent, TransformComponent>();
 
         uint32_t currentInstanceIndex = 0;
         for (auto entity: view) {
@@ -148,7 +148,7 @@ namespace Metal {
                 break;
             }
             if (worldRepository->hiddenEntities.contains(entity)) continue;
-            auto &meshComp = view.get<PrimitiveComponent>(entity);
+            auto &meshComp = view.get<StaticGeometryComponent>(entity);
             if (meshComp.meshId.empty()) continue;
 
             VkDeviceAddress blasAddress = blasService->getBLASAddress(meshComp.meshId);

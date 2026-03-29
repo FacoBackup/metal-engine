@@ -5,9 +5,6 @@ struct MaterialInfo {
     float subsurface;
     float roughness;
     float metallic;
-    float transmission;
-    float thickness;
-    float ior;
     float specular;
     float specularTint;
     float clearcoat;
@@ -33,7 +30,6 @@ struct RayPayload {
     vec3 hitNormal;
     vec2 uv;
     uint renderIndex;
-    float alpha;
     bool hit;
     float t;
 };
