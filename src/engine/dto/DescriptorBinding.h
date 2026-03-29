@@ -12,7 +12,8 @@ namespace Metal {
         COMBINED_IMAGE_SAMPLER,
         STORAGE_IMAGE,
         ACCELERATION_STRUCTURE,
-        FBO_ATTACHMENT
+        FBO_ATTACHMENT,
+        STORAGE_FBO_ATTACHMENT
     };
 
     struct DescriptorBinding {

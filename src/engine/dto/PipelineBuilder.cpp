@@ -103,6 +103,17 @@ namespace Metal {
         return *this;
     }
 
+    PipelineBuilder &PipelineBuilder::addStorageFboBinding(std::string frameBufferId, uint32_t attachmentIndex) {
+        DescriptorBindingBuilder b{};
+        b.bindingPoint = currentBindingPoint++;
+        b.frameBufferId = std::move(frameBufferId);
+        b.attachmentIndex = static_cast<int>(attachmentIndex);
+        b.layout = VK_IMAGE_LAYOUT_GENERAL;
+        b.type = DescriptorBindingType::STORAGE_FBO_ATTACHMENT;
+        resourceBindings.push_back(b);
+        return *this;
+    }
+
     PipelineBuilder &PipelineBuilder::addTextureBinding(TextureInstance *texture) {
         return addCombinedImageSamplerBinding(texture->vkSampler, texture->vkImageView);
     }

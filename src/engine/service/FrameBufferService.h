@@ -18,7 +18,7 @@ namespace Metal {
         VulkanContext *vulkanContext = nullptr;
 
         std::shared_ptr<FrameBufferAttachment> createAttachmentInternal(VkFormat format,
-                                                                        VkImageUsageFlagBits usage,
+                                                                        VkImageUsageFlags usage,
                                                                         FrameBufferInstance *framebuffer) const;
 
         void createVKFrameBuffer(FrameBufferInstance *framebuffer) const;
@@ -33,7 +33,7 @@ namespace Metal {
 
         void createDepthAttachment(FrameBufferInstance *framebuffer) const;
 
-        void createAttachment(VkFormat format, VkImageUsageFlagBits usage,
+        void createAttachment(VkFormat format, VkImageUsageFlags usage,
                               FrameBufferInstance *framebuffer) const;
 
         void createRenderPass(FrameBufferInstance *framebuffer) const;

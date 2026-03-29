@@ -6,10 +6,10 @@
 layout (set = 0, binding = 1) uniform accelerationStructureEXT topLevelAS;
 layout (set = 0, binding = 2, rgba32f) uniform image2D outputImage;
 
-layout (set = 0, binding = 3) uniform sampler2D gBufferAlbedoEmissive;
-layout (set = 0, binding = 4) uniform sampler2D gBufferRoughnessMetallic;
-layout (set = 0, binding = 5) uniform sampler2D gBufferRenderIndexDepth;
-layout (set = 0, binding = 6) uniform sampler2D gBufferNormal;
+layout (set = 0, binding = 3, rgba16f) uniform readonly image2D gBufferAlbedoEmissive;
+layout (set = 0, binding = 4, rg16f) uniform readonly image2D gBufferRoughnessMetallic;
+layout (set = 0, binding = 5, rg32f) uniform readonly image2D gBufferRenderIndexDepth;
+layout (set = 0, binding = 6, rgba16f) uniform readonly image2D gBufferNormal;
 
 #include "../util/HWRayTracingUtil.glsl"
 
@@ -25,7 +25,6 @@ layout (location = 0) rayPayloadEXT RayPayload payload;
 
 #include "../MeshDataSampling.glsl"
 
-
 #include "../util/DisneyBSDF.glsl"
 #include "../util/PixelShading.glsl"
 
@@ -37,72 +36,72 @@ void main() {
 
     vec2 pixelCenter = vec2(launchId) + vec2(0.5);
     vec2 texCoords = pixelCenter / vec2(launchSize);
-//
-//    vec3 finalColor = vec3(0);
-//
-//    payload.hit = false;
-//    payload.renderIndex = 0;
-//
-//    vec2 gBufferRenderIdxDepth = texture(gBufferRenderIndexDepth, texCoords).rg;
-//
-//    if (gBufferRenderIdxDepth.r > 0.0) {
-//        payload.hit = true;
-//        float depth = gBufferRenderIdxDepth.g;
-//        payload.renderIndex = uint(gBufferRenderIdxDepth.r - 1.0);
-//
-//        // Reconstruct position from depth
-//        vec4 clipPos;
-//        clipPos.xy = texCoords * 2.0 - 1.0;
-//        clipPos.z = depth;
-//        clipPos.y *= -1.0; // Invert Y for Vulkan NDC
-//        clipPos.w = 1.0;
-//        vec4 worldPos = globalData.invProjView * clipPos;
-//        payload.hitPosition = worldPos.xyz / worldPos.w;
-//
-//        vec4 gBufferNorm = texture(gBufferNormal, texCoords);
-//        payload.hitNormal = gBufferNorm.rgb;
-//
-//        vec4 albedoEmissive = texture(gBufferAlbedoEmissive, texCoords);
-//        float packedRoughnessMetallic = texture(gBufferRoughnessMetallic, texCoords).r;
-//
-//        float roughness, metallic;
-//        decompressRoughnessMetallic(packedRoughnessMetallic, metallic, roughness);
-//
-//        payload.material.baseColor = albedoEmissive.rgb;
-//        payload.material.roughness = max(roughness, 0.015);
-//        payload.material.metallic = metallic;
-//        payload.material.isEmissive = albedoEmissive.a < 0.0;
-//    }
-//
-//
-//    if (!payload.hit) {
-//        if (pushConstants.isAtmosphereEnabled != 0) {
-//            vec3 rayOrigin;
-//            vec3 rayDirection = createRay(texCoords, globalData.invProj, globalData.invView, rayOrigin);
-//            finalColor = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), rayDirection, 2.0f) * 0.05f;
-//        }
-//    } else {
-//        state = uint(uint(launchId.x) * uint(1973) + uint(launchId.y) * uint(9277) + uint(globalData.globalFrameCount) * uint(26699)) | uint(1);
-//
-//        MaterialInfo material = payload.material;
-//        SurfaceInteraction interaction;
-//        interaction.normal = payload.hitNormal;
-//        interaction.point = payload.hitPosition;
-//        interaction.anyHit = true;
-//
-//        if (material.isEmissive) {
-//            finalColor = material.baseColor;
-//        } else {
-//            vec2 jitterTexCoords = (vec2(launchId) + vec2(random(), random())) / vec2(launchSize);
-//            vec3 rayOrigin;
-//            vec3 rayDirection = createRay(jitterTexCoords, globalData.invProj, globalData.invView, rayOrigin);
-//            finalColor = calculatePixelColor(rayDirection, texCoords, material, interaction);
-//        }
-//    }
-//
-//    vec4 prev = imageLoad(outputImage, launchId);
-//    float count = min(float(globalData.pathTracerMaxSamples), max(float(globalData.pathTracerAccumulationCount), 1.0));
-//    vec3 color = prev.rgb * (1.0 - 1.0 / count) + finalColor.rgb * (1.0 / count);
 
-    imageStore(outputImage, launchId, vec4(vec2(pixelCenter), 0, 1));
+    vec3 finalColor = vec3(0);
+
+    payload.hit = false;
+    payload.renderIndex = 0;
+
+    vec2 gBufferRenderIdxDepth = imageLoad(gBufferRenderIndexDepth, launchId).rg;
+
+    if (gBufferRenderIdxDepth.r > 0.0) {
+        payload.hit = true;
+        float depth = gBufferRenderIdxDepth.g;
+        payload.renderIndex = uint(gBufferRenderIdxDepth.r - 1.0);
+
+        // Reconstruct position from depth
+        vec4 clipPos;
+        clipPos.xy = texCoords * 2.0 - 1.0;
+        clipPos.z = depth;
+        clipPos.y *= -1.0; // Invert Y for Vulkan NDC
+        clipPos.w = 1.0;
+        vec4 worldPos = globalData.invProjView * clipPos;
+        payload.hitPosition = worldPos.xyz / worldPos.w;
+
+        vec4 gBufferNorm = imageLoad(gBufferNormal, launchId);
+        payload.hitNormal = gBufferNorm.rgb;
+
+        vec4 albedoEmissive = imageLoad(gBufferAlbedoEmissive, launchId);
+        float packedRoughnessMetallic = imageLoad(gBufferRoughnessMetallic, launchId).r;
+
+        float roughness, metallic;
+        decompressRoughnessMetallic(packedRoughnessMetallic, metallic, roughness);
+
+        payload.material.baseColor = albedoEmissive.rgb;
+        payload.material.roughness = max(roughness, 0.015);
+        payload.material.metallic = metallic;
+        payload.material.isEmissive = albedoEmissive.a < 0.0;
+    }
+
+
+    if (!payload.hit) {
+        if (pushConstants.isAtmosphereEnabled != 0) {
+            vec3 rayOrigin;
+            vec3 rayDirection = createRay(texCoords, globalData.invProj, globalData.invView, rayOrigin);
+            finalColor = calculate_sky_luminance_rgb(normalize(globalData.sunPosition), rayDirection, 2.0f) * 0.05f;
+        }
+    } else {
+        state = uint(uint(launchId.x) * uint(1973) + uint(launchId.y) * uint(9277) + uint(globalData.globalFrameCount) * uint(26699)) | uint(1);
+
+        MaterialInfo material = payload.material;
+        SurfaceInteraction interaction;
+        interaction.normal = payload.hitNormal;
+        interaction.point = payload.hitPosition;
+        interaction.anyHit = true;
+
+        if (material.isEmissive) {
+            finalColor = material.baseColor;
+        } else {
+            vec2 jitterTexCoords = (vec2(launchId) + vec2(random(), random())) / vec2(launchSize);
+            vec3 rayOrigin;
+            vec3 rayDirection = createRay(jitterTexCoords, globalData.invProj, globalData.invView, rayOrigin);
+            finalColor = calculatePixelColor(rayDirection, texCoords, material, interaction);
+        }
+    }
+
+    vec4 prev = imageLoad(outputImage, launchId);
+    float count = min(float(globalData.pathTracerMaxSamples), max(float(globalData.pathTracerAccumulationCount), 1.0));
+    vec3 color = prev.rgb * (1.0 - 1.0 / count) + finalColor.rgb * (1.0 / count);
+
+    imageStore(outputImage, launchId, vec4(color, 1));
 }

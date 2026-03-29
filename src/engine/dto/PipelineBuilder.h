@@ -128,6 +128,11 @@ namespace Metal {
                                             VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
         /**
+         * @brief Adds a binding for a specific framebuffer attachment as a storage image.
+         */
+        PipelineBuilder &addStorageFboBinding(std::string frameBufferId, uint32_t attachmentIndex);
+
+        /**
          * @brief Adds a binding for an existing texture instance.
          */
         PipelineBuilder &addTextureBinding(TextureInstance *texture);

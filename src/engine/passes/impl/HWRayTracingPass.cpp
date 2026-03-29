@@ -26,10 +26,10 @@ namespace Metal {
                 .addAccelerationStructureBinding(VK_NULL_HANDLE)
                 .addStorageImageBinding(getScopedResourceId(RID_ACCUMULATED_FRAME))
 
-                .addFboBinding(getScopedResourceId(RID_GBUFFER_FBO), RID_GBUFFER_ALBEDO_EMISSIVE)
-                .addFboBinding(getScopedResourceId(RID_GBUFFER_FBO), RID_GBUFFER_ROUGHNESS_METALLIC)
-                .addFboBinding(getScopedResourceId(RID_GBUFFER_FBO), RID_GBUFFER_RENDER_INDEX_DEPTH)
-                .addFboBinding(getScopedResourceId(RID_GBUFFER_FBO), RID_GBUFFER_NORMAL)
+                .addStorageFboBinding(getScopedResourceId(RID_GBUFFER_FBO), RID_GBUFFER_ALBEDO_EMISSIVE)
+                .addStorageFboBinding(getScopedResourceId(RID_GBUFFER_FBO), RID_GBUFFER_ROUGHNESS_METALLIC)
+                .addStorageFboBinding(getScopedResourceId(RID_GBUFFER_FBO), RID_GBUFFER_RENDER_INDEX_DEPTH)
+                .addStorageFboBinding(getScopedResourceId(RID_GBUFFER_FBO), RID_GBUFFER_NORMAL)
 
                 .addBufferBinding(getScopedResourceId(RID_LIGHT_BUFFER))
                 .addBufferBinding(getScopedResourceId(RID_MATERIAL_DATA_BUFFER))

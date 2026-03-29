@@ -28,7 +28,7 @@ namespace Metal {
         return *this;
     }
 
-    EngineFrameBuilder &EngineFrameBuilder::addColor(VkFormat format, VkImageUsageFlagBits usage) {
+    EngineFrameBuilder &EngineFrameBuilder::addColor(VkFormat format, VkImageUsageFlags usage) {
         dynamic_cast<FramebufferBuilder *>(currentBuilder.get())->addColor(format, usage, nullptr);
         return *this;
     }

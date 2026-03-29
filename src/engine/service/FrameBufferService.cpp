@@ -29,7 +29,7 @@ namespace Metal {
         att->depth = true;
     }
 
-    void FrameBufferService::createAttachment(VkFormat format, VkImageUsageFlagBits usage,
+    void FrameBufferService::createAttachment(VkFormat format, VkImageUsageFlags usage,
                                               FrameBufferInstance *framebuffer) const {
         const auto att = createAttachmentInternal(format,
                                                   usage,
@@ -39,7 +39,7 @@ namespace Metal {
 
     std::shared_ptr<FrameBufferAttachment> FrameBufferService::createAttachmentInternal(
         VkFormat format,
-        VkImageUsageFlagBits usage,
+        VkImageUsageFlags usage,
         FrameBufferInstance *framebuffer) const {
         std::shared_ptr<FrameBufferAttachment> attachment = std::make_shared<FrameBufferAttachment>();
         ctx->injectDependencies(attachment.get());

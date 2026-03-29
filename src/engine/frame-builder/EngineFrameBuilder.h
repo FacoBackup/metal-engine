@@ -70,7 +70,7 @@ namespace Metal {
         /**
          * @brief Adds a color attachment to the current framebuffer being built.
          */
-        EngineFrameBuilder &addColor(VkFormat format, VkImageUsageFlagBits usage);
+        EngineFrameBuilder &addColor(VkFormat format, VkImageUsageFlags usage);
 
         /**
          * @brief Adds a depth attachment to the current framebuffer being built.

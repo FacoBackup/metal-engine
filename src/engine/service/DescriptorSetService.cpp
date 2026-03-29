@@ -32,7 +32,7 @@ namespace Metal {
             binding.frameBufferId = builder.frameBufferId;
             binding.attachmentIndex = builder.attachmentIndex;
 
-            if (builder.type == DescriptorBindingType::FBO_ATTACHMENT) {
+            if (builder.type == DescriptorBindingType::FBO_ATTACHMENT || builder.type == DescriptorBindingType::STORAGE_FBO_ATTACHMENT) {
                 auto *fbo = framebufferService->getResource(binding.frameBufferId);
                 if (fbo == nullptr) {
                     throw std::runtime_error("Framebuffer not found: " + binding.frameBufferId);
@@ -41,7 +41,7 @@ namespace Metal {
                     throw std::runtime_error("FBO attachment index out of bounds: " + std::to_string(binding.attachmentIndex));
                 }
                 binding.view = fbo->attachments[binding.attachmentIndex]->vkImageView;
-                if (binding.sampler == VK_NULL_HANDLE) {
+                if (builder.type == DescriptorBindingType::FBO_ATTACHMENT && binding.sampler == VK_NULL_HANDLE) {
                     binding.sampler = vulkanContext->vkImageSampler;
                 }
             }
@@ -65,6 +65,9 @@ namespace Metal {
                 case DescriptorBindingType::COMBINED_IMAGE_SAMPLER:
                 case DescriptorBindingType::FBO_ATTACHMENT:
                     binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+                    break;
+                case DescriptorBindingType::STORAGE_FBO_ATTACHMENT:
+                    binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
                     break;
                 case DescriptorBindingType::STORAGE_IMAGE: {
                     auto *texture = textureService->getResource(binding.storageImageId);
