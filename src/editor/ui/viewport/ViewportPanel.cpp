@@ -4,13 +4,12 @@
 #include "ImGuizmo.h"
 #include "ViewportHeaderPanel.h"
 #include "EngineFramePanel.h"
-#include "engine/dto/Camera.h"
+#include "engine/repository/CameraRepository.h"
 #include "engine/frame-builder/EngineFrameBuilder.h"
 #include <algorithm>
 #include "../../repository/EditorRepository.h"
 #include "engine/repository/WorldRepository.h"
 #include "../../service/SelectionService.h"
-#include "engine/service/CameraService.h"
 #include "engine/repository/RuntimeRepository.h"
 #include "engine/EngineContext.h"
 #include "engine/dto/MetadataComponent.h"
@@ -101,9 +100,9 @@ namespace Metal {
             lastMouseY = mouseY;
 
             if (const auto &io = ImGui::GetIO(); io.MouseWheel != 0) {
-                worldRepository->camera.movementSensitivity += io.MouseWheel * 100 * engineContext->deltaTime;
-                worldRepository->camera.movementSensitivity =
-                        std::max(.1f, worldRepository->camera.movementSensitivity);
+                cameraRepository->movementSensitivity += io.MouseWheel * 100 * engineContext->deltaTime;
+                cameraRepository->movementSensitivity =
+                        std::max(.1f, cameraRepository->movementSensitivity);
             }
             isFirstMovement = false;
         } else {

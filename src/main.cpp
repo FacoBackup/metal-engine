@@ -56,6 +56,7 @@
 #include "engine/service/TransformService.h"
 #include "engine/EngineContext.h"
 #include "editor/ui/viewport/GizmoTransformStrategy.h"
+#include "engine/repository/CameraRepository.h"
 #include "engine/service/DirtyStateService.h"
 
 int main(int, char **) {
@@ -111,6 +112,7 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::FileImporterService>());
     context->registerSingleton(std::make_shared<Metal::EditorCameraService>());
     context->registerSingleton(std::make_shared<Metal::CameraService>());
+    context->registerSingleton(std::make_shared<Metal::CameraRepository>());
     context->registerSingleton(std::make_shared<Metal::TransformService>());
     context->registerSingleton(std::make_shared<Metal::PickingService>());
     context->registerSingleton(std::make_shared<Metal::PhysicsService>());

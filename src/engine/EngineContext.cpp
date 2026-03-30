@@ -9,6 +9,7 @@
 #include "service/LightService.h"
 #include "service/PhysicsService.h"
 #include "repository/WorldRepository.h"
+#include "repository/CameraRepository.h"
 #include "repository/EngineRepository.h"
 #include "editor/repository/EditorRepository.h"
 #include "core/VulkanContext.h"
@@ -64,7 +65,6 @@ namespace Metal {
             tlasService->onSync();
         }
         materialService->onSync();
-        cameraUpdateCallback();
         cameraService->onSync();
         lightService->onSync();
         for (auto *frame: registeredFrames) {
@@ -80,13 +80,12 @@ namespace Metal {
     }
 
     void EngineContext::updateGlobalData() {
-        auto &camera = worldRepository->camera;
         globalDataUBO.previousProjView = globalDataUBO.projView;
-        globalDataUBO.projView = camera.projViewMatrix;
-        globalDataUBO.invProj = camera.invProjectionMatrix;
-        globalDataUBO.invView = camera.invViewMatrix;
-        globalDataUBO.invProjView = camera.invProjView;
-        globalDataUBO.cameraWorldPosition = camera.position;
+        globalDataUBO.projView = cameraRepository->projViewMatrix;
+        globalDataUBO.invProj = cameraRepository->invProjectionMatrix;
+        globalDataUBO.invView = cameraRepository->invViewMatrix;
+        globalDataUBO.invProjView = cameraRepository->invProjView;
+        globalDataUBO.cameraWorldPosition = cameraRepository->position;
         globalDataUBO.lightsCount = lightService->getCount();
         globalDataUBO.debugFlag = ShadingModes::IndexOfValue(editorRepository->shadingMode);
 
@@ -99,7 +98,7 @@ namespace Metal {
         globalDataUBO.pathTracerMaxSamples = engineRepository->pathTracerMaxSamples;
         globalDataUBO.denoiserEnabled = engineRepository->denoiserEnabled && (
                                             globalDataUBO.debugFlag == LIT || globalDataUBO.debugFlag == GRID);
-        globalDataUBO.isOrthographic = camera.isOrthographic;
+        globalDataUBO.isOrthographic = cameraRepository->isOrthographic;
 
         currentFrame->getResourceAs<BufferInstance>(RID_GLOBAL_DATA)->update(&globalDataUBO);
     }

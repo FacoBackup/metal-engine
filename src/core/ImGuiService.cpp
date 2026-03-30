@@ -12,6 +12,7 @@
 #include "WindowService.h"
 #include "engine/service/DescriptorSetService.h"
 #include "editor/enum/engine-definitions.h"
+#include "editor/ui/UIUtil.h"
 
 namespace Metal {
     void ImGuiService::renderImage(TextureInstance *texture, const float sizeX, const float sizeY) const {

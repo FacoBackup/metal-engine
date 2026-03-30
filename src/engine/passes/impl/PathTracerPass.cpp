@@ -1,4 +1,4 @@
-#include "HWRayTracingPass.h"
+#include "PathTracerPass.h"
 #include "../../dto/PipelineBuilder.h"
 #include "../../resource/PipelineInstance.h"
 #include "../../resource/TextureInstance.h"
@@ -16,16 +16,16 @@
 #include "engine/frame-builder/EngineFrame.h"
 
 namespace Metal {
-    void HWRayTracingPass::onInitialize() {
+    void PathTracerPass::onInitialize() {
         eventListener([this](const Event &) {
             needsUpdate = true;
         }, "EngineRepository");
 
         PipelineBuilder builder = PipelineBuilder::OfRayTracing(
-                    "rt/HWRayTracing.rgen",
-                    "rt/HWRayTracing.rmiss",
-                    "rt/HWRayTracing.rchit")
-                .setPushConstantsSize(sizeof(HWRayTracingPushConstant))
+                    "rt/PathTracer.rgen",
+                    "rt/PathTracer.rmiss",
+                    "rt/PathTracer.rchit")
+                .setPushConstantsSize(sizeof(PathTracerPushConstant))
                 .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA)) // 0
                 .addAccelerationStructureBinding(VK_NULL_HANDLE) // 1
                 .addStorageImageBinding(getScopedResourceId(RID_ACCUMULATED_FRAME)) // 2
@@ -45,7 +45,11 @@ namespace Metal {
         pipelineInstance = pipelineService->createPipeline(builder);
     }
 
-    void HWRayTracingPass::onSync() {
+    bool PathTracerPass::shouldRun() {
+        return engineRepository->isRayTracingEnabled;
+    }
+
+    void PathTracerPass::onSync() {
         auto *accumulatedFrame = frame->getResourceAs<TextureInstance>(RID_ACCUMULATED_FRAME);
         auto *gBuffer = frame->getResourceAs<RenderTargetInstance>(RID_GBUFFER_RT);
 

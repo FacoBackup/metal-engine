@@ -7,6 +7,7 @@
 #include "../../frame-builder/EngineFrame.h"
 #include "../../resource/TextureInstance.h"
 #include "engine/resource/RenderTargetInstance.h"
+#include "engine/repository/CameraRepository.h"
 
 namespace Metal {
     void MotionBlurPass::onInitialize() {
@@ -24,10 +25,9 @@ namespace Metal {
     }
 
     void MotionBlurPass::onSync() {
-        auto &camera = worldRepository->camera;
-        pushConstant.motionBlurEnabled = camera.motionBlurEnabled;
-        pushConstant.motionBlurVelocityScale = camera.motionBlurVelocityScale;
-        pushConstant.motionBlurMaxSamples = camera.motionBlurMaxSamples;
+        pushConstant.motionBlurEnabled = cameraRepository->motionBlurEnabled;
+        pushConstant.motionBlurVelocityScale = cameraRepository->motionBlurVelocityScale;
+        pushConstant.motionBlurMaxSamples = cameraRepository->motionBlurMaxSamples;
 
         recordPushConstant(&pushConstant);
         recordDrawSimpleInstanced(3, 1);

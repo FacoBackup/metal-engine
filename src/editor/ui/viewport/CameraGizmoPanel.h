@@ -5,10 +5,10 @@
 #include <glm/mat4x4.hpp>
 
 namespace Metal {
-    struct WorldRepository;
+    struct CameraRepository;
 
     class CameraGizmoPanel final : public AbstractPanel {
-        WorldRepository *worldRepository = nullptr;
+        CameraRepository *cameraRepository = nullptr;
         glm::mat4 tempView{1.0f};
         bool isManipulating = false;
         static constexpr float GIZMO_SIZE = 100.0f;
@@ -16,7 +16,7 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"WorldRepository", &worldRepository}
+                {"CameraRepository", &cameraRepository}
             };
         }
 

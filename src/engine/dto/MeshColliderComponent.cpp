@@ -4,7 +4,7 @@
 
 namespace Metal {
     void MeshColliderComponent::registerFields() {
-        static const std::vector<const FileExtensionInfo*> meshExtensions = {Metal::FileExtensions::mesh.get()};
+        static const std::vector<const FileExtensionInfo*> meshExtensions = {Metal::FileExtensions::geometry.get()};
         registerEditableField<RESOURCE>(&meshId).setName("meshId").setLabel("Mesh").setSupportedFileTypes(meshExtensions);
         registerSerializableOnlyField<BOOLEAN>(&isConvex).setName("isConvex");
     }

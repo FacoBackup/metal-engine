@@ -4,7 +4,7 @@
 #include "../docks/AbstractDockPanel.h"
 
 namespace Metal {
-    class CameraService;
+    struct CameraRepository;
     class SelectionService;
     struct EditorRepository;
     struct WorldRepository;
@@ -21,7 +21,7 @@ namespace Metal {
         std::shared_ptr<AbstractPanel> cameraGizmoPanel = nullptr;
         std::shared_ptr<AbstractPanel> engineFramePanel = nullptr;
 
-        CameraService *cameraService = nullptr;
+        CameraRepository *cameraRepository = nullptr;
         SelectionService *selectionService = nullptr;
         EditorRepository *editorRepository = nullptr;
         WorldRepository *worldRepository = nullptr;
@@ -32,7 +32,7 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
-                {"CameraService", &cameraService},
+                {"CameraRepository", &cameraRepository},
                 {"SelectionService", &selectionService},
                 {"EditorRepository", &editorRepository},
                 {"WorldRepository", &worldRepository},

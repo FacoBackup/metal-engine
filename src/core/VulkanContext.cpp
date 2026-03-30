@@ -11,7 +11,6 @@
 #include "engine/service/RenderTargetService.h"
 
 namespace Metal {
-
     void VulkanContext::createSwapChain() {
         int w{}, h{};
         SDL_GetWindowSizeInPixels(window, &w, &h);
@@ -92,7 +91,8 @@ namespace Metal {
                 vkGetDeviceProcAddr(device.device, "vkGetAccelerationStructureBuildSizesKHR"));
             vkCmdBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(
                 vkGetDeviceProcAddr(device.device, "vkCmdBuildAccelerationStructuresKHR"));
-            vkGetAccelerationStructureDeviceAddressKHR = reinterpret_cast<PFN_vkGetAccelerationStructureDeviceAddressKHR>(
+            vkGetAccelerationStructureDeviceAddressKHR = reinterpret_cast<
+                PFN_vkGetAccelerationStructureDeviceAddressKHR>(
                 vkGetDeviceProcAddr(device.device, "vkGetAccelerationStructureDeviceAddressKHR"));
             vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(
                 vkGetDeviceProcAddr(device.device, "vkCreateRayTracingPipelinesKHR"));
@@ -310,7 +310,6 @@ namespace Metal {
     }
 
     void VulkanContext::disposeManually() {
-
         vkDestroySampler(device.device, vkImageSampler, nullptr);
         vkDestroySampler(device.device, vkTextureSampler, nullptr);
 
@@ -341,7 +340,11 @@ namespace Metal {
         poolInfo.maxSets = 500;
 
         VulkanUtils::CheckVKResult(vkCreateDescriptorPool(device.device, &poolInfo,
-                                                          nullptr, const_cast<VkDescriptorPool*>(&descriptorPool)));
+                                                          nullptr, const_cast<VkDescriptorPool *>(&descriptorPool)));
+    }
+
+    uint32_t VulkanContext::getMaxCombinedImageSamplers() const {
+        return physicalDeviceProperties.limits.maxDescriptorSetSamplers / 2;
     }
 
     VkCommandBuffer VulkanContext::beginSingleTimeCommands() const {

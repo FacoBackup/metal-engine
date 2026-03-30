@@ -4,7 +4,6 @@
 #include "common/Reflection.h"
 #include "common/IRepository.h"
 #include "engine/repository/WorldRepository.h"
-#include "engine/dto/Camera.h"
 
 namespace Metal {
     void RepositoriesPanel::onInitialize() {

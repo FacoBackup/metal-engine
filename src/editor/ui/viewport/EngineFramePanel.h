@@ -6,6 +6,7 @@
 #include <imgui.h>
 
 namespace Metal {
+    class CameraService;
     class EngineFrame;
     class VulkanContext;
     struct EngineRepository;
@@ -27,7 +28,7 @@ namespace Metal {
         PickingService *pickingService = nullptr;
         SelectionService *selectionService = nullptr;
         WorldRepository *worldRepository = nullptr;
-        EditorCameraRepository *editorCameraRepository = nullptr;
+        CameraService *cameraService = nullptr;
         EditorCameraService *editorCameraService = nullptr;
 
     public:
@@ -37,11 +38,11 @@ namespace Metal {
                 {"EngineRepository", &engineRepository},
                 {"EditorRepository", &editorRepository},
                 {"EngineContext", &engineContext},
+                {"cameraService", &cameraService},
                 {"DescriptorSetService", &descriptorSetService},
                 {"PickingService", &pickingService},
                 {"SelectionService", &selectionService},
                 {"WorldRepository", &worldRepository},
-                {"EditorCameraRepository", &editorCameraRepository},
                 {"EditorCameraService", &editorCameraService}
             };
         }

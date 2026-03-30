@@ -15,8 +15,8 @@
 #include "ImGuizmo.h"
 #include "../../repository/EditorRepository.h"
 #include <algorithm>
-#include "engine/passes/impl/DepthOfFieldPass.h"
-#include "engine/passes/impl/HWRayTracingPass.h"
+#include "engine/passes/impl/PBRPass.h"
+#include "engine/passes/impl/PathTracerPass.h"
 #include "engine/passes/impl/MotionBlurPass.h"
 #include "engine/passes/impl/PostProcessingPass.h"
 #include "engine/passes/impl/StaticGBufferPass.h"
@@ -29,63 +29,11 @@
 #include "engine/EngineContext.h"
 #include "engine/service/DescriptorSetService.h"
 #include "../../service/SelectionService.h"
-#include "engine/resource/TextureInstance.h"
-
-#include "editor/repository/EditorCameraRepository.h"
 #include "editor/service/EditorCameraService.h"
-#include "engine/repository/WorldRepository.h"
-#include "engine/dto/CameraComponent.h"
-#include "engine/dto/TransformComponent.h"
-
-#include "editor/ui/UIUtil.h"
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Metal {
     void EngineFramePanel::onInitialize() {
-        engineContext->setCameraUpdateCallback([this]() {
-            if (!editorRepository->isPlaying) {
-                worldRepository->camera.fov = editorCameraRepository->fov;
-                worldRepository->camera.zNear = editorCameraRepository->zNear;
-                worldRepository->camera.zFar = editorCameraRepository->zFar;
-                worldRepository->camera.rotationSensitivity = editorCameraRepository->rotationSensitivity;
-                worldRepository->camera.movementSensitivity = editorCameraRepository->movementSensitivity;
-                worldRepository->camera.zoomSensitivity = editorCameraRepository->zoomSensitivity;
-                worldRepository->camera.motionBlurEnabled = editorCameraRepository->motionBlurEnabled;
-                worldRepository->camera.motionBlurVelocityScale = editorCameraRepository->motionBlurVelocityScale;
-                worldRepository->camera.motionBlurMaxSamples = editorCameraRepository->motionBlurMaxSamples;
-                worldRepository->camera.cameraMotionBlur = editorCameraRepository->cameraMotionBlur;
-                worldRepository->camera.dofEnabled = editorCameraRepository->dofEnabled;
-                worldRepository->camera.dofFocusDistance = editorCameraRepository->dofFocusDistance;
-                worldRepository->camera.dofAperture = editorCameraRepository->dofAperture;
-                worldRepository->camera.dofFocalLength = editorCameraRepository->dofFocalLength;
-                worldRepository->camera.bloomEnabled = editorCameraRepository->bloomEnabled;
-                worldRepository->camera.filmGrain = editorCameraRepository->filmGrain;
-                worldRepository->camera.vignetteEnabled = editorCameraRepository->vignetteEnabled;
-                worldRepository->camera.chromaticAberrationEnabled = editorCameraRepository->chromaticAberrationEnabled;
-                worldRepository->camera.distortionEnabled = editorCameraRepository->distortionEnabled;
-                worldRepository->camera.filmGrainStrength = editorCameraRepository->filmGrainStrength;
-                worldRepository->camera.vignetteStrength = editorCameraRepository->vignetteStrength;
-                worldRepository->camera.bloomThreshold = editorCameraRepository->bloomThreshold;
-                worldRepository->camera.bloomQuality = editorCameraRepository->bloomQuality;
-                worldRepository->camera.bloomOffset = editorCameraRepository->bloomOffset;
-                worldRepository->camera.chromaticAberrationIntensity = editorCameraRepository->
-                        chromaticAberrationIntensity;
-                worldRepository->camera.distortionIntensity = editorCameraRepository->distortionIntensity;
-                worldRepository->camera.position = editorCameraRepository->position;
-                worldRepository->camera.pitch = editorCameraRepository->pitch;
-                worldRepository->camera.yaw = editorCameraRepository->yaw;
-            } else {
-                auto view = worldRepository->registry.view<CameraComponent, TransformComponent>();
-                for (auto entity: view) {
-                    auto &cameraComp = view.get<CameraComponent>(entity);
-                    if (cameraComp.mainCamera) {
-                        worldRepository->updateCameraData(entity);
-                        break;
-                    }
-                }
-            }
-        });
-
         const auto gBufferW = vulkanContext->getWindowWidth() / engineRepository->
                               shadingResInvScale;
         const auto gBufferH = vulkanContext->getWindowHeight() / engineRepository
@@ -132,10 +80,10 @@ namespace Metal {
                 .addPass(std::make_unique<StaticGBufferPass>(), RID_GBUFFER_CB)
 
                 .addComputeCommandBuffer(RID_RT_COMPUTE_CB, true) // 1
-                .addPass(std::make_unique<HWRayTracingPass>(), RID_RT_COMPUTE_CB)
+                .addPass(std::make_unique<PathTracerPass>(), RID_RT_COMPUTE_CB)
 
                 .addCommandBuffer(RID_DOF_CB, RID_DOF_RT) // 2
-                .addPass(std::make_unique<DepthOfFieldPass>(), RID_DOF_CB)
+                .addPass(std::make_unique<PBRPass>(), RID_DOF_CB)
 
                 .addCommandBuffer(RID_MOTION_BLUR_CB, RID_MOTION_BLUR_RT) // 3
                 .addPass(std::make_unique<MotionBlurPass>(), RID_MOTION_BLUR_CB)

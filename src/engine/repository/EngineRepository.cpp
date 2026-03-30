@@ -14,6 +14,7 @@ namespace Metal {
 
         registerEditableField<FLOAT>(&pathTracerMultiplier).setName("pathTracerMultiplier").setLabel("Path tracer multiplier").setMin(0).setMax(100).setIncrement(0.1f);
         registerEditableField<BOOLEAN>(&denoiserEnabled).setName("denoiserEnabled").setLabel("Denoiser enabled");
+        registerEditableField<BOOLEAN>(&isRayTracingEnabled).setName("isRayTracingEnabled").setLabel("Ray tracing enabled");
         registerEditableField<INT>(&pathTracerMaxSamples).setName("pathTracerMaxSamples").setLabel("Path tracer max accumulation").setMin(1).setMax(10000).setIncrement(10);
         registerEditableField<INT>(&pathTracerSamples).setName("pathTracerSamples").setLabel("Path tracer samples per pixel").setMin(1).setMax(32).setIncrement(1);
         registerEditableField<INT>(&pathTracerBounces).setName("pathTracerBounces").setLabel("Path tracer bounces").setMin(0).setMax(16).setIncrement(1);

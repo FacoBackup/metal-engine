@@ -1,14 +1,11 @@
-#ifndef CAMERA_H
-#define CAMERA_H
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_LEFT_HANDED
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/mat4x4.hpp>
-#include <glm/vec3.hpp>
+#ifndef METAL_ENGINE_CAMERAREPOSITORY_H
+#define METAL_ENGINE_CAMERAREPOSITORY_H
+#include "common/IInit.h"
+#include "common/IRepository.h"
+#include <glm/glm.hpp>
 
-#include "../../common/Reflection.h"
 namespace Metal {
-    struct Camera final : Reflection {
+    struct CameraRepository : IRepository, IInit {
         float fov = 90;
         float zNear = .1f;
         float zFar = 10000;
@@ -61,6 +58,9 @@ namespace Metal {
         float deltaX = 0;
         float deltaY = 0;
 
+        void clear() override {
+        }
+
         const char *getTitle() const override;
 
         const char *getIcon() const override;
@@ -71,14 +71,13 @@ namespace Metal {
 
         void registerFields() override;
 
-        explicit Camera(float pitch, float yaw, glm::vec3 position);
-
+        void onInitialize() override;
 
     private:
         static void extractPlane(const glm::mat4 &matrix, int index, glm::vec4 &plane);
 
         glm::vec4 planes[6] = {glm::vec4{}, glm::vec4{}, glm::vec4{}, glm::vec4{}, glm::vec4{}, glm::vec4{}};
     };
-}
+} // Metal
 
-#endif
+#endif //METAL_ENGINE_CAMERAREPOSITORY_H

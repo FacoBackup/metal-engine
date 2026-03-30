@@ -1,4 +1,5 @@
 #include "LayoutingToolProvider.h"
+#include "engine/repository/CameraRepository.h"
 #include "engine/repository/WorldRepository.h"
 #include "editor/service/FilesService.h"
 #include "engine/dto/TransformComponent.h"
@@ -12,18 +13,18 @@
 namespace Metal {
     void LayoutingToolProvider::registerTools() {
         // Tool: list_mesh_files
-        registerTool("list_mesh_files", "Lists all available .mesh files in the project.", {},
-                     [this](const nlohmann::json &params) { return listMeshFiles(params); });
+        registerTool("list_mesh_files", "Lists all available .geometry files in the project.", {},
+                     [this](const nlohmann::json &) { return listMeshFiles(); });
 
         // Tool: get_camera_position
         registerTool("get_camera_position", "Returns the current camera position and orientation.", {},
-                     [this](const nlohmann::json &params) { return getCameraPosition(params); });
+                     [this](const nlohmann::json &) { return getCameraPosition(); });
 
         // Tool: create_mesh_entity
         registerTool("create_mesh_entity",
-                     "Creates a new entity with a mesh and optional transform. If 'position' is not provided, the entity should be created in front of the camera.",
+                     "Creates a new entity with a geometry and optional transform. If 'position' is not provided, the entity should be created in front of the camera.",
                      {
-                         {"mesh_id", "The ID/path of the mesh file", ToolParamType::STRING},
+                         {"mesh_id", "The ID/path of the geometry file", ToolParamType::STRING},
                          {"name", "Optional name for the entity (string)", ToolParamType::STRING},
                          {
                              "position", "Optional array of 3 numbers [x, y, z] - Pass as string: '[x,y,z]'",
@@ -62,29 +63,28 @@ namespace Metal {
                      [this](const nlohmann::json &params) { return setEntityTransform(params); });
     }
 
-    std::string LayoutingToolProvider::listMeshFiles(const nlohmann::json &params) {
-        auto meshes = filesService->listFilesWithExtension(Metal::FileExtensions::mesh->extension);
-        if (meshes.empty()) return std::string("No .mesh files found.");
+    std::string LayoutingToolProvider::listMeshFiles() const {
+        auto meshes = filesService->listFilesWithExtension(Metal::FileExtensions::geometry->extension);
+        if (meshes.empty()) return "No .geometry files found.";
 
         std::stringstream ss;
-        ss << "Available mesh files:\n";
+        ss << "Available geometry files:\n";
         for (const auto &mesh: meshes) {
             ss << "- " << mesh << "\n";
         }
         return ss.str();
     }
 
-    std::string LayoutingToolProvider::getCameraPosition(const nlohmann::json &params) {
-        auto &camera = worldRepository->camera;
+    std::string LayoutingToolProvider::getCameraPosition() const {
         nlohmann::json j;
-        j["position"] = {camera.position.x, camera.position.y, camera.position.z};
-        j["pitch"] = camera.pitch;
-        j["yaw"] = camera.yaw;
+        j["position"] = {cameraRepository->position.x, cameraRepository->position.y, cameraRepository->position.z};
+        j["pitch"] = cameraRepository->pitch;
+        j["yaw"] = cameraRepository->yaw;
         return j.dump();
     }
 
     std::string LayoutingToolProvider::createMeshEntity(const nlohmann::json &params) {
-        if (!params.contains("mesh_id")) return std::string("Error: Missing 'mesh_id' parameter");
+        if (!params.contains("mesh_id")) return "Error: Missing 'mesh_id' parameter";
 
         auto entity = worldRepository->createEntity();
 
@@ -103,7 +103,7 @@ namespace Metal {
             transform.translation = parseVec3(params.at("position").get<std::string>());
         } else {
             // Instantiate in front of the camera if no position is specified
-            transform.translation = worldRepository->camera.position + getCameraForward() * 5.0f;
+            transform.translation = cameraRepository->position + getCameraForward() * 5.0f;
         }
         if (params.contains("rotation_euler")) {
             auto rot = parseVec3(params.at("rotation_euler").get<std::string>());
@@ -113,19 +113,19 @@ namespace Metal {
         if (params.contains("scale")) {
             transform.scale = parseVec3(params.at("scale").get<std::string>());
         }
-        
+
         // Add and configure StaticGeometryComponent
         worldRepository->createComponent(entity, STATIC_GEOMETRY);
         auto &primitive = worldRepository->registry.get<StaticGeometryComponent>(entity);
         primitive.meshId = params.at("mesh_id").get<std::string>();
-        
+
         dirtyStateService->markEntityDirty(entity, DirtyType::Transform | DirtyType::Material | DirtyType::Mesh);
 
         std::stringstream ss;
         ss << "Created entity '" << (params.contains("name")
                                          ? params.at("name").get<std::string>()
                                          : "New entity")
-                << "' (ID: " << entt::to_integral(entity) << ") with mesh: " << primitive.meshId;
+                << "' (ID: " << entt::to_integral(entity) << ") with geometry: " << primitive.meshId;
         return ss.str();
     }
 
@@ -172,11 +172,10 @@ namespace Metal {
     }
 
     glm::vec3 LayoutingToolProvider::getCameraForward() const {
-        auto &camera = worldRepository->camera;
         return glm::normalize(glm::vec3(
-            -std::sin(camera.yaw) * std::cos(camera.pitch),
-            std::sin(camera.pitch),
-            -std::cos(camera.yaw) * std::cos(camera.pitch)
+            -std::sin(cameraRepository->yaw) * std::cos(cameraRepository->pitch),
+            std::sin(cameraRepository->pitch),
+            -std::cos(cameraRepository->yaw) * std::cos(cameraRepository->pitch)
         ));
     }
 }

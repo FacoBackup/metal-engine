@@ -232,7 +232,6 @@ namespace Metal {
             }
         };
 
-        registerCompositeField(&camera).setName("camera");
         registerGenericField(hiddenEntitiesToJson, hiddenEntitiesFromJson).setName("hiddenEntities");
 
         auto registryToJson = [this] {
@@ -299,46 +298,4 @@ namespace Metal {
         }
     }
 
-    void WorldRepository::updateCameraData(entt::entity entity) {
-        if (entity == entt::null) return;
-        auto *component = registry.try_get<CameraComponent>(entity);
-        auto *transform = registry.try_get<TransformComponent>(entity);
-        if (!component || !transform) return;
-
-        camera.fov = component->fov;
-        camera.zNear = component->zNear;
-        camera.zFar = component->zFar;
-        camera.rotationSensitivity = component->rotationSensitivity;
-        camera.movementSensitivity = component->movementSensitivity;
-        camera.zoomSensitivity = component->zoomSensitivity;
-        camera.motionBlurEnabled = component->motionBlurEnabled;
-        camera.motionBlurVelocityScale = component->motionBlurVelocityScale;
-        camera.motionBlurMaxSamples = component->motionBlurMaxSamples;
-        camera.cameraMotionBlur = component->cameraMotionBlur;
-        camera.dofEnabled = component->dofEnabled;
-        camera.dofFocusDistance = component->dofFocusDistance;
-        camera.dofAperture = component->dofAperture;
-        camera.dofFocalLength = component->dofFocalLength;
-        camera.bloomEnabled = component->bloomEnabled;
-        camera.filmGrain = component->filmGrain;
-        camera.vignetteEnabled = component->vignetteEnabled;
-        camera.chromaticAberrationEnabled = component->chromaticAberrationEnabled;
-        camera.distortionEnabled = component->distortionEnabled;
-        camera.filmGrainStrength = component->filmGrainStrength;
-        camera.vignetteStrength = component->vignetteStrength;
-        camera.bloomThreshold = component->bloomThreshold;
-        camera.bloomQuality = component->bloomQuality;
-        camera.bloomOffset = component->bloomOffset;
-        camera.chromaticAberrationIntensity = component->chromaticAberrationIntensity;
-        camera.distortionIntensity = component->distortionIntensity;
-        camera.isOrthographic = component->isOrthographic;
-        camera.aspectRatio = component->aspectRatio;
-        camera.orthographicProjectionSize = component->orthographicProjectionSize;
-
-        camera.position = transform->translation;
-        camera.yaw = component->yaw;
-        camera.pitch = component->pitch;
-
-        ApplicationEventContext::dispatch("Camera");
-    }
 } // Metal

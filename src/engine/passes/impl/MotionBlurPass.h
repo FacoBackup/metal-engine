@@ -7,21 +7,21 @@
 namespace Metal {
     class VulkanContext;
     class PipelineService;
-    struct WorldRepository;
+    struct CameraRepository;
 
     class MotionBlurPass final : public AbstractRenderPass {
         MotionBlurPushConstant pushConstant{};
 
         VulkanContext *vulkanContext = nullptr;
         PipelineService *pipelineService = nullptr;
-        WorldRepository *worldRepository = nullptr;
+        CameraRepository *cameraRepository = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
             return {
                 {"VulkanContext", &vulkanContext},
                 {"PipelineService", &pipelineService},
-                {"WorldRepository", &worldRepository}
+                {"CameraRepository", &cameraRepository}
             };
         }
 

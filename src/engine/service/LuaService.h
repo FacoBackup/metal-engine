@@ -13,6 +13,7 @@
 #include <entt/entity/entity.hpp>
 
 namespace Metal {
+    struct ScriptComponent;
     struct WorldRepository;
 
     class EngineContext;

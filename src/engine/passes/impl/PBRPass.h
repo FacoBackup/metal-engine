@@ -2,16 +2,15 @@
 #define DEPTHOFFIELDPASS_H
 
 #include "../AbstractRenderPass.h"
-#include "../../dto/DepthOfFieldPushConstant.h"
 
 namespace Metal {
+    struct EngineRepository;
     class VulkanContext;
     class PipelineService;
     struct WorldRepository;
 
-    class DepthOfFieldPass final : public AbstractRenderPass {
-        DepthOfFieldPushConstant pushConstant{};
-
+    class PBRPass final : public AbstractRenderPass {
+        EngineRepository *engineRepository = nullptr;
         VulkanContext *vulkanContext = nullptr;
         PipelineService *pipelineService = nullptr;
         WorldRepository *worldRepository = nullptr;
@@ -21,11 +20,14 @@ namespace Metal {
             return {
                 {"VulkanContext", &vulkanContext},
                 {"PipelineService", &pipelineService},
+                {"EngineRepository", &engineRepository},
                 {"WorldRepository", &worldRepository}
             };
         }
 
         void onInitialize() override;
+
+        bool shouldRun() override;
 
         void onSync() override;
     };

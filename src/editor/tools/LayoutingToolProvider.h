@@ -6,11 +6,13 @@
 #include "../dto/IToolProvider.h"
 
 namespace Metal {
+    class CameraRepository;
     class WorldRepository;
     class FilesService;
     class DirtyStateService;
 
     class LayoutingToolProvider final : public IToolProvider {
+        CameraRepository *cameraRepository = nullptr;
         WorldRepository *worldRepository = nullptr;
         FilesService *filesService = nullptr;
         DirtyStateService *dirtyStateService = nullptr;
@@ -18,6 +20,7 @@ namespace Metal {
     public:
         std::vector<Dependency> getDependencies() override {
             return {
+                {"CameraRepository", &cameraRepository},
                 {"WorldRepository", &worldRepository},
                 {"FilesService", &filesService},
                 {"DirtyStateService", &dirtyStateService}
@@ -28,9 +31,9 @@ namespace Metal {
         void registerTools() override;
 
     private:
-        std::string listMeshFiles(const nlohmann::json &params);
+        std::string listMeshFiles() const;
 
-        std::string getCameraPosition(const nlohmann::json &params);
+        std::string getCameraPosition() const;
 
         std::string createMeshEntity(const nlohmann::json &params);
 

@@ -5,7 +5,7 @@
 
 namespace Metal {
     void StaticGeometryComponent::registerFields() {
-        static const std::vector<const FileExtensionInfo *> meshExtensions = {Metal::FileExtensions::mesh.get()};
+        static const std::vector<const FileExtensionInfo *> meshExtensions = {Metal::FileExtensions::geometry.get()};
         static const std::vector<const FileExtensionInfo *> textureExtensions = {
             Metal::FileExtensions::png.get(), Metal::FileExtensions::jpg.get(),
             Metal::FileExtensions::jpeg.get(),

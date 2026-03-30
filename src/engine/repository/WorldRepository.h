@@ -2,20 +2,15 @@
 #define WORLDREPOSITORY_H
 
 #include <vector>
-#include <set>
 #include <unordered_map>
-#include <entt/entt.hpp>
-#include <glm/ext/scalar_constants.hpp>
 #include <nlohmann/json.hpp>
 
 #include <common/IRepository.h>
-#include <engine/dto/Camera.h>
 #include <engine/enum/ComponentType.h>
 #include <common/ILoader.h>
 
 namespace Metal {
     struct TransformComponent;
-    struct CameraComponent;
     struct MetadataComponent;
     class Reflection;
     class DirectoryService;
@@ -32,7 +27,6 @@ namespace Metal {
         HistoryService *historyService = nullptr;
         DirtyStateService *dirtyStateService = nullptr;
 
-        Camera camera{-(glm::pi<float>() / 4), glm::pi<float>() / 4, {10, 10, 10}};
         entt::registry registry{};
         std::unordered_map<entt::entity, bool> culled{};
         std::unordered_map<entt::entity, bool> hiddenEntities{};
@@ -68,7 +62,6 @@ namespace Metal {
         bool isCompatible(const std::string &absolutePath) override;
 
         void deserializeEntityComplete(const EntityState &state);
-        void updateCameraData(entt::entity entity);
     };
 } // Metal
 

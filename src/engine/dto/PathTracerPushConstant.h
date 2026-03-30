@@ -2,7 +2,7 @@
 #define HWRAYTRACING_PUSHCONSTANT_H
 
 namespace Metal {
-    struct HWRayTracingPushConstant {
+    struct PathTracerPushConstant {
         alignas(4) float pathTracerMultiplier{};
         alignas(4) unsigned int isAtmosphereEnabled{};
 

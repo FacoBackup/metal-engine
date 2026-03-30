@@ -7,6 +7,7 @@
 #include "../../frame-builder/EngineFrame.h"
 #include "../../resource/TextureInstance.h"
 #include "engine/resource/RenderTargetInstance.h"
+#include "engine/repository/CameraRepository.h"
 
 
 namespace Metal {
@@ -22,13 +23,12 @@ namespace Metal {
     }
 
     void PostProcessingPass::onSync() {
-        auto &camera = worldRepository->camera;
-        pushConstant.distortionIntensity = camera.distortionIntensity;
-        pushConstant.chromaticAberrationIntensity = camera.chromaticAberrationIntensity;
-        pushConstant.distortionEnabled = camera.distortionEnabled;
-        pushConstant.chromaticAberrationEnabled = camera.chromaticAberrationEnabled;
-        pushConstant.vignetteEnabled = camera.vignetteEnabled;
-        pushConstant.vignetteStrength = camera.vignetteStrength;
+        pushConstant.distortionIntensity = cameraRepository->distortionIntensity;
+        pushConstant.chromaticAberrationIntensity = cameraRepository->chromaticAberrationIntensity;
+        pushConstant.distortionEnabled = cameraRepository->distortionEnabled;
+        pushConstant.chromaticAberrationEnabled = cameraRepository->chromaticAberrationEnabled;
+        pushConstant.vignetteEnabled = cameraRepository->vignetteEnabled;
+        pushConstant.vignetteStrength = cameraRepository->vignetteStrength;
 
         recordPushConstant(&pushConstant);
         recordDrawSimpleInstanced(3, 1);

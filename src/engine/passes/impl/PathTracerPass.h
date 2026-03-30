@@ -1,7 +1,7 @@
 #ifndef HWRAYTRACINGPASS_H
 #define HWRAYTRACINGPASS_H
 #include "../AbstractComputePass.h"
-#include "../../dto/HWRayTracingPushConstant.h"
+#include "../../dto/PathTracerPushConstant.h"
 
 namespace Metal {
     class TLASService;
@@ -12,10 +12,10 @@ namespace Metal {
     struct EngineRepository;
     class ApplicationEventContext;
 
-    class HWRayTracingPass final : public AbstractComputePass {
+    class PathTracerPass final : public AbstractComputePass {
         bool isFirstRun = true;
         bool needsUpdate = true;
-        HWRayTracingPushConstant pushConstant{};
+        PathTracerPushConstant pushConstant{};
 
         TLASService *tlasService = nullptr;
         PipelineService *pipelineService = nullptr;
@@ -40,6 +40,8 @@ namespace Metal {
         void onSync() override;
 
         void onInitialize() override;
+
+        bool shouldRun() override;
 
         bool requiresRayTracing() override {
             return true;

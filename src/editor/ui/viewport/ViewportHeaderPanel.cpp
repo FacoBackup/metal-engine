@@ -5,7 +5,7 @@
 #include "ApplicationContext.h"
 #include "editor/ui/UIUtil.h"
 #include "../../repository/EditorRepository.h"
-#include "engine/repository/WorldRepository.h"
+#include "engine/repository/CameraRepository.h"
 
 namespace Metal {
     void ViewportHeaderPanel::onInitialize() {
@@ -36,7 +36,7 @@ namespace Metal {
         if (UIUtil::ButtonSimple(Icons::center_focus_strong + id + "centerCamera",
                                  UIUtil::ONLY_ICON_BUTTON_SIZE,
                                  UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            worldRepository->camera.position = {0, 0, 0};
+            cameraRepository->position = {0, 0, 0};
             ApplicationEventContext::dispatch("Camera");
         }
         UIUtil::RenderTooltip("Center camera?");
@@ -47,13 +47,13 @@ namespace Metal {
         static float speedValues[] = {0.1f, 0.5f, 1.0f, 2.0f, 5.0f, 10.0f};
         int currentSpeedIndex = 2;
         for (int i = 0; i < 6; i++) {
-            if (worldRepository->camera.movementSensitivity == speedValues[i]) {
+            if (cameraRepository->movementSensitivity == speedValues[i]) {
                 currentSpeedIndex = i;
                 break;
             }
         }
         if (ImGui::Combo((id + "speedCamera").c_str(), &currentSpeedIndex, speeds, IM_ARRAYSIZE(speeds))) {
-            worldRepository->camera.movementSensitivity = speedValues[currentSpeedIndex];
+            cameraRepository->movementSensitivity = speedValues[currentSpeedIndex];
         }
         UIUtil::RenderTooltip("Camera speed");
     }

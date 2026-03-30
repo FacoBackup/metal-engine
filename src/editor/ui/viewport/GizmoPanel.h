@@ -9,6 +9,7 @@
 #include "editor/ui/abstract/AbstractPanel.h"
 
 namespace Metal {
+    struct CameraRepository;
     struct EditorRepository;
     struct WorldRepository;
     class SelectionService;
@@ -28,8 +29,8 @@ namespace Metal {
         TransformComponent *localSelected = nullptr;
 
         GizmoTransformStrategy *gizmoStrategy = nullptr;
+        CameraRepository *cameraRepository = nullptr;
         EditorRepository *editorRepository = nullptr;
-        WorldRepository *worldRepository = nullptr;
         SelectionService *selectionService = nullptr;
         HistoryService *historyService = nullptr;
 
@@ -37,7 +38,7 @@ namespace Metal {
         std::vector<Dependency> getDependencies() override {
             return {
                 {"EditorRepository", &editorRepository},
-                {"WorldRepository", &worldRepository},
+                {"CameraRepository", &cameraRepository},
                 {"SelectionService", &selectionService},
                 {"HistoryService", &historyService},
                 {"GizmoTransformStrategy", &gizmoStrategy}

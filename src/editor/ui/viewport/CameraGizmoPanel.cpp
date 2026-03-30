@@ -11,11 +11,10 @@
 #include "editor/ui/UIUtil.h"
 #include "common/Icons.h"
 #include "ViewportHeaderPanel.h"
+#include "engine/repository/CameraRepository.h"
 
 namespace Metal {
     void CameraGizmoPanel::onSync() {
-        auto &camera = worldRepository->camera;
-
         ImGuizmo::SetDrawlist();
 
         ImVec2 viewportPos = ImGui::GetWindowPos();
@@ -26,8 +25,8 @@ namespace Metal {
 
         ImVec2 gizmoPos = ImVec2(viewportPos.x + viewportSize.x - GIZMO_SIZE - 10, viewportPos.y + headerOffset + 10);
 
-        if (tempView != camera.viewMatrix && !isManipulating) {
-            tempView = camera.viewMatrix;
+        if (tempView != cameraRepository->viewMatrix && !isManipulating) {
+            tempView = cameraRepository->viewMatrix;
         }
 
         ImGuizmo::ViewManipulate(glm::value_ptr(tempView), 8.0f, gizmoPos, ImVec2(GIZMO_SIZE, GIZMO_SIZE),
@@ -36,24 +35,16 @@ namespace Metal {
         ImGui::SetCursorPos(ImVec2(viewportSize.x - GIZMO_SIZE - 10, headerOffset + 10));
         ImGui::InvisibleButton("gizmoButton", ImVec2(GIZMO_SIZE, GIZMO_SIZE));
 
-        isManipulating = camera.viewMatrix != tempView && ImGui::IsItemHovered();
+        isManipulating = cameraRepository->viewMatrix != tempView && ImGui::IsItemHovered();
         if (isManipulating) {
-            camera.viewMatrix = tempView;
+            cameraRepository->viewMatrix = tempView;
             glm::mat4 invView = glm::inverse(tempView);
             glm::vec3 forward = glm::normalize(invView[2]); // world-space forward
 
-            camera.yaw = atan2(forward.x, forward.z);
-            camera.pitch = asin(forward.y);
+            cameraRepository->yaw = atan2(forward.x, forward.z);
+            cameraRepository->pitch = asin(forward.y);
 
             ApplicationEventContext::dispatch("Camera");
         }
-
-        // ImGui::SetCursorPos(ImVec2(viewportSize.x - GIZMO_SIZE / 2.0f - 25, GIZMO_SIZE + headerOffset + 15));
-        // const std::string icon = camera.isOrthographic ? Icons::videocam_off : Icons::videocam;
-        // if (UIUtil::ButtonSimple(icon + id + "projectionMode", 30, 30)) {
-        //     camera.isOrthographic = !camera.isOrthographic;
-        //     ApplicationEventContext::dispatch("Camera");
-        // }
-        // UIUtil::RenderTooltip(camera.isOrthographic ? "Switch to Perspective" : "Switch to Orthographic");
     }
 } // Metal

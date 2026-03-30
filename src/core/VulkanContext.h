@@ -124,9 +124,7 @@ namespace Metal {
             return rayTracingSupported;
         }
 
-        [[nodiscard]] uint32_t getMaxCombinedImageSamplers() const {
-            return physicalDeviceProperties.limits.maxDescriptorSetSamplers;
-        }
+        [[nodiscard]] uint32_t getMaxCombinedImageSamplers() const;\
 
         [[nodiscard]] VkCommandBuffer beginSingleTimeCommands() const;
 

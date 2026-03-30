@@ -1,12 +1,15 @@
 #ifndef CAMERASYSTEM_H
 #define CAMERASYSTEM_H
 
+#include <entt/entity/fwd.hpp>
+
 #include "../../common/ISync.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "../../common/IService.h"
 #include "../../common/IEventMember.h"
+#include "../../common/IInit.h"
 #include "../../common/IInit.h"
 
 constexpr float PI_OVER_2 = glm::pi<float>() / 2.0f;
@@ -15,34 +18,36 @@ constexpr float MIN_MAX_PITCH = glm::radians(89.0f);
 
 namespace Metal {
     class ApplicationContext;
-    struct Camera;
 
     class EngineContext;
     struct WorldRepository;
     struct RuntimeRepository;
+    struct CameraRepository;
     class DirtyStateService;
-    struct Camera;
 
     class CameraService final : public IService, public ISync, public IEventMember, public IInit {
         EngineContext *engineContext = nullptr;
         WorldRepository *worldRepository = nullptr;
         RuntimeRepository *runtimeRepository = nullptr;
+        CameraRepository *cameraRepository = nullptr;
         DirtyStateService *dirtyStateService = nullptr;
 
-        Camera *camera = nullptr;
         glm::vec3 xAxis{0.0f};
         glm::vec3 yAxis{0.0f};
         glm::vec3 zAxis{0.0f};
+        bool isPlaying = false;
 
         void updateMatrices();
 
         void updateView();
 
-        void updateProjection() const;
+        void updateProjection();
 
-        void updateAspectRatio() const;
+        void updateAspectRatio();
 
         void createViewMatrix();
+
+        void handleCamera();
 
     public:
         std::vector<Dependency> getDependencies() override {
@@ -50,9 +55,12 @@ namespace Metal {
                 {"EngineContext", &engineContext},
                 {"WorldRepository", &worldRepository},
                 {"RuntimeRepository", &runtimeRepository},
+                {"CameraRepository", &cameraRepository},
                 {"DirtyStateService", &dirtyStateService}
             };
         }
+
+        void updateCameraData(entt::entity entity);
 
         void onInitialize() override;
 

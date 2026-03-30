@@ -8,9 +8,9 @@
 #include <array>
 
 namespace Metal {
+    struct CameraRepository;
     struct TransformComponent;
     struct EditorRepository;
-    struct WorldRepository;
     class HistoryService;
     class DirtyStateService;
 
@@ -29,7 +29,7 @@ namespace Metal {
 
         HistoryService *historyService = nullptr;
         EditorRepository *editorRepository = nullptr;
-        WorldRepository *worldRepository = nullptr;
+        CameraRepository *cameraRepository = nullptr;
         DirtyStateService *dirtyStateService = nullptr;
 
     public:
@@ -37,7 +37,7 @@ namespace Metal {
             return {
                 {"HistoryService", &historyService},
                 {"EditorRepository", &editorRepository},
-                {"WorldRepository", &worldRepository},
+                {"CameraRepository", &cameraRepository},
                 {"DirtyStateService", &dirtyStateService}
             };
         }

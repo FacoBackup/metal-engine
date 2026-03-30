@@ -6,11 +6,13 @@
 #include "../EngineContext.h"
 #include <unordered_map>
 
+#include "ApplicationContext.h"
 #include "common/LoggerUtil.h"
 
 namespace Metal {
     void LuaService::onInitialize() {
-        luaContext.initialize(worldRepository, engineContext, transformService);
+        ctx->injectDependencies(&luaContext);
+        luaContext.onInitialize();
 
         // Registry listeners for automatic lifecycle management
         worldRepository->registry.on_construct<ScriptComponent>().connect<&LuaService::onScriptComponentAdded>(this);
@@ -25,7 +27,7 @@ namespace Metal {
             activeAsyncUpdateScripts.clear();
 
             auto view = worldRepository->registry.view<ScriptComponent>();
-            for (auto entity : view) {
+            for (auto entity: view) {
                 auto &comp = view.get<ScriptComponent>(entity);
                 loadScript(comp, entity);
             }
@@ -37,7 +39,7 @@ namespace Metal {
             enabled = false;
 
             auto view = worldRepository->registry.view<ScriptComponent>();
-            for (auto entity : view) {
+            for (auto entity: view) {
                 auto &comp = view.get<ScriptComponent>(entity);
                 if (comp.instance.valid() && comp.instance["onDestroy"].valid()) {
                     auto res = comp.instance["onDestroy"](comp.instance);
@@ -69,13 +71,13 @@ namespace Metal {
     void LuaService::onScriptComponentUpdated(entt::registry &registry, entt::entity entity) {
         if (!playStarted) return;
         std::lock_guard<std::mutex> lock(luaMutex);
-        
+
         // Remove from active lists first
         std::erase(activeUpdateScripts, entity);
         std::erase(activeAsyncUpdateScripts, entity);
 
         auto &comp = registry.get<ScriptComponent>(entity);
-        
+
         // Clean up old instance if it exists
         if (comp.instance.valid() && comp.instance["onDestroy"].valid()) {
             comp.instance["onDestroy"](comp.instance);
@@ -194,7 +196,7 @@ namespace Metal {
         for (auto it = activeUpdateScripts.begin(); it != activeUpdateScripts.end();) {
             entt::entity entity = *it;
             auto &comp = worldRepository->registry.get<ScriptComponent>(entity);
-            
+
             if (comp.isErrored) {
                 it++;
                 continue;

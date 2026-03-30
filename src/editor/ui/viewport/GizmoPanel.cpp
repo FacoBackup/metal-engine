@@ -1,15 +1,10 @@
 #include "GizmoPanel.h"
 #include "GizmoTransformStrategy.h"
-#include "ApplicationContext.h"
 #include "engine/dto/TransformComponent.h"
-#include "engine/dto/Camera.h"
+#include "engine/repository/CameraRepository.h"
 #include "ImGuizmo.h"
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/matrix_decompose.hpp>
 #include "../../repository/EditorRepository.h"
-#include "engine/repository/WorldRepository.h"
 #include "../../service/SelectionService.h"
-#include "editor/service/HistoryService.h"
 
 namespace Metal {
     GizmoPanel::GizmoPanel(ImVec2 *position, glm::vec2 *size) : size(size), position(position) {
@@ -32,7 +27,7 @@ namespace Metal {
         }
 
         gizmoStrategy->recomposeMatrix();
-        ImGuizmo::SetOrthographic(worldRepository->camera.isOrthographic);
+        ImGuizmo::SetOrthographic(cameraRepository->isOrthographic);
         ImGuizmo::SetDrawlist();
         ImVec2 viewportMin = ImGui::GetItemRectMin();
         ImVec2 viewportSize = ImGui::GetItemRectSize();

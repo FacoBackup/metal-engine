@@ -13,12 +13,12 @@ set(ENGINE_SOURCES_LIST
         service/MeshService.cpp
         service/TextureService.cpp
         passes/CommandBufferRecorder.cpp
-        dto/Camera.cpp
         repository/WorldRepository.cpp
         enum/ComponentType.cpp
         dto/AnimatedGeometryComponent.cpp
         dto/InstancedGeometryComponent.cpp
         dto/MetadataComponent.cpp
+        repository/CameraRepository.cpp
         dto/CameraComponent.cpp
         dto/TransformComponent.cpp
         dto/StaticGeometryComponent.cpp
@@ -26,8 +26,8 @@ set(ENGINE_SOURCES_LIST
         service/StreamingService.cpp
         service/TransformService.cpp
         passes/impl/PostProcessingPass.cpp
-        passes/impl/DepthOfFieldPass.cpp
-        passes/impl/HWRayTracingPass.cpp
+        passes/impl/PBRPass.cpp
+        passes/impl/PathTracerPass.cpp
         passes/impl/MotionBlurPass.cpp
         service/BLASService.cpp
         service/TLASService.cpp

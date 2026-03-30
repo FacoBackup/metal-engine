@@ -43,7 +43,9 @@ return MyScript
 - `world:getMetadata(entity)`: Returns the `MetadataComponent` (name, tags).
 - `world:getScript(entity)`: Returns the `ScriptComponent`.
 - `world:getCamera(entity)`: Returns the `CameraComponent` for the entity.
-- `world:updateCameraData(entity)`: Synchronizes the specified entity's camera data to the engine's active camera.
+
+#### CameraService API
+- `cameraService:updateCameraData(entity)`: Synchronizes the specified entity's camera data to the engine's active camera.
 
 #### Component Types
 - `TransformComponent`: `translation` (vec3), `rotation` (quat), `scale` (vec3), `isStatic` (bool).

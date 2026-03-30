@@ -1,12 +1,13 @@
 #include "GizmoTransformStrategy.h"
 #include "../../repository/EditorRepository.h"
-#include "engine/repository/WorldRepository.h"
 #include "engine/dto/TransformComponent.h"
 #include "editor/service/HistoryService.h"
 #include "engine/service/DirtyStateService.h"
 #include "ImGuizmo.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
+
+#include "engine/repository/CameraRepository.h"
 
 namespace Metal {
     void GizmoTransformStrategy::updateCache(TransformComponent *selected) {
@@ -20,8 +21,8 @@ namespace Metal {
     }
 
     void GizmoTransformStrategy::recomposeMatrix() {
-        viewMatrixCache = glm::value_ptr(worldRepository->camera.viewMatrix);
-        cacheProjection = worldRepository->camera.projectionMatrix;
+        viewMatrixCache = glm::value_ptr(cameraRepository->viewMatrix);
+        cacheProjection = cameraRepository->projectionMatrix;
 
         cacheProjection[1][1] *= -1;
 

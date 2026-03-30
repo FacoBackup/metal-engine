@@ -16,9 +16,11 @@ namespace Metal {
 
     struct FileExtensions {
         inline static const std::unique_ptr<FileExtensionInfo> scene = std::make_unique<FileExtensionInfo>(
-            ".scene", "scene", "Scene", Icons::inventory_2);
-        inline static const std::unique_ptr<FileExtensionInfo> mesh = std::make_unique<FileExtensionInfo>(
-            ".mesh", "mesh", "Mesh", Icons::view_in_ar);
+            ".mscene", "scene", "Scene", Icons::inventory_2);
+        inline static const std::unique_ptr<FileExtensionInfo> geometry = std::make_unique<FileExtensionInfo>(
+            ".mgeometry", "geometry", "Geometry", Icons::view_in_ar);
+        inline static const std::unique_ptr<FileExtensionInfo> level = std::make_unique<FileExtensionInfo>(
+            ".mlevel", "level", "Level", Icons::forest);
 
         inline static const std::unique_ptr<FileExtensionInfo> png = std::make_unique<FileExtensionInfo>(
             ".png", "png", "Texture", Icons::texture);
@@ -41,8 +43,9 @@ namespace Metal {
         inline static const std::unique_ptr<FileExtensionInfo> lua = std::make_unique<FileExtensionInfo>(
             ".lua", "lua", "Script", Icons::insert_drive_file);
 
+
         inline static const std::vector<const FileExtensionInfo *> all = {
-            scene.get(),  mesh.get(), png.get(), jpg.get(), jpeg.get(), tga.get(), glb.get(),
+            scene.get(), geometry.get(), png.get(), jpg.get(), jpeg.get(), tga.get(), glb.get(),
             gltf.get(), fbx.get(), obj.get(), lua.get()
         };
 

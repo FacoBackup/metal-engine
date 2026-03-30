@@ -9,6 +9,7 @@ namespace Metal {
         bool vsync = true;
 
         bool denoiserEnabled = false;
+        bool isRayTracingEnabled = false;
 
         int shadingResInvScale = 2;
         int pathTracerMaxSamples = 200;
