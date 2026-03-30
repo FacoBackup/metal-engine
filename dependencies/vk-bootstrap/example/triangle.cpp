@@ -363,7 +363,7 @@ int create_framebuffers(Init& init, RenderData& data) {
         framebuffer_info.height = init.swapchain.extent.height;
         framebuffer_info.layers = 1;
 
-        if (init.disp.createRenderTarget(&framebuffer_info, nullptr, &data.framebuffers[i]) != VK_SUCCESS) {
+        if (init.disp.createFramebuffer(&framebuffer_info, nullptr, &data.framebuffers[i]) != VK_SUCCESS) {
             return -1; // failed to create framebuffer
         }
     }

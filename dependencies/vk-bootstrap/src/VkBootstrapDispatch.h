@@ -1442,7 +1442,7 @@ struct DispatchTable {
         fp_vkAllocateDescriptorSets = reinterpret_cast<PFN_vkAllocateDescriptorSets>(procAddr(device, "vkAllocateDescriptorSets"));
         fp_vkFreeDescriptorSets = reinterpret_cast<PFN_vkFreeDescriptorSets>(procAddr(device, "vkFreeDescriptorSets"));
         fp_vkUpdateDescriptorSets = reinterpret_cast<PFN_vkUpdateDescriptorSets>(procAddr(device, "vkUpdateDescriptorSets"));
-        fp_vkcreateRenderTarget = reinterpret_cast<PFN_vkcreateRenderTarget>(procAddr(device, "vkcreateRenderTarget"));
+        fp_vkCreateFramebuffer = reinterpret_cast<PFN_vkCreateFramebuffer>(procAddr(device, "vkCreateFramebuffer"));
         fp_vkDestroyFramebuffer = reinterpret_cast<PFN_vkDestroyFramebuffer>(procAddr(device, "vkDestroyFramebuffer"));
         fp_vkCreateRenderPass = reinterpret_cast<PFN_vkCreateRenderPass>(procAddr(device, "vkCreateRenderPass"));
         fp_vkDestroyRenderPass = reinterpret_cast<PFN_vkDestroyRenderPass>(procAddr(device, "vkDestroyRenderPass"));
@@ -3116,8 +3116,8 @@ struct DispatchTable {
     void updateDescriptorSets(uint32_t descriptorWriteCount, const VkWriteDescriptorSet* pDescriptorWrites, uint32_t descriptorCopyCount, const VkCopyDescriptorSet* pDescriptorCopies) const noexcept {
         fp_vkUpdateDescriptorSets(device, descriptorWriteCount, pDescriptorWrites, descriptorCopyCount, pDescriptorCopies);
     }
-    VkResult createRenderTarget(const VkFramebufferCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkFramebuffer* pFramebuffer) const noexcept {
-        return fp_vkcreateRenderTarget(device, pCreateInfo, pAllocator, pFramebuffer);
+    VkResult createFramebuffer(const VkFramebufferCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkFramebuffer* pFramebuffer) const noexcept {
+        return fp_vkCreateFramebuffer(device, pCreateInfo, pAllocator, pFramebuffer);
     }
     void destroyFramebuffer(VkFramebuffer framebuffer, const VkAllocationCallbacks* pAllocator) const noexcept {
         fp_vkDestroyFramebuffer(device, framebuffer, pAllocator);
@@ -5709,7 +5709,7 @@ struct DispatchTable {
     PFN_vkAllocateDescriptorSets fp_vkAllocateDescriptorSets = nullptr;
     PFN_vkFreeDescriptorSets fp_vkFreeDescriptorSets = nullptr;
     PFN_vkUpdateDescriptorSets fp_vkUpdateDescriptorSets = nullptr;
-    PFN_vkcreateRenderTarget fp_vkcreateRenderTarget = nullptr;
+    PFN_vkCreateFramebuffer fp_vkCreateFramebuffer = nullptr;
     PFN_vkDestroyFramebuffer fp_vkDestroyFramebuffer = nullptr;
     PFN_vkCreateRenderPass fp_vkCreateRenderPass = nullptr;
     PFN_vkDestroyRenderPass fp_vkDestroyRenderPass = nullptr;
