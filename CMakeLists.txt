@@ -30,6 +30,7 @@ message(STATUS "Lua Libraries: ${LUA_LIBRARIES}")
 message(STATUS "Lua Include Dir: ${LUA_INCLUDE_DIR}")
 include_directories(${LUA_INCLUDE_DIR})
 include_directories(dependencies/imgui_markdown-main)
+include_directories(dependencies/boost-di)
 
 set(COMMON_LIBRARIES
         SDL3::SDL3
