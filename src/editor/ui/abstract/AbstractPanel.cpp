@@ -1,6 +1,5 @@
 #include "AbstractPanel.h"
 #include "common/Util.h"
-#include "ApplicationContext.h"
 
 namespace Metal {
     void AbstractPanel::onSyncChildren() const {

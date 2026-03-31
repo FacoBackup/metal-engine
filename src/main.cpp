@@ -1,3 +1,4 @@
+#include <boost-di.h>
 #include "ApplicationContext.h"
 #include "core/DirectoryService.h"
 #include "core/service/SnapshotService.h"
@@ -61,78 +62,134 @@
 #include "engine/service/DirtyStateService.h"
 
 int main(int, char **) {
-    std::shared_ptr<Metal::ApplicationContext> context = std::make_shared<Metal::ApplicationContext>(true);
+    namespace di = boost::ext::di;
+    auto injector = di::make_injector(
+        di::bind<Metal::WindowService>().in(di::singleton),
+        di::bind<Metal::VulkanContext>().in(di::singleton),
+        di::bind<Metal::ImGuiService>().in(di::singleton),
+        di::bind<Metal::DirectoryService>().in(di::singleton),
+        di::bind<Metal::SnapshotService>().in(di::singleton),
+        di::bind<Metal::ThreadManager>().in(di::singleton),
+        di::bind<Metal::AsyncSyncService>().in(di::singleton),
+        di::bind<Metal::DirtyStateService>().in(di::singleton),
+        di::bind<Metal::FilesService>().in(di::singleton),
+        di::bind<Metal::EngineContext>().in(di::singleton),
+        di::bind<Metal::EngineRepository>().in(di::singleton),
+        di::bind<Metal::EditorRepository>().in(di::singleton),
+        di::bind<Metal::EditorCameraRepository>().in(di::singleton),
+        di::bind<Metal::DockRepository>().in(di::singleton),
+        di::bind<Metal::AIAssistantRepository>().in(di::singleton),
+        di::bind<Metal::RuntimeRepository>().in(di::singleton),
+        di::bind<Metal::WorldRepository>().in(di::singleton),
+        di::bind<Metal::MeshService>().in(di::singleton),
+        di::bind<Metal::TextureService>().in(di::singleton),
+        di::bind<Metal::RenderTargetService>().in(di::singleton),
+        di::bind<Metal::PipelineService>().in(di::singleton),
+        di::bind<Metal::BufferService>().in(di::singleton),
+        di::bind<Metal::CommandBufferRecorderService>().in(di::singleton),
+        di::bind<Metal::NotificationService>().in(di::singleton),
+        di::bind<Metal::HistoryService>().in(di::singleton),
+        di::bind<Metal::GizmoTransformStrategy>().in(di::singleton),
+        di::bind<Metal::HttpService>().in(di::singleton),
+        di::bind<Metal::DescriptorSetService>().in(di::singleton),
+        di::bind<Metal::ThemeService>().in(di::singleton),
+        di::bind<Metal::DockService>().in(di::singleton),
+        di::bind<Metal::MaterialService>().in(di::singleton),
+        di::bind<Metal::AsyncTaskService>().in(di::singleton),
+        di::bind<Metal::AIAssistantService>().in(di::singleton),
+        di::bind<Metal::WorldToolProvider>().in(di::singleton),
+        di::bind<Metal::ScriptingToolProvider>().in(di::singleton),
+        di::bind<Metal::LayoutingToolProvider>().in(di::singleton),
+        di::bind<Metal::InspectionToolProvider>().in(di::singleton),
+        di::bind<Metal::SceneImporterService>().in(di::singleton),
+        di::bind<Metal::SelectionService>().in(di::singleton),
+        di::bind<Metal::MeshImporterService>().in(di::singleton),
+        di::bind<Metal::MaterialImporterService>().in(di::singleton),
+        di::bind<Metal::TextureImporterService>().in(di::singleton),
+        di::bind<Metal::FileImporterService>().in(di::singleton),
+        di::bind<Metal::EditorCameraService>().in(di::singleton),
+        di::bind<Metal::CameraService>().in(di::singleton),
+        di::bind<Metal::CameraRepository>().in(di::singleton),
+        di::bind<Metal::TransformService>().in(di::singleton),
+        di::bind<Metal::PickingService>().in(di::singleton),
+        di::bind<Metal::PhysicsService>().in(di::singleton),
+        di::bind<Metal::LuaService>().in(di::singleton),
+        di::bind<Metal::LevelService>().in(di::singleton),
+        di::bind<Metal::LightService>().in(di::singleton),
+        di::bind<Metal::StreamingService>().in(di::singleton),
+        di::bind<Metal::BLASService>().in(di::singleton),
+        di::bind<Metal::TLASService>().in(di::singleton),
+        di::bind<Metal::ShaderService>().in(di::singleton),
+        di::bind<Metal::FrameService>().in(di::singleton)
+    );
 
-    // --- ORDER MATTERS
-    context->registerSingleton(context);
-    context->registerSingleton(std::make_shared<Metal::WindowService>());
-    context->registerSingleton(std::make_shared<Metal::VulkanContext>());
-    context->registerSingleton(std::make_shared<Metal::ImGuiService>());
-    context->registerSingleton(std::make_shared<Metal::DirectoryService>());
-    context->registerSingleton(std::make_shared<Metal::SnapshotService>());
-    context->registerSingleton(std::make_shared<Metal::ThreadManager>());
-    context->registerSingleton(std::make_shared<Metal::AsyncSyncService>());
-    // --- ORDER MATTERS
+    auto &frameService = injector.create<Metal::FrameService &>();
+    auto &directoryService = injector.create<Metal::DirectoryService &>();
 
-    context->registerSingleton(std::make_shared<Metal::DirtyStateService>());
-    context->registerSingleton(std::make_shared<Metal::FilesService>());
-    context->registerSingleton(std::make_shared<Metal::EngineContext>());
-    context->registerSingleton(std::make_shared<Metal::EngineRepository>());
-    context->registerSingleton(std::make_shared<Metal::EditorRepository>());
-    context->registerSingleton(std::make_shared<Metal::EditorCameraRepository>());
-    context->registerSingleton(std::make_shared<Metal::DockRepository>());
-    context->registerSingleton(std::make_shared<Metal::AIAssistantRepository>());
-    context->registerSingleton(std::make_shared<Metal::RuntimeRepository>());
-    context->registerSingleton(std::make_shared<Metal::WorldRepository>());
-    context->registerSingleton(std::make_shared<Metal::MeshService>());
-    context->registerSingleton(std::make_shared<Metal::TextureService>());
-    context->registerSingleton(std::make_shared<Metal::RenderTargetService>());
-    context->registerSingleton(std::make_shared<Metal::PipelineService>());
-    context->registerSingleton(std::make_shared<Metal::BufferService>());
-    context->registerSingleton(std::make_shared<Metal::CommandBufferRecorderService>());
-    context->registerSingleton(std::make_shared<Metal::NotificationService>());
-    context->registerSingleton(std::make_shared<Metal::HistoryService>());
-    context->registerSingleton(std::make_shared<Metal::GizmoTransformStrategy>());
-    context->registerSingleton(std::make_shared<Metal::HttpService>());
-    context->registerSingleton(std::make_shared<Metal::DescriptorSetService>());
-    context->registerSingleton(std::make_shared<Metal::ThemeService>());
-    context->registerSingleton(std::make_shared<Metal::DockService>());
-    context->registerSingleton(std::make_shared<Metal::MaterialService>());
-    context->registerSingleton(std::make_shared<Metal::AsyncTaskService>());
-    context->registerSingleton(std::make_shared<Metal::AIAssistantService>());
-    context->registerSingleton(std::make_shared<Metal::WorldToolProvider>());
-    context->registerSingleton(std::make_shared<Metal::ScriptingToolProvider>());
-    context->registerSingleton(std::make_shared<Metal::LayoutingToolProvider>());
-    context->registerSingleton(std::make_shared<Metal::InspectionToolProvider>());
-    context->registerSingleton(std::make_shared<Metal::SceneImporterService>());
+    Metal::AbstractPanel::serviceProvider = [&](const std::string &name) -> void * {
+        if (name == "WindowService") return &injector.create<Metal::WindowService &>();
+        if (name == "VulkanContext") return &injector.create<Metal::VulkanContext &>();
+        if (name == "ImGuiService") return &injector.create<Metal::ImGuiService &>();
+        if (name == "DirectoryService") return &injector.create<Metal::DirectoryService &>();
+        if (name == "SnapshotService") return &injector.create<Metal::SnapshotService &>();
+        if (name == "ThreadManager") return &injector.create<Metal::ThreadManager &>();
+        if (name == "AsyncSyncService") return &injector.create<Metal::AsyncSyncService &>();
+        if (name == "DirtyStateService") return &injector.create<Metal::DirtyStateService &>();
+        if (name == "FilesService") return &injector.create<Metal::FilesService &>();
+        if (name == "EngineContext") return &injector.create<Metal::EngineContext &>();
+        if (name == "EngineRepository") return &injector.create<Metal::EngineRepository &>();
+        if (name == "EditorRepository") return &injector.create<Metal::EditorRepository &>();
+        if (name == "EditorCameraRepository") return &injector.create<Metal::EditorCameraRepository &>();
+        if (name == "DockRepository") return &injector.create<Metal::DockRepository &>();
+        if (name == "AIAssistantRepository") return &injector.create<Metal::AIAssistantRepository &>();
+        if (name == "RuntimeRepository") return &injector.create<Metal::RuntimeRepository &>();
+        if (name == "WorldRepository") return &injector.create<Metal::WorldRepository &>();
+        if (name == "MeshService") return &injector.create<Metal::MeshService &>();
+        if (name == "TextureService") return &injector.create<Metal::TextureService &>();
+        if (name == "RenderTargetService") return &injector.create<Metal::RenderTargetService &>();
+        if (name == "PipelineService") return &injector.create<Metal::PipelineService &>();
+        if (name == "BufferService") return &injector.create<Metal::BufferService &>();
+        if (name == "CommandBufferRecorderService") return &injector.create<Metal::CommandBufferRecorderService &>();
+        if (name == "NotificationService") return &injector.create<Metal::NotificationService &>();
+        if (name == "HistoryService") return &injector.create<Metal::HistoryService &>();
+        if (name == "GizmoTransformStrategy") return &injector.create<Metal::GizmoTransformStrategy &>();
+        if (name == "HttpService") return &injector.create<Metal::HttpService &>();
+        if (name == "DescriptorSetService") return &injector.create<Metal::DescriptorSetService &>();
+        if (name == "ThemeService") return &injector.create<Metal::ThemeService &>();
+        if (name == "DockService") return &injector.create<Metal::DockService &>();
+        if (name == "MaterialService") return &injector.create<Metal::MaterialService &>();
+        if (name == "AsyncTaskService") return &injector.create<Metal::AsyncTaskService &>();
+        if (name == "AIAssistantService") return &injector.create<Metal::AIAssistantService &>();
+        if (name == "WorldToolProvider") return &injector.create<Metal::WorldToolProvider &>();
+        if (name == "ScriptingToolProvider") return &injector.create<Metal::ScriptingToolProvider &>();
+        if (name == "LayoutingToolProvider") return &injector.create<Metal::LayoutingToolProvider &>();
+        if (name == "InspectionToolProvider") return &injector.create<Metal::InspectionToolProvider &>();
+        if (name == "SceneImporterService") return &injector.create<Metal::SceneImporterService &>();
+        if (name == "SelectionService") return &injector.create<Metal::SelectionService &>();
+        if (name == "MeshImporterService") return &injector.create<Metal::MeshImporterService &>();
+        if (name == "MaterialImporterService") return &injector.create<Metal::MaterialImporterService &>();
+        if (name == "TextureImporterService") return &injector.create<Metal::TextureImporterService &>();
+        if (name == "FileImporterService") return &injector.create<Metal::FileImporterService &>();
+        if (name == "EditorCameraService") return &injector.create<Metal::EditorCameraService &>();
+        if (name == "CameraService") return &injector.create<Metal::CameraService &>();
+        if (name == "CameraRepository") return &injector.create<Metal::CameraRepository &>();
+        if (name == "TransformService") return &injector.create<Metal::TransformService &>();
+        if (name == "PickingService") return &injector.create<Metal::PickingService &>();
+        if (name == "PhysicsService") return &injector.create<Metal::PhysicsService &>();
+        if (name == "LuaService") return &injector.create<Metal::LuaService &>();
+        if (name == "LevelService") return &injector.create<Metal::LevelService &>();
+        if (name == "LightService") return &injector.create<Metal::LightService &>();
+        if (name == "StreamingService") return &injector.create<Metal::StreamingService &>();
+        if (name == "BLASService") return &injector.create<Metal::BLASService &>();
+        if (name == "TLASService") return &injector.create<Metal::TLASService &>();
+        if (name == "ShaderService") return &injector.create<Metal::ShaderService &>();
+        if (name == "FrameService") return &injector.create<Metal::FrameService &>();
+        return nullptr;
+    };
 
-    context->registerSingleton(std::make_shared<Metal::SelectionService>());
-    context->registerSingleton(std::make_shared<Metal::MeshImporterService>());
-    context->registerSingleton(std::make_shared<Metal::MaterialImporterService>());
-    context->registerSingleton(std::make_shared<Metal::TextureImporterService>());
-    context->registerSingleton(std::make_shared<Metal::FileImporterService>());
-    context->registerSingleton(std::make_shared<Metal::EditorCameraService>());
-    context->registerSingleton(std::make_shared<Metal::CameraService>());
-    context->registerSingleton(std::make_shared<Metal::CameraRepository>());
-    context->registerSingleton(std::make_shared<Metal::TransformService>());
-    context->registerSingleton(std::make_shared<Metal::PickingService>());
-    context->registerSingleton(std::make_shared<Metal::PhysicsService>());
-    context->registerSingleton(std::make_shared<Metal::LuaService>());
-    context->registerSingleton(std::make_shared<Metal::LevelService>());
-    context->registerSingleton(std::make_shared<Metal::LightService>());
-    context->registerSingleton(std::make_shared<Metal::StreamingService>());
-
-    context->registerSingleton(std::make_shared<Metal::BLASService>());
-    context->registerSingleton(std::make_shared<Metal::TLASService>());
-    context->registerSingleton(std::make_shared<Metal::ShaderService>());
-    context->registerSingleton(std::make_shared<Metal::FrameService>());
-
-    context->onInitialize();
-    auto &frameService = context->getSingleton<Metal::FrameService>();
-    auto &directoryService = context->getSingleton<Metal::DirectoryService>();
     directoryService.updateRootPath(false);
     Metal::EditorPanel editor{};
-    context->injectDependencies(&editor);
+    editor.performInjection();
     editor.onInitialize();
 
     frameService.setPanel(&editor);
@@ -141,10 +198,9 @@ int main(int, char **) {
         return 1;
     }
     frameService.start();
-    context->dispose();
-    context->getSingleton<Metal::ImGuiService>().disposeManually();
-    context->getSingleton<Metal::VulkanContext>().disposeManually();
-    context->getSingleton<Metal::WindowService>().disposeManually();
+    injector.create<Metal::ImGuiService &>().disposeManually();
+    injector.create<Metal::VulkanContext &>().disposeManually();
+    injector.create<Metal::WindowService &>().disposeManually();
 
     return 0;
 }
