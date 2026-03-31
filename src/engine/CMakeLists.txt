@@ -47,6 +47,7 @@ set(ENGINE_SOURCES_LIST
         passes/impl/StaticGBufferPass.cpp
         service/PhysicsService.cpp
         service/LuaService.cpp
+        service/LevelService.cpp
         util/LuaContext.cpp
         dto/LightComponent.cpp
         dto/BoxColliderComponent.cpp

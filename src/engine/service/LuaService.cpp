@@ -5,9 +5,9 @@
 #include "../dto/ScriptComponent.h"
 #include "../EngineContext.h"
 #include <unordered_map>
-
 #include "ApplicationContext.h"
 #include "common/LoggerUtil.h"
+#include "common/FileExtensions.h"
 
 namespace Metal {
     void LuaService::onInitialize() {
@@ -237,6 +237,19 @@ namespace Metal {
             }
             it++;
         }
+    }
+
+    void LuaService::load(const std::string &absolutePath) {
+        LOG_INFO("LuaService: Loading and executing script: " + absolutePath);
+        if (executeFile(absolutePath)) {
+            LOG_INFO("LuaService: Script execution finished: " + absolutePath);
+        } else {
+            LOG_ERROR("LuaService: Script execution failed: " + absolutePath);
+        }
+    }
+
+    bool LuaService::isCompatible(const std::string &absolutePath) {
+        return absolutePath.ends_with(FileExtensions::lua->extension);
     }
 
     bool LuaService::executeString(const std::string &script) {

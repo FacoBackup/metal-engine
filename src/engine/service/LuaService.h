@@ -8,6 +8,7 @@
 #include "common/ISync.h"
 #include "../util/LuaContext.h"
 #include "common/IAsyncSync.h"
+#include "common/ILoader.h"
 #include <string>
 #include <mutex>
 #include <entt/entity/entity.hpp>
@@ -19,7 +20,7 @@ namespace Metal {
     class EngineContext;
     class TransformService;
 
-    class LuaService final : public IService, public IInit, public IEventMember, public ISync, public IAsyncSync {
+    class LuaService final : public IService, public IInit, public IEventMember, public ISync, public IAsyncSync, public ILoader {
         LuaContext luaContext;
         bool enabled = false;
         bool playStarted = false;
@@ -60,6 +61,11 @@ namespace Metal {
         float getSyncInterval() const override { return 16.0f; } // ~60fps
 
         void onAsyncSync() override;
+
+        // ILoader implementation
+        void load(const std::string &absolutePath) override;
+
+        bool isCompatible(const std::string &absolutePath) override;
 
         /**
          * Executes a lua script string.

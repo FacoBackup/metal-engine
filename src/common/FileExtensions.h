@@ -41,12 +41,12 @@ namespace Metal {
             ".obj", "obj", "Scene Source", Icons::category);
 
         inline static const std::unique_ptr<FileExtensionInfo> lua = std::make_unique<FileExtensionInfo>(
-            ".lua", "lua", "Script", Icons::insert_drive_file);
+            ".lua", "lua", "Lua Script", Icons::script);
 
 
         inline static const std::vector<const FileExtensionInfo *> all = {
-            scene.get(), geometry.get(), png.get(), jpg.get(), jpeg.get(), tga.get(), glb.get(),
-            gltf.get(), fbx.get(), obj.get(), lua.get()
+            scene.get(), geometry.get(), level.get(), png.get(), jpg.get(), jpeg.get(), tga.get(), glb.get(),
+            gltf.get(), fbx.get(), obj.get(), lua.get(), level.get()
         };
 
         inline static const std::vector<const FileExtensionInfo *> scripts = {

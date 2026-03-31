@@ -11,6 +11,7 @@
 #include <iostream>
 #include "common/serialization-definitions.h"
 #include "../../core/DirectoryService.h"
+#include "editor/dto/FileEntryDTO.h"
 #include "ApplicationContext.h"
 #include "common/ILoader.h"
 #include "common/AbstractImporter.h"
@@ -212,6 +213,26 @@ namespace Metal {
             for (const auto &entry: fs::recursive_directory_iterator(rootPath)) {
                 if (entry.is_regular_file() && entry.path().extension() == extension) {
                     files.push_back(entry.path().string());
+                }
+            }
+        } catch (const std::exception &e) {
+            LOG_ERROR("Error listing files: " + std::string(e.what()));
+        }
+        return files;
+    }
+
+    std::vector<FileEntryDTO> FilesService::listFilesWithExtensionDTO(const std::string &extension) const {
+        std::vector<FileEntryDTO> files;
+        const std::string &root = directoryService->getRootDirectory();
+        if (root.empty()) {
+            return files;
+        }
+
+        fs::path rootPath(root);
+        try {
+            for (const auto &entry: fs::recursive_directory_iterator(rootPath)) {
+                if (entry.is_regular_file() && entry.path().extension() == extension) {
+                    files.push_back({entry.path().string(), entry.path().filename().string()});
                 }
             }
         } catch (const std::exception &e) {

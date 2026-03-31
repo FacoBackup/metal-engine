@@ -9,6 +9,7 @@ set(EDITOR_SOURCES
         ui/viewport/CameraGizmoPanel.h
         ui/docks/AbstractDockPanel.h
         ui/abstract/AbstractPanel.h
+        dto/FileEntryDTO.h
         ui/abstract/AbstractPanel.cpp
         tools/WorldToolProvider.h
         tools/WorldToolProvider.cpp

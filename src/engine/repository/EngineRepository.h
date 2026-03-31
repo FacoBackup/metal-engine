@@ -23,6 +23,7 @@ namespace Metal {
         bool restirEnabled = true;
 
         glm::vec3 gravity{0, -9.81f, 0};
+        std::string mainLevel = "";
 
         void clear() override;
 

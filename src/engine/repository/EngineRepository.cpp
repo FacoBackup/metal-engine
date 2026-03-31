@@ -2,6 +2,7 @@
 
 #include "../../common/Icons.h"
 #include "../../ApplicationContext.h"
+#include "../../common/FileExtensions.h"
 
 namespace Metal {
     void EngineRepository::clear() {
@@ -25,6 +26,7 @@ namespace Metal {
         registerEditableField<FLOAT>(&elapsedTime).setName("elapsedTime").setLabel("Atmosphere elapsed time").setMin(0).setMax(24).setIncrement(0.01f);
 
         registerEditableField<VECTOR3>(&gravity).setName("gravity").setLabel("Physics gravity").setIncrement(0.1f);
+        registerEditableField<RESOURCE>(&mainLevel).setName("mainLevel").setLabel("Main level").setSupportedFileTypes({FileExtensions::level.get()});
     }
 
 

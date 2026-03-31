@@ -4,10 +4,21 @@
 #include "ApplicationContext.h"
 #include "../../repository/EditorRepository.h"
 #include "editor/service/ThemeService.h"
+#include "editor/service/FilesService.h"
+#include "engine/service/LevelService.h"
+#include "common/FileExtensions.h"
+#include "common/Icons.h"
 
 namespace Metal {
     void EditorFooterPanel::onSync() {
         ImGui::SameLine();
+        
+        if (UIUtil::ButtonSimple(Icons::forest + " " + editorRepository->currentLevelName + "##levelPopup", 0, 25)) {
+            ImGui::OpenPopup("LevelSelectionPopup");
+        }
+        renderLevelPopup();
+        ImGui::SameLine();
+
         renderShortcuts();
         ImGui::SameLine(ImGui::GetWindowWidth() - 100);
 
@@ -18,6 +29,39 @@ namespace Metal {
 
     void EditorFooterPanel::onInitialize() {
         asyncTaskPanel = initializePanel<AsyncTaskPanel>(false);
+        refreshLevelCache();
+    }
+
+    void EditorFooterPanel::renderLevelPopup() {
+        if (ImGui::BeginPopup("LevelSelectionPopup")) {
+            if (ImGui::MenuItem((Icons::refresh + " Refresh").c_str())) {
+                refreshLevelCache();
+            }
+            ImGui::Separator();
+
+            if (levelCache.empty()) {
+                ImGui::TextDisabled("No levels found");
+            } else {
+                for (const auto &level : levelCache) {
+                    if (ImGui::MenuItem(level.name.c_str())) {
+                        editorRepository->currentLevelName = level.name;
+                        
+                        auto levelLoaders = ctx->getSingletons<ILoader>();
+                        for (auto *loader : levelLoaders) {
+                            if (loader->isCompatible(level.path)) {
+                                loader->load(level.path);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            ImGui::EndPopup();
+        }
+    }
+
+    void EditorFooterPanel::refreshLevelCache() {
+        levelCache = filesService->listFilesWithExtensionDTO(FileExtensions::level->extension);
     }
 
     void EditorFooterPanel::framerate() {

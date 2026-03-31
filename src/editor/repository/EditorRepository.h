@@ -59,6 +59,7 @@ namespace Metal {
 
         bool enableSnapshots = true;
         float snapshotInterval = 5.f; // in minutes
+        std::string currentLevelName = "Untitled";
 
         void clear() override;
 

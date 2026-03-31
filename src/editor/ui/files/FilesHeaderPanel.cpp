@@ -70,12 +70,22 @@ namespace Metal {
         UIUtil::RenderTooltip("Refresh");
 
         ImGui::SameLine();
-        if (UIUtil::ButtonSimple(Icons::description + id, UIUtil::ONLY_ICON_BUTTON_SIZE,
-                                 UIUtil::ONLY_ICON_BUTTON_SIZE)) {
-            filesService->CreateFile(filesContext.currentDirectory, "NewScript", Metal::FileExtensions::lua->extension);
-            filesService->GetEntries(filesContext.currentDirectory);
+        if (UIUtil::ButtonSimple(Icons::add + id, UIUtil::ONLY_ICON_BUTTON_SIZE, UIUtil::ONLY_ICON_BUTTON_SIZE)) {
+            ImGui::OpenPopup((id + "CreateFilePopup").c_str());
         }
-        UIUtil::RenderTooltip("Create Lua Script");
+        UIUtil::RenderTooltip("Create new file...");
+
+        if (ImGui::BeginPopup((id + "CreateFilePopup").c_str())) {
+            if (ImGui::MenuItem((Icons::insert_drive_file + " Lua Script").c_str())) {
+                filesService->CreateFile(filesContext.currentDirectory, "NewScript", Metal::FileExtensions::lua->extension);
+                filesService->GetEntries(filesContext.currentDirectory);
+            }
+            if (ImGui::MenuItem((Icons::forest + " Level").c_str())) {
+                filesService->CreateFile(filesContext.currentDirectory, "NewLevel", Metal::FileExtensions::level->extension);
+                filesService->GetEntries(filesContext.currentDirectory);
+            }
+            ImGui::EndPopup();
+        }
 
         ImGui::PopStyleVar();
         ImGui::EndGroup();
