@@ -127,7 +127,7 @@ namespace Metal {
             if (it == meshMap.end()) continue;
 
             auto &childMeshNode = scene.entities.emplace_back();
-            childMeshNode.primitive = PrimitiveComponent();
+            childMeshNode.primitive = StaticGeometryComponent();
             childMeshNode.primitive->meshId = it->second.id;
             childMeshNode.transform.gizmoCenter = it->second.gizmoCenter;
 

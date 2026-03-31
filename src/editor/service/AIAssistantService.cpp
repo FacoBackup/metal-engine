@@ -20,7 +20,7 @@ namespace Metal {
         LOG_INFO("AIAssistantService: Found " + std::to_string(toolProviders.size()) + " tool providers");
 
         try {
-            FilesUtil::ReadFile("../resources/engine-system-prompt.md", systemPrompt);
+            FilesUtil::ReadFile("../resources/prompts/engine-system-prompt.md", systemPrompt);
         } catch (const std::exception &e) {
             LOG_ERROR("AIAssistantService: Failed to load system prompt: " + std::string(e.what()));
         }
@@ -158,7 +158,7 @@ namespace Metal {
     nlohmann::json AIAssistantService::buildMessages(const std::shared_ptr<Chat> &chat) {
         nlohmann::json messages = nlohmann::json::array();
 
-        std::string fullSystemPrompt = buildFullSystemPrompt();
+        std::string fullSystemPrompt = buildFullSystemPrompt(chat);
         if (!fullSystemPrompt.empty()) {
             messages.push_back({{"role", "system"}, {"content", fullSystemPrompt}});
         }
@@ -229,8 +229,22 @@ namespace Metal {
         return toolsArray;
     }
 
-    std::string AIAssistantService::buildFullSystemPrompt() {
-        return systemPrompt;
+    std::string AIAssistantService::buildFullSystemPrompt(const std::shared_ptr<Chat> &chat) {
+        std::string fullPrompt = systemPrompt;
+
+        if (chat && chat->selectedSkill) {
+            std::string skillContent;
+            try {
+                FilesUtil::ReadFile(("../" + chat->selectedSkill->path).c_str(), skillContent);
+                if (!skillContent.empty()) {
+                    fullPrompt += "\n\n### Selected Skill: " + chat->selectedSkill->label + "\n" + skillContent;
+                }
+            } catch (const std::exception &e) {
+                LOG_ERROR("AIAssistantService: Failed to load skill prompt: " + std::string(e.what()));
+            }
+        }
+
+        return fullPrompt;
     }
 
     void AIAssistantService::processAIResponse(const std::string &chatId, int messageIndex, AIModel model,

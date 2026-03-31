@@ -8,10 +8,9 @@
 #include "engine/repository/EngineRepository.h"
 #include "engine/service/MeshService.h"
 #include "engine/service/TextureService.h"
-#include "engine/service/FrameBufferService.h"
+#include "engine/service/RenderTargetService.h"
 
 namespace Metal {
-
     void VulkanContext::createSwapChain() {
         int w{}, h{};
         SDL_GetWindowSizeInPixels(window, &w, &h);
@@ -51,6 +50,12 @@ namespace Metal {
     void VulkanContext::createDevice() {
         vkb::DeviceBuilder deviceBuilder{physDevice};
 
+        VkPhysicalDeviceDynamicRenderingFeatures dynamicRenderingFeatures{
+            .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES,
+            .dynamicRendering = VK_TRUE
+        };
+        deviceBuilder.add_pNext(&dynamicRenderingFeatures);
+
         if (rayTracingSupported) {
             VkPhysicalDeviceBufferDeviceAddressFeatures bufferDeviceAddressFeatures{};
             bufferDeviceAddressFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
@@ -86,7 +91,8 @@ namespace Metal {
                 vkGetDeviceProcAddr(device.device, "vkGetAccelerationStructureBuildSizesKHR"));
             vkCmdBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(
                 vkGetDeviceProcAddr(device.device, "vkCmdBuildAccelerationStructuresKHR"));
-            vkGetAccelerationStructureDeviceAddressKHR = reinterpret_cast<PFN_vkGetAccelerationStructureDeviceAddressKHR>(
+            vkGetAccelerationStructureDeviceAddressKHR = reinterpret_cast<
+                PFN_vkGetAccelerationStructureDeviceAddressKHR>(
                 vkGetDeviceProcAddr(device.device, "vkGetAccelerationStructureDeviceAddressKHR"));
             vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(
                 vkGetDeviceProcAddr(device.device, "vkCreateRayTracingPipelinesKHR"));
@@ -100,6 +106,18 @@ namespace Metal {
             deviceProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
             deviceProperties2.pNext = &rayTracingPipelineProperties;
             vkGetPhysicalDeviceProperties2(physDevice.physical_device, &deviceProperties2);
+        }
+
+        vkCmdBeginRendering = reinterpret_cast<PFN_vkCmdBeginRenderingKHR>(
+            vkGetDeviceProcAddr(device.device, "vkCmdBeginRendering"));
+        vkCmdEndRendering = reinterpret_cast<PFN_vkCmdEndRenderingKHR>(
+            vkGetDeviceProcAddr(device.device, "vkCmdEndRendering"));
+
+        if (!vkCmdBeginRendering || !vkCmdEndRendering) {
+            vkCmdBeginRendering = reinterpret_cast<PFN_vkCmdBeginRenderingKHR>(
+                vkGetDeviceProcAddr(device.device, "vkCmdBeginRenderingKHR"));
+            vkCmdEndRendering = reinterpret_cast<PFN_vkCmdEndRenderingKHR>(
+                vkGetDeviceProcAddr(device.device, "vkCmdEndRenderingKHR"));
         }
     }
 
@@ -153,6 +171,7 @@ namespace Metal {
         }
         physDevice.enable_extension_if_present(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME);
         physDevice.enable_extension_if_present(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+        physDevice.enable_extension_if_present(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
 
         // Ray tracing extensions
         rayTracingSupported =
@@ -291,7 +310,6 @@ namespace Metal {
     }
 
     void VulkanContext::disposeManually() {
-
         vkDestroySampler(device.device, vkImageSampler, nullptr);
         vkDestroySampler(device.device, vkTextureSampler, nullptr);
 
@@ -322,7 +340,11 @@ namespace Metal {
         poolInfo.maxSets = 500;
 
         VulkanUtils::CheckVKResult(vkCreateDescriptorPool(device.device, &poolInfo,
-                                                          nullptr, const_cast<VkDescriptorPool*>(&descriptorPool)));
+                                                          nullptr, const_cast<VkDescriptorPool *>(&descriptorPool)));
+    }
+
+    uint32_t VulkanContext::getMaxCombinedImageSamplers() const {
+        return physicalDeviceProperties.limits.maxDescriptorSetSamplers / 2;
     }
 
     VkCommandBuffer VulkanContext::beginSingleTimeCommands() const {

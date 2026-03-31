@@ -7,16 +7,30 @@
 #include "common/IEventMember.h"
 #include "common/ISync.h"
 #include "../util/LuaContext.h"
+#include "common/IAsyncSync.h"
+#include "common/ILoader.h"
 #include <string>
+#include <mutex>
+#include <entt/entity/entity.hpp>
 
 namespace Metal {
+    struct ScriptComponent;
     struct WorldRepository;
 
-    class LuaService final : public IService, public IInit, public IDisposable, public IEventMember, public ISync {
+    class EngineContext;
+    class TransformService;
+
+    class LuaService final : public IService, public IInit, public IEventMember, public ISync, public IAsyncSync, public ILoader {
         LuaContext luaContext;
         bool enabled = false;
         bool playStarted = false;
         WorldRepository *worldRepository = nullptr;
+        EngineContext *engineContext = nullptr;
+        TransformService *transformService = nullptr;
+        std::unordered_map<std::string, sol::protected_function> scriptCache;
+        std::vector<entt::entity> activeUpdateScripts;
+        std::vector<entt::entity> activeAsyncUpdateScripts;
+        std::mutex luaMutex;
 
     public:
         LuaService() = default;
@@ -24,14 +38,34 @@ namespace Metal {
         ~LuaService() override = default;
 
         std::vector<Dependency> getDependencies() override {
-            return {{"WorldRepository", &worldRepository}};
+            return {
+                {"WorldRepository", &worldRepository},
+                {"EngineContext", &engineContext},
+                {"TransformService", &transformService}
+            };
         }
 
         void onInitialize() override;
 
-        void dispose() override;
+        void onScriptComponentAdded(entt::registry &registry, entt::entity entity);
+
+        void onScriptComponentUpdated(entt::registry &registry, entt::entity entity);
+
+        void onScriptComponentRemoved(entt::registry &registry, entt::entity entity);
 
         void onSync() override;
+
+        // IAsyncSync implementation
+        [[nodiscard]] std::string getSyncThreadId() const override { return "lua_async_scripting"; }
+
+        float getSyncInterval() const override { return 16.0f; } // ~60fps
+
+        void onAsyncSync() override;
+
+        // ILoader implementation
+        void load(const std::string &absolutePath) override;
+
+        bool isCompatible(const std::string &absolutePath) override;
 
         /**
          * Executes a lua script string.
@@ -51,6 +85,9 @@ namespace Metal {
          * Access the lua state directly for bindings.
          */
         sol::state &getState() { return luaContext.getState(); }
+
+    private:
+        void loadScript(ScriptComponent &comp, entt::entity entity);
     };
 } // Metal
 

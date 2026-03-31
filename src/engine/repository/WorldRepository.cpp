@@ -9,6 +9,9 @@
 #include "../../core/DirectoryService.h"
 #include "common/FileExtensions.h"
 #include "editor/dto/FieldModificationEvent.h"
+#include "engine/dto/CameraComponent.h"
+#include "engine/dto/TransformComponent.h"
+#include "engine/EngineContext.h"
 
 namespace Metal {
     entt::entity WorldRepository::createEntity() {
@@ -27,12 +30,12 @@ namespace Metal {
                         registry.destroy(entity);
                         if (hiddenEntities.contains(entity)) hiddenEntities.erase(entity);
                         if (culled.contains(entity)) culled.erase(entity);
-                        if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
+                        ApplicationEventContext::dispatch("BVH");
                     }
                 },
                 [this, createdState]() {
                     deserializeEntityComplete(*createdState);
-                    if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
+                    ApplicationEventContext::dispatch("BVH");
                 }
             );
         }
@@ -77,7 +80,7 @@ namespace Metal {
                     for (const EntityState &state: deletedStates) {
                         deserializeEntityComplete(state);
                     }
-                    if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
+                    ApplicationEventContext::dispatch("BVH");
                 },
                 [this, entities]() {
                     // Redo: Delete entities
@@ -88,7 +91,7 @@ namespace Metal {
                             registry.destroy(entityId);
                         }
                     }
-                    if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
+                    ApplicationEventContext::dispatch("BVH");
                 }
             );
         }
@@ -105,7 +108,7 @@ namespace Metal {
 
             registry.destroy(entityId);
         }
-        if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
+        ApplicationEventContext::dispatch("BVH");
     }
 
     void WorldRepository::changeVisibility(entt::entity entity, bool isVisible) {
@@ -128,7 +131,13 @@ namespace Metal {
         } else {
             hiddenEntities.insert({entity, true});
         }
-        if (dirtyStateService) dirtyStateService->markDirty(DirtyType::BVH);
+        ApplicationEventContext::dispatch("BVH");
+    }
+
+    void WorldRepository::clear() {
+        registry.clear();
+        hiddenEntities.clear();
+        culled.clear();
     }
 
     void WorldRepository::load(const std::string &absolutePath) {
@@ -154,15 +163,14 @@ namespace Metal {
             transform.isStatic = entityData.transform.isStatic;
 
             if (entityData.primitive) {
-                createComponent(entityId, PRIMITIVE);
-                auto &primitive = registry.get<PrimitiveComponent>(entityId);
+                createComponent(entityId, STATIC_GEOMETRY);
+                auto &primitive = registry.get<StaticGeometryComponent>(entityId);
                 primitive.meshId = entityData.primitive->meshId;
                 primitive.albedo = entityData.primitive->albedo;
                 primitive.roughness = entityData.primitive->roughness;
                 primitive.metallic = entityData.primitive->metallic;
-                primitive.transmissionFactor = entityData.primitive->transmissionFactor;
-                primitive.thicknessFactor = entityData.primitive->thicknessFactor;
-                primitive.ior = entityData.primitive->ior;
+                primitive.height = entityData.primitive->height;
+                primitive.normal = entityData.primitive->normal;
             }
         }
 
@@ -224,7 +232,6 @@ namespace Metal {
             }
         };
 
-        registerCompositeField(&camera).setName("camera");
         registerGenericField(hiddenEntitiesToJson, hiddenEntitiesFromJson).setName("hiddenEntities");
 
         auto registryToJson = [this] {
@@ -264,7 +271,7 @@ namespace Metal {
                     }
                 }
             }
-            for (auto entity: registry.view<PrimitiveComponent>()) {
+            for (auto entity: registry.view<StaticGeometryComponent>()) {
                 if (dirtyStateService) dirtyStateService->markEntityDirty(entity, DirtyType::Material);
             }
         };
@@ -290,4 +297,5 @@ namespace Metal {
             }
         }
     }
+
 } // Metal

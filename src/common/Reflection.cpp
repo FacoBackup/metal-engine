@@ -30,9 +30,9 @@ namespace Metal {
         return nullptr;
     }
 
-    std::shared_ptr<FieldMetadata> Reflection::getFieldByPath(const std::string &path) {
+    std::shared_ptr<FieldMetadata> Reflection::getFieldByName(const std::string &path) {
         for (const auto &member: getFields()) {
-            if (member->path == path) {
+            if (member->name == path) {
                 return member;
             }
         }
@@ -44,12 +44,7 @@ namespace Metal {
             fieldsRegistered = true;
             registerFields();
             for (auto &field: fields) {
-                field->nameWithId = field->name + field->id;
-                if (!field->group.empty()) {
-                    field->path = field->group + "/" + field->name;
-                } else {
-                    field->path = field->name;
-                }
+                field->labelWithId = field->label + field->id;
             }
         }
 
@@ -130,9 +125,7 @@ namespace Metal {
 
                 nlohmann::json f;
                 f["name"] = field->name;
-                f["group"] = field->group;
                 f["type"] = field->type;
-                f["path"] = field->path;
                 f["value"] = val;
 
                 if (field->type == RESOURCE) {

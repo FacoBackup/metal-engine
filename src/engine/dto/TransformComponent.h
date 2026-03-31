@@ -10,6 +10,7 @@
 namespace Metal {
     struct TransformComponent final : AbstractComponent {
         glm::mat4x4 model = glm::identity<glm::mat4x4>();
+        glm::mat4x4 previousModel = glm::identity<glm::mat4x4>();
         glm::vec3 translation{};
         glm::quat rotation = glm::identity<glm::quat>();
         glm::vec3 scale{1, 1, 1};

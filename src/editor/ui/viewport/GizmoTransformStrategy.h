@@ -2,17 +2,19 @@
 #define GIZMOTRANSFORMSTRATEGY_H
 
 #define GLM_ENABLE_EXPERIMENTAL
+#include <common/IContextMember.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <array>
 
 namespace Metal {
+    struct CameraRepository;
     struct TransformComponent;
     struct EditorRepository;
-    struct WorldRepository;
     class HistoryService;
+    class DirtyStateService;
 
-    class GizmoTransformStrategy {
+    class GizmoTransformStrategy final : public IContextMember {
         glm::mat4x4 cacheProjection{};
         glm::mat4x4 cacheMatrixMat4{};
         glm::vec3 auxTranslation{};
@@ -25,15 +27,24 @@ namespace Metal {
         float *projectionMatrixCache = nullptr;
         std::array<float, 3> translationSnap;
 
-        HistoryService *historyService;
-        EditorRepository *editorRepository;
-        WorldRepository *worldRepository;
+        HistoryService *historyService = nullptr;
+        EditorRepository *editorRepository = nullptr;
+        CameraRepository *cameraRepository = nullptr;
+        DirtyStateService *dirtyStateService = nullptr;
 
     public:
-        GizmoTransformStrategy(HistoryService *historyService, EditorRepository *editorRepository,
-                               WorldRepository *worldRepository);
+        std::vector<Dependency> getDependencies() override {
+            return {
+                {"HistoryService", &historyService},
+                {"EditorRepository", &editorRepository},
+                {"CameraRepository", &cameraRepository},
+                {"DirtyStateService", &dirtyStateService}
+            };
+        }
 
-        ~GizmoTransformStrategy() = default;
+        GizmoTransformStrategy() = default;
+
+        ~GizmoTransformStrategy() override = default;
 
         void updateCache(TransformComponent *selected);
 

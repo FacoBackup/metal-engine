@@ -8,7 +8,8 @@
 #include "common/IService.h"
 
 namespace Metal {
-    struct DirectoryService;
+    struct FileEntryDTO;
+    class DirectoryService;
     struct FSEntry;
 
     class NotificationService;
@@ -52,6 +53,8 @@ namespace Metal {
         std::shared_ptr<FSEntry> GetEntry(const std::string &path);
 
         std::vector<std::string> listFilesWithExtension(const std::string &extension) const;
+
+        std::vector<FileEntryDTO> listFilesWithExtensionDTO(const std::string &extension) const;
 
         /**
          * Writes content to a file in the root directory.

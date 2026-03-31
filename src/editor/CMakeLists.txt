@@ -5,8 +5,11 @@ set(EDITOR_SOURCES
         ui/viewport/ViewportPanel.h
         ui/viewport/EngineFramePanel.cpp
         ui/viewport/EngineFramePanel.h
+        ui/viewport/CameraGizmoPanel.cpp
+        ui/viewport/CameraGizmoPanel.h
         ui/docks/AbstractDockPanel.h
         ui/abstract/AbstractPanel.h
+        dto/FileEntryDTO.h
         ui/abstract/AbstractPanel.cpp
         tools/WorldToolProvider.h
         tools/WorldToolProvider.cpp
@@ -49,11 +52,14 @@ set(EDITOR_SOURCES
         service/ThemeService.cpp
         service/ThemeService.h
         repository/EditorRepository.h
+        repository/EditorCameraRepository.h
+        repository/EditorCameraRepository.cpp
         repository/DockRepository.h
         repository/DockRepository.cpp
         repository/AIAssistantRepository.h
         repository/AIAssistantRepository.cpp
         dto/ChatDTO.h
+        dto/Skill.h
         enum/engine-definitions.h
         ui/files/FilesPanel.cpp
         ui/files/FilesPanel.h
@@ -109,6 +115,8 @@ set(EDITOR_SOURCES
         service/FilesService.h
         service/FileImporterService.cpp
         service/FileImporterService.h
+        service/EditorCameraService.cpp
+        service/EditorCameraService.h
         passes/GridPass.cpp
         passes/GridPass.h
         enum/ShadingMode.h
@@ -138,10 +146,6 @@ set(EDITOR_SOURCES
         ui/viewport/GizmoSettingsPanel.h
         ui/abstract/form/types/QuatField.cpp
         ui/abstract/form/types/QuatField.h
-        dto/SparseVoxelOctreeBuilder.cpp
-        dto/SparseVoxelOctreeBuilder.h
-        dto/OctreeNode.cpp
-        dto/OctreeNode.h
         dto/SceneData.h
         service/NotificationService.cpp
         service/NotificationService.h
@@ -151,17 +155,15 @@ set(EDITOR_SOURCES
         enum/NotificationSeverity.h
         passes/SelectionOutlinePass.cpp
         passes/SelectionOutlinePass.h
+        passes/CameraVisualizationPass.cpp
+        passes/CameraVisualizationPass.h
         service/PickingService.cpp
         service/PickingService.h
         passes/SelectionIDPass.cpp
         passes/SelectionIDPass.h
-        passes/FallbackPass.cpp
-        passes/FallbackPass.h
         repository/EditorRepository.cpp
         dto/GridPushConstant.h
         dto/AsyncTask.h
-        service/VoxelImporterService.cpp
-        service/VoxelImporterService.h
         dto/SceneImportSettingsDTO.h
         ui/NotificationsPanel.cpp
         ui/NotificationsPanel.h

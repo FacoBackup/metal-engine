@@ -1,12 +1,14 @@
 #include "CameraService.h"
 
-#include "../dto/Camera.h"
+#include "../repository/CameraRepository.h"
 #include "../../ApplicationContext.h"
 #include "../EngineContext.h"
 #include "../repository/WorldRepository.h"
 #include "../repository/RuntimeRepository.h"
 #include "../service/DirtyStateService.h"
 #include "editor/dto/FieldModificationEvent.h"
+#include "engine/dto/CameraComponent.h"
+#include "engine/dto/TransformComponent.h"
 
 namespace Metal {
     void CameraService::onInitialize() {
@@ -15,37 +17,28 @@ namespace Metal {
             dirtyStateService->markDirty(DirtyType::Camera);
         }, "Camera");
 
-        eventListener([this](const Event &) { forwardPressed = true; }, "CameraMoveForward");
-        eventListener([this](const Event &) { backwardPressed = true; }, "CameraMoveBackward");
-        eventListener([this](const Event &) { leftPressed = true; }, "CameraMoveLeft");
-        eventListener([this](const Event &) { rightPressed = true; }, "CameraMoveRight");
-        eventListener([this](const Event &) { upPressed = true; }, "CameraMoveUp");
-        eventListener([this](const Event &) { downPressed = true; }, "CameraMoveDown");
+        eventListener([this](const Event &e) {
+            isPlaying = e.key == "Play";
+        }, "Play", "Stop");
     }
 
     // Per frame
     void CameraService::onSync() {
-        camera = &worldRepository->camera;
-        if (camera != nullptr) {
-            updateAspectRatio();
-            if (dirtyStateService->isDirty(DirtyType::Camera)) {
-                updateMatrices();
-                engineContext->setCameraUpdated(true);
-                dirtyStateService->consumeDirtyFlags(DirtyType::Camera);
-            }
+        if (isPlaying) {
+            handleCamera();
         }
-        forwardPressed = false;
-        backwardPressed = false;
-        leftPressed = false;
-        rightPressed = false;
-        upPressed = false;
-        downPressed = false;
+        updateAspectRatio();
+        if (dirtyStateService->isDirty(DirtyType::Camera)) {
+            updateMatrices();
+            engineContext->setCameraUpdated(true);
+            dirtyStateService->consumeDirtyFlags(DirtyType::Camera);
+        }
     }
 
-    void CameraService::updateAspectRatio() const {
-        const float prevAspect = camera->aspectRatio;
-        camera->aspectRatio = runtimeRepository->viewportW / runtimeRepository->viewportH;
-        if (prevAspect != camera->aspectRatio) {
+    void CameraService::updateAspectRatio() {
+        const float prevAspect = cameraRepository->aspectRatio;
+        cameraRepository->aspectRatio = runtimeRepository->viewportW / runtimeRepository->viewportH;
+        if (prevAspect != cameraRepository->aspectRatio) {
             dirtyStateService->markDirty(DirtyType::Camera);
         }
     }
@@ -53,134 +46,106 @@ namespace Metal {
     void CameraService::updateMatrices() {
         updateProjection();
         updateView();
-        camera->projViewMatrix = camera->projectionMatrix * camera->viewMatrix;
-        camera->extractFrustumPlanes(camera->projViewMatrix);
+        cameraRepository->projViewMatrix = cameraRepository->projectionMatrix * cameraRepository->viewMatrix;
+        cameraRepository->invProjView = glm::inverse(cameraRepository->projViewMatrix);
+        cameraRepository->extractFrustumPlanes(cameraRepository->projViewMatrix);
     }
 
     void CameraService::updateView() {
         createViewMatrix();
-        camera->invViewMatrix = inverse(camera->viewMatrix);
+        cameraRepository->invViewMatrix = inverse(cameraRepository->viewMatrix);
     }
 
-    void CameraService::updateProjection() const {
-        if (camera->isOrthographic) {
-            camera->projectionMatrix = glm::ortho(-camera->orthographicProjectionSize,
-                                                  camera->orthographicProjectionSize,
-                                                  -camera->orthographicProjectionSize / camera->aspectRatio,
-                                                  camera->orthographicProjectionSize / camera->aspectRatio,
-                                                  -camera->zFar, camera->zFar);
+    void CameraService::updateProjection() {
+        if (cameraRepository->isOrthographic) {
+            cameraRepository->projectionMatrix = glm::ortho(-cameraRepository->orthographicProjectionSize,
+                                                            cameraRepository->orthographicProjectionSize,
+                                                            -cameraRepository->orthographicProjectionSize /
+                                                            cameraRepository->aspectRatio,
+                                                            cameraRepository->orthographicProjectionSize /
+                                                            cameraRepository->aspectRatio,
+                                                            cameraRepository->zNear, cameraRepository->zFar);
         } else {
-            camera->projectionMatrix = glm::perspective(camera->fov * Util::TO_RADIANS, camera->aspectRatio,
-                                                        camera->zNear,
-                                                        camera->zFar);
+            cameraRepository->projectionMatrix = glm::perspective(cameraRepository->fov * Util::TO_RADIANS,
+                                                                  cameraRepository->aspectRatio,
+                                                                  cameraRepository->zNear,
+                                                                  cameraRepository->zFar);
         }
-        camera->projectionMatrix[1][1] *= -1;
-        camera->invProjectionMatrix = glm::inverse(camera->projectionMatrix);
-    }
-
-    void CameraService::handleInputInternal() const {
-        glm::vec3 forward(
-            -std::sin(camera->yaw) * std::cos(camera->pitch),
-            std::sin(camera->pitch),
-            -std::cos(camera->yaw) * std::cos(camera->pitch)
-        );
-        glm::vec3 right(
-            std::sin(camera->yaw - PI_OVER_2),
-            0.0f,
-            std::cos(camera->yaw - PI_OVER_2)
-        );
-        forward = glm::normalize(forward);
-        right = glm::normalize(right);
-
-        const float multiplier = 10 * camera->movementSensitivity *
-                                 engineContext->deltaTime;
-        if (leftPressed) {
-            camera->position += right * multiplier;
-            dirtyStateService->markDirty(DirtyType::Camera);
-        }
-        if (rightPressed) {
-            camera->position -= right * multiplier;
-            dirtyStateService->markDirty(DirtyType::Camera);
-        }
-        if (backwardPressed) {
-            if (camera->isOrthographic) {
-                camera->orthographicProjectionSize += multiplier;
-            } else {
-                camera->position -= forward * multiplier;
-            }
-            dirtyStateService->markDirty(DirtyType::Camera);
-        }
-        if (forwardPressed) {
-            if (camera->isOrthographic) {
-                camera->orthographicProjectionSize -= multiplier;
-            } else {
-                camera->position += forward * multiplier;
-            }
-            dirtyStateService->markDirty(DirtyType::Camera);
-        }
-        if (upPressed) {
-            camera->position += glm::vec3(0, 1, 0) * multiplier;
-            dirtyStateService->markDirty(DirtyType::Camera);
-        }
-        if (downPressed) {
-            camera->position -= glm::vec3(0, 1, 0) * multiplier;
-            dirtyStateService->markDirty(DirtyType::Camera);
-        }
-    }
-
-    void CameraService::handleMouse(const bool isFirstMovement) const {
-        updateDelta(isFirstMovement);
-
-        camera->yaw -= glm::radians(camera->deltaX);
-        if (std::abs(camera->yaw) >= PI_2) {
-            float mapped = std::abs(camera->yaw) - PI_2;
-            camera->yaw = (camera->yaw < 0.0f ? -mapped : mapped);
-        }
-        camera->pitch += glm::radians(camera->deltaY);
-        camera->pitch = glm::clamp(camera->pitch, -MIN_MAX_PITCH, MIN_MAX_PITCH);
-
-        dirtyStateService->markDirty(DirtyType::Camera);
-    }
-
-    void CameraService::updateDelta(const bool isFirstMovement) const {
-        const float mouseX = runtimeRepository->mouseX;
-        const float mouseY = runtimeRepository->mouseY;
-
-        if (isFirstMovement) {
-            camera->lastMouseX = mouseX;
-            camera->lastMouseY = mouseY;
-        }
-
-        camera->deltaX = (mouseX - camera->lastMouseX) * camera->rotationSensitivity *
-                         0.25f;
-        camera->deltaY = (camera->lastMouseY - mouseY) * camera->rotationSensitivity *
-                         0.25f;
-
-        camera->lastMouseX = mouseX;
-        camera->lastMouseY = mouseY;
-    }
-
-    void CameraService::handleInput(const bool isFirstMovement) const {
-        handleInputInternal();
-        handleMouse(isFirstMovement);
+        cameraRepository->projectionMatrix[1][1] *= -1;
+        cameraRepository->invProjectionMatrix = glm::inverse(cameraRepository->projectionMatrix);
     }
 
     void CameraService::createViewMatrix() {
-        const float cosPitch = std::cos(camera->pitch);
-        const float sinPitch = std::sin(camera->pitch);
-        const float cosYaw = std::cos(camera->yaw);
-        const float sinYaw = std::sin(camera->yaw);
+        const float cosPitch = std::cos(cameraRepository->pitch);
+        const float sinPitch = std::sin(cameraRepository->pitch);
+        const float cosYaw = std::cos(cameraRepository->yaw);
+        const float sinYaw = std::sin(cameraRepository->yaw);
 
         xAxis = glm::vec3(cosYaw, 0.0f, -sinYaw);
         yAxis = glm::vec3(sinYaw * sinPitch, cosPitch, cosYaw * sinPitch);
         zAxis = glm::vec3(sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw);
 
-        camera->viewMatrix = glm::mat4x4(
+        cameraRepository->viewMatrix = glm::mat4x4(
             xAxis.x, yAxis.x, zAxis.x, 0.0f,
             xAxis.y, yAxis.y, zAxis.y, 0.0f,
             xAxis.z, yAxis.z, zAxis.z, 0.0f,
-            -dot(xAxis, camera->position),
-            -dot(yAxis, camera->position),
-            -dot(zAxis, camera->position), 1.0f);
+            -dot(xAxis, cameraRepository->position),
+            -dot(yAxis, cameraRepository->position),
+            -dot(zAxis, cameraRepository->position), 1.0f);
+    }
+
+
+    void CameraService::updateCameraData(entt::entity entity) {
+        if (entity == entt::null) return;
+        auto *component = worldRepository->registry.try_get<CameraComponent>(entity);
+        auto *transform = worldRepository->registry.try_get<TransformComponent>(entity);
+        if (!component || !transform) return;
+
+        cameraRepository->fov = component->fov;
+        cameraRepository->zNear = component->zNear;
+        cameraRepository->zFar = component->zFar;
+        cameraRepository->rotationSensitivity = component->rotationSensitivity;
+        cameraRepository->movementSensitivity = component->movementSensitivity;
+        cameraRepository->zoomSensitivity = component->zoomSensitivity;
+        cameraRepository->motionBlurEnabled = component->motionBlurEnabled;
+        cameraRepository->motionBlurVelocityScale = component->motionBlurVelocityScale;
+        cameraRepository->motionBlurMaxSamples = component->motionBlurMaxSamples;
+        cameraRepository->cameraMotionBlur = component->cameraMotionBlur;
+        cameraRepository->dofEnabled = component->dofEnabled;
+        cameraRepository->dofFocusDistance = component->dofFocusDistance;
+        cameraRepository->dofAperture = component->dofAperture;
+        cameraRepository->dofFocalLength = component->dofFocalLength;
+        cameraRepository->bloomEnabled = component->bloomEnabled;
+        cameraRepository->filmGrain = component->filmGrain;
+        cameraRepository->vignetteEnabled = component->vignetteEnabled;
+        cameraRepository->chromaticAberrationEnabled = component->chromaticAberrationEnabled;
+        cameraRepository->distortionEnabled = component->distortionEnabled;
+        cameraRepository->filmGrainStrength = component->filmGrainStrength;
+        cameraRepository->vignetteStrength = component->vignetteStrength;
+        cameraRepository->bloomThreshold = component->bloomThreshold;
+        cameraRepository->bloomQuality = component->bloomQuality;
+        cameraRepository->bloomOffset = component->bloomOffset;
+        cameraRepository->chromaticAberrationIntensity = component->chromaticAberrationIntensity;
+        cameraRepository->distortionIntensity = component->distortionIntensity;
+        cameraRepository->isOrthographic = component->isOrthographic;
+        cameraRepository->aspectRatio = component->aspectRatio;
+        cameraRepository->orthographicProjectionSize = component->orthographicProjectionSize;
+
+        cameraRepository->position = transform->translation;
+        cameraRepository->yaw = component->yaw;
+        cameraRepository->pitch = component->pitch;
+
+        ApplicationEventContext::dispatch("Camera");
+    }
+
+    void CameraService::handleCamera() {
+        for (const auto view = worldRepository->registry.view<CameraComponent, TransformComponent>();
+             const auto entity:
+             view) {
+            if (const auto &cameraComp = view.get<CameraComponent>(entity); cameraComp.mainCamera) {
+                updateCameraData(entity);
+                break;
+            }
+        }
     }
 }

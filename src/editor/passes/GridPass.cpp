@@ -7,14 +7,14 @@
 namespace Metal {
     void GridPass::onInitialize() {
         PipelineBuilder gridPipelineBuilder = PipelineBuilder::Of(
-                    getScopedResourceId(RID_POST_PROCESSING_FBO),
+                    getScopedResourceId(RID_POST_PROCESSING_RT),
                     "QUAD.vert",
                     "tools/Grid.frag"
                 )
                 .enableBlending()
                 .setPushConstantsSize(sizeof(GridPushConstant))
                 .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
-                .addStorageImageBinding(getScopedResourceId(RID_GBUFFER_POSITION_INDEX));
+                .addRenderTargetBinding(getScopedResourceId(RID_GBUFFER_RT), RID_GBUFFER_RENDER_INDEX_DEPTH);
         pipelineInstance = pipelineService->createPipeline(gridPipelineBuilder);
     }
 

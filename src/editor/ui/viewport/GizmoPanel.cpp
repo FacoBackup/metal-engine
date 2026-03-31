@@ -1,31 +1,19 @@
 #include "GizmoPanel.h"
 #include "GizmoTransformStrategy.h"
-#include "ApplicationContext.h"
 #include "engine/dto/TransformComponent.h"
-#include "engine/dto/Camera.h"
+#include "engine/repository/CameraRepository.h"
 #include "ImGuizmo.h"
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/matrix_decompose.hpp>
 #include "../../repository/EditorRepository.h"
-#include "engine/repository/WorldRepository.h"
 #include "../../service/SelectionService.h"
-#include "editor/service/HistoryService.h"
 
 namespace Metal {
     GizmoPanel::GizmoPanel(ImVec2 *position, glm::vec2 *size) : size(size), position(position) {
     }
 
-    GizmoPanel::~GizmoPanel() {
-        delete gizmoStrategy;
-    }
-
-    void GizmoPanel::onInitialize() {
-        gizmoStrategy = new GizmoTransformStrategy(historyService, editorRepository, worldRepository);
-    }
-
     void GizmoPanel::onSync() {
         if (editorRepository->primitiveSelected == nullptr) {
-            isGizmoOver = false;
+            editorRepository->isGizmoOver = false;
+            editorRepository->isGizmoUsing = false;
             localSelected = nullptr;
             if (editorRepository->mainSelection != EMPTY_ENTITY) {
                 selectionService->updatePrimitiveSelected();
@@ -39,7 +27,7 @@ namespace Metal {
         }
 
         gizmoStrategy->recomposeMatrix();
-        ImGuizmo::SetOrthographic(worldRepository->camera.isOrthographic);
+        ImGuizmo::SetOrthographic(cameraRepository->isOrthographic);
         ImGuizmo::SetDrawlist();
         ImVec2 viewportMin = ImGui::GetItemRectMin();
         ImVec2 viewportSize = ImGui::GetItemRectSize();
@@ -53,15 +41,16 @@ namespace Metal {
             nullptr,
             gizmoStrategy->getSnapValues());
 
-        gizmoStrategy->updateUsingState(ImGuizmo::IsUsing());
+        editorRepository->isGizmoUsing = ImGuizmo::IsUsing();
+        gizmoStrategy->updateUsingState(editorRepository->isGizmoUsing);
 
-        if (ImGuizmo::IsUsing()) {
+        if (editorRepository->isGizmoUsing) {
             gizmoStrategy->decomposeMatrix(localSelected);
         } else {
             // Ensure endTransaction is called even if decomposeMatrix wasn't called this frame
             gizmoStrategy->updateUsingState(false);
         }
 
-        isGizmoOver = ImGuizmo::IsOver();
+        editorRepository->isGizmoOver = ImGuizmo::IsOver();
     }
 } // Metal

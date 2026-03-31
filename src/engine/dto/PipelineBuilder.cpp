@@ -2,10 +2,10 @@
 #include "../resource/TextureInstance.h"
 
 namespace Metal {
-    PipelineBuilder PipelineBuilder::Of(std::string frameBufferId, const char *vertexShader,
+    PipelineBuilder PipelineBuilder::Of(std::string renderTargetId, const char *vertexShader,
                                         const char *fragmentShader) {
         PipelineBuilder d{};
-        d.frameBufferId = std::move(frameBufferId);
+        d.renderTargetId = std::move(renderTargetId);
         d.vertexShader = vertexShader;
         d.fragmentShader = fragmentShader;
         return d;
@@ -91,14 +91,25 @@ namespace Metal {
         return *this;
     }
 
-    PipelineBuilder &PipelineBuilder::addFboBinding(std::string frameBufferId, uint32_t attachmentIndex,
+    PipelineBuilder &PipelineBuilder::addRenderTargetBinding(std::string renderTargetId, uint32_t attachmentIndex,
                                                          VkImageLayout layout) {
         DescriptorBindingBuilder b{};
         b.bindingPoint = currentBindingPoint++;
-        b.frameBufferId = std::move(frameBufferId);
+        b.renderTargetId = std::move(renderTargetId);
         b.attachmentIndex = static_cast<int>(attachmentIndex);
         b.layout = layout;
-        b.type = DescriptorBindingType::FBO_ATTACHMENT;
+        b.type = DescriptorBindingType::RENDERTARGET_ATTACHMENT;
+        resourceBindings.push_back(b);
+        return *this;
+    }
+
+    PipelineBuilder &PipelineBuilder::addStorageRenderTargetBinding(std::string renderTargetId, uint32_t attachmentIndex) {
+        DescriptorBindingBuilder b{};
+        b.bindingPoint = currentBindingPoint++;
+        b.renderTargetId = std::move(renderTargetId);
+        b.attachmentIndex = static_cast<int>(attachmentIndex);
+        b.layout = VK_IMAGE_LAYOUT_GENERAL;
+        b.type = DescriptorBindingType::STORAGE_RENDERTARGET_ATTACHMENT;
         resourceBindings.push_back(b);
         return *this;
     }

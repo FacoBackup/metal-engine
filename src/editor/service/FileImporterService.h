@@ -12,7 +12,7 @@ namespace Metal {
     struct FSEntry;
     class SceneImporterService;
     class TextureImporterService;
-    struct DirectoryService;
+    class DirectoryService;
     class VoxelImporterService;
     class NotificationService;
     class AsyncTaskService;

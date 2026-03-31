@@ -7,7 +7,7 @@
 namespace Metal {
     class MeshService;
     class VoxelService;
-    class FrameBufferService;
+    class RenderTargetService;
     class TextureService;
     class PipelineService;
     class BufferService;
@@ -15,7 +15,7 @@ namespace Metal {
     class MetricsPanel final : public AbstractDockPanel {
         MeshService *meshService = nullptr;
         VoxelService *voxelService = nullptr;
-        FrameBufferService *framebufferService = nullptr;
+        RenderTargetService *RenderTargetService = nullptr;
         TextureService *textureService = nullptr;
         PipelineService *pipelineService = nullptr;
         BufferService *bufferService = nullptr;
@@ -25,7 +25,7 @@ namespace Metal {
             return {
                 {"MeshService", &meshService},
                 {"VoxelService", &voxelService},
-                {"FrameBufferService", &framebufferService},
+                {"RenderTargetService", &RenderTargetService},
                 {"TextureService", &textureService},
                 {"PipelineService", &pipelineService},
                 {"BufferService", &bufferService}

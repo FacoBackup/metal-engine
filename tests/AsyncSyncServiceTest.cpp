@@ -14,6 +14,7 @@ class MockAsyncService1 final : public IService, public IAsyncSync {
 public:
     std::atomic<int> syncCount{0};
     std::string getSyncThreadId() const override { return "thread_1"; }
+    float getSyncInterval() const override { return 1.0f; }
     void onAsyncSync() override { syncCount++; }
 };
 
@@ -21,12 +22,13 @@ class MockAsyncService2 final : public IService, public IAsyncSync {
 public:
     std::atomic<int> syncCount{0};
     std::string getSyncThreadId() const override { return "thread_2"; }
+    float getSyncInterval() const override { return 1.0f; }
     void onAsyncSync() override { syncCount++; }
 };
 
 TEST(AsyncSyncServiceTest, OrchestratesAsyncSync) {
     auto context = std::make_shared<ApplicationContext>(true);
-    
+
     auto threadManager = std::make_shared<ThreadManager>();
     auto asyncSyncService = std::make_shared<AsyncSyncService>();
     auto mockService1 = std::make_shared<MockAsyncService1>();
@@ -48,4 +50,3 @@ TEST(AsyncSyncServiceTest, OrchestratesAsyncSync) {
 
     context->dispose();
 }
-

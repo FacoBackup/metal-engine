@@ -11,6 +11,8 @@
 namespace Metal {
     class DockRepository final : public IRepository, public IInit {
     public:
+        void clear() override;
+
         void registerFields() override;
 
         void onInitialize() override;

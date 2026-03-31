@@ -6,6 +6,7 @@
 #include <imgui.h>
 
 namespace Metal {
+    class CameraService;
     class EngineFrame;
     class VulkanContext;
     struct EngineRepository;
@@ -14,6 +15,9 @@ namespace Metal {
     class DescriptorSetService;
     class PickingService;
     class SelectionService;
+    struct WorldRepository;
+    struct EditorCameraRepository;
+    class EditorCameraService;
 
     class EngineFramePanel final : public AbstractPanel {
         VulkanContext *vulkanContext = nullptr;
@@ -23,6 +27,9 @@ namespace Metal {
         DescriptorSetService *descriptorSetService = nullptr;
         PickingService *pickingService = nullptr;
         SelectionService *selectionService = nullptr;
+        WorldRepository *worldRepository = nullptr;
+        CameraService *cameraService = nullptr;
+        EditorCameraService *editorCameraService = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
@@ -31,9 +38,12 @@ namespace Metal {
                 {"EngineRepository", &engineRepository},
                 {"EditorRepository", &editorRepository},
                 {"EngineContext", &engineContext},
+                {"cameraService", &cameraService},
                 {"DescriptorSetService", &descriptorSetService},
                 {"PickingService", &pickingService},
-                {"SelectionService", &selectionService}
+                {"SelectionService", &selectionService},
+                {"WorldRepository", &worldRepository},
+                {"EditorCameraService", &editorCameraService}
             };
         }
 

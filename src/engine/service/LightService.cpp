@@ -5,7 +5,7 @@
 #include "../EngineContext.h"
 #include "../repository/EngineRepository.h"
 #include "../repository/WorldRepository.h"
-#include "../dto/PrimitiveComponent.h"
+#include "../dto/StaticGeometryComponent.h"
 #include "../dto/MeshData.h"
 #include "MeshService.h"
 #include "common/LoggerUtil.h"
@@ -16,21 +16,25 @@ namespace Metal {
     void LightService::onInitialize() {
         eventListener([this](const Event &) {
             needsUpdate = true;
-        }, "BVHUpdated");
+        }, "LightComponent", "BVH", "BVHUpdated");
     }
 
     void LightService::registerLights() {
-        for (const auto entity: worldRepository->registry.view<PrimitiveComponent, LightComponent>()) {
-            auto &primitive = worldRepository->registry.get<PrimitiveComponent>(entity);
+        for (const auto entity: worldRepository->registry.view<StaticGeometryComponent, LightComponent>()) {
+            auto &primitive = worldRepository->registry.get<StaticGeometryComponent>(entity);
             if (primitive.meshId.empty()) {
                 continue;
             }
+            if (worldRepository->hiddenEntities.contains(entity)) {
+                return;
+            }
+
             auto &lightComponent = worldRepository->registry.get<LightComponent>(entity);
             if (MeshData *meshData = meshService->loadMeshData(primitive.meshId)) {
                 for (size_t i = 0; i < meshData->indices.size(); i += 3) {
                     LightData light{};
                     light.color = lightComponent.color;
-                    light.triangleIndex = static_cast<unsigned int>(i / 3);
+                    light.triangleIndex = i;
                     light.meshIndex = primitive.renderIndex;
                     items.push_back(light);
                 }

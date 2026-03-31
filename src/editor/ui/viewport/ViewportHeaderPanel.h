@@ -6,7 +6,7 @@
 
 namespace Metal {
     struct EditorRepository;
-    struct WorldRepository;
+    struct CameraRepository;
 
     class ViewportHeaderPanel final : public AbstractPanel {
         static constexpr int FLAGS = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground |
@@ -15,13 +15,13 @@ namespace Metal {
         int shadingModelOption = 0;
 
         EditorRepository *editorRepository = nullptr;
-        WorldRepository *worldRepository = nullptr;
+        CameraRepository *cameraRepository = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
             return {
                 {"EditorRepository", &editorRepository},
-                {"WorldRepository", &worldRepository}
+                {"CameraRepository", &cameraRepository}
             };
         }
 

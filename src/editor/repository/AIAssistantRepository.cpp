@@ -47,6 +47,10 @@ namespace Metal {
         chats.push_back(chat);
     }
 
+    void AIAssistantRepository::clear() {
+        chats.clear();
+    }
+
     void AIAssistantRepository::deleteChat(const std::string &id) {
         chats.erase(std::remove_if(chats.begin(), chats.end(),
                                    [&id](const std::shared_ptr<Chat> &c) { return c && c->id == id; }), chats.end());

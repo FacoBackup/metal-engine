@@ -4,17 +4,16 @@
 #include "../repository/WorldRepository.h"
 #include "MeshService.h"
 #include "TextureService.h"
-#include "VoxelService.h"
-#include "../../ApplicationContext.h"
 #include "../../ApplicationEventContext.h"
 #include "../dto/ResourceDisposalPayload.h"
 
-#include "../resource/SVOInstance.h"
 #include "../resource/MeshInstance.h"
 #include "../resource/TextureInstance.h"
 #include "../../common/LoggerUtil.h"
 
-#include "../dto/PrimitiveComponent.h"
+#include "../dto/StaticGeometryComponent.h"
+#include "../dto/InstancedGeometryComponent.h"
+#include "../dto/AnimatedGeometryComponent.h"
 
 namespace Metal {
     static constexpr int MAX_TIMEOUT = 10000;
@@ -38,9 +37,41 @@ namespace Metal {
     }
 
     void StreamingService::onSync() {
-        auto view = worldRepository->registry.view<PrimitiveComponent>();
+        auto view = worldRepository->registry.view<StaticGeometryComponent>();
         for (auto entity: view) {
-            auto &meshComp = view.get<PrimitiveComponent>(entity);
+            auto &meshComp = view.get<StaticGeometryComponent>(entity);
+            if (!meshComp.meshId.empty()) {
+                lastUse[meshComp.meshId] = engineContext->currentTimeMs;
+            }
+            if (!meshComp.albedo.empty()) {
+                lastUse[meshComp.albedo] = engineContext->currentTimeMs;
+            }
+            if (!meshComp.roughness.empty()) {
+                lastUse[meshComp.roughness] = engineContext->currentTimeMs;
+            }
+            if (!meshComp.metallic.empty()) {
+                lastUse[meshComp.metallic] = engineContext->currentTimeMs;
+            }
+        }
+        auto instancedView = worldRepository->registry.view<InstancedGeometryComponent>();
+        for (auto entity: instancedView) {
+            auto &meshComp = instancedView.get<InstancedGeometryComponent>(entity);
+            if (!meshComp.meshId.empty()) {
+                lastUse[meshComp.meshId] = engineContext->currentTimeMs;
+            }
+            if (!meshComp.albedo.empty()) {
+                lastUse[meshComp.albedo] = engineContext->currentTimeMs;
+            }
+            if (!meshComp.roughness.empty()) {
+                lastUse[meshComp.roughness] = engineContext->currentTimeMs;
+            }
+            if (!meshComp.metallic.empty()) {
+                lastUse[meshComp.metallic] = engineContext->currentTimeMs;
+            }
+        }
+        auto animatedView = worldRepository->registry.view<AnimatedGeometryComponent>();
+        for (auto entity: animatedView) {
+            auto &meshComp = animatedView.get<AnimatedGeometryComponent>(entity);
             if (!meshComp.meshId.empty()) {
                 lastUse[meshComp.meshId] = engineContext->currentTimeMs;
             }
@@ -59,7 +90,6 @@ namespace Metal {
             sinceLastCleanup = engineContext->currentTime;
             disposeResources(meshService, lastUse, engineContext);
             disposeResources(textureService, lastUse, engineContext);
-            disposeResources(voxelService, lastUse, engineContext);
         }
     }
 }

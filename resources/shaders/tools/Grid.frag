@@ -16,7 +16,7 @@ layout(push_constant) uniform Push {
 
 layout(location = 0) in vec2 texCoords;
 layout(location = 0) out vec4 finalColor;
-layout(set = 0, binding = 1, rgba32f) uniform readonly image2D gBufferPositionIndex;
+layout(set = 0, binding = 1, rg32f) uniform readonly image2D gBufferRenderIndexDepth;
 
 vec3 p = vec3(0);
 
@@ -37,17 +37,26 @@ float getGridLine(float gridScale){
 }
 
 void main() {
-    vec4 positionIndex = imageLoad(gBufferPositionIndex, ivec2(gl_FragCoord.xy));
-    float renderIndex = positionIndex.a;
+    vec2 renderIndexDepth = imageLoad(gBufferRenderIndexDepth, ivec2(gl_FragCoord.xy)).rg;
+    float renderIndex = renderIndexDepth.r;
+    float depth = renderIndexDepth.g;
     bool hasData = false;
     bool isOverlay = false;
     if (renderIndex != 0){
         hasData = OVERLAY_OBJECTS;
         isOverlay = true;
-        p = positionIndex.rgb;
+
+        // Reconstruct position from depth
+        vec4 clipPos;
+        clipPos.xy = texCoords * 2.0 - 1.0;
+        clipPos.z = depth;
+        clipPos.w = 1.0;
+        vec4 worldPos = globalData.invProjView * clipPos;
+        p = worldPos.xyz / worldPos.w;
     } else {
-        vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView);
-        hasData = rayMarch(globalData.cameraWorldPosition.xyz, rayDir, 1);
+        vec3 rayOrigin;
+        vec3 rayDir = createRay(texCoords, globalData.invProj, globalData.invView, rayOrigin);
+        hasData = rayMarch(rayOrigin, rayDir, 1);
     }
 
     if (hasData){

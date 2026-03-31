@@ -6,14 +6,14 @@
 
 namespace Metal {
     struct MaterialData {
-        alignas(16) float transmission{};
-        alignas(4) float thickness{};
-        alignas(4) float ior{1.45f};
         alignas(4) unsigned int isEmissive{};
 
         alignas(4) unsigned int albedoTextureId = 0;
         alignas(4) unsigned int roughnessTextureId = 0;
         alignas(4) unsigned int metallicTextureId = 0;
+        alignas(4) unsigned int normalTextureId = 0;
+        alignas(4) unsigned int heightTextureId = 0;
+        alignas(4) float parallaxScale = 0.05f;
     };
 }
 

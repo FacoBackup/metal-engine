@@ -18,15 +18,15 @@ public:
     glm::vec3 colorVal = {1, 1, 1};
 
     void registerFields() override {
-        registerEditableField<FLOAT>(&floatVal).setName("Float").setGroup("Group");
-        registerEditableField<INT>(&intVal).setName("Int").setGroup("Group");
-        registerEditableField<STRING>(&stringVal).setName("String").setGroup("Group");
-        registerEditableField<BOOLEAN>(&boolVal).setName("Bool").setGroup("Group");
-        registerEditableField<VECTOR2>(&vec2Val).setName("Vec2").setGroup("Group");
-        registerEditableField<VECTOR3>(&vec3Val).setName("Vec3").setGroup("Group");
-        registerEditableField<VECTOR4>(&vec4Val).setName("Vec4").setGroup("Group");
-        registerEditableField<QUAT>(&quatVal).setName("Quat").setGroup("Group");
-        registerEditableField<COLOR>(&colorVal).setName("Color").setGroup("Group");
+        registerEditableField<FLOAT>(&floatVal).setName("Float").setLabel("Group");
+        registerEditableField<INT>(&intVal).setName("Int").setLabel("Group");
+        registerEditableField<STRING>(&stringVal).setName("String").setLabel("Group");
+        registerEditableField<BOOLEAN>(&boolVal).setName("Bool").setLabel("Group");
+        registerEditableField<VECTOR2>(&vec2Val).setName("Vec2").setLabel("Group");
+        registerEditableField<VECTOR3>(&vec3Val).setName("Vec3").setLabel("Group");
+        registerEditableField<VECTOR4>(&vec4Val).setName("Vec4").setLabel("Group");
+        registerEditableField<QUAT>(&quatVal).setName("Quat").setLabel("Group");
+        registerEditableField<COLOR>(&colorVal).setName("Color").setLabel("Group");
     }
 
     const char *getIcon() const override { return ""; }

@@ -1,5 +1,6 @@
 #include "ApplicationContext.h"
 #include "core/DirectoryService.h"
+#include "core/service/SnapshotService.h"
 #include "core/FrameService.h"
 #include "core/WindowService.h"
 #include "core/ImGuiService.h"
@@ -25,10 +26,11 @@
 #include "editor/service/SceneImporterService.h"
 #include "editor/service/SelectionService.h"
 #include "editor/service/TextureImporterService.h"
+#include "editor/service/EditorCameraService.h"
 #include "editor/service/ThemeService.h"
-#include "editor/service/VoxelImporterService.h"
 #include "editor/repository/EditorRepository.h"
 #include "editor/repository/DockRepository.h"
+#include "editor/repository/EditorCameraRepository.h"
 #include "editor/repository/AIAssistantRepository.h"
 
 #include "engine/repository/EngineRepository.h"
@@ -39,10 +41,11 @@
 #include "engine/service/CameraService.h"
 #include "engine/service/CommandBufferRecorderService.h"
 #include "engine/service/DescriptorSetService.h"
-#include "engine/service/FrameBufferService.h"
+#include "engine/service/RenderTargetService.h"
 #include "engine/service/LightService.h"
 #include "engine/service/PhysicsService.h"
 #include "engine/service/LuaService.h"
+#include "engine/service/LevelService.h"
 #include "engine/service/MaterialService.h"
 #include "engine/service/MeshService.h"
 #include "engine/service/PipelineService.h"
@@ -52,9 +55,9 @@
 #include "engine/service/StreamingService.h"
 #include "engine/service/TextureService.h"
 #include "engine/service/TransformService.h"
-#include "engine/service/VolumeService.h"
-#include "engine/service/VoxelService.h"
 #include "engine/EngineContext.h"
+#include "editor/ui/viewport/GizmoTransformStrategy.h"
+#include "engine/repository/CameraRepository.h"
 #include "engine/service/DirtyStateService.h"
 
 int main(int, char **) {
@@ -66,6 +69,7 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::VulkanContext>());
     context->registerSingleton(std::make_shared<Metal::ImGuiService>());
     context->registerSingleton(std::make_shared<Metal::DirectoryService>());
+    context->registerSingleton(std::make_shared<Metal::SnapshotService>());
     context->registerSingleton(std::make_shared<Metal::ThreadManager>());
     context->registerSingleton(std::make_shared<Metal::AsyncSyncService>());
     // --- ORDER MATTERS
@@ -75,18 +79,20 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::EngineContext>());
     context->registerSingleton(std::make_shared<Metal::EngineRepository>());
     context->registerSingleton(std::make_shared<Metal::EditorRepository>());
+    context->registerSingleton(std::make_shared<Metal::EditorCameraRepository>());
     context->registerSingleton(std::make_shared<Metal::DockRepository>());
     context->registerSingleton(std::make_shared<Metal::AIAssistantRepository>());
     context->registerSingleton(std::make_shared<Metal::RuntimeRepository>());
     context->registerSingleton(std::make_shared<Metal::WorldRepository>());
     context->registerSingleton(std::make_shared<Metal::MeshService>());
     context->registerSingleton(std::make_shared<Metal::TextureService>());
-    context->registerSingleton(std::make_shared<Metal::FrameBufferService>());
+    context->registerSingleton(std::make_shared<Metal::RenderTargetService>());
     context->registerSingleton(std::make_shared<Metal::PipelineService>());
     context->registerSingleton(std::make_shared<Metal::BufferService>());
     context->registerSingleton(std::make_shared<Metal::CommandBufferRecorderService>());
     context->registerSingleton(std::make_shared<Metal::NotificationService>());
     context->registerSingleton(std::make_shared<Metal::HistoryService>());
+    context->registerSingleton(std::make_shared<Metal::GizmoTransformStrategy>());
     context->registerSingleton(std::make_shared<Metal::HttpService>());
     context->registerSingleton(std::make_shared<Metal::DescriptorSetService>());
     context->registerSingleton(std::make_shared<Metal::ThemeService>());
@@ -105,17 +111,17 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::MaterialImporterService>());
     context->registerSingleton(std::make_shared<Metal::TextureImporterService>());
     context->registerSingleton(std::make_shared<Metal::FileImporterService>());
+    context->registerSingleton(std::make_shared<Metal::EditorCameraService>());
     context->registerSingleton(std::make_shared<Metal::CameraService>());
+    context->registerSingleton(std::make_shared<Metal::CameraRepository>());
     context->registerSingleton(std::make_shared<Metal::TransformService>());
     context->registerSingleton(std::make_shared<Metal::PickingService>());
-    context->registerSingleton(std::make_shared<Metal::VolumeService>());
     context->registerSingleton(std::make_shared<Metal::PhysicsService>());
     context->registerSingleton(std::make_shared<Metal::LuaService>());
-    context->registerSingleton(std::make_shared<Metal::VoxelImporterService>());
+    context->registerSingleton(std::make_shared<Metal::LevelService>());
     context->registerSingleton(std::make_shared<Metal::LightService>());
     context->registerSingleton(std::make_shared<Metal::StreamingService>());
 
-    context->registerSingleton(std::make_shared<Metal::VoxelService>());
     context->registerSingleton(std::make_shared<Metal::BLASService>());
     context->registerSingleton(std::make_shared<Metal::TLASService>());
     context->registerSingleton(std::make_shared<Metal::ShaderService>());

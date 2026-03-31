@@ -16,7 +16,7 @@ namespace Metal {
             values[0] = ptr->x;
             values[1] = ptr->y;
             values[2] = ptr->z;
-            ImGui::Text(field.name.c_str());
+            ImGui::Text(field.label.c_str());
 
             glm::vec3 oldValue = *ptr;
             if (ImGui::ColorPicker3(field.id.c_str(), values, ImGuiColorEditFlags_NoSidePreview)) {
@@ -28,7 +28,7 @@ namespace Metal {
             }
 
             if (ImGui::IsItemActivated()) {
-                historyService->startTransaction("Change " + field.name);
+                historyService->startTransaction("Change " + field.label);
             }
             if (ImGui::IsItemDeactivatedAfterEdit()) {
                 historyService->endTransaction();
@@ -40,7 +40,7 @@ namespace Metal {
 
     bool ColorField::isVisible() const {
         if (!filter || filter->empty()) return true;
-        std::string lowerName = field.name;
+        std::string lowerName = field.label;
         std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
         return lowerName.find(*filter) != std::string::npos;
     }

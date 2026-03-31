@@ -1,13 +1,14 @@
 #include <gtest/gtest.h>
 #include <entt/entt.hpp>
+#include <iostream>
 
 #include <fstream>
 #include <filesystem>
 #include "../src/ApplicationContext.h"
+#include "../src/engine/EngineContext.h"
 #include "../src/engine/service/LuaService.h"
 #include "../src/engine/repository/WorldRepository.h"
-#include "../src/engine/dto/ScopedScriptComponent.h"
-#include "../src/engine/dto/GlobalScriptComponent.h"
+#include "../src/engine/dto/ScriptComponent.h"
 #include "../src/engine/dto/MetadataComponent.h"
 #include "../src/ApplicationEventContext.h"
 
@@ -26,6 +27,10 @@ protected:
         worldRepository = std::make_shared<WorldRepository>();
         context->registerSingleton<WorldRepository>(worldRepository);
 
+        auto engineContext = std::make_shared<EngineContext>();
+        engineContext->deltaTime = 0.016f;
+        context->registerSingleton<EngineContext>(engineContext);
+
         auto service = std::make_shared<LuaService>();
         context->registerSingleton<LuaService>(service);
         
@@ -35,12 +40,7 @@ protected:
     }
 
     void TearDown() override {
-        luaService->dispose();
-        // Cleanup any created lua files
-        if (fs::exists("test_create.lua")) fs::remove("test_create.lua");
-        if (fs::exists("test_update.lua")) fs::remove("test_update.lua");
-        if (fs::exists("test_destroy.lua")) fs::remove("test_destroy.lua");
-        if (fs::exists("test_global.lua")) fs::remove("test_global.lua");
+        if (fs::exists("test_script.lua")) fs::remove("test_script.lua");
     }
 
     void createLuaFile(const std::string& path, const std::string& content) {
@@ -71,89 +71,165 @@ TEST_F(LuaServiceTest, CppBinding) {
     EXPECT_EQ(res, 50);
 }
 
-TEST_F(LuaServiceTest, PlayEventExecutesScripts) {
-    createLuaFile("test_create.lua", "create_called = true");
-    createLuaFile("test_global.lua", "global_called = true");
+TEST_F(LuaServiceTest, ScriptLifecycle) {
+    createLuaFile("test_script.lua", 
+        "local script = {}\n"
+        "function script:onCreate() self.created = true end\n"
+        "function script:onUpdate() self.updates = (self.updates or 0) + 1 end\n"
+        "function script:onDestroy() self.destroyed = true end\n"
+        "return script"
+    );
 
     auto entity = worldRepository->registry.create();
-    auto& scoped = worldRepository->registry.emplace<ScopedScriptComponent>(entity);
-    scoped.onCreatePath = "test_create.lua";
+    auto& comp = worldRepository->registry.emplace<ScriptComponent>(entity);
+    comp.scriptPath = "test_script.lua";
 
-    auto globalEntity = worldRepository->registry.create();
-    auto& global = worldRepository->registry.emplace<GlobalScriptComponent>(globalEntity);
-    global.scriptPath = "test_global.lua";
-
-    ApplicationEventContext::dispatch("Play");
-
-    bool createCalled = luaService->getState()["create_called"];
-    bool globalCalled = luaService->getState()["global_called"];
-
-    EXPECT_TRUE(createCalled);
-    EXPECT_TRUE(globalCalled);
-}
-
-TEST_F(LuaServiceTest, StopEventExecutesScripts) {
-    createLuaFile("test_destroy.lua", "destroy_called = true");
-
-    auto entity = worldRepository->registry.create();
-    auto& scoped = worldRepository->registry.emplace<ScopedScriptComponent>(entity);
-    scoped.onDestroyPath = "test_destroy.lua";
-
-    ApplicationEventContext::dispatch("Stop");
-
-    bool destroyCalled = luaService->getState()["destroy_called"];
-    EXPECT_TRUE(destroyCalled);
-}
-
-TEST_F(LuaServiceTest, OnSyncExecutesScriptsWhenPlaying) {
-    createLuaFile("test_update.lua", "update_count = (update_count or 0) + 1");
-
-    auto entity = worldRepository->registry.create();
-    auto& scoped = worldRepository->registry.emplace<ScopedScriptComponent>(entity);
-    scoped.onUpdatePath = "test_update.lua";
-
-    // Not playing yet
-    luaService->onSync();
-    sol::optional<int> countBefore = luaService->getState()["update_count"];
-    EXPECT_FALSE(countBefore.has_value());
-
+    // Play event
     ApplicationEventContext::dispatch("Play");
     
+    ASSERT_TRUE(comp.instance.valid());
+    bool created = comp.instance["created"];
+    EXPECT_TRUE(created);
+
+    // Sync (Update)
     luaService->onSync();
-    int countAfter1 = luaService->getState()["update_count"];
-    EXPECT_EQ(countAfter1, 1);
+    int updates = comp.instance["updates"];
+    EXPECT_EQ(updates, 1);
 
     luaService->onSync();
-    int countAfter2 = luaService->getState()["update_count"];
-    EXPECT_EQ(countAfter2, 2);
+    updates = comp.instance["updates"];
+    EXPECT_EQ(updates, 2);
 
+    // Stop event
+    std::cout << "Dispatching Stop" << std::endl;
     ApplicationEventContext::dispatch("Stop");
-    
-    luaService->onSync();
-    int countAfterStop = luaService->getState()["update_count"];
-    EXPECT_EQ(countAfterStop, 2); // Should not have increased
+    std::cout << "Checking destroyed" << std::endl;
+    EXPECT_FALSE(comp.instance.valid());
 }
 
 TEST_F(LuaServiceTest, EntityIdAndWorldBindings) {
     auto entity = worldRepository->createEntity();
-    auto& scoped = worldRepository->registry.emplace<ScopedScriptComponent>(entity);
-    createLuaFile("test_entity_id.lua", "captured_entity = this_entity\n"
-                                        "new_ent = world:createEntity()\n"
-                                        "metadata = world:getEntity(new_ent)\n"
-                                        "has_metadata = world:hasComponent(new_ent, 3)"); // 3 is METADATA
+    auto& comp = worldRepository->registry.emplace<ScriptComponent>(entity);
+    createLuaFile("test_script.lua", 
+        "local script = {}\n"
+        "function script:onUpdate()\n"
+        "  self.captured_entity = self.this_entity\n"
+        "  self.new_ent = world:createEntity()\n"
+        "  self.has_metadata = world:hasComponent(self.new_ent, ComponentType.METADATA)\n"
+        "end\n"
+        "return script"
+    );
 
-    scoped.onUpdatePath = "test_entity_id.lua";
+    comp.scriptPath = "test_script.lua";
 
     ApplicationEventContext::dispatch("Play");
     luaService->onSync();
 
-    entt::entity captured = luaService->getState()["captured_entity"];
+    ASSERT_TRUE(comp.instance.valid());
+    entt::entity captured = comp.instance["captured_entity"];
     EXPECT_EQ(captured, entity);
 
-    entt::entity newEnt = luaService->getState()["new_ent"];
-    // EXPECT_NE(newEnt, entt::null);
-    bool hasMetadata = luaService->getState()["has_metadata"];
+    entt::entity newEnt = comp.instance["new_ent"];
+    bool hasMetadata = comp.instance["has_metadata"];
     EXPECT_TRUE(hasMetadata);
 
-    if (fs::exists("test_entity_id.lua")) fs::remove("test_entity_id.lua");
+    float dt = luaService->getState()["deltaTime"];
+    EXPECT_GT(dt, -1.0f); // Just check it's bound
+}
+
+TEST_F(LuaServiceTest, ScriptIsolation) {
+    createLuaFile("test_iso.lua", 
+        "local script = {}\n"
+        "function script:onCreate() my_var = (my_var or 0) + 1; self.val = my_var end\n"
+        "return script"
+    );
+
+    auto ent1 = worldRepository->createEntity();
+    auto& comp1 = worldRepository->registry.emplace<ScriptComponent>(ent1);
+    comp1.scriptPath = "test_iso.lua";
+
+    auto ent2 = worldRepository->createEntity();
+    auto& comp2 = worldRepository->registry.emplace<ScriptComponent>(ent2);
+    comp2.scriptPath = "test_iso.lua";
+
+    ApplicationEventContext::dispatch("Play");
+
+    int val1 = comp1.instance["val"];
+    int val2 = comp2.instance["val"];
+
+    // If they share global state 'my_var', val2 would be 2.
+    // With isolation, both should be 1 as they have separate environments.
+    EXPECT_EQ(val1, 1);
+    EXPECT_EQ(val2, 1);
+
+    if (fs::exists("test_iso.lua")) fs::remove("test_iso.lua");
+    if (fs::exists("test_error.lua")) fs::remove("test_error.lua");
+    if (fs::exists("test_async.lua")) fs::remove("test_async.lua");
+}
+
+TEST_F(LuaServiceTest, ScriptErrorHandling) {
+    createLuaFile("test_error.lua", 
+        "local script = {}\n"
+        "function script:onUpdate() error('intentional error') end\n"
+        "return script"
+    );
+
+    auto entity = worldRepository->createEntity();
+    auto& comp = worldRepository->registry.emplace<ScriptComponent>(entity);
+    comp.scriptPath = "test_error.lua";
+
+    ApplicationEventContext::dispatch("Play");
+    
+    // First update should trigger error and disable script
+    luaService->onSync();
+    EXPECT_TRUE(comp.isErrored);
+
+    // Further updates should not crash and should respect isErrored
+    luaService->onSync();
+    EXPECT_TRUE(comp.isErrored);
+}
+
+TEST_F(LuaServiceTest, ScriptAsyncExecution) {
+    createLuaFile("test_async.lua", 
+        "local script = {}\n"
+        "function script:onUpdate() self.async_done = true end\n"
+        "return script"
+    );
+
+    auto entity = worldRepository->createEntity();
+    auto& comp = worldRepository->registry.emplace<ScriptComponent>(entity);
+    comp.scriptPath = "test_async.lua";
+    comp.runAsync = true;
+
+    ApplicationEventContext::dispatch("Play");
+    
+    // onSync should NOT update this script
+    luaService->onSync();
+    bool done = comp.instance["async_done"].get_or(false);
+    EXPECT_FALSE(done);
+
+    // onAsyncSync SHOULD update this script
+    luaService->onAsyncSync();
+    done = comp.instance["async_done"];
+    EXPECT_TRUE(done);
+}
+
+TEST_F(LuaServiceTest, ScriptReloadOnUpdate) {
+    createLuaFile("test_v1.lua", "return { v = 1, onUpdate = function(self) end }");
+    createLuaFile("test_v2.lua", "return { v = 2, onUpdate = function(self) end }");
+
+    auto entity = worldRepository->createEntity();
+    auto& comp = worldRepository->registry.emplace<ScriptComponent>(entity);
+    comp.scriptPath = "test_v1.lua";
+
+    ApplicationEventContext::dispatch("Play");
+    int v = comp.instance["v"];
+    EXPECT_EQ(v, 1);
+
+    // Update path
+    comp.scriptPath = "test_v2.lua";
+    worldRepository->registry.patch<ScriptComponent>(entity);
+
+    v = comp.instance["v"];
+    EXPECT_EQ(v, 2);
 }

@@ -49,7 +49,7 @@ namespace Metal {
                 historyService->redo();
             });
             newView->shortcuts.emplace_back("Save", ImGuiMod_Ctrl | ImGuiKey_S, [this] {
-                directoryService->save();
+                directoryService->save(false);
             });
 
             views.emplace(selectedSpace->index, newView);

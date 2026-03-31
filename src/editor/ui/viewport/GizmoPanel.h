@@ -9,6 +9,7 @@
 #include "editor/ui/abstract/AbstractPanel.h"
 
 namespace Metal {
+    struct CameraRepository;
     struct EditorRepository;
     struct WorldRepository;
     class SelectionService;
@@ -22,15 +23,14 @@ namespace Metal {
     class GizmoTransformStrategy;
 
     class GizmoPanel final : public AbstractPanel {
-        GizmoTransformStrategy *gizmoStrategy = nullptr;
 
         glm::vec2 *size = nullptr;
         ImVec2 *position = nullptr;
         TransformComponent *localSelected = nullptr;
-        bool isGizmoOver = false;
 
+        GizmoTransformStrategy *gizmoStrategy = nullptr;
+        CameraRepository *cameraRepository = nullptr;
         EditorRepository *editorRepository = nullptr;
-        WorldRepository *worldRepository = nullptr;
         SelectionService *selectionService = nullptr;
         HistoryService *historyService = nullptr;
 
@@ -38,16 +38,14 @@ namespace Metal {
         std::vector<Dependency> getDependencies() override {
             return {
                 {"EditorRepository", &editorRepository},
-                {"WorldRepository", &worldRepository},
+                {"CameraRepository", &cameraRepository},
                 {"SelectionService", &selectionService},
-                {"HistoryService", &historyService}
+                {"HistoryService", &historyService},
+                {"GizmoTransformStrategy", &gizmoStrategy}
             };
         }
 
         explicit GizmoPanel(ImVec2 *position, glm::vec2 *size);
-        ~GizmoPanel() override;
-
-        void onInitialize() override;
 
         void onSync() override;
     };

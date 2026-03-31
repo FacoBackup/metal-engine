@@ -3,11 +3,11 @@
 #include "../resource/BufferInstance.h"
 #include "../../common/LoggerUtil.h"
 #include "../../core/VulkanContext.h"
-#include "FrameBufferService.h"
+#include "RenderTargetService.h"
 #include "BufferService.h"
 #include "TextureService.h"
-#include "../resource/FrameBufferAttachment.h"
-#include "../resource/FrameBufferInstance.h"
+#include "../resource/RenderTargetAttachment.h"
+#include "../resource/RenderTargetInstance.h"
 #include "../resource/TextureInstance.h"
 #include "../../common/VulkanUtils.h"
 
@@ -29,16 +29,19 @@ namespace Metal {
             binding.accelerationStructure = builder.accelerationStructure;
             binding.bufferId = builder.bufferId;
             binding.storageImageId = builder.storageImageId;
-            binding.frameBufferId = builder.frameBufferId;
+            binding.renderTargetId = builder.renderTargetId;
             binding.attachmentIndex = builder.attachmentIndex;
 
-            if (builder.type == DescriptorBindingType::FBO_ATTACHMENT) {
-                auto *fbo = framebufferService->getResource(binding.frameBufferId);
+            if (builder.type == DescriptorBindingType::RENDERTARGET_ATTACHMENT || builder.type == DescriptorBindingType::STORAGE_RENDERTARGET_ATTACHMENT) {
+                auto *fbo = RenderTargetService->getResource(binding.renderTargetId);
                 if (fbo == nullptr) {
-                    throw std::runtime_error("Framebuffer not found: " + binding.frameBufferId);
+                    throw std::runtime_error("Framebuffer not found: " + binding.renderTargetId);
+                }
+                if (binding.attachmentIndex < 0 || binding.attachmentIndex >= fbo->attachments.size()) {
+                    throw std::runtime_error("FBO attachment index out of bounds: " + std::to_string(binding.attachmentIndex));
                 }
                 binding.view = fbo->attachments[binding.attachmentIndex]->vkImageView;
-                if (binding.sampler == VK_NULL_HANDLE) {
+                if (builder.type == DescriptorBindingType::RENDERTARGET_ATTACHMENT && binding.sampler == VK_NULL_HANDLE) {
                     binding.sampler = vulkanContext->vkImageSampler;
                 }
             }
@@ -60,8 +63,11 @@ namespace Metal {
                     break;
                 }
                 case DescriptorBindingType::COMBINED_IMAGE_SAMPLER:
-                case DescriptorBindingType::FBO_ATTACHMENT:
+                case DescriptorBindingType::RENDERTARGET_ATTACHMENT:
                     binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+                    break;
+                case DescriptorBindingType::STORAGE_RENDERTARGET_ATTACHMENT:
+                    binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
                     break;
                 case DescriptorBindingType::STORAGE_IMAGE: {
                     auto *texture = textureService->getResource(binding.storageImageId);
@@ -73,7 +79,7 @@ namespace Metal {
                     break;
                 }
             }
-            binding.stageFlags = static_cast<VkShaderStageFlagBits>(stageFlags);
+            binding.stageFlags = stageFlags;
             descriptorInstance->bindings.push_back(binding);
         }
 
@@ -95,13 +101,13 @@ namespace Metal {
         return descriptors;
     }
 
-    void DescriptorSetService::setImageDescriptor(const FrameBufferInstance *framebuffer,
+    void DescriptorSetService::setImageDescriptor(const RenderTargetInstance *framebuffer,
                                                   unsigned int attachmentIndex) {
         auto attachment = framebuffer->attachments[attachmentIndex];
         if (attachment->imageDescriptor == nullptr) {
             attachment->imageDescriptor =
                     createResourceInstance(framebuffer->getId() + std::to_string(attachmentIndex));
-            attachment->imageDescriptor->bindings.push_back(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
+            attachment->imageDescriptor->bindings.push_back(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
                 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0,
                 vulkanContext->vkImageSampler,
                 attachment->vkImageView,
@@ -113,7 +119,7 @@ namespace Metal {
     void DescriptorSetService::setImageDescriptor(TextureInstance *texture) {
         if (texture->imageDescriptor == nullptr) {
             texture->imageDescriptor = createResourceInstance(texture->getId() + "_descriptor");
-            texture->imageDescriptor->bindings.push_back(DescriptorBinding::Of(VK_SHADER_STAGE_FRAGMENT_BIT,
+            texture->imageDescriptor->bindings.push_back(DescriptorBinding::Of(VK_SHADER_STAGE_ALL,
                                                                                VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                                                                                0,
                                                                                texture->vkSampler,

@@ -10,14 +10,14 @@
 namespace Metal {
     void SelectionOutlinePass::onInitialize() {
         PipelineBuilder builder = PipelineBuilder::Of(
-                    getScopedResourceId(RID_POST_PROCESSING_FBO),
+                    getScopedResourceId(RID_POST_PROCESSING_RT),
                     "QUAD.vert",
                     "tools/SelectionOutline.frag"
                 )
                 .enableBlending()
                 .setPushConstantsSize(sizeof(SelectionOutlinePushConstant))
                 .addBufferBinding(getScopedResourceId(RID_GLOBAL_DATA))
-                .addFboBinding(getScopedResourceId(RID_SELECTION_FBO), 0);
+                .addRenderTargetBinding(getScopedResourceId(RID_SELECTION_RT), 0);
         pipelineInstance = pipelineService->createPipeline(builder);
     }
 

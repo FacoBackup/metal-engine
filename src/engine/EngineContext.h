@@ -1,6 +1,7 @@
 #ifndef METAL_ENGINE_ENGINECONTEXT_H
 #define METAL_ENGINE_ENGINECONTEXT_H
 
+#include <functional>
 #include <chrono>
 #include <memory>
 #include <thread>
@@ -23,8 +24,8 @@ namespace Metal {
     class TLASService;
     class MaterialService;
     class CameraService;
+    struct CameraRepository;
     class LightService;
-    class VolumeService;
     class PhysicsService;
     class VulkanContext;
     struct WorldRepository;
@@ -40,8 +41,8 @@ namespace Metal {
         TLASService *tlasService = nullptr;
         MaterialService *materialService = nullptr;
         CameraService *cameraService = nullptr;
+        CameraRepository *cameraRepository = nullptr;
         LightService *lightService = nullptr;
-        VolumeService *volumeService = nullptr;
         PhysicsService *physicsService = nullptr;
         VulkanContext *vulkanContext = nullptr;
         WorldRepository *worldRepository = nullptr;
@@ -61,8 +62,8 @@ namespace Metal {
                 {"TLASService", &tlasService},
                 {"MaterialService", &materialService},
                 {"CameraService", &cameraService},
+                {"CameraRepository", &cameraRepository},
                 {"LightService", &lightService},
-                {"VolumeService", &volumeService},
                 {"PhysicsService", &physicsService},
                 {"VulkanContext", &vulkanContext},
                 {"WorldRepository", &worldRepository},
@@ -96,6 +97,12 @@ namespace Metal {
 
         std::vector<EngineFrame *> registeredFrames;
         EngineFrame *currentFrame = nullptr;
+
+        std::function<void()> cameraUpdateCallback;
+
+        void setCameraUpdateCallback(std::function<void()> callback) {
+            cameraUpdateCallback = std::move(callback);
+        }
 
         void updateGlobalData();
 

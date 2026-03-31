@@ -6,12 +6,14 @@
 #include "../../common/IEventMember.h"
 #include "../dto/MaterialData.h"
 
-#include "../dto/PrimitiveComponent.h"
+#include "../dto/StaticGeometryComponent.h"
 #include <map>
 
 namespace Metal {
     struct MaterialData;
-    struct PrimitiveComponent;
+    struct StaticGeometryComponent;
+    struct InstancedGeometryComponent;
+    struct AnimatedGeometryComponent;
     class TextureService;
     class EngineContext;
     struct WorldRepository;
@@ -41,7 +43,11 @@ namespace Metal {
          */
         bool processDirtyMaterials();
 
-        [[nodiscard]] std::string getMaterialKey(const PrimitiveComponent &component) const;
+        [[nodiscard]] std::string getMaterialKey(const StaticGeometryComponent &component) const;
+
+        [[nodiscard]] std::string getMaterialKey(const InstancedGeometryComponent &component) const;
+
+        [[nodiscard]] std::string getMaterialKey(const AnimatedGeometryComponent &component) const;
 
     public:
         std::vector<Dependency> getDependencies() override {
@@ -58,7 +64,11 @@ namespace Metal {
 
         void onSync() override;
 
-        void load(MaterialData &dest, const PrimitiveComponent &component);
+        void load(MaterialData &dest, const StaticGeometryComponent &component);
+
+        void load(MaterialData &dest, const InstancedGeometryComponent &component);
+
+        void load(MaterialData &dest, const AnimatedGeometryComponent &component);
 
         void uploadMaterialData();
 
@@ -66,7 +76,11 @@ namespace Metal {
 
         void clear();
 
-        uint32_t getMaterialIndex(const PrimitiveComponent &component);
+        uint32_t getMaterialIndex(StaticGeometryComponent &component);
+
+        uint32_t getMaterialIndex(InstancedGeometryComponent &component);
+
+        uint32_t getMaterialIndex(AnimatedGeometryComponent &component);
     };
 } // Metal
 

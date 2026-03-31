@@ -10,6 +10,8 @@
 #include "../src/engine/service/DirtyStateService.h"
 #include <iostream>
 
+#include "core/service/SnapshotService.h"
+
 using namespace Metal;
 
 class WorldRepositoryTest : public ::testing::Test, public IEventMember {
@@ -25,18 +27,15 @@ protected:
 
         auto worldRepo = std::make_shared<WorldRepository>();
         auto directoryService = std::make_shared<DirectoryService>();
+        auto snapshotService = std::make_shared<SnapshotService>();
         auto historyService = std::make_shared<HistoryService>();
         auto dirtyStateService = std::make_shared<DirtyStateService>();
 
         context->registerSingleton<WorldRepository>(worldRepo);
+        context->registerSingleton<SnapshotService>(snapshotService);
         context->registerSingleton<DirectoryService>(directoryService);
         context->registerSingleton<HistoryService>(historyService);
         context->registerSingleton<DirtyStateService>(dirtyStateService);
-
-        context->injectDependencies(worldRepo.get());
-        context->injectDependencies(historyService.get());
-        context->injectDependencies(directoryService.get());
-        context->injectDependencies(dirtyStateService.get());
 
         context->onInitialize();
 

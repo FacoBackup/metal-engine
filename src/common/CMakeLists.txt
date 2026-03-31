@@ -2,12 +2,12 @@ set(COMMON_SOURCES
         VulkanUtils.cpp
         VulkanUtils.h
         ISync.h
-        Util.h
+        Util.cpp
         Reflection.h
         Reflection.cpp
         FieldType.h
         FieldMetadata.h
-        Icons.h
+        Icons.cpp
         LoggerUtil.cpp
         LoggerUtil.h
         AbstractResourceService.h

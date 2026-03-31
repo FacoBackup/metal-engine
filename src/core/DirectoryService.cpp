@@ -1,12 +1,18 @@
 #include "DirectoryService.h"
+#include "service/SnapshotService.h"
 #include "../common/FileDialogUtil.h"
 #include "../common/FilesUtil.h"
+#include "../common/Util.h"
 #include "../common/serialization-definitions.h"
 #include "../common/IRepository.h"
 #include "../ApplicationContext.h"
 
+#include "../ApplicationEventContext.h"
 #include <filesystem>
+#include <iomanip>
+#include <sstream>
 #include "editor/service/NotificationService.h"
+#include "editor/repository/EditorRepository.h"
 #include "engine/repository/WorldRepository.h"
 
 namespace Metal {
@@ -27,15 +33,17 @@ namespace Metal {
     }
 
     void DirectoryService::updateRootPath(bool forceSelection) {
+        if (forceSelection) {
+            for (auto *instance: ctx->getSingletons<IRepository>()) {
+                instance->clear();
+            }
+        }
         char *home = getenv("USERPROFILE");
         if (!home) home = getenv("HOME");
-        if (home) {
-            engineMetadataPath = std::string(home) + "/.metal";
-            FilesUtil::CreateDirectory(engineMetadataPath);
-        } else {
-            engineMetadataPath = ".metal";
-            FilesUtil::CreateDirectory(engineMetadataPath);
-        }
+        engineMetadataPath = (home) ? std::string(home) + "/.metal" : ".metal";
+        FilesUtil::CreateDirectory(engineMetadataPath);
+
+        snapshotService->setEngineMetadataPath(engineMetadataPath);
 
         std::string cachedPath;
         std::string cachePathFile = engineMetadataPath + "/metal-engine-cached.txt";
@@ -47,25 +55,30 @@ namespace Metal {
             if (rootDirectory.empty()) {
                 throw std::runtime_error("No directory selected.");
             }
+            snapshotService->setRootDirectory(rootDirectory);
             save();
             FilesUtil::WriteFile(cachePathFile.c_str(), rootDirectory.c_str());
         } else {
             rootDirectory = cachedPath;
+            snapshotService->setRootDirectory(rootDirectory);
         }
         FilesUtil::CreateDirectory(getProjectTargetPath());
 
-        for (auto *instance: ctx->getSingletons<IRepository>()) {
-            std::string path = getProjectTargetPath() + "/" + instance->getClassName() + ".json";
-            if (std::filesystem::exists(path)) {
-                std::cout << "Loading " << path << std::endl;
-                std::ifstream is(path);
-                if (is.is_open()) {
-                    nlohmann::json j;
-                    is >> j;
-                    instance->fromJson(j);
-                }
-            }
+        std::string projectIdPath = getProjectTargetPath() + "/project";
+        if (fs::exists(projectIdPath)) {
+            FilesUtil::ReadFile(projectIdPath.c_str(), projectId);
+            projectId.erase(std::ranges::remove(projectId, '\n').begin(), projectId.cend());
+            projectId.erase(std::ranges::remove(projectId, '\r').begin(), projectId.cend());
         }
+
+        if (projectId.empty()) {
+            projectId = Util::uuidV4();
+            FilesUtil::WriteFile(projectIdPath.c_str(), projectId.c_str());
+        }
+
+        snapshotService->setProjectId(projectId);
+
+        snapshotService->loadProject(getProjectTargetPath());
 
         FilesUtil::CreateDirectory(engineMetadataPath + "/shaders/");
     }
@@ -74,22 +87,29 @@ namespace Metal {
     void DirectoryService::save(const bool silent) const {
         try {
             if (rootDirectory.empty()) return;
-            std::string targetPath = getProjectTargetPath();
-            FilesUtil::CreateDirectory(targetPath);
 
-            for (auto *instance: ctx->getSingletons<IRepository>()) {
-                std::ofstream os(targetPath + "/" + instance->getClassName() + ".json");
-                if (os.is_open()) {
-                    std::string data = instance->toJson().dump(4);
-                    os << data;
-                }
-            }
+            snapshotService->saveProject();
+
             if (!silent)
                 notificationService->pushMessage("Project saved", NotificationSeverities::SUCCESS);
         } catch (const std::exception &e) {
             LOG_ERROR(e.what());
             if (!silent)
                 notificationService->pushMessage("Could not save project", NotificationSeverities::ERROR);
+        }
+    }
+
+    void DirectoryService::clearCaches() const {
+        try {
+            if (fs::exists(engineMetadataPath)) {
+                for (const auto &entry: fs::directory_iterator(engineMetadataPath)) {
+                    fs::remove_all(entry.path());
+                }
+                notificationService->pushMessage("Caches cleared", NotificationSeverities::SUCCESS);
+            }
+        } catch (const std::exception &e) {
+            LOG_ERROR(std::string("Failed to clear caches: ") + e.what());
+            notificationService->pushMessage("Could not clear caches", NotificationSeverities::ERROR);
         }
     }
 

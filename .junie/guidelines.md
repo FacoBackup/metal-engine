@@ -1,9 +1,5 @@
 ## **Engine Development & Code Style Guidelines**
 
-For building the project, use this pattern:
-"C:\Program Files\JetBrains\CLion 2025.3.4\bin\cmake\win\x64\bin\cmake.exe" --build C:
-\Users\russi\CLionProjects\metal-engine\cmake-build-debug-visual-studio --target metal_engine -j 10
-
 ### **1. Inclusion & Naming Conventions**
 
 * **Absolute Paths:** Always use absolute paths relative to the project `src` or `include` root (e.g.,
@@ -40,3 +36,4 @@ Here is the updated section with the dynamic project path and the CMake cache sa
 * **Suppress LSP Noise:** Ignore transient `clangd` or static analysis errors during active development. Trust the
   compiler's output as the source of truth over the IDE's "red squiggles."
 * **Mandatory Compilation:** A task is not "finished" until the project compiles successfully.
+* Dependencies injected via getDependencies method will never be null. Do dont null checks on them

@@ -1,15 +1,15 @@
 #include "ViewportPanel.h"
 #include "GizmoPanel.h"
+#include "CameraGizmoPanel.h"
 #include "ImGuizmo.h"
 #include "ViewportHeaderPanel.h"
 #include "EngineFramePanel.h"
-#include "engine/dto/Camera.h"
+#include "engine/repository/CameraRepository.h"
 #include "engine/frame-builder/EngineFrameBuilder.h"
 #include <algorithm>
 #include "../../repository/EditorRepository.h"
 #include "engine/repository/WorldRepository.h"
 #include "../../service/SelectionService.h"
-#include "engine/service/CameraService.h"
 #include "engine/repository/RuntimeRepository.h"
 #include "engine/EngineContext.h"
 #include "engine/dto/MetadataComponent.h"
@@ -19,6 +19,7 @@ namespace Metal {
     void ViewportPanel::onInitialize() {
         headerPanel = initializePanel<ViewportHeaderPanel>();
         engineFramePanel = initializePanel<EngineFramePanel>();
+        cameraGizmoPanel = initializePanel<CameraGizmoPanel>();
         gizmoPanel = initializePanel<GizmoPanel>(true, position, size);
 
         shortcuts = {
@@ -66,12 +67,6 @@ namespace Metal {
             ShortcutDTO("Move Right", ImGuiKey_D, []() {
                 ApplicationEventContext::dispatch("CameraMoveRight");
             }, true),
-            ShortcutDTO("Move Up", ImGuiKey_Space, []() {
-                ApplicationEventContext::dispatch("CameraMoveUp");
-            }, true),
-            ShortcutDTO("Move Down", ImGuiKey_LeftCtrl, []() {
-                ApplicationEventContext::dispatch("CameraMoveDown");
-            }, true)
         };
     }
 
@@ -86,16 +81,28 @@ namespace Metal {
 
         if (!editorRepository->isPlaying) {
             gizmoPanel->onSync();
+            cameraGizmoPanel->onSync();
         }
     }
 
     void ViewportPanel::updateCamera() {
         if (ImGui::IsWindowHovered() && !ImGuizmo::IsUsing() && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-            cameraService->handleInput(isFirstMovement);
+            const float mouseX = ImGui::GetIO().MousePos.x;
+            const float mouseY = ImGui::GetIO().MousePos.y;
+
+            if (!isFirstMovement) {
+                const float deltaX = mouseX - lastMouseX;
+                const float deltaY = lastMouseY - mouseY;
+                ApplicationEventContext::dispatch("CameraRotate", std::make_shared<MouseEventPayload>(deltaX, deltaY));
+            }
+
+            lastMouseX = mouseX;
+            lastMouseY = mouseY;
+
             if (const auto &io = ImGui::GetIO(); io.MouseWheel != 0) {
-                worldRepository->camera.movementSensitivity += io.MouseWheel * 100 * engineContext->deltaTime;
-                worldRepository->camera.movementSensitivity =
-                        std::max(.1f, worldRepository->camera.movementSensitivity);
+                cameraRepository->movementSensitivity += io.MouseWheel * 100 * engineContext->deltaTime;
+                cameraRepository->movementSensitivity =
+                        std::max(.1f, cameraRepository->movementSensitivity);
             }
             isFirstMovement = false;
         } else {

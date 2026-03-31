@@ -6,14 +6,15 @@
 #include "../../core/VulkanContext.h"
 #include "engine/service/BufferService.h"
 #include "engine/repository/WorldRepository.h"
-#include "engine/dto/PrimitiveComponent.h"
+#include "engine/dto/StaticGeometryComponent.h"
 #include "engine/dto/TransformComponent.h"
+#include "engine/resource/RenderTargetInstance.h"
 
 namespace Metal {
-    std::optional<entt::entity> PickingService::pickEntityFromGBuffer(TextureInstance *attachment, const uint32_t pixelX,
+    std::optional<entt::entity> PickingService::pickEntityFromGBuffer(std::shared_ptr<RenderTargetAttachment> &attachment, const uint32_t pixelX,
                                                                   const uint32_t pixelY) const {
 
-        constexpr VkDeviceSize imageSize = 4 * sizeof(float);
+        constexpr VkDeviceSize imageSize = 2 * sizeof(float);
         auto stagingBuffer = bufferService->createBuffer("stagingBuffer", imageSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                                                             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                             VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
@@ -61,7 +62,7 @@ namespace Metal {
         void *data = nullptr;
         vkMapMemory(vulkanContext->device.device, stagingBuffer->vkDeviceMemory, 0, imageSize, 0, &data);
         const auto *pixel = static_cast<const float *>(data);
-        const float idValue = pixel[3]; // Render index is in the A channel (index 3)
+        const float idValue = pixel[0]; // Render index is in the R channel (index 0)
         vkUnmapMemory(vulkanContext->device.device, stagingBuffer->vkDeviceMemory);
         bufferService->dispose("stagingBuffer");
 
@@ -72,9 +73,9 @@ namespace Metal {
         const unsigned int renderIndex = static_cast<unsigned int>(idValue + 0.5f) - 1;
 
         auto &registry = worldRepository->registry;
-        auto view = registry.view<PrimitiveComponent>();
+        auto view = registry.view<StaticGeometryComponent>();
         for (auto entity: view) {
-            auto &mesh = registry.get<PrimitiveComponent>(entity);
+            auto &mesh = registry.get<StaticGeometryComponent>(entity);
             if (mesh.renderIndex == renderIndex) {
                 return entity;
             }

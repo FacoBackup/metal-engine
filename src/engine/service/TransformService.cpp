@@ -7,7 +7,7 @@
 #include <ApplicationContext.h>
 #include <engine/dto/TransformComponent.h>
 #include <engine/repository/WorldRepository.h>
-#include <engine/dto/PrimitiveComponent.h>
+#include <engine/dto/StaticGeometryComponent.h>
 #include <engine/service/DirtyStateService.h>
 #include <editor/dto/FieldModificationEvent.h>
 #include <ApplicationEventContext.h>
@@ -26,7 +26,7 @@ namespace Metal {
         }
     }
 
-    void TransformService::onAsyncSync() {
+    void TransformService::onSync() {
         auto dirtyEntities = dirtyStateService->getDirtyEntities(DirtyType::Transform, true);
         if (dirtyEntities.empty()) return;
 
@@ -57,9 +57,10 @@ namespace Metal {
 
         auxMat42 = glm::scale(auxMat42, st->scale); // Scale
 
+        st->previousModel = st->model;
         st->model = auxMat4 * auxMat42;
 
-        if (worldRepository->hasComponent(st->getEntityId(), PRIMITIVE) || worldRepository->hasComponent(
+        if (worldRepository->hasComponent(st->getEntityId(), STATIC_GEOMETRY) || worldRepository->hasComponent(
                 st->getEntityId(), LIGHT)) {
             dirtyStateService->markDirty(DirtyType::BVH);
         }

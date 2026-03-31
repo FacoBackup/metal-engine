@@ -2,8 +2,7 @@
 #include "ApplicationContext.h"
 #include "imgui.h"
 #include "engine/service/MeshService.h"
-#include "engine/service/VoxelService.h"
-#include "engine/service/FrameBufferService.h"
+#include "engine/service/RenderTargetService.h"
 #include "engine/service/TextureService.h"
 #include "engine/service/PipelineService.h"
 #include "engine/service/BufferService.h"
@@ -29,8 +28,7 @@ namespace Metal {
 
     void MetricsPanel::onSync() {
         if (meshService) drawResourceList("Meshes", *meshService, id);
-        if (voxelService) drawResourceList("Voxels", *voxelService, id);
-        if (framebufferService) drawResourceList("Framebuffers", *framebufferService, id);
+        if (RenderTargetService) drawResourceList("Framebuffers", *RenderTargetService, id);
         if (textureService) drawResourceList("Textures", *textureService, id);
         if (pipelineService) drawResourceList("Pipelines", *pipelineService, id);
         if (bufferService) drawResourceList("Buffers", *bufferService, id);

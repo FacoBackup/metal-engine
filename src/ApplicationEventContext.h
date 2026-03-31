@@ -16,6 +16,13 @@ namespace Metal {
         std::shared_ptr<EventPayload> payload;
     };
 
+    struct MouseEventPayload final : EventPayload {
+        float deltaX;
+        float deltaY;
+
+        MouseEventPayload(const float deltaX, const float deltaY) : deltaX(deltaX), deltaY(deltaY) {}
+    };
+
     class ApplicationEventContext final {
         struct Subscription {
             std::function<void(const Event &)> callback;

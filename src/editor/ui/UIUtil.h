@@ -4,6 +4,8 @@
 #include "imgui.h"
 #include <string>
 
+#define LARGE_FONT_SIZE 38
+
 namespace Metal::UIUtil {
     inline constexpr ImVec4 DIRECTORY_COLOR{188 / 255.f, 128 / 255.f, 78 / 255.f, 1};
     inline constexpr ImVec2 MEDIUM_SPACING(5, 0);
@@ -24,7 +26,11 @@ namespace Metal::UIUtil {
     bool RenderOption(const std::string &label, bool selected, float sizeX, float sizeY,
                       const ImVec4 &accent);
 
-    bool RenderButtonSolid(const std::string &id, const std::string &icon, float size, const ImVec4 &color, float rounding);
+    bool RenderButtonSolid(const std::string &id, const std::string &icon, float size, const ImVec4 &color,
+                           float rounding);
+
+    bool RenderButtonSolid(const std::string &id, const std::string &icon, const ImVec2 &size, const ImVec4 &color,
+                           float rounding);
 
     bool ButtonSimple(const std::string &label, float sizeX, float sizeY);
 

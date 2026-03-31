@@ -14,17 +14,28 @@ namespace Metal {
     class EngineContext;
     class AbstractPass;
     class CommandBufferRecorder;
-    struct FrameBufferInstance;
+    struct RenderTargetInstance;
     struct DescriptorBinding;
     class ResourceBuilder;
     class VulkanContext;
     class EngineFrame;
 
+    /**
+     * @struct PassData
+     * @brief Holds information about a render pass and its associated command buffer.
+     */
     struct PassData {
-        std::unique_ptr<AbstractPass> pass;
-        std::string commandBufferId;
+        std::unique_ptr<AbstractPass> pass; ///< The render pass implementation.
+        std::string commandBufferId;        ///< ID of the command buffer to record into.
     };
 
+    /**
+     * @class EngineFrameBuilder
+     * @brief Fluent builder for constructing an EngineFrame.
+     *
+     * This builder allows defining the resources (framebuffers, textures, buffers)
+     * and the sequence of render passes that constitute a single engine frame.
+     */
     class EngineFrameBuilder final : public IContextMember {
         std::string frameId;
         std::vector<std::shared_ptr<ResourceBuilder> > builders{};
@@ -41,37 +52,82 @@ namespace Metal {
             };
         }
 
+        /**
+         * @brief Constructs a frame builder with a unique ID.
+         */
         explicit EngineFrameBuilder(std::string frameId = Util::uuidV4());
 
-        EngineFrameBuilder &addFramebuffer(std::string id, unsigned w, unsigned h, glm::vec4 clearColor);
+        /**
+         * @brief Adds a new rendertarget resource to the frame.
+         */
+        EngineFrameBuilder &addRenderTarget(std::string id, unsigned w, unsigned h, glm::vec4 clearColor);
 
-        EngineFrameBuilder &addFramebuffer(const std::string &id);
+        /**
+         * @brief References an existing rendertarget by ID.
+         */
+        EngineFrameBuilder &addRenderTarget(const std::string &id);
 
-        EngineFrameBuilder &addColor(VkFormat format, VkImageUsageFlagBits usage);
+        /**
+         * @brief Adds a color attachment to the current rendertarget being built.
+         */
+        EngineFrameBuilder &addColor(VkFormat format, VkImageUsageFlags usage);
 
+        /**
+         * @brief Adds a depth attachment to the current rendertarget being built.
+         */
         EngineFrameBuilder &addDepth();
 
+        /**
+         * @brief Adds a standalone texture resource to the frame.
+         */
         EngineFrameBuilder &addTexture(const std::string &id, unsigned w, unsigned h,
                                        VkFormat format = VK_FORMAT_R16G16B16A16_SFLOAT);
 
+        /**
+         * @brief References an existing texture by ID.
+         */
         EngineFrameBuilder &addTexture(const std::string &id);
 
+        /**
+         * @brief Adds a buffer resource (Uniform, Storage, etc.) to the frame.
+         */
         EngineFrameBuilder &addBuffer(const std::string &id, VkDeviceSize size,
                                       VkMemoryPropertyFlags properties, BufferType type);
 
+        /**
+         * @brief References an existing buffer by ID.
+         */
         EngineFrameBuilder &addBuffer(const std::string &id);
 
-        EngineFrameBuilder &addCommandBuffer(const std::string &id, const std::string &framebufferId,
+        /**
+         * @brief Adds a graphics command buffer associated with a rendertarget.
+         */
+        EngineFrameBuilder &addCommandBuffer(const std::string &id, const std::string &renderTargetId,
                                              bool clearBuffer = true);
 
+        /**
+         * @brief Stores the current resource builder into the internal list.
+         */
         void storeBuilder();
 
+        /**
+         * @brief Adds a compute command buffer, optionally supporting ray tracing.
+         */
         EngineFrameBuilder &addComputeCommandBuffer(const std::string &id, bool requiresRayTracing = false);
 
+        /**
+         * @brief Adds a render pass to be executed in this frame.
+         */
         EngineFrameBuilder &addPass(std::unique_ptr<AbstractPass> pass, const std::string &commandBufferId);
 
+        /**
+         * @brief Checks if a resource with the given ID and type exists in the builder.
+         */
         bool tryMatch(const std::string &id, ResourceType type);
 
+        /**
+         * @brief Finalizes building and registers the frame with the EngineContext.
+         */
         void build();
     };
 } // Metal

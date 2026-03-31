@@ -9,7 +9,7 @@
 #include <glm/vec3.hpp>
 
 namespace Metal {
-    struct DirectoryService;
+    class DirectoryService;
 
     struct MeshId {
         std::string id;

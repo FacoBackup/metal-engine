@@ -2,37 +2,31 @@
 
 #include "../../common/Icons.h"
 #include "../../ApplicationContext.h"
-
-#define PATH_TRACER "Path tracer"
-#define ATMOSPHERE "Atmosphere"
-#define SUN "Sun"
-#define VOLUMES "Volumes"
-#define DEPTH_OF_FIELD "Depth of field"
-#define PHYSICS "Physics"
+#include "../../common/FileExtensions.h"
 
 namespace Metal {
+    void EngineRepository::clear() {
+        // Nothing to clear
+    }
+
     void EngineRepository::registerFields() {
-        registerEditableField<INT>(&shadingResInvScale).setName("Shading inverted resolution scale").setGroup("Display settings (Restart required)").setMin(1).setMax(16);
-        registerEditableField<BOOLEAN>(&vsync).setName("VSync?").setGroup("Display settings (Restart required)");
+        registerEditableField<INT>(&shadingResInvScale).setName("shadingResInvScale").setLabel("Shading inverted resolution scale").setMin(1).setMax(16).setIncrement(1);
+        registerEditableField<BOOLEAN>(&vsync).setName("vsync").setLabel("VSync enabled");
 
-        registerEditableField<INT>(&volumeShadowSteps).setName("Shadow steps").setGroup(VOLUMES).setMin(1);
+        registerEditableField<FLOAT>(&pathTracerMultiplier).setName("pathTracerMultiplier").setLabel("Path tracer multiplier").setMin(0).setMax(100).setIncrement(0.1f);
+        registerEditableField<BOOLEAN>(&denoiserEnabled).setName("denoiserEnabled").setLabel("Denoiser enabled");
+        registerEditableField<BOOLEAN>(&isRayTracingEnabled).setName("isRayTracingEnabled").setLabel("Ray tracing enabled");
+        registerEditableField<INT>(&pathTracerMaxSamples).setName("pathTracerMaxSamples").setLabel("Path tracer max accumulation").setMin(1).setMax(10000).setIncrement(10);
+        registerEditableField<INT>(&pathTracerSamples).setName("pathTracerSamples").setLabel("Path tracer samples per pixel").setMin(1).setMax(32).setIncrement(1);
+        registerEditableField<INT>(&pathTracerBounces).setName("pathTracerBounces").setLabel("Path tracer bounces").setMin(0).setMax(16).setIncrement(1);
+        registerEditableField<FLOAT>(&pathTracingEmissiveFactor).setName("pathTracingEmissiveFactor").setLabel("Path tracing emissive factor").setMin(0).setMax(100).setIncrement(0.1f);
 
-        registerEditableField<FLOAT>(&pathTracerMultiplier).setName("Strength").setGroup(PATH_TRACER);
-        registerEditableField<BOOLEAN>(&denoiserEnabled).setName("Enable denoiser?").setGroup(PATH_TRACER);
-        registerEditableField<INT>(&pathTracerMaxSamples).setName("Maximum accumulation").setGroup(PATH_TRACER).setMin(1).setMax(10000);
-        registerEditableField<INT>(&pathTracerSamples).setName("Samples per pixel").setGroup(PATH_TRACER).setMin(1).setMax(32);
-        registerEditableField<INT>(&pathTracerBounces).setName("Bounces").setGroup(PATH_TRACER).setMin(0).setMax(7);
-        registerEditableField<FLOAT>(&pathTracingEmissiveFactor).setName("Emissive surface factor").setGroup(PATH_TRACER).setMin(0);
+        registerEditableField<BOOLEAN>(&atmosphereEnabled).setName("atmosphereEnabled").setLabel("Atmosphere enabled");
+        registerEditableField<BOOLEAN>(&restirEnabled).setName("restirEnabled").setLabel("ReSTIR GI enabled");
+        registerEditableField<FLOAT>(&elapsedTime).setName("elapsedTime").setLabel("Atmosphere elapsed time").setMin(0).setMax(24).setIncrement(0.01f);
 
-        registerEditableField<BOOLEAN>(&dofEnabled).setName("Enable depth of field?").setGroup(DEPTH_OF_FIELD);
-        registerEditableField<FLOAT>(&dofFocusDistance).setName("Focus distance").setGroup(DEPTH_OF_FIELD);
-        registerEditableField<FLOAT>(&dofAperture).setName("Aperture").setGroup(DEPTH_OF_FIELD);
-        registerEditableField<FLOAT>(&dofFocalLength).setName("Focal length").setGroup(DEPTH_OF_FIELD);
-
-        registerEditableField<BOOLEAN>(&atmosphereEnabled).setName("Enable atmosphere?").setGroup(ATMOSPHERE);
-        registerEditableField<FLOAT>(&elapsedTime).setName("Elapsed time").setGroup(ATMOSPHERE);
-
-        registerEditableField<VECTOR3>(&gravity).setName("Gravity").setGroup(PHYSICS);
+        registerEditableField<VECTOR3>(&gravity).setName("gravity").setLabel("Physics gravity").setIncrement(0.1f);
+        registerEditableField<RESOURCE>(&mainLevel).setName("mainLevel").setLabel("Main level").setSupportedFileTypes({FileExtensions::level.get()});
     }
 
 

@@ -4,8 +4,6 @@
 #include "../../dto/ImportSettingsDTO.h"
 #include "../../service/FilesService.h"
 #include "../../service/FileImporterService.h"
-#include "common/ILoader.h"
-#include "common/AbstractImporter.h"
 #include "common/Icons.h"
 #include "common/FileExtensions.h"
 #include "ApplicationContext.h"

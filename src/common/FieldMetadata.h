@@ -49,10 +49,9 @@ namespace Metal {
 
     struct FieldMetadata {
         std::string name;
-        std::string nameWithId;
+        std::string labelWithId;
         std::string id;
-        std::string group;
-        std::string path;
+        std::string label;
         FieldType type = BOOLEAN;
         Reflection *instance = nullptr;
 
@@ -103,8 +102,8 @@ namespace Metal {
             return *this;
         }
 
-        FieldMetadata &setGroup(std::string g) {
-            group = std::move(g);
+        FieldMetadata &setLabel(std::string g) {
+            label = std::move(g);
             return *this;
         }
 

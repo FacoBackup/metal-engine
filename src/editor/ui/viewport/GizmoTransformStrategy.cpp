@@ -1,17 +1,15 @@
 #include "GizmoTransformStrategy.h"
 #include "../../repository/EditorRepository.h"
-#include "engine/repository/WorldRepository.h"
 #include "engine/dto/TransformComponent.h"
 #include "editor/service/HistoryService.h"
+#include "engine/service/DirtyStateService.h"
 #include "ImGuizmo.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 
-namespace Metal {
-    GizmoTransformStrategy::GizmoTransformStrategy(HistoryService *historyService, EditorRepository *editorRepository, WorldRepository *worldRepository)
-        : historyService(historyService), editorRepository(editorRepository), worldRepository(worldRepository), translationSnap({1, 1, 1}) {
-    }
+#include "engine/repository/CameraRepository.h"
 
+namespace Metal {
     void GizmoTransformStrategy::updateCache(TransformComponent *selected) {
         if (selected == nullptr) return;
 
@@ -23,8 +21,8 @@ namespace Metal {
     }
 
     void GizmoTransformStrategy::recomposeMatrix() {
-        viewMatrixCache = glm::value_ptr(worldRepository->camera.viewMatrix);
-        cacheProjection = worldRepository->camera.projectionMatrix;
+        viewMatrixCache = glm::value_ptr(cameraRepository->viewMatrix);
+        cacheProjection = cameraRepository->projectionMatrix;
 
         cacheProjection[1][1] *= -1;
 
@@ -68,6 +66,10 @@ namespace Metal {
         }
         if (oldRotation != selected->rotation) {
             historyService->recordChange(selected->getFieldByPointer(&selected->rotation).get(), oldRotation);
+        }
+
+        if (oldTranslation != selected->translation || oldScale != selected->scale || oldRotation != selected->rotation) {
+            dirtyStateService->markEntityDirty(selected->getEntityId(), DirtyType::Transform);
         }
     }
 

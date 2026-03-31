@@ -3,6 +3,13 @@
 #include "editor/dto/DockSpace.h"
 
 namespace Metal {
+    void DockRepository::clear() {
+        center = nullptr;
+        left.clear();
+        right.clear();
+        bottom.clear();
+    }
+
     void DockRepository::registerFields() {
         registerGenericField(
             [this] {

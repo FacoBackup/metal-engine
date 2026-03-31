@@ -10,7 +10,7 @@ namespace Metal {
         void disposeResource(CommandBufferRecorder *resource) override {
         }
         
-        CommandBufferRecorder* create(const std::string& id, FrameBufferInstance *frameBuffer, bool clearBuffer = true) {
+        CommandBufferRecorder* create(const std::string& id, RenderTargetInstance *frameBuffer, bool clearBuffer = true) {
             return createResourceInstance(id, frameBuffer, clearBuffer);
         }
 

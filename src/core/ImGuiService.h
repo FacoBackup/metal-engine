@@ -10,7 +10,7 @@
 
 namespace Metal {
     class WindowService;
-    struct FrameBufferAttachment;
+    struct RenderTargetAttachment;
     struct TextureInstance;
 
     class VulkanContext;

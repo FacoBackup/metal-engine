@@ -6,31 +6,31 @@
 #include "editor/enum/EngineResourceIDs.h"
 #include "../../frame-builder/EngineFrame.h"
 #include "../../resource/TextureInstance.h"
+#include "engine/resource/RenderTargetInstance.h"
+#include "engine/repository/CameraRepository.h"
 
 
 namespace Metal {
     void PostProcessingPass::onInitialize() {
         PipelineBuilder ppPipelineBuilder = PipelineBuilder::Of(
-                    getScopedResourceId(RID_POST_PROCESSING_FBO),
+                    getScopedResourceId(RID_POST_PROCESSING_RT),
                     "QUAD.vert",
                     "PostProcessing.frag"
                 )
                 .setPushConstantsSize(sizeof(PostProcessingPushConstant))
-                .addSingleCombinedImageSamplerBinding(vulkanContext->vkImageSampler, frame->getResourceAs<TextureInstance>(RID_DENOISED_FRAME)->vkImageView);
+                .addRenderTargetBinding(getScopedResourceId(RID_MOTION_BLUR_RT), 0);
         pipelineInstance = pipelineService->createPipeline(ppPipelineBuilder);
     }
 
     void PostProcessingPass::onSync() {
-        auto &camera = worldRepository->camera;
-        pushConstant.distortionIntensity = camera.distortionIntensity;
-        pushConstant.chromaticAberrationIntensity = camera.chromaticAberrationIntensity;
-        pushConstant.distortionEnabled = camera.distortionEnabled;
-        pushConstant.chromaticAberrationEnabled = camera.chromaticAberrationEnabled;
-        pushConstant.vignetteEnabled = camera.vignetteEnabled;
-        pushConstant.vignetteStrength = camera.vignetteStrength;
+        pushConstant.distortionIntensity = cameraRepository->distortionIntensity;
+        pushConstant.chromaticAberrationIntensity = cameraRepository->chromaticAberrationIntensity;
+        pushConstant.distortionEnabled = cameraRepository->distortionEnabled;
+        pushConstant.chromaticAberrationEnabled = cameraRepository->chromaticAberrationEnabled;
+        pushConstant.vignetteEnabled = cameraRepository->vignetteEnabled;
+        pushConstant.vignetteStrength = cameraRepository->vignetteStrength;
 
         recordPushConstant(&pushConstant);
         recordDrawSimpleInstanced(3, 1);
     }
-
 } // Metal

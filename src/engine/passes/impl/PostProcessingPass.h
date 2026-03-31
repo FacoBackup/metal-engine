@@ -4,23 +4,23 @@
 #include "../../dto/PostProcessingPushConstant.h"
 
 namespace Metal {
+    struct CameraRepository;
     class VulkanContext;
     class PipelineService;
-    struct WorldRepository;
 
     class PostProcessingPass final : public AbstractRenderPass {
         PostProcessingPushConstant pushConstant{};
 
         VulkanContext *vulkanContext = nullptr;
         PipelineService *pipelineService = nullptr;
-        WorldRepository *worldRepository = nullptr;
+        CameraRepository *cameraRepository = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
             return {
                 {"VulkanContext", &vulkanContext},
                 {"PipelineService", &pipelineService},
-                {"WorldRepository", &worldRepository}
+                {"CameraRepository", &cameraRepository}
             };
         }
 

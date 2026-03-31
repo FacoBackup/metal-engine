@@ -1,7 +1,6 @@
 #include "FileImporterService.h"
 #include "SceneImporterService.h"
 #include "TextureImporterService.h"
-#include "VoxelImporterService.h"
 #include "NotificationService.h"
 #include "AsyncTaskService.h"
 #include "common/LoggerUtil.h"
@@ -10,7 +9,6 @@
 #include <thread>
 
 #include "ApplicationContext.h"
-#include "common/FileExtensions.h"
 #include "common/ILoader.h"
 #include "core/DirectoryService.h"
 #include "editor/dto/FSEntry.h"

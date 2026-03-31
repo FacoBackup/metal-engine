@@ -19,13 +19,13 @@ namespace Metal {
                 // Pick a representative key and instance for the whole transaction
                 std::string key = currentTransaction->name;
                 Reflection *instance = nullptr;
-                std::string propertyPath;
+                std::string propertyName;
 
                 for (const auto &change: currentTransaction->changes) {
                     if (std::holds_alternative<PropertyChange>(change)) {
                         const auto &pc = std::get<PropertyChange>(change);
                         instance = pc.field->instance;
-                        propertyPath = pc.field->path;
+                        propertyName = pc.field->name;
                         // If we find a property change, we use its instance's title as key if it's better than the generic transaction name
                         if (instance) key = instance->getTitle();
                         break;
@@ -35,7 +35,7 @@ namespace Metal {
                 if (instance) {
                     ApplicationEventContext::dispatch(instance->getClassName(),
                                                       std::make_shared<FieldModificationPayload>(
-                                                          *instance->getFieldByPath(propertyPath)));
+                                                          *instance->getFieldByName(propertyName)));
                 }
 
                 undoStack.push_back(std::move(*currentTransaction));
@@ -101,7 +101,7 @@ namespace Metal {
             }
         } else {
             Transaction trans;
-            trans.name = "Change " + field->path;
+            trans.name = "Change " + field->name;
             trans.changes.push_back(change);
             undoStack.push_back(std::move(trans));
             redoStack.clear();

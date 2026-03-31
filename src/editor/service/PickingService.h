@@ -6,6 +6,7 @@
 #include <optional>
 
 namespace Metal {
+    struct RenderTargetAttachment;
     struct TextureInstance;
     class VulkanContext;
     class BufferService;
@@ -25,7 +26,7 @@ namespace Metal {
             };
         }
 
-        [[nodiscard]] std::optional<entt::entity> pickEntityFromGBuffer(TextureInstance *attachment, uint32_t pixelX, uint32_t pixelY) const;
+        [[nodiscard]] std::optional<entt::entity> pickEntityFromGBuffer(std::shared_ptr<RenderTargetAttachment> &attachment, uint32_t pixelX, uint32_t pixelY) const;
     };
 } // Metal
 
