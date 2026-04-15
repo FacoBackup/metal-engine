@@ -3,8 +3,11 @@
 #include "common/LoggerUtil.h"
 #include "../enum/engine-definitions.h"
 #include "engine/dto/StaticGeometryComponent.h"
+#include "engine/dto/Material.h"
 #include <assimp/material.h>
 #include <filesystem>
+#include <fstream>
+#include <nlohmann/json.hpp>
 
 namespace Metal {
     void MaterialImporterService::importMaterial(const std::string &targetDir, const aiMaterial *material,
@@ -46,7 +49,6 @@ namespace Metal {
         };
 
         const auto trySetFromType = [&](std::string &slot, aiTextureType type, const std::string &nameHint) {
-            if (!slot.empty()) return;
             if (material->GetTextureCount(type) == 0) return;
             aiString texturePath;
             if (material->GetTexture(type, 0, &texturePath) == AI_SUCCESS) {
@@ -54,12 +56,31 @@ namespace Metal {
             }
         };
 
+        Material mat;
         // Albedo
-        trySetFromType(primitive.albedo, aiTextureType_BASE_COLOR, "albedo");
-        trySetFromType(primitive.albedo, aiTextureType_DIFFUSE, "albedo");
+        trySetFromType(mat.albedo, aiTextureType_BASE_COLOR, "albedo");
+        trySetFromType(mat.albedo, aiTextureType_DIFFUSE, "albedo");
 
         // Metallic / Roughness
-        trySetFromType(primitive.metallic, aiTextureType_METALNESS, "metallic");
-        trySetFromType(primitive.roughness, aiTextureType_DIFFUSE_ROUGHNESS, "roughness");
+        trySetFromType(mat.metallic, aiTextureType_METALNESS, "metallic");
+        trySetFromType(mat.roughness, aiTextureType_DIFFUSE_ROUGHNESS, "roughness");
+        
+        // Emissive
+        trySetFromType(mat.emissive, aiTextureType_EMISSIVE, "emissive");
+        
+        // Normal
+        trySetFromType(mat.normal, aiTextureType_NORMALS, "normal");
+
+        aiString matName;
+        material->Get(AI_MATKEY_NAME, matName);
+        std::string name = matName.C_Str();
+        if (name.empty()) name = "material";
+        
+        std::string materialPath = (fs::path(targetDir) / (name + ".mmat")).string();
+        std::ofstream os(materialPath);
+        if (os.is_open()) {
+            os << mat.toJson().dump(4);
+            primitive.materialId = materialPath;
+        }
     }
 }

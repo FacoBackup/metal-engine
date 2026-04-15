@@ -84,6 +84,10 @@ namespace Metal {
                 filesService->CreateFile(filesContext.currentDirectory, "NewLevel", Metal::FileExtensions::level->extension);
                 filesService->GetEntries(filesContext.currentDirectory);
             }
+            if (ImGui::MenuItem((Icons::palette + " Material").c_str())) {
+                filesService->CreateFile(filesContext.currentDirectory, "NewMaterial", Metal::FileExtensions::material->extension);
+                filesService->GetEntries(filesContext.currentDirectory);
+            }
             ImGui::EndPopup();
         }
 

@@ -42,11 +42,13 @@ namespace Metal {
 
         inline static const std::unique_ptr<FileExtensionInfo> lua = std::make_unique<FileExtensionInfo>(
             ".lua", "lua", "Lua Script", Icons::script);
+        inline static const std::unique_ptr<FileExtensionInfo> material = std::make_unique<FileExtensionInfo>(
+            ".mmat", "mmat", "Material", Icons::palette);
 
 
         inline static const std::vector<const FileExtensionInfo *> all = {
             scene.get(), geometry.get(), level.get(), png.get(), jpg.get(), jpeg.get(), tga.get(), glb.get(),
-            gltf.get(), fbx.get(), obj.get(), lua.get(), level.get()
+            gltf.get(), fbx.get(), obj.get(), lua.get(), level.get(), material.get()
         };
 
         inline static const std::vector<const FileExtensionInfo *> scripts = {

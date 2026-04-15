@@ -68,6 +68,7 @@ namespace Metal {
         void extractFrustumPlanes(glm::mat4x4 m);
 
         bool isSphereInsideFrustum(glm::vec3 center, float radius) const;
+        bool isAABBInsideFrustum(glm::vec3 min, glm::vec3 max) const;
 
         void registerFields() override;
 

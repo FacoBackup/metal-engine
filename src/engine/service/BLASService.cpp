@@ -54,6 +54,7 @@ namespace Metal {
     }
 
     BLASInstance *BLASService::buildBLAS(const std::string &meshId) {
+        return nullptr;
         if (!vulkanContext->rayTracingSupported) return nullptr;
 
         auto *instance = meshService->stream(meshId);

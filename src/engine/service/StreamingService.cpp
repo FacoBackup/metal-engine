@@ -14,9 +14,30 @@
 #include "../dto/StaticGeometryComponent.h"
 #include "../dto/InstancedGeometryComponent.h"
 #include "../dto/AnimatedGeometryComponent.h"
+#include "../dto/Material.h"
+#include <nlohmann/json.hpp>
+#include <fstream>
 
 namespace Metal {
     static constexpr int MAX_TIMEOUT = 10000;
+
+    void updateMaterialTexturesLastUse(const std::string& materialId, std::unordered_map<std::string, long long>& lastUse, EngineContext* engineContext) {
+        if (materialId.empty()) return;
+        std::ifstream is(materialId);
+        if (is.is_open()) {
+            try {
+                nlohmann::json j;
+                is >> j;
+                Material mat;
+                mat.fromJson(j);
+                if (!mat.albedo.empty()) lastUse[mat.albedo] = engineContext->currentTimeMs;
+                if (!mat.normal.empty()) lastUse[mat.normal] = engineContext->currentTimeMs;
+                if (!mat.roughness.empty()) lastUse[mat.roughness] = engineContext->currentTimeMs;
+                if (!mat.metallic.empty()) lastUse[mat.metallic] = engineContext->currentTimeMs;
+                if (!mat.emissive.empty()) lastUse[mat.emissive] = engineContext->currentTimeMs;
+            } catch (...) {}
+        }
+    }
 
     template<typename T>
     void disposeResources(AbstractResourceService<T> *service, std::unordered_map<std::string, long long> &lastUse, EngineContext *engineContext) {
@@ -43,14 +64,9 @@ namespace Metal {
             if (!meshComp.meshId.empty()) {
                 lastUse[meshComp.meshId] = engineContext->currentTimeMs;
             }
-            if (!meshComp.albedo.empty()) {
-                lastUse[meshComp.albedo] = engineContext->currentTimeMs;
-            }
-            if (!meshComp.roughness.empty()) {
-                lastUse[meshComp.roughness] = engineContext->currentTimeMs;
-            }
-            if (!meshComp.metallic.empty()) {
-                lastUse[meshComp.metallic] = engineContext->currentTimeMs;
+            if (!meshComp.materialId.empty()) {
+                lastUse[meshComp.materialId] = engineContext->currentTimeMs;
+                updateMaterialTexturesLastUse(meshComp.materialId, lastUse, engineContext);
             }
         }
         auto instancedView = worldRepository->registry.view<InstancedGeometryComponent>();
@@ -59,14 +75,9 @@ namespace Metal {
             if (!meshComp.meshId.empty()) {
                 lastUse[meshComp.meshId] = engineContext->currentTimeMs;
             }
-            if (!meshComp.albedo.empty()) {
-                lastUse[meshComp.albedo] = engineContext->currentTimeMs;
-            }
-            if (!meshComp.roughness.empty()) {
-                lastUse[meshComp.roughness] = engineContext->currentTimeMs;
-            }
-            if (!meshComp.metallic.empty()) {
-                lastUse[meshComp.metallic] = engineContext->currentTimeMs;
+            if (!meshComp.materialId.empty()) {
+                lastUse[meshComp.materialId] = engineContext->currentTimeMs;
+                updateMaterialTexturesLastUse(meshComp.materialId, lastUse, engineContext);
             }
         }
         auto animatedView = worldRepository->registry.view<AnimatedGeometryComponent>();
@@ -75,14 +86,9 @@ namespace Metal {
             if (!meshComp.meshId.empty()) {
                 lastUse[meshComp.meshId] = engineContext->currentTimeMs;
             }
-            if (!meshComp.albedo.empty()) {
-                lastUse[meshComp.albedo] = engineContext->currentTimeMs;
-            }
-            if (!meshComp.roughness.empty()) {
-                lastUse[meshComp.roughness] = engineContext->currentTimeMs;
-            }
-            if (!meshComp.metallic.empty()) {
-                lastUse[meshComp.metallic] = engineContext->currentTimeMs;
+            if (!meshComp.materialId.empty()) {
+                lastUse[meshComp.materialId] = engineContext->currentTimeMs;
+                updateMaterialTexturesLastUse(meshComp.materialId, lastUse, engineContext);
             }
         }
 

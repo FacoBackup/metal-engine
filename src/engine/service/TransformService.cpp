@@ -9,6 +9,7 @@
 #include <engine/repository/WorldRepository.h>
 #include <engine/dto/StaticGeometryComponent.h>
 #include <engine/service/DirtyStateService.h>
+#include <engine/service/QuadTreeService.h>
 #include <editor/dto/FieldModificationEvent.h>
 #include <ApplicationEventContext.h>
 
@@ -35,6 +36,7 @@ namespace Metal {
             TransformComponent &st = worldRepository->registry.get<TransformComponent>(entity);
             transform(&st, nullptr);
         }
+        dirtyStateService->markDirty(DirtyType::QuadTree);
     }
 
     void TransformService::transform(TransformComponent *st, const TransformComponent *parentTransform) {

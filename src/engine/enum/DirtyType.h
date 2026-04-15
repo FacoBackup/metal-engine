@@ -18,6 +18,7 @@ namespace Metal {
         
         // Special Flags
         BVH = 1 << 6,
+        QuadTree = 1 << 7,
         
         All = 0xFFFFFFFF
     };

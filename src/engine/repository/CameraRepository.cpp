@@ -12,9 +12,23 @@ namespace Metal {
     }
 
     bool CameraRepository::isSphereInsideFrustum(const glm::vec3 center, const float radius) const {
-        for (const auto plane: planes) {
+        for (const auto &plane: planes) {
             if (const float distance = plane.x * center.x + plane.y * center.y + plane.z * center.z + plane.w;
                 distance < -radius) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool CameraRepository::isAABBInsideFrustum(const glm::vec3 min, const glm::vec3 max) const {
+        for (const auto &plane: planes) {
+            glm::vec3 positive = min;
+            if (plane.x >= 0) positive.x = max.x;
+            if (plane.y >= 0) positive.y = max.y;
+            if (plane.z >= 0) positive.z = max.z;
+
+            if (glm::dot(glm::vec3(plane), positive) + plane.w < 0) {
                 return false;
             }
         }

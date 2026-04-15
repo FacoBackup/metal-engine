@@ -81,8 +81,8 @@ set(EDITOR_SOURCES
         ui/metrics/MetricsPanel.h
         ui/world/WorldPanel.cpp
         ui/world/WorldPanel.h
-        ui/lua-editor/LuaEditorPanel.cpp
-        ui/lua-editor/LuaEditorPanel.h
+        ui/lua-editor/AssetEditorPanel.cpp
+        ui/lua-editor/AssetEditorPanel.h
         ui/mcp/AIAssistantPanel.cpp
         ui/mcp/AIAssistantPanel.h
         ui/mcp/ChatHeaderPanel.cpp

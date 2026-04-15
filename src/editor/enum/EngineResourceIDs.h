@@ -21,8 +21,8 @@ namespace Metal {
     inline constexpr const char *RID_SELECTION_CB = "selectionCB";
     inline constexpr const char *RID_GBUFFER_CB = "gBufferCB";
     inline constexpr const char *RID_GBUFFER_RT = "gBufferRT";
-    inline constexpr const char *RID_DOF_RT = "dofRT";
-    inline constexpr const char *RID_DOF_CB = "dofCB";
+    inline constexpr const char *RID_PBR_RT = "pbrRT";
+    inline constexpr const char *RID_PBR_CB = "pbrCB";
     inline constexpr const char *RID_MOTION_BLUR_RT = "motionBlurRT";
     inline constexpr const char *RID_MOTION_BLUR_CB = "motionBlurCB";
 

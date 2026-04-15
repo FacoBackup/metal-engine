@@ -34,6 +34,7 @@
 #include "editor/repository/AIAssistantRepository.h"
 
 #include "engine/repository/EngineRepository.h"
+#include "engine/repository/TerrainRepository.h"
 #include "engine/repository/RuntimeRepository.h"
 #include "engine/repository/WorldRepository.h"
 
@@ -52,8 +53,10 @@
 #include "engine/service/BLASService.h"
 #include "engine/service/TLASService.h"
 #include "engine/service/ShaderService.h"
+#include "engine/service/TerrainService.h"
 #include "engine/service/StreamingService.h"
 #include "engine/service/TextureService.h"
+#include "engine/service/QuadTreeService.h"
 #include "engine/service/TransformService.h"
 #include "engine/EngineContext.h"
 #include "editor/ui/viewport/GizmoTransformStrategy.h"
@@ -78,6 +81,7 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::FilesService>());
     context->registerSingleton(std::make_shared<Metal::EngineContext>());
     context->registerSingleton(std::make_shared<Metal::EngineRepository>());
+    context->registerSingleton(std::make_shared<Metal::TerrainRepository>());
     context->registerSingleton(std::make_shared<Metal::EditorRepository>());
     context->registerSingleton(std::make_shared<Metal::EditorCameraRepository>());
     context->registerSingleton(std::make_shared<Metal::DockRepository>());
@@ -86,6 +90,7 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::WorldRepository>());
     context->registerSingleton(std::make_shared<Metal::MeshService>());
     context->registerSingleton(std::make_shared<Metal::TextureService>());
+    context->registerSingleton(std::make_shared<Metal::QuadTreeService>());
     context->registerSingleton(std::make_shared<Metal::RenderTargetService>());
     context->registerSingleton(std::make_shared<Metal::PipelineService>());
     context->registerSingleton(std::make_shared<Metal::BufferService>());
@@ -120,6 +125,7 @@ int main(int, char **) {
     context->registerSingleton(std::make_shared<Metal::LuaService>());
     context->registerSingleton(std::make_shared<Metal::LevelService>());
     context->registerSingleton(std::make_shared<Metal::LightService>());
+    context->registerSingleton(std::make_shared<Metal::TerrainService>());
     context->registerSingleton(std::make_shared<Metal::StreamingService>());
 
     context->registerSingleton(std::make_shared<Metal::BLASService>());

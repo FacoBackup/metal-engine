@@ -19,10 +19,12 @@ namespace Metal {
 
     struct WorldRepository;
     class DirtyStateService;
+    class QuadTreeService;
 
     class TransformService final : public IService, public ISync, public IEventMember, public IInit {
         WorldRepository *worldRepository = nullptr;
         DirtyStateService *dirtyStateService = nullptr;
+        QuadTreeService *quadTreeService = nullptr;
 
         glm::vec3 distanceAux{};
         glm::mat4x4 auxMat4{};
@@ -33,7 +35,8 @@ namespace Metal {
         std::vector<Dependency> getDependencies() override {
             return {
                 {"WorldRepository", &worldRepository},
-                {"DirtyStateService", &dirtyStateService}
+                {"DirtyStateService", &dirtyStateService},
+                {"QuadTreeService", &quadTreeService}
             };
         }
 

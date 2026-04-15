@@ -20,6 +20,7 @@
 #include "engine/passes/impl/MotionBlurPass.h"
 #include "engine/passes/impl/PostProcessingPass.h"
 #include "engine/passes/impl/StaticGBufferPass.h"
+#include "engine/passes/impl/TerrainGBufferPass.h"
 #include "../../passes/GridPass.h"
 #include "../../passes/SelectionIDPass.h"
 #include "../../passes/SelectionOutlinePass.h"
@@ -70,20 +71,20 @@ namespace Metal {
                 .addRenderTarget(RID_POST_PROCESSING_RT, gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
                 .addColor(VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
 
-                .addRenderTarget(RID_DOF_RT, gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
+                .addRenderTarget(RID_PBR_RT, gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
                 .addColor(VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
 
                 .addRenderTarget(RID_MOTION_BLUR_RT, gBufferW, gBufferH, glm::vec4(0, 0, 0, 0))
                 .addColor(VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
 
                 .addCommandBuffer(RID_GBUFFER_CB, RID_GBUFFER_RT) // 0
+                .addPass(std::make_unique<TerrainGBufferPass>(), RID_GBUFFER_CB)
                 .addPass(std::make_unique<StaticGBufferPass>(), RID_GBUFFER_CB)
 
-                .addComputeCommandBuffer(RID_RT_COMPUTE_CB, true) // 1
-                .addPass(std::make_unique<PathTracerPass>(), RID_RT_COMPUTE_CB)
-
-                .addCommandBuffer(RID_DOF_CB, RID_DOF_RT) // 2
-                .addPass(std::make_unique<PBRPass>(), RID_DOF_CB)
+                .addCommandBuffer(RID_PBR_CB, RID_PBR_RT) // 2
+                .addPass(std::make_unique<PBRPass>(), RID_PBR_CB)
+                //.addComputeCommandBuffer(RID_RT_COMPUTE_CB, true) // 1
+                //.addPass(std::make_unique<PathTracerPass>(), RID_RT_COMPUTE_CB)
 
                 .addCommandBuffer(RID_MOTION_BLUR_CB, RID_MOTION_BLUR_RT) // 3
                 .addPass(std::make_unique<MotionBlurPass>(), RID_MOTION_BLUR_CB)

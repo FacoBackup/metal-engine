@@ -27,12 +27,14 @@ namespace Metal {
     struct CameraRepository;
     class LightService;
     class PhysicsService;
+    class QuadTreeService;
     class VulkanContext;
     struct WorldRepository;
     struct EditorRepository;
     struct EngineRepository;
     class EngineFrame;
     class EngineFrameBuilder;
+    class DirtyStateService;
 
     class EngineContext final : public IService, public ISync {
         TransformService *transformService = nullptr;
@@ -44,10 +46,12 @@ namespace Metal {
         CameraRepository *cameraRepository = nullptr;
         LightService *lightService = nullptr;
         PhysicsService *physicsService = nullptr;
+        QuadTreeService *quadTreeService = nullptr;
         VulkanContext *vulkanContext = nullptr;
         WorldRepository *worldRepository = nullptr;
         EditorRepository *editorRepository = nullptr;
         EngineRepository *engineRepository = nullptr;
+        DirtyStateService *dirtyStateService = nullptr;
 
         GlobalDataUBO globalDataUBO{};
         long long start = -1;
@@ -65,10 +69,12 @@ namespace Metal {
                 {"CameraRepository", &cameraRepository},
                 {"LightService", &lightService},
                 {"PhysicsService", &physicsService},
+                {"QuadTreeService", &quadTreeService},
                 {"VulkanContext", &vulkanContext},
                 {"WorldRepository", &worldRepository},
                 {"EditorRepository", &editorRepository},
-                {"EngineRepository", &engineRepository}
+                {"EngineRepository", &engineRepository},
+                {"DirtyStateService", &dirtyStateService}
             };
         }
 

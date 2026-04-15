@@ -9,6 +9,7 @@ namespace Metal {
     struct WorldRepository;
     class MeshService;
     class VulkanContext;
+    class QuadTreeService;
 
     struct StaticGeometryPushConstant {
         glm::mat4 model;
@@ -26,6 +27,7 @@ namespace Metal {
         WorldRepository *worldRepository = nullptr;
         MeshService *meshService = nullptr;
         VulkanContext *vulkanContext = nullptr;
+        QuadTreeService *quadTreeService = nullptr;
 
     public:
         std::vector<Dependency> getDependencies() override {
@@ -33,7 +35,8 @@ namespace Metal {
                 {"PipelineService", &pipelineService},
                 {"WorldRepository", &worldRepository},
                 {"VulkanContext", &vulkanContext},
-                {"MeshService", &meshService}
+                {"MeshService", &meshService},
+                {"QuadTreeService", &quadTreeService}
             };
         }
 

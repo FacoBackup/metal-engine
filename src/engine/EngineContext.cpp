@@ -8,6 +8,9 @@
 #include "service/CameraService.h"
 #include "service/LightService.h"
 #include "service/PhysicsService.h"
+#include "service/QuadTreeService.h"
+#include "service/DirtyStateService.h"
+#include "enum/DirtyType.h"
 #include "repository/WorldRepository.h"
 #include "repository/CameraRepository.h"
 #include "repository/EngineRepository.h"
@@ -61,11 +64,12 @@ namespace Metal {
 
         transformService->onSync();
         streamingService->onSync();
-        if (vulkanContext->isRayTracingSupported()) {
+        /*if (vulkanContext->isRayTracingSupported()) {
             tlasService->onSync();
-        }
+        }*/
         materialService->onSync();
         cameraService->onSync();
+        dirtyStateService->consumeDirtyFlags(DirtyType::Camera);
         lightService->onSync();
         for (auto *frame: registeredFrames) {
             if (frame->getShouldRender()) {

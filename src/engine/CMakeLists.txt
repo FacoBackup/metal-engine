@@ -23,6 +23,8 @@ set(ENGINE_SOURCES_LIST
         dto/TransformComponent.cpp
         dto/StaticGeometryComponent.cpp
         service/DirtyStateService.cpp
+        service/QuadTreeService.cpp
+        service/TerrainService.cpp
         service/StreamingService.cpp
         service/TransformService.cpp
         passes/impl/PostProcessingPass.cpp
@@ -33,6 +35,7 @@ set(ENGINE_SOURCES_LIST
         service/TLASService.cpp
         resource/RenderTargetAttachment.cpp
         repository/EngineRepository.cpp
+        repository/TerrainRepository.cpp
         passes/AbstractComputePass.cpp
         passes/AbstractPass.cpp
         service/MaterialService.cpp
@@ -45,6 +48,7 @@ set(ENGINE_SOURCES_LIST
         dto/PipelineBuilder.cpp
         frame-builder/structures/CommandBufferRecorderBuilder.cpp
         passes/impl/StaticGBufferPass.cpp
+        passes/impl/TerrainGBufferPass.cpp
         service/PhysicsService.cpp
         service/LuaService.cpp
         service/LevelService.cpp

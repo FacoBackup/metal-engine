@@ -5,6 +5,7 @@
 #include "engine/service/PipelineService.h"
 #include "engine/repository/WorldRepository.h"
 #include "engine/service/MeshService.h"
+#include "engine/service/QuadTreeService.h"
 #include "editor/enum/EngineResourceIDs.h"
 #include "core/VulkanContext.h"
 
@@ -29,29 +30,38 @@ namespace Metal {
     }
 
     void StaticGBufferPass::onSync() {
-        worldRepository->registry.view<StaticGeometryComponent, TransformComponent>().each(
-            [&](entt::entity entityId, const StaticGeometryComponent &mesh, const TransformComponent &transform) {
-                if (mesh.meshId.empty()) {
-                    return;
-                }
-                if (worldRepository->hiddenEntities.contains(entityId)) {
-                    return;
-                }
+        std::vector<entt::entity> visibleEntities;
+        quadTreeService->queryVisible(visibleEntities);
 
-                const auto *meshInstance = meshService->stream(mesh.meshId);
-                if (!meshInstance) {
-                    return;
-                }
+        for (auto entityId : visibleEntities) {
+            if (!worldRepository->registry.all_of<StaticGeometryComponent, TransformComponent>(entityId)) {
+                continue;
+            }
 
-                pushConstant.model = transform.model;
-                pushConstant.previousModel = transform.previousModel;
-                pushConstant.renderIndex = mesh.renderIndex;
-                pushConstant.materialIndex = mesh.materialIndex;
-                pushConstant.parallaxHeightScale = mesh.parallaxScale;
-                pushConstant.parallaxLayers = 32;
+            const auto &mesh = worldRepository->registry.get<StaticGeometryComponent>(entityId);
+            const auto &transform = worldRepository->registry.get<TransformComponent>(entityId);
 
-                recordPushConstant(&pushConstant);
-                recordDrawMesh(meshInstance);
-            });
+            if (mesh.meshId.empty()) {
+                continue;
+            }
+            if (worldRepository->hiddenEntities.contains(entityId)) {
+                continue;
+            }
+
+            const auto *meshInstance = meshService->stream(mesh.meshId);
+            if (!meshInstance) {
+                continue;
+            }
+
+            pushConstant.model = transform.model;
+            pushConstant.previousModel = transform.previousModel;
+            pushConstant.renderIndex = mesh.renderIndex;
+            pushConstant.materialIndex = mesh.materialIndex;
+            pushConstant.parallaxHeightScale = 0.05f;
+            pushConstant.parallaxLayers = 32;
+
+            recordPushConstant(&pushConstant);
+            recordDrawMesh(meshInstance);
+        }
     }
 } // Metal

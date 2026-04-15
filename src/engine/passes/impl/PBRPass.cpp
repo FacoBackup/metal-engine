@@ -25,7 +25,7 @@ namespace Metal {
     }
 
     bool PBRPass::shouldRun() {
-        return !engineRepository->isRayTracingEnabled;
+        return true;
     }
 
     void PBRPass::onSync() {

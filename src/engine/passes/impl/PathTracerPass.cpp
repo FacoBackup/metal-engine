@@ -46,7 +46,7 @@ namespace Metal {
     }
 
     bool PathTracerPass::shouldRun() {
-        return engineRepository->isRayTracingEnabled;
+        return false;
     }
 
     void PathTracerPass::onSync() {

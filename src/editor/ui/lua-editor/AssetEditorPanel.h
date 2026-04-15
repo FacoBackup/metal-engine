@@ -1,14 +1,16 @@
-#ifndef LUAEDITORPANEL_H
-#define LUAEDITORPANEL_H
+#ifndef ASSETEDITORPANEL_H
+#define ASSETEDITORPANEL_H
 
 #include "../docks/AbstractDockPanel.h"
+#include "../../../engine/dto/Material.h"
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace Metal {
-    class LuaEditorPanel final : public AbstractDockPanel {
+    class AssetEditorPanel final : public AbstractDockPanel {
     public:
-        LuaEditorPanel();
+        AssetEditorPanel();
 
         void onSync() override;
 
@@ -17,11 +19,18 @@ namespace Metal {
 
         void saveFile();
 
+        void renderMaterialEditor();
+
+        void renderScriptEditor();
+
         std::string filePath;
         std::string fileContent;
         std::string lastModified;
         char pathInput[512] = "";
         char contentBuffer[1024 * 64] = ""; // 64KB buffer for editing
+        
+        std::shared_ptr<Material> currentMaterial;
+        bool isMaterial = false;
     };
 }
 

@@ -29,6 +29,7 @@ namespace Metal {
     }
 
     void TLASService::onSync() {
+        return;
         if (!vulkanContext->rayTracingSupported) {
             return;
         }

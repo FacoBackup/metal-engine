@@ -17,7 +17,7 @@ namespace Metal {
                     "MotionBlur.frag"
                 )
                 .setPushConstantsSize(sizeof(MotionBlurPushConstant))
-                .addRenderTargetBinding(getScopedResourceId(RID_DOF_RT), 0)
+                .addRenderTargetBinding(getScopedResourceId(RID_PBR_RT), 0)
                 .addRenderTargetBinding(getScopedResourceId(RID_GBUFFER_RT), RID_GBUFFER_RENDER_INDEX_DEPTH)
                 .addRenderTargetBinding(getScopedResourceId(RID_GBUFFER_RT), RID_GBUFFER_MOTION_VECTOR);
 

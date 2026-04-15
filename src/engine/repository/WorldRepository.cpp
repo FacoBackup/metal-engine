@@ -166,11 +166,7 @@ namespace Metal {
                 createComponent(entityId, STATIC_GEOMETRY);
                 auto &primitive = registry.get<StaticGeometryComponent>(entityId);
                 primitive.meshId = entityData.primitive->meshId;
-                primitive.albedo = entityData.primitive->albedo;
-                primitive.roughness = entityData.primitive->roughness;
-                primitive.metallic = entityData.primitive->metallic;
-                primitive.height = entityData.primitive->height;
-                primitive.normal = entityData.primitive->normal;
+                primitive.materialId = entityData.primitive->materialId;
             }
         }
 

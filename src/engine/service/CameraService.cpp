@@ -31,7 +31,6 @@ namespace Metal {
         if (dirtyStateService->isDirty(DirtyType::Camera)) {
             updateMatrices();
             engineContext->setCameraUpdated(true);
-            dirtyStateService->consumeDirtyFlags(DirtyType::Camera);
         }
     }
 
